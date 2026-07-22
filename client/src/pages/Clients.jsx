@@ -26,6 +26,7 @@ export default function Clients() {
     if (editId) setClients(clients.map(c => c.id === editId ? { ...form, id: editId } : c));
     else setClients([...clients, { ...form, id: String(Date.now()) }]);
     setShowForm(false);
+    setEditId(null);
   }
 
   function remove(id) { setClients(clients.filter(c => c.id !== id)); if (expandedId === id) setExpandedId(null); }
@@ -51,7 +52,7 @@ export default function Clients() {
           <div><label className="label">Cleaning Notes</label><textarea placeholder="Focus on kitchen..." value={form.cleaning_notes} onChange={e => setForm({ ...form, cleaning_notes: e.target.value })} className="input" rows={2} /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Key Code</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">Alarm Code</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
           <div><label className="label">Pet Instructions</label><input placeholder="1 friendly dog..." value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
-          <div className="flex gap-2 pt-1"><button type="submit" className="btn-primary flex-1">{editId ? 'Save Changes' : 'Add Client'}</button><button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">Cancel</button></div>
+          <div className="flex gap-2 pt-1"><button type="submit" className="btn-primary flex-1">{editId ? 'Save Changes' : 'Add Client'}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">Cancel</button></div>
         </form>
       )}
 
