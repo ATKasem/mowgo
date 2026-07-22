@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { demoJobs } from '../lib/demoData';
 import { Navigation, Check, Key, PawPrint, MapPin, AlertTriangle } from 'lucide-react';
+import { getMapsUrl } from '../lib/maps';
 
 export default function Route() {
   const [jobs, setJobs] = useState(demoJobs);
@@ -71,7 +72,7 @@ export default function Route() {
                     {isDone ? <span className="flex items-center gap-1"><Check className="w-3 h-3" />Done</span> : 'Mark Done'}
                   </button>
                   {client?.address && (
-                    <a href={`https://maps.google.com/?q=${encodeURIComponent(client.address)}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-sky-600 dark:text-sky-400 font-medium hover:text-sky-700 dark:hover:text-sky-300 transition-colors">
+                    <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-sky-600 dark:text-sky-400 font-medium hover:text-sky-700 dark:hover:text-sky-300 transition-colors">
                       <Navigation className="w-3 h-3" />Navigate
                     </a>
                   )}

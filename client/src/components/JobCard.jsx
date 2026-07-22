@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck } from 'lucide-react';
 import { STATUS_CONFIG } from '../lib/constants';
+import { getMapsUrl } from '../lib/maps';
 
 function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggleStatus }) {
   const client = job.clients;
@@ -76,7 +77,7 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
           {/* Actions */}
           <div className="flex gap-2 pt-1">
             {client?.address && (
-              <a href={`https://maps.google.com/?q=${encodeURIComponent(client.address)}`} target="_blank" rel="noreferrer" className="btn-secondary flex-1 text-xs gap-1.5">
+              <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary flex-1 text-xs gap-1.5">
                 <Navigation className="w-3.5 h-3.5" />Navigate
               </a>
             )}
