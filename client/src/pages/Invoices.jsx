@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { demoInvoices } from '../lib/demoData';
-import { FileText, CheckCircle, AlertCircle, Clock, Send, ArrowUpRight } from 'lucide-react';
+import { FileText, CheckCircle, AlertCircle, Send, Receipt } from 'lucide-react';
 
 const statusConfig = {
-  paid: { icon: CheckCircle, bg: 'bg-emerald-50', text: 'text-emerald-700', badge: 'badge-success', label: 'Paid' },
-  unpaid: { icon: AlertCircle, bg: 'bg-amber-50', text: 'text-amber-700', badge: 'badge-warning', label: 'Unpaid' },
-  overdue: { icon: Clock, bg: 'bg-red-50', text: 'text-red-700', badge: 'badge-danger', label: 'Overdue' },
+  paid: { icon: CheckCircle, bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-700 dark:text-emerald-400', badge: 'badge-success', label: 'Paid' },
+  unpaid: { icon: AlertCircle, bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', badge: 'badge-warning', label: 'Unpaid' },
+  overdue: { icon: AlertCircle, bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-700 dark:text-red-400', badge: 'badge-danger', label: 'Overdue' },
 };
 
 export default function Invoices() {
@@ -14,83 +14,55 @@ export default function Invoices() {
 
   function sendReminder(id) {
     setSentReminders(new Set([...sentReminders, id]));
-    setTimeout(() => {
-      setSentReminders(prev => { const next = new Set(prev); next.delete(id); return next; });
-    }, 2000);
+    setTimeout(() => setSentReminders(prev => { const n = new Set(prev); n.delete(id); return n; }), 2500);
   }
 
-  const totalUnpaid = invoices.filter(i => i.status !== 'paid').reduce((sum, i) => sum + i.amount, 0);
+  const unpaid = invoices.filter(i => i.status !== 'paid');
+  const totalUnpaid = unpaid.reduce((s, i) => s + i.amount, 0);
+  const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0);
 
   return (
     <div>
-      {/* Page header */}
       <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-900">Invoices</h2>
-        {totalUnpaid > 0 && (
-          <p className="text-sm text-gray-500 mt-0.5">
-            ${totalUnpaid} outstanding
-          </p>
-        )}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Invoices</h2>
+        <div className="flex items-center gap-3 mt-0.5">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{invoices.length} total</p>
+          <span className="text-gray-300 dark:text-gray-600">&middot;</span>
+          {unpaid.length > 0 && <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">${totalUnpaid} outstanding</p>}
+          {totalPaid > 0 && <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">${totalPaid} collected</p>}
+        </div>
       </div>
 
-      {/* Summary card */}
-      {totalUnpaid > 0 && (
-        <div className="card p-4 mb-4 bg-gradient-to-r from-amber-50 to-white border-amber-200">
+      {unpaid.length > 0 && (
+        <div className="card p-4 mb-4 bg-gradient-to-r from-amber-50 to-white dark:from-amber-950/20 dark:to-gray-900 border-amber-200 dark:border-amber-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <p className="font-semibold text-amber-800">${totalUnpaid} in unpaid invoices</p>
-              <p className="text-sm text-amber-600">{invoices.filter(i => i.status !== 'paid').length} invoice{invoices.filter(i => i.status !== 'paid').length !== 1 ? 's' : ''} needing attention</p>
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center"><AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" /></div>
+            <div><p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">${totalUnpaid} in unpaid invoices</p><p className="text-xs text-amber-600 dark:text-amber-400">{unpaid.length} invoice{unpaid.length !== 1 ? 's' : ''} need{unpaid.length === 1 ? 's' : ''} attention</p></div>
           </div>
         </div>
       )}
 
-      {/* Invoice list */}
       <div className="space-y-2">
         {invoices.length === 0 && (
-          <div className="card p-8 text-center">
-            <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No invoices yet</p>
-            <p className="text-gray-400 text-sm mt-1">Invoices appear when you complete a job</p>
-          </div>
+          <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" /><p className="text-gray-500 dark:text-gray-400 font-semibold">No invoices yet</p><p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Invoices are created when you complete a job</p></div>
         )}
         {invoices.map(inv => {
-          const config = statusConfig[inv.status] || statusConfig.unpaid;
-          const StatusIcon = config.icon;
+          const cfg = statusConfig[inv.status] || statusConfig.unpaid;
+          const Icon = cfg.icon;
           return (
-            <div key={inv.id} className="card p-4 flex items-center justify-between">
+            <div key={inv.id} className="card p-4 flex items-center justify-between hover:border-sky-200 dark:hover:border-sky-800 transition-all">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center`}>
-                  <StatusIcon className={`w-5 h-5 ${config.text}`} />
-                </div>
+                <div className={`w-10 h-10 rounded-xl ${cfg.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${cfg.text}`} /></div>
                 <div>
-                  <p className="font-semibold text-gray-900 text-sm">{inv.clients?.name || 'Unknown'}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    &middot; ${inv.amount}
-                  </p>
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">{inv.clients?.name || 'Unknown'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${inv.amount}</span></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={config.badge}>{config.label}</span>
+                <span className={cfg.badge}>{cfg.label}</span>
                 {inv.status === 'unpaid' && (
-                  <button
-                    onClick={() => sendReminder(inv.id)}
-                    disabled={sentReminders.has(inv.id)}
-                    className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${
-                      sentReminders.has(inv.id)
-                        ? 'text-emerald-600'
-                        : 'text-sky-600 hover:text-sky-700'
-                    }`}
-                  >
-                    {sentReminders.has(inv.id) ? (
-                      <><CheckCircle className="w-3 h-3" /> Sent</>
-                    ) : (
-                      <><Send className="w-3 h-3" /> Remind</>
-                    )}
+                  <button onClick={() => sendReminder(inv.id)} disabled={sentReminders.has(inv.id)} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(inv.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-sky-600 dark:text-sky-400 hover:text-sky-700'}`}>
+                    {sentReminders.has(inv.id) ? <><CheckCircle className="w-3 h-3" />Sent!</> : <><Send className="w-3 h-3" />Remind</>}
                   </button>
                 )}
               </div>
