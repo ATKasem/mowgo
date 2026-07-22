@@ -8,8 +8,8 @@ export default function Route() {
 
   function toggleStatus(job) {
     setAnimating(job.id);
-    setTimeout(() => {
-      setJobs(jobs.map(j => j.id === job.id ? { ...j, status: j.status === 'done' ? 'scheduled' : 'done' } : j));
+    const id = setTimeout(() => {
+      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: j.status === 'done' ? 'scheduled' : 'done' } : j));
       setAnimating(null);
     }, 150);
   }
