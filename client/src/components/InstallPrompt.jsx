@@ -52,7 +52,7 @@ export default function InstallPrompt() {
         <button onClick={install} className="btn-primary text-xs px-3 py-1.5 whitespace-nowrap">
           Install
         </button>
-        <button onClick={() => setShowPrompt(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <button onClick={() => setShowPrompt(false)} aria-label="Dismiss install prompt" className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           <X className="w-4 h-4" />
         </button>
       </div>

@@ -30,7 +30,7 @@ export default function Layout() {
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center">
-              <Sparkles className="w-4.5 h-4.5 text-white" />
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
             <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">CleanFlow</h1>
           </div>

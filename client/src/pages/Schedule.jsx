@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { demoJobs, demoClients } from '../lib/demoData';
 import { Plus, Check, Clock, Calendar, Sparkles } from 'lucide-react';
 
@@ -26,10 +26,11 @@ export default function Schedule() {
 
   function toggleStatus(job) {
     setAnimating(job.id);
-    setTimeout(() => {
-      setJobs(jobs.map(j => j.id === job.id ? { ...j, status: j.status === 'done' ? 'scheduled' : 'done' } : j));
+    const id = setTimeout(() => {
+      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: j.status === 'done' ? 'scheduled' : 'done' } : j));
       setAnimating(null);
     }, 150);
+    return () => clearTimeout(id);
   }
 
   const filtered = date === new Date().toISOString().split('T')[0] ? jobs : jobs.filter(j => j.scheduled_date === date);
@@ -88,23 +89,24 @@ export default function Schedule() {
           </div>
         )}
         {filtered.map(job => {
-          const cfg = statusConfig[job.status] || statusConfig.scheduled;
+          const statusInfo = statusConfig[job.status] || statusConfig.scheduled;
           const isAnimating = animating === job.id;
           return (
-            <div key={job.id} className={`card p-4 flex items-center gap-3 border transition-all duration-300 ${cfg.bg} ${isAnimating ? 'scale-[0.98] opacity-70' : ''}`}>
-              <button onClick={() => toggleStatus(job)} className={`w-7 h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${job.status === 'done' ? 'bg-emerald-500 border-emerald-500 scale-100' : 'border-gray-300 dark:border-gray-500 hover:border-emerald-400 hover:scale-110'}`}>
+            <div key={job.id} className={`card p-4 flex items-center gap-3 border transition-all duration-300 ${statusInfo.bg} ${isAnimating ? 'scale-[0.98] opacity-70' : ''}`}>
+              <button aria-label="Toggle job status"
+ onClick={() => toggleStatus(job)} className={`w-7 h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${job.status === 'done' ? 'bg-emerald-500 border-emerald-500 scale-100' : 'border-gray-300 dark:border-gray-500 hover:border-emerald-400 hover:scale-110'}`}>
                 {job.status === 'done' && <Check className="w-4 h-4 text-white" />}
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className={`font-semibold text-sm transition-all duration-300 ${job.status === 'done' ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>{job.clients?.name || 'Unknown Client'}</p>
-                  <span className={cfg.badge}>{cfg.label}</span>
+                  <span className={statusInfo.badge}>{statusInfo.label}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{job.scheduled_time?.slice(0, 5)}</span>
                   <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">{job.title}</span>
-                  <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Store, Phone, Save, CheckCircle, Loader2 } from 'lucide-react';
 
@@ -7,7 +7,7 @@ export default function Settings() {
   const [saved, setSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
       supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => { if (data) setProfile(data); }).catch(() => {});

@@ -46,23 +46,23 @@ export default function Invoices() {
         {invoices.length === 0 && (
           <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" /><p className="text-gray-500 dark:text-gray-400 font-semibold">No invoices yet</p><p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Invoices are created when you complete a job</p></div>
         )}
-        {invoices.map(inv => {
-          const cfg = statusConfig[inv.status] || statusConfig.unpaid;
-          const Icon = cfg.icon;
+        {invoices.map(invoice => {
+          const statusInfo = statusConfig[invoice.status] || statusConfig.unpaid;
+          const Icon = statusInfo.icon;
           return (
-            <div key={inv.id} className="card p-4 flex items-center justify-between hover:border-sky-200 dark:hover:border-sky-800 transition-all">
+            <div key={invoice.id} className="card p-4 flex items-center justify-between hover:border-sky-200 dark:hover:border-sky-800 transition-all">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${cfg.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${cfg.text}`} /></div>
+                <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white text-sm">{inv.clients?.name || 'Unknown'}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${inv.amount}</span></p>
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">{invoice.clients?.name || 'Unknown'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${invoice.amount}</span></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={cfg.badge}>{cfg.label}</span>
-                {inv.status === 'unpaid' && (
-                  <button onClick={() => sendReminder(inv.id)} disabled={sentReminders.has(inv.id)} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(inv.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-sky-600 dark:text-sky-400 hover:text-sky-700'}`}>
-                    {sentReminders.has(inv.id) ? <><CheckCircle className="w-3 h-3" />Sent!</> : <><Send className="w-3 h-3" />Remind</>}
+                <span className={statusInfo.badge}>{statusInfo.label}</span>
+                {invoice.status === 'unpaid' && (
+                  <button onClick={() => sendReminder(invoice.id)} disabled={sentReminders.has(invoice.id)} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-sky-600 dark:text-sky-400 hover:text-sky-700'}`}>
+                    {sentReminders.has(invoice.id) ? <><CheckCircle className="w-3 h-3" />Sent!</> : <><Send className="w-3 h-3" />Remind</>}
                   </button>
                 )}
               </div>
