@@ -273,4 +273,8 @@
   .dark .border-gray-200 { border-color: #4b5563; }
   .dark .border-amber-200 { border-color: rgba(245, 158, 11, 0.2); }
   .dark .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
 }

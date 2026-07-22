@@ -1,18 +1,13 @@
 import { useState } from 'react';
 import { demoJobs, demoClients, demoInvoices } from '../lib/demoData';
+import { STATUS_CONFIG, INITIAL_JOB_FORM } from '../lib/constants';
 import { Plus, Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, Sparkles, Circle } from 'lucide-react';
-
-const STATUS_CONFIG = {
-  scheduled: { bg: 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800', badge: 'badge-warning', label: 'Scheduled', dot: 'bg-amber-500' },
-  in_progress: { bg: 'bg-sky-50 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800', badge: 'badge-info', label: 'In Progress', dot: 'bg-sky-500' },
-  done: { bg: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800', badge: 'badge-success', label: 'Done', dot: 'bg-emerald-500' },
-};
 
 export default function Today({ invoices, setInvoices }) {
   const [jobs, setJobs] = useState(demoJobs);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ client_id: '', title: 'Cleaning', scheduled_time: '09:00', duration_minutes: 120 });
+  const [form, setForm] = useState(INITIAL_JOB_FORM);
   const [expandedId, setExpandedId] = useState(null);
   const [animating, setAnimating] = useState(null);
   const [completedToast, setCompletedToast] = useState(null);
@@ -23,7 +18,7 @@ export default function Today({ invoices, setInvoices }) {
     const newJob = { id: String(Date.now()), ...form, scheduled_date: date, status: 'scheduled', route_order: jobs.length + 1, clients: client };
     setJobs([newJob, ...jobs]);
     setShowForm(false);
-    setForm({ client_id: '', title: 'Cleaning', scheduled_time: '09:00', duration_minutes: 120 });
+    setForm(INITIAL_JOB_FORM);
   }
 
   function toggleStatus(job) {
@@ -61,7 +56,7 @@ export default function Today({ invoices, setInvoices }) {
     <div>
       {/* Toast */}
       {completedToast && (
-        <div className="fixed top-4 inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out' }}>
+        <div role="status" aria-live="polite" className="fixed top-4 inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out' }}>
           <div className="card bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 px-4 py-3 flex items-center gap-2 pointer-events-auto shadow-lg">
             <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <div>
@@ -86,7 +81,7 @@ export default function Today({ invoices, setInvoices }) {
 
       {/* Date picker + progress */}
       <div className="flex items-center gap-3 mb-4">
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} className="input w-auto" />
+        <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label="Select date" className="input w-auto" />
         <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
           <div className="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full transition-all duration-500" style={{ width: `${filtered.length ? (doneCount / filtered.length) * 100 : 0}%` }} />
         </div>
@@ -106,7 +101,7 @@ export default function Today({ invoices, setInvoices }) {
       <div className="space-y-3">
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
-            <Circle className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400 font-semibold">No jobs scheduled</p>
             <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Tap + to add your first job</p>
           </div>
@@ -121,7 +116,13 @@ export default function Today({ invoices, setInvoices }) {
           return (
             <div key={job.id} className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-70' : ''}`}>
               {/* Main row */}
-              <div className="p-4 flex items-center gap-3 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : job.id)}>
+              <div
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : job.id); } }}
+                className="p-4 flex items-center gap-3 cursor-pointer"
+                onClick={() => setExpandedId(isExpanded ? null : job.id)}
+              >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {/* Stop number */}
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-sm ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400'}`}>
@@ -147,9 +148,9 @@ export default function Today({ invoices, setInvoices }) {
 
                 {/* Mark Done button — always visible */}
                 <button
-                  aria-label="Mark job complete"
+                  aria-label={isDone ? 'Undo completion' : 'Mark job complete'}
                   onClick={e => { e.stopPropagation(); toggleStatus(job); }}
-                  className={`flex-shrink-0 w-28 text-center text-xs font-bold px-3 py-2.5 rounded-xl transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : isAnimating ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800'}`}
+                  className={`flex-shrink-0 w-28 min-h-[44px] text-center text-xs font-bold px-3 py-2.5 rounded-xl transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : isAnimating ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800'}`}
                 >
                   {isDone ? '✓ Done' : isAnimating ? '...' : 'Mark Done'}
                 </button>

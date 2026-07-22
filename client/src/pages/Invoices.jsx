@@ -59,7 +59,7 @@ export default function Invoices({ invoices, setInvoices }) {
               <div className="flex items-center gap-3">
                 <span className={statusInfo.badge}>{statusInfo.label}</span>
                 {invoice.status === 'unpaid' && (
-                  <button onClick={() => sendReminder(invoice.id)} disabled={sentReminders.has(invoice.id)} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-sky-600 dark:text-sky-400 hover:text-sky-700'}`}>
+                  <button onClick={() => { if (!sentReminders.has(invoice.id)) sendReminder(invoice.id); }} aria-disabled={sentReminders.has(invoice.id)} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-sky-600 dark:text-sky-400 hover:text-sky-700'}`}>
                     {sentReminders.has(invoice.id) ? <><CheckCircle className="w-3 h-3" />Sent!</> : <><Send className="w-3 h-3" />Remind</>}
                   </button>
                 )}

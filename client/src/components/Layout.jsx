@@ -18,8 +18,11 @@ export default function Layout() {
   const navigate = useNavigate();
 
   async function logout() {
-    await supabase.auth.signOut();
-    navigate('/');
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      navigate('/');
+    }
   }
 
   return (
@@ -52,7 +55,7 @@ export default function Layout() {
       <InstallPrompt />
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 z-20 safe-bottom">
+      <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 z-20 safe-bottom">
         <div className="max-w-2xl mx-auto flex justify-around">
           {navItems.map(({ to, icon: Icon, title }) => (
             <NavLink
@@ -60,15 +63,20 @@ export default function Layout() {
               to={to}
               end={to === '/app'}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 py-2 px-3 min-w-[64px] transition-colors duration-150 ${
+                `flex flex-col items-center gap-0.5 py-2 px-3 min-w-[64px] transition-colors duration-150 relative ${
                   isActive
                     ? 'text-sky-600 dark:text-sky-400'
                     : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                 }`
               }
             >
-              <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{title}</span>
+              {({ isActive }) => (
+                <>
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[11px] font-medium">{title}</span>
+                  {isActive && <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-sky-500 dark:bg-sky-400" />}
+                </>
+              )}
             </NavLink>
           ))}
         </div>
