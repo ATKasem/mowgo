@@ -18,8 +18,8 @@ export default function Clients() {
   const [form, setForm] = useState(emptyForm);
   const [expandedId, setExpandedId] = useState(null);
 
-  function openNew() { setEditId(null); setForm(emptyForm); setShowForm(true); }
-  function openEdit(client) { setEditId(client.id); setForm(client); setShowForm(true); }
+  function openNew() { setEditId(null); setForm(emptyForm); setExpandedId(null); setShowForm(true); }
+  function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
 
   function save(e) {
     e.preventDefault();
