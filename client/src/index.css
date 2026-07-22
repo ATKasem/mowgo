@@ -224,7 +224,7 @@
     color: #047857;
   }
   .dark .badge-success {
-    background: rgba(16, 185, 129, 0.2);
+    background: #064e3b;
     color: #6ee7b7;
   }
   .badge-warning {
@@ -232,7 +232,7 @@
     color: #b45309;
   }
   .dark .badge-warning {
-    background: rgba(245, 158, 11, 0.2);
+    background: #451a03;
     color: #fbbf24;
   }
   .badge-danger {
@@ -240,7 +240,7 @@
     color: #b91c1c;
   }
   .dark .badge-danger {
-    background: rgba(239, 68, 68, 0.2);
+    background: #450a0a;
     color: #fca5a5;
   }
   .badge-info {
@@ -248,14 +248,14 @@
     color: #0369a1;
   }
   .dark .badge-info {
-    background: rgba(14, 165, 233, 0.2);
+    background: #0c2d48;
     color: #7dd3fc;
   }
 
   /* Dark mode specific overrides */
-  .dark .bg-amber-50 { background: rgba(245, 158, 11, 0.1); }
-  .dark .bg-sky-50 { background: rgba(14, 165, 233, 0.1); }
-  .dark .bg-emerald-50 { background: rgba(16, 185, 129, 0.1); }
+  .dark .bg-amber-50 { background: #451a03; }
+  .dark .bg-sky-50 { background: #0c2d48; }
+  .dark .bg-emerald-50 { background: #064e3b; }
   .dark .bg-gray-100 { background: #374151; }
   .dark .bg-white { background: #1f2937; }
   .dark .bg-gray-50 { background: #030712; }
