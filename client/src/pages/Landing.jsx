@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Calendar, MapPin, Users, FileText, Check, ArrowRight, Star, ChevronRight } from 'lucide-react';
+import { Sparkles, Calendar, MapPin, Users, FileText, Check, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const features = [

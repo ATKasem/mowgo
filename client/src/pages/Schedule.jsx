@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { demoJobs, demoClients } from '../lib/demoData';
 import { Plus, Check, Clock, Calendar, Sparkles } from 'lucide-react';
 

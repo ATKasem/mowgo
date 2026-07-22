@@ -67,7 +67,7 @@ export default function Route() {
                 </div>
 
                 <div className="flex flex-col gap-2 items-end flex-shrink-0">
-                  <button onClick={() => toggleStatus(job)} className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/60'}`}>
+                  <button onClick={() => toggleStatus(job)} aria-label="Toggle job status" className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/60'}`}>
                     {isDone ? <span className="flex items-center gap-1"><Check className="w-3 h-3" />Done</span> : 'Mark Done'}
                   </button>
                   {client?.address && (
