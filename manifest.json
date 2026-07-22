@@ -1,0 +1,20 @@
+{
+  "name": "CleanFlow — Cleaning Business Software",
+  "short_name": "CleanFlow",
+  "description": "Simple scheduling, routing, and invoicing for house cleaning crews",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/favicon.svg", "sizes": "48x48", "type": "image/svg+xml" }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    { "name": "Schedule", "url": "/", "icons": [{ "src": "/icon.svg", "sizes": "96x96" }] },
+    { "name": "New Job", "url": "/?new=job", "icons": [{ "src": "/icon.svg", "sizes": "96x96" }] }
+  ]
+}
