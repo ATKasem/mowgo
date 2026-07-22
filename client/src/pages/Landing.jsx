@@ -5,19 +5,19 @@ import { startCheckout } from '../lib/payments';
 
 const features = [
   { icon: Calendar, title: 'Smart Scheduling', desc: 'Recurring jobs, drag-to-reschedule, color-coded calendar. Set it once, it runs forever.', color: 'from-blue-500 to-cyan-500' },
-  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time cleaning.', color: 'from-emerald-500 to-teal-500' },
+  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time mowing.', color: 'from-emerald-500 to-teal-500' },
   { icon: Users, title: 'Client Management', desc: 'Names, addresses, key codes, pet instructions — everything in one place.', color: 'from-violet-500 to-purple-500' },
   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Job done → tap invoice. Client gets a text with a Stripe payment link.', color: 'from-amber-500 to-orange-500' },
 ];
 
 const plans = [
-  { name: 'Free', price: '0', period: 'forever', desc: 'For solo cleaners getting started', features: ['Up to 10 clients', 'Basic calendar', 'Route view (1 stop/day)', 'Manual invoicing'], cta: 'Start Free', highlight: false },
-  { name: 'Solo', price: '39', period: 'month', desc: 'For independent cleaners with a full schedule', features: ['Unlimited clients', 'Full calendar + recurring jobs', 'Daily route optimization', 'One-tap invoicing + Stripe', 'Client notes + key codes', 'Email support'], cta: 'Start Free Trial', highlight: true },
-  { name: 'Crew', price: '69', period: 'month', desc: 'For small teams of 2-3 cleaners', features: ['Everything in Solo', 'Multi-user team access', 'Job assignment + tracking', 'Team progress dashboard', 'Priority support', 'Coming: QuickBooks export'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Free', price: '0', period: 'forever', desc: 'For solo landscapers getting started', features: ['Up to 10 clients', 'Basic calendar', 'Route view (1 stop/day)', 'Manual invoicing'], cta: 'Start Free', highlight: false },
+  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients', 'Full calendar + recurring jobs', 'Daily route optimization', 'One-tap invoicing + Stripe', 'Client notes + key codes', 'Email support'], cta: 'Start Free Trial', highlight: true },
+  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Multi-user team access', 'Job assignment + tracking', 'Team progress dashboard', 'Priority support', 'Coming: QuickBooks export'], cta: 'Start Free Trial', highlight: false },
 ];
 
 const stats = [
-  { value: '556K+', label: 'US cleaning businesses', suffix: 'and growing' },
+  { value: '556K+', label: 'US lawn care businesses', suffix: 'and growing' },
   { value: '$188B', label: 'Industry market size', suffix: 'in 2026' },
   { value: '<1%', label: 'of your revenue', suffix: '— our price' },
 ];
@@ -52,12 +52,12 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-              Scheduling that <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">actually works</span> for cleaning crews
+              Scheduling that <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">actually works</span> for lawn care crews
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              The only app built for 1–3 person cleaning teams. Schedule jobs, plan routes, invoice clients — all from your phone. No office staff required.
+              The only app built for 1–3 person lawn care teams. Schedule jobs, plan routes, invoice clients — all from your phone. No office staff required.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -79,7 +79,7 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Everything you need, <span className="text-sky-500">nothing you don't</span></h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Jobber is $169/month for a reason — it's built for 20-person crews. CleanFlow is built for you.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Jobber is $169/month for a reason — it's built for 20-person crews. MowFlow is built for you.</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5">
           {features.map(({ icon: Icon, title, desc, color }, i) => (
@@ -155,9 +155,9 @@ export default function Landing() {
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Ready to stop losing track of jobs?</h2>
-            <p className="text-sky-100 text-lg mb-10">Join cleaning crews who've reclaimed 5+ hours a week.</p>
+            <p className="text-sky-100 text-lg mb-10">Join lawn care crews who've reclaimed 5+ hours a week.</p>
             <Link to="/app" className="group inline-flex items-center gap-2 bg-white text-sky-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-sky-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
-              Try CleanFlow Free
+              Try MowFlow Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <p className="mt-4 text-sky-200/80 text-sm">Available on iOS, Android, and web.</p>
@@ -170,12 +170,12 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 text-sm">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center"><Sparkles className="w-3.5 h-3.5 text-white" /></div>
-            CleanFlow &copy; 2026
+            MowFlow &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">App</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
-            <a href="mailto:hello@cleanflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
+            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
           </div>
         </div>
       </footer>

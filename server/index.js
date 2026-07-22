@@ -109,10 +109,10 @@ app.post('/api/invoices', auth, async (req, res) => {
   // Send invoice via Resend
   if (client?.email) {
     await resend.emails.send({
-      from: 'CleanFlow <invoices@cleanflow.app>',
+      from: 'MowFlow <invoices@mowflow.app>',
       to: client.email,
-      subject: `Invoice from CleanFlow — $${amount}`,
-      html: `<p>Hi ${client.name},</p><p>Here's your cleaning invoice for $${amount}. <a href="${process.env.APP_URL}/pay/${invoice.id}">Pay online</a></p>`,
+      subject: `Invoice from MowFlow — $${amount}`,
+      html: `<p>Hi ${client.name},</p><p>Here's your lawn care invoice for $${amount}. <a href="${process.env.APP_URL}/pay/${invoice.id}">Pay online</a></p>`,
     });
   }
 
@@ -124,7 +124,7 @@ app.post('/api/stripe/checkout', auth, async (req, res) => {
   const { invoice_id, amount } = req.body;
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    line_items: [{ price_data: { currency: 'usd', product_data: { name: 'Cleaning Invoice' }, unit_amount: Math.round(amount * 100) }, quantity: 1 }],
+    line_items: [{ price_data: { currency: 'usd', product_data: { name: 'Service Invoice' }, unit_amount: Math.round(amount * 100) }, quantity: 1 }],
     mode: 'payment',
     success_url: `${process.env.APP_URL}/invoices?paid=true`,
     cancel_url: `${process.env.APP_URL}/invoices?paid=false`,
@@ -147,4 +147,4 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`CleanFlow API running on port ${PORT}`));
+app.listen(PORT, () => console.log(`MowFlow API running on port ${PORT}`));

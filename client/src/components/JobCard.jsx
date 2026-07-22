@@ -67,10 +67,10 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
               <span>{client.address}</span>
             </div>
           )}
-          {client?.cleaning_notes && (
+          {client?.service_notes && (
             <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
               <StickyNote className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-              {client.cleaning_notes}
+              {client.service_notes}
             </div>
           )}
 

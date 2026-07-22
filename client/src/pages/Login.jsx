@@ -22,8 +22,8 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-center mb-2">🧹 CleanFlow</h1>
-        <p className="text-gray-500 text-center mb-8">Simple scheduling for cleaning crews</p>
+        <h1 className="text-3xl font-bold text-center mb-2">🌿 MowFlow</h1>
+        <p className="text-gray-500 text-center mb-8">Simple scheduling for lawn care crews</p>
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4">
           <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full border rounded-lg px-3 py-2" required minLength={6} />

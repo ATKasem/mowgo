@@ -1,7 +1,7 @@
 {
-  "name": "CleanFlow — Cleaning Business Software",
-  "short_name": "CleanFlow",
-  "description": "Simple scheduling, routing, and invoicing for house cleaning crews",
+  "name": "MowFlow — Lawn Care Business Software",
+  "short_name": "MowFlow",
+  "description": "Simple scheduling, routing, and invoicing for lawn care crews",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

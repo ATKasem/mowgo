@@ -46,7 +46,7 @@ export default function InstallPrompt() {
           <Download className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-gray-900 dark:text-white">Install CleanFlow</p>
+          <p className="font-semibold text-sm text-gray-900 dark:text-white">Install MowFlow</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Add to your home screen for quick access</p>
         </div>
         <button onClick={install} className="btn-primary text-xs px-3 py-1.5 whitespace-nowrap">

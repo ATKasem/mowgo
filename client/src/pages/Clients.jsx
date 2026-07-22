@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { demoClients } from '../lib/demoData';
 import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users } from 'lucide-react';
 
-const emptyForm = { name: '', address: '', phone: '', email: '', rate: 0, cleaning_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
+const emptyForm = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
 
 function getInitials(name) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -48,8 +48,8 @@ export default function Clients() {
           <div><label className="label">Name *</label><input placeholder="Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
           <div><label className="label">Address</label><input placeholder="123 Main St, OKC, OK" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Phone</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">Email</label><input placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>
-          <div><label className="label">Rate ($/clean)</label><input type="number" placeholder="120" value={form.rate} onChange={e => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} className="input" /></div>
-          <div><label className="label">Cleaning Notes</label><textarea placeholder="Focus on kitchen..." value={form.cleaning_notes} onChange={e => setForm({ ...form, cleaning_notes: e.target.value })} className="input" rows={2} /></div>
+          <div><label className="label">Rate ($/visit)</label><input type="number" placeholder="120" value={form.rate} onChange={e => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} className="input" /></div>
+          <div><label className="label">Service Notes</label><textarea placeholder="Focus on front yard..." value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Key Code</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">Alarm Code</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
           <div><label className="label">Pet Instructions</label><input placeholder="1 friendly dog..." value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
           <div className="flex gap-2 pt-1"><button type="submit" className="btn-primary flex-1">{editId ? 'Save Changes' : 'Add Client'}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">Cancel</button></div>
@@ -86,7 +86,7 @@ export default function Clients() {
                 <div className="card border-t-0 rounded-t-none -mt-1 p-4 pt-3 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
                   {client.phone && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Phone className="w-3.5 h-3.5 text-gray-400" />{client.phone}</div>}
                   {client.email && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Mail className="w-3.5 h-3.5 text-gray-400" />{client.email}</div>}
-                  {client.cleaning_notes && <div className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400"><StickyNote className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />{client.cleaning_notes}</div>}
+                  {client.service_notes && <div className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400"><StickyNote className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />{client.service_notes}</div>}
                   <div className="flex flex-wrap gap-1.5">
                     {client.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><Key className="w-3 h-3" />Key: {client.key_code}</span>}
                     {client.alarm_code && <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1 text-[11px]"><AlarmCheck className="w-3 h-3" />Alarm: {client.alarm_code}</span>}

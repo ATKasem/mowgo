@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.cleanflow.app',
-  appName: 'CleanFlow',
+  appId: 'com.mowflow.app',
+  appName: 'MowFlow',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

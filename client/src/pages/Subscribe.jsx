@@ -35,7 +35,7 @@ export default function Subscribe() {
             <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">You're all set!</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">Welcome to CleanFlow. Your subscription is active — start managing your cleaning business.</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">Welcome to MowFlow. Your subscription is active — start managing your lawn care business.</p>
           <Link to="/app" className="btn-primary text-base px-8 py-3 gap-2">
             Go to Dashboard <ArrowRight className="w-4 h-4" />
           </Link>

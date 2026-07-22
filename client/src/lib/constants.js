@@ -45,5 +45,5 @@ export const INVOICE_STATUS = {
 };
 
 /** Default form values for new jobs and clients. */
-export const INITIAL_JOB_FORM = { client_id: '', title: 'Cleaning', scheduled_time: '09:00', duration_minutes: 120 };
-export const INITIAL_CLIENT_FORM = { name: '', address: '', phone: '', email: '', rate: 0, cleaning_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
+export const INITIAL_JOB_FORM = { client_id: '', title: 'Mow + Edge', scheduled_time: '09:00', duration_minutes: 120 };
+export const INITIAL_CLIENT_FORM = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };

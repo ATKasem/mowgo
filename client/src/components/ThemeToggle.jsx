@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
 
-const THEME_KEY = 'cleanflow-theme';
+const THEME_KEY = 'mowflow-theme';
 
 export function getStoredTheme() {
   return localStorage.getItem(THEME_KEY) || 'system';

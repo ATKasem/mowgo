@@ -36,7 +36,7 @@ export default function Settings() {
       <form onSubmit={save} className="card p-5 space-y-5">
         <div>
           <label className="label flex items-center gap-1.5"><Store className="w-3.5 h-3.5" />Business Name</label>
-          <input value={profile.business_name || ''} onChange={e => setProfile({ ...profile, business_name: e.target.value })} placeholder="Sparkling Clean LLC" className="input" />
+          <input value={profile.business_name || ''} onChange={e => setProfile({ ...profile, business_name: e.target.value })} placeholder="Green Thumb Lawn Care" className="input" />
         </div>
         <div>
           <label className="label flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />Phone Number</label>
