@@ -15,11 +15,6 @@ const navItems = [
   { to: '/settings', icon: Settings, title: 'Settings' },
 ];
 
-// Register service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
-}
-
 export default function Layout() {
   const navigate = useNavigate();
 
