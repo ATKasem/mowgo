@@ -1,23 +1,20 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { FileText, CheckCircle, AlertCircle, Send, Receipt } from 'lucide-react';
+import { INVOICE_STATUS } from '../lib/constants';
 
-const statusConfig = {
-  paid: { icon: CheckCircle, bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-700 dark:text-emerald-400', badge: 'badge-success', label: 'Paid' },
-  unpaid: { icon: AlertCircle, bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', badge: 'badge-warning', label: 'Unpaid' },
-  overdue: { icon: AlertCircle, bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-700 dark:text-red-400', badge: 'badge-danger', label: 'Overdue' },
-};
+const iconMap = { CheckCircle, AlertCircle };
 
 export default function Invoices({ invoices, setInvoices }) {
   const [sentReminders, setSentReminders] = useState(new Set());
 
-  function sendReminder(id) {
-    setSentReminders(new Set([...sentReminders, id]));
+  const sendReminder = useCallback((id) => {
+    setSentReminders(prev => new Set([...prev, id]));
     setTimeout(() => setSentReminders(prev => { const n = new Set(prev); n.delete(id); return n; }), 2500);
-  }
+  }, []);
 
   const unpaid = invoices.filter(i => i.status !== 'paid');
-  const totalUnpaid = unpaid.reduce((s, i) => s + i.amount, 0);
-  const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0);
+  const totalUnpaid = unpaid.reduce((s, i) => s + (i.amount || 0), 0);
+  const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0);
 
   return (
     <div>
@@ -45,15 +42,16 @@ export default function Invoices({ invoices, setInvoices }) {
           <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" /><p className="text-gray-500 dark:text-gray-400 font-semibold">No invoices yet</p><p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Invoices are created when you complete a job</p></div>
         )}
         {invoices.map(invoice => {
-          const statusInfo = statusConfig[invoice.status] || statusConfig.unpaid;
-          const Icon = statusInfo.icon;
+          const statusInfo = INVOICE_STATUS[invoice.status] || INVOICE_STATUS.unpaid;
+          const Icon = iconMap[statusInfo.icon] || AlertCircle;
+          const dateStr = invoice.created_at ? new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown date';
           return (
             <div key={invoice.id} className="card p-4 flex items-center justify-between hover:border-sky-200 dark:hover:border-sky-800 transition-all">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white text-sm">{invoice.clients?.name || 'Unknown'}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${invoice.amount}</span></p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dateStr} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${invoice.amount}</span></p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
