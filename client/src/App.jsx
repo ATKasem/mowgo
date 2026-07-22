@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Privacy from './pages/Privacy';
@@ -10,7 +10,7 @@ import Settings from './pages/Settings';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Marketing / landing */}
         <Route path="/" element={<Landing />} />
@@ -26,6 +26,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
