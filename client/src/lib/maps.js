@@ -1,12 +1,17 @@
 /**
- * Returns the correct maps URL for the user's platform.
- * iOS → Apple Maps, everything else → Google Maps.
+ * Returns the correct maps URL based on the user's platform.
+ * iOS/macOS → Apple Maps (system default)
+ * Android → Google Maps (system default)
+ * Everything else → Google Maps (universal fallback)
  */
 export function getMapsUrl(address) {
   const q = encodeURIComponent(address);
-  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  const isMac = /Macintosh/.test(navigator.userAgent) && !isIOS;
-  return (isIOS || isMac)
-    ? `http://maps.apple.com/?q=${q}`
-    : `https://maps.google.com/?q=${q}`;
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isMac = /Macintosh/.test(ua) && !isIOS;
+  const isAndroid = /Android/.test(ua);
+
+  if (isIOS || isMac) return `http://maps.apple.com/?q=${q}`;
+  if (isAndroid) return `geo:0,0?q=${q}`; // opens Google Maps app natively
+  return `https://maps.google.com/?q=${q}`; // web fallback
 }
