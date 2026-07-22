@@ -122,35 +122,37 @@ export default function Today({ invoices, setInvoices }) {
             <div key={job.id} className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-70' : ''}`}>
               {/* Main row */}
               <div className="p-4 flex items-center gap-3 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : job.id)}>
-                {/* Stop number / check */}
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  {/* Stop number */}
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-sm ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400'}`}>
+                    {isDone ? <Check className="w-5 h-5" /> : <span>{i + 1}</span>}
+                  </div>
+
+                  {/* Info */}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className={`font-semibold text-sm ${isDone ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>{client?.name || 'Unknown'}</p>
+                      <span className={statusInfo.badge}>{statusInfo.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{job.scheduled_time?.slice(0, 5)}</span>
+                      <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{job.title}</span>
+                    </div>
+                    {client?.address && (
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1"><MapPin className="w-3 h-3" />{client.address}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Mark Done button — always visible */}
                 <button
-                  aria-label="Toggle job status"
+                  aria-label="Mark job complete"
                   onClick={e => { e.stopPropagation(); toggleStatus(job); }}
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all duration-300 shadow-sm ${isDone ? 'bg-emerald-500 text-white' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60'}`}
+                  className={`flex-shrink-0 w-28 text-center text-xs font-bold px-3 py-2.5 rounded-xl transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : isAnimating ? 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800'}`}
                 >
-                  {isDone ? <Check className="w-5 h-5" /> : <span>{i + 1}</span>}
+                  {isDone ? '✓ Done' : isAnimating ? '...' : 'Mark Done'}
                 </button>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className={`font-semibold text-sm ${isDone ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>{client?.name || 'Unknown'}</p>
-                    <span className={statusInfo.badge}>{statusInfo.label}</span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{job.scheduled_time?.slice(0, 5)}</span>
-                    <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{job.title}</span>
-                  </div>
-                  {client?.address && (
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1"><MapPin className="w-3 h-3" />{client.address}</p>
-                  )}
-                </div>
-
-                {/* Quick actions */}
-                <div className="flex items-center gap-2">
-                  {client?.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-[11px] inline-flex items-center gap-1"><Key className="w-3 h-3" />{client.key_code}</span>}
-                </div>
               </div>
 
               {/* Expanded detail */}
