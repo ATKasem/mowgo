@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { demoInvoices } from '../lib/demoData';
 import { FileText, CheckCircle, AlertCircle, Send, Receipt } from 'lucide-react';
 
 const statusConfig = {
@@ -8,8 +7,7 @@ const statusConfig = {
   overdue: { icon: AlertCircle, bg: 'bg-red-50 dark:bg-red-950/30', text: 'text-red-700 dark:text-red-400', badge: 'badge-danger', label: 'Overdue' },
 };
 
-export default function Invoices() {
-  const [invoices, setInvoices] = useState(demoInvoices);
+export default function Invoices({ invoices, setInvoices }) {
   const [sentReminders, setSentReminders] = useState(new Set());
 
   function sendReminder(id) {

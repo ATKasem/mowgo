@@ -1,15 +1,14 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
-  Calendar, MapPin, Users, FileText, Settings,
+  Calendar, Users, FileText, Settings,
   Sparkles, LogOut
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import InstallPrompt from './InstallPrompt';
 
 const navItems = [
-  { to: '/app', icon: Calendar, title: 'Schedule' },
-  { to: '/app/route', icon: MapPin, title: 'Route' },
+  { to: '/app', icon: Calendar, title: 'Today' },
   { to: '/app/clients', icon: Users, title: 'Clients' },
   { to: '/app/invoices', icon: FileText, title: 'Invoices' },
   { to: '/app/settings', icon: Settings, title: 'Settings' },

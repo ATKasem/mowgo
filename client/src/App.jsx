@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Privacy from './pages/Privacy';
-import Schedule from './pages/Schedule';
-import RoutePage from './pages/Route';
+import Today from './pages/Today';
 import Clients from './pages/Clients';
 import Invoices from './pages/Invoices';
 import Settings from './pages/Settings';
+import { demoInvoices } from './lib/demoData';
 
 export default function App() {
+  const [invoices, setInvoices] = useState(demoInvoices);
+
   return (
     <HashRouter>
       <Routes>
@@ -18,10 +21,9 @@ export default function App() {
 
         {/* App */}
         <Route element={<Layout />}>
-          <Route path="/app" element={<Schedule />} />
-          <Route path="/app/route" element={<RoutePage />} />
+          <Route path="/app" element={<Today invoices={invoices} setInvoices={setInvoices} />} />
           <Route path="/app/clients" element={<Clients />} />
-          <Route path="/app/invoices" element={<Invoices />} />
+          <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
           <Route path="/app/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
