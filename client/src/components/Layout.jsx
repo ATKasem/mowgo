@@ -8,11 +8,11 @@ import ThemeToggle from './ThemeToggle';
 import InstallPrompt from './InstallPrompt';
 
 const navItems = [
-  { to: '/', icon: Calendar, title: 'Schedule' },
-  { to: '/route', icon: MapPin, title: 'Route' },
-  { to: '/clients', icon: Users, title: 'Clients' },
-  { to: '/invoices', icon: FileText, title: 'Invoices' },
-  { to: '/settings', icon: Settings, title: 'Settings' },
+  { to: '/app', icon: Calendar, title: 'Schedule' },
+  { to: '/app/route', icon: MapPin, title: 'Route' },
+  { to: '/app/clients', icon: Users, title: 'Clients' },
+  { to: '/app/invoices', icon: FileText, title: 'Invoices' },
+  { to: '/app/settings', icon: Settings, title: 'Settings' },
 ];
 
 export default function Layout() {
@@ -59,7 +59,7 @@ export default function Layout() {
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={to === '/app'}
               className={({ isActive }) =>
                 `flex flex-col items-center gap-0.5 py-2 px-3 min-w-[64px] transition-colors duration-150 ${
                   isActive
