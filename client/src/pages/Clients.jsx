@@ -64,9 +64,10 @@ export default function Clients() {
           </div>
         )}
         {filtered.map((client, i) => {
+          const isEditing = editId === client.id;
           const isExpanded = expandedId === client.id;
           return (
-            <div key={client.id}>
+            <div key={client.id} className={isEditing ? 'opacity-40 pointer-events-none' : ''}>
               <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-sky-200 dark:hover:border-sky-800 transition-all" onClick={() => setExpandedId(isExpanded ? null : client.id)}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors[i % avatarColors.length]}`}>{getInitials(client.name)}</div>
                 <div className="flex-1 min-w-0">
