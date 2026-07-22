@@ -42,7 +42,7 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-br from-sky-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-sky-950" />
         <div className="absolute top-20 -right-20 w-96 h-96 bg-gradient-to-br from-sky-200/40 to-blue-300/20 rounded-full blur-3xl" />
         <div className="absolute bottom-10 -left-20 w-80 h-80 bg-gradient-to-tr from-violet-200/30 to-purple-300/20 rounded-full blur-3xl" />
-        <div className="relative max-w-4xl mx-auto px-4 py-24 md:py-32 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-24 md:py-32 text-center">
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6 hover:scale-105 transition-transform cursor-default">
               <Sparkles className="w-4 h-4" />
@@ -99,7 +99,7 @@ export default function Landing() {
 
       {/* Stats */}
       <section className="max-w-4xl mx-auto px-4 pb-24">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {stats.map(({ value, label, suffix }) => (
             <FadeIn key={label}>
               <div className="card p-6 text-center hover:border-sky-200 dark:hover:border-sky-800 transition-all">
