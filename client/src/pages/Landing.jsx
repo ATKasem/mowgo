@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Calendar, MapPin, Users, FileText, Check, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { startCheckout } from '../lib/payments';
 
 const features = [
   { icon: Calendar, title: 'Smart Scheduling', desc: 'Recurring jobs, drag-to-reschedule, color-coded calendar. Set it once, it runs forever.', color: 'from-blue-500 to-cyan-500' },
@@ -135,7 +136,11 @@ export default function Landing() {
                       <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />{f}</li>
                     ))}
                   </ul>
-                  <Link to="/app" className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>{plan.cta}</Link>
+                  {plan.name === 'Free' ? (
+                    <Link to="/app" className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700`}>{plan.cta}</Link>
+                  ) : (
+                    <button onClick={() => startCheckout(plan.name.toLowerCase())} className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>{plan.cta}</button>
+                  )}
                 </div>
               </FadeIn>
             ))}

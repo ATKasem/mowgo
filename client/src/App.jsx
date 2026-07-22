@@ -8,6 +8,7 @@ import Clients from './pages/Clients';
 import Invoices from './pages/Invoices';
 import Settings from './pages/Settings';
 import { demoInvoices, demoJobs } from './lib/demoData';
+import Subscribe from './pages/Subscribe';
 
 export default function App() {
   const [invoices, setInvoices] = useState(demoInvoices);
@@ -19,6 +20,7 @@ export default function App() {
         {/* Marketing / landing */}
         <Route path="/" element={<Landing />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/subscribe" element={<Subscribe />} />
 
         {/* App */}
         <Route element={<Layout />}>
