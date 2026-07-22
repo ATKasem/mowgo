@@ -6,6 +6,6 @@ export function getMapsUrl(address) {
   const q = encodeURIComponent(address);
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
   return isIOS
-    ? `maps://?q=${q}`          // Apple Maps (native app)
+    ? `http://maps.apple.com/?q=${q}`  // Apple Maps (opens app if installed, web fallback)
     : `https://maps.google.com/?q=${q}`; // Google Maps
 }
