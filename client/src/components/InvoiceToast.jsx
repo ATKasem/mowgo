@@ -7,13 +7,13 @@ export default function InvoiceToast({ toast }) {
   const isError = toast.type === 'error';
   const Icon = isError ? CloudRain : isRain ? CloudRain : Check;
   const bg = isError
-    ? 'card bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800'
+    ? 'card bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'
     : isRain
-    ? 'card bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800'
-    : 'card bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800';
-  const textColor = isError ? 'text-red-800 dark:text-red-300' : isRain ? 'text-amber-800 dark:text-amber-300' : 'text-emerald-800 dark:text-emerald-300';
-  const iconColor = isError ? 'text-red-600 dark:text-red-400' : isRain ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400';
-  const subColor = isError ? 'text-red-600 dark:text-red-400' : isRain ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400';
+    ? 'card bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800'
+    : 'card bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800';
+  const textColor = isError ? 'text-red-800 dark:text-red-200' : isRain ? 'text-amber-800 dark:text-amber-200' : 'text-emerald-800 dark:text-emerald-200';
+  const iconColor = isError ? 'text-red-600 dark:text-red-400' : isRain ? 'text-amber-600 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-300';
+  const subColor = isError ? 'text-red-600 dark:text-red-400' : isRain ? 'text-amber-600 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-300';
 
   return (
     <div role="status" aria-live="polite" className="fixed inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out', top: 'calc(4rem + env(safe-area-inset-top, 0px) + 8px)' }}>
