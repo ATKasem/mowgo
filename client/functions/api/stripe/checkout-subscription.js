@@ -24,12 +24,14 @@ export async function onRequestPost(context) {
       return json({ error: 'Invalid plan' }, 400);
     }
 
-    const priceId = plan === 'solo' ? env.STRIPE_PRICE_SOLO : env.STRIPE_PRICE_CREW;
+    const priceId = plan === 'solo'
+      ? (env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO)
+      : (env.STRIPE_PRICE_CREW || env.VITE_STRIPE_PRICE_CREW);
     if (!priceId) {
       return json({ error: 'Price ID not configured' }, 500);
     }
 
-    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS, 10) || 14;
+    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS, 10) || 14;
     const appUrl = env.APP_URL || origin || 'https://mowflow.pages.dev';
 
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
