@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
-import { createJob, updateJobStatus, updateJob, loadClients } from '../lib/data';
+import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
@@ -29,6 +30,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const [dragOverId, setDragOverId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [clients, setClients] = useState([]);
+
+  const { rainLikely, todayRainChance } = useWeather();
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
@@ -179,8 +182,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
       </div>
 
-      {/* Rain delay */}
-      {filtered.some(j => j.status !== 'done') && (
+      {/* Rain delay — weather-aware: only appears when rain is forecast */}
+      {filtered.some(j => j.status !== 'done') && rainLikely() && (
         <div className="mb-4">
           <button
             onClick={() => {
@@ -193,8 +196,6 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                   const failed = results.filter(r => r.status === 'rejected');
                   if (failed.length > 0) {
                     console.error('Rain delay: some jobs failed to move', failed.map(r => r.reason));
-                    setCompletedToast({ name: `${failed.length} of ${toMove.length} jobs failed to move`, amount: 0, type: 'error' });
-                    setTimeout(() => setCompletedToast(null), 4000);
                   }
                 });
               setJobs(prev => prev.map(j =>
@@ -205,9 +206,13 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
               setTimeout(() => setCompletedToast(null), 3500);
             }}
-            className="w-full flex items-center justify-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+            className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-2 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
           >
-            <CloudRain className="w-4 h-4" /> Rain Delay — move remaining to tomorrow
+            <CloudRain className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="flex-1 text-left">
+              <span className="font-semibold">{todayRainChance()}%</span> chance of rain — <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">move {filtered.filter(j => j.status !== 'done').length} remaining to tomorrow</span>
+            </span>
+            <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">Move All</span>
           </button>
         </div>
       )}
