@@ -3,7 +3,7 @@ import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck
 import { STATUS_CONFIG, RECURRENCE_OPTIONS } from '../lib/constants';
 import { getMapsUrl } from '../lib/maps';
 
-function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd }) {
+function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown }) {
   const client = job.clients;
   const isDone = job.status === 'done';
   const statusInfo = STATUS_CONFIG[job.status] || STATUS_CONFIG.scheduled;
@@ -112,6 +112,21 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
               {isDone ? 'Undo' : 'Mark Complete'}
             </button>
           </div>
+          {/* Keyboard reordering buttons — hidden from mouse users, accessible to keyboard */}
+          {!isDone && (
+            <div className="flex gap-2">
+              {onMoveUp && (
+                <button onClick={e => { e.stopPropagation(); onMoveUp(); }} className="sr-only focus:not-sr-only focus:btn-secondary focus:text-xs focus:gap-1" aria-label="Move up">
+                  ↑ Move up
+                </button>
+              )}
+              {onMoveDown && (
+                <button onClick={e => { e.stopPropagation(); onMoveDown(); }} className="sr-only focus:not-sr-only focus:btn-secondary focus:text-xs focus:gap-1" aria-label="Move down">
+                  ↓ Move down
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

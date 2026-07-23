@@ -61,7 +61,7 @@ export default function Invoices({ invoices, setInvoices }) {
 
       <div className="flex items-center gap-2 mb-4">
         <div className="relative">
-          <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1"><Filter className="w-4 h-4" /></button>
+          <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1" aria-label="Filter invoices by status"><Filter className="w-4 h-4" /></button>
           {showFilter && (
             <div className="absolute left-0 top-full mt-1 card p-1 z-10 min-w-[110px] shadow-lg"
                  onMouseLeave={() => setShowFilter(false)}

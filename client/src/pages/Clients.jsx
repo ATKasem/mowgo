@@ -6,6 +6,7 @@ import { getMapsUrl } from '../lib/maps';
 const emptyForm = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
 
 function getInitials(name) {
+  if (!name) return '?';
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
@@ -99,7 +100,7 @@ export default function Clients({ jobs = [] }) {
       </div>
 
       <div className="flex gap-2 mb-4">
-        <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
+        <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." aria-label="Search clients" value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
         <div className="relative">
           <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label="Sort clients"><Filter className="w-4 h-4" /></button>
           {showSort && (

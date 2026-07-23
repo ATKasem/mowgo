@@ -21,7 +21,7 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
       </div>
       <div>
         <label className="label">Job Title</label>
-        <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Mow + Edge" className="input" />
+        <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="e.g. Full Service" className="input" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

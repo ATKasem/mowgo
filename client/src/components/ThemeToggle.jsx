@@ -38,7 +38,7 @@ export default function ThemeToggle() {
   const label = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'Auto';
 
   return (
-    <button onClick={cycle} className="btn-ghost text-xs gap-1.5" title={`Theme: ${label}`}>
+    <button onClick={cycle} className="btn-ghost text-xs gap-1.5" aria-label={`Theme: ${label}`} title={`Theme: ${label}`}>
       <Icon className="w-4 h-4" />
       {label}
     </button>

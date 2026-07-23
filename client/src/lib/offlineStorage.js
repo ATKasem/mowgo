@@ -19,7 +19,7 @@ export async function saveOffline(key, value) {
   // Fallback: localStorage
   try {
     localStorage.setItem(`mf_${key}`, JSON.stringify({ value, updated: Date.now() }));
-  } catch { /* quota exceeded */ }
+  } catch (e) { console.warn('offlineStorage: saveOffline localStorage quota exceeded', e); }
 }
 
 export async function loadOffline(key) {
@@ -41,7 +41,7 @@ export async function loadOffline(key) {
       const parsed = JSON.parse(raw);
       return parsed.value;
     }
-  } catch { /* corrupt data */ }
+  } catch (e) { console.warn('offlineStorage: loadOffline localStorage corrupt data', e); }
   return null;
 }
 
@@ -53,7 +53,7 @@ export async function persistAppState(jobs, clients, invoices) {
       saveOffline('clients', clients),
       saveOffline('invoices', invoices),
     ]);
-  } catch { /* non-critical */ }
+  } catch (e) { console.warn('offlineStorage: persistAppState failed', e); }
 }
 
 /** Determine if the app is currently offline */

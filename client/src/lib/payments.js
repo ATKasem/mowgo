@@ -24,8 +24,8 @@ export const PRICES = {
 export async function startCheckout(plan) {
   const stripe = await getStripe();
   if (!stripe) {
-    alert('Stripe is not configured yet. Add your publishable key to .env.');
-    return;
+    console.warn('Stripe is not configured yet. Add your publishable key to .env.');
+    return { error: 'Stripe is not configured yet. Add your publishable key to .env.' };
   }
 
   const priceId = plan === 'solo' ? PRICES.solo_monthly : PRICES.crew_monthly;
@@ -41,6 +41,7 @@ export async function startCheckout(plan) {
 
   if (error) {
     console.error('Stripe checkout error:', error);
-    alert('Something went wrong. Please try again.');
+    return { error: error.message || 'Something went wrong. Please try again.' };
   }
+  return { success: true };
 }

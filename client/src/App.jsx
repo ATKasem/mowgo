@@ -115,7 +115,7 @@ export default function App() {
             <Route path="/app/clients" element={<Clients jobs={jobs} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/app" />} />
           </Route>
         </Routes>
       </AuthProvider>

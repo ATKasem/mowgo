@@ -114,7 +114,7 @@ export default function Settings() {
               role="switch"
               aria-checked={notifyOnComplete}
               onClick={() => toggleNotifyComplete(!notifyOnComplete)}
-              className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${notifyOnComplete ? 'translate-x-[18px]' : ''}`} />
             </button>
@@ -128,7 +128,7 @@ export default function Settings() {
               role="switch"
               aria-checked={notifyOnRain}
               onClick={() => toggleNotifyRain(!notifyOnRain)}
-              className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${notifyOnRain ? 'translate-x-[18px]' : ''}`} />
             </button>

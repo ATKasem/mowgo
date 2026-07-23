@@ -41,6 +41,9 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 transition-colors duration-200">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:dark:bg-gray-900 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold">
+        Skip to main content
+      </a>
       {/* Offline banner */}
       {isOffline && (
         <div className="bg-amber-500 text-white text-center text-xs font-semibold py-1.5 flex items-center justify-center gap-1.5">
@@ -69,7 +72,7 @@ export default function Layout() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-2xl mx-auto px-4 py-5">
+      <main id="main-content" className="max-w-2xl mx-auto px-4 py-5">
         <Outlet />
       </main>
 

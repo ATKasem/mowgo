@@ -41,7 +41,7 @@ function StatCard({ icon: Icon, value, label, color, sub }) {
   return (
     <div className={`card p-4 flex flex-col items-center text-center gap-1 ${c.hover} transition-all`}>
       <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center mb-1`}>
-        <Icon className={`w-4.5 h-4.5 ${c.text}`} />
+        <Icon className={`w-[18px] h-[18px] ${c.text}`} />
       </div>
       <span className="text-xl font-extrabold text-gray-900 dark:text-white">{value}</span>
       <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
@@ -139,7 +139,12 @@ export default function Home({ jobs = [], invoices = [] }) {
               <span className={`text-xs font-medium w-9 text-right ${day.isToday ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-gray-500 dark:text-gray-400'}`}>
                 {day.label}
               </span>
-              <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
+              <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden"
+                   role="progressbar"
+                   aria-valuenow={day.done}
+                   aria-valuemin={0}
+                   aria-valuemax={day.total || 1}
+                   aria-label={`${day.label} job completion: ${day.done} of ${day.total} done`}>
                 <div
                   className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500"
                   style={{ width: `${day.total ? Math.max((day.done / Math.max(day.total, 1)) * 100, 8) : 0}%` }}

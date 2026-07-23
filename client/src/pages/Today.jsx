@@ -20,7 +20,7 @@ function getNextDate(currentDate, recurrence) {
 }
 
 export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
-  const { user } = useAuth();
+  useAuth();
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
@@ -58,39 +58,39 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       try {
         const newStatus = job.status === 'done' ? 'scheduled' : 'done';
         await updateJobStatus(job.id, newStatus);
-        setJobs(prev => {
-          let nextJobs = prev.map(j => j.id === job.id ? { ...j, status: newStatus } : j);
 
-          // Auto-regenerate recurring jobs
-          if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
-            const nextDate = getNextDate(job.scheduled_date, job.recurrence);
-            if (nextDate) {
-              const recLabel = RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label || job.recurrence;
-              createJob({
-                client_id: job.client_id,
-                title: job.title,
-                scheduled_date: nextDate,
-                scheduled_time: job.scheduled_time,
-                duration_minutes: job.duration_minutes,
-                recurrence: job.recurrence,
-                route_order: 99,
-              }).then(nextJob => {
-                if (nextJob) setJobs(p => [...p, nextJob]);
-              });
-              setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate });
-            } else {
-              setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
-            }
-          } else if (job.status !== 'done') {
+        // Update state outside the callback to avoid race condition
+        const nextJobs = jobs.map(j => j.id === job.id ? { ...j, status: newStatus } : j);
+        setJobs(nextJobs);
+
+        // Auto-regenerate recurring jobs (outside setJobs to avoid race)
+        if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
+          const nextDate = getNextDate(job.scheduled_date, job.recurrence);
+          if (nextDate) {
+            const recLabel = RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label || job.recurrence;
+            createJob({
+              client_id: job.client_id,
+              title: job.title,
+              scheduled_date: nextDate,
+              scheduled_time: job.scheduled_time,
+              duration_minutes: job.duration_minutes,
+              recurrence: job.recurrence,
+              route_order: 99,
+            }).then(nextJob => {
+              if (nextJob) setJobs(p => [...p, nextJob]);
+            });
+            setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate });
+          } else {
             setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
           }
-          setTimeout(() => setCompletedToast(null), 4000);
-          return nextJobs;
-        });
+        } else if (job.status !== 'done') {
+          setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
+        }
+        setTimeout(() => setCompletedToast(null), 4000);
       } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
     }, 150);
-  }, [setJobs]);
+  }, [jobs, setJobs]);
 
   // Drag-and-drop reordering
   function handleDragStart(job) { setDragId(job.id); }
@@ -113,6 +113,28 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     setDragOverId(null);
   }
   function handleDragEnd() { setDragId(null); setDragOverId(null); }
+
+  // Keyboard reordering
+  function handleMoveUp(jobIndex) {
+    setJobs(prev => {
+      const updated = [...prev];
+      if (jobIndex <= 0) return prev;
+      [updated[jobIndex - 1], updated[jobIndex]] = [updated[jobIndex], updated[jobIndex - 1]];
+      const reordered = updated.map((j, i) => ({ ...j, route_order: i + 1 }));
+      reordered.forEach(j => updateJob(j.id, { route_order: j.route_order }).catch(() => {}));
+      return reordered;
+    });
+  }
+  function handleMoveDown(jobIndex) {
+    setJobs(prev => {
+      const updated = [...prev];
+      if (jobIndex >= updated.length - 1) return prev;
+      [updated[jobIndex], updated[jobIndex + 1]] = [updated[jobIndex + 1], updated[jobIndex]];
+      const reordered = updated.map((j, i) => ({ ...j, route_order: i + 1 }));
+      reordered.forEach(j => updateJob(j.id, { route_order: j.route_order }).catch(() => {}));
+      return reordered;
+    });
+  }
 
   const filtered = date === today ? jobs : jobs.filter(j => j.scheduled_date === date);
   const doneCount = filtered.filter(j => j.status === 'done').length;
@@ -153,7 +175,15 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               tomorrow.setDate(tomorrow.getDate() + 1);
               const nextDate = tomorrow.toISOString().split('T')[0];
               const toMove = filtered.filter(j => j.status !== 'done');
-              toMove.forEach(j => updateJob(j.id, { scheduled_date: nextDate }).catch(() => {}));
+              Promise.allSettled(toMove.map(j => updateJob(j.id, { scheduled_date: nextDate })))
+                .then(results => {
+                  const failed = results.filter(r => r.status === 'rejected');
+                  if (failed.length > 0) {
+                    console.error('Rain delay: some jobs failed to move', failed.map(r => r.reason));
+                    setCompletedToast({ name: `${failed.length} of ${toMove.length} jobs failed to move`, amount: 0, type: 'error' });
+                    setTimeout(() => setCompletedToast(null), 4000);
+                  }
+                });
               setJobs(prev => prev.map(j =>
                 j.status !== 'done' && j.scheduled_date === date
                   ? { ...j, scheduled_date: nextDate }
@@ -172,7 +202,12 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       {/* Date picker + progress */}
       <div className="flex items-center gap-3 mb-4">
         <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label="Select date" className="input w-auto" />
-        <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
+        <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden"
+             role="progressbar"
+             aria-valuenow={doneCount}
+             aria-valuemin={0}
+             aria-valuemax={filtered.length || 1}
+             aria-label="Job completion progress">
           <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${filtered.length ? (doneCount / filtered.length) * 100 : 0}%` }} />
         </div>
       </div>
@@ -206,6 +241,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             onDragOver={(e) => handleDragOver(e, job)}
             onDrop={() => handleDrop(job)}
             onDragEnd={handleDragEnd}
+            onMoveUp={() => handleMoveUp(jobs.findIndex(j => j.id === job.id))}
+            onMoveDown={() => handleMoveDown(jobs.findIndex(j => j.id === job.id))}
           />
         ))}
       </div>

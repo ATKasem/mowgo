@@ -8,23 +8,28 @@ export default function InstallPrompt() {
 
   useEffect(() => {
     // Listen for install prompt
-    const handler = (e) => {
+    const beforeInstallHandler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
       setShowPrompt(true);
     };
-    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('beforeinstallprompt', beforeInstallHandler);
 
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setInstalled(true);
     }
-    window.addEventListener('appinstalled', () => {
+
+    const installedHandler = () => {
       setInstalled(true);
       setShowPrompt(false);
-    });
+    };
+    window.addEventListener('appinstalled', installedHandler);
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', beforeInstallHandler);
+      window.removeEventListener('appinstalled', installedHandler);
+    };
   }, []);
 
   async function install() {

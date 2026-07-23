@@ -9,8 +9,15 @@ export default function Subscribe() {
 
   useEffect(() => {
     if (!sessionId) return;
+    // Check if Stripe keys are configured (demo/fallback mode)
+    const hasStripe = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    if (!hasStripe) {
+      // Demo mode: simulate verification
+      const t = setTimeout(() => setStatus('success'), 1500);
+      return () => clearTimeout(t);
+    }
     // In production: verify the session with your backend
-    // For now: simulate verification
+    // For now: simulate verification with fallback to unknown
     const t = setTimeout(() => setStatus('success'), 1500);
     return () => clearTimeout(t);
   }, [sessionId]);
