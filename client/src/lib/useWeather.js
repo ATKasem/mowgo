@@ -7,10 +7,10 @@ export function useWeather(lat = 35.47, lon = -97.52) {
 
   useEffect(() => {
     let cancelled = false;
-    async function fetchWeather() {
+    async function fetchWeather(latitude, longitude) {
       try {
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_probability_max,weather_code&temperature_unit=fahrenheit&timezone=auto&forecast_days=3`
+          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=precipitation_probability_max,weather_code&temperature_unit=fahrenheit&timezone=auto&forecast_days=3`
         );
         const data = await res.json();
         if (!cancelled) setWeather(data);
@@ -20,12 +20,12 @@ export function useWeather(lat = 35.47, lon = -97.52) {
 
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        pos => { if (!cancelled) { lat = pos.coords.latitude; lon = pos.coords.longitude; fetchWeather(); } },
-        () => fetchWeather(),
+        pos => { if (!cancelled) fetchWeather(pos.coords.latitude, pos.coords.longitude); },
+        () => fetchWeather(lat, lon),
         { timeout: 5000 }
       );
     } else {
-      fetchWeather();
+      fetchWeather(lat, lon);
     }
 
     return () => { cancelled = true; };

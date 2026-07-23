@@ -1,0 +1,28 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    # Sync certificates and provisioning profiles
+    match(type: "appstore")
+
+    # Build the web app and sync to Capacitor
+    Dir.chdir("..") do
+      sh("npm run build")
+      sh("npx cap sync ios")
+    end
+
+    # Build the iOS app
+    build_app(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      export_method: "app-store",
+      output_directory: "build",
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+end

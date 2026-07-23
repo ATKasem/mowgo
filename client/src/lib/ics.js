@@ -20,7 +20,7 @@ export function generateGoogleCalUrl(jobs) {
   const params = new URLSearchParams({
     text: `${first.title} - ${first.clients?.name || 'MowFlow Job'}`,
     dates: `${date}T${time}/${date}T${endTime}`,
-    details: jobs.map(j => `${j.title} - ${j.clients?.name || ''} at ${j.scheduled_time?.slice(0, 5)}`).join('\\n'),
+    details: jobs.map(j => `${j.title} - ${j.clients?.name || ''} at ${j.scheduled_time?.slice(0, 5)}`).join('\n'),
     location: first.clients?.address || '',
   });
   return `${base}&${params.toString()}`;

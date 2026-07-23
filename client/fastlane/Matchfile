@@ -1,0 +1,5 @@
+git_url("git@github.com:ATKasem/mowflow.git")
+storage_mode("git")
+type("appstore")
+app_identifier("com.mowflow.app")
+username("REPLACE_WITH_APPLE_ID_EMAIL")

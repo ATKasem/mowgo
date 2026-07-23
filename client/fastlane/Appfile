@@ -1,0 +1,3 @@
+app_identifier("com.mowflow.app")
+apple_id("REPLACE_WITH_APPLE_ID_EMAIL")
+team_id("REPLACE_WITH_TEAM_ID")

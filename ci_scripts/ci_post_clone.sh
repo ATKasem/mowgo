@@ -12,6 +12,8 @@ export NODE_VERSION=$(cat .nvmrc 2>/dev/null || echo "22")
 export HOMEBREW_NO_AUTO_UPDATE=1
 
 # Install Node if needed (Xcode Cloud has nvm)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 if command -v nvm &>/dev/null; then
   nvm install "$NODE_VERSION"
   nvm use "$NODE_VERSION"

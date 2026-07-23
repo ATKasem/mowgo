@@ -1,11 +1,11 @@
-import { Check, CloudRain } from 'lucide-react';
+import { AlertCircle, Check, CloudRain } from 'lucide-react';
 
 export default function InvoiceToast({ toast }) {
   if (!toast) return null;
 
   const isRain = toast.type === 'rain';
   const isError = toast.type === 'error';
-  const Icon = isError ? CloudRain : isRain ? CloudRain : Check;
+  const Icon = isError ? AlertCircle : isRain ? CloudRain : Check;
   const bg = isError
     ? 'card bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'
     : isRain

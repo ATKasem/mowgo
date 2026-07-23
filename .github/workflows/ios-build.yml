@@ -1,0 +1,61 @@
+name: iOS Build + TestFlight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'client/src/**'
+      - 'client/public/**'
+      - 'client/fastlane/**'
+      - 'client/ios/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build web app
+        working-directory: client
+        run: npm run build
+
+      - name: Sync Capacitor
+        working-directory: client
+        run: npx cap sync ios
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Install Fastlane
+        working-directory: client
+        run: gem install fastlane -NV
+
+      - name: Build + Upload to TestFlight
+        working-directory: client
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_TOKEN }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.ASC_KEY }}
+        run: fastlane ios beta
