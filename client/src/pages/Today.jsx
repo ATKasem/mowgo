@@ -91,7 +91,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
                   ? { ...j, scheduled_date: nextDate }
                   : j
               ));
-              setCompletedToast({ name: `${filtered.filter(j => j.status !== 'done').length} jobs moved to tomorrow`, amount: 0 });
+              setCompletedToast({ name: `${filtered.filter(j => j.status !== 'done').length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
               setTimeout(() => setCompletedToast(null), 3500);
             }}
             className="w-full flex items-center justify-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
