@@ -14,6 +14,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 /** Check if we're connected to a real Supabase project */
 export function isDemoMode() {
+  // VITE_FORCE_DEMO overrides everything — set on Cloudflare Pages to keep demo accessible
+  if (import.meta.env.VITE_FORCE_DEMO === 'true') return true;
   return !import.meta.env.VITE_SUPABASE_URL || supabaseUrl === 'https://demo.supabase.co';
 }
 
