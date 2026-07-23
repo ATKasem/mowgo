@@ -214,7 +214,7 @@ export default function Home({ jobs = [], invoices = [] }) {
           {DAYS.map(d => <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 py-0.5">{d}</div>)}
         </div>
         {/* Calendar grid — compact, interactive */}
-        <div className="grid grid-cols-7 gap-px scroll-fade-bottom">
+        <div className="grid grid-cols-7 gap-px">
           {calendarGrid.map((date, i) => {
             if (!date) return <div key={`empty-${i}`} className="h-7" />;
             const dayNum = parseInt(date.split('-')[2]);

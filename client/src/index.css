@@ -290,14 +290,4 @@
   .safe-top {
     padding-top: env(safe-area-inset-top, 0);
   }
-  .scroll-fade-bottom {
-    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-  }
-  @media (min-width: 640px) {
-    .scroll-fade-bottom {
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-  }
 }

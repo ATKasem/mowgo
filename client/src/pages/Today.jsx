@@ -249,7 +249,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       )}
 
       {/* Job list */}
-      <div className="space-y-3 scroll-fade-bottom">
+      <div className="space-y-3">
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
             <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
