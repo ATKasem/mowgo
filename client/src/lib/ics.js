@@ -26,6 +26,54 @@ export function generateGoogleCalUrl(jobs) {
   return `${base}&${params.toString()}`;
 }
 
+/** Generate and download CSV (opens in Excel, Numbers, Google Sheets) */
+export function downloadCSV(jobs, filename = 'mowflow-schedule.csv') {
+  const headers = ['Date', 'Time', 'Client', 'Service', 'Address', 'Duration', 'Rate', 'Status'];
+  const rows = jobs.map(j => [
+    j.scheduled_date,
+    j.scheduled_time?.slice(0, 5) || '',
+    j.clients?.name || 'Unknown',
+    j.title,
+    j.clients?.address || '',
+    `${j.duration_minutes || 60} min`,
+    `$${j.clients?.rate || 0}`,
+    j.status,
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/** Open print-friendly schedule view for PDF export */
+export function printSchedule(jobs) {
+  const rows = jobs.map(j => `
+    <tr>
+      <td>${j.scheduled_date}</td>
+      <td>${j.scheduled_time?.slice(0, 5) || ''}</td>
+      <td>${j.clients?.name || 'Unknown'}</td>
+      <td>${j.title}</td>
+      <td>${j.clients?.address || ''}</td>
+      <td>$${j.clients?.rate || 0}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>MowFlow Schedule</title>
+    <style>body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}
+    h1{color:#16a34a}table{width:100%;border-collapse:collapse;margin-top:1rem}
+    th,td{text-align:left;padding:8px 12px;border-bottom:1px solid #e5e7eb}th{background:#f3f4f6;font-weight:600}
+    @media print{body{margin:0;padding:1cm}}</style></head>
+    <body><h1>🌱 MowFlow Schedule</h1><p>${new Date().toLocaleDateString()}</p>
+    <table><thead><tr><th>Date</th><th>Time</th><th>Client</th><th>Service</th><th>Address</th><th>Rate</th></tr></thead>
+    <tbody>${rows}</tbody></table></body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+}
+
 /** Generate raw ICS string (reusable) */
 export function generateICS(jobs) {
   const lines = [

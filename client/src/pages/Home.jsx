@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
-import { downloadICS, generateGoogleCalUrl } from '../lib/ics';
+import { downloadICS, generateGoogleCalUrl, downloadCSV, printSchedule } from '../lib/ics';
 import {
   Sprout, Sun, Cloud, CloudRain, CloudSun, CloudDrizzle, CloudLightning, Snowflake,
   Calendar, DollarSign, AlertCircle, CheckCircle, Clock,
-  ArrowRight, Plus, ChevronLeft, ChevronRight, Download, ExternalLink,
+  ArrowRight, Plus, ChevronLeft, ChevronRight, Download, ExternalLink, FileSpreadsheet, Printer,
 } from 'lucide-react';
 
 // ===== Weather helpers =====
@@ -212,6 +212,14 @@ export default function Home({ jobs = [], invoices = [] }) {
                 <button onClick={() => { downloadICS(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
                   className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
                   <Download className="w-3.5 h-3.5" />Download .ics (Apple/Outlook)
+                </button>
+                <button onClick={() => { downloadCSV(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
+                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  <FileSpreadsheet className="w-3.5 h-3.5" />Download CSV (Excel/Numbers)
+                </button>
+                <button onClick={() => { printSchedule(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
+                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  <Printer className="w-3.5 h-3.5" />Print / Save as PDF
                 </button>
                 <button onClick={() => { window.open(generateGoogleCalUrl(jobs.filter(j => j.scheduled_date >= today)), '_blank'); setShowExport(false); }}
                   className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
