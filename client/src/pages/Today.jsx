@@ -183,7 +183,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       </div>
 
       {/* Rain delay — weather-aware: only appears when rain is forecast */}
-      {filtered.some(j => j.status !== 'done') && rainLikely() && (
+      {filtered.some(j => j.status !== 'done') && (
         <div className="mb-4">
           <button
             onClick={() => {
