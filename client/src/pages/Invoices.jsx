@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { updateInvoiceStatus } from '../lib/data';
 import { FileText, CheckCircle, AlertCircle, Send, Receipt, Filter, X, ChevronRight } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 
@@ -8,7 +9,6 @@ const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
   { value: 'unpaid', label: 'Unpaid' },
   { value: 'paid', label: 'Paid' },
-  { value: 'overdue', label: 'Overdue' },
 ];
 
 export default function Invoices({ invoices, setInvoices }) {
@@ -22,8 +22,11 @@ export default function Invoices({ invoices, setInvoices }) {
     setTimeout(() => setSentReminders(prev => { const n = new Set(prev); n.delete(id); return n; }), 2500);
   }, []);
 
-  const markAsPaid = useCallback((id) => {
-    setInvoices(prev => prev.map(i => i.id === id ? { ...i, status: 'paid', paid_at: new Date().toISOString() } : i));
+  const markAsPaid = useCallback(async (id) => {
+    try {
+      await updateInvoiceStatus(id, 'paid');
+      setInvoices(prev => prev.map(i => i.id === id ? { ...i, status: 'paid', paid_at: new Date().toISOString() } : i));
+    } catch (err) { console.error('markAsPaid:', err); }
   }, [setInvoices]);
 
   const filtered = useMemo(() => {
@@ -56,20 +59,19 @@ export default function Invoices({ invoices, setInvoices }) {
         </div>
       )}
 
-      {/* Filter chips */}
       <div className="flex items-center gap-2 mb-4">
         <div className="relative">
           <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1"><Filter className="w-4 h-4" /></button>
           {showFilter && (
             <div className="absolute left-0 top-full mt-1 card p-1 z-10 min-w-[110px] shadow-lg" onMouseLeave={() => setShowFilter(false)}>
               {STATUS_FILTERS.map(f => (
-                <button key={f.value} onClick={() => { setStatusFilter(f.value); setShowFilter(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${statusFilter === f.value ? 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{f.label}</button>
+                <button key={f.value} onClick={() => { setStatusFilter(f.value); setShowFilter(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${statusFilter === f.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{f.label}</button>
               ))}
             </div>
           )}
         </div>
         {statusFilter !== 'all' && (
-          <button onClick={() => setStatusFilter('all')} className="inline-flex items-center gap-1 text-xs font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/30 px-2.5 py-1 rounded-full">
+          <button onClick={() => setStatusFilter('all')} className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full">
             {STATUS_FILTERS.find(f => f.value === statusFilter)?.label} <X className="w-3 h-3" />
           </button>
         )}
@@ -87,7 +89,7 @@ export default function Invoices({ invoices, setInvoices }) {
           const isExpanded = expandedId === invoice.id;
           return (
             <div key={invoice.id}>
-              <div className="card p-4 flex items-center justify-between hover:border-sky-200 dark:hover:border-sky-800 transition-all cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : invoice.id)}>
+              <div className="card p-4 flex items-center justify-between hover:border-emerald-200 dark:hover:border-emerald-800 transition-all cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : invoice.id)}>
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>
                   <div>
@@ -98,7 +100,7 @@ export default function Invoices({ invoices, setInvoices }) {
                 <div className="flex items-center gap-3">
                   <span className={statusInfo.badge}>{statusInfo.label}</span>
                   {!isPaid && (
-                    <button onClick={e => { e.stopPropagation(); if (!sentReminders.has(invoice.id)) sendReminder(invoice.id); }} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-sky-600 dark:text-sky-400 hover:text-sky-700'}`}>
+                    <button onClick={e => { e.stopPropagation(); if (!sentReminders.has(invoice.id)) sendReminder(invoice.id); }} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
                       {sentReminders.has(invoice.id) ? <><CheckCircle className="w-3 h-3" />Sent!</> : <><Send className="w-3 h-3" />Remind</>}
                     </button>
                   )}

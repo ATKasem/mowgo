@@ -2,7 +2,7 @@ import { Sparkles, RefreshCw } from 'lucide-react';
 import { demoClients } from '../lib/demoData';
 import { RECURRENCE_OPTIONS } from '../lib/constants';
 
-export default function NewJobForm({ form, setForm, onSubmit, onCancel }) {
+export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving = false }) {
   return (
     <form onSubmit={onSubmit} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
       <div className="flex items-center gap-2 mb-1">
@@ -43,8 +43,8 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel }) {
         </select>
       </div>
       <div className="flex gap-2 pt-1">
-        <button type="submit" className="btn-primary flex-1">Add Job</button>
-        <button type="button" onClick={onCancel} className="btn-secondary flex-1">Cancel</button>
+        <button type="submit" disabled={saving} className="btn-primary flex-1">{saving ? 'Adding...' : 'Add Job'}</button>
+        <button type="button" onClick={onCancel} disabled={saving} className="btn-secondary flex-1">Cancel</button>
       </div>
     </form>
   );

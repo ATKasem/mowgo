@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
-import { demoClients } from '../lib/demoData';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
-import { Plus, Circle, CloudRain, Repeat } from 'lucide-react';
+import { createJob, updateJobStatus, updateJob, loadJobs } from '../lib/data';
+import { useAuth } from '../App';
+import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
@@ -18,7 +19,8 @@ function getNextDate(currentDate, recurrence) {
   return d.toISOString().split('T')[0];
 }
 
-export default function Today({ jobs, setJobs, invoices, setInvoices }) {
+export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
+  const { user } = useAuth();
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
@@ -27,84 +29,68 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
   const [completedToast, setCompletedToast] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const createJob = useCallback((e) => {
+  const createJobHandler = useCallback(async (e) => {
     e.preventDefault();
     if (!form.client_id) return;
-    const client = demoClients.find(c => c.id === form.client_id);
-    setJobs(prev => {
-      const newJob = {
-        id: String(Date.now()),
-        ...form,
-        scheduled_date: date,
-        status: 'scheduled',
-        route_order: prev.filter(j => j.scheduled_date === date).length + 1,
-        clients: client,
-      };
-      return [newJob, ...prev];
-    });
+    setSaving(true);
+    try {
+      const newJob = await createJob({ ...form, scheduled_date: date, route_order: jobs.filter(j => j.scheduled_date === date).length + 1 });
+      if (newJob) {
+        setJobs(prev => [newJob, ...prev]);
+      }
+    } catch (err) { console.error('createJob:', err); }
+    setSaving(false);
     setShowForm(false);
     setForm(INITIAL_JOB_FORM);
-  }, [form, date, setJobs]);
+  }, [form, date, jobs, setJobs]);
 
-  const toggleStatus = useCallback((job) => {
+  const toggleStatus = useCallback(async (job) => {
     setAnimating(job.id);
-    setTimeout(() => {
-      setJobs(prev => {
-        let nextJobs = prev.map(j => {
-          if (j.id !== job.id) return j;
-          const newStatus = j.status === 'done' ? 'scheduled' : 'done';
-          return { ...j, status: newStatus };
-        });
+    setTimeout(async () => {
+      try {
+        const newStatus = job.status === 'done' ? 'scheduled' : 'done';
+        await updateJobStatus(job.id, newStatus);
+        setJobs(prev => {
+          let nextJobs = prev.map(j => j.id === job.id ? { ...j, status: newStatus } : j);
 
-        // Auto-regenerate: if completing a recurring job, create next occurrence
-        if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
-          const nextDate = getNextDate(job.scheduled_date, job.recurrence);
-          if (nextDate) {
-            const nextJob = {
-              id: String(Date.now() + 1),
-              client_id: job.client_id,
-              title: job.title,
-              scheduled_date: nextDate,
-              scheduled_time: job.scheduled_time,
-              duration_minutes: job.duration_minutes,
-              status: 'scheduled',
-              route_order: 99,
-              recurrence: job.recurrence,
-              clients: job.clients,
-            };
-            nextJobs = [...nextJobs, nextJob];
+          // Auto-regenerate recurring jobs
+          if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
+            const nextDate = getNextDate(job.scheduled_date, job.recurrence);
+            if (nextDate) {
+              const recLabel = RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label || job.recurrence;
+              createJob({
+                client_id: job.client_id,
+                title: job.title,
+                scheduled_date: nextDate,
+                scheduled_time: job.scheduled_time,
+                duration_minutes: job.duration_minutes,
+                recurrence: job.recurrence,
+                route_order: 99,
+              }).then(nextJob => {
+                if (nextJob) setJobs(p => [...p, nextJob]);
+              });
+              setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate });
+            } else {
+              setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
+            }
+          } else if (job.status !== 'done') {
+            setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
           }
-        }
-        return nextJobs;
-      });
+          setTimeout(() => setCompletedToast(null), 4000);
+          return nextJobs;
+        });
+      } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
-      if (job.status !== 'done') {
-        const newInvoice = {
-          id: String(Date.now()),
-          clients: job.clients,
-          amount: job.clients?.rate || 0,
-          status: 'unpaid',
-          created_at: new Date().toISOString(),
-        };
-        if (setInvoices) setInvoices(prev => [newInvoice, ...prev]);
-        const recLabel = job.recurrence && job.recurrence !== 'none'
-          ? ` · Next ${RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label || job.recurrence} job created`
-          : '';
-        setCompletedToast({ name: `${job.clients?.name}${recLabel}`, amount: job.clients?.rate });
-        setTimeout(() => setCompletedToast(null), 4000);
-      }
     }, 150);
-  }, [setJobs, setInvoices]);
+  }, [setJobs]);
 
   // Drag-and-drop reordering
   function handleDragStart(job) { setDragId(job.id); }
-  function handleDragOver(e, job) {
-    e.preventDefault();
-    if (dragId && dragId !== job.id) setDragOverId(job.id);
-  }
+  function handleDragOver(e, job) { e.preventDefault(); if (dragId && dragId !== job.id) setDragOverId(job.id); }
   function handleDrop(job) {
     if (!dragId || dragId === job.id) { setDragId(null); setDragOverId(null); return; }
     setJobs(prev => {
@@ -114,7 +100,10 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
       if (dragIdx === -1 || dropIdx === -1) return prev;
       const [dragged] = updated.splice(dragIdx, 1);
       updated.splice(dropIdx, 0, dragged);
-      return updated.map((j, i) => ({ ...j, route_order: i + 1 }));
+      const reordered = updated.map((j, i) => ({ ...j, route_order: i + 1 }));
+      // Persist new orders
+      reordered.forEach(j => updateJob(j.id, { route_order: j.route_order }).catch(() => {}));
+      return reordered;
     });
     setDragId(null);
     setDragOverId(null);
@@ -123,6 +112,14 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
 
   const filtered = date === today ? jobs : jobs.filter(j => j.scheduled_date === date);
   const doneCount = filtered.filter(j => j.status === 'done').length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -140,7 +137,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
             )}
           </div>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
+        <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
       </div>
 
       {/* Rain delay */}
@@ -151,12 +148,14 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
               const tomorrow = new Date(date);
               tomorrow.setDate(tomorrow.getDate() + 1);
               const nextDate = tomorrow.toISOString().split('T')[0];
+              const toMove = filtered.filter(j => j.status !== 'done');
+              toMove.forEach(j => updateJob(j.id, { scheduled_date: nextDate }).catch(() => {}));
               setJobs(prev => prev.map(j =>
                 j.status !== 'done' && j.scheduled_date === date
                   ? { ...j, scheduled_date: nextDate }
                   : j
               ));
-              setCompletedToast({ name: `${filtered.filter(j => j.status !== 'done').length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
+              setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
               setTimeout(() => setCompletedToast(null), 3500);
             }}
             className="w-full flex items-center justify-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
@@ -170,13 +169,13 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
       <div className="flex items-center gap-3 mb-4">
         <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label="Select date" className="input w-auto" />
         <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full transition-all duration-500" style={{ width: `${filtered.length ? (doneCount / filtered.length) * 100 : 0}%` }} />
+          <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${filtered.length ? (doneCount / filtered.length) * 100 : 0}%` }} />
         </div>
       </div>
 
       {/* New job form */}
       {showForm && (
-        <NewJobForm form={form} setForm={setForm} onSubmit={createJob} onCancel={() => setShowForm(false)} />
+        <NewJobForm form={form} setForm={setForm} onSubmit={createJobHandler} onCancel={() => setShowForm(false)} saving={saving} />
       )}
 
       {/* Job list */}

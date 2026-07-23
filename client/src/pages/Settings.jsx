@@ -1,33 +1,43 @@
 import { useState, useEffect } from 'react';
-import { supabase, isDemoMode } from '../lib/supabase';
-import { Store, Phone, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle } from 'lucide-react';
+import { loadProfile, saveProfile } from '../lib/data';
+import { isDemoMode } from '../lib/supabase';
+import { Store, Phone, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
 
 export default function Settings() {
   const [profile, setProfile] = useState({ business_name: '', phone: '' });
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
-  // Notification prefs (local only for now)
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
   const [notifyOnRain, setNotifyOnRain] = useState(() => localStorage.getItem('mf_notify_rain') !== 'false');
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => { if (data) setProfile(data); }).catch(() => {});
-    }).catch(() => {});
+    loadProfile().then(data => {
+      if (data) setProfile(data);
+      setProfileLoading(false);
+    });
   }, []);
 
   async function save(e) {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) await supabase.from('profiles').upsert({ id: user.id, ...profile });
+      await saveProfile(profile);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-    } catch { setSaved(true); setTimeout(() => setSaved(false), 2500); }
-    finally { setIsLoading(false); }
+    } catch (err) {
+      if (isDemoMode()) {
+        // Demo mode: treat as success (no backend)
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      } else {
+        setError(err.message || 'Failed to save profile');
+      }
+    }
+    setIsLoading(false);
   }
 
   function toggleNotifyComplete(val) {
@@ -50,15 +60,27 @@ export default function Settings() {
 
         {/* Business Profile */}
         <form onSubmit={save} className="card p-5 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-sky-500" />Business Profile</h3>
-          <div>
-            <label className="label">Business Name</label>
-            <input value={profile.business_name || ''} onChange={e => setProfile({ ...profile, business_name: e.target.value })} placeholder="Green Thumb Lawn Care" className="input" />
-          </div>
-          <div>
-            <label className="label">Phone Number</label>
-            <input value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="405-555-0100" className="input" />
-          </div>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-emerald-500" />Business Profile</h3>
+          {profileLoading ? (
+            <div className="flex items-center justify-center py-6"><Loader2 className="w-5 h-5 text-emerald-500 animate-spin" /></div>
+          ) : (
+            <>
+              <div>
+                <label className="label">Business Name</label>
+                <input value={profile.business_name || ''} onChange={e => setProfile({ ...profile, business_name: e.target.value })} placeholder="Green Thumb Lawn Care" className="input" />
+              </div>
+              <div>
+                <label className="label">Phone Number</label>
+                <input value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="405-555-0100" className="input" />
+              </div>
+            </>
+          )}
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
           <button type="submit" disabled={isLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-emerald-500 hover:!bg-emerald-600 !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
             {saved ? <><CheckCircle className="w-4 h-4" />Saved</> : isLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save Changes</>}
           </button>
@@ -92,7 +114,7 @@ export default function Settings() {
               role="switch"
               aria-checked={notifyOnComplete}
               onClick={() => toggleNotifyComplete(!notifyOnComplete)}
-              className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-sky-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+              className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${notifyOnComplete ? 'translate-x-[18px]' : ''}`} />
             </button>
@@ -106,7 +128,7 @@ export default function Settings() {
               role="switch"
               aria-checked={notifyOnRain}
               onClick={() => toggleNotifyRain(!notifyOnRain)}
-              className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-sky-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+              className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${notifyOnRain ? 'translate-x-[18px]' : ''}`} />
             </button>
@@ -118,7 +140,7 @@ export default function Settings() {
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-emerald-500" />Team</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.</p>
           <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-            <div className="w-9 h-9 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-xs font-bold text-sky-700 dark:text-sky-400">YO</div>
+            <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400">YO</div>
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-white">You</p>
               <p className="text-xs text-gray-400 dark:text-gray-500">Owner</p>
@@ -129,7 +151,7 @@ export default function Settings() {
         {/* Help */}
         <div className="card p-5 space-y-3">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-gray-400" />Help & Support</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Need help? Email us at <a href="mailto:hello@mowflow.app" className="text-sky-600 dark:text-sky-400 hover:underline">hello@mowflow.app</a></p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Need help? Email us at <a href="mailto:hello@mowflow.app" className="text-emerald-600 dark:text-emerald-400 hover:underline">hello@mowflow.app</a></p>
           <p className="text-xs text-gray-400 dark:text-gray-500">MowFlow v1.0 — Built for lawn care crews</p>
         </div>
 

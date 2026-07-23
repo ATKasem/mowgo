@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
-import { demoClients } from '../lib/demoData';
-import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { loadClients, createClient, updateClient, deleteClient } from '../lib/data';
+import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar, Loader2 } from 'lucide-react';
 import { getMapsUrl } from '../lib/maps';
 
 const emptyForm = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
@@ -15,11 +15,11 @@ const SORT_OPTIONS = [
   { value: 'name', label: 'Name' },
   { value: 'rate-desc', label: 'Rate ↓' },
   { value: 'rate-asc', label: 'Rate ↑' },
-  { value: 'recent', label: 'Recent' },
 ];
 
 export default function Clients({ jobs = [] }) {
-  const [clients, setClients] = useState(demoClients);
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState('');
@@ -27,21 +27,38 @@ export default function Clients({ jobs = [] }) {
   const [expandedId, setExpandedId] = useState(null);
   const [sortBy, setSortBy] = useState('name');
   const [showSort, setShowSort] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadClients().then(data => { setClients(data); setLoading(false); });
+  }, []);
 
   function openNew() { setEditId(null); setForm(emptyForm); setExpandedId(null); setShowForm(true); }
   function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
 
-  function save(e) {
+  async function save(e) {
     e.preventDefault();
-    if (editId) setClients(clients.map(c => c.id === editId ? { ...form, id: editId } : c));
-    else setClients([...clients, { ...form, id: String(Date.now()) }]);
-    setShowForm(false);
-    setEditId(null);
+    setSaving(true);
+    try {
+      if (editId) {
+        const updated = await updateClient(editId, form);
+        setClients(prev => prev.map(c => c.id === editId ? { ...c, ...updated } : c));
+      } else {
+        const created = await createClient(form);
+        setClients(prev => [...prev, created]);
+      }
+      setShowForm(false);
+      setEditId(null);
+    } catch (err) { console.error('save client:', err); }
+    setSaving(false);
   }
 
-  function remove(id) { setClients(clients.filter(c => c.id !== id)); if (expandedId === id) setExpandedId(null); }
+  async function remove(id) {
+    await deleteClient(id);
+    setClients(prev => prev.filter(c => c.id !== id));
+    if (expandedId === id) setExpandedId(null);
+  }
 
-  // Get next scheduled job + recent history for a client
   const clientMeta = useMemo(() => {
     const map = {};
     clients.forEach(c => {
@@ -61,17 +78,24 @@ export default function Clients({ jobs = [] }) {
     switch (sortBy) {
       case 'rate-desc': list.sort((a, b) => (b.rate || 0) - (a.rate || 0)); break;
       case 'rate-asc': list.sort((a, b) => (a.rate || 0) - (b.rate || 0)); break;
-      case 'recent': break; // default order
       default: list.sort((a, b) => a.name.localeCompare(b.name)); break;
     }
     return list;
   }, [clients, search, sortBy]);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
         <div><h2 className="text-xl font-bold text-gray-900 dark:text-white">Clients</h2><p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{clients.length} total</p></div>
-        <button onClick={openNew} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />Add Client</button>
+        <button onClick={openNew} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />Add Client</button>
       </div>
 
       <div className="flex gap-2 mb-4">
@@ -81,7 +105,7 @@ export default function Clients({ jobs = [] }) {
           {showSort && (
             <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[140px] shadow-lg" onMouseLeave={() => setShowSort(false)}>
               {SORT_OPTIONS.map(o => (
-                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${sortBy === o.value ? 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
+                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${sortBy === o.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
               ))}
             </div>
           )}
@@ -89,7 +113,7 @@ export default function Clients({ jobs = [] }) {
       </div>
 
       {showForm && (
-        <form onSubmit={save} className="card p-5 mb-4 space-y-3 border-sky-200 dark:border-sky-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
+        <form onSubmit={save} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{editId ? 'Edit Client' : 'New Client'}</h3>
           <div><label className="label">Name *</label><input placeholder="Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
           <div><label className="label">Address</label><input placeholder="123 Main St, OKC, OK" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
@@ -98,7 +122,7 @@ export default function Clients({ jobs = [] }) {
           <div><label className="label">Service Notes</label><textarea placeholder="Focus on front yard..." value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Key Code</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">Alarm Code</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
           <div><label className="label">Pet Instructions</label><input placeholder="1 friendly dog..." value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
-          <div className="flex gap-2 pt-1"><button type="submit" className="btn-primary flex-1">{editId ? 'Save Changes' : 'Add Client'}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">Cancel</button></div>
+          <div className="flex gap-2 pt-1"><button type="submit" disabled={saving} className="btn-primary flex-1">{saving ? 'Saving...' : editId ? 'Save Changes' : 'Add Client'}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">Cancel</button></div>
         </form>
       )}
 
@@ -116,7 +140,7 @@ export default function Clients({ jobs = [] }) {
           const meta = clientMeta[client.id];
           return (
             <div key={client.id} className={isEditing ? 'opacity-40 pointer-events-none' : ''}>
-              <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-sky-200 dark:hover:border-sky-800 transition-all" onClick={() => setExpandedId(isExpanded ? null : client.id)}>
+              <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-800 transition-all" onClick={() => setExpandedId(isExpanded ? null : client.id)}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors[i % avatarColors.length]}`}>{getInitials(client.name)}</div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</p>
@@ -134,26 +158,19 @@ export default function Clients({ jobs = [] }) {
               </div>
               {isExpanded && (
                 <div className="card border-t-0 rounded-t-none -mt-1 p-4 pt-3 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
-                  {/* Quick actions */}
                   <div className="flex gap-2 mb-1">
                     {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Phone className="w-3 h-3" />Call</a>}
                     {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Navigation className="w-3 h-3" />Navigate</a>}
                   </div>
-
-                  {/* Contact info */}
                   {client.phone && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Phone className="w-3.5 h-3.5 text-gray-400" />{client.phone}</div>}
                   {client.email && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Mail className="w-3.5 h-3.5 text-gray-400" />{client.email}</div>}
                   {client.service_notes && <div className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400"><StickyNote className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />{client.service_notes}</div>}
-
-                  {/* Next scheduled */}
                   {meta?.nextJob && (
                     <div className="flex items-center gap-2.5 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/20 rounded-lg p-2.5">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>Next: <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5)} — {meta.nextJob.title}</span>
                     </div>
                   )}
-
-                  {/* Recent service history */}
                   {meta?.recentDone?.length > 0 && (
                     <div className="pt-1">
                       <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Recent service ({meta.totalJobs} total jobs)</p>
@@ -169,15 +186,11 @@ export default function Clients({ jobs = [] }) {
                       </div>
                     </div>
                   )}
-
-                  {/* Access info badges */}
                   <div className="flex flex-wrap gap-1.5">
                     {client.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><Key className="w-3 h-3" />Key: {client.key_code}</span>}
                     {client.alarm_code && <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1 text-[11px]"><AlarmCheck className="w-3 h-3" />Alarm: {client.alarm_code}</span>}
                     {client.pet_instructions && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><PawPrint className="w-3 h-3" />{client.pet_instructions}</span>}
                   </div>
-
-                  {/* Edit/delete */}
                   <div className="flex gap-2 pt-1">
                     <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-1.5 px-3 gap-1"><Pencil className="w-3 h-3" />Edit</button>
                     <button onClick={e => { e.stopPropagation(); remove(client.id); }} className="btn-ghost text-xs py-1.5 px-3 gap-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600"><Trash2 className="w-3 h-3" />Delete</button>
