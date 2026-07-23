@@ -169,7 +169,7 @@ export default function Home({ jobs = [], invoices = [] }) {
 
       {/* 5-day forecast strip */}
       {!weatherLoading && forecast.length > 0 && (
-        <div className="flex gap-2 mb-5 overflow-x-auto pb-2 -mx-1 px-1
+        <div className="flex gap-2 mb-5 overflow-x-auto overflow-y-visible pb-2 -mx-1 px-1
           [&::-webkit-scrollbar]:h-1.5
           [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700
@@ -177,7 +177,7 @@ export default function Home({ jobs = [], invoices = [] }) {
           {forecast.map((f, i) => {
             const FI = weatherIcons[f.code] || Sun;
             return (
-              <div key={i} className={`card flex-shrink-0 p-3 flex flex-col items-center gap-1.5 w-[76px] ${f.day === new Date().toLocaleDateString('en-US', { weekday: 'short' }) ? 'ring-1 ring-emerald-400' : ''}`}>
+              <div key={i} className={`card flex-shrink-0 py-3 px-2.5 flex flex-col items-center gap-1.5 w-[76px] box-border ${f.day === new Date().toLocaleDateString('en-US', { weekday: 'short' }) ? 'ring-1 ring-inset ring-emerald-400 border-emerald-400' : ''}`}>
                 <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{f.day}</span>
                 <FI className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                 <span className="text-xs font-bold text-gray-900 dark:text-white">{f.hi}°</span>
