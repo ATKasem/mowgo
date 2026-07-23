@@ -6,7 +6,7 @@ import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle,
 
 export default function Settings() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState({ business_name: '', phone: '' });
+  const [profile, setProfile] = useState({ business_name: '', phone: '', tier: 'free' });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -67,7 +67,7 @@ export default function Settings() {
         <form onSubmit={save} className="card p-5 space-y-4">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-emerald-500" />Business Profile</h3>
           {profileLoading ? (
-            <div className="flex items-center justify-center py-6"><Loader2 className="w-5 h-5 text-emerald-500 animate-spin" /></div>
+            <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-emerald-500 animate-spin" /></div>
           ) : (
             <>
               <div>
@@ -78,18 +78,18 @@ export default function Settings() {
                 <label className="label">Phone Number</label>
                 <input value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="405-555-0100" className="input" />
               </div>
+              {error && (
+                <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {error}
+                </div>
+              )}
+              <button type="submit" disabled={isLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-emerald-500 hover:!bg-emerald-600 !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
+                {saved ? <><CheckCircle className="w-4 h-4" />Saved</> : isLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save Changes</>}
+              </button>
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Changes sync across all your devices.</p>
             </>
           )}
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
-          <button type="submit" disabled={isLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-emerald-500 hover:!bg-emerald-600 !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
-            {saved ? <><CheckCircle className="w-4 h-4" />Saved</> : isLoading ? <><Loader2 className="w-4 h-4 animate-spin" />Saving...</> : <><Save className="w-4 h-4" />Save Changes</>}
-          </button>
-          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Changes sync across all your devices.</p>
         </form>
 
         {/* Plan Info */}
@@ -155,7 +155,7 @@ export default function Settings() {
               {(profile?.business_name || user?.email || 'YO').slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.business_name || user?.email?.split('@')[0] || 'You'}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.business_name || (user?.email?.split('@')?.[0]) || 'You'}</p>
               <p className="text-xs text-gray-400 dark:text-gray-500">Owner</p>
             </div>
           </div>
