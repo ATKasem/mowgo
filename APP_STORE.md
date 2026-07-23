@@ -1,9 +1,9 @@
-# CleanFlow — App Store Submission Package
+# MowFlow — App Store Submission Package
 
 ## App Identity
-- **App Name:** CleanFlow
+- **App Name:** MowFlow
 - **Subtitle:** Cleaning Business Scheduler
-- **Bundle ID:** com.cleanflow.app
+- **Bundle ID:** com.mowflow.app
 - **Category:** Business
 - **Secondary Category:** Productivity
 - **Age Rating:** 4+
@@ -11,10 +11,10 @@
 
 ## App Store Description
 
-CleanFlow is the simplest way for solo and small cleaning crews to manage their business from their phone. Schedule recurring jobs, plan daily routes, manage client details, and send invoices — all in one app that doesn't require an office manager to operate.
+MowFlow is the simplest way for solo and small lawn care crews to manage their business from their phone. Schedule recurring jobs, plan daily routes, manage client details, and send invoices — all in one app that doesn't require an office manager to operate.
 
-**WHY CLEANFLOW?**
-Unlike Jobber or Housecall Pro (built for 20-person crews at $169+/month), CleanFlow is designed specifically for 1-3 person cleaning teams. No features you won't use. No complexity you don't need.
+**WHY MOWFLOW?**
+Unlike Jobber or Housecall Pro (built for 20-person crews at $169+/month), MowFlow is designed specifically for 1-3 person cleaning teams. No features you won't use. No complexity you don't need.
 
 **KEY FEATURES:**
 • Smart calendar with recurring jobs — set a biweekly clean once, it populates forever
@@ -29,12 +29,12 @@ Unlike Jobber or Housecall Pro (built for 20-person crews at $169+/month), Clean
 • Crew: $69/month — multi-user team access, job assignment
 
 **WHAT CLEANERS SAY:**
-"I was running my 2-person crew on texts and a whiteboard. CleanFlow saves me 5 hours a week." — Maria, OKC
+"I was running my 2-person crew on texts and a whiteboard. MowFlow saves me 5 hours a week." — Maria, OKC
 
-Download CleanFlow and take your first job in under 2 minutes.
+Download MowFlow and take your first job in under 2 minutes.
 
 ## Keywords
-cleaning business, scheduling app, house cleaning, maid service, route planner, invoicing, client management, cleaning schedule, small business, field service, service business
+lawn care business, scheduling app, lawn maintenance, lawn maintenance, route planner, invoicing, client management, cleaning schedule, small business, field service, service business
 
 ## Screenshots (6.7" iPhone)
 Required: 6.7" iPhone screenshots (1290x2796px)
@@ -44,7 +44,7 @@ Required: 6.7" iPhone screenshots (1290x2796px)
 4. Invoicing with paid/unpaid tracking
 
 ## Privacy Policy URL
-https://cleanfloww.netlify.app/privacy
+https://mowflow.netlify.app/privacy
 
 ## Support URL
-https://cleanfloww.netlify.app
+https://mowflow.netlify.app

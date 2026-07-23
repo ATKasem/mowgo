@@ -41,8 +41,8 @@ export default function InstallPrompt() {
 
   return (
     <div className="fixed bottom-20 inset-x-0 z-30 px-4 pointer-events-none">
-      <div className="card max-w-md mx-auto p-4 flex items-center gap-3 pointer-events-auto animate-[slideUp_0.3s_ease-out] shadow-lg border-sky-200 dark:border-sky-800">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center flex-shrink-0">
+      <div className="card max-w-md mx-auto p-4 flex items-center gap-3 pointer-events-auto animate-[slideUp_0.3s_ease-out] shadow-lg border-emerald-200 dark:border-emerald-800">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
           <Download className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">

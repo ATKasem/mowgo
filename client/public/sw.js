@@ -1,23 +1,53 @@
-const CACHE_NAME = 'mowflow-v2';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/favicon.svg',
-  '/icons.svg',
-];
+const CACHE_NAME = 'mowflow-v3';
+const DB_NAME = 'mowflow-offline';
+const DB_VERSION = 1;
 
-// Install — cache core assets
+// ===== IndexedDB =====
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('store')) {
+        db.createObjectStore('store', { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function dbGet(key) {
+  const db = await openDB();
+  return new Promise((resolve) => {
+    const tx = db.transaction('store', 'readonly');
+    const req = tx.objectStore('store').get(key);
+    req.onsuccess = () => resolve(req.result?.value);
+    req.onerror = () => resolve(null);
+  });
+}
+
+async function dbSet(key, value) {
+  const db = await openDB();
+  return new Promise((resolve) => {
+    const tx = db.transaction('store', 'readwrite');
+    tx.objectStore('store').put({ key, value, updated: Date.now() });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
+// ===== Install =====
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch(() => {});
+      return cache.addAll(['/', '/index.html', '/manifest.json', '/favicon.svg', '/icons.svg']).catch(() => {});
     })
   );
   self.skipWaiting();
 });
 
-// Activate — clean old caches
+// ===== Activate =====
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -27,22 +57,27 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch — network-first with cache fallback
+// ===== Fetch =====
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  // Skip chrome-extension and non-HTTP requests
+  const url = new URL(event.request.url);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+  if (url.hostname === 'm.stripe.network') return;
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache successful responses
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, clone);
-        });
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, clone);
+          });
+        }
         return response;
       })
       .catch(() => {
-        // Offline — return from cache
         return caches.match(event.request).then((cached) => {
           return cached || new Response('Offline — check your connection', {
             status: 503,
@@ -51,4 +86,18 @@ self.addEventListener('fetch', (event) => {
         });
       })
   );
+});
+
+// ===== Message handling (for main thread to store/retrieve offline data) =====
+self.addEventListener('message', (event) => {
+  const { type, key, value } = event.data || {};
+  if (type === 'SET_OFFLINE') {
+    event.waitUntil(dbSet(key, value).then(() => {
+      if (event.ports?.[0]) event.ports[0].postMessage({ ok: true });
+    }));
+  } else if (type === 'GET_OFFLINE') {
+    event.waitUntil(dbGet(key).then((val) => {
+      if (event.ports?.[0]) event.ports[0].postMessage({ value: val });
+    }));
+  }
 });

@@ -11,9 +11,9 @@ const features = [
 ];
 
 const plans = [
-  { name: 'Free', price: '0', period: 'forever', desc: 'For solo landscapers getting started', features: ['Up to 10 clients', 'Basic calendar', 'Route view (1 stop/day)', 'Manual invoicing'], cta: 'Start Free', highlight: false },
-  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients', 'Full calendar + recurring jobs', 'Daily route optimization', 'One-tap invoicing + Stripe', 'Client notes + key codes', 'Email support'], cta: 'Start Free Trial', highlight: true },
-  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Multi-user team access', 'Job assignment + tracking', 'Team progress dashboard', 'Priority support', 'Coming: QuickBooks export'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Free', price: '0', period: 'forever', desc: 'For solo landscapers getting started', features: ['Up to 10 clients', 'Daily job scheduling', 'Recurring job auto-regenerate', 'Invoice tracking', 'Rain delay reschedule', 'Dark mode + mobile PWA'], cta: 'Start Free', highlight: false },
+  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'Client notes, codes & pets', 'GPS navigate to job site', 'Offline mode', 'Stripe payments'], cta: 'Start Free Trial', highlight: true, coming: ['Stripe payments'] },
+  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Multi-user team access', 'Route optimization', 'Team progress dashboard', 'Priority support', 'QuickBooks export'], cta: 'Start Free Trial', highlight: false, coming: ['Multi-user team access', 'Route optimization', 'QuickBooks export'] },
 ];
 
 const stats = [
@@ -132,9 +132,15 @@ export default function Landing() {
                     <span className="text-gray-400 dark:text-gray-500 font-medium">/{plan.period}</span>
                   </div>
                   <ul className="space-y-3 flex-1 border-t border-gray-100 dark:border-gray-800 pt-4">
-                    {plan.features.map(f => (
-                      <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />{f}</li>
-                    ))}
+                    {plan.features.map(f => {
+                      const isComing = plan.coming?.includes(f);
+                      return (
+                        <li key={f} className={`flex items-start gap-2.5 text-sm ${isComing ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}>
+                          <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isComing ? 'text-gray-300 dark:text-gray-600' : 'text-emerald-500'}`} />
+                          <span>{f}{isComing && <span className="ml-1.5 text-[10px] font-semibold uppercase text-amber-500 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">Soon</span>}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   {plan.name === 'Free' ? (
                     <Link to="/app" className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700`}>{plan.cta}</Link>

@@ -57,7 +57,7 @@
   }
 
   *:focus-visible {
-    outline: 2px solid #0ea5e9;
+    outline: 2px solid #16a34a;
     outline-offset: 2px;
   }
 }
@@ -87,7 +87,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background: #0ea5e9;
+    background: #16a34a;
     color: white;
     font-weight: 600;
     border-radius: 0.75rem;
@@ -99,7 +99,7 @@
     transition: all 0.15s ease;
   }
   .btn-primary:hover {
-    background: #0284c7;
+    background: #15803d;
   }
   .btn-primary:active {
     transform: scale(0.97);
@@ -170,12 +170,12 @@
     color: var(--color-text-muted);
   }
   .input:focus {
-    border-color: #38bdf8;
+    border-color: #4ade80;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
   }
   .dark .input:focus {
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3);
   }
 
   .select {
@@ -192,12 +192,12 @@
     box-sizing: border-box;
   }
   .select:focus {
-    border-color: #38bdf8;
+    border-color: #4ade80;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
   }
   .dark .select:focus {
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3);
   }
 
   /* Labels */
@@ -255,18 +255,18 @@
     color: #fca5a5;
   }
   .badge-info {
-    color: #0369a1;
+    color: #047857;
   }
   .badge-info::before {
-    background: #0ea5e9;
+    background: #10b981;
   }
   .dark .badge-info {
-    color: #7dd3fc;
+    color: #6ee7b7;
   }
 
   /* Dark mode specific overrides */
   .dark .bg-amber-50 { background: #451a03; }
-  .dark .bg-sky-50 { background: #0c2d48; }
+  .dark .bg-sky-50 { background: #064e3b; }
   .dark .bg-emerald-50 { background: #064e3b; }
   .dark .bg-gray-100 { background: #374151; }
   .dark .bg-white { background: #1f2937; }
@@ -278,7 +278,7 @@
   .dark .text-gray-900 { color: #f9fafb; }
   .dark .text-emerald-700 { color: #6ee7b7; }
   .dark .text-amber-700 { color: #fbbf24; }
-  .dark .text-sky-700 { color: #7dd3fc; }
+  .dark .text-sky-700 { color: #6ee7b7; }
   .dark .text-amber-800 { color: #fbbf24; }
   .dark .text-amber-600 { color: #fbbf24; }
   .dark .border-gray-100 { border-color: #374151; }

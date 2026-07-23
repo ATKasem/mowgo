@@ -10,10 +10,10 @@ export const demoClients = [
 ];
 
 export const demoJobs = [
-  { id: '1', client_id: '1', title: 'Mow + Edge', scheduled_date: today, scheduled_time: '08:00', duration_minutes: 45, status: 'done', route_order: 1, clients: demoClients[0] },
-  { id: '2', client_id: '2', title: 'Full Service', scheduled_date: today, scheduled_time: '09:30', duration_minutes: 90, status: 'in_progress', route_order: 2, clients: demoClients[1] },
-  { id: '3', client_id: '3', title: 'Quick Mow', scheduled_date: today, scheduled_time: '11:00', duration_minutes: 30, status: 'scheduled', route_order: 3, clients: demoClients[2] },
-  { id: '4', client_id: '4', title: 'Biweekly Service', scheduled_date: today, scheduled_time: '13:00', duration_minutes: 60, status: 'scheduled', route_order: 4, clients: demoClients[3] },
+  { id: '1', client_id: '1', title: 'Mow + Edge', scheduled_date: today, scheduled_time: '08:00', duration_minutes: 45, status: 'done', route_order: 1, recurrence: 'weekly', clients: demoClients[0] },
+  { id: '2', client_id: '2', title: 'Full Service', scheduled_date: today, scheduled_time: '09:30', duration_minutes: 90, status: 'in_progress', route_order: 2, recurrence: 'weekly', clients: demoClients[1] },
+  { id: '3', client_id: '3', title: 'Quick Mow', scheduled_date: today, scheduled_time: '11:00', duration_minutes: 30, status: 'scheduled', route_order: 3, recurrence: 'biweekly', clients: demoClients[2] },
+  { id: '4', client_id: '4', title: 'Biweekly Service', scheduled_date: today, scheduled_time: '13:00', duration_minutes: 60, status: 'scheduled', route_order: 4, recurrence: 'biweekly', clients: demoClients[3] },
 ];
 
 export const demoInvoices = [

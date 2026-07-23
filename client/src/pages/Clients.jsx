@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { demoClients } from '../lib/demoData';
-import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar } from 'lucide-react';
+import { getMapsUrl } from '../lib/maps';
 
 const emptyForm = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
 
@@ -10,13 +11,22 @@ function getInitials(name) {
 
 const avatarColors = ['bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400', 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400', 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-400', 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400', 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400'];
 
-export default function Clients() {
+const SORT_OPTIONS = [
+  { value: 'name', label: 'Name' },
+  { value: 'rate-desc', label: 'Rate ↓' },
+  { value: 'rate-asc', label: 'Rate ↑' },
+  { value: 'recent', label: 'Recent' },
+];
+
+export default function Clients({ jobs = [] }) {
   const [clients, setClients] = useState(demoClients);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState(emptyForm);
   const [expandedId, setExpandedId] = useState(null);
+  const [sortBy, setSortBy] = useState('name');
+  const [showSort, setShowSort] = useState(false);
 
   function openNew() { setEditId(null); setForm(emptyForm); setExpandedId(null); setShowForm(true); }
   function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
@@ -31,7 +41,31 @@ export default function Clients() {
 
   function remove(id) { setClients(clients.filter(c => c.id !== id)); if (expandedId === id) setExpandedId(null); }
 
-  const filtered = useMemo(() => clients.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || (c.address || '').toLowerCase().includes(search.toLowerCase())), [clients, search]);
+  // Get next scheduled job + recent history for a client
+  const clientMeta = useMemo(() => {
+    const map = {};
+    clients.forEach(c => {
+      const clientJobs = jobs.filter(j => j.client_id === c.id).sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date));
+      const upcoming = clientJobs.filter(j => j.status !== 'done' && j.scheduled_date >= new Date().toISOString().split('T')[0]);
+      const recentDone = clientJobs.filter(j => j.status === 'done').slice(-3);
+      map[c.id] = { nextJob: upcoming[0] || null, totalJobs: clientJobs.length, recentDone };
+    });
+    return map;
+  }, [clients, jobs]);
+
+  const filtered = useMemo(() => {
+    let list = clients.filter(c =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      (c.address || '').toLowerCase().includes(search.toLowerCase())
+    );
+    switch (sortBy) {
+      case 'rate-desc': list.sort((a, b) => (b.rate || 0) - (a.rate || 0)); break;
+      case 'rate-asc': list.sort((a, b) => (a.rate || 0) - (b.rate || 0)); break;
+      case 'recent': break; // default order
+      default: list.sort((a, b) => a.name.localeCompare(b.name)); break;
+    }
+    return list;
+  }, [clients, search, sortBy]);
 
   return (
     <div>
@@ -40,7 +74,19 @@ export default function Clients() {
         <button onClick={openNew} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />Add Client</button>
       </div>
 
-      <div className="relative mb-4"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
+        <div className="relative">
+          <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label="Sort clients"><Filter className="w-4 h-4" /></button>
+          {showSort && (
+            <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[140px] shadow-lg" onMouseLeave={() => setShowSort(false)}>
+              {SORT_OPTIONS.map(o => (
+                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${sortBy === o.value ? 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       {showForm && (
         <form onSubmit={save} className="card p-5 mb-4 space-y-3 border-sky-200 dark:border-sky-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
@@ -67,6 +113,7 @@ export default function Clients() {
         {filtered.map((client, i) => {
           const isEditing = editId === client.id;
           const isExpanded = expandedId === client.id;
+          const meta = clientMeta[client.id];
           return (
             <div key={client.id} className={isEditing ? 'opacity-40 pointer-events-none' : ''}>
               <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-sky-200 dark:hover:border-sky-800 transition-all" onClick={() => setExpandedId(isExpanded ? null : client.id)}>
@@ -78,20 +125,59 @@ export default function Clients() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {meta?.nextJob && (
+                    <span className="badge-info text-[11px]"><Clock className="w-3 h-3" />{meta.nextJob.scheduled_date === new Date().toISOString().split('T')[0] ? 'Today' : new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                  )}
                   <span className="badge-info">${client.rate}</span>
                   <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
                 </div>
               </div>
               {isExpanded && (
                 <div className="card border-t-0 rounded-t-none -mt-1 p-4 pt-3 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
+                  {/* Quick actions */}
+                  <div className="flex gap-2 mb-1">
+                    {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Phone className="w-3 h-3" />Call</a>}
+                    {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Navigation className="w-3 h-3" />Navigate</a>}
+                  </div>
+
+                  {/* Contact info */}
                   {client.phone && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Phone className="w-3.5 h-3.5 text-gray-400" />{client.phone}</div>}
                   {client.email && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Mail className="w-3.5 h-3.5 text-gray-400" />{client.email}</div>}
                   {client.service_notes && <div className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400"><StickyNote className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />{client.service_notes}</div>}
+
+                  {/* Next scheduled */}
+                  {meta?.nextJob && (
+                    <div className="flex items-center gap-2.5 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/20 rounded-lg p-2.5">
+                      <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span>Next: <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5)} — {meta.nextJob.title}</span>
+                    </div>
+                  )}
+
+                  {/* Recent service history */}
+                  {meta?.recentDone?.length > 0 && (
+                    <div className="pt-1">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Recent service ({meta.totalJobs} total jobs)</p>
+                      <div className="space-y-1">
+                        {meta.recentDone.map(j => (
+                          <div key={j.id} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+                            <span>{new Date(j.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                            <span className="text-gray-300 dark:text-gray-600">&middot;</span>
+                            <span>{j.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Access info badges */}
                   <div className="flex flex-wrap gap-1.5">
                     {client.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><Key className="w-3 h-3" />Key: {client.key_code}</span>}
                     {client.alarm_code && <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1 text-[11px]"><AlarmCheck className="w-3 h-3" />Alarm: {client.alarm_code}</span>}
                     {client.pet_instructions && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><PawPrint className="w-3 h-3" />{client.pet_instructions}</span>}
                   </div>
+
+                  {/* Edit/delete */}
                   <div className="flex gap-2 pt-1">
                     <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-1.5 px-3 gap-1"><Pencil className="w-3 h-3" />Edit</button>
                     <button onClick={e => { e.stopPropagation(); remove(client.id); }} className="btn-ghost text-xs py-1.5 px-3 gap-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600"><Trash2 className="w-3 h-3" />Delete</button>

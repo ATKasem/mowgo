@@ -7,10 +7,10 @@ export const STATUS_CONFIG = {
     dot: 'bg-amber-500',
   },
   in_progress: {
-    bg: 'bg-sky-50 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800',
     badge: 'badge-info',
     label: 'In Progress',
-    dot: 'bg-sky-500',
+    dot: 'bg-emerald-500',
   },
   done: {
     bg: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800',
@@ -44,6 +44,14 @@ export const INVOICE_STATUS = {
   },
 };
 
+/** Recurrence options for jobs */
+export const RECURRENCE_OPTIONS = [
+  { value: 'none', label: 'One-time' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Every 2 weeks' },
+  { value: 'monthly', label: 'Monthly' },
+];
+
 /** Default form values for new jobs and clients. */
-export const INITIAL_JOB_FORM = { client_id: '', title: 'Mow + Edge', scheduled_time: '09:00', duration_minutes: 120 };
+export const INITIAL_JOB_FORM = { client_id: '', title: 'Mow + Edge', scheduled_time: '09:00', duration_minutes: 120, recurrence: 'none' };
 export const INITIAL_CLIENT_FORM = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };

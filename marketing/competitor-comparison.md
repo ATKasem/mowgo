@@ -1,8 +1,8 @@
-# CleanFlow vs Competitors — Sales One-Pager
+# MowFlow vs Competitors — Sales One-Pager
 
 ## Quick Comparison (April 2026)
 
-| | **CleanFlow** | Jobber | Housecall Pro | ZenMaid | Square Appts |
+| | **MowFlow** | Jobber | Housecall Pro | ZenMaid | Square Appts |
 |---|---|---|---|---|---|
 | **Starting Price** | **Free** | $29/mo* | $79/mo | $58/mo | Free |
 | **Usable Plan Price** | **$39/mo** | $169/mo | $189/mo | $58/mo | $29/mo |
@@ -25,17 +25,17 @@
 ## Our Advantage
 
 1. **Cleaners-first design** — key codes, alarm codes, and pet instructions aren't afterthoughts
-2. **Free tier that's actually useful** — 10 clients is enough for a part-time solo cleaner
+2. **Free tier that's actually useful** — 10 clients is enough for a part-time solo landscaper
 3. **2-minute setup** — no onboarding calls, no training videos, no "schedule a demo"
 4. **Fair pricing** — $39/mo unlimited vs $169/mo for Jobber's first usable tier
 5. **No bloat** — no CRM, no marketing automation, no inventory management
 
-## Who should NOT use CleanFlow
+## Who should NOT use MowFlow
 - Crews of 5+ people → Jobber or Housecall Pro
 - Companies that need QuickBooks sync today → Jobber
 - Businesses that want built-in marketing → Housecall Pro
 
-## Who SHOULD use CleanFlow
+## Who SHOULD use MowFlow
 - Solo cleaners with 10-50 recurring clients
 - 2-3 person crews who just need scheduling + invoicing
 - Cleaners currently using pen & paper, texts, or spreadsheets

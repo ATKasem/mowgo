@@ -1,4 +1,4 @@
-# CleanFlow — Capacitor Native App Setup
+# MowFlow — Capacitor Native App Setup
 
 ## Prerequisites (on your Mac)
 - Xcode 26+ (App Store)
@@ -8,7 +8,7 @@
 ## One-Time Setup
 
 ```bash
-cd /path/to/cleanflow/client
+cd /path/to/mowflow/client
 
 # Install deps
 npm install
@@ -45,6 +45,6 @@ All required sizes are in `public/icon-*.png`. Xcode picks them up automatically
 - `APP_STORE.md` — App Store metadata, description, keywords
 
 ## Notes
-- Privacy policy: https://cleanfloww.netlify.app/privacy
-- The web app runs at https://cleanfloww.netlify.app (auto-deploys from GitHub)
+- Privacy policy: https://mowflow.netlify.app/privacy
+- The web app runs at https://mowflow.netlify.app (auto-deploys from GitHub)
 - Capacitor wraps the same code into a native iOS app — same features, native feel

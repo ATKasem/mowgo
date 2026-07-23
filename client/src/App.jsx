@@ -25,7 +25,7 @@ export default function App() {
         {/* App */}
         <Route element={<Layout />}>
           <Route path="/app" element={<Today jobs={jobs} setJobs={setJobs} invoices={invoices} setInvoices={setInvoices} />} />
-          <Route path="/app/clients" element={<Clients />} />
+          <Route path="/app/clients" element={<Clients jobs={jobs} />} />
           <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
           <Route path="/app/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/" />} />

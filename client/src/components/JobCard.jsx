@@ -1,12 +1,15 @@
 import { memo } from 'react';
-import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck } from 'lucide-react';
-import { STATUS_CONFIG } from '../lib/constants';
+import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw } from 'lucide-react';
+import { STATUS_CONFIG, RECURRENCE_OPTIONS } from '../lib/constants';
 import { getMapsUrl } from '../lib/maps';
 
 function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggleStatus }) {
   const client = job.clients;
   const isDone = job.status === 'done';
   const statusInfo = STATUS_CONFIG[job.status] || STATUS_CONFIG.scheduled;
+  const recurrenceLabel = job.recurrence && job.recurrence !== 'none'
+    ? RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label
+    : null;
 
   return (
     <div className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-60' : ''}`}>
@@ -23,7 +26,7 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
         <button
           aria-label={isDone ? 'Undo completion' : 'Mark job complete'}
           onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60 hover:scale-105'}`}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 hover:scale-105'}`}
         >
           {isDone ? <Check className="w-6 h-6" /> : <span>{index + 1}</span>}
         </button>
@@ -37,6 +40,10 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
             <span className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)}</span>
             <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
             <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{job.title}</span>
+            {recurrenceLabel && (
+              <><span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
+              <span className="text-xs text-violet-500 dark:text-violet-400 inline-flex items-center gap-0.5"><RefreshCw className="w-3 h-3" />{recurrenceLabel}</span></>
+            )}
           </div>
         </div>
 
@@ -57,6 +64,9 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
             )}
             {client?.pet_instructions && (
               <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><PawPrint className="w-3.5 h-3.5" />{client.pet_instructions}</span>
+            )}
+            {recurrenceLabel && (
+              <span className="badge bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><RefreshCw className="w-3.5 h-3.5" />{recurrenceLabel}</span>
             )}
           </div>
 
