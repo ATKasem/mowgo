@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MowFlow</string>
+    <string name="title_activity_main">MowFlow</string>
+    <string name="package_name">com.mowflow.app</string>
+    <string name="custom_url_scheme">com.mowflow.app</string>
+</resources>
