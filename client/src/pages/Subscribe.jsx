@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, Loader2, Sparkles, ArrowRight } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
 
 export default function Subscribe() {
   const [searchParams] = useSearchParams();
