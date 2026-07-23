@@ -1,43 +1,47 @@
 # MowFlow — SEO & Landing Page Copy
 
 ## Title Tag (60 chars max)
-MowFlow — Cleaning Business Scheduling App | Free Plan
+MowFlow — Lawn Care Scheduling That Just Works | Free
 
 ## Meta Description (155 chars max)
-Simple scheduling, routing, and invoicing for 1-3 person lawn care crews. Free forever plan. $39/mo Solo. $69/mo Crew. Works on iPhone, Android, and web.
+The lawn care app that just works. Scheduling, routes, and invoicing from your phone. Free for 10 clients. No credit card. Takes 2 minutes.
 
 ## H1 Headline
-Scheduling software built for lawn care crews, not corporations
+The lawn care app that just works.
 
 ## Subheadline
-Jobber starts at $169/mo for the plan you'd actually use. MowFlow starts at free — and stays focused on what a 1-3 person crew actually needs.
+Even when it rains. One button shifts your whole route to tomorrow. No other app does that.
 
-## Feature Bullets (for above the fold)
-- Recurring jobs on autopilot — set a biweekly clean once
-- Daily route planner with turn-by-turn navigation
-- Client profiles with key codes, alarm codes, and pet instructions
-- One-tap invoicing via Stripe — client gets a payment link instantly
+## Above the Fold (replaces feature bullets)
+**Scheduling that just works.**
+Set a recurring job once. Your route builds itself every morning.
 
-## Social Proof Section
-"Jobber is great if you have 15 employees and an office manager. For the rest of us, MowFlow actually makes sense."
-— What we hear from cleaners
+**Rain delay. One button.**
+Storm hits at 7am. Tap once. Every job shifts to tomorrow. Clients get notified. You go back to bed.
+
+**Invoicing that just works.**
+Mark a job complete. Invoice sends automatically. Client pays with one tap. No Sunday night admin session.
+
+**Free for 10 clients. No credit card.**
+Not a trial. Not a demo. Just free. Upgrade when you need more.
+
+## Social Proof
+"I tried three apps before this. The other ones wanted a demo call before I could even see the thing. MowFlow took 2 minutes and I was scheduling. It just works."
+— Actual lawn care owner
 
 ## FAQ Section
 
-**Q: How is MowFlow different from Jobber?**
-Jobber is built for 5-30 person field service companies. Their usable plan starts at $169/month. MowFlow is built for 1-3 person lawn care crews — only the features you need, starting at free.
+**Q: Is it actually free?**
+Yes. 10 clients, scheduling, routes, invoicing, rain delay. No credit card. No time limit. Free.
 
-**Q: Is there really a free plan?**
-Yes. Up to 10 clients, basic calendar, and manual invoicing. No credit card, no time limit.
+**Q: What makes it different?**
+Rain delay. Nobody else has it under $100 a month. Also: no demos, no setup calls, no features you will never touch. It does less than the other apps and that is the point.
 
-**Q: Does it work on iPhone?**
-Yes — MowFlow is a PWA that installs to your home screen like a native app. Also available as a native iOS/Android app.
+**Q: Does it work on my phone?**
+Yes. iPhone, Android, any browser. Installs to your home screen like a native app.
 
-**Q: Can I try it before paying?**
-The free plan is unlimited. Solo and Crew plans have a 14-day free trial.
-
-**Q: What if I have more than 3 cleaners?**
-MowFlow is optimized for 1-3 person crews. If you're growing past that, we recommend Jobber or Housecall Pro — and we'll help you export your data.
+**Q: How fast can I start?**
+2 minutes. Type in your business name. Add a client. You are scheduling.
 
 ## CTA Copy
-"Stop losing track of jobs and invoices. Start your free MowFlow account in under 2 minutes."
+Try it free. No credit card. You will be scheduling in 2 minutes.

@@ -1,59 +1,53 @@
 # MowFlow — Launch Copy
 
-## Tweet / X Post
-🧹 I built an app for lawn care crews who are tired of $169/mo software built for 20-person companies.
+## One-Liner
+> The lawn care app that just works. Even when it rains.
 
-MowFlow — scheduling, routes, invoicing, all from your phone. Free plan for solo cleaners.
+## Tweet / X Post
+I built a lawn care app because the existing ones made me want to throw my phone in a lake.
+
+MowFlow. Scheduling, routes, invoicing. No demo calls. No bloat. Rain delay with one button — nobody else has that.
+
+Free for 10 clients. No credit card. 2 minutes.
 
 → cleanflloww.pages.dev
 
 ## Instagram Caption
-Stop running your lawn care business on texts and a whiteboard. 🧹
+Your scheduling app should not need a onboarding call. 🌱
 
-MowFlow is the scheduling app built for 1-3 person crews — not for 20-person operations at $169/month.
+MowFlow is the lawn care app that just works.
+- Your route builds itself every morning
+- Rain hits → one button shifts everything
+- Job done → invoice sends automatically
 
-📅 Recurring jobs on autopilot
-🗺️ Daily routes with navigation
-👥 Client profiles with key codes + pet notes
-💰 One-tap invoicing with Stripe
-
-Free forever for solo cleaners with up to 10 clients.
-Solo $39/mo. Crew $69/mo.
+Free for 10 clients. No credit card. $49/mo for unlimited.
 
 Link in bio → cleanflloww.pages.dev
 
-#cleaningbusiness #housecleaning #smallbiz #cleaningcrew #maidservice
+#lawncare #landscaping #lawncarebusiness #smallbiz #landscaper
 
 ## LinkedIn Post
-I spent 3 months talking to house cleaners in Oklahoma. Here's what I learned:
+I spent months talking to lawn care owners. Here is what I learned:
 
-Most 1-3 person crews are running their entire business on:
-- Text messages for scheduling
-- A whiteboard for routes
-- Sunday-night QuickBooks sessions for invoices
+The existing scheduling software makes you book a demo before you can even see it. It is built for 20-person operations at $169 a month. And not a single one handles what every lawn crew deals with weekly: rain.
 
-The software that exists (Jobber, Housecall Pro) starts at $79-169/month and is built for 20-person operations with office staff.
+So I built MowFlow.
 
-So I built MowFlow — scheduling, routing, and invoicing designed specifically for small lawn care crews. It does less than Jobber, and that's the point.
+It does less than the other apps. That is the point. Scheduling, routes, invoicing. And a rain delay button that shifts your whole route to tomorrow — nobody else has that. It just works. No demos. No setup calls. Free for 10 clients.
 
-Free plan for solo cleaners. $39/mo for unlimited. $69/mo for teams.
-
-If you know a landscaper who's still running on pen and paper, send them this.
+If you know a landscaper who is still running on texts and a notebook, send them the link.
 
 → cleanflloww.pages.dev
 
 ## Facebook / Group Post
-Hey everyone — I've been lurking in this group for a while learning how small lawn care crews actually operate. One thing I kept seeing: most of you are running on texts, memory, and spreadsheets because the existing software is way too expensive and complicated for a 1-3 person team.
+Hey everyone — I have been in this group for a while watching how small crews actually run their operations. One thing kept coming up: everyone hates their scheduling software.
 
-I built something specifically for crews our size. It's called MowFlow:
+The apps out there are either too expensive, too complicated, or both. Most of you are still using texts and a notebook because that actually works better than fighting with bad software.
 
-✅ Recurring scheduling (set a biweekly clean once)
-✅ Daily route planner with Google Maps navigation
-✅ Client profiles with key codes, alarm codes, pet notes
-✅ One-tap invoicing — client gets a Stripe payment link instantly
+So I built MowFlow. It does three things: scheduling, routes, invoicing. That is it. No CRM. No marketing dashboards. No "book a demo." It just works.
 
-Free forever plan (up to 10 clients). $39/mo for unlimited. $69/mo for teams.
+Free for 10 clients. $49/mo solo. $79/mo crew. 2 minute setup.
 
-Not here to spam — genuinely looking for feedback from real cleaners. If you try it, tell me what sucks so I can fix it.
+Not here to pitch. Genuinely want feedback from actual lawn guys. If you try it, tell me what is broken.
 
 → cleanflloww.pages.dev

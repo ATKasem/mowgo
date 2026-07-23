@@ -1,42 +1,41 @@
-# MowFlow vs Competitors — Sales One-Pager
+# MowFlow vs Competitors
 
-## Quick Comparison (April 2026)
+## The "Just Works" Advantage
 
-| | **MowFlow** | Jobber | Housecall Pro | ZenMaid | Square Appts |
-|---|---|---|---|---|---|
-| **Starting Price** | **Free** | $29/mo* | $79/mo | $58/mo | Free |
-| **Usable Plan Price** | **$39/mo** | $169/mo | $189/mo | $58/mo | $29/mo |
-| **Target Crew Size** | **1-3** | 5-30 | 5-50 | 1-20 | 1 |
-| **Free Tier** | ✅ 10 clients | ❌ | ❌ | ❌ | ✅ Basic |
-| **iOS App** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Android App** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Recurring Jobs** | ✅ | ✅ | ✅ | ✅ | ⚠️ Basic |
-| **Route Planning** | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **Client Notes** | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **Key/Alarm Codes** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Pet Instructions** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Stripe Invoicing** | ✅ | ✅ | ❌ (in-house) | ✅ | ❌ (Square) |
-| **Marketing Tools** | ❌ | ❌ | ✅ | ❌ | ❌ |
-| **QuickBooks Sync** | Coming | ✅ | ✅ | ✅ | ❌ |
-| **Setup Time** | **2 min** | 2-4 hrs | 3-6 hrs | 1-2 hrs | 30 min |
+| | **MowFlow** | The Others |
+|---|---|---|
+| **Price** | **Free** | $29-$189/mo |
+| **Usable plan** | **$49/mo** | $169/mo for real features |
+| **Setup** | **2 minutes** | 2 hours to 2 days |
+| **Demo required** | **No** | Yes, for most |
+| **Rain delay** | **One button** | Not available under $100/mo |
+| **Gate codes, pet notes** | **Built in** | Not in most |
+| **Auto invoicing** | **Yes, free tier** | Paid plans only |
+| **Credit card for trial** | **No** | Almost always |
 
-*Jobber $29/mo "Core" is stripped — 1 user, limited features. Real usable plan is "Connect" at $169/mo.
+## Why MowFlow Just Works
 
-## Our Advantage
+**No demos. No setup calls.**
+You should not need a training session to use a scheduling app. Sign up. Add a client. Done.
 
-1. **Cleaners-first design** — key codes, alarm codes, and pet instructions aren't afterthoughts
-2. **Free tier that's actually useful** — 10 clients is enough for a part-time solo landscaper
-3. **2-minute setup** — no onboarding calls, no training videos, no "schedule a demo"
-4. **Fair pricing** — $39/mo unlimited vs $169/mo for Jobber's first usable tier
-5. **No bloat** — no CRM, no marketing automation, no inventory management
+**Rain delay. One button.**
+Nobody else has this. Storm at 7am? Tap once. Every job moves to tomorrow. Clients get notified. You go back to bed. Your route is fine.
 
-## Who should NOT use MowFlow
-- Crews of 5+ people → Jobber or Housecall Pro
-- Companies that need QuickBooks sync today → Jobber
-- Businesses that want built-in marketing → Housecall Pro
+**Free tier that is actually useful.**
+10 clients. Full scheduling. Rain delay. Auto invoicing. No credit card. Not a "14 day trial." Just free.
 
-## Who SHOULD use MowFlow
-- Solo cleaners with 10-50 recurring clients
-- 2-3 person crews who just need scheduling + invoicing
-- Cleaners currently using pen & paper, texts, or spreadsheets
-- Anyone paying $100+/mo for software they only use 20% of
+**$49. Flat.**
+Not $29 that becomes $169 when you want the features you actually need. $49 is $49. Unlimited clients. Everything included.
+
+**It does less. That is the point.**
+No CRM. No marketing automation. No inventory management. No "fleet tracking." You already know where your truck is. You need scheduling that just works.
+
+## Who It Is For
+- Lawn care crews who want to stop using texts and notebooks
+- Anyone paying $100+ for features they never touch
+- Owners who value their time more than a feature checklist
+
+## Who It Is Not For
+- Companies with 10+ employees and an office manager
+- Businesses that need built-in marketing and CRM
+- Anyone who likes scheduling demo calls

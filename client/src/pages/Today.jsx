@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
-import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
-import { useAuth } from '../App';
+import { createJob, updateJobStatus, updateJob, loadClients } from '../lib/data';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
@@ -20,7 +19,6 @@ function getNextDate(currentDate, recurrence) {
 }
 
 export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
-  useAuth();
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
@@ -60,8 +58,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         await updateJobStatus(job.id, newStatus);
 
         // Update state outside the callback to avoid race condition
-        const nextJobs = jobs.map(j => j.id === job.id ? { ...j, status: newStatus } : j);
-        setJobs(nextJobs);
+        setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: newStatus } : j));
 
         // Auto-regenerate recurring jobs (outside setJobs to avoid race)
         if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
@@ -90,7 +87,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
     }, 150);
-  }, [jobs, setJobs]);
+  }, [setJobs]);
 
   // Drag-and-drop reordering
   function handleDragStart(job) { setDragId(job.id); }
