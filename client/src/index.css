@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant glass (&:where(.glass, .glass *));
 
 /* Keyframe animations */
 @keyframes slideDown {
@@ -18,6 +19,11 @@
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+@keyframes springIn {
+  0% { opacity: 0; transform: scale(0.92); }
+  60% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -47,6 +53,26 @@
     --color-text: #f9fafb;
     --color-text-secondary: #9ca3af;
     --color-text-muted: #6b7280;
+  }
+
+  .glass {
+    /* Glass surface: translucent dark with blur */
+    --glass-bg: rgba(15, 23, 42, 0.65);
+    --glass-bg-hover: rgba(30, 41, 59, 0.75);
+    --glass-bg-secondary: rgba(15, 23, 42, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(255, 255, 255, 0.14);
+    --glass-blur: 20px;
+    --glass-saturation: 1.8;
+    /* Text on glass */
+    --color-text: #f1f5f9;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #64748b;
+    /* Surface colors for glass mode */
+    --color-surface: var(--glass-bg);
+    --color-surface-hover: var(--glass-bg-hover);
+    --color-surface-secondary: var(--glass-bg-secondary);
+    --color-border: var(--glass-border);
   }
 
   body {

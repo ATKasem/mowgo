@@ -112,68 +112,70 @@ export default function Invoices({ invoices, setInvoices }) {
           const isExpanded = expandedId === invoice.id;
           return (
             <div key={invoice.id}>
-              <div className="card p-4 flex items-center justify-between hover:border-emerald-200 dark:hover:border-emerald-800 transition-all cursor-pointer"
+              <div className="card hover:border-emerald-200 dark:hover:border-emerald-800 transition-all cursor-pointer"
                    role="button" tabIndex={0}
                    onClick={() => setExpandedId(isExpanded ? null : invoice.id)}
                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : invoice.id); } }}>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{invoice.clients?.name || 'Unknown'}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dateStr} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${invoice.amount}</span></p>
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm">{invoice.clients?.name || 'Unknown'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dateStr} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${invoice.amount}</span></p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={statusInfo.badge}>{statusInfo.label}</span>
+                    {!isPaid && (
+                      <button
+                        onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }}
+                        className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 group"
+                      >
+                        {copiedIds.has(invoice.id) ? (
+                          <><ClipboardCheck className="w-3 h-3" />Copied!
+                            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
+                              Paste into a text to the client
+                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                            </span>
+                          </>) : (
+                          <><Copy className="w-3 h-3" />Copy
+                            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
+                              Copy a payment request to send via text
+                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                            </span>
+                          </>)}
+                      </button>
+                    )}
+                    <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={statusInfo.badge}>{statusInfo.label}</span>
-                  {!isPaid && (
-                    <button
-                      onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }}
-                      className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 group"
-                    >
-                      {copiedIds.has(invoice.id) ? (
-                        <><ClipboardCheck className="w-3 h-3" />Copied!
-                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
-                            Paste into a text to the client
+                {isExpanded && (
+                  <div className="border-t border-gray-100 dark:border-gray-800 px-4 pb-4 space-y-3" style={{ animation: 'slideDown 0.15s ease-out' }}>
+                    <div className="grid grid-cols-2 gap-3 text-sm pt-3">
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Client</span><span className="font-medium text-gray-900 dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Amount</span><span className="font-bold text-gray-900 dark:text-white">${invoice.amount}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Created</span><span className="text-gray-700 dark:text-gray-300">{dateStr}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Status</span><span className={statusInfo.badge}>{statusInfo.label}</span></div>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      {!isPaid && (
+                        <button onClick={e => { e.stopPropagation(); markAsPaid(invoice.id); }} className="btn-primary flex-1 text-xs gap-1 bg-emerald-500 hover:bg-emerald-600">
+                          <CheckCircle className="w-3.5 h-3.5" />Mark as Paid
+                        </button>
+                      )}
+                      {!isPaid && (
+                        <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group">
+                          <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
+                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
+                            Copies a payment request — paste in a text
                             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
                           </span>
-                        </>) : (
-                        <><Copy className="w-3 h-3" />Copy
-                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
-                            Copy a payment request to send via text
-                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
-                          </span>
-                        </>)}
-                    </button>
-                  )}
-                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
-                </div>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-              {isExpanded && (
-                <div className="border-t border-gray-100 dark:border-gray-800 p-4 pt-3 space-y-3" style={{ animation: 'slideDown 0.15s ease-out' }}>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Client</span><span className="font-medium text-gray-900 dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
-                    <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Amount</span><span className="font-bold text-gray-900 dark:text-white">${invoice.amount}</span></div>
-                    <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Created</span><span className="text-gray-700 dark:text-gray-300">{dateStr}</span></div>
-                    <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Status</span><span className={statusInfo.badge}>{statusInfo.label}</span></div>
-                  </div>
-                  <div className="flex gap-2 pt-1">
-                    {!isPaid && (
-                      <button onClick={e => { e.stopPropagation(); markAsPaid(invoice.id); }} className="btn-primary flex-1 text-xs gap-1 bg-emerald-500 hover:bg-emerald-600">
-                        <CheckCircle className="w-3.5 h-3.5" />Mark as Paid
-                      </button>
-                    )}
-                    {!isPaid && (
-                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group">
-                        <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
-                        <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
-                          Copies a payment request — paste in a text
-                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}

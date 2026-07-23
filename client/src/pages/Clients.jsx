@@ -143,27 +143,28 @@ export default function Clients({ jobs = [] }) {
           const meta = clientMeta[client.id];
           return (
             <div key={client.id} className={isEditing ? 'opacity-40 pointer-events-none' : ''}>
-              <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-800 transition-all"
+              <div className="card cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-800 transition-all"
                    role="button" tabIndex={0}
                    onClick={() => setExpandedId(isExpanded ? null : client.id)}
                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : client.id); } }}>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors[i % avatarColors.length]}`}>{getInitials(client.name)}</div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {client.address && <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><MapPin className="w-3 h-3" />{client.address}</span>}
+                <div className="p-4 flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors[i % avatarColors.length]}`}>{getInitials(client.name)}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {client.address && <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><MapPin className="w-3 h-3" />{client.address}</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {meta?.nextJob && (
+                      <span className="badge-info text-[11px]"><Clock className="w-3 h-3" />{meta.nextJob.scheduled_date === new Date().toISOString().split('T')[0] ? 'Today' : new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    )}
+                    <span className="badge-info">${client.rate}</span>
+                    <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {meta?.nextJob && (
-                    <span className="badge-info text-[11px]"><Clock className="w-3 h-3" />{meta.nextJob.scheduled_date === new Date().toISOString().split('T')[0] ? 'Today' : new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                  )}
-                  <span className="badge-info">${client.rate}</span>
-                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
-                </div>
-              </div>
-              {isExpanded && (
-                <div className="border-t border-gray-100 dark:border-gray-800 p-4 pt-3 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
+                {isExpanded && (
+                  <div className="border-t border-gray-100 dark:border-gray-800 px-4 pb-4 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
                   <div className="flex gap-2 mb-1">
                     {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Phone className="w-3 h-3" />Call</a>}
                     {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Navigation className="w-3 h-3" />Navigate</a>}
@@ -203,6 +204,7 @@ export default function Clients({ jobs = [] }) {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           );
         })}
