@@ -30,7 +30,7 @@ export async function loadJobs() {
 
   const { data, error } = await supabase
     .from('jobs')
-    .select('*, clients!inner(*)')
+    .select('*, clients!left(*)')
     .eq('user_id', user.id)
     .order('route_order', { ascending: true });
 
@@ -85,7 +85,29 @@ export async function createJob(job) {
   }).select('*, clients!inner(*)').single();
 
   if (error) throw error;
-  return data;
+  return {
+    id: data.id,
+    client_id: data.client_id,
+    title: data.title,
+    scheduled_date: data.scheduled_date,
+    scheduled_time: data.scheduled_time?.slice(0, 5),
+    duration_minutes: data.duration_minutes,
+    status: data.status,
+    route_order: data.route_order,
+    recurrence: data.recurrence_rule || 'none',
+    clients: data.clients ? {
+      id: data.clients.id,
+      name: data.clients.name,
+      address: data.clients.address,
+      phone: data.clients.phone,
+      email: data.clients.email,
+      rate: data.clients.rate,
+      service_notes: data.clients.notes,
+      key_code: data.clients.key_code,
+      alarm_code: data.clients.alarm_code,
+      pet_instructions: data.clients.pet_instructions,
+    } : null,
+  };
 }
 
 export async function updateJob(id, updates) {
@@ -200,7 +222,7 @@ export async function loadInvoices() {
 
   const { data, error } = await supabase
     .from('invoices')
-    .select('*, clients!inner(*)')
+    .select('*, clients!left(*)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
