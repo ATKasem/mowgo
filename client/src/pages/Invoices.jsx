@@ -49,6 +49,13 @@ export default function Invoices({ invoices, setInvoices }) {
     } catch (err) { console.error('markAsPaid:', err); }
   }, [setInvoices]);
 
+  const changeStatus = useCallback(async (id, newStatus) => {
+    try {
+      await updateInvoiceStatus(id, newStatus);
+      setInvoices(prev => prev.map(i => i.id === id ? { ...i, status: newStatus, ...(newStatus === 'paid' ? { paid_at: new Date().toISOString() } : {}) } : i));
+    } catch (err) { console.error('changeStatus:', err); }
+  }, [setInvoices]);
+
   const filtered = useMemo(() => {
     if (statusFilter === 'all') return invoices;
     return invoices.filter(i => i.status === statusFilter);
@@ -158,20 +165,36 @@ export default function Invoices({ invoices, setInvoices }) {
                       <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Status</span><span className={statusInfo.badge}>{statusInfo.label}</span></div>
                     </div>
                     <div className="flex gap-2 pt-1">
-                      {!isPaid && (
-                        <button onClick={e => { e.stopPropagation(); markAsPaid(invoice.id); }} className="btn-primary flex-1 text-xs gap-1 bg-emerald-500 hover:bg-emerald-600">
-                          <CheckCircle className="w-3.5 h-3.5" />Mark as Paid
-                        </button>
-                      )}
-                      {!isPaid && (
-                        <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group">
-                          <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
-                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
-                            Copies a payment request — paste in a text
-                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
-                          </span>
-                        </button>
-                      )}
+                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group">
+                        <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
+                        <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
+                          Copies a payment request — paste in a text
+                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                        </span>
+                      </button>
+                    </div>
+                    <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Change status</p>
+                      <div className="flex gap-1">
+                        {['unpaid', 'paid', 'overdue'].map(s => {
+                          const si = INVOICE_STATUS[s];
+                          const active = invoice.status === s;
+                          return (
+                            <button
+                              key={s}
+                              onClick={e => { e.stopPropagation(); changeStatus(invoice.id, s); }}
+                              disabled={active}
+                              className={`flex-1 text-xs font-semibold py-2 rounded-lg transition-all duration-150 ${
+                                active
+                                  ? `${si.bg} ${si.text} cursor-default`
+                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              {si.label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 )}
