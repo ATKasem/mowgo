@@ -5,35 +5,33 @@
  * Returns: { url: 'https://checkout.stripe.com/...' }
  */
 
+const ALLOWED_ORIGINS = ['https://mowflow.pages.dev', 'https://cleanflloww.pages.dev', 'https://mowflow.app'];
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  // CORS
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
+  // Origin validation
+  const origin = request.headers.get('origin');
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    return json({ error: 'Forbidden' }, 403);
   }
 
   try {
     const { plan } = await request.json();
 
-    const priceId = plan === 'solo'
-      ? (env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO)
-      : (env.STRIPE_PRICE_CREW || env.VITE_STRIPE_PRICE_CREW);
-
-    if (!priceId) {
-      return jsonResponse({ error: 'Price ID not configured' }, 500);
+    // Validate plan
+    if (!['solo', 'crew'].includes(plan)) {
+      return json({ error: 'Invalid plan' }, 400);
     }
 
-    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS, 10) || 7;
-    const origin = request.headers.get('origin') || env.APP_URL || 'https://mowflow.pages.dev';
+    const priceId = plan === 'solo' ? env.STRIPE_PRICE_SOLO : env.STRIPE_PRICE_CREW;
+    if (!priceId) {
+      return json({ error: 'Price ID not configured' }, 500);
+    }
 
-    // Call Stripe API to create a Checkout Session
+    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS, 10) || 14;
+    const appUrl = env.APP_URL || origin || 'https://mowflow.pages.dev';
+
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
@@ -45,30 +43,32 @@ export async function onRequestPost(context) {
         'line_items[0][quantity]': '1',
         mode: 'subscription',
         'subscription_data[trial_period_days]': String(trialDays),
-        'success_url': `${origin}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
-        'cancel_url': `${origin}/#/pricing`,
-        'allow_promotion_codes': 'true',
+        success_url: `${appUrl}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appUrl}/#/pricing`,
+        allow_promotion_codes: 'true',
       }).toString(),
     });
 
     const session = await stripeResponse.json();
 
     if (session.error) {
-      return jsonResponse({ error: session.error.message }, 400);
+      console.error('Stripe checkout error:', session.error.type, session.error.message);
+      return json({ error: 'Unable to start checkout. Please try again.' }, 400);
     }
 
-    return jsonResponse({ url: session.url });
+    return json({ url: session.url });
   } catch (err) {
-    return jsonResponse({ error: err.message }, 500);
+    console.error('Checkout function error:', err);
+    return json({ error: 'Something went wrong' }, 500);
   }
 }
 
-function jsonResponse(data, status = 200) {
+function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
     },
   });
 }
