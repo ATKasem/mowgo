@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, CloudRain, Calendar, MapPin, Users, FileText, Check, ArrowRight, Zap, Wifi, Moon, Shield } from 'lucide-react';
+import { Sprout, CloudRain, Calendar, MapPin, Users, FileText, Check, ArrowRight, Zap, Wifi, Moon, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
@@ -14,7 +14,7 @@ const differentiators = [
   { icon: Wifi, title: 'Works Offline', desc: 'Crews in rural areas with spotty cell service? MowFlow works without internet and syncs when you\'re back online. Yardbook only syncs GPS every 4 hours.' },
   { icon: Moon, title: 'Dark Mode Built In', desc: 'Early morning starts? Dark mode keeps the screen easy on your eyes at 6am. Most lawn care apps are still blinding white in 2026.' },
   { icon: Shield, title: 'No Data Selling', desc: 'Yardbook is "free" because they sell your customer data to advertisers. MowFlow never touches your data — you\'re the customer, not the product.' },
-  { icon: Sparkles, title: 'Works Everywhere', desc: 'MowFlow runs on iPhone, Android, and desktop — no App Store download needed. LawnPro and Yardbook are stuck in a browser tab.', },
+  { icon: Sprout, title: 'Works Everywhere', desc: 'MowFlow runs on iPhone, Android, and desktop — no App Store download needed. LawnPro and Yardbook are stuck in a browser tab.', },
 ];
 
 const plans = [
@@ -201,7 +201,7 @@ export default function Landing() {
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 text-sm">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sparkles className="w-3.5 h-3.5 text-white" /></div>
+            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sprout className="w-3.5 h-3.5 text-white" /></div>
             MowFlow &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">

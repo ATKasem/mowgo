@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   Calendar, Users, FileText, Settings,
-  Sparkles, LogOut, WifiOff
+  Sprout, LogOut, WifiOff
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import InstallPrompt from './InstallPrompt';
@@ -51,12 +51,12 @@ export default function Layout() {
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <Link to="/login" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sprout className="w-4 h-4 text-white" />
             </div>
             <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">MowFlow</h1>
-          </div>
+          </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />
             <button onClick={logout} className="btn-ghost text-xs gap-1.5">

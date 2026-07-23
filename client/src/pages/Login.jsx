@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, isDemoMode } from '../lib/supabase';
-import { Sparkles, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Sprout, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export default function Login() {
         {/* Brand */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-3">
-            <Sparkles className="w-6 h-6 text-white" />
+            <Sprout className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">MowFlow</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Simple scheduling for lawn care crews</p>
