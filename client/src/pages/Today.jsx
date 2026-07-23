@@ -148,7 +148,9 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     // Persist reordered jobs
     updated.forEach(j => {
       if (j.scheduled_date === currentDate) {
-        updateJob(j.id, { route_order: j.route_order }).catch(() => {});
+        updateJob(j.id, { route_order: j.route_order }).catch(err => {
+          console.error('reorderWithinDate: failed to persist', j.id, err);
+        });
       }
     });
     return updated;

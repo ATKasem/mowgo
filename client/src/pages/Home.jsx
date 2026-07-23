@@ -242,7 +242,7 @@ export default function Home({ jobs = [], invoices = [] }) {
         {/* Calendar grid — compact, interactive */}
         <div className="grid grid-cols-7 gap-px">
           {calendarGrid.map((date, i) => {
-            if (!date) return <div key={`empty-${i}`} className="h-7" />;
+            if (!date) return <div key={`empty-${i}`} className="h-11" />;
             const dayNum = parseInt(date.split('-')[2]);
             const dayJobs = jobsByDate[date] || [];
             const isToday = date === today;
@@ -250,7 +250,7 @@ export default function Home({ jobs = [], invoices = [] }) {
               <button
                 key={date}
                 onClick={() => setShowForm({ date, jobs: dayJobs })}
-                className={`h-7 flex items-center justify-center rounded-md text-[11px] font-medium transition-all relative
+                className={`h-11 flex items-center justify-center rounded-md text-[11px] font-medium transition-all relative
                   ${isToday ? 'bg-emerald-500 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}
                   ${dayJobs.length > 0 && !isToday ? 'ring-1 ring-inset ring-amber-300 dark:ring-amber-700' : ''}
                 `}

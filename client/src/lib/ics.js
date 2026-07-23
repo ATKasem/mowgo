@@ -47,16 +47,27 @@ export function downloadCSV(jobs, filename = 'mowflow-schedule.csv') {
   URL.revokeObjectURL(url);
 }
 
+/** Escape HTML special characters */
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /** Open print-friendly schedule view for PDF export */
 export function printSchedule(jobs) {
   const rows = jobs.map(j => `
     <tr>
-      <td>${j.scheduled_date}</td>
-      <td>${j.scheduled_time?.slice(0, 5) || ''}</td>
-      <td>${j.clients?.name || 'Unknown'}</td>
-      <td>${j.title}</td>
-      <td>${j.clients?.address || ''}</td>
-      <td>$${j.clients?.rate || 0}</td>
+      <td>${escapeHtml(j.scheduled_date)}</td>
+      <td>${escapeHtml(j.scheduled_time?.slice(0, 5) || '')}</td>
+      <td>${escapeHtml(j.clients?.name || 'Unknown')}</td>
+      <td>${escapeHtml(j.title)}</td>
+      <td>${escapeHtml(j.clients?.address || '')}</td>
+      <td>$${escapeHtml(String(j.clients?.rate || 0))}</td>
     </tr>`).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>MowFlow Schedule</title>
@@ -72,6 +83,16 @@ export function printSchedule(jobs) {
   w.document.write(html);
   w.document.close();
   setTimeout(() => w.print(), 500);
+}
+
+/** Escape ICS special characters */
+function escapeICS(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;')
+    .replace(/\n/g, '\\n');
 }
 
 /** Generate raw ICS string (reusable) */
@@ -95,10 +116,10 @@ export function generateICS(jobs) {
       'BEGIN:VEVENT',
       `DTSTART:${date}T${time}`,
       `DTEND:${date}T${endTime}`,
-      `SUMMARY:${job.title} - ${job.clients.name}`,
-      `LOCATION:${job.clients.address || ''}`,
-      `DESCRIPTION:${job.clients.service_notes || ''}\\nRate: $${job.clients.rate || 0}`,
-      `UID:${uid}`,
+      `SUMMARY:${escapeICS(`${job.title} - ${job.clients.name}`)}`,
+      `LOCATION:${escapeICS(job.clients.address || '')}`,
+      `DESCRIPTION:${escapeICS(`${job.clients.service_notes || ''}\\nRate: $${job.clients.rate || 0}`)}`,
+      `UID:${escapeICS(uid)}`,
       'END:VEVENT',
     );
   });
