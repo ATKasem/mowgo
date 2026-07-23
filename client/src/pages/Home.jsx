@@ -56,7 +56,9 @@ function getGreeting() {
 function StatCard({ icon: Icon, value, label, color, sub }) {
   return (
     <div className={`card p-4 flex flex-col items-center text-center gap-1 hover:border-${color}-200 dark:hover:border-${color}-800 transition-all`}>
-      <Icon className={`w-5 h-5 text-${color}-500 dark:text-${color}-400 mb-0.5`} />
+      <div className={`w-9 h-9 rounded-xl bg-${color}-100 dark:bg-${color}-950/40 flex items-center justify-center mb-1`}>
+        <Icon className={`w-4.5 h-4.5 text-${color}-600 dark:text-${color}-400`} />
+      </div>
       <span className="text-xl font-extrabold text-gray-900 dark:text-white">{value}</span>
       <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
       {sub && <span className="text-[10px] text-gray-400 dark:text-gray-500">{sub}</span>}
