@@ -103,7 +103,10 @@ export default function Clients({ jobs = [] }) {
         <div className="relative">
           <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label="Sort clients"><Filter className="w-4 h-4" /></button>
           {showSort && (
-            <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[140px] shadow-lg" onMouseLeave={() => setShowSort(false)}>
+            <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[140px] shadow-lg"
+                 onMouseLeave={() => setShowSort(false)}
+                 onKeyDown={e => { if (e.key === 'Escape') { setShowSort(false); } }}
+                 onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowSort(false); }}>
               {SORT_OPTIONS.map(o => (
                 <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${sortBy === o.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
               ))}
@@ -140,7 +143,10 @@ export default function Clients({ jobs = [] }) {
           const meta = clientMeta[client.id];
           return (
             <div key={client.id} className={isEditing ? 'opacity-40 pointer-events-none' : ''}>
-              <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-800 transition-all" onClick={() => setExpandedId(isExpanded ? null : client.id)}>
+              <div className="card p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-800 transition-all"
+                   role="button" tabIndex={0}
+                   onClick={() => setExpandedId(isExpanded ? null : client.id)}
+                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : client.id); } }}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors[i % avatarColors.length]}`}>{getInitials(client.name)}</div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</p>

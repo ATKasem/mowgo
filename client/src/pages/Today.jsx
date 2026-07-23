@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
-import { createJob, updateJobStatus, updateJob, loadJobs } from '../lib/data';
+import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
 import { useAuth } from '../App';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
@@ -30,8 +30,12 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const [dragId, setDragId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [clients, setClients] = useState([]);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  // Load clients for the NewJobForm dropdown
+  useEffect(() => { loadClients().then(setClients).catch(() => {}); }, []);
 
   const createJobHandler = useCallback(async (e) => {
     e.preventDefault();
@@ -175,7 +179,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
 
       {/* New job form */}
       {showForm && (
-        <NewJobForm form={form} setForm={setForm} onSubmit={createJobHandler} onCancel={() => setShowForm(false)} saving={saving} />
+        <NewJobForm form={form} setForm={setForm} onSubmit={createJobHandler} onCancel={() => setShowForm(false)} saving={saving} clients={clients} />
       )}
 
       {/* Job list */}

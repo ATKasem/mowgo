@@ -2,7 +2,10 @@ import { Sparkles, RefreshCw } from 'lucide-react';
 import { demoClients } from '../lib/demoData';
 import { RECURRENCE_OPTIONS } from '../lib/constants';
 
-export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving = false }) {
+export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving = false, clients }) {
+  // Use real clients when provided, fall back to demo for demo mode
+  const clientList = clients?.length ? clients : demoClients;
+
   return (
     <form onSubmit={onSubmit} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
       <div className="flex items-center gap-2 mb-1">
@@ -13,7 +16,7 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
         <label className="label">Client</label>
         <select value={form.client_id} onChange={e => setForm({ ...form, client_id: e.target.value })} className="select" required>
           <option value="">Select a client...</option>
-          {demoClients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {clientList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>
       <div>
