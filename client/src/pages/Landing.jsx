@@ -46,9 +46,16 @@ export default function Landing() {
   const [paymentError, setPaymentError] = useState('');
 
   async function handleStartCheckout(plan) {
-    const r = await startCheckout(plan);
-    if (r?.error) setPaymentError(r.error);
-    setTimeout(() => setPaymentError(''), 5000);
+    try {
+      const r = await startCheckout(plan);
+      if (r?.error) {
+        setPaymentError(r.error);
+        setTimeout(() => setPaymentError(''), 5000);
+      }
+    } catch (e) {
+      setPaymentError(e.message || 'Payment failed');
+      setTimeout(() => setPaymentError(''), 5000);
+    }
   }
 
   return (
@@ -173,7 +180,8 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Simple, transparent pricing</h2>
-            <p className="text-center text-gray-500 dark:text-gray-400 mb-4 text-lg">Start free. Upgrade when you are ready. Cancel anytime.</p>
+            <p className="text-center text-gray-500 dark:text-gray-400 mb-2 text-lg">Start free. Upgrade when you are ready. Cancel anytime.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">Solo <strong>$49/mo</strong> — that's <strong>65% less</strong> than Jobber Connect at $139/mo. Same rain delay, better price.</p>
             <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">14-day free trial on paid plans. No setup fees. No contracts.</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">

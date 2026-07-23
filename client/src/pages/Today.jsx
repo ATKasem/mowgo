@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
 import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
@@ -32,10 +32,14 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const [dragOverId, setDragOverId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [clients, setClients] = useState([]);
+  const toggleTimeoutRef = useRef(null);
+  const jobsRef = useRef(jobs);
+
+  useEffect(() => { jobsRef.current = jobs; }, [jobs]);
 
   const { rainLikely, todayRainChance } = useWeather();
 
-  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const today = new Date().toISOString().split('T')[0];
 
   // Load clients for the NewJobForm dropdown
   useEffect(() => { loadClients().then(setClients).catch(() => {}); }, []);
@@ -57,7 +61,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
 
   const toggleStatus = useCallback(async (job) => {
     setAnimating(job.id);
-    setTimeout(async () => {
+    if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+    toggleTimeoutRef.current = setTimeout(async () => {
       try {
         const newStatus = job.status === 'done' ? 'scheduled' : 'done';
         await updateJobStatus(job.id, newStatus);
@@ -70,7 +75,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
           const nextDate = getNextDate(job.scheduled_date, job.recurrence);
           if (nextDate) {
             // Check if next occurrence already exists to prevent duplicates
-            const alreadyExists = jobs.some(j =>
+            const alreadyExists = jobsRef.current.some(j =>
               j.client_id === job.client_id &&
               j.scheduled_date === nextDate &&
               j.title === job.title
@@ -98,11 +103,19 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         } else if (job.status !== 'done') {
           setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
         }
-        setTimeout(() => setCompletedToast(null), 4000);
+        const toastTimeout = setTimeout(() => setCompletedToast(null), 4000);
+        toggleTimeoutRef.current = toastTimeout;
       } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
     }, 150);
   }, [setJobs, jobs]);
+
+  // Clean up timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+    };
+  }, []);
 
   // Drag-and-drop reordering
   function handleDragStart(job) { setDragId(job.id); }
@@ -216,7 +229,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                   : j
               ));
               setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
-              setTimeout(() => setCompletedToast(null), 3500);
+              if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+              toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
             }}
             className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-2.5 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
           >

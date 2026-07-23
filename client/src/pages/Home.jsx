@@ -81,15 +81,19 @@ export default function Home({ jobs = [], invoices = [] }) {
   const [weatherLoading, setWeatherLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     async function fetchWeather(lat, lon) {
       try {
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&temperature_unit=fahrenheit&timezone=auto&forecast_days=10`
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&temperature_unit=fahrenheit&timezone=auto&forecast_days=10`,
+          { signal }
         );
         const data = await res.json();
-        setWeather(data);
+        if (!signal.aborted) setWeather(data);
       } catch { /* offline or API down — silent fallback */ }
-      setWeatherLoading(false);
+      if (!signal.aborted) setWeatherLoading(false);
     }
 
     if ('geolocation' in navigator) {
@@ -101,6 +105,8 @@ export default function Home({ jobs = [], invoices = [] }) {
     } else {
       fetchWeather(35.47, -97.52);
     }
+
+    return () => controller.abort();
   }, []);
 
   // ===== Calendar state =====
@@ -265,7 +271,7 @@ export default function Home({ jobs = [], invoices = [] }) {
               <h4 className="font-bold text-sm text-gray-900 dark:text-white">
                 {new Date(showForm.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </h4>
-              <button onClick={() => setShowForm(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none">&times;</button>
+              <button onClick={() => setShowForm(null)} aria-label="Close calendar popover" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none">&times;</button>
             </div>
             {showForm.jobs.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400">No jobs scheduled</p>

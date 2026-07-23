@@ -43,17 +43,6 @@ export async function loadOffline(key) {
   return null;
 }
 
-/** Persist app state (jobs, clients, invoices) to offline storage */
-export async function persistAppState(jobs, clients, invoices) {
-  try {
-    await Promise.all([
-      saveOffline('jobs', jobs),
-      saveOffline('clients', clients),
-      saveOffline('invoices', invoices),
-    ]);
-  } catch (e) { console.warn('offlineStorage: persistAppState failed', e); }
-}
-
 /** Determine if the app is currently offline */
 export function isCurrentlyOffline() {
   return typeof navigator !== 'undefined' && !navigator.onLine;
