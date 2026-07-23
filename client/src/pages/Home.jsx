@@ -163,7 +163,11 @@ export default function Home({ jobs = [], invoices = [] }) {
 
       {/* 5-day forecast strip */}
       {!weatherLoading && forecast.length > 0 && (
-        <div className="flex gap-2 mb-5 overflow-x-auto pb-2 -mx-1 px-1">
+        <div className="flex gap-2 mb-5 overflow-x-auto pb-2 -mx-1 px-1
+          [&::-webkit-scrollbar]:h-1.5
+          [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700
+          [&::-webkit-scrollbar-thumb]:rounded-full">
           {forecast.map((f, i) => {
             const FI = weatherIcons[f.code] || Sun;
             return (
