@@ -214,10 +214,12 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         <div className="mb-5">
           <button
             onClick={() => {
+              const toMove = filtered.filter(j => j.status !== 'done');
+              if (toMove.length === 0) return;
+              if (!window.confirm(`Move ${toMove.length} job${toMove.length > 1 ? 's' : ''} to tomorrow?`)) return;
               const tomorrow = new Date(date);
               tomorrow.setDate(tomorrow.getDate() + 1);
               const nextDate = tomorrow.toISOString().split('T')[0];
-              const toMove = filtered.filter(j => j.status !== 'done');
               Promise.allSettled(toMove.map(j => updateJob(j.id, { scheduled_date: nextDate })))
                 .then(results => {
                   const failed = results.filter(r => r.status === 'rejected');

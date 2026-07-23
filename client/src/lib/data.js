@@ -82,7 +82,7 @@ export async function createJob(job) {
     status: 'scheduled',
     route_order: job.route_order || 99,
     recurrence_rule: job.recurrence || 'none',
-  }).select('*, clients!inner(*)').single();
+  }).select('*, clients!left(*)').single();
 
   if (error) throw error;
   return {
