@@ -32,7 +32,7 @@ export default function Login() {
         : await supabase.auth.signUp({ email, password });
 
       if (result.error) {
-        setError(result.error.message);
+        setError(typeof result.error.message === 'string' ? result.error.message : (result.error.msg || result.error.error_code || 'Something went wrong. Please try again.'));
         setLoading(false);
         return;
       }
