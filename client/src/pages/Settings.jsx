@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { loadProfile, saveProfile } from '../lib/data';
 import { isDemoMode } from '../lib/supabase';
-import { Store, Phone, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
+import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
 
 export default function Settings() {
   const [profile, setProfile] = useState({ business_name: '', phone: '' });
@@ -26,6 +26,9 @@ export default function Settings() {
     setError('');
     try {
       await saveProfile(profile);
+      // Also store locally for clipboard invoice texts
+      localStorage.setItem('mf_business_name', profile.business_name || '');
+      localStorage.setItem('mf_business_phone', profile.phone || '');
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {

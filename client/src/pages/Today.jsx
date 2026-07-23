@@ -92,45 +92,61 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   // Drag-and-drop reordering
   function handleDragStart(job) { setDragId(job.id); }
   function handleDragOver(e, job) { e.preventDefault(); if (dragId && dragId !== job.id) setDragOverId(job.id); }
+  // Shared date-scoped reorder — prevents cross-date corruption
+  function reorderInPlace(updated, fromIdx, toIdx) {
+    const [moved] = updated.splice(fromIdx, 1);
+    updated.splice(toIdx, 0, moved);
+  }
+
+  function reorderWithinDate(prev, fromJobId, toJobId, currentDate) {
+    const updated = [...prev];
+    // Get date-scoped indices (relative to full array)
+    const dateJobs = updated.filter(j => j.scheduled_date === currentDate);
+    const dateJobIds = dateJobs.map(j => j.id);
+    const fromPos = dateJobIds.indexOf(fromJobId);
+    const toPos = dateJobIds.indexOf(toJobId);
+    if (fromPos === -1 || toPos === -1 || fromPos === toPos) return prev;
+    // Map filtered indices back to full-array indices
+    const fromFullIdx = updated.findIndex(j => j.id === fromJobId);
+    const toFullIdx = updated.findIndex(j => j.id === toJobId);
+    reorderInPlace(updated, fromFullIdx, toFullIdx);
+    // Re-number route_order for jobs on this date only
+    let order = 1;
+    for (let i = 0; i < updated.length; i++) {
+      if (updated[i].scheduled_date === currentDate) {
+        updated[i] = { ...updated[i], route_order: order++ };
+      }
+    }
+    // Persist reordered jobs
+    updated.forEach(j => {
+      if (j.scheduled_date === currentDate) {
+        updateJob(j.id, { route_order: j.route_order }).catch(() => {});
+      }
+    });
+    return updated;
+  }
+
   function handleDrop(job) {
     if (!dragId || dragId === job.id) { setDragId(null); setDragOverId(null); return; }
-    setJobs(prev => {
-      const updated = [...prev];
-      const dragIdx = updated.findIndex(j => j.id === dragId);
-      const dropIdx = updated.findIndex(j => j.id === job.id);
-      if (dragIdx === -1 || dropIdx === -1) return prev;
-      const [dragged] = updated.splice(dragIdx, 1);
-      updated.splice(dropIdx, 0, dragged);
-      const reordered = updated.map((j, i) => ({ ...j, route_order: i + 1 }));
-      // Persist new orders
-      reordered.forEach(j => updateJob(j.id, { route_order: j.route_order }).catch(() => {}));
-      return reordered;
-    });
+    setJobs(prev => reorderWithinDate(prev, dragId, job.id, date));
     setDragId(null);
     setDragOverId(null);
   }
   function handleDragEnd() { setDragId(null); setDragOverId(null); }
 
-  // Keyboard reordering
-  function handleMoveUp(jobIndex) {
-    setJobs(prev => {
-      const updated = [...prev];
-      if (jobIndex <= 0) return prev;
-      [updated[jobIndex - 1], updated[jobIndex]] = [updated[jobIndex], updated[jobIndex - 1]];
-      const reordered = updated.map((j, i) => ({ ...j, route_order: i + 1 }));
-      reordered.forEach(j => updateJob(j.id, { route_order: j.route_order }).catch(() => {}));
-      return reordered;
-    });
+  // Keyboard reordering — date-scoped via same reorderWithinDate helper
+  function handleMoveUp(job) {
+    const dateJobs = jobs.filter(j => j.scheduled_date === date);
+    const pos = dateJobs.findIndex(j => j.id === job.id);
+    if (pos <= 0) return;
+    setJobs(prev => reorderWithinDate(prev, job.id, dateJobs[pos - 1].id, date));
   }
-  function handleMoveDown(jobIndex) {
-    setJobs(prev => {
-      const updated = [...prev];
-      if (jobIndex >= updated.length - 1) return prev;
-      [updated[jobIndex], updated[jobIndex + 1]] = [updated[jobIndex + 1], updated[jobIndex]];
-      const reordered = updated.map((j, i) => ({ ...j, route_order: i + 1 }));
-      reordered.forEach(j => updateJob(j.id, { route_order: j.route_order }).catch(() => {}));
-      return reordered;
-    });
+
+  function handleMoveDown(job) {
+    const dateJobs = jobs.filter(j => j.scheduled_date === date);
+    const pos = dateJobs.findIndex(j => j.id === job.id);
+    if (pos === -1 || pos >= dateJobs.length - 1) return;
+    setJobs(prev => reorderWithinDate(prev, job.id, dateJobs[pos + 1].id, date));
   }
 
   const filtered = date === today ? jobs : jobs.filter(j => j.scheduled_date === date);
@@ -238,8 +254,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             onDragOver={(e) => handleDragOver(e, job)}
             onDrop={() => handleDrop(job)}
             onDragEnd={handleDragEnd}
-            onMoveUp={() => handleMoveUp(jobs.findIndex(j => j.id === job.id))}
-            onMoveDown={() => handleMoveDown(jobs.findIndex(j => j.id === job.id))}
+            onMoveUp={() => handleMoveUp(job)}
+            onMoveDown={() => handleMoveDown(job)}
           />
         ))}
       </div>

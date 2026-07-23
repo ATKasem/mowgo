@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { loadClients, createClient, updateClient, deleteClient } from '../lib/data';
+import { INITIAL_CLIENT_FORM } from '../lib/constants';
 import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar, Loader2 } from 'lucide-react';
 import { getMapsUrl } from '../lib/maps';
-
-const emptyForm = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
 
 function getInitials(name) {
   if (!name) return '?';
@@ -24,7 +23,7 @@ export default function Clients({ jobs = [] }) {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState(INITIAL_CLIENT_FORM);
   const [expandedId, setExpandedId] = useState(null);
   const [sortBy, setSortBy] = useState('name');
   const [showSort, setShowSort] = useState(false);
@@ -34,7 +33,7 @@ export default function Clients({ jobs = [] }) {
     loadClients().then(data => { setClients(data); setLoading(false); });
   }, []);
 
-  function openNew() { setEditId(null); setForm(emptyForm); setExpandedId(null); setShowForm(true); }
+  function openNew() { setEditId(null); setForm(INITIAL_CLIENT_FORM); setExpandedId(null); setShowForm(true); }
   function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
 
   async function save(e) {

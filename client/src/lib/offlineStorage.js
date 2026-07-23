@@ -2,8 +2,6 @@
  * Offline storage using service worker's IndexedDB via MessageChannel.
  * Falls back to localStorage when SW is not available.
  */
-const SW_FALLBACK = typeof localStorage !== 'undefined';
-
 export async function saveOffline(key, value) {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     return new Promise((resolve) => {

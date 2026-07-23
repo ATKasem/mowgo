@@ -63,7 +63,8 @@ export async function loadJobs() {
 
 export async function createJob(job) {
   if (isDemoMode()) {
-    const newJob = { ...job, id: uid(), status: 'scheduled' };
+    const client = _clients.find(c => c.id === job.client_id);
+    const newJob = { ...job, id: uid(), status: 'scheduled', clients: client || null };
     _jobs = [newJob, ..._jobs];
     notify();
     return newJob;

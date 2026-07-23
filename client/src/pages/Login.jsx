@@ -21,6 +21,7 @@ export default function Login() {
 
     if (demo) {
       // Demo mode: skip auth, just go to app
+      setLoading(false);
       setTimeout(() => navigate('/app'), 400);
       return;
     }

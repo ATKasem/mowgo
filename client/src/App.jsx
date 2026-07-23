@@ -82,15 +82,15 @@ export default function App() {
   // Load data on mount + when demo data changes
   useEffect(() => {
     let mounted = true;
-    async function fetch() {
+    async function fetchData() {
       setDataLoading(true);
       const [j, inv] = await Promise.all([loadJobs(), loadInvoices()]);
       if (mounted) { setJobs(j); setInvoices(inv); setDataLoading(false); }
     }
-    fetch();
+    fetchData();
 
     // Listen for demo-mode data changes
-    const unsub = onDataChange(() => fetch());
+    const unsub = onDataChange(() => fetchData());
     return () => { mounted = false; unsub(); };
   }, []);
 

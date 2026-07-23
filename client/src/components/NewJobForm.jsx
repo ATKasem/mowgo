@@ -4,7 +4,7 @@ import { RECURRENCE_OPTIONS } from '../lib/constants';
 
 export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving = false, clients }) {
   // Use real clients when provided, fall back to demo for demo mode
-  const clientList = clients?.length ? clients : demoClients;
+  const clientList = clients ?? demoClients;
 
   return (
     <form onSubmit={onSubmit} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>

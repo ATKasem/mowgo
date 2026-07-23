@@ -1,9 +1,26 @@
 import { useState, useCallback, useMemo } from 'react';
 import { updateInvoiceStatus } from '../lib/data';
-import { FileText, CheckCircle, AlertCircle, Send, Receipt, Filter, X, ChevronRight } from 'lucide-react';
+import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 
 const iconMap = { CheckCircle, AlertCircle };
+
+/** Generate invoice text for clipboard */
+function invoiceText(invoice) {
+  const name = invoice.clients?.name || 'Client';
+  const amount = invoice.amount || 0;
+  const date = invoice.created_at
+    ? new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : 'today';
+  const phone = localStorage.getItem('mf_business_phone') || '';
+  const bizName = localStorage.getItem('mf_business_name') || '';
+
+  const payInfo = phone
+    ? `Pay via Venmo @${bizName || 'YourBiz'} or Zelle: ${phone}`
+    : 'Please send payment at your earliest convenience.';
+
+  return `Hi ${name} — your lawn was serviced on ${date}. $${amount} due. ${payInfo} Thanks!`;
+}
 
 const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
@@ -12,14 +29,17 @@ const STATUS_FILTERS = [
 ];
 
 export default function Invoices({ invoices, setInvoices }) {
-  const [sentReminders, setSentReminders] = useState(new Set());
+  const [copiedIds, setCopiedIds] = useState(new Set());
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
 
-  const sendReminder = useCallback((id) => {
-    setSentReminders(prev => new Set([...prev, id]));
-    setTimeout(() => setSentReminders(prev => { const n = new Set(prev); n.delete(id); return n; }), 2500);
+  const copyToClipboard = useCallback(async (invoice) => {
+    try {
+      await navigator.clipboard.writeText(invoiceText(invoice));
+      setCopiedIds(prev => new Set([...prev, invoice.id]));
+      setTimeout(() => setCopiedIds(prev => { const n = new Set(prev); n.delete(invoice.id); return n; }), 2500);
+    } catch { /* clipboard denied */ }
   }, []);
 
   const markAsPaid = useCallback(async (id) => {
@@ -106,8 +126,8 @@ export default function Invoices({ invoices, setInvoices }) {
                 <div className="flex items-center gap-3">
                   <span className={statusInfo.badge}>{statusInfo.label}</span>
                   {!isPaid && (
-                    <button onClick={e => { e.stopPropagation(); if (!sentReminders.has(invoice.id)) sendReminder(invoice.id); }} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${sentReminders.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
-                      {sentReminders.has(invoice.id) ? <><CheckCircle className="w-3 h-3" />Sent!</> : <><Send className="w-3 h-3" />Remind</>}
+                    <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${copiedIds.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
+                      {copiedIds.has(invoice.id) ? <><ClipboardCheck className="w-3 h-3" />Copied!</> : <><Copy className="w-3 h-3" />Copy</>}
                     </button>
                   )}
                   <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
@@ -128,8 +148,8 @@ export default function Invoices({ invoices, setInvoices }) {
                       </button>
                     )}
                     {!isPaid && (
-                      <button onClick={e => { e.stopPropagation(); if (!sentReminders.has(invoice.id)) sendReminder(invoice.id); }} className="btn-secondary flex-1 text-xs gap-1">
-                        <Send className="w-3.5 h-3.5" />{sentReminders.has(invoice.id) ? 'Sent!' : 'Send Reminder'}
+                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="btn-secondary flex-1 text-xs gap-1">
+                        <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
                       </button>
                     )}
                   </div>

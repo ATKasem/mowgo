@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical } from 'lucide-react';
+import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical } from 'lucide-react';
 import { STATUS_CONFIG, RECURRENCE_OPTIONS } from '../lib/constants';
 import { getMapsUrl } from '../lib/maps';
 

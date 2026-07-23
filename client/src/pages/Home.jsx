@@ -2,11 +2,10 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
 import {
-  Sprout, Sun, CloudRain, Cloud, CloudSun,
+  Sun,
   Calendar, DollarSign, AlertCircle, CheckCircle,
   ArrowRight, Plus, ChevronRight, Clock,
 } from 'lucide-react';
-import { RECURRENCE_OPTIONS } from '../lib/constants';
 
 // Simple weather mock — would be replaced with real API
 const weatherMock = { temp: 92, condition: 'Clear', icon: Sun, emoji: '☀️' };
