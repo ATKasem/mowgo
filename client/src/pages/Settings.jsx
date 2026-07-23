@@ -19,7 +19,7 @@ export default function Settings() {
     loadProfile().then(data => {
       if (data) setProfile(data);
       setProfileLoading(false);
-    });
+    }).catch(() => setProfileLoading(false));
   }, []);
 
   async function save(e) {
@@ -118,6 +118,7 @@ export default function Settings() {
             <button
               role="switch"
               aria-checked={notifyOnComplete}
+              aria-label="Job completion alerts"
               onClick={() => toggleNotifyComplete(!notifyOnComplete)}
               className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
@@ -132,6 +133,7 @@ export default function Settings() {
             <button
               role="switch"
               aria-checked={notifyOnRain}
+              aria-label="Rain delay notifications"
               onClick={() => toggleNotifyRain(!notifyOnRain)}
               className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
             >

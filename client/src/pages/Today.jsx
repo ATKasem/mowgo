@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
 import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
+import { useSearchParams } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
@@ -20,7 +21,8 @@ function getNextDate(currentDate, recurrence) {
 }
 
 export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [searchParams] = useSearchParams();
+  const [date, setDate] = useState(() => searchParams.get('date') || new Date().toISOString().split('T')[0]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
   const [expandedId, setExpandedId] = useState(null);
@@ -86,7 +88,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               }).then(nextJob => {
                 if (nextJob) setJobs(p => [...p, nextJob]);
               });
-              setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate });
+              setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate, type: 'recurring' });
             } else {
               setCompletedToast({ name: `${job.clients?.name} · ${recLabel} job already scheduled`, amount: job.clients?.rate });
             }
@@ -100,7 +102,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
     }, 150);
-  }, [setJobs]);
+  }, [setJobs, jobs]);
 
   // Drag-and-drop reordering
   function handleDragStart(job) { setDragId(job.id); }

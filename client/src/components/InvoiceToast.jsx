@@ -21,7 +21,7 @@ export default function InvoiceToast({ toast }) {
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <div>
           <p className={`text-sm font-semibold ${textColor}`}>
-            {isRain ? toast.name : `Invoice created for ${toast.name}`}
+            {isRain ? toast.name : toast.type === 'recurring' ? toast.name : `Invoice created for ${toast.name}`}
           </p>
           {!isRain && <p className={`text-xs ${subColor}`}>${toast.amount} — unpaid</p>}
         </div>

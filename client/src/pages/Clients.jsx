@@ -30,7 +30,7 @@ export default function Clients({ jobs = [] }) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    loadClients().then(data => { setClients(data); setLoading(false); });
+    loadClients().then(data => { setClients(data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   function openNew() { setEditId(null); setForm(INITIAL_CLIENT_FORM); setExpandedId(null); setShowForm(true); }

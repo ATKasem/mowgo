@@ -29,6 +29,10 @@ export async function startCheckout(plan) {
   }
 
   const priceId = plan === 'solo' ? PRICES.solo_monthly : PRICES.crew_monthly;
+  // Guard against placeholder / unconfigured price IDs
+  if (!priceId || !priceId.startsWith('price_')) {
+    return { error: 'Payment is not configured yet. Set VITE_STRIPE_PRICE_SOLO and VITE_STRIPE_PRICE_CREW in your .env file.' };
+  }
 
   const trialDays = parseInt(import.meta.env.VITE_STRIPE_TRIAL_DAYS, 10) || 0;
 
@@ -36,7 +40,7 @@ export async function startCheckout(plan) {
     lineItems: [{ price: priceId, quantity: 1 }],
     mode: 'subscription',
     successUrl: `${window.location.origin}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
-    cancelUrl: `${window.location.origin}/#/pricing`,
+    cancelUrl: `${window.location.origin}/#/`,
     allowPromotionCodes: true,
     ...(trialDays > 0 && {
       subscriptionData: { trial_period_days: trialDays },
