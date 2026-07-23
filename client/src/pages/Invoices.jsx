@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { updateInvoiceStatus } from '../lib/data';
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
@@ -33,6 +33,23 @@ export default function Invoices({ invoices, setInvoices }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
+  const filterRef = useRef(null);
+
+  // Close filter dropdown on click outside (handles touch devices)
+  useEffect(() => {
+    if (!showFilter) return;
+    const handler = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setShowFilter(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [showFilter]);
 
   const copyToClipboard = useCallback(async (invoice) => {
     try {
@@ -87,7 +104,7 @@ export default function Invoices({ invoices, setInvoices }) {
       )}
 
       <div className="flex items-center gap-2 mb-4">
-        <div className="relative" style={{ overflow: 'visible' }}>
+        <div className="relative" ref={filterRef} style={{ overflow: 'visible' }}>
           <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1" aria-label="Filter invoices by status"><Filter className="w-4 h-4" /></button>
           {showFilter && (
             <div className="absolute left-0 top-full mt-1 card p-1 z-20 min-w-[110px] shadow-lg"

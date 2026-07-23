@@ -49,7 +49,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     if (!form.client_id) return;
     setSaving(true);
     try {
-      const newJob = await createJob({ ...form, scheduled_date: date, route_order: jobs.filter(j => j.scheduled_date === date).length + 1 });
+      const currentJobs = jobsRef.current;
+      const newJob = await createJob({ ...form, scheduled_date: date, route_order: currentJobs.filter(j => j.scheduled_date === date).length + 1 });
       if (newJob) {
         setJobs(prev => [newJob, ...prev]);
       }
@@ -57,7 +58,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     setSaving(false);
     setShowForm(false);
     setForm(INITIAL_JOB_FORM);
-  }, [form, date, jobs, setJobs]);
+  }, [form, date, setJobs]);
 
   const toggleStatus = useCallback(async (job) => {
     setAnimating(job.id);
@@ -92,16 +93,20 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                 route_order: 99,
               }).then(nextJob => {
                 if (nextJob) setJobs(p => [...p, nextJob]);
+              }).catch(err => {
+                console.error('failed to create recurring job:', err);
               });
-              setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate, type: 'recurring' });
+              const clientName = job.clients?.name || 'Job';
+              setCompletedToast({ name: `${clientName} · Next ${recLabel} job created`, amount: job.clients?.rate || 0, type: 'recurring' });
             } else {
-              setCompletedToast({ name: `${job.clients?.name} · ${recLabel} job already scheduled`, amount: job.clients?.rate });
+              const clientName = job.clients?.name || 'Job';
+              setCompletedToast({ name: `${clientName} · ${recLabel} job already scheduled`, amount: job.clients?.rate || 0 });
             }
           } else {
-            setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
+            setCompletedToast({ name: job.clients?.name || 'Job', amount: job.clients?.rate || 0 });
           }
         } else if (job.status !== 'done') {
-          setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
+          setCompletedToast({ name: job.clients?.name || 'Job', amount: job.clients?.rate || 0 });
         }
         const toastTimeout = setTimeout(() => setCompletedToast(null), 4000);
         toggleTimeoutRef.current = toastTimeout;
@@ -240,7 +245,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
           >
             <CloudRain className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="flex-1 text-left min-w-0">
-              <span className="font-semibold">{todayRainChance()}%</span> chance of rain — move{' '}
+              <span className="font-semibold">{(todayRainChance() ?? 0)}%</span> chance of rain — move{' '}
               <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">
                 {jobs.filter(j => j.status !== 'done' && j.scheduled_date === date).length} remaining to tomorrow
               </span>

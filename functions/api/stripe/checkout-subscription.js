@@ -16,22 +16,28 @@ export async function onRequestPost(context) {
     return json({ error: 'Forbidden' }, 403);
   }
 
+  // Guard: Stripe secret key must be configured before making API calls
+  if (!env.STRIPE_SECRET_KEY) {
+    console.error('Stripe secret key not configured');
+    return json({ error: 'Payment system not configured' }, 500, origin);
+  }
+
   try {
     const { plan } = await request.json();
 
     // Validate plan
     if (!['solo', 'crew'].includes(plan)) {
-      return json({ error: 'Invalid plan' }, 400);
+      return json({ error: 'Invalid plan' }, 400, origin);
     }
 
     const priceId = plan === 'solo'
       ? (env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO)
       : (env.STRIPE_PRICE_CREW || env.VITE_STRIPE_PRICE_CREW);
     if (!priceId) {
-      return json({ error: 'Price ID not configured' }, 500);
+      return json({ error: 'Price ID not configured' }, 500, origin);
     }
 
-    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS, 10) || 14;
+    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS || '14', 10) || 14;
     const appUrl = env.APP_URL || origin || 'https://mowflow.pages.dev';
 
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -55,22 +61,21 @@ export async function onRequestPost(context) {
 
     if (session.error) {
       console.error('Stripe checkout error:', session.error.type, session.error.message);
-      return json({ error: 'Unable to start checkout. Please try again.' }, 400);
+      return json({ error: 'Unable to start checkout. Please try again.' }, 400, origin);
     }
 
-    return json({ url: session.url });
+    return json({ url: session.url }, 200, origin);
   } catch (err) {
     console.error('Checkout function error:', err);
-    return json({ error: 'Something went wrong' }, 500);
+    return json({ error: 'Something went wrong' }, 500, origin);
   }
 }
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
-    },
-  });
+function json(data, status = 200, origin = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  // Echo back the validated origin so multi-domain setups work
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
+  }
+  return new Response(JSON.stringify(data), { status, headers });
 }

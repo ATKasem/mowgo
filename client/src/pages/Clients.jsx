@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { loadClients, createClient, updateClient, deleteClient } from '../lib/data';
 import { INITIAL_CLIENT_FORM } from '../lib/constants';
 import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar, Loader2 } from 'lucide-react';
@@ -28,10 +28,27 @@ export default function Clients({ jobs = [] }) {
   const [sortBy, setSortBy] = useState('name');
   const [showSort, setShowSort] = useState(false);
   const [saving, setSaving] = useState(false);
+  const sortRef = useRef(null);
 
   useEffect(() => {
     loadClients().then(data => { setClients(data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
+
+  // Close sort dropdown on click outside (handles touch devices)
+  useEffect(() => {
+    if (!showSort) return;
+    const handler = (e) => {
+      if (sortRef.current && !sortRef.current.contains(e.target)) {
+        setShowSort(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [showSort]);
 
   function openNew() { setEditId(null); setForm(INITIAL_CLIENT_FORM); setExpandedId(null); setShowForm(true); }
   function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
@@ -106,7 +123,7 @@ export default function Clients({ jobs = [] }) {
 
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." aria-label="Search clients" value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
-        <div className="relative" style={{ overflow: 'visible' }}>
+        <div className="relative" ref={sortRef} style={{ overflow: 'visible' }}>
           <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label="Sort clients"><Filter className="w-4 h-4" /></button>
           {showSort && (
             <div className="absolute right-0 top-full mt-1 card p-1 z-20 min-w-[140px] shadow-lg"
@@ -127,7 +144,7 @@ export default function Clients({ jobs = [] }) {
           <div><label className="label">Name *</label><input placeholder="Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
           <div><label className="label">Address</label><input placeholder="123 Main St, OKC, OK" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Phone</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">Email</label><input placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>
-          <div><label className="label">Rate ($/visit)</label><input type="number" placeholder="120" value={form.rate} onChange={e => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} className="input" /></div>
+          <div><label className="label">Rate ($/visit)</label><input type="number" min="0" placeholder="120" value={form.rate} onChange={e => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} className="input" /></div>
           <div><label className="label">Service Notes</label><textarea placeholder="Focus on front yard..." value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Key Code</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">Alarm Code</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
           <div><label className="label">Pet Instructions</label><input placeholder="1 friendly dog..." value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
@@ -181,7 +198,7 @@ export default function Clients({ jobs = [] }) {
                   {meta?.nextJob && (
                     <div className="flex items-center gap-2.5 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/20 rounded-lg p-2.5">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>Next: <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5)} — {meta.nextJob.title}</span>
+                      <span>Next: <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5) || '--:--'} — {meta.nextJob.title}</span>
                     </div>
                   )}
                   {meta?.recentDone?.length > 0 && (
