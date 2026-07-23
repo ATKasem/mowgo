@@ -126,7 +126,7 @@ export default function Invoices({ invoices, setInvoices }) {
                 <div className="flex items-center gap-3">
                   <span className={statusInfo.badge}>{statusInfo.label}</span>
                   {!isPaid && (
-                    <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${copiedIds.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
+                    <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} title="Copy payment request to paste in a text message" className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${copiedIds.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
                       {copiedIds.has(invoice.id) ? <><ClipboardCheck className="w-3 h-3" />Copied!</> : <><Copy className="w-3 h-3" />Copy</>}
                     </button>
                   )}
@@ -148,7 +148,7 @@ export default function Invoices({ invoices, setInvoices }) {
                       </button>
                     )}
                     {!isPaid && (
-                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="btn-secondary flex-1 text-xs gap-1">
+                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} title="Copies a payment request to your clipboard — paste it into a text to the client" className="btn-secondary flex-1 text-xs gap-1">
                         <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
                       </button>
                     )}
