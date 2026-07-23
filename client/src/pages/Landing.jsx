@@ -186,8 +186,8 @@ export default function Landing() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">The only app that moves your schedule when it rains — for free</h2>
-            <p className="text-emerald-100 text-lg mb-10">Stop losing $40-80 every time it rains and you forget to reschedule. One tap. Done.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Ready to stop losing track of jobs?</h2>
+            <p className="text-emerald-100 text-lg mb-10">Get it on iPhone, Android, or use it on desktop. App Store coming soon.</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               Try MowFlow Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

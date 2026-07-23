@@ -1,7 +1,7 @@
 # MowFlow — Capacitor Native App Setup
 
 ## Prerequisites (on your Mac)
-- Xcode 26+ (App Store)
+- Xcode 16+ (App Store)
 - Node.js 22+ (`node --version`)
 - Apple Developer account ($99/year) — https://developer.apple.com
 
@@ -39,12 +39,12 @@ Then in Xcode: Product → Archive → Distribute App.
 All required sizes are in `public/icon-*.png`. Xcode picks them up automatically from the asset catalog.
 
 ## Key Files
-- `capacitor.config.ts` — app ID, name, splash screen config
+- `capacitor.config.json` — app ID, name, splash screen config (green background)
 - `public/app-icon-1024.png` — master icon for App Store
 - `public/icon-*.png` — all iOS icon sizes
 - `APP_STORE.md` — App Store metadata, description, keywords
 
 ## Notes
-- Privacy policy: https://mowflow.netlify.app/privacy
-- The web app runs at https://mowflow.netlify.app (auto-deploys from GitHub)
+- Live URL: https://cleanflloww.pages.dev
+- Privacy policy: https://cleanflloww.pages.dev/privacy
 - Capacitor wraps the same code into a native iOS app — same features, native feel
