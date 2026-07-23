@@ -163,7 +163,7 @@ export default function Clients({ jobs = [] }) {
                 </div>
               </div>
               {isExpanded && (
-                <div className="card border-t-0 rounded-t-none -mt-1 p-4 pt-3 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
+                <div className="border-t border-gray-100 dark:border-gray-800 p-4 pt-3 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
                   <div className="flex gap-2 mb-1">
                     {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Phone className="w-3 h-3" />Call</a>}
                     {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Navigation className="w-3 h-3" />Navigate</a>}

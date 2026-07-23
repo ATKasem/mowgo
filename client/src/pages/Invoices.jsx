@@ -149,7 +149,7 @@ export default function Invoices({ invoices, setInvoices }) {
                 </div>
               </div>
               {isExpanded && (
-                <div className="card border-t-0 rounded-t-none -mt-1 p-4 pt-3 space-y-3" style={{ animation: 'slideDown 0.15s ease-out' }}>
+                <div className="border-t border-gray-100 dark:border-gray-800 p-4 pt-3 space-y-3" style={{ animation: 'slideDown 0.15s ease-out' }}>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Client</span><span className="font-medium text-gray-900 dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
                     <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Amount</span><span className="font-bold text-gray-900 dark:text-white">${invoice.amount}</span></div>
