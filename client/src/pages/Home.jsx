@@ -55,9 +55,9 @@ function getGreeting() {
 
 function StatCard({ icon: Icon, value, label, color, sub }) {
   const colors = {
-    emerald: { bg: 'bg-emerald-100 dark:bg-emerald-950/40', text: 'text-emerald-600 dark:text-emerald-400', hover: 'hover:border-emerald-200 dark:hover:border-emerald-800' },
-    sky:     { bg: 'bg-sky-100 dark:bg-sky-950/40',     text: 'text-sky-600 dark:text-sky-400',     hover: 'hover:border-sky-200 dark:hover:border-sky-800' },
-    amber:   { bg: 'bg-amber-100 dark:bg-amber-950/40',   text: 'text-amber-600 dark:text-amber-400',   hover: 'hover:border-amber-200 dark:hover:border-amber-800' },
+    emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/60', text: 'text-emerald-600 dark:text-emerald-400', hover: 'hover:border-emerald-200 dark:hover:border-emerald-800' },
+    sky:     { bg: 'bg-sky-50 dark:bg-sky-950/60',     text: 'text-sky-600 dark:text-sky-400',     hover: 'hover:border-sky-200 dark:hover:border-sky-800' },
+    amber:   { bg: 'bg-amber-50 dark:bg-amber-950/60',   text: 'text-amber-600 dark:text-amber-400',   hover: 'hover:border-amber-200 dark:hover:border-amber-800' },
   };
   const c = colors[color] || colors.emerald;
   return (
