@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sprout, CloudRain, Calendar, MapPin, Users, FileText, Check, ArrowRight, Zap, Wifi, Moon, Shield } from 'lucide-react';
+import { Sprout, CloudRain, Calendar, MapPin, Users, FileText, Check, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
@@ -43,8 +43,25 @@ function FadeIn({ children, className = '', delay = 0 }) {
 }
 
 export default function Landing() {
+  const [paymentError, setPaymentError] = useState('');
+
+  async function handleStartCheckout(plan) {
+    const r = await startCheckout(plan);
+    if (r?.error) setPaymentError(r.error);
+    setTimeout(() => setPaymentError(''), 5000);
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
+      {/* Payment error toast */}
+      {paymentError && (
+        <div className="fixed top-4 inset-x-0 z-50 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out' }}>
+          <div className="card bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 px-4 py-3 flex items-center gap-2 pointer-events-auto shadow-lg max-w-sm mx-4">
+            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-sm text-amber-800 dark:text-amber-300">{paymentError}</p>
+          </div>
+        </div>
+      )}
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -186,7 +203,7 @@ export default function Landing() {
                   {plan.name === 'Free' ? (
                     <Link to="/login" className="mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">{plan.cta}</Link>
                   ) : (
-                    <button onClick={async () => { const r = await startCheckout(plan.name.toLowerCase()); if (r?.error) console.warn(r.error); }} className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>{plan.cta}</button>
+                    <button onClick={() => handleStartCheckout(plan.name.toLowerCase())} className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>{plan.cta}</button>
                   )}
                 </div>
               </FadeIn>
