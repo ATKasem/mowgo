@@ -100,10 +100,10 @@ export default function Clients({ jobs = [] }) {
 
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." aria-label="Search clients" value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
-        <div className="relative">
+        <div className="relative" style={{ overflow: 'visible' }}>
           <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label="Sort clients"><Filter className="w-4 h-4" /></button>
           {showSort && (
-            <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[140px] shadow-lg"
+            <div className="absolute right-0 top-full mt-1 card p-1 z-20 min-w-[140px] shadow-lg"
                  onMouseLeave={() => setShowSort(false)}
                  onKeyDown={e => { if (e.key === 'Escape') { setShowSort(false); } }}
                  onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowSort(false); }}>

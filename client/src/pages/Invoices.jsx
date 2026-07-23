@@ -80,10 +80,10 @@ export default function Invoices({ invoices, setInvoices }) {
       )}
 
       <div className="flex items-center gap-2 mb-4">
-        <div className="relative">
+        <div className="relative" style={{ overflow: 'visible' }}>
           <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1" aria-label="Filter invoices by status"><Filter className="w-4 h-4" /></button>
           {showFilter && (
-            <div className="absolute left-0 top-full mt-1 card p-1 z-10 min-w-[110px] shadow-lg"
+            <div className="absolute left-0 top-full mt-1 card p-1 z-20 min-w-[110px] shadow-lg"
                  onMouseLeave={() => setShowFilter(false)}
                  onKeyDown={e => { if (e.key === 'Escape') { setShowFilter(false); } }}
                  onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowFilter(false); }}>
@@ -126,8 +126,23 @@ export default function Invoices({ invoices, setInvoices }) {
                 <div className="flex items-center gap-3">
                   <span className={statusInfo.badge}>{statusInfo.label}</span>
                   {!isPaid && (
-                    <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} title="Copy payment request to paste in a text message" className={`text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 ${copiedIds.has(invoice.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
-                      {copiedIds.has(invoice.id) ? <><ClipboardCheck className="w-3 h-3" />Copied!</> : <><Copy className="w-3 h-3" />Copy</>}
+                    <button
+                      onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }}
+                      className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 group"
+                    >
+                      {copiedIds.has(invoice.id) ? (
+                        <><ClipboardCheck className="w-3 h-3" />Copied!
+                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
+                            Paste into a text to the client
+                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                          </span>
+                        </>) : (
+                        <><Copy className="w-3 h-3" />Copy
+                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
+                            Copy a payment request to send via text
+                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                          </span>
+                        </>)}
                     </button>
                   )}
                   <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
@@ -148,8 +163,12 @@ export default function Invoices({ invoices, setInvoices }) {
                       </button>
                     )}
                     {!isPaid && (
-                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} title="Copies a payment request to your clipboard — paste it into a text to the client" className="btn-secondary flex-1 text-xs gap-1">
+                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group">
                         <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
+                        <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
+                          Copies a payment request — paste in a text
+                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                        </span>
                       </button>
                     )}
                   </div>
