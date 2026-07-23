@@ -19,7 +19,7 @@ export default function Subscribe() {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-sky-500 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mx-auto mb-4" />
           <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Confirming your subscription</h1>
           <p className="text-gray-500 dark:text-gray-400">Just a moment...</p>
         </div>

@@ -28,10 +28,10 @@ export default function Login() {
           <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full border rounded-lg px-3 py-2" required minLength={6} />
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white rounded-lg py-2 font-semibold disabled:opacity-50">
+          <button type="submit" disabled={loading} className="w-full bg-emerald-600 text-white rounded-lg py-2 font-semibold disabled:opacity-50">
             {loading ? 'Loading...' : mode === 'login' ? 'Log In' : 'Sign Up'}
           </button>
-          <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="w-full text-blue-600 text-sm">
+          <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="w-full text-emerald-600 text-sm">
             {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
           </button>
         </form>

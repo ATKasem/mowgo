@@ -1,9 +1,9 @@
 import { memo } from 'react';
-import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw } from 'lucide-react';
+import { Check, Clock, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical } from 'lucide-react';
 import { STATUS_CONFIG, RECURRENCE_OPTIONS } from '../lib/constants';
 import { getMapsUrl } from '../lib/maps';
 
-function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggleStatus }) {
+function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd }) {
   const client = job.clients;
   const isDone = job.status === 'done';
   const statusInfo = STATUS_CONFIG[job.status] || STATUS_CONFIG.scheduled;
@@ -12,7 +12,14 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
     : null;
 
   return (
-    <div className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-60' : ''}`}>
+    <div
+      className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-60' : ''} ${isDragging ? 'opacity-40 scale-95' : ''} ${isDragOver ? 'ring-2 ring-sky-400 dark:ring-sky-500 border-sky-400' : ''}`}
+      draggable={!isDone}
+      onDragStart={(e) => { if (!isDone) { e.dataTransfer.effectAllowed = 'move'; onDragStart?.(); } }}
+      onDragOver={(e) => { e.preventDefault(); onDragOver?.(e); }}
+      onDrop={(e) => { e.preventDefault(); onDrop?.(); }}
+      onDragEnd={onDragEnd}
+    >
       {/* Main row — tap anywhere to expand */}
       <div
         role="button"
@@ -22,11 +29,18 @@ function JobCard({ job, index, isExpanded, isAnimating, onToggleExpand, onToggle
         className="p-4 flex items-center gap-3 cursor-pointer"
         onClick={onToggleExpand}
       >
+        {/* Drag handle */}
+        {!isDone && (
+          <div className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing flex-shrink-0" aria-label="Drag to reorder">
+            <GripVertical className="w-4 h-4" />
+          </div>
+        )}
+
         {/* Status toggle — tap to mark done/undo */}
         <button
           aria-label={isDone ? 'Undo completion' : 'Mark job complete'}
           onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 hover:scale-105'}`}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60 hover:scale-105'}`}
         >
           {isDone ? <Check className="w-6 h-6" /> : <span>{index + 1}</span>}
         </button>

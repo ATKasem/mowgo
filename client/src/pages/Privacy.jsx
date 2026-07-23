@@ -10,7 +10,7 @@ export default function Privacy() {
         </Link>
 
         <div className="flex items-center gap-2 mb-8">
-          <Sparkles className="w-6 h-6 text-sky-500" />
+          <Sparkles className="w-6 h-6 text-emerald-500" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
         </div>
 
