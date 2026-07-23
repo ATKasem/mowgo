@@ -53,8 +53,8 @@ export default function Layout() {
       )}
 
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 safe-top">
+        <div className="max-w-2xl mx-auto px-4 pt-[env(safe-area-inset-top,0px)] h-14 flex items-center justify-between">
           <Link to="/app" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" />
@@ -72,7 +72,7 @@ export default function Layout() {
       </header>
 
       {/* Main content */}
-      <main id="main-content" className="max-w-2xl mx-auto px-4 py-5">
+      <main id="main-content" className="max-w-2xl mx-auto px-4 pt-5 pb-6">
         <Outlet />
       </main>
 

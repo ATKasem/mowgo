@@ -67,19 +67,29 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
           const nextDate = getNextDate(job.scheduled_date, job.recurrence);
           if (nextDate) {
+            // Check if next occurrence already exists to prevent duplicates
+            const alreadyExists = jobs.some(j =>
+              j.client_id === job.client_id &&
+              j.scheduled_date === nextDate &&
+              j.title === job.title
+            );
             const recLabel = RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label || job.recurrence;
-            createJob({
-              client_id: job.client_id,
-              title: job.title,
-              scheduled_date: nextDate,
-              scheduled_time: job.scheduled_time,
-              duration_minutes: job.duration_minutes,
-              recurrence: job.recurrence,
-              route_order: 99,
-            }).then(nextJob => {
-              if (nextJob) setJobs(p => [...p, nextJob]);
-            });
-            setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate });
+            if (!alreadyExists) {
+              createJob({
+                client_id: job.client_id,
+                title: job.title,
+                scheduled_date: nextDate,
+                scheduled_time: job.scheduled_time,
+                duration_minutes: job.duration_minutes,
+                recurrence: job.recurrence,
+                route_order: 99,
+              }).then(nextJob => {
+                if (nextJob) setJobs(p => [...p, nextJob]);
+              });
+              setCompletedToast({ name: `${job.clients?.name} · Next ${recLabel} job created`, amount: job.clients?.rate });
+            } else {
+              setCompletedToast({ name: `${job.clients?.name} · ${recLabel} job already scheduled`, amount: job.clients?.rate });
+            }
           } else {
             setCompletedToast({ name: job.clients?.name, amount: job.clients?.rate });
           }
@@ -168,7 +178,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       <InvoiceToast toast={completedToast} />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Today</h2>
           <div className="flex items-center gap-2 mt-0.5">
@@ -182,9 +192,9 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
       </div>
 
-      {/* Rain delay — weather-aware: only appears when rain is forecast */}
+      {/* Rain delay — always visible when there are incomplete jobs */}
       {filtered.some(j => j.status !== 'done') && (
-        <div className="mb-4">
+        <div className="mb-5">
           <button
             onClick={() => {
               const tomorrow = new Date(date);
@@ -206,11 +216,14 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
               setTimeout(() => setCompletedToast(null), 3500);
             }}
-            className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-2 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
+            className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-2.5 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
           >
             <CloudRain className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="flex-1 text-left">
-              <span className="font-semibold">{todayRainChance()}%</span> chance of rain — <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">move {filtered.filter(j => j.status !== 'done').length} remaining to tomorrow</span>
+            <span className="flex-1 text-left min-w-0">
+              <span className="font-semibold">{todayRainChance()}%</span> chance of rain — move{' '}
+              <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">
+                {filtered.filter(j => j.status !== 'done').length} remaining to tomorrow
+              </span>
             </span>
             <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">Move All</span>
           </button>
@@ -218,7 +231,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       )}
 
       {/* Date picker + progress */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-5">
         <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label="Select date" className="input w-auto" />
         <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden"
              role="progressbar"
@@ -236,7 +249,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       )}
 
       {/* Job list */}
-      <div className="space-y-3">
+      <div className="space-y-3 scroll-fade-bottom">
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
             <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />

@@ -16,8 +16,8 @@ export default function InvoiceToast({ toast }) {
   const subColor = isError ? 'text-red-600 dark:text-red-400' : isRain ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400';
 
   return (
-    <div role="status" aria-live="polite" className="fixed top-4 inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out' }}>
-      <div className={`${bg} px-4 py-3 flex items-center gap-2 pointer-events-auto shadow-lg`}>
+    <div role="status" aria-live="polite" className="fixed inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out', top: 'calc(4rem + env(safe-area-inset-top, 0px) + 8px)' }}>
+      <div className={`${bg} px-4 py-3 mx-4 flex items-center gap-2 pointer-events-auto shadow-lg max-w-sm`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <div>
           <p className={`text-sm font-semibold ${textColor}`}>

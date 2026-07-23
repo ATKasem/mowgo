@@ -152,7 +152,7 @@ export default function Home({ jobs = [], invoices = [] }) {
   return (
     <div>
       {/* Greeting + Weather */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {getGreeting()}, {userName} {wEmoji}
@@ -170,7 +170,7 @@ export default function Home({ jobs = [], invoices = [] }) {
 
       {/* 5-day forecast strip */}
       {!weatherLoading && forecast.length > 0 && (
-        <div className="flex gap-2 mb-5 overflow-x-auto overflow-y-visible pb-2 -mx-1 px-1
+        <div className="flex gap-2 mb-6 overflow-x-auto overflow-y-visible pb-2 -mx-1 px-1
           [&::-webkit-scrollbar]:h-1.5
           [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700
@@ -191,14 +191,14 @@ export default function Home({ jobs = [], invoices = [] }) {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-3 gap-3 mb-6">
         <StatCard icon={CheckCircle} value={totalToday ? `${doneToday}/${totalToday}` : '—'} label="Done today" color="emerald" sub={totalToday ? `${Math.round((doneToday / totalToday) * 100)}%` : ''} />
         <StatCard icon={DollarSign} value={`$${todayRevenue}`} label="Today's revenue" color="sky" />
         <StatCard icon={AlertCircle} value={`$${unpaidTotal}`} label="Outstanding" color={unpaidTotal > 0 ? 'amber' : 'emerald'} sub={unpaidInvoices.length ? `${unpaidInvoices.length} unpaid` : 'All clear'} />
       </div>
 
       {/* Monthly Calendar */}
-      <div className="card p-4 mb-5">
+      <div className="card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <button onClick={prevMonth} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
@@ -214,7 +214,7 @@ export default function Home({ jobs = [], invoices = [] }) {
           {DAYS.map(d => <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 py-0.5">{d}</div>)}
         </div>
         {/* Calendar grid — compact, interactive */}
-        <div className="grid grid-cols-7 gap-px">
+        <div className="grid grid-cols-7 gap-px scroll-fade-bottom">
           {calendarGrid.map((date, i) => {
             if (!date) return <div key={`empty-${i}`} className="h-7" />;
             const dayNum = parseInt(date.split('-')[2]);
@@ -274,14 +274,14 @@ export default function Home({ jobs = [], invoices = [] }) {
       )}
 
       {/* Up Next + Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
         <div className="card p-4">
           <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
             <Clock className="w-4 h-4 text-violet-500" />
             Up Next
           </h3>
           {upcoming.length === 0 ? (
-            <div className="text-center py-4">
+            <div className="text-center py-5">
               <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
               <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">All done for today!</p>
             </div>
