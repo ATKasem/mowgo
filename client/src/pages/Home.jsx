@@ -77,7 +77,7 @@ export default function Home({ jobs = [], invoices = [] }) {
     async function fetchWeather(lat, lon) {
       try {
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&temperature_unit=fahrenheit&timezone=auto&forecast_days=5`
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&temperature_unit=fahrenheit&timezone=auto&forecast_days=10`
         );
         const data = await res.json();
         setWeather(data);
@@ -123,7 +123,7 @@ export default function Home({ jobs = [], invoices = [] }) {
   const wLabel = weather ? wmoToLabel(weather.current.weather_code) : 'Clear';
   const wTemp = weather ? Math.round(weather.current.temperature_2m) : '—';
   const wEmoji = weather ? (weatherEmoji[weather.current.weather_code] || '☀️') : '☀️';
-  const forecast = weather?.daily ? weather.daily.time.slice(0, 5).map((_, i) => ({
+  const forecast = weather?.daily ? weather.daily.time.slice(0, 10).map((_, i) => ({
     day: new Date(weather.daily.time[i] + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' }),
     hi: Math.round(weather.daily.temperature_2m_max[i]),
     lo: Math.round(weather.daily.temperature_2m_min[i]),
