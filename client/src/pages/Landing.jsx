@@ -1,25 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Calendar, MapPin, Users, FileText, Check, ArrowRight } from 'lucide-react';
+import { Sparkles, CloudRain, Calendar, MapPin, Users, FileText, Check, ArrowRight, Zap, Wifi, Moon, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
 const features = [
-  { icon: Calendar, title: 'Smart Scheduling', desc: 'Recurring jobs, drag-to-reschedule, color-coded calendar. Set it once, it runs forever.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time mowing.', color: 'from-emerald-500 to-teal-500' },
-  { icon: Users, title: 'Client Management', desc: 'Names, addresses, key codes, pet instructions — everything in one place.', color: 'from-violet-500 to-purple-500' },
-  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Job done → tap invoice. Client gets a text with a Stripe payment link.', color: 'from-amber-500 to-orange-500' },
+  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Rain tomorrow? One tap moves your whole schedule forward. Nobody else offers this on a free plan — Lawn.Best charges $49 for it.', color: 'from-emerald-500 to-green-500' },
+  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time mowing. Jobber locks this behind a $199/mo plan.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, chemical notes — fields you actually need. Generic apps like Jobber make you use "custom fields."', color: 'from-violet-500 to-purple-500' },
+  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Job done → tap invoice. Client pays via Stripe link. Track paid vs unpaid at a glance. No hidden processing fees like DoorstepHQ.', color: 'from-amber-500 to-orange-500' },
+];
+
+const differentiators = [
+  { icon: Wifi, title: 'Works Offline', desc: 'Crews in rural areas with spotty cell service? MowFlow works without internet and syncs when you\'re back online. Yardbook only syncs GPS every 4 hours.' },
+  { icon: Moon, title: 'Dark Mode Built In', desc: 'Early morning starts? Dark mode keeps the screen easy on your eyes at 6am. Most lawn care apps are still blinding white in 2026.' },
+  { icon: Shield, title: 'No Data Selling', desc: 'Yardbook is "free" because they sell your customer data to advertisers. MowFlow never touches your data — you\'re the customer, not the product.' },
+  { icon: Sparkles, title: 'Install as an App', desc: 'Add MowFlow to your phone\'s home screen — works like a native app. No App Store download needed. LawnPro and Yardbook are stuck in a browser tab.' },
 ];
 
 const plans = [
-  { name: 'Free', price: '0', period: 'forever', desc: 'For solo landscapers getting started', features: ['Up to 10 clients', 'Daily job scheduling', 'Recurring job auto-regenerate', 'Invoice tracking', 'Rain delay reschedule', 'Dark mode + mobile PWA'], cta: 'Start Free', highlight: false },
-  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'Client notes, codes & pets', 'GPS navigate to job site', 'Offline mode', 'Stripe payments'], cta: 'Start Free Trial', highlight: true, coming: ['Stripe payments'] },
-  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Multi-user team access', 'Route optimization', 'Team progress dashboard', 'Priority support', 'QuickBooks export'], cta: 'Start Free Trial', highlight: false, coming: ['Multi-user team access', 'Route optimization', 'QuickBooks export'] },
+  { name: 'Free', price: '0', period: 'forever', desc: 'For solo operators just getting started', features: ['Up to 10 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
+  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode', 'Online payments (Stripe)'], cta: 'Start Free Trial', highlight: true, coming: ['Online payments (Stripe)'] },
+  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Multi-user team access', 'Route optimization', 'Job assignment & tracking', 'Team progress dashboard', 'Priority support'], cta: 'Start Free Trial', highlight: false, coming: ['Multi-user team access', 'Route optimization'] },
 ];
 
 const stats = [
   { value: '556K+', label: 'US lawn care businesses', suffix: 'and growing' },
-  { value: '$188B', label: 'Industry market size', suffix: 'in 2026' },
-  { value: '<1%', label: 'of your revenue', suffix: '— our price' },
+  { value: '0', label: 'Competitors with free rain delay', suffix: '— we\'re the only one' },
+  { value: '<1%', label: 'of your revenue', suffix: '— Solo plan costs less than one missed job' },
 ];
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -45,9 +52,9 @@ export default function Landing() {
         <div className="absolute bottom-10 -left-20 w-80 h-80 bg-gradient-to-tr from-violet-200/30 to-purple-300/20 rounded-full blur-3xl" />
         <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-24 md:py-32 text-center">
           <FadeIn>
-            <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6 hover:scale-105 transition-transform cursor-default">
-              <Sparkles className="w-4 h-4" />
-              Now on iOS, Android & Web
+            <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+              <Zap className="w-4 h-4" />
+              The only lawn care app with free rain delay
             </div>
           </FadeIn>
           <FadeIn delay={100}>
@@ -57,7 +64,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              The only app built for 1–3 person lawn care teams. Schedule jobs, plan routes, invoice clients — all from your phone. No office staff required.
+              Built for 1–3 person crews. Rain delay, routes, invoicing — all from your phone. Jobber's usable plan runs $119+/mo. MowFlow starts free.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -70,7 +77,7 @@ export default function Landing() {
                 View Pricing
               </a>
             </div>
-            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">Free forever plan. No credit card required.</p>
+            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">Rain delay on free tier. No credit card required.</p>
           </FadeIn>
         </div>
       </section>
@@ -78,10 +85,10 @@ export default function Landing() {
       {/* Features */}
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Everything you need, <span className="text-emerald-500">nothing you don't</span></h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Jobber is $169/month for a reason — it's built for 20-person crews. MowFlow is built for you.</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Built for lawn care, <span className="text-emerald-500">not office work</span></h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Jobber and Housecall Pro are built for 20-person operations. Yardbook is "free" because they sell your data. We're different.</p>
         </FadeIn>
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color }, i) => (
             <FadeIn key={title} delay={i * 100}>
               <div className="group card p-6 flex gap-4 hover:border-emerald-200 dark:hover:border-emerald-800 cursor-default">
@@ -91,6 +98,24 @@ export default function Landing() {
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+
+        {/* Differentiators */}
+        <FadeIn>
+          <h3 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-10">Things our competitors won't tell you</h3>
+        </FadeIn>
+        <div className="grid md:grid-cols-2 gap-5">
+          {differentiators.map(({ icon: Icon, title, desc }, i) => (
+            <FadeIn key={title} delay={i * 100}>
+              <div className="card p-5 flex gap-3">
+                <Icon className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{title}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{desc}</p>
                 </div>
               </div>
             </FadeIn>
@@ -118,7 +143,8 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Simple, transparent pricing</h2>
-            <p className="text-center text-gray-500 dark:text-gray-400 mb-14 text-lg">Start free. Upgrade when you're ready. Cancel anytime.</p>
+            <p className="text-center text-gray-500 dark:text-gray-400 mb-4 text-lg">Start free. Upgrade when you're ready. Cancel anytime.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">Compare: Jobber's usable plan is $119+/mo plus $29 per extra user. Yardbook is "free" but sells your customer data.</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan, i) => (
@@ -128,8 +154,8 @@ export default function Landing() {
                   <h3 className={`text-lg font-bold ${plan.highlight ? 'text-emerald-600 dark:text-emerald-400 mt-3' : 'text-gray-900 dark:text-white'}`}>{plan.name}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{plan.desc}</p>
                   <div className="mt-5 mb-6">
-                    <span className="text-4xl font-extrabold text-gray-900 dark:text-white">${plan.price}</span>
-                    <span className="text-gray-400 dark:text-gray-500 font-medium">/{plan.period}</span>
+                    <span className="text-4xl font-extrabold text-gray-900 dark:text-white">{plan.price === '0' ? 'Free' : `$${plan.price}`}</span>
+                    {plan.price !== '0' && <span className="text-gray-400 dark:text-gray-500 font-medium">/{plan.period}</span>}
                   </div>
                   <ul className="space-y-3 flex-1 border-t border-gray-100 dark:border-gray-800 pt-4">
                     {plan.features.map(f => {
@@ -143,7 +169,7 @@ export default function Landing() {
                     })}
                   </ul>
                   {plan.name === 'Free' ? (
-                    <Link to="/app" className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700`}>{plan.cta}</Link>
+                    <Link to="/app" className="mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">{plan.cta}</Link>
                   ) : (
                     <button onClick={() => startCheckout(plan.name.toLowerCase())} className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>{plan.cta}</button>
                   )}
@@ -160,13 +186,13 @@ export default function Landing() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Ready to stop losing track of jobs?</h2>
-            <p className="text-emerald-100 text-lg mb-10">Join lawn care crews who've reclaimed 5+ hours a week.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">The only app that moves your schedule when it rains — for free</h2>
+            <p className="text-emerald-100 text-lg mb-10">Stop losing $40-80 every time it rains and you forget to reschedule. One tap. Done.</p>
             <Link to="/app" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               Try MowFlow Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="mt-4 text-emerald-200/80 text-sm">Available on iOS, Android, and web.</p>
+            <p className="mt-4 text-emerald-200/80 text-sm">Works on iPhone, Android, and desktop — install it like an app.</p>
           </FadeIn>
         </div>
       </section>

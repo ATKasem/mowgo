@@ -34,9 +34,8 @@ export default function Layout() {
   async function logout() {
     try {
       await supabase.auth.signOut();
-    } finally {
-      navigate('/');
-    }
+    } catch { /* session may already be gone */ }
+    navigate('/login');
   }
 
   return (
