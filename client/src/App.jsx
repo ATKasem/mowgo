@@ -12,6 +12,7 @@ import Settings from './pages/Settings';
 import { supabase, isDemoMode } from './lib/supabase';
 import { loadJobs, loadInvoices, onDataChange } from './lib/data';
 import Subscribe from './pages/Subscribe';
+import Compare from './pages/Compare';
 
 // ===== Auth Context =====
 export const AuthContext = createContext(null);
@@ -100,6 +101,7 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/login" element={<Login />} />
