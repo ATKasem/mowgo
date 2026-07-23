@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
 const features = [
-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Rain tomorrow? One tap moves your whole schedule forward. Nobody else offers this on a free plan — Lawn.Best charges $49 for it.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time mowing. Jobber locks this behind a $199/mo plan.', color: 'from-emerald-500 to-teal-500' },
-  { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, chemical notes — fields you actually need. Generic apps like Jobber make you use "custom fields."', color: 'from-violet-500 to-purple-500' },
-  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Job done → tap invoice. Client pays via Stripe link. Track paid vs unpaid at a glance. No hidden processing fees like DoorstepHQ.', color: 'from-amber-500 to-orange-500' },
+  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Rain tomorrow? One tap moves your whole schedule forward. Clients get notified automatically. The feature no other app has.', color: 'from-emerald-500 to-green-500' },
+  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time mowing. Your route builds itself every morning.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, chemical notes — the fields you actually use every day. Not generic "custom fields."', color: 'from-violet-500 to-purple-500' },
+  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice sends automatically. Client pays via Stripe link. Track paid vs unpaid at a glance.', color: 'from-amber-500 to-orange-500' },
 ];
 
 const differentiators = [
-  { icon: Wifi, title: 'Works Offline', desc: 'Crews in rural areas with spotty cell service? MowFlow works without internet and syncs when you\'re back online. Yardbook only syncs GPS every 4 hours.' },
-  { icon: Moon, title: 'Dark Mode Built In', desc: 'Early morning starts? Dark mode keeps the screen easy on your eyes at 6am. Most lawn care apps are still blinding white in 2026.' },
-  { icon: Shield, title: 'No Data Selling', desc: 'Yardbook is "free" because they sell your customer data to advertisers. MowFlow never touches your data — you\'re the customer, not the product.' },
-  { icon: Sprout, title: 'Works Everywhere', desc: 'MowFlow runs on iPhone, Android, and desktop — no App Store download needed. LawnPro and Yardbook are stuck in a browser tab.', },
+  { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural areas? MowFlow keeps working without internet and syncs when you are back online.' },
+  { icon: Moon, title: 'Dark Mode Built In', desc: 'Early mornings are hard enough. Dark mode keeps the screen easy on your eyes at 6am. Most lawn care apps are still blinding white.' },
+  { icon: Shield, title: 'Your Data Is Yours', desc: 'Some "free" apps sell your customer data to advertisers. MowFlow never touches your data. You are the customer, not the product.' },
+  { icon: Sprout, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
 ];
 
 const plans = [
@@ -45,6 +45,21 @@ function FadeIn({ children, className = '', delay = 0 }) {
 export default function Landing() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
+      {/* Nav */}
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+              <Sprout className="w-4 h-4 text-white" />
+            </div>
+            MowFlow
+          </Link>
+          <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            Log In
+          </Link>
+        </div>
+      </nav>
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-950 dark:to-emerald-950" />
@@ -64,13 +79,13 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Built for 1–3 person crews. Rain delay, routes, invoicing — all from your phone. Jobber's usable plan runs $119+/mo. MowFlow starts free.
+              Scheduling, routes, and invoicing that just works. No demos. No setup calls. Free for 10 clients — no credit card.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/login" className="group inline-flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-gray-900/10 hover:shadow-2xl hover:shadow-gray-900/20 hover:-translate-y-0.5 transition-all duration-200">
-                Try the Demo
+              <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
+                Start Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a href="#pricing" className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
@@ -86,7 +101,7 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Built for lawn care, <span className="text-emerald-500">not office work</span></h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Jobber and Housecall Pro are built for 20-person operations. Yardbook is "free" because they sell your data. We're different.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">The other apps are built for 20-person operations with office staff. MowFlow does less. That is the point.</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color }, i) => (
@@ -143,8 +158,8 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Simple, transparent pricing</h2>
-            <p className="text-center text-gray-500 dark:text-gray-400 mb-4 text-lg">Start free. Upgrade when you're ready. Cancel anytime.</p>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">Compare: Jobber's usable plan is $119+/mo plus $29 per extra user. Yardbook is "free" but sells your customer data.</p>
+            <p className="text-center text-gray-500 dark:text-gray-400 mb-4 text-lg">Start free. Upgrade when you are ready. Cancel anytime.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">14-day free trial on paid plans. No setup fees. No contracts.</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan, i) => (
@@ -186,10 +201,10 @@ export default function Landing() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Ready to stop losing track of jobs?</h2>
-            <p className="text-emerald-100 text-lg mb-10">Get it on iPhone, Android, or use it on desktop. App Store coming soon.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Stop running your business on texts and a notebook</h2>
+            <p className="text-emerald-100 text-lg mb-10">Free for 10 clients. No credit card. 2 minutes.</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
-              Try MowFlow Free
+              Start Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <p className="mt-4 text-emerald-200/80 text-sm">Available on iPhone, Android, and desktop.</p>
