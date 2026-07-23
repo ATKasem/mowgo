@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, isDemoMode } from '../lib/supabase';
 import { Store, Phone, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle } from 'lucide-react';
 
 export default function Settings() {

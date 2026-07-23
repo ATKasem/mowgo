@@ -36,7 +36,7 @@ export default function Subscribe() {
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">You're all set!</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Welcome to MowFlow. Your subscription is active — start managing your lawn care business.</p>
-          <Link to="/app" className="btn-primary text-base px-8 py-3 gap-2">
+          <Link to="/login" className="btn-primary text-base px-8 py-3 gap-2">
             Go to Dashboard <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -54,7 +54,7 @@ export default function Subscribe() {
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">No worries</h1>
         <p className="text-gray-500 dark:text-gray-400 mb-8">You can always try the free plan or subscribe when you're ready.</p>
         <div className="flex gap-3 justify-center">
-          <Link to="/app" className="btn-primary text-sm px-6 py-2.5">Try Free</Link>
+          <Link to="/login" className="btn-primary text-sm px-6 py-2.5">Try Free</Link>
           <Link to="/" className="btn-secondary text-sm px-6 py-2.5">Back Home</Link>
         </div>
       </div>

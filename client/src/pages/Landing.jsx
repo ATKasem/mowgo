@@ -69,7 +69,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/app" className="group inline-flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-gray-900/10 hover:shadow-2xl hover:shadow-gray-900/20 hover:-translate-y-0.5 transition-all duration-200">
+              <Link to="/login" className="group inline-flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-gray-900/10 hover:shadow-2xl hover:shadow-gray-900/20 hover:-translate-y-0.5 transition-all duration-200">
                 Try the Demo
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -169,7 +169,7 @@ export default function Landing() {
                     })}
                   </ul>
                   {plan.name === 'Free' ? (
-                    <Link to="/app" className="mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">{plan.cta}</Link>
+                    <Link to="/login" className="mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">{plan.cta}</Link>
                   ) : (
                     <button onClick={() => startCheckout(plan.name.toLowerCase())} className={`mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>{plan.cta}</button>
                   )}
@@ -188,7 +188,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">The only app that moves your schedule when it rains — for free</h2>
             <p className="text-emerald-100 text-lg mb-10">Stop losing $40-80 every time it rains and you forget to reschedule. One tap. Done.</p>
-            <Link to="/app" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
+            <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               Try MowFlow Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -205,7 +205,7 @@ export default function Landing() {
             MowFlow &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">App</Link>
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">App</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
             <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
           </div>
