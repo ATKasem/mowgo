@@ -19,8 +19,8 @@ const differentiators = [
 
 const plans = [
   { name: 'Free', price: '0', period: 'forever', desc: 'For solo operators just getting started', features: ['Up to 10 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
-  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode', 'Online payments (Stripe)'], cta: 'Start Free Trial', highlight: true, coming: ['Online payments (Stripe)'] },
-  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Multi-user team access', 'Route optimization', 'Job assignment & tracking', 'Team progress dashboard', 'Priority support'], cta: 'Start Free Trial', highlight: false, coming: ['Multi-user team access', 'Route optimization'] },
+  { name: 'Solo', price: '49', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial', highlight: true },
+  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'Priority support'], cta: 'Start Free Trial', highlight: false },
 ];
 
 const stats = [
@@ -188,15 +188,12 @@ export default function Landing() {
                     {plan.price !== '0' && <span className="text-gray-400 dark:text-gray-500 font-medium">/{plan.period}</span>}
                   </div>
                   <ul className="space-y-3 flex-1 border-t border-gray-100 dark:border-gray-800 pt-4">
-                    {plan.features.map(f => {
-                      const isComing = plan.coming?.includes(f);
-                      return (
-                        <li key={f} className={`flex items-start gap-2.5 text-sm ${isComing ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}>
-                          <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isComing ? 'text-gray-300 dark:text-gray-600' : 'text-emerald-500'}`} />
-                          <span>{f}{isComing && <span className="ml-1.5 text-[10px] font-semibold uppercase text-amber-500 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">Soon</span>}</span>
-                        </li>
-                      );
-                    })}
+                    {plan.features.map(f => (
+                      <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400">
+                        <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-500" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
                   </ul>
                   {plan.name === 'Free' ? (
                     <Link to="/login" className="mt-6 text-center py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">{plan.cta}</Link>
@@ -207,6 +204,9 @@ export default function Landing() {
               </FadeIn>
             ))}
           </div>
+          <FadeIn delay={400}>
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">Coming later this summer: online payments via Stripe, multi-user team access, and route optimization. Early adopters get these at no price increase.</p>
+          </FadeIn>
         </div>
       </section>
 
