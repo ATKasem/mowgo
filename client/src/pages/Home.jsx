@@ -107,6 +107,7 @@ export default function Home({ jobs = [], invoices = [] }) {
   // ===== Calendar state =====
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
+  const [showForm, setShowForm] = useState(null); // calendar popover
   const calendarGrid = useMemo(() => getMonthGrid(calYear, calMonth), [calYear, calMonth]);
   const jobsByDate = useMemo(() => {
     const map = {};
@@ -209,38 +210,68 @@ export default function Home({ jobs = [], invoices = [] }) {
           </button>
         </div>
         {/* Day headers */}
-        <div className="grid grid-cols-7 mb-1">
-          {DAYS.map(d => <div key={d} className="text-center text-[11px] font-semibold text-gray-400 dark:text-gray-500 py-1">{d}</div>)}
+        <div className="grid grid-cols-7 mb-0.5">
+          {DAYS.map(d => <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 py-0.5">{d}</div>)}
         </div>
-        {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-0.5">
+        {/* Calendar grid — compact, interactive */}
+        <div className="grid grid-cols-7 gap-px">
           {calendarGrid.map((date, i) => {
-            if (!date) return <div key={`empty-${i}`} className="aspect-square" />;
+            if (!date) return <div key={`empty-${i}`} className="h-7" />;
             const dayNum = parseInt(date.split('-')[2]);
             const dayJobs = jobsByDate[date] || [];
             const isToday = date === today;
-            const isDone = dayJobs.length > 0 && dayJobs.every(j => j.status === 'done');
             return (
-              <Link
+              <button
                 key={date}
-                to={`/app/today?date=${date}`}
-                className={`aspect-square flex flex-col items-center justify-center rounded-lg text-xs transition-all hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                  isToday ? 'bg-emerald-500 text-white font-bold hover:bg-emerald-600' : 'text-gray-700 dark:text-gray-300'
-                }`}
+                onClick={() => setShowForm({ date, jobs: dayJobs })}
+                className={`h-7 flex items-center justify-center rounded-md text-[11px] font-medium transition-all relative
+                  ${isToday ? 'bg-emerald-500 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}
+                  ${dayJobs.length > 0 && !isToday ? 'ring-1 ring-inset ring-amber-300 dark:ring-amber-700' : ''}
+                `}
+                title={dayJobs.length ? `${dayJobs.length} job${dayJobs.length > 1 ? 's' : ''}` : ''}
               >
-                <span className={isToday ? '' : 'font-medium'}>{dayNum}</span>
-                {dayJobs.length > 0 && (
-                  <div className={`flex gap-0.5 mt-0.5 ${isToday ? '' : ''}`}>
-                    {dayJobs.slice(0, 3).map((j, ji) => (
-                      <div key={ji} className={`w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : isDone ? 'bg-emerald-400' : j.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                    ))}
-                  </div>
-                )}
-              </Link>
+                {dayNum}
+              </button>
             );
           })}
         </div>
       </div>
+
+      {/* Calendar day popover */}
+      {showForm && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50" onClick={() => setShowForm(null)}>
+          <div className="card p-4 m-4 max-w-xs w-full shadow-2xl" onClick={e => e.stopPropagation()} style={{ animation: 'scaleIn 0.15s ease-out' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-bold text-sm text-gray-900 dark:text-white">
+                {new Date(showForm.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+              </h4>
+              <button onClick={() => setShowForm(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none">&times;</button>
+            </div>
+            {showForm.jobs.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">No jobs scheduled</p>
+            ) : (
+              <div className="space-y-2">
+                {showForm.jobs.map((job, ji) => (
+                  <div key={job.id} className="flex items-center gap-2.5 p-2 -mx-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${job.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
+                    </div>
+                  </div>
+                ))}
+                <Link
+                  to={`/app/today?date=${showForm.date}`}
+                  onClick={() => setShowForm(null)}
+                  className="btn-primary w-full text-xs py-2 justify-center mt-1"
+                >
+                  View in Schedule
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Up Next + Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
