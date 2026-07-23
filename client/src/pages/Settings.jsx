@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { loadProfile, saveProfile } from '../lib/data';
 import { isDemoMode } from '../lib/supabase';
+import { useAuth } from '../App';
 import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
 
 export default function Settings() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState({ business_name: '', phone: '' });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
@@ -143,10 +145,12 @@ export default function Settings() {
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-emerald-500" />Team</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.</p>
           <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-            <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400">YO</div>
+            <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400">
+              {user?.email ? user.email.slice(0, 2).toUpperCase() : 'YO'}
+            </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">You</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">Owner</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.email?.split('@')[0] || 'You'}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{user?.email || 'Owner'}</p>
             </div>
           </div>
         </div>
@@ -155,7 +159,7 @@ export default function Settings() {
         <div className="card p-5 space-y-3">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-gray-400" />Help & Support</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">Need help? Email us at <a href="mailto:hello@mowflow.app" className="text-emerald-600 dark:text-emerald-400 hover:underline">hello@mowflow.app</a></p>
-          <p className="text-xs text-gray-400 dark:text-gray-500">MowFlow v1.0 — Built for lawn care crews</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">MowFlow v1.0 · Built for lawn care crews · <a href="https://cleanflloww.pages.dev" className="hover:text-emerald-500 transition-colors">cleanflloww.pages.dev</a></p>
         </div>
 
       </div>
