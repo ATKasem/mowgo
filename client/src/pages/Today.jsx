@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { demoClients } from '../lib/demoData';
 import { INITIAL_JOB_FORM } from '../lib/constants';
-import { Plus, Circle } from 'lucide-react';
+import { Plus, Circle, CloudRain } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
@@ -67,7 +67,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
       <InvoiceToast toast={completedToast} />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Today</h2>
           <div className="flex items-center gap-2 mt-0.5">
@@ -77,6 +77,29 @@ export default function Today({ jobs, setJobs, invoices, setInvoices }) {
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
       </div>
+
+      {/* Rain delay */}
+      {filtered.some(j => j.status !== 'done') && (
+        <div className="mb-4">
+          <button
+            onClick={() => {
+              const tomorrow = new Date(date);
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              const nextDate = tomorrow.toISOString().split('T')[0];
+              setJobs(prev => prev.map(j =>
+                j.status !== 'done' && j.scheduled_date === date
+                  ? { ...j, scheduled_date: nextDate }
+                  : j
+              ));
+              setCompletedToast({ name: `${filtered.filter(j => j.status !== 'done').length} jobs moved to tomorrow`, amount: 0 });
+              setTimeout(() => setCompletedToast(null), 3500);
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+          >
+            <CloudRain className="w-4 h-4" /> Rain Delay — move remaining to tomorrow
+          </button>
+        </div>
+      )}
 
       {/* Date picker + progress */}
       <div className="flex items-center gap-3 mb-4">
