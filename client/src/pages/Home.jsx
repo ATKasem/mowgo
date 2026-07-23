@@ -1,12 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
-import { RECURRENCE_OPTIONS } from '../lib/constants';
-import { downloadICS } from '../lib/ics';
+import { downloadICS, generateGoogleCalUrl } from '../lib/ics';
 import {
   Sprout, Sun, Cloud, CloudRain, CloudSun, CloudDrizzle, CloudLightning, Snowflake,
   Calendar, DollarSign, AlertCircle, CheckCircle, Clock,
-  ArrowRight, Plus, ChevronLeft, ChevronRight, Download,
+  ArrowRight, Plus, ChevronLeft, ChevronRight, Download, ExternalLink,
 } from 'lucide-react';
 
 // ===== Weather helpers =====
@@ -108,6 +107,7 @@ export default function Home({ jobs = [], invoices = [] }) {
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [showForm, setShowForm] = useState(null); // calendar popover
+  const [showExport, setShowExport] = useState(false);
   const calendarGrid = useMemo(() => getMonthGrid(calYear, calMonth), [calYear, calMonth]);
   const jobsByDate = useMemo(() => {
     const map = {};
@@ -140,12 +140,7 @@ export default function Home({ jobs = [], invoices = [] }) {
     rain: weather.daily.precipitation_probability_max[i],
   })) : [];
 
-  // ===== ICS export =====
-  const handleExport = useCallback(() => {
-    downloadICS(jobs.filter(j => j.scheduled_date >= today));
-  }, [jobs, today]);
-
-  // Calendar navigation
+  // ===== Calendar navigation =====
   const prevMonth = () => calMonth === 0 ? (setCalYear(calYear - 1), setCalMonth(11)) : setCalMonth(calMonth - 1);
   const nextMonth = () => calMonth === 11 ? (setCalYear(calYear + 1), setCalMonth(0)) : setCalMonth(calMonth + 1);
 
@@ -205,9 +200,26 @@ export default function Home({ jobs = [], invoices = [] }) {
             <h3 className="font-semibold text-sm text-gray-900 dark:text-white">{MONTHS[calMonth]} {calYear}</h3>
             <button onClick={nextMonth} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
           </div>
-          <button onClick={handleExport} className="btn-ghost text-xs gap-1.5 text-emerald-600 dark:text-emerald-400" title="Export schedule as .ics for Apple/Google/Outlook">
-            <Download className="w-3.5 h-3.5" />Export .ics
-          </button>
+          <div className="relative">
+            <button onClick={() => setShowExport(!showExport)} className="btn-ghost text-xs gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <Download className="w-3.5 h-3.5" />Export
+            </button>
+            {showExport && (
+              <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[190px] shadow-lg"
+                   onMouseLeave={() => setShowExport(false)}
+                   onKeyDown={e => { if (e.key === 'Escape') setShowExport(false); }}
+                   onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowExport(false); }}>
+                <button onClick={() => { downloadICS(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
+                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  <Download className="w-3.5 h-3.5" />Download .ics (Apple/Outlook)
+                </button>
+                <button onClick={() => { window.open(generateGoogleCalUrl(jobs.filter(j => j.scheduled_date >= today)), '_blank'); setShowExport(false); }}
+                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  <ExternalLink className="w-3.5 h-3.5" />Add to Google Calendar
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         {/* Day headers */}
         <div className="grid grid-cols-7 mb-0.5">
