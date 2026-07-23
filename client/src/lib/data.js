@@ -283,10 +283,34 @@ export async function createInvoice(invoice) {
     client_id: invoice.client_id || invoice.clients?.id,
     amount: invoice.amount,
     status: 'unpaid',
-  }).select().single();
+  }).select('id').single();
 
   if (error) throw error;
-  return data;
+
+  // Re-fetch with client join for consistent shape with loadInvoices
+  const { data: fullData, error: fetchError } = await supabase
+    .from('invoices')
+    .select('*, clients!left(*)')
+    .eq('id', data.id)
+    .single();
+
+  if (fetchError) return data; // fallback to raw row if join fails
+
+  return {
+    id: fullData.id,
+    clients: fullData.clients ? {
+      id: fullData.clients.id,
+      name: fullData.clients.name,
+      address: fullData.clients.address,
+      phone: fullData.clients.phone,
+      email: fullData.clients.email,
+      rate: fullData.clients.rate,
+      service_notes: fullData.clients.notes,
+    } : null,
+    amount: fullData.amount,
+    status: fullData.status,
+    created_at: fullData.created_at,
+  };
 }
 
 export async function updateInvoiceStatus(id, status) {

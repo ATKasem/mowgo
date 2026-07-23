@@ -42,7 +42,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const today = new Date().toISOString().split('T')[0];
 
   // Load clients for the NewJobForm dropdown
-  useEffect(() => { loadClients().then(setClients).catch(() => {}); }, []);
+  useEffect(() => { loadClients().then(setClients).catch(err => console.error('loadClients:', err)); }, []);
 
   const createJobHandler = useCallback(async (e) => {
     e.preventDefault();

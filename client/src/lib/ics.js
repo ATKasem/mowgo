@@ -118,7 +118,7 @@ export function generateICS(jobs) {
       `DTEND:${date}T${endTime}`,
       `SUMMARY:${escapeICS(`${job.title} - ${job.clients.name}`)}`,
       `LOCATION:${escapeICS(job.clients.address || '')}`,
-      `DESCRIPTION:${escapeICS(`${job.clients.service_notes || ''}\\nRate: $${job.clients.rate || 0}`)}`,
+      `DESCRIPTION:${escapeICS(job.clients.service_notes || '')}\\nRate: $${escapeICS(String(job.clients.rate || 0))}`,
       `UID:${escapeICS(uid)}`,
       'END:VEVENT',
     );
