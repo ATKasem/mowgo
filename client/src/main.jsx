@@ -4,15 +4,9 @@ import './index.css'
 import App from './App.jsx'
 
 // Apply theme before React hydration to prevent flash
-const theme = localStorage.getItem('mowflow-theme') || (() => {
-  // Default to glass on Capacitor iOS for native app feel
-  if (typeof window !== 'undefined' && window.Capacitor?.getPlatform() === 'ios') return 'glass';
-  return 'system';
-})();
-
+const theme = localStorage.getItem('mowflow-theme') || 'system';
 const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-document.documentElement.classList.toggle('dark', isDark && theme !== 'glass');
-document.documentElement.classList.toggle('glass', theme === 'glass');
+document.documentElement.classList.toggle('dark', isDark);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
