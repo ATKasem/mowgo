@@ -14,7 +14,7 @@ const differentiators = [
   { icon: Wifi, title: 'Works Offline', desc: 'Crews in rural areas with spotty cell service? MowFlow works without internet and syncs when you\'re back online. Yardbook only syncs GPS every 4 hours.' },
   { icon: Moon, title: 'Dark Mode Built In', desc: 'Early morning starts? Dark mode keeps the screen easy on your eyes at 6am. Most lawn care apps are still blinding white in 2026.' },
   { icon: Shield, title: 'No Data Selling', desc: 'Yardbook is "free" because they sell your customer data to advertisers. MowFlow never touches your data — you\'re the customer, not the product.' },
-  { icon: Sparkles, title: 'Install as an App', desc: 'Add MowFlow to your phone\'s home screen — works like a native app. No App Store download needed. LawnPro and Yardbook are stuck in a browser tab.' },
+  { icon: Sparkles, title: 'Works Everywhere', desc: 'MowFlow runs on iPhone, Android, and desktop — no App Store download needed. LawnPro and Yardbook are stuck in a browser tab.', },
 ];
 
 const plans = [
@@ -54,12 +54,12 @@ export default function Landing() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <Zap className="w-4 h-4" />
-              The only lawn care app with free rain delay
+              Available on iPhone, Android & desktop
             </div>
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-              Scheduling that <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">actually works</span> for lawn care crews
+              The only lawn care app with <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">free rain delay</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
@@ -192,7 +192,7 @@ export default function Landing() {
               Try MowFlow Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="mt-4 text-emerald-200/80 text-sm">Works on iPhone, Android, and desktop — install it like an app.</p>
+            <p className="mt-4 text-emerald-200/80 text-sm">Available on iPhone, Android, and desktop.</p>
           </FadeIn>
         </div>
       </section>
