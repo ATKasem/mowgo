@@ -1,55 +1,27 @@
-import { loadStripe } from '@stripe/stripe-js';
-
-// Stripe will be loaded lazily on first use
-let stripePromise = null;
-function getStripe() {
-  if (!stripePromise) {
-    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    if (key) stripePromise = loadStripe(key);
-  }
-  return stripePromise;
-}
-
-// Price IDs — create these in your Stripe dashboard
-// Products → Add Product → copy the API ID
-export const PRICES = {
-  solo_monthly: import.meta.env.VITE_STRIPE_PRICE_SOLO || 'price_solo_monthly',
-  crew_monthly: import.meta.env.VITE_STRIPE_PRICE_CREW || 'price_crew_monthly',
-};
-
 /**
- * Redirect to Stripe Checkout for a subscription.
+ * Redirect to Stripe Checkout via Cloudflare Pages Function.
+ * The server-side endpoint handles Stripe API calls with the secret key.
+ *
  * @param {'solo'|'crew'} plan
  */
 export async function startCheckout(plan) {
-  const stripe = await getStripe();
-  if (!stripe) {
-    console.warn('Stripe is not configured yet. Add your publishable key to .env.');
-    return { error: 'Stripe is not configured yet. Add your publishable key to .env.' };
+  try {
+    const res = await fetch('/api/stripe/checkout-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan }),
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+      return { success: true };
+    }
+
+    return { error: data.error || 'Failed to start checkout' };
+  } catch (err) {
+    console.error('Checkout error:', err);
+    return { error: 'Connection failed. Check your internet and try again.' };
   }
-
-  const priceId = plan === 'solo' ? PRICES.solo_monthly : PRICES.crew_monthly;
-  // Guard against placeholder / unconfigured price IDs
-  if (!priceId || !priceId.startsWith('price_')) {
-    return { error: 'Payment is not configured yet. Set VITE_STRIPE_PRICE_SOLO and VITE_STRIPE_PRICE_CREW in your .env file.' };
-  }
-
-  const trialDays = parseInt(import.meta.env.VITE_STRIPE_TRIAL_DAYS, 10) || 0;
-
-  const { error } = await stripe.redirectToCheckout({
-    lineItems: [{ price: priceId, quantity: 1 }],
-    mode: 'subscription',
-    successUrl: `${window.location.origin}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
-    cancelUrl: `${window.location.origin}/#/`,
-    allowPromotionCodes: true,
-    ...(trialDays > 0 && {
-      subscriptionData: { trial_period_days: trialDays },
-    }),
-  });
-
-  if (error) {
-    console.error('Stripe checkout error:', error);
-    return { error: error.message || 'Something went wrong. Please try again.' };
-  }
-  return { success: true };
 }
