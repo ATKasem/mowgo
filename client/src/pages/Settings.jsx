@@ -97,14 +97,16 @@ export default function Settings() {
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-violet-500" />Plan</h3>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-gray-900 dark:text-white">Free Plan</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Up to 10 clients · All core features</p>
+              <p className="font-semibold text-gray-900 dark:text-white capitalize">{profile?.tier === 'solo' ? 'Solo Plan' : profile?.tier === 'crew' ? 'Crew Plan' : 'Free Plan'}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{profile?.tier === 'crew' ? 'Unlimited clients · Full team access' : profile?.tier === 'solo' ? 'Unlimited clients · All features' : 'Up to 10 clients · All core features'}</p>
             </div>
             <span className="badge-success text-xs">Active</span>
           </div>
-          <div className="text-xs text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
-            Upgrade to Solo ($49/mo) or Crew ($79/mo) for unlimited clients, offline mode, and more.
-          </div>
+          {(!profile?.tier || profile.tier === 'free') && (
+            <div className="text-xs text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
+              Upgrade to Solo ($49/mo) or Crew ($79/mo) for unlimited clients, offline mode, and more.
+            </div>
+          )}
         </div>
 
         {/* Notifications */}
@@ -145,14 +147,16 @@ export default function Settings() {
         {/* Team */}
         <div className="card p-5 space-y-3">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-emerald-500" />Team</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.</p>
+          {profile?.tier !== 'crew' && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.</p>
+          )}
           <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
             <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400">
-              {user?.email ? user.email.slice(0, 2).toUpperCase() : 'YO'}
+              {(profile?.business_name || user?.email || 'YO').slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.email?.split('@')[0] || 'You'}</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">{user?.email || 'Owner'}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.business_name || user?.email?.split('@')[0] || 'You'}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Owner</p>
             </div>
           </div>
         </div>

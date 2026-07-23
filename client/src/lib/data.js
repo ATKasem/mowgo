@@ -329,7 +329,7 @@ export async function updateInvoiceStatus(id, status) {
 // ===== Profile =====
 
 export async function loadProfile() {
-  if (isDemoMode()) return { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100' };
+  if (isDemoMode()) return { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo' };
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
