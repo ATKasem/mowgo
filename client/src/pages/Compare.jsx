@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Check, X, CloudRain, Wifi, Moon, Shield, Zap, Sprout, ArrowRight } from 'lucide-react';
+import { Check, X, CloudRain, Wifi, Shield, Zap, Sprout, ArrowRight } from 'lucide-react';
 
 const competitors = [
   { name: 'MowFlow', price: 'Free – $49', highlight: true },
