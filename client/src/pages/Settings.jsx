@@ -159,7 +159,7 @@ export default function Settings() {
         <div className="card p-5 space-y-3">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-gray-400" />Help & Support</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">Need help? Email us at <a href="mailto:hello@mowflow.app" className="text-emerald-600 dark:text-emerald-400 hover:underline">hello@mowflow.app</a></p>
-          <p className="text-xs text-gray-400 dark:text-gray-500">MowFlow v1.0 · Built for lawn care crews · <a href="https://cleanflloww.pages.dev" className="hover:text-emerald-500 transition-colors">cleanflloww.pages.dev</a></p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">MowFlow v1.0 · Built for lawn care crews · <a href="https://mowflow.pages.dev" className="hover:text-emerald-500 transition-colors">mowflow.pages.dev</a></p>
         </div>
 
       </div>

@@ -45,7 +45,7 @@ Required: 6.7" iPhone screenshots (1290x2796px)
 4. Invoicing with paid/unpaid tracking
 
 ## Privacy Policy URL
-https://cleanflloww.pages.dev/privacy
+https://mowflow.pages.dev/privacy
 
 ## Support URL
-https://cleanflloww.pages.dev
+https://mowflow.pages.dev

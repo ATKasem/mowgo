@@ -45,6 +45,6 @@ All required sizes are in `public/icon-*.png`. Xcode picks them up automatically
 - `APP_STORE.md` — App Store metadata, description, keywords
 
 ## Notes
-- Live URL: https://cleanflloww.pages.dev
-- Privacy policy: https://cleanflloww.pages.dev/privacy
+- Live URL: https://mowflow.pages.dev
+- Privacy policy: https://mowflow.pages.dev/privacy
 - Capacitor wraps the same code into a native iOS app — same features, native feel
