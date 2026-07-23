@@ -210,11 +210,11 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       </div>
 
       {/* Rain delay — always visible when there are incomplete jobs */}
-      {filtered.some(j => j.status !== 'done') && (
+      {jobs.some(j => j.status !== 'done' && j.scheduled_date === date) && (
         <div className="mb-5">
           <button
             onClick={() => {
-              const toMove = filtered.filter(j => j.status !== 'done');
+              const toMove = jobs.filter(j => j.status !== 'done' && j.scheduled_date === date);
               if (toMove.length === 0) return;
               if (!window.confirm(`Move ${toMove.length} job${toMove.length > 1 ? 's' : ''} to tomorrow?`)) return;
               const tomorrow = new Date(date);
@@ -242,7 +242,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             <span className="flex-1 text-left min-w-0">
               <span className="font-semibold">{todayRainChance()}%</span> chance of rain — move{' '}
               <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">
-                {filtered.filter(j => j.status !== 'done').length} remaining to tomorrow
+                {jobs.filter(j => j.status !== 'done' && j.scheduled_date === date).length} remaining to tomorrow
               </span>
             </span>
             <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">Move All</span>

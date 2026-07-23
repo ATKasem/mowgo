@@ -10,9 +10,9 @@ const ALLOWED_ORIGINS = ['https://mowflow.pages.dev', 'https://cleanflloww.pages
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  // Origin validation
+  // Origin validation — require header from browser requests
   const origin = request.headers.get('origin');
-  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+  if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
     return json({ error: 'Forbidden' }, 403);
   }
 

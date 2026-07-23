@@ -4,8 +4,17 @@
  * Returns: { status: 'complete' | 'expired' | 'open', customer_email, ... }
  */
 
+const ALLOWED_ORIGINS = ['https://mowflow.pages.dev', 'https://cleanflloww.pages.dev', 'https://mowflow.app'];
+
 export async function onRequestGet(context) {
   const { request, env } = context;
+
+  // Origin validation
+  const origin = request.headers.get('origin');
+  if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
+    return json({ error: 'Forbidden' }, 403);
+  }
+
   const url = new URL(request.url);
   const sessionId = url.searchParams.get('session_id');
 
@@ -47,7 +56,7 @@ function json(data, status = 200) {
     status,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'https://mowflow.pages.dev',
+      'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
     },
   });
 }

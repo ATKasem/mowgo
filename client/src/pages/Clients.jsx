@@ -56,9 +56,13 @@ export default function Clients({ jobs = [] }) {
   async function remove(id) {
     const client = clients.find(c => c.id === id);
     if (!window.confirm(`Delete ${client?.name || 'this client'} and all their jobs? This cannot be undone.`)) return;
-    await deleteClient(id);
-    setClients(prev => prev.filter(c => c.id !== id));
-    if (expandedId === id) setExpandedId(null);
+    try {
+      await deleteClient(id);
+      setClients(prev => prev.filter(c => c.id !== id));
+      if (expandedId === id) setExpandedId(null);
+    } catch (err) {
+      console.error('remove client:', err);
+    }
   }
 
   const clientMeta = useMemo(() => {
