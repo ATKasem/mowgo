@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Privacy from './pages/Privacy';
 import Login from './pages/Login';
+import Home from './pages/Home';
 import Today from './pages/Today';
 import Clients from './pages/Clients';
 import Invoices from './pages/Invoices';
@@ -109,7 +110,8 @@ export default function App() {
               <Layout />
             </RequireAuth>
           }>
-            <Route path="/app" element={<Today jobs={jobs} setJobs={setJobs} invoices={invoices} setInvoices={setInvoices} loading={dataLoading} />} />
+            <Route path="/app" element={<Home jobs={jobs} invoices={invoices} />} />
+            <Route path="/app/today" element={<Today jobs={jobs} setJobs={setJobs} invoices={invoices} setInvoices={setInvoices} loading={dataLoading} />} />
             <Route path="/app/clients" element={<Clients jobs={jobs} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
