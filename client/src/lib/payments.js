@@ -30,13 +30,17 @@ export async function startCheckout(plan) {
 
   const priceId = plan === 'solo' ? PRICES.solo_monthly : PRICES.crew_monthly;
 
+  const trialDays = parseInt(import.meta.env.VITE_STRIPE_TRIAL_DAYS, 10) || 0;
+
   const { error } = await stripe.redirectToCheckout({
     lineItems: [{ price: priceId, quantity: 1 }],
     mode: 'subscription',
     successUrl: `${window.location.origin}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: `${window.location.origin}/#/pricing`,
-    // Allow promo codes in checkout
     allowPromotionCodes: true,
+    ...(trialDays > 0 && {
+      subscriptionData: { trial_period_days: trialDays },
+    }),
   });
 
   if (error) {
