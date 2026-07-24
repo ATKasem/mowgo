@@ -11,10 +11,12 @@ platform :ios do
       is_key_content_base64: false,
     )
 
-    # Automatic code signing — uses Apple API, no git storage needed
-    enable_automatic_code_signing(
+    # Configure automatic code signing with the Apple API key
+    update_code_signing_settings(
+      use_automatic_signing: true,
       path: "ios/App/App.xcodeproj",
       team_id: "5W23S34GUN",
+      api_key: api_key,
     )
 
     # Build the iOS app
@@ -23,7 +25,6 @@ platform :ios do
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
-      api_key: api_key,
       xcargs: "-allowProvisioningUpdates",
       export_options: {
         signingStyle: "automatic",
