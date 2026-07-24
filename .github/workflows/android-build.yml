@@ -10,6 +10,9 @@ on:
       - '.github/workflows/android-build.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,6 +30,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
+          cache-dependency-path: client/android/**/*.gradle*
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -50,7 +55,9 @@ jobs:
         run: npx cap sync android
 
       - name: Decode keystore
-        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > client/android/app/release.keystore
+        run: printenv ANDROID_KEYSTORE | base64 -d > client/android/app/release.keystore
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
 
       - name: Build Android App Bundle
         working-directory: client/android
@@ -60,6 +67,10 @@ jobs:
           RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Clean up keystore
+        if: always()
+        run: rm -f client/android/app/release.keystore
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
