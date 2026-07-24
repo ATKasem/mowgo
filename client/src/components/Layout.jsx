@@ -129,7 +129,7 @@ export default function Layout() {
             onClick={() => setChatOpen(false)}
           />
           {/* Panel — centered compact sheet */}
-          <div className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col"
+          <div className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden"
                style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             {/* Handle bar + close + reset */}
             <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800">
