@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Check, X, CloudRain, Wifi, Shield, Zap, Sprout, ArrowRight } from 'lucide-react';
+import { Check, X, CloudRain, Wifi, Shield, Zap, Sprout, ArrowRight, Bot, DollarSign, Star } from 'lucide-react';
 
 const competitors = [
+  { name: 'MowFlow', price: 'Free – $49', highlight: true },
   { name: 'QuoteIQ', price: '$29.99/mo' },
-  { name: 'MowFlow', price: 'Free – $39', highlight: true },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
   { name: 'LawnPro', price: '$39/mo' },
@@ -16,30 +16,34 @@ const features = [
   { label: 'Rain Delay', key: 'rainDelay', desc: 'One-tap reschedule when rain hits', star: true },
   { label: 'Offline Mode', key: 'offline', desc: 'Works without cell service, syncs later' },
   { label: 'Dark Mode', key: 'darkMode', desc: 'Built-in — not a browser hack' },
-  { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 5 clients, no card' },
+  { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 10 clients, no card' },
+  { label: 'Transaction Fees', key: 'txFees', desc: 'Platform surcharge on top of Stripe', star: true },
+  { label: 'AI Features', key: 'ai', desc: 'AI estimates, measurements, or receptionist' },
   { label: 'Drag & Drop Route', key: 'dragDrop', desc: 'Reorder your day by dragging' },
   { label: 'Auto Invoicing', key: 'invoicing', desc: 'Invoice auto-created on job complete' },
   { label: 'Client Notes & Codes', key: 'notes', desc: 'Gate codes, pets, mow height' },
   { label: 'Recurring Jobs', key: 'recurring', desc: 'Weekly/biweekly/monthly auto-schedule' },
+  { label: 'Native Apps', key: 'native', desc: 'App Store + Google Play (not just PWA)' },
   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
-  { label: 'iOS + Android PWA', key: 'pwa', desc: 'Install to home screen, no App Store' },
   { label: 'Stripe Payments', key: 'stripe', desc: 'Accept cards online' },
   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
 ];
 
-// ✅ = confirmed, ❌ = not available, ⚠️ = partial/limited, 🔜 = coming soon
+// ✅ = confirmed, ❌ = not available, 🔜 = coming soon
 const data = {
-  rainDelay:    [ false, true,  false, false, false, false, false, false ],
-  offline:      [ false, true,  true,  false, false, true,  true,  false ],
-  darkMode:     [ false, true,  false, false, false, false, false, false ],
-  freeTier:     [ false, true,  false, true,  false, false, false, false ],
+  rainDelay:    [ true,  false, false, false, false, false, false, false ],
+  offline:      [ true,  false, true,  false, false, true,  true,  false ],
+  darkMode:     [ true,  false, false, false, false, false, false, false ],
+  freeTier:     [ true,  false, false, true,  false, false, false, false ],
+  txFees:       [ false, true,  false, false, false, false, false, false ],
+  ai:           [ false, true,  false, false, false, 'soon', false, false ],
   dragDrop:     [ true,  true,  true,  false, false, true,  false, false ],
   invoicing:    [ true,  true,  true,  true,  true,  true,  false, false ],
   notes:        [ true,  true,  true,  true,  true,  true,  false, false ],
   recurring:    [ true,  true,  true,  true,  true,  true,  false, false ],
+  native:       [ 'soon', true,  true,  false, false, true,  false, false ],
   privacy:      [ true,  true,  false, false, true,  true,  true,  false ],
-  pwa:          [ false, true,  true,  false, false, true,  false, false ],
-  stripe:       [ true,  'soon', true,  false, true,  true,  false, false ],
+  stripe:       [ 'soon', true,  true,  false, true,  true,  false, false ],
   gps:          [ true,  true,  true,  false, true,  true,  true,  false ],
 };
 
@@ -85,21 +89,21 @@ export default function Compare() {
               <CloudRain className="w-6 h-6 text-white" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">Only app with rain delay</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Rain tomorrow? One tap moves your whole day. No competitor has this. Zero.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Rain tomorrow? One tap moves your whole day. No competitor has this — not QuoteIQ, not Jobber, not anyone.</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/20">
-              <Wifi className="w-6 h-6 text-white" />
+              <DollarSign className="w-6 h-6 text-white" />
             </div>
-            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Offline mode that works</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Rural routes with spotty cell service? MowFlow keeps going. GreenRoute charges extra for this.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">No platform fees</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — Stripe takes their cut, that's it.</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/20">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">Your data is yours</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Yardbook is "free" because they sell your customer list. We never touch your data.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Yardbook is "free" because they sell your customer list. We never touch your data — no ads, no selling, no funny business.</p>
           </div>
         </div>
       </section>
@@ -139,6 +143,12 @@ export default function Compare() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+          <p className="text-sm text-amber-700 dark:text-amber-300">
+            <strong>QuoteIQ note:</strong> QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowFlow is purpose-built for you.
+          </p>
         </div>
 
         <div className="mt-10 text-center">
