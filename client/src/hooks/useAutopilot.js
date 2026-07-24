@@ -17,15 +17,18 @@ import { TOOLS, executeTool, SYSTEM_PROMPT } from '../lib/autopilotTools';
 
 const API_URL = '/api/autopilot';
 const MAX_LOOP = 5; // Prevent infinite tool call loops
+let _msgId = 0;
+function msgId() { return ++_msgId; }
+
+const WELCOME_MSG = {
+  id: msgId(),
+  role: 'assistant',
+  content: "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
+  isWelcome: true
+};
 
 export default function useAutopilot() {
-  const [messages, setMessages] = useState(() => [
-    {
-      role: 'assistant',
-      content: "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
-      isWelcome: true
-    }
-  ]);
+  const [messages, setMessages] = useState(() => [WELCOME_MSG]);
   const [status, setStatus] = useState('idle'); // idle | thinking | executing | error
   const [currentAction, setCurrentAction] = useState(null); // What the AI is doing right now
   const controllerRef = useRef(null);
@@ -39,7 +42,7 @@ export default function useAutopilot() {
     controllerRef.current = new AbortController();
 
     // Add user message
-    const userMsg = { role: 'user', content: userText };
+    const userMsg = { id: msgId(), role: 'user', content: userText };
     setMessages(prev => [...prev, userMsg]);
     setStatus('thinking');
     setCurrentAction(null);
@@ -58,6 +61,7 @@ export default function useAutopilot() {
       if (err.name === 'AbortError') return;
       console.error('Autopilot error:', err);
       setMessages(prev => [...prev, {
+        id: msgId(),
         role: 'assistant',
         content: err.message === 'not_configured'
           ? "⚠️ AI Autopilot isn't configured yet. Add your OpenRouter API key to get started."
@@ -115,6 +119,7 @@ export default function useAutopilot() {
       // Case 1: LLM returned text → done
       if (message.content && !message.tool_calls) {
         setMessages(prev => [...prev, {
+          id: msgId(),
           role: 'assistant',
           content: message.content
         }]);
@@ -139,6 +144,7 @@ export default function useAutopilot() {
 
         // Add tool call message to UI
         setMessages(prev => [...prev, {
+          id: msgId(),
           role: 'assistant',
           content: message.content || null,
           tool_calls: message.tool_calls,
@@ -166,6 +172,7 @@ export default function useAutopilot() {
 
           // Show tool result in UI
           setMessages(prev => [...prev, {
+            id: msgId(),
             role: 'tool',
             tool_call_id: tc.id,
             toolName: fnName,
@@ -182,6 +189,7 @@ export default function useAutopilot() {
 
       // Case 3: No content and no tool calls (shouldn't happen)
       setMessages(prev => [...prev, {
+        id: msgId(),
         role: 'assistant',
         content: "I'm not sure how to help with that. Could you rephrase?",
         isError: true
@@ -192,6 +200,7 @@ export default function useAutopilot() {
 
     // Max loop exceeded
     setMessages(prev => [...prev, {
+      id: msgId(),
       role: 'assistant',
       content: "That took more steps than expected. Let's try a simpler request.",
       isError: true
@@ -202,11 +211,7 @@ export default function useAutopilot() {
   /** Reset the conversation */
   const reset = useCallback(() => {
     controllerRef.current?.abort();
-    setMessages([{
-      role: 'assistant',
-      content: "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
-      isWelcome: true
-    }]);
+    setMessages([{ ...WELCOME_MSG, id: msgId() }]);
     setStatus('idle');
     setCurrentAction(null);
   }, []);

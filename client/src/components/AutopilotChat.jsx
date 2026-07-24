@@ -25,11 +25,18 @@ export default function AutopilotChat() {
   const { messages, status, currentAction, sendMessage, reset, retry } = useAutopilot();
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom — but not if user has scrolled up to read history
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const threshold = 60; // px from bottom before we auto-scroll
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    if (isNearBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
   // Focus input on mount
@@ -46,6 +53,7 @@ export default function AutopilotChat() {
 
   function handleQuickPrompt(text) {
     sendMessage(text);
+    setInput('');
   }
 
   const isBusy = status === 'thinking' || status === 'executing';
@@ -79,9 +87,9 @@ export default function AutopilotChat() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-3 overscroll-contain">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto py-4 space-y-3 overscroll-contain">
         {messages.filter(m => !m.isToolResult).map((msg, i) => (
-          <MessageBubble key={i} msg={msg} messages={messages} index={i} />
+          <MessageBubble key={msg.id} msg={msg} messages={messages} index={i} />
         ))}
 
         {/* Typing indicator */}
