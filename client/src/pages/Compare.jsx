@@ -3,7 +3,7 @@ import { Check, X, CloudRain, Wifi, Shield, Zap, Sprout, ArrowRight } from 'luci
 
 const competitors = [
   { name: 'QuoteIQ', price: '$29.99/mo' },
-  { name: 'MowFlow', price: 'Free – $49', highlight: true },
+  { name: 'MowFlow', price: 'Free – $39', highlight: true },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
   { name: 'LawnPro', price: '$39/mo' },
@@ -16,7 +16,7 @@ const features = [
   { label: 'Rain Delay', key: 'rainDelay', desc: 'One-tap reschedule when rain hits', star: true },
   { label: 'Offline Mode', key: 'offline', desc: 'Works without cell service, syncs later' },
   { label: 'Dark Mode', key: 'darkMode', desc: 'Built-in — not a browser hack' },
-  { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 10 clients, no card' },
+  { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 5 clients, no card' },
   { label: 'Drag & Drop Route', key: 'dragDrop', desc: 'Reorder your day by dragging' },
   { label: 'Auto Invoicing', key: 'invoicing', desc: 'Invoice auto-created on job complete' },
   { label: 'Client Notes & Codes', key: 'notes', desc: 'Gate codes, pets, mow height' },
