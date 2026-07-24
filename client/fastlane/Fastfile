@@ -23,6 +23,7 @@ platform :ios do
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
+      xcargs: "-allowProvisioningUpdates",
     )
 
     # Upload to TestFlight
