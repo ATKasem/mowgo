@@ -49,11 +49,14 @@ jobs:
         working-directory: client
         run: npx cap sync android
 
+      - name: Decode keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > client/android/app/release.keystore
+
       - name: Build Android App Bundle
         working-directory: client/android
         run: ./gradlew bundleRelease
         env:
-          RELEASE_STORE_FILE: ${{ secrets.ANDROID_KEYSTORE }}
+          RELEASE_STORE_FILE: release.keystore
           RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
