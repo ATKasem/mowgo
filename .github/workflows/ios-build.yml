@@ -11,6 +11,9 @@ on:
       - '.github/workflows/ios-build.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15
