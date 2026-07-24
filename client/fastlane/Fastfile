@@ -23,7 +23,12 @@ platform :ios do
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
+      api_key: api_key,
       xcargs: "-allowProvisioningUpdates",
+      export_options: {
+        signingStyle: "automatic",
+        teamID: "5W23S34GUN",
+      },
     )
 
     # Upload to TestFlight
