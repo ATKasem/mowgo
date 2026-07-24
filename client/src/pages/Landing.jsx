@@ -150,7 +150,7 @@ export default function Landing() {
 
         {/* Differentiators */}
         <FadeIn>
-          <h3 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-10">Things our competitors won't tell you</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-12">Things our competitors won't tell you</h3>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5">
           {differentiators.map(({ icon: Icon, title, desc }, i) => (
@@ -168,7 +168,7 @@ export default function Landing() {
 
         {/* Comparison Callout */}
         <FadeIn delay={200}>
-          <div className="mt-14 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
+          <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
             <h3 className="text-lg font-bold text-white mb-1">How MowFlow Solo stacks up</h3>
             <p className="text-sm text-gray-400 mb-6">Same features, fraction of the price.</p>
             <div className="overflow-x-auto">
