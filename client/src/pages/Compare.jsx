@@ -2,7 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 
 const competitors = [
-  { name: 'MowFlow', price: 'Free – $39', highlight: true },
+  { name: 'MowFlow', price: 'Free – $49', highlight: true },
   { name: 'QuoteIQ', price: '$29.99/mo' },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },

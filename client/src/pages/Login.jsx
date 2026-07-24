@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, isDemoMode } from '../lib/supabase';
-import { Sprout, Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Sprout, Mail, Lock, KeyRound, ArrowRight, Loader2, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [mode, setMode] = useState('login'); // login | signup | forgot
+  const [mode, setMode] = useState('login'); // login | signup | forgot | recovery
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
 
   const demo = isDemoMode();
 
@@ -44,7 +46,9 @@ export default function Login() {
 
     // Successful recovery — Supabase client processes the token via onAuthStateChange
     if (hash.includes('type=recovery')) {
-      setMode('login');
+      setMode('recovery');
+      // Clean the hash so refreshing doesn't re-trigger
+      window.history.replaceState({}, '', window.location.pathname + '/#/login');
     }
   }, []);
 
@@ -60,6 +64,30 @@ export default function Login() {
     }
 
     try {
+      // Recovery mode — update password
+      if (mode === 'recovery') {
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          setLoading(false);
+          return;
+        }
+        if (password.length < 6) {
+          setError('Password must be at least 6 characters.');
+          setLoading(false);
+          return;
+        }
+        const { error: updateError } = await supabase.auth.updateUser({ password });
+        if (updateError) {
+          setError(updateError.message);
+          setLoading(false);
+          return;
+        }
+        setPasswordUpdated(true);
+        setLoading(false);
+        return;
+      }
+
+      // Forgot mode — send reset email
       if (mode === 'forgot') {
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin,
@@ -116,8 +144,22 @@ export default function Login() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Simple scheduling for lawn care crews</p>
         </div>
 
-        {/* Confirmation sent (signup) */}
-        {confirmSent ? (
+        {/* Password updated successfully */}
+        {passwordUpdated ? (
+          <div className="card p-6 text-center space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mx-auto">
+              <CheckCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="font-bold text-gray-900 dark:text-white">Password updated</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your password has been changed successfully.</p>
+            </div>
+            <button onClick={() => navigate('/app')} className="btn-primary w-full gap-2 text-sm py-2.5">
+              <ArrowRight className="w-4 h-4" />Continue to MowFlow
+            </button>
+          </div>
+        ) : confirmSent ? (
+          /* Confirmation sent (signup) */
           <div className="card p-6 text-center space-y-4">
             <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mx-auto">
               <Mail className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
@@ -154,6 +196,14 @@ export default function Login() {
               </div>
             )}
 
+            {/* Set new password header (recovery mode) */}
+            {mode === 'recovery' && (
+              <div className="text-center -mt-1 mb-1">
+                <h2 className="font-semibold text-gray-900 dark:text-white">Set New Password</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter your new password below</p>
+              </div>
+            )}
+
             {/* Forgot password header */}
             {mode === 'forgot' && (
               <div className="text-center -mt-1 mb-1">
@@ -162,27 +212,29 @@ export default function Login() {
               </div>
             )}
 
-            {/* Email */}
-            <div>
-              <label className="label">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="input pl-10"
-                  required
-                  autoComplete="email"
-                />
+            {/* Email — hidden in recovery mode */}
+            {mode !== 'recovery' && (
+              <div>
+                <label className="label">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="input pl-10"
+                    required
+                    autoComplete="email"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Password — hidden in forgot mode */}
+            {/* Password — shown in login, signup, and recovery modes */}
             {mode !== 'forgot' && (
               <div>
-                <label className="label">Password</label>
+                <label className="label">{mode === 'recovery' ? 'New Password' : 'Password'}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -194,6 +246,26 @@ export default function Login() {
                     required
                     minLength={6}
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Confirm Password — recovery mode only */}
+            {mode === 'recovery' && (
+              <div>
+                <label className="label">Confirm Password</label>
+                <div className="relative">
+                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    className="input pl-10"
+                    required
+                    minLength={6}
+                    autoComplete="new-password"
                   />
                 </div>
               </div>
@@ -217,16 +289,16 @@ export default function Login() {
               className="btn-primary w-full gap-2 text-sm py-2.5"
             >
               {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" />{mode === 'forgot' ? 'Sending...' : mode === 'login' ? 'Signing in...' : 'Creating account...'}</>
+                <><Loader2 className="w-4 h-4 animate-spin" />{mode === 'forgot' ? 'Sending...' : mode === 'recovery' ? 'Setting Password...' : mode === 'login' ? 'Signing in...' : 'Creating account...'}</>
               ) : demo ? (
                 <><ArrowRight className="w-4 h-4" />Continue with Demo</>
               ) : (
-                <>{mode === 'forgot' ? 'Send Reset Link' : mode === 'login' ? 'Log In' : 'Create Account'}</>
+                <>{mode === 'forgot' ? 'Send Reset Link' : mode === 'recovery' ? 'Set New Password' : mode === 'login' ? 'Log In' : 'Create Account'}</>
               )}
             </button>
 
-            {/* Toggle mode — hidden in forgot */}
-            {mode !== 'forgot' ? (
+            {/* Toggle mode — hidden in forgot and recovery */}
+            {mode !== 'forgot' && mode !== 'recovery' ? (
               <button
                 type="button"
                 onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
@@ -234,7 +306,7 @@ export default function Login() {
               >
                 {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
               </button>
-            ) : (
+            ) : mode === 'forgot' ? (
               <button
                 type="button"
                 onClick={() => { setMode('login'); setError(''); }}
@@ -243,7 +315,7 @@ export default function Login() {
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to login
               </button>
-            )}
+            ) : null}
 
             {/* Demo mode indicator */}
             {demo && (

@@ -86,13 +86,25 @@ function SupabaseErrorRedirect() {
   const navigate = useNavigate();
   useEffect(() => {
     const hash = window.location.hash;
-    if (!hash || !hash.includes('error=')) return;
+    if (!hash) return;
     // Already on /login — let Login.jsx handle it
     if (hash.startsWith('#/login')) return;
-    // Rewrite hash to include /login route so the Login component renders
-    const errorHash = hash.startsWith('#') ? hash.slice(1) : hash;
-    window.history.replaceState({}, '', window.location.pathname + '#/login&' + errorHash);
-    navigate('/login', { replace: true });
+
+    const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
+
+    // Handle error hashes (expired/invalid reset link)
+    if (hashStr.includes('error=')) {
+      window.history.replaceState({}, '', window.location.pathname + '#/login&' + hashStr);
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    // Handle recovery hashes (access_token + type=recovery) — route to login
+    if (hashStr.includes('type=recovery') && hashStr.includes('access_token=')) {
+      window.history.replaceState({}, '', window.location.pathname + '#/login&' + hashStr);
+      navigate('/login', { replace: true });
+      return;
+    }
   }, [navigate]);
   return null;
 }
