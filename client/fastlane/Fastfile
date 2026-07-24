@@ -13,6 +13,7 @@ platform :ios do
 
     # Automatic code signing — uses Apple API, no git storage needed
     enable_automatic_code_signing(
+      path: "ios/App/App.xcodeproj",
       team_id: "5W23S34GUN",
     )
 
@@ -22,6 +23,7 @@ platform :ios do
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
+      api_key: api_key,
     )
 
     # Upload to TestFlight
