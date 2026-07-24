@@ -229,12 +229,12 @@ export default function Compare() {
             </div>
             MowFlow © 2026
           </div>
-          <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300">Home</Link>
-            <a href="#" onClick={goToPricing} className="hover:text-gray-600 dark:hover:text-gray-300">Pricing</a>
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300">App</Link>
-            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300">Privacy</Link>
-            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300">Contact</a>
+          <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
+            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Home</Link>
+            <a href="#" onClick={goToPricing} className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Pricing</a>
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">App</Link>
+            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Privacy</Link>
+            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Contact</a>
           </div>
         </div>
       </footer>

@@ -54,10 +54,10 @@ export default function InstallPrompt() {
           <p className="font-semibold text-sm text-gray-900 dark:text-white">Install MowFlow</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Add to your home screen for quick access</p>
         </div>
-        <button onClick={install} className="btn-primary text-xs px-3 py-1.5 whitespace-nowrap">
+        <button onClick={install} className="btn-primary text-xs px-3 py-2 whitespace-nowrap">
           Install
         </button>
-        <button onClick={() => setShowPrompt(false)} aria-label="Dismiss install prompt" className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <button onClick={() => setShowPrompt(false)} aria-label="Dismiss install prompt" className="p-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           <X className="w-4 h-4" />
         </button>
       </div>

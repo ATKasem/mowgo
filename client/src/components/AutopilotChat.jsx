@@ -21,7 +21,7 @@ const QUICK_PROMPTS = [
   { label: 'Unpaid invoices', text: 'Who has unpaid invoices?' }
 ];
 
-export default function AutopilotChat() {
+export default function AutopilotChat({ compact = false }) {
   const { messages, status, currentAction, sendMessage, reset, retry } = useAutopilot();
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
@@ -59,8 +59,9 @@ export default function AutopilotChat() {
   const isBusy = status === 'thinking' || status === 'executing';
 
   return (
-    <div className="flex flex-col h-[calc(100vh-13rem)] max-h-[calc(100vh-13rem)]">
-      {/* Header */}
+    <div className={`flex flex-col ${compact ? 'flex-1 min-h-0' : 'h-[calc(100vh-13rem)] max-h-[calc(100vh-13rem)]'}`}>
+      {/* Header — hidden in compact mode */}
+      {!compact && (
       <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center">
@@ -85,6 +86,7 @@ export default function AutopilotChat() {
           New chat
         </button>
       </div>
+      )}
 
       {/* Messages */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto py-4 space-y-3 overscroll-contain">
@@ -120,7 +122,7 @@ export default function AutopilotChat() {
               <button
                 key={i}
                 onClick={() => handleQuickPrompt(p.text)}
-                className="text-left text-xs px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-violet-700 dark:hover:text-violet-300"
+                className="text-left text-xs px-3 py-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-violet-700 dark:hover:text-violet-300 min-h-[44px]"
               >
                 {p.label}
               </button>
@@ -156,12 +158,12 @@ export default function AutopilotChat() {
               "Type a command (e.g. 'Show today's schedule')"
             }
             disabled={isBusy}
-            className="flex-1 px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50 transition-shadow"
+            className="flex-1 px-4 py-2.5 text-base bg-gray-100 dark:bg-gray-800 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50 transition-shadow"
           />
           <button
             type="submit"
             disabled={!input.trim() || isBusy}
-            className="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-colors disabled:cursor-not-allowed"
+            className="px-4 py-3 bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-colors disabled:cursor-not-allowed min-h-[44px]"
           >
             {isBusy ? (
               <Loader2 className="w-4 h-4 animate-spin" />

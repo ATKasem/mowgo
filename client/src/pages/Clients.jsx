@@ -189,8 +189,8 @@ export default function Clients({ jobs = [] }) {
                 {isExpanded && (
                   <div className="border-t border-gray-100 dark:border-gray-800 px-4 pb-4 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
                   <div className="flex gap-2 mb-1">
-                    {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Phone className="w-3 h-3" />Call</a>}
-                    {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-1.5 px-3 gap-1 flex-1"><Navigation className="w-3 h-3" />Navigate</a>}
+                    {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-2.5 px-3 gap-1 flex-1 min-h-[44px]"><Phone className="w-3 h-3" />Call</a>}
+                    {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-2.5 px-3 gap-1 flex-1 min-h-[44px]"><Navigation className="w-3 h-3" />Navigate</a>}
                   </div>
                   {client.phone && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Phone className="w-3.5 h-3.5 text-gray-400" />{client.phone}</div>}
                   {client.email && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Mail className="w-3.5 h-3.5 text-gray-400" />{client.email}</div>}
@@ -222,8 +222,8 @@ export default function Clients({ jobs = [] }) {
                     {client.pet_instructions && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><PawPrint className="w-3 h-3" />{client.pet_instructions}</span>}
                   </div>
                   <div className="flex gap-2 pt-1">
-                    <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-1.5 px-3 gap-1"><Pencil className="w-3 h-3" />Edit</button>
-                    <button onClick={e => { e.stopPropagation(); remove(client.id); }} className="btn-ghost text-xs py-1.5 px-3 gap-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600"><Trash2 className="w-3 h-3" />Delete</button>
+                    <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-2.5 px-3 gap-1 min-h-[44px]"><Pencil className="w-3 h-3" />Edit</button>
+                    <button onClick={e => { e.stopPropagation(); remove(client.id); }} className="btn-ghost text-xs py-2.5 px-3 gap-1 min-h-[44px] text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600"><Trash2 className="w-3 h-3" />Delete</button>
                   </div>
                 </div>
               )}

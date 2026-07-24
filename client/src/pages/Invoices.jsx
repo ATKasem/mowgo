@@ -182,7 +182,7 @@ export default function Invoices({ invoices, setInvoices }) {
                       <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Status</span><span className={statusInfo.badge}>{statusInfo.label}</span></div>
                     </div>
                     <div className="flex gap-2 pt-1">
-                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group">
+                      <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group min-h-[44px] py-2.5">
                         <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
                         <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
                           Copies a payment request — paste in a text
@@ -201,7 +201,7 @@ export default function Invoices({ invoices, setInvoices }) {
                               key={s}
                               onClick={e => { e.stopPropagation(); changeStatus(invoice.id, s); }}
                               disabled={active}
-                              className={`flex-1 text-xs font-semibold py-2 rounded-lg transition-all duration-150 ${
+                              className={`flex-1 text-xs font-semibold py-2.5 rounded-lg transition-all duration-150 min-h-[44px] ${
                                 active
                                   ? `${si.bg} ${si.text} cursor-default`
                                   : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'

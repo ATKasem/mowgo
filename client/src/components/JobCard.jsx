@@ -101,13 +101,13 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
           {/* Actions */}
           <div className="flex gap-2 pt-1">
             {client?.address && (
-              <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary flex-1 text-xs gap-1.5">
+              <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary flex-1 text-xs gap-1.5 min-h-[44px] py-2.5">
                 <Navigation className="w-3.5 h-3.5" />Navigate
               </a>
             )}
             <button
               onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-              className={`flex-1 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'}`}
+              className={`flex-1 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 min-h-[44px] ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'}`}
             >
               {isDone ? 'Undo' : 'Mark Complete'}
             </button>

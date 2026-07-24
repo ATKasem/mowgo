@@ -305,10 +305,10 @@ export default function Landing() {
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sprout className="w-3.5 h-3.5 text-white" /></div>
             MowFlow &copy; 2026
           </div>
-          <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">App</Link>
-            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
-            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
+          <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">App</Link>
+            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Privacy</Link>
+            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Contact</a>
           </div>
         </div>
       </footer>

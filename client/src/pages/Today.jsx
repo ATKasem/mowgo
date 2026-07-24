@@ -260,7 +260,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                   toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
                 });
             }}
-            className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-2.5 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
+            className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-3 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group min-h-[44px]"
           >
             <CloudRain className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="flex-1 text-left min-w-0">
