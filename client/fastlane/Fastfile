@@ -11,11 +11,10 @@ platform :ios do
       is_key_content_base64: false,
     )
 
-    # Sync distribution certificates via match (uses GITHUB_TOKEN for auth)
+    # Sync distribution certificates via match (first run creates them, subsequent runs reuse)
     match(
       type: "appstore",
       api_key: api_key,
-      readonly: is_ci,
     )
 
     # Build the iOS app
