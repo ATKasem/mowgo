@@ -1,0 +1,65 @@
+name: Android Build + Play Store
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'client/src/**'
+      - 'client/public/**'
+      - 'client/android/**'
+      - '.github/workflows/android-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build web app
+        working-directory: client
+        run: npm run build
+
+      - name: Sync Capacitor
+        working-directory: client
+        run: npx cap sync android
+
+      - name: Build Android App Bundle
+        working-directory: client/android
+        run: ./gradlew bundleRelease
+        env:
+          RELEASE_STORE_FILE: ${{ secrets.ANDROID_KEYSTORE }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mowflow-release-aab
+          path: client/android/app/build/outputs/bundle/release/app-release.aab
