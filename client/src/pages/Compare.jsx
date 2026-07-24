@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Check, X, CloudRain, Wifi, Shield, Zap, Sprout, ArrowRight, Bot, DollarSign, Star } from 'lucide-react';
+import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 
 const competitors = [
   { name: 'MowFlow', price: 'Free – $49', highlight: true },
@@ -17,7 +17,7 @@ const features = [
   { label: 'Offline Mode', key: 'offline', desc: 'Works without cell service, syncs later' },
   { label: 'Dark Mode', key: 'darkMode', desc: 'Built-in — not a browser hack' },
   { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 10 clients, no card' },
-  { label: 'Transaction Fees', key: 'txFees', desc: 'Platform surcharge on top of Stripe', star: true },
+  { label: 'Transaction Fees', key: 'txFees', desc: 'QuoteIQ adds 1% on top of Stripe', star: true },
   { label: 'AI Features', key: 'ai', desc: 'AI estimates, measurements, or receptionist' },
   { label: 'Drag & Drop Route', key: 'dragDrop', desc: 'Reorder your day by dragging' },
   { label: 'Auto Invoicing', key: 'invoicing', desc: 'Invoice auto-created on job complete' },
