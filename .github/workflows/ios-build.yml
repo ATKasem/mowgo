@@ -55,7 +55,7 @@ jobs:
         working-directory: client
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ATKasem:${{ secrets.MATCH_GIT_TOKEN }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ATKasem:${{ secrets.GITHUB_TOKEN }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.ASC_KEY }}
