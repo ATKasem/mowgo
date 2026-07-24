@@ -341,17 +341,24 @@ function formatToolCallLabel(name, args) {
   }
 }
 
-/** Simple markdown-like formatting for message content */
+/** Simple markdown-like formatting for message content — safe against XSS */
 function FormatContent({ content, isUser }) {
   if (!content) return null;
 
+  // Escape HTML entities first, then apply our own formatting
   const lines = content.split('\n');
   return lines.map((line, i) => {
-    // Bold
-    const bolded = line.replace(/\*\*(.*?)\*\*/g, (_, text) =>
+    // 1. Escape any HTML to prevent XSS from LLM responses
+    const escaped = line
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    // 2. Bold
+    const bolded = escaped.replace(/\*\*(.*?)\*\*/g, (_, text) =>
       `<strong class="${isUser ? 'text-white' : 'text-gray-900 dark:text-white'} font-semibold">${text}</strong>`
     );
-    // Inline code
+    // 3. Inline code
     const coded = bolded.replace(/`(.*?)`/g, (_, text) =>
       `<code class="${isUser ? 'bg-emerald-700/50' : 'bg-gray-200 dark:bg-gray-700'} px-1 py-0.5 rounded text-xs font-mono">${text}</code>`
     );
