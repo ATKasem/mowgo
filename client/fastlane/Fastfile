@@ -11,10 +11,11 @@ platform :ios do
       is_key_content_base64: false,
     )
 
-    # Enable automatic signing
-    enable_automatic_code_signing(
-      path: "ios/App/App.xcodeproj",
-      team_id: "5W23S34GUN",
+    # Sync distribution certificates via match (uses GITHUB_TOKEN for auth)
+    match(
+      type: "appstore",
+      api_key: api_key,
+      readonly: is_ci,
     )
 
     # Build the iOS app
@@ -23,7 +24,6 @@ platform :ios do
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
-      xcargs: "-allowProvisioningUpdates",
     )
 
     # Upload to TestFlight
