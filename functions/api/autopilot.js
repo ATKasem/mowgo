@@ -25,10 +25,11 @@ const DEFAULT_MODEL = 'deepseek/deepseek-chat';
 const MAX_TOKENS = 1024;
 const TIMEOUT_MS = 20000;
 
-export async function onRequestOptions() {
+export async function onRequestOptions(context) {
+  const origin = context.request.headers.get('origin');
   return new Response(null, {
     status: 204,
-    headers: corsHeaders('*')
+    headers: corsHeaders(origin || '*')
   });
 }
 

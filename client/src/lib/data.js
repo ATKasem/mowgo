@@ -82,6 +82,7 @@ export async function createJob(job) {
     status: 'scheduled',
     route_order: job.route_order || 99,
     recurrence_rule: job.recurrence || 'none',
+    notes: job.notes || null,
   }).select('*, clients!left(*)').single();
 
   if (error) throw error;

@@ -32,6 +32,7 @@ export default function useAutopilot() {
   const [status, setStatus] = useState('idle'); // idle | thinking | executing | error
   const [currentAction, setCurrentAction] = useState(null); // What the AI is doing right now
   const controllerRef = useRef(null);
+  const sendMessageRef = useRef(null);
 
   /** Send a user message and run the LLM loop */
   const sendMessage = useCallback(async (userText) => {
@@ -216,16 +217,33 @@ export default function useAutopilot() {
     setCurrentAction(null);
   }, []);
 
-  /** Retry last errored request */
+  /** Retry last errored request — find the last user message and re-send it */
   const retry = useCallback(() => {
-    setStatus('idle');
-    // Remove last error message and retry
+    // Use ref to always get the latest sendMessage
+    const send = sendMessageRef.current;
+    if (!send) return;
+
+    // Remove the last error message, then find and re-send last user message
     setMessages(prev => {
       const last = prev[prev.length - 1];
-      if (last?.isError) return prev.slice(0, -1);
-      return prev;
+      const cleaned = last?.isError ? prev.slice(0, -1) : prev;
+      // Find the most recent user message
+      for (let i = cleaned.length - 1; i >= 0; i--) {
+        if (cleaned[i].role === 'user') {
+          const text = cleaned[i].content;
+          // Remove that user message from state so it gets re-added fresh
+          const withoutLastUser = cleaned.slice(0, i);
+          setStatus('idle');
+          setTimeout(() => send(text), 0);
+          return withoutLastUser;
+        }
+      }
+      return cleaned;
     });
   }, []);
+
+  // Keep ref current
+  sendMessageRef.current = sendMessage;
 
   return { messages, status, currentAction, sendMessage, reset, retry };
 }

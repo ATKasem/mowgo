@@ -53,19 +53,18 @@ export const TOOLS = [
       properties: {
         jobIds: { type: 'array', items: { type: 'string' }, description: 'List of job IDs to reschedule' },
         newDate: { type: 'string', description: 'New date YYYY-MM-DD' },
-        notify: { type: 'boolean', description: 'Whether to notify customers (default true)', default: true }
+        newTime: { type: 'string', description: 'Optional — new time HH:MM. If not provided, original time is kept.' },
+        notify: { type: 'boolean', description: 'Notify customers (SMS not yet available — will note this in response)' }
       },
       required: ['jobIds', 'newDate']
     }
   },
   {
     name: 'runRainDelay',
-    description: "Move ALL of today's unfinished (scheduled) jobs to tomorrow. This is the rain delay feature — use when it's raining or about to rain. Tells you how many jobs were moved and optionally texts customers.",
+    description: "Move ALL of today's unfinished (scheduled) jobs to tomorrow. This is the rain delay feature — use when it's raining or about to rain. Tells you how many jobs were moved. SMS notifications not yet available.",
     parameters: {
       type: 'object',
-      properties: {
-        notify: { type: 'boolean', description: 'Text customers to let them know (default true)', default: true }
-      },
+      properties: {},
       required: []
     }
   },
@@ -240,13 +239,13 @@ export async function executeTool(name, args) {
       }
 
       case 'rescheduleJobs': {
-        const { jobIds, newDate, notify = true } = args;
+        const { jobIds, newDate, newTime, notify = false } = args;
         const results = [];
         for (const id of jobIds) {
-          await updateJob(id, {
-            scheduled_date: newDate,
-            scheduled_time: null
-          });
+          const update = { scheduled_date: newDate };
+          if (newTime) update.scheduled_time = newTime;
+          // Don't null out time if not specified — preserve original
+          await updateJob(id, update);
           results.push({ id, movedTo: newDate });
         }
         return {
@@ -261,7 +260,6 @@ export async function executeTool(name, args) {
       }
 
       case 'runRainDelay': {
-        const { notify = true } = args;
         const allJobs = await loadJobs();
         const todayStr = today();
         const tomorrowStr = tomorrow();
@@ -269,10 +267,8 @@ export async function executeTool(name, args) {
           j => j.scheduled_date === todayStr && j.status === 'scheduled'
         );
         for (const j of todaysScheduled) {
-          await updateJob(j.id, {
-            scheduled_date: tomorrowStr,
-            scheduled_time: null
-          });
+          // Preserve original time
+          await updateJob(j.id, { scheduled_date: tomorrowStr });
         }
         return {
           success: true,
@@ -281,7 +277,7 @@ export async function executeTool(name, args) {
             from: todayStr,
             to: tomorrowStr,
             jobs: todaysScheduled.map(j => ({ id: j.id, client: j.clients?.name })),
-            notified: notify ? 'Customers would be notified (SMS not yet integrated)' : false
+            note: 'SMS notifications not yet available — tell customers manually'
           }
         };
       }
@@ -529,7 +525,11 @@ export async function executeTool(name, args) {
 
         const results = [];
         for (const [cid, group] of Object.entries(byClient)) {
-          const rate = group.client?.rate || group.jobs[0]?.clients?.rate || 45;
+          const rate = group.client?.rate || group.jobs[0]?.clients?.rate;
+          if (!rate || rate === 0) {
+            results.push({ client: group.client?.name || 'Unknown', warning: 'No rate set — skipped. Set a rate in Clients tab first.' });
+            continue;
+          }
           const amount = group.jobs.length * rate;
           const invoice = await createInvoice({
             client_id: cid,
