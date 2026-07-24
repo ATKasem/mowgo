@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 
@@ -48,28 +49,52 @@ const data = {
 };
 
 function Cell({ value, isFirst }) {
-  if (value === true) return <td className={`text-center py-2.5 px-2 ${isFirst ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''}`}><Check className="w-4 h-4 text-emerald-500 mx-auto" /></td>;
-  if (value === false) return <td className={`text-center py-2.5 px-2 ${isFirst ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''}`}><X className="w-4 h-4 text-gray-300 dark:text-gray-600 mx-auto" /></td>;
-  if (value === 'soon') return <td className={`text-center py-2.5 px-2 ${isFirst ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''}`}><span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">Soon</span></td>;
-  return <td className={`text-center py-2.5 px-2 ${isFirst ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''}`}><span className="text-xs text-gray-400">{value}</span></td>;
+  const base = `text-center py-2.5 px-2${isFirst ? ' bg-emerald-50 dark:bg-emerald-950/20' : ''}`;
+  if (value === true) return <td className={base}><Check className="w-4 h-4 text-emerald-500 mx-auto" aria-hidden="true" /></td>;
+  if (value === false) return <td className={base}><X className="w-4 h-4 text-gray-300 dark:text-gray-600 mx-auto" aria-hidden="true" /></td>;
+  if (value === 'soon') return <td className={base}><span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">Soon</span></td>;
+  return <td className={base}><span className="text-xs text-gray-400">{value}</span></td>;
 }
 
 export default function Compare() {
+  const navigate = useNavigate();
+
+  function goToPricing(e) {
+    e.preventDefault();
+    navigate('/');
+    // Wait for page render then scroll
+    setTimeout(() => {
+      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
+      {/* Skip to content */}
+      <a
+        href="#comparison"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:dark:bg-gray-900 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold"
+      >
+        Skip to comparison table
+      </a>
+
       {/* Sticky Nav */}
-      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <nav aria-label="Compare page navigation" className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              <Sprout className="w-4 h-4 text-white" />
+              <Sprout className="w-4 h-4 text-white" aria-hidden="true" />
             </div>
             MowFlow
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/#pricing" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <a
+              href="/#pricing"
+              onClick={goToPricing}
+              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
               Pricing
-            </Link>
+            </a>
             <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
               Log In
             </Link>
@@ -79,9 +104,9 @@ export default function Compare() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-950 dark:to-emerald-950">
-        <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center">
+        <div className="max-w-4xl mx-auto px-4 py-16 md:py-24 text-center">
           <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-            <Zap className="w-4 h-4" /> The honest comparison
+            <Zap className="w-4 h-4" aria-hidden="true" /> The honest comparison
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-4">
             MowFlow vs <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Everyone</span>
@@ -92,7 +117,7 @@ export default function Compare() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-              Try MowFlow Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              Try MowFlow Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Link>
             <a href="#comparison" className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               See the table
@@ -102,25 +127,25 @@ export default function Compare() {
       </section>
 
       {/* Standout features */}
-      <section className="max-w-5xl mx-auto px-4 py-16">
+      <section className="max-w-4xl mx-auto px-4 py-16">
         <div className="grid md:grid-cols-3 gap-5 mb-16">
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20">
-              <CloudRain className="w-6 h-6 text-white" />
+              <CloudRain className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">Only app with rain delay</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">Rain tomorrow? One tap moves your whole day. No competitor has this — not QuoteIQ, not Jobber, not anyone.</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/20">
-              <DollarSign className="w-6 h-6 text-white" />
+              <DollarSign className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">No platform fees</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — Stripe takes their cut, that's it.</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/20">
-              <Shield className="w-6 h-6 text-white" />
+              <Shield className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">Your data is yours</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">Yardbook is "free" because they sell your customer list. We never touch your data — no ads, no selling, no funny business.</p>
@@ -129,17 +154,18 @@ export default function Compare() {
       </section>
 
       {/* Comparison table */}
-      <section id="comparison" className="max-w-5xl mx-auto px-4 pb-24">
+      <section id="comparison" className="max-w-4xl mx-auto px-4 pb-24">
         <h2 className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3">Feature comparison</h2>
         <p className="text-center text-gray-500 dark:text-gray-400 mb-10">Updated July 2026. Based on public pricing pages and hands-on testing.</p>
 
-        <div className="overflow-x-auto -mx-4 px-4">
+        <div className="overflow-x-auto -mx-4 px-4" role="region" aria-label="Feature comparison table — scroll horizontally on mobile">
           <table className="w-full text-sm border-collapse">
+            <caption className="sr-only">Feature comparison between MowFlow and 7 competitors including pricing and availability of 14 key features</caption>
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-800">
-                <th className="text-left py-3 px-3 font-semibold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-950 z-10">Feature</th>
+                <th scope="col" className="text-left py-3 px-3 font-semibold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-950 z-10">Feature</th>
                 {competitors.map(c => (
-                  <th key={c.name} className={`py-3 px-2 text-center font-semibold whitespace-nowrap ${c.highlight ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20' : 'text-gray-600 dark:text-gray-400'}`}>
+                  <th key={c.name} scope="col" className={`py-3 px-2 text-center font-semibold whitespace-nowrap ${c.highlight ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20' : 'text-gray-600 dark:text-gray-400'}`}>
                     <div>{c.name}</div>
                     <div className="text-[10px] font-normal text-gray-400 dark:text-gray-500 mt-0.5">{c.price}</div>
                   </th>
@@ -149,7 +175,7 @@ export default function Compare() {
             <tbody>
               {features.map((f, i) => (
                 <tr key={f.key} className={`border-b border-gray-100 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-gray-50/50 dark:bg-gray-900/30' : ''}`}>
-                  <td className="py-3 px-3 sticky left-0 bg-inherit">
+                  <th scope="row" className="py-3 px-3 sticky left-0 bg-inherit text-left font-normal">
                     <div className="flex items-center gap-2">
                       {f.star && <span className="text-[10px] font-bold uppercase text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded">⭐</span>}
                       <div>
@@ -157,7 +183,7 @@ export default function Compare() {
                         <span className="hidden md:inline text-xs text-gray-400 dark:text-gray-500 ml-1.5">— {f.desc}</span>
                       </div>
                     </div>
-                  </td>
+                  </th>
                   {data[f.key].map((v, j) => <Cell key={j} value={v} isFirst={j === 0} />)}
                 </tr>
               ))}
@@ -171,12 +197,12 @@ export default function Compare() {
           </p>
         </div>
 
-        <div className="mt-10 text-center">
-          <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">
+        <div className="mt-10 text-center space-y-6">
+          <p className="text-sm text-gray-400 dark:text-gray-500">
             Think something's wrong? <a href="mailto:hello@mowflow.app" className="text-emerald-500 hover:underline">Tell us</a> and we'll fix it. We're not afraid of the truth.
           </p>
           <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-            Try MowFlow Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            Try MowFlow Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
       </section>
@@ -187,21 +213,23 @@ export default function Compare() {
           <h2 className="text-3xl font-extrabold text-white mb-4">The only lawn care app with free rain delay.</h2>
           <p className="text-emerald-100 text-lg mb-8">0 competitors. 0 asterisks. Just a better way to run your crew.</p>
           <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-            Start Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            Start Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
-        <div className="max-w-5xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 text-sm">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              <Sprout className="w-3.5 h-3.5 text-white" />
+              <Sprout className="w-3.5 h-3.5 text-white" aria-hidden="true" />
             </div>
             MowFlow © 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
+            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300">Home</Link>
+            <a href="#" onClick={goToPricing} className="hover:text-gray-600 dark:hover:text-gray-300">Pricing</a>
             <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300">App</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300">Privacy</Link>
             <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300">Contact</a>
