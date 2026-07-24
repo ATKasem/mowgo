@@ -57,6 +57,26 @@ function Cell({ value, isFirst }) {
 export default function Compare() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
+      {/* Sticky Nav */}
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+              <Sprout className="w-4 h-4 text-white" />
+            </div>
+            MowFlow
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/#pricing" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+              Pricing
+            </Link>
+            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+              Log In
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-950 dark:to-emerald-950">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center">
