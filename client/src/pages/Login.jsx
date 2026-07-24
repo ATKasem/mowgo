@@ -148,7 +148,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
-              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2.5 min-h-[44px]"
             >
               {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
             </button>

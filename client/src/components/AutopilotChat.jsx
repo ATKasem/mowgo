@@ -136,7 +136,7 @@ export default function AutopilotChat({ compact = false }) {
         <div className="pb-3">
           <button
             onClick={retry}
-            className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors min-h-[44px]"
           >
             <RefreshCw className="w-4 h-4" />
             Retry

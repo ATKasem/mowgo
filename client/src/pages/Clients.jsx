@@ -131,7 +131,7 @@ export default function Clients({ jobs = [] }) {
                  onKeyDown={e => { if (e.key === 'Escape') { setShowSort(false); } }}
                  onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowSort(false); }}>
               {SORT_OPTIONS.map(o => (
-                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${sortBy === o.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
+                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${sortBy === o.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
               ))}
             </div>
           )}

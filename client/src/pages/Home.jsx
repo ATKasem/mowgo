@@ -202,9 +202,9 @@ export default function Home({ jobs = [], invoices = [] }) {
       <div className="card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <button onClick={prevMonth} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
+            <button onClick={prevMonth} className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
             <h3 className="font-semibold text-sm text-gray-900 dark:text-white">{MONTHS[calMonth]} {calYear}</h3>
-            <button onClick={nextMonth} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
+            <button onClick={nextMonth} className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
           </div>
           <div className="relative">
             <button onClick={() => setShowExport(!showExport)} className="btn-ghost text-xs gap-1.5 text-emerald-600 dark:text-emerald-400">
@@ -216,19 +216,19 @@ export default function Home({ jobs = [], invoices = [] }) {
                    onKeyDown={e => { if (e.key === 'Escape') setShowExport(false); }}
                    onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowExport(false); }}>
                 <button onClick={() => { downloadICS(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
-                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
                   <Download className="w-3.5 h-3.5" />Download .ics (Apple/Outlook)
                 </button>
                 <button onClick={() => { downloadCSV(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
-                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
                   <FileSpreadsheet className="w-3.5 h-3.5" />Download CSV (Excel/Numbers)
                 </button>
                 <button onClick={() => { printSchedule(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
-                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
                   <Printer className="w-3.5 h-3.5" />Print / Save as PDF
                 </button>
                 <button onClick={() => { window.open(generateGoogleCalUrl(jobs.filter(j => j.scheduled_date >= today)), '_blank'); setShowExport(false); }}
-                  className="w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2">
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
                   <ExternalLink className="w-3.5 h-3.5" />Add to Google Calendar
                 </button>
               </div>
@@ -271,7 +271,7 @@ export default function Home({ jobs = [], invoices = [] }) {
               <h4 className="font-bold text-sm text-gray-900 dark:text-white">
                 {new Date(showForm.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </h4>
-              <button onClick={() => setShowForm(null)} aria-label="Close calendar popover" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none">&times;</button>
+              <button onClick={() => setShowForm(null)} aria-label="Close calendar popover" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
             </div>
             {showForm.jobs.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400">No jobs scheduled</p>
