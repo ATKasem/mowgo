@@ -1,5 +1,6 @@
 git_url("https://github.com/ATKasem/mowflow.git")
 storage_mode("git")
+git_branch("main")
 type("appstore")
 app_identifier("com.mowflow.app")
 username("aaronkasem@gmail.com")
