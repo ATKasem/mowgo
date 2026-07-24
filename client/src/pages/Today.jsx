@@ -93,11 +93,17 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                 route_order: 99,
               }).then(nextJob => {
                 if (nextJob) setJobs(p => [...p, nextJob]);
+                const clientName = job.clients?.name || 'Job';
+                setCompletedToast({ name: `${clientName} · Next ${recLabel} job created`, amount: job.clients?.rate || 0, type: 'recurring' });
+                if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+                toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
               }).catch(err => {
                 console.error('failed to create recurring job:', err);
+                const clientName = job.clients?.name || 'Job';
+                setCompletedToast({ name: `${clientName} · Failed to create recurring job`, amount: 0, type: 'error' });
+                if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+                toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
               });
-              const clientName = job.clients?.name || 'Job';
-              setCompletedToast({ name: `${clientName} · Next ${recLabel} job created`, amount: job.clients?.rate || 0, type: 'recurring' });
             } else {
               const clientName = job.clients?.name || 'Job';
               setCompletedToast({ name: `${clientName} · ${recLabel} job already scheduled`, amount: job.clients?.rate || 0 });
@@ -113,7 +119,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
     }, 150);
-  }, [setJobs, jobs]);
+  }, [setJobs]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
@@ -215,31 +221,44 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       </div>
 
       {/* Rain delay — always visible when there are incomplete jobs */}
-      {jobs.some(j => j.status !== 'done' && j.scheduled_date === date) && (
+      {filtered.some(j => j.status !== 'done') && (
         <div className="mb-5">
           <button
             onClick={() => {
-              const toMove = jobs.filter(j => j.status !== 'done' && j.scheduled_date === date);
+              const toMove = filtered.filter(j => j.status !== 'done');
               if (toMove.length === 0) return;
               if (!window.confirm(`Move ${toMove.length} job${toMove.length > 1 ? 's' : ''} to tomorrow?`)) return;
               const tomorrow = new Date(date);
               tomorrow.setDate(tomorrow.getDate() + 1);
               const nextDate = tomorrow.toISOString().split('T')[0];
-              Promise.allSettled(toMove.map(j => updateJob(j.id, { scheduled_date: nextDate })))
-                .then(results => {
-                  const failed = results.filter(r => r.status === 'rejected');
-                  if (failed.length > 0) {
-                    console.error('Rain delay: some jobs failed to move', failed.map(r => r.reason));
-                  }
-                });
+              // Optimistic update
               setJobs(prev => prev.map(j =>
                 j.status !== 'done' && j.scheduled_date === date
                   ? { ...j, scheduled_date: nextDate }
                   : j
               ));
-              setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
-              if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
-              toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
+              // Persist to server with rollback on failure
+              Promise.allSettled(toMove.map(j => updateJob(j.id, { scheduled_date: nextDate })))
+                .then(results => {
+                  const failed = results.filter(r => r.status === 'rejected');
+                  if (failed.length > 0) {
+                    console.error('Rain delay: some jobs failed to move', failed.map(r => r.reason));
+                    // Roll back only the jobs that actually failed
+                    const failedIds = new Set(
+                      toMove.filter((_, i) => results[i].status === 'rejected').map(j => j.id)
+                    );
+                    setJobs(prev => prev.map(j =>
+                      failedIds.has(j.id) && j.scheduled_date === nextDate
+                        ? { ...j, scheduled_date: date }
+                        : j
+                    ));
+                    setCompletedToast({ name: `Failed to move ${failed.length} job${failed.length > 1 ? 's' : ''}`, amount: 0, type: 'rain' });
+                  } else {
+                    setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
+                  }
+                  if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+                  toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
+                });
             }}
             className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-2.5 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
           >

@@ -121,6 +121,10 @@ export async function updateJob(id, updates) {
     supabaseUpdates.recurrence_rule = updates.recurrence;
     delete supabaseUpdates.recurrence;
   }
+  if (updates.service_notes !== undefined) {
+    supabaseUpdates.cleaning_notes = updates.service_notes;
+    delete supabaseUpdates.service_notes;
+  }
   const { data, error } = await supabase.from('jobs').update(supabaseUpdates).eq('id', id).select('*, clients!left(*)').single();
   if (error) throw error;
   return {
@@ -205,7 +209,7 @@ export async function createClient(client) {
     phone: client.phone,
     email: client.email,
     rate: client.rate || 0,
-    notes: client.service_notes,
+    cleaning_notes: client.service_notes,
     key_code: client.key_code,
     alarm_code: client.alarm_code,
     pet_instructions: client.pet_instructions,

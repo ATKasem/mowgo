@@ -13,6 +13,9 @@ import { supabase, isDemoMode } from './lib/supabase';
 import { loadJobs, loadInvoices, onDataChange } from './lib/data';
 import Subscribe from './pages/Subscribe';
 import Compare from './pages/Compare';
+import SwitchingFromLawnPro from './pages/SwitchingFromLawnPro';
+import JobberPriceIncrease from './pages/JobberPriceIncrease';
+import AutopilotChat from './components/AutopilotChat';
 
 // ===== Auth Context =====
 export const AuthContext = createContext(null);
@@ -102,8 +105,10 @@ export default function App() {
           {/* Public */}
           <Route path="/" element={<Landing />} />
           <Route path="/compare" element={<Compare />} />
+          <Route path="/blog/jobber-price-increase-2026" element={<JobberPriceIncrease />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/subscribe" element={<Subscribe />} />
+          <Route path="/switch-from-lawnpro" element={<SwitchingFromLawnPro />} />
           <Route path="/login" element={<Login />} />
 
           {/* Protected */}
@@ -117,6 +122,7 @@ export default function App() {
             <Route path="/app/clients" element={<Clients jobs={jobs} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
+            <Route path="/app/autopilot" element={<AutopilotChat />} />
             <Route path="*" element={<Navigate to="/app" />} />
           </Route>
         </Routes>

@@ -14,6 +14,7 @@ export default function Subscribe() {
     async function verify() {
       try {
         const res = await fetch(`/api/stripe/verify-session?session_id=${sessionId}`);
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const data = await res.json();
 
         if (data.status === 'complete' && data.payment_status === 'paid') {
@@ -25,9 +26,10 @@ export default function Subscribe() {
           setStatus('failed');
           setError(data.error || 'Payment was not completed');
         }
-      } catch {
-        // Network error — fall back to showing success if session_id exists
-        setStatus('success');
+      } catch (err) {
+        // Network error — don't lie to the user
+        setStatus('failed');
+        setError('Could not verify payment. Please contact support or try again.');
       }
     }
 

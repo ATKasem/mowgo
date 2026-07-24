@@ -3,7 +3,7 @@ import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   Calendar, Users, FileText, Settings,
-  Sprout, LogOut, WifiOff, LayoutDashboard
+  Sprout, LogOut, WifiOff, LayoutDashboard, Sparkles
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import InstallPrompt from './InstallPrompt';
@@ -14,6 +14,7 @@ const navItems = [
   { to: '/app/today', icon: Calendar, title: 'Today' },
   { to: '/app/clients', icon: Users, title: 'Clients' },
   { to: '/app/invoices', icon: FileText, title: 'Invoices' },
+  { to: '/app/autopilot', icon: Sparkles, title: 'AI' },
   { to: '/app/settings', icon: Settings, title: 'Settings' },
 ];
 

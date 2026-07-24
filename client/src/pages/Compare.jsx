@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Check, X, CloudRain, Wifi, Shield, Zap, Sprout, ArrowRight } from 'lucide-react';
 
 const competitors = [
+  { name: 'QuoteIQ', price: '$29.99/mo' },
   { name: 'MowFlow', price: 'Free – $49', highlight: true },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
@@ -28,18 +29,18 @@ const features = [
 
 // ✅ = confirmed, ❌ = not available, ⚠️ = partial/limited, 🔜 = coming soon
 const data = {
-  rainDelay:    [ true,  false, false, false, false, false, false ],
-  offline:      [ true,  true,  false, false, true,  true,  false ],
-  darkMode:     [ true,  false, false, false, false, false, false ],
-  freeTier:     [ true,  false, true,  false, false, false, false ],
-  dragDrop:     [ true,  true,  false, false, true,  false, false ],
-  invoicing:    [ true,  true,  true,  true,  true,  false, false ],
-  notes:        [ true,  true,  true,  true,  true,  false, false ],
-  recurring:    [ true,  true,  true,  true,  true,  false, false ],
-  privacy:      [ true,  false, false, true,  true,  true,  false ],
-  pwa:          [ true,  true,  false, false, true,  false, false ],
-  stripe:       [ 'soon', true,  false, true,  true,  false, false ],
-  gps:          [ true,  true,  false, true,  true,  true,  false ],
+  rainDelay:    [ false, true,  false, false, false, false, false, false ],
+  offline:      [ false, true,  true,  false, false, true,  true,  false ],
+  darkMode:     [ false, true,  false, false, false, false, false, false ],
+  freeTier:     [ false, true,  false, true,  false, false, false, false ],
+  dragDrop:     [ true,  true,  true,  false, false, true,  false, false ],
+  invoicing:    [ true,  true,  true,  true,  true,  true,  false, false ],
+  notes:        [ true,  true,  true,  true,  true,  true,  false, false ],
+  recurring:    [ true,  true,  true,  true,  true,  true,  false, false ],
+  privacy:      [ true,  true,  false, false, true,  true,  true,  false ],
+  pwa:          [ false, true,  true,  false, false, true,  false, false ],
+  stripe:       [ true,  'soon', true,  false, true,  true,  false, false ],
+  gps:          [ true,  true,  true,  false, true,  true,  true,  false ],
 };
 
 function Cell({ value, isFirst }) {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sprout, CloudRain, Calendar, MapPin, Users, FileText, Check, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
+import { Sprout, CloudRain, Calendar, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
@@ -165,6 +165,62 @@ export default function Landing() {
             </FadeIn>
           ))}
         </div>
+
+        {/* Comparison Callout */}
+        <FadeIn delay={200}>
+          <div className="mt-14 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-bold text-white mb-1">How MowFlow Solo stacks up</h3>
+            <p className="text-sm text-gray-400 mb-6">Same features, fraction of the price.</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left py-2.5 pr-4 text-gray-400 font-medium"></th>
+                    <th className="text-center py-2.5 px-3">
+                      <span className="text-emerald-400 font-bold">MowFlow Solo</span>
+                      <span className="block text-xs text-gray-500 font-normal">$49/mo</span>
+                    </th>
+                    <th className="text-center py-2.5 px-3">
+                      <span className="text-gray-300 font-semibold">Jobber Connect</span>
+                      <span className="block text-xs text-gray-500 font-normal">$139/mo</span>
+                    </th>
+                    <th className="text-center py-2.5 pl-3">
+                      <span className="text-gray-300 font-semibold">LawnPro</span>
+                      <span className="block text-xs text-gray-500 font-normal">$39/mo</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-gray-800">
+                    <td className="py-2.5 pr-4 text-gray-400">Rain Delay</td>
+                    <td className="text-center py-2.5 px-3"><Check className="w-4 h-4 text-emerald-400 mx-auto" /></td>
+                    <td className="text-center py-2.5 px-3"><X className="w-4 h-4 text-gray-600 mx-auto" /></td>
+                    <td className="text-center py-2.5 pl-3"><X className="w-4 h-4 text-gray-600 mx-auto" /></td>
+                  </tr>
+                  <tr className="border-b border-gray-800">
+                    <td className="py-2.5 pr-4 text-gray-400">Per-User Fees</td>
+                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-medium">None</span></td>
+                    <td className="text-center py-2.5 px-3"><span className="text-gray-500">$30/user</span></td>
+                    <td className="text-center py-2.5 pl-3"><span className="text-gray-500">N/A</span></td>
+                  </tr>
+                  <tr className="border-b border-gray-800">
+                    <td className="py-2.5 pr-4 text-gray-400">Offline Mode</td>
+                    <td className="text-center py-2.5 px-3"><Check className="w-4 h-4 text-emerald-400 mx-auto" /></td>
+                    <td className="text-center py-2.5 px-3"><Check className="w-4 h-4 text-emerald-400 mx-auto" /></td>
+                    <td className="text-center py-2.5 pl-3"><X className="w-4 h-4 text-gray-600 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 pr-4 text-gray-400">Price</td>
+                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-bold">$49/mo</span></td>
+                    <td className="text-center py-2.5 px-3"><span className="text-gray-500 line-through">$139/mo</span></td>
+                    <td className="text-center py-2.5 pl-3"><span className="text-gray-500">$39/mo</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-500 mt-4 text-center">LawnPro is currently broken — no active mobile app or web dashboard. Jobber Connect charges $30/user/seat on top of $139.</p>
+          </div>
+        </FadeIn>
       </section>
 
       {/* Stats */}
