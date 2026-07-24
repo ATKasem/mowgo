@@ -128,8 +128,8 @@ export default function Layout() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setChatOpen(false)}
           />
-          {/* Panel — slides up from bottom */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl max-h-[85vh] flex flex-col"
+          {/* Panel — centered compact sheet */}
+          <div className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col"
                style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             {/* Handle bar + close + reset */}
             <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800">

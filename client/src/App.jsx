@@ -77,6 +77,26 @@ function RequireAuth({ children }) {
   return children;
 }
 
+// ===== Supabase Error Redirect =====
+// When Supabase redirects back with error params (expired/invalid reset link),
+// the hash may not include a route path (e.g. #error=access_denied&...).
+// This component detects that and rewrites to /#/login so Login.jsx can show
+// a friendly error message instead of a blank page.
+function SupabaseErrorRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash || !hash.includes('error=')) return;
+    // Already on /login — let Login.jsx handle it
+    if (hash.startsWith('#/login')) return;
+    // Rewrite hash to include /login route so the Login component renders
+    const errorHash = hash.startsWith('#') ? hash.slice(1) : hash;
+    window.history.replaceState({}, '', window.location.pathname + '#/login&' + errorHash);
+    navigate('/login', { replace: true });
+  }, [navigate]);
+  return null;
+}
+
 // ===== App =====
 export default function App() {
   const [jobs, setJobs] = useState([]);
@@ -101,6 +121,7 @@ export default function App() {
   return (
     <HashRouter>
       <AuthProvider>
+        <SupabaseErrorRedirect />
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />

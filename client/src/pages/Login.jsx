@@ -15,12 +15,35 @@ export default function Login() {
 
   const demo = isDemoMode();
 
-  // Handle password recovery callback from Supabase redirect
+  // Handle password recovery callback or error params from Supabase redirect
   useEffect(() => {
     const hash = window.location.hash;
+    if (!hash) return;
+
+    // Strip leading '#' and parse params
+    // Hash may be "#/login&error=..." (after SupabaseErrorRedirect) or "#error=..."
+    const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
+    const params = new URLSearchParams(hashStr);
+
+    const errorType = params.get('error');
+    const errorCode = params.get('error_code');
+    const errorDesc = params.get('error_description');
+
+    if (errorType) {
+      // Map Supabase error codes to friendly messages
+      const friendlyMessages = {
+        'otp_expired': 'This password reset link has expired. Please request a new one.',
+        'access_denied': 'This password reset link is invalid or has expired. Please request a new one.',
+      };
+      const message = friendlyMessages[errorCode] || decodeURIComponent(errorDesc || errorType);
+      setError(message);
+      // Clean the hash so refreshing doesn't re-show the error
+      window.history.replaceState({}, '', window.location.pathname + '/#/login');
+      return;
+    }
+
+    // Successful recovery — Supabase client processes the token via onAuthStateChange
     if (hash.includes('type=recovery')) {
-      // Supabase will handle the token exchange via onAuthStateChange
-      // Just switch to a password-reset-friendly state
       setMode('login');
     }
   }, []);
@@ -39,7 +62,7 @@ export default function Login() {
     try {
       if (mode === 'forgot') {
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/#/login',
+          redirectTo: window.location.origin,
         });
         if (resetError) {
           setError(resetError.message);
