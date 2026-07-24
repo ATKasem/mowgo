@@ -6,15 +6,12 @@ platform :ios do
     # Sync certificates and provisioning profiles
     match(type: "appstore")
 
-    # Build the web app and sync to Capacitor
-    Dir.chdir("..") do
-      sh("npm run build")
-      sh("npx cap sync ios")
-    end
+    # Note: web build + cap sync is handled by the GitHub Actions workflow.
+    # This lane assumes the iOS project is already synced.
 
     # Build the iOS app
     build_app(
-      project: "App.xcodeproj",
+      project: "ios/App/App.xcodeproj",
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
