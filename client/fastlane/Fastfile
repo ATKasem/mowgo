@@ -11,14 +11,10 @@ platform :ios do
       is_key_content_base64: false,
     )
 
-    # Sync certificates and provisioning profiles
-    match(
-      type: "appstore",
-      api_key: api_key,
+    # Automatic code signing — uses Apple API, no git storage needed
+    enable_automatic_code_signing(
+      team_id: "5W23S34GUN",
     )
-
-    # Note: web build + cap sync is handled by the GitHub Actions workflow.
-    # This lane assumes the iOS project is already synced.
 
     # Build the iOS app
     build_app(
@@ -30,6 +26,7 @@ platform :ios do
 
     # Upload to TestFlight
     upload_to_testflight(
+      api_key: api_key,
       skip_waiting_for_build_processing: true,
     )
   end
