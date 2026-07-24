@@ -98,13 +98,13 @@ export default function Settings() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-gray-900 dark:text-white capitalize">{profile?.tier === 'solo' ? 'Solo Plan' : profile?.tier === 'crew' ? 'Crew Plan' : 'Free Plan'}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{profile?.tier === 'crew' ? 'Unlimited clients · Full team access' : profile?.tier === 'solo' ? 'Unlimited clients · All features' : 'Up to 10 clients · All core features'}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{profile?.tier === 'crew' ? 'Unlimited clients · Full team access' : profile?.tier === 'solo' ? 'Unlimited clients · All features' : 'Up to 5 clients · All core features'}</p>
             </div>
             <span className="badge-success text-xs">Active</span>
           </div>
           {(!profile?.tier || profile.tier === 'free') && (
             <div className="text-xs text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
-              Upgrade to Solo ($49/mo) or Crew ($79/mo) for unlimited clients, offline mode, and more.
+              Upgrade to Solo ($39/mo) or Crew ($79/mo) for unlimited clients, offline mode, and more.
             </div>
           )}
         </div>

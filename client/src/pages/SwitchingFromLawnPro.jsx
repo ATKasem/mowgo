@@ -12,7 +12,7 @@ const painPoints = [
 const solutions = [
   { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One tap moves your entire schedule forward when it rains. Clients get notified automatically. Included on every plan — even free.', color: 'from-emerald-500 to-green-500' },
   { icon: Wifi, title: 'Offline Mode', desc: 'MowFlow works without internet. Rural areas, bad signal, doesn\'t matter. Your data syncs when you\'re back online.', color: 'from-teal-500 to-cyan-500' },
-  { icon: Shield, title: '$49 Flat Pricing', desc: 'Solo plan: $49/mo. That\'s it. No per-user fees, no hidden charges, no "gotcha" upsells. Unlimited clients and jobs.', color: 'from-amber-500 to-orange-500' },
+  { icon: Shield, title: '$39 Flat Pricing', desc: 'Solo plan: $39/mo. That\'s it. No per-user fees, no hidden charges, no "gotcha" upsells. Unlimited clients and jobs.', color: 'from-amber-500 to-orange-500' },
   { icon: Sprout, title: 'Your Data Is Yours', desc: 'We don\'t sell your customer data to advertisers. You are the customer, not the product. Full data export whenever you want.', color: 'from-violet-500 to-purple-500' },
 ];
 
@@ -100,7 +100,7 @@ export default function SwitchingFromLawnPro() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
-            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">Free for 10 clients. No credit card. 2 minutes to set up.</p>
+            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">Free for 5 clients. No credit card. 2 minutes to set up.</p>
           </FadeIn>
         </div>
       </section>
@@ -232,7 +232,7 @@ export default function SwitchingFromLawnPro() {
                 <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">MowFlow Solo</span></div>
                 <div className="mt-3">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-gray-900 dark:text-white">$49</span>
+                    <span className="text-4xl font-extrabold text-gray-900 dark:text-white">$39</span>
                     <span className="text-gray-400 dark:text-gray-500 font-medium">/mo</span>
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">What you get:</p>
@@ -303,7 +303,7 @@ export default function SwitchingFromLawnPro() {
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Ready to make the switch?</h2>
-            <p className="text-emerald-100 text-lg mb-10">Free for 10 clients. No credit card. Import your data in minutes.</p>
+            <p className="text-emerald-100 text-lg mb-10">Free for 5 clients. No credit card. Import your data in minutes.</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               Start Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

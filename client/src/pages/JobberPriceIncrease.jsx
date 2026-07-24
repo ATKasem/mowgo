@@ -16,9 +16,9 @@ const whatToLookFor = [
 ];
 
 const comparisonRows = [
-  { feature: 'Monthly price (solo operator)', mowflow: '$49/mo', jobber: '$139/mo (Connect)' },
+  { feature: 'Monthly price (solo operator)', mowflow: '$39/mo', jobber: '$139/mo (Connect)' },
   { feature: 'Per-user fees', mowflow: 'None', jobber: 'Yes — each crew member costs extra' },
-  { feature: 'Free tier', mowflow: 'Yes — 10 clients, forever', jobber: '14-day trial only' },
+  { feature: 'Free tier', mowflow: 'Yes — 5 clients, forever', jobber: '14-day trial only' },
   { feature: 'Rain delay auto-reschedule', mowflow: 'Yes — one tap', jobber: 'No built-in rain delay' },
   { feature: 'Offline mode', mowflow: 'Yes — works without cell service', jobber: 'Limited offline support' },
   { feature: 'Mobile-first design', mowflow: 'Yes — built for the truck', jobber: 'Desktop-first, mobile feels secondary' },
@@ -160,7 +160,7 @@ export default function JobberPriceIncrease() {
             MowFlow vs Jobber
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            Here's a straightforward comparison of what you get with MowFlow Solo ($49/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:
+            Here's a straightforward comparison of what you get with MowFlow Solo ($39/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:
           </p>
           <div className="overflow-x-auto">
             <div className="card overflow-hidden min-w-[600px]">
@@ -200,7 +200,7 @@ export default function JobberPriceIncrease() {
           </div>
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              MowFlow Solo at <strong className="text-gray-900 dark:text-white">$49/mo</strong> is <strong className="text-emerald-600 dark:text-emerald-400">65% less</strong> than Jobber Connect — with no per-user fees.
+              MowFlow Solo at <strong className="text-gray-900 dark:text-white">$39/mo</strong> is <strong className="text-emerald-600 dark:text-emerald-400">72% less</strong> than Jobber Connect — with no per-user fees.
             </p>
           </div>
         </section>
@@ -212,7 +212,7 @@ export default function JobberPriceIncrease() {
           <div className="relative px-8 py-12 text-center">
             <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">Try MowFlow Free</h2>
             <p className="text-emerald-100 mb-8 max-w-md mx-auto leading-relaxed">
-              Start with 10 clients on the free plan. No credit card required. Upgrade to Solo when you're ready — still less than a third of Jobber Connect.
+              Start with 5 clients on the free plan. No credit card required. Upgrade to Solo when you're ready — still less than a third of Jobber Connect.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">

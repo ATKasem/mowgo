@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sprout, CloudRain, Calendar, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
+import { Sprout, CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
@@ -110,7 +110,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Scheduling, routes, and invoicing that just works. No demos. No setup calls. Free for 10 clients — no credit card.
+              Scheduling, routes, and invoicing that just works. No demos. No setup calls. Free for 5 clients — no credit card.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -178,7 +178,7 @@ export default function Landing() {
                     <th className="text-left py-2.5 pr-4 text-gray-400 font-medium"></th>
                     <th className="text-center py-2.5 px-3">
                       <span className="text-emerald-400 font-bold">MowFlow Solo</span>
-                      <span className="block text-xs text-gray-500 font-normal">$49/mo</span>
+                      <span className="block text-xs text-gray-500 font-normal">$39/mo</span>
                     </th>
                     <th className="text-center py-2.5 px-3">
                       <span className="text-gray-300 font-semibold">Jobber Connect</span>
@@ -211,7 +211,7 @@ export default function Landing() {
                   </tr>
                   <tr>
                     <td className="py-2.5 pr-4 text-gray-400">Price</td>
-                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-bold">$49/mo</span></td>
+                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-bold">$39/mo</span></td>
                     <td className="text-center py-2.5 px-3"><span className="text-gray-500 line-through">$139/mo</span></td>
                     <td className="text-center py-2.5 pl-3"><span className="text-gray-500">$39/mo</span></td>
                   </tr>
@@ -244,7 +244,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Simple, transparent pricing</h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-2 text-lg">Start free. Upgrade when you are ready. Cancel anytime.</p>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">Solo <strong>$49/mo</strong> — that's <strong>65% less</strong> than Jobber Connect at $139/mo. Same rain delay, better price.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">Solo <strong>$39/mo</strong> — that's <strong>72% less</strong> than Jobber Connect at $139/mo. Same rain delay, better price.</p>
             <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">14-day free trial on paid plans. No setup fees. No contracts.</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">
@@ -288,7 +288,7 @@ export default function Landing() {
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Stop running your business on texts and a notebook</h2>
-            <p className="text-emerald-100 text-lg mb-10">Free for 10 clients. No credit card. 2 minutes.</p>
+            <p className="text-emerald-100 text-lg mb-10">Free for 5 clients. No credit card. 2 minutes.</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               Start Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

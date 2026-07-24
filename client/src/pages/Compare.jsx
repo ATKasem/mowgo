@@ -1,9 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 
 const competitors = [
-  { name: 'MowFlow', price: 'Free – $49', highlight: true },
+  { name: 'MowFlow', price: 'Free – $39', highlight: true },
   { name: 'QuoteIQ', price: '$29.99/mo' },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
@@ -17,7 +16,7 @@ const features = [
   { label: 'Rain Delay', key: 'rainDelay', desc: 'One-tap reschedule when rain hits', star: true },
   { label: 'Offline Mode', key: 'offline', desc: 'Works without cell service, syncs later' },
   { label: 'Dark Mode', key: 'darkMode', desc: 'Built-in — not a browser hack' },
-  { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 10 clients, no card' },
+  { label: 'Free Tier', key: 'freeTier', desc: 'Full features, 5 clients, no card' },
   { label: 'Transaction Fees', key: 'txFees', desc: 'QuoteIQ adds 1% on top of Stripe', star: true },
   { label: 'AI Features', key: 'ai', desc: 'AI estimates, measurements, or receptionist' },
   { label: 'Drag & Drop Route', key: 'dragDrop', desc: 'Reorder your day by dragging' },
@@ -50,10 +49,10 @@ const data = {
 
 function Cell({ value, isFirst }) {
   const base = `text-center py-2.5 px-2${isFirst ? ' bg-emerald-50 dark:bg-emerald-950/20' : ''}`;
-  if (value === true) return <td className={base}><Check className="w-4 h-4 text-emerald-500 mx-auto" aria-hidden="true" /></td>;
-  if (value === false) return <td className={base}><X className="w-4 h-4 text-gray-300 dark:text-gray-600 mx-auto" aria-hidden="true" /></td>;
-  if (value === 'soon') return <td className={base}><span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">Soon</span></td>;
-  return <td className={base}><span className="text-xs text-gray-400">{value}</span></td>;
+  if (value === true) return <td className={base} aria-label="Available"><Check className="w-4 h-4 text-emerald-500 mx-auto" aria-hidden="true" /></td>;
+  if (value === false) return <td className={base} aria-label="Not available"><X className="w-4 h-4 text-gray-300 dark:text-gray-600 mx-auto" aria-hidden="true" /></td>;
+  if (value === 'soon') return <td className={base} aria-label="Coming soon"><span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">Soon</span></td>;
+  return <td className={base} aria-label={`Value: ${value}`}><span className="text-xs text-gray-400">{value}</span></td>;
 }
 
 export default function Compare() {
@@ -62,10 +61,13 @@ export default function Compare() {
   function goToPricing(e) {
     e.preventDefault();
     navigate('/');
-    // Wait for page render then scroll
-    setTimeout(() => {
-      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    // Poll via rAF until the #pricing element is mounted, then scroll
+    const tryScroll = (attempts = 0) => {
+      const el = document.getElementById('pricing');
+      if (el) { el.scrollIntoView({ behavior: 'smooth' }); return; }
+      if (attempts < 30) requestAnimationFrame(() => tryScroll(attempts + 1));
+    };
+    requestAnimationFrame(() => tryScroll());
   }
 
   return (
@@ -184,7 +186,7 @@ export default function Compare() {
                       </div>
                     </div>
                   </th>
-                  {data[f.key].map((v, j) => <Cell key={j} value={v} isFirst={j === 0} />)}
+                  {(data[f.key] ?? []).map((v, j) => <Cell key={j} value={v} isFirst={j === 0} />)}
                 </tr>
               ))}
             </tbody>
