@@ -233,7 +233,6 @@ export default function useAutopilot() {
           const text = cleaned[i].content;
           // Remove that user message from state so it gets re-added fresh
           const withoutLastUser = cleaned.slice(0, i);
-          setStatus('idle');
           setTimeout(() => send(text), 0);
           return withoutLastUser;
         }
