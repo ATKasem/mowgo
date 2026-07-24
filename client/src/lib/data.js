@@ -53,7 +53,7 @@ export async function loadJobs() {
       phone: j.clients.phone,
       email: j.clients.email,
       rate: j.clients.rate,
-      service_notes: j.clients.notes,
+      service_notes: j.clients.cleaning_notes,
       key_code: j.clients.key_code,
       alarm_code: j.clients.alarm_code,
       pet_instructions: j.clients.pet_instructions,
@@ -102,7 +102,7 @@ export async function createJob(job) {
       phone: data.clients.phone,
       email: data.clients.email,
       rate: data.clients.rate,
-      service_notes: data.clients.notes,
+      service_notes: data.clients.cleaning_notes,
       key_code: data.clients.key_code,
       alarm_code: data.clients.alarm_code,
       pet_instructions: data.clients.pet_instructions,
@@ -140,7 +140,7 @@ export async function updateJob(id, updates) {
       phone: data.clients.phone,
       email: data.clients.email,
       rate: data.clients.rate,
-      service_notes: data.clients.notes,
+      service_notes: data.clients.cleaning_notes,
       key_code: data.clients.key_code,
       alarm_code: data.clients.alarm_code,
       pet_instructions: data.clients.pet_instructions,
@@ -181,7 +181,7 @@ export async function loadClients() {
     phone: c.phone,
     email: c.email,
     rate: c.rate,
-    service_notes: c.notes,
+    service_notes: c.cleaning_notes,
     key_code: c.key_code,
     alarm_code: c.alarm_code,
     pet_instructions: c.pet_instructions,
@@ -212,7 +212,7 @@ export async function createClient(client) {
   }).select().single();
 
   if (error) throw error;
-  return { ...data, service_notes: data.notes };
+  return { ...data, service_notes: data.cleaning_notes };
 }
 
 export async function updateClient(id, updates) {
@@ -222,10 +222,10 @@ export async function updateClient(id, updates) {
     return _clients.find(c => c.id === id);
   }
   const supabaseUpdates = { ...updates };
-  if (updates.service_notes !== undefined) { supabaseUpdates.notes = updates.service_notes; delete supabaseUpdates.service_notes; }
+  if (updates.service_notes !== undefined) { supabaseUpdates.cleaning_notes = updates.service_notes; delete supabaseUpdates.service_notes; }
   const { data, error } = await supabase.from('clients').update(supabaseUpdates).eq('id', id).select().single();
   if (error) throw error;
-  return { ...data, service_notes: data.notes };
+  return { ...data, service_notes: data.cleaning_notes };
 }
 
 export async function deleteClient(id) {
@@ -259,7 +259,7 @@ export async function loadInvoices() {
       phone: inv.clients.phone,
       email: inv.clients.email,
       rate: inv.clients.rate,
-      service_notes: inv.clients.notes,
+      service_notes: inv.clients.cleaning_notes,
     } : null,
     amount: inv.amount,
     status: inv.status,
@@ -296,7 +296,7 @@ export async function createInvoice(invoice) {
       phone: data.clients.phone,
       email: data.clients.email,
       rate: data.clients.rate,
-      service_notes: data.clients.notes,
+      service_notes: data.clients.cleaning_notes,
     } : null,
     amount: data.amount,
     status: data.status,
