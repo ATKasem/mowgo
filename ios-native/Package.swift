@@ -16,10 +16,6 @@ let package = Package(
             path: "MowFlow",
             resources: [
                 .process("Assets.xcassets"),
-            ],
-            swiftSettings: [
-                .define("SUPABASE_URL_VALUE", to: "\"https://vqgiynfrpsqddjrayczc.supabase.co\""),
-                .define("SUPABASE_ANON_KEY_VALUE", to: "\"sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz\""),
             ]
         ),
     ]
