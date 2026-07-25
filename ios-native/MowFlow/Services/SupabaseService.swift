@@ -89,7 +89,7 @@ final class SupabaseService {
 
     func getCurrentUserId() async throws -> UUID? {
         // Try refresh if token is expired
-        if !isAuthenticated, let rt = refreshToken {
+        if !isAuthenticated, let _ = refreshToken {
             try? await refreshAccessToken()
         }
         guard token != nil else { return nil }
