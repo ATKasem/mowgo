@@ -11,7 +11,7 @@
 
 import Foundation
 
-final class SupabaseService {
+actor SupabaseService {
     static let shared = SupabaseService()
 
     private let baseURL: String
@@ -48,10 +48,10 @@ final class SupabaseService {
         let info = Bundle.main.infoDictionary
         self.baseURL = (info?["SUPABASE_URL"] as? String)
                      ?? (info?["SupabaseURL"] as? String)
-                     ?? "https://vqgiynfrpsqddjrayczc.supabase.co"
+                     ?? ""
         self.anonKey = (info?["SUPABASE_ANON_KEY"] as? String)
                      ?? (info?["SupabaseAnonKey"] as? String)
-                     ?? "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz"
+                     ?? ""
     }
 
     // MARK: - Config check (for preview/testing)
@@ -86,7 +86,7 @@ final class SupabaseService {
         _ = try await request("POST", "/auth/v1/signup", body: body)
     }
 
-    func signOut() {
+    func signOut() async {
         token = nil
         refreshToken = nil
         tokenExpiry = nil
@@ -108,6 +108,10 @@ final class SupabaseService {
     }
 
     // MARK: - Token persistence
+    // TODO: Migrate token storage from UserDefaults to Keychain for production.
+    // UserDefaults are backed up to iCloud and are not encrypted at rest.
+    // Use Security.framework (SecItemAdd/SecItemCopyMatching) or a wrapper
+    // like KeychainAccess to store sb_token and sb_refresh_token securely.
 
     private func saveSession() {
         let defaults = UserDefaults.standard
@@ -144,6 +148,10 @@ final class SupabaseService {
                 tokenExpiry = Date().addingTimeInterval(expiresIn - 300)
             }
             saveSession()
+        } else {
+            // Refresh failed — clear the session
+            await signOut()
+            throw AuthError.sessionExpired
         }
     }
 

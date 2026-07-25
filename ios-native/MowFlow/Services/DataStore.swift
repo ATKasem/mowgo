@@ -84,7 +84,12 @@ final class DataStore: ObservableObject {
         try await updateJob(updated)
     }
 
+    private var isRainDelaying = false
+
     func rainDelay(for date: String) async throws {
+        guard !isRainDelaying else { return }
+        isRainDelaying = true
+        defer { isRainDelaying = false }
         let pending = jobs.filter { $0.scheduledDate == date && $0.status == .scheduled }
         let tomorrow = nextDay(date)
         for var job in pending {

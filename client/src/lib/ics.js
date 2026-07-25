@@ -72,7 +72,7 @@ export function printSchedule(jobs) {
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>MowFlow Schedule</title>
     <style>body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}
-    h1{color:#16a34a}table{width:100%;border-collapse:collapse;margin-top:1rem}
+    h1{color:#22c55e}table{width:100%;border-collapse:collapse;margin-top:1rem}
     th,td{text-align:left;padding:8px 12px;border-bottom:1px solid #e5e7eb}th{background:#f3f4f6;font-weight:600}
     @media print{body{margin:0;padding:1cm}}</style></head>
     <body><h1>🌱 MowFlow Schedule</h1><p>${new Date().toLocaleDateString()}</p>

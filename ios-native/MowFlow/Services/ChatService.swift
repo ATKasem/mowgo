@@ -48,9 +48,17 @@ final class ChatService: ObservableObject {
 
     // MARK: - Send
 
+    /// Maximum messages kept in memory to prevent unbounded growth.
+    private let maxMessages = 100
+
     func send(_ text: String) async {
         let userMsg = ChatMessage(role: .user, content: text)
         messages.append(userMsg)
+        // Cap messages to prevent unbounded memory growth.
+        // Only the most recent 20 are sent to the API for context.
+        if messages.count > maxMessages {
+            messages.removeFirst(messages.count - maxMessages)
+        }
         isLoading = true
         error = nil
 

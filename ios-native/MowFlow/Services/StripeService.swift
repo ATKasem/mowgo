@@ -23,9 +23,18 @@ final class StripeService: ObservableObject {
         Bundle.main.infoDictionary?["StripePublishableKey"] as? String
     }
 
+    /// Cached result of configuration check. Set once on first access
+    /// to avoid setting StripeAPI.defaultPublishableKey on every view render.
+    private var _isConfigured: Bool?
+
     var isConfigured: Bool {
-        guard let key = publishableKey, !key.isEmpty else { return false }
+        if let cached = _isConfigured { return cached }
+        guard let key = publishableKey, !key.isEmpty else {
+            _isConfigured = false
+            return false
+        }
         StripeAPI.defaultPublishableKey = key
+        _isConfigured = true
         return true
     }
 

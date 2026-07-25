@@ -8,7 +8,7 @@ let package = Package(
         .package(url: "https://github.com/stripe/stripe-ios.git", from: "23.0.0"),
     ],
     targets: [
-        .executableTarget(
+        .target(
             name: "MowFlow",
             dependencies: [
                 .product(name: "StripePayments", package: "stripe-ios"),

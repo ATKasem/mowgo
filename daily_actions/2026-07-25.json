@@ -1,0 +1,60 @@
+{
+  "date": "2026-07-25",
+  "action_time": "08:00 CST",
+  "part_of_chain": "2/3 (Scan → 8am Action → 9am Report)",
+  "completed": [
+    {
+      "task": "Fix Mimo bug hunt cron — model deprecated",
+      "status": "done",
+      "detail": "Updated cron eaa76d30f06f model from xiaomi/mimo-v2-flash (deprecated) → xiaomi/mimo-v2.5. Also fixed codebase paths from /opt/data/cleanflow/ → /opt/data/mowflow/ (the old path didn't exist). Cron will run on next 4-hour interval."
+    },
+    {
+      "task": "Fix ICS double-escaped newlines in ics.js",
+      "status": "already_fixed",
+      "detail": "ICS file already has correct '\\n' (newline) and '\\r\\n' (CRLF) — fixed in prior commit ab505a1 (Mimo re-audit). Verified file content."
+    },
+    {
+      "task": "Verify mowflow.pages.dev Solo pricing ($39 vs $49)",
+      "status": "done",
+      "detail": "Site is a SPA (client-side render). Source code consistently shows $39/mo for Solo in Landing.jsx pricing cards and comparison table. The only $49 reference is in Compare.jsx ('Free – $49' price range, intentional). The original pricing card discrepancy was already fixed."
+    },
+    {
+      "task": "Fix code smells — AbortController for weather fetch + touch targets",
+      "status": "already_fixed",
+      "detail": "Home.jsx already has AbortController (line 84) with proper cleanup (line 109: return () => controller.abort()). Invoices.jsx already has min-h-[44px] on filter and action buttons. Fixed in prior Mimo re-audit commits."
+    },
+    {
+      "task": "Fix build regression in Today.jsx — await outside async function",
+      "status": "done",
+      "detail": "reorderWithinDate() on line 145 used 'await' but wasn't async. Added async keyword. Build now passes clean. Regression was likely introduced in the N+1 batch reorder fix (commit ab505a1)."
+    },
+    {
+      "task": "Draft 'Switching from Jobber' content for post-July-31 window",
+      "status": "done",
+      "detail": "Created /opt/data/mowflow/marketing/switching-from-jobber.md with: pricing math, feature comparison table (Jobber Core/Connect vs MowFlow Solo/Crew), 3-person crew cost analysis, social media posts for Twitter/Reddit/LinkedIn, and landing page comparison table. Ready for review/publishing."
+    }
+  ],
+  "in_progress": [
+    {
+      "task": "Reply to hot Reddit leads (5 HIGH-priority threads)",
+      "status": "needs_aaron",
+      "detail": "Suggested replies already in /opt/data/mowflow/leads/reddit-threads.md. Top target: r/CRM 'Help deciding on a CRM for solo lawncare biz' (37 comments, active). Cannot post to Reddit from server without API credentials. Aaron needs to post replies manually or provide Reddit API access."
+    }
+  ],
+  "blocked": [
+    {
+      "task": "iOS native app Xcode deployment (latest ios-native.zip + iOS 17.0 target)",
+      "reason": "needs Mac with Xcode — manual step for Blasian. Latest zip already posted to Discord.",
+      "blocker": "Cannot be automated from server."
+    }
+  ],
+  "meta": {
+    "day": "Saturday",
+    "quick_wins_assessed": 4,
+    "quick_wins_executed": 4,
+    "already_fixed_by_prior_runs": 2,
+    "new_bug_found_and_fixed": 1,
+    "build_status": "passing clean",
+    "up_next_part_3": "9am Report — deliver to Discord"
+  }
+}

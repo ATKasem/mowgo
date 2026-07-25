@@ -4,8 +4,8 @@
   "description": "Simple scheduling, routing, and invoicing for lawn care crews",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#10b981",
+  "background_color": "#061208",
+  "theme_color": "#22c55e",
   "orientation": "portrait-primary",
   "categories": ["business", "productivity"],
   "icons": [

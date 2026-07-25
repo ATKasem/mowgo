@@ -16,6 +16,10 @@ struct Job: Codable, Identifiable, Equatable {
     var clientId: UUID?
     var assignedTo: UUID?
     var title: String
+    // MARK: UTC contract
+    // All date strings MUST be ISO-8601 date-only in UTC (e.g. "2026-07-25").
+    // Comparisons are lexicographic and assume UTC. Never store local-date
+    // strings — the server (Postgres `date` type) always returns UTC.
     var scheduledDate: String        // "2026-07-25"
     var scheduledTime: String?       // "09:00"
     var durationMinutes: Int?
@@ -85,7 +89,12 @@ struct Invoice: Codable, Identifiable, Equatable {
     var userId: UUID?
     var clientId: UUID?
     var jobId: UUID?
+    // WARNING: Double causes floating-point rounding errors for currency.
+    // Prefer amountCents (Int) for all arithmetic. The Supabase schema stores
+    // `amount` as numeric — this field mirrors it for decoding compatibility.
     var amount: Double
+    /// Amount in cents (integer) for safe currency arithmetic.
+    var amountCents: Int { Int((amount * 100).rounded()) }
     var status: InvoiceStatus
     var stripeInvoiceId: String?
     var stripePaymentIntentId: String?

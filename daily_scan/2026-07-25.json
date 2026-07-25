@@ -1,0 +1,84 @@
+{
+  "date": "2026-07-25",
+  "scan_time": "07:00 CST",
+  "threads_scanned": [
+    "1529295018429517935 (build log)",
+    "1529667780440227892 (intel engine)",
+    "1529588592098414602 (sales & leads)",
+    "1529588589422444727 (marketing & launch)",
+    "1529588586314338507 (dev & payments)",
+    "1529716720925675561 (bug hunt)"
+  ],
+  "quick_wins": [
+    {
+      "task": "Fix Mimo bug hunt cron — model deprecated (current model returned 404, migrate to xiaomi/mimo-v2.5-pro)",
+      "source": "bug-hunt (1529716720925675561)",
+      "context": "Cron eaa76d30f06f failed: 'This model has been deprecated. It is recommended to migrate to xiaomi/mimo-v2.5'",
+      "effort": "~5 min — update cron config to new model name"
+    },
+    {
+      "task": "Fix ICS double-escaped newlines — ics.js lines 42 (.join('\\\\\\\\n') for CSV) and 128 (.join('\\\\\\\\r\\\\\\\\n') for ICS return)",
+      "source": "bug-hunt (1529716720925675561)",
+      "context": "Reported in Mimo audit Jul 23-24 reports. Lines produce literal \\n text instead of actual newline/CRLF line endings.",
+      "effort": "~5 min — change '\\\\\\\\n' to '\\n' and '\\\\\\\\r\\\\\\\\n' to '\\r\\n'"
+    },
+    {
+      "task": "Verify mowflow.pages.dev Solo pricing consistency ($39 vs $49)",
+      "source": "dev-payments (1529588586314338507)",
+      "context": "Mimo audit found Landing.jsx pricing card shows $49 while comparison table says $39. Was fixed but verify deploy hasn't regressed.",
+      "effort": "~2 min — curl and check"
+    },
+    {
+      "task": "Drop latest ios-native.zip into Xcode and set minimum deployment target to iOS 17.0",
+      "source": "dev-payments (1529588586314338507)",
+      "context": "Updated zip with paidAt/createdAt fix was sent. Blasian needs to extract and set deployment target to clear 97 errors.",
+      "effort": "~3 min — extract zip, click project settings"
+    }
+  ],
+  "important": [
+    {
+      "task": "Reply to hot Reddit leads — top priority: r/CRM 'Help deciding on a CRM for solo lawncare biz' (37 comments, active, perfect ICP match)",
+      "source": "sales-leads (1529588592098414602)",
+      "context": "5 HIGH-priority threads found Jul 25. Thread #1 is a solo lawn care op saying Jobber/Housecall Pro are overkill. Suggested replies in /opt/data/mowflow/leads/reddit-threads.md",
+      "effort": "~10 min per thread"
+    },
+    {
+      "task": "Create 'Switching from Jobber' landing content — capitalize on post-July-31 promo expiry",
+      "source": "intel-engine (1529667780440227892) + build-log (1529295018429517935)",
+      "context": "Jobber's 40%-off promo expires July 31. After that, MowFlow's $39 Solo vs Jobber's $49 Core is clean again — plus MowFlow includes features Jobber gates behind $139 Connect. Intel Engine recommended this twice.",
+      "effort": "~30 min — landing page copy + comparison table",
+      "deadline": "Before July 31"
+    },
+    {
+      "task": "Publish Jobber vs MowFlow annual cost comparison ($1,788 vs $588 for 3-person crew)",
+      "source": "intel-engine (1529667780440227892)",
+      "context": "Intel already has the math: 3-person crew = $1,788/yr Jobber vs $588/yr MowFlow Solo. Headline-ready.",
+      "effort": "~15 min — blog post or landing page section"
+    },
+    {
+      "task": "Fix code smells from Mimo audit — add AbortController for weather fetch in Home.jsx, fix touch targets below 44px in Invoices.jsx",
+      "source": "bug-hunt (1529716720925675561)",
+      "context": "Multiple Mimo audits reported these. Not critical but accumulate technical debt.",
+      "effort": "~15 min"
+    }
+  ],
+  "blocked": [
+    {
+      "task": "Mimo bug hunt cron broken — model deprecated (xiaomi/mimo-v2.5 → must migrate to xiaomi/mimo-v2.5-pro)",
+      "blocker": "Cron config uses deprecated model ID. Needs cron job update to reference new model.",
+      "resolution": "Quick fix: update the model reference in the cron job config. Can be done in <5 min once accessed."
+    },
+    {
+      "task": "iOS native app can't build in Xcode without manual steps (deployment target + DataStore fix)",
+      "blocker": "Requires Blasian on Mac with Xcode: (1) set minimum deployment to iOS 17.0, (2) ensure latest ios-native.zip is used (paidAt fix applied). Cannot be automated from server.",
+      "resolution": "Latest zip already sent to Discord. Blasian just needs to use that file and set deployment target."
+    }
+  ],
+  "meta": {
+    "day": "Saturday",
+    "part_of_chain": "1/3 (Scan → 8am Action → 9am Report)",
+    "war_chest_updated_last": "2026-07-25 (Intel Engine run #3, Jobber pricing corrections + QuoteIQ/GreenRoute intel)",
+    "reddit_leads_last_fetched": "2026-07-25 08:58 UTC (5 HIGH-priority threads)",
+    "bug_hunt_last_successful": "2026-07-25 06:11 UTC (4 bugs auto-fixed, build clean)"
+  }
+}

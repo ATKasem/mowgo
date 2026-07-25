@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   business_name TEXT,
   phone TEXT,
+  avatar_url TEXT,
   tier TEXT DEFAULT 'solo',
   stripe_customer_id TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
