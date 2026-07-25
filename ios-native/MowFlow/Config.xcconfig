@@ -1,0 +1,16 @@
+// MowFlow.xcconfig
+// Build settings for MowFlow iOS app.
+// Xcode → Project → Info → Configurations → set this file for Debug & Release.
+
+// MARK: - Supabase (custom Info.plist keys via INFOPLIST_KEY_ prefix)
+INFOPLIST_KEY_SUPABASE_URL = https://vqgiynfrpsqddjrayczc.supabase.co
+INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
+
+// MARK: - Stripe
+INFOPLIST_KEY_StripePublishableKey = pk_live_REPLACE_ME
+
+// MARK: - App Info
+PRODUCT_BUNDLE_IDENTIFIER = com.mowflow.app
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
+SWIFT_EMIT_LOC_STRINGS = YES
