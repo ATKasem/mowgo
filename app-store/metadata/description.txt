@@ -1,0 +1,26 @@
+MowFlow is the simplest way for solo lawn care crews to manage their business from their phone. Schedule jobs, plan routes, track clients, and send invoices — all in one app built specifically for lawn care.
+
+WHY MOWFLOW
+Jobber and Housecall Pro are built for big crews at $119+/month. Yardbook is "free" but sells your data. MowFlow is the only app with free rain delay — tap once when it rains, your whole schedule moves. Built for 1-3 person lawn care crews.
+
+FREE TIER: 5 CLIENTS, FOREVER
+• Rain delay auto-reschedule — one tap, done
+• Daily scheduling with drag-and-drop
+• Client profiles — gate codes, pet instructions, mow notes
+• Invoicing with Stripe payments
+• Dark mode built in, works offline
+
+SOLO PLAN — $39/MONTH
+• Unlimited clients & jobs
+• AI Autopilot — chat to manage your CRM
+• GPS route navigation
+• Recurring job automation
+• 14-day free trial
+
+CREW PLAN — $79/MONTH
+• Everything in Solo
+• Job assignment & tracking
+• Team dashboard
+• Priority support
+
+No per-user fees. No contracts. Cancel anytime.
