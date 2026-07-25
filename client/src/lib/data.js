@@ -355,7 +355,11 @@ export async function saveProfile(profile) {
 
   // The row is created by the on_auth_user_created trigger, so this is an
   // update rather than an upsert — no INSERT against profiles is needed.
-  const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+  // Select the result back: an update matching zero rows is not an error, and
+  // silently reporting success would leave the user thinking it saved.
+  const { data, error } = await supabase
+    .from('profiles').update(updates).eq('id', user.id).select().maybeSingle();
   if (error) throw error;
-  return { ...profile, ...updates };
+  if (!data) throw new Error('Profile not found — sign out and back in to recreate it.');
+  return data;
 }

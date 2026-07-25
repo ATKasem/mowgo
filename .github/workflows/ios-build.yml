@@ -55,9 +55,12 @@ jobs:
         working-directory: client
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          # fastlane expects this base64-encoded, not as a raw "user:token" pair.
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.ASC_KEY }}
-        run: bundle exec fastlane ios beta
+        run: |
+          # fastlane expects base64("user:token"); passing the raw pair fails auth.
+          # Derived here so no separately maintained secret can drift out of date.
+          export MATCH_GIT_BASIC_AUTHORIZATION="$(printf 'x-access-token:%s' "$MATCH_GIT_TOKEN" | base64 | tr -d '\n')"
+          bundle exec fastlane ios beta

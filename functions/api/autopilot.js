@@ -31,9 +31,11 @@ const MAX_TOKENS = 1024;
 const TIMEOUT_MS = 20000;
 
 // Bound the proxied payload — the request body is attacker-controlled and
-// every token costs money.
-const MAX_MESSAGES = 40;
-const MAX_TOTAL_CHARS = 24000;
+// every token costs money. Authentication is the real abuse control; these are
+// set generously so a legitimate long conversation (schedule listings run to
+// several KB per tool result) is never cut off by accident.
+const MAX_MESSAGES = 80;
+const MAX_TOTAL_CHARS = 80000;
 
 function allowedOrigins(env) {
   if (env.ALLOWED_ORIGINS) {

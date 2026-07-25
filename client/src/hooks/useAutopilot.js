@@ -67,7 +67,7 @@ export default function useAutopilot() {
         role: 'assistant',
         content: err.message === 'not_configured'
           ? "⚠️ AI Autopilot isn't configured yet. Add your OpenRouter API key to get started."
-          : '⚠️ Something went wrong. Try again in a moment.',
+          : (err.userMessage || '⚠️ Something went wrong. Try again in a moment.'),
         isError: true
       }]);
       setStatus('error');
@@ -104,8 +104,16 @@ export default function useAutopilot() {
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || `API error ${res.status}`);
+        const body = await res.json().catch(() => ({}));
+        if (body.error === 'not_configured') throw new Error('not_configured');
+
+        // The proxy sends actionable text for auth and size limits — show it
+        // rather than collapsing everything into "something went wrong".
+        const err = new Error(body.error || `API error ${res.status}`);
+        err.userMessage = res.status === 401
+          ? '⚠️ Your session expired. Sign in again to keep using Autopilot.'
+          : (body.message || body.error || null);
+        throw err;
       }
 
       const { message, error } = await res.json();

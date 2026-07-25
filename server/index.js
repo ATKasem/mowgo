@@ -15,8 +15,10 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
 app.use(cors({
   origin(origin, cb) {
     // Allow same-origin/non-browser callers (no Origin header) through to auth.
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    return cb(new Error('Not allowed by CORS'));
+    // Disallowed origins get `false` rather than an Error: omitting the CORS
+    // headers is what actually blocks the browser, whereas throwing turns a
+    // rejected preflight into a 500 from the default error handler.
+    cb(null, !origin || ALLOWED_ORIGINS.includes(origin));
   },
 }));
 
@@ -229,6 +231,13 @@ app.post('/api/invoices', auth, async (req, res) => {
   // will not catch a client_id borrowed from another account.
   const client = await ownsClient(req.user.id, client_id);
   if (!client) return res.status(400).json({ error: 'Unknown client' });
+
+  // Same for the optional job reference.
+  if (job_id) {
+    const { data: job } = await supabase
+      .from('jobs').select('id').eq('id', job_id).eq('user_id', req.user.id).maybeSingle();
+    if (!job) return res.status(400).json({ error: 'Unknown job' });
+  }
 
   const { data: invoice, error } = await supabase.from('invoices')
     .insert({ user_id: req.user.id, client_id, job_id, amount: parsedAmount, status: 'unpaid' })
