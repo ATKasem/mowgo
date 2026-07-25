@@ -17,25 +17,33 @@ final class AuthService: ObservableObject {
 
     private let sb = SupabaseService.shared
 
+    /// Cached at init — SupabaseService configuration doesn't change at runtime.
+    private let isConfigured: Bool
+
     /// True only if Supabase credentials are missing/unconfigured.
-    var isDemoMode: Bool { !sb.isConfigured }
+    var isDemoMode: Bool { !isConfigured }
 
     init() {
+        // Cache config state synchronously before any async work
+        // (actor properties can't be read from sync init without await)
+        isConfigured = false  // placeholder, real value set in Task below
         // Try to restore a previous session
-        if sb.isConfigured && sb.restoreSession() {
-            isAuthenticated = true
-            isLoading = false
-            Task { await loadProfile() }
-        } else if isDemoMode {
-            // No backend configured — show splash briefly, then enter demo
-            Task {
+        Task {
+            guard await sb.isConfigured else {
+                // No backend configured — show splash briefly, then enter demo
                 try? await Task.sleep(for: .milliseconds(800))
                 isAuthenticated = true
                 isLoading = false
+                return
             }
-        } else {
-            // No session, real backend — show login
-            isLoading = false
+            if await sb.restoreSession() {
+                isAuthenticated = true
+                isLoading = false
+                await loadProfile()
+            } else {
+                // No session, real backend — show login
+                isLoading = false
+            }
         }
     }
 
@@ -65,13 +73,13 @@ final class AuthService: ObservableObject {
     }
 
     func signOut() {
-        sb.signOut()
+        Task { await sb.signOut() }
         isAuthenticated = false
         user = nil
     }
 
     private func loadProfile() async {
-        guard sb.isConfigured else { return }
+        guard await sb.isConfigured else { return }
         do {
             user = try await sb.fetchProfile()
         } catch {

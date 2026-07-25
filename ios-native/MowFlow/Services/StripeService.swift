@@ -40,7 +40,13 @@ final class StripeService: ObservableObject {
 
     // MARK: - Create PaymentIntent via Supabase Edge Function
 
-    func createPaymentIntent(amount: Int, currency: String = "usd", invoiceId: UUID) async throws -> String {
+    /// Returns both the client secret (for PaymentSheet) and payment intent ID.
+    struct PaymentIntentResult {
+        let clientSecret: String
+        let paymentIntentId: String
+    }
+
+    func createPaymentIntent(amount: Int, currency: String = "usd", invoiceId: UUID) async throws -> PaymentIntentResult {
         let body: [String: Any] = [
             "amount": amount,
             "currency": currency,
@@ -48,10 +54,11 @@ final class StripeService: ObservableObject {
         ]
         let data = try await sb.requestFunction("create-payment-intent", body: body)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let clientSecret = json?["client_secret"] as? String else {
+        guard let clientSecret = json?["client_secret"] as? String,
+              let paymentIntentId = json?["payment_intent_id"] as? String else {
             throw StripeError.noClientSecret
         }
-        return clientSecret
+        return PaymentIntentResult(clientSecret: clientSecret, paymentIntentId: paymentIntentId)
     }
 
     // MARK: - Confirm payment (marks invoice as paid via Edge Function)

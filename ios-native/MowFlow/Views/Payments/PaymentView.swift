@@ -74,18 +74,13 @@ struct PaymentView: View {
         paymentError = nil
         let amountCents = Int(invoice.amount * 100)
         do {
-            let clientSecret = try await stripe.createPaymentIntent(
+            let result = try await stripe.createPaymentIntent(
                 amount: amountCents, invoiceId: invoice.id
             )
-            // TODO: Present StripePaymentSheet here and wait for user confirmation
+            // TODO: Present StripePaymentSheet with result.clientSecret
             // PaymentSheet.IntentConfiguration(mode: .payment(amount: ..., currency: "usd")) { result in ... }
-            // For now, extract the paymentIntentId and verify via edge function
-            let paymentIntentId = clientSecret.components(separatedBy: "_secret_").first ?? ""
-            guard !paymentIntentId.isEmpty else {
-                throw StripeError.paymentFailed("Invalid payment intent ID")
-            }
-            // Confirm with backend (validates with Stripe before marking paid)
-            try await stripe.confirmPayment(invoiceId: invoice.id, paymentIntentId: paymentIntentId)
+            // On successful confirmation, verify via edge function:
+            try await stripe.confirmPayment(invoiceId: invoice.id, paymentIntentId: result.paymentIntentId)
             // Only mark paid AFTER backend confirmation
             try await store.markInvoicePaid(invoice)
             paymentError = nil

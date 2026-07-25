@@ -26,7 +26,7 @@ final class DataStore: ObservableObject {
         isLoading = true
         error = nil
 
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             // No backend — use demo data
             loadDemo()
             isLoading = false
@@ -48,7 +48,7 @@ final class DataStore: ObservableObject {
     // MARK: - Jobs
 
     func createJob(_ job: Job) async throws {
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             jobs.append(job)
             return
         }
@@ -57,7 +57,7 @@ final class DataStore: ObservableObject {
     }
 
     func updateJob(_ job: Job) async throws {
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = job
             }
@@ -70,7 +70,7 @@ final class DataStore: ObservableObject {
     }
 
     func deleteJob(_ job: Job) async throws {
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             jobs.removeAll { $0.id == job.id }
             return
         }
@@ -101,7 +101,7 @@ final class DataStore: ObservableObject {
     // MARK: - Clients
 
     func createClient(_ client: Client) async throws {
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             clients.append(client)
             return
         }
@@ -110,7 +110,7 @@ final class DataStore: ObservableObject {
     }
 
     func updateClient(_ client: Client) async throws {
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = client
             }
@@ -123,7 +123,7 @@ final class DataStore: ObservableObject {
     }
 
     func deleteClient(_ client: Client) async throws {
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             clients.removeAll { $0.id == client.id }
             return
         }
@@ -137,7 +137,7 @@ final class DataStore: ObservableObject {
         var updated = invoice
         updated.status = .paid
         updated.paidAt = ISO8601DateFormatter().string(from: Date())
-        guard sb.isConfigured else {
+        guard await sb.isConfigured else {
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }

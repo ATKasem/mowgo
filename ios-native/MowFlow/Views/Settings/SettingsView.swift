@@ -98,7 +98,6 @@ struct SettingsView: View {
             InfoRow(label: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
             InfoRow(label: "Bundle", value: Bundle.main.bundleIdentifier ?? "com.mowflow.app")
             InfoRow(label: "Made in", value: "OKC 🌾")
-            InfoRow(label: "Backend", value: SupabaseService.shared.isConfigured ? "Connected" : "Demo Mode")
         }
         .padding(16).background(Color(hex: "1f2937")).cornerRadius(16)
     }
