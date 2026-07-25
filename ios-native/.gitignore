@@ -1,5 +1,6 @@
 # Xcode
-*.xcodeproj/
+# Note: .xcodeproj is tracked
+# xcuserdata/ is still excluded below
 *.xcworkspace/
 xcuserdata/
 DerivedData/
