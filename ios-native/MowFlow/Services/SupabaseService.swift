@@ -47,9 +47,17 @@ final class SupabaseService {
     private init() {
         let info = Bundle.main.infoDictionary
         self.baseURL = (info?["SUPABASE_URL"] as? String)
-                     ?? (info?["SupabaseURL"] as? String) ?? ""
+                     ?? (info?["SupabaseURL"] as? String)
+#if SUPABASE_URL_VALUE
+                     ?? String(cString: SUPABASE_URL_VALUE)
+#endif
+                     ?? ""
         self.anonKey = (info?["SUPABASE_ANON_KEY"] as? String)
-                     ?? (info?["SupabaseAnonKey"] as? String) ?? ""
+                     ?? (info?["SupabaseAnonKey"] as? String)
+#if SUPABASE_ANON_KEY_VALUE
+                     ?? String(cString: SUPABASE_ANON_KEY_VALUE)
+#endif
+                     ?? ""
     }
 
     // MARK: - Config check (for preview/testing)
