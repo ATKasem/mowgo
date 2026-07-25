@@ -187,10 +187,12 @@ struct DemoData {
     }
     static func tomorrow() -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: Calendar.current.date(byAdding: .day, value: 1, to: Date())!)
+        guard let d = Calendar.current.date(byAdding: .day, value: 1, to: Date()) else { return "" }
+        return f.string(from: d)
     }
     static func yesterday() -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
+        guard let d = Calendar.current.date(byAdding: .day, value: -1, to: Date()) else { return "" }
+        return f.string(from: d)
     }
 }
