@@ -138,7 +138,11 @@ struct HomeView: View {
 
     private var greeting: String {
         let h = Calendar.current.component(.hour, from: Date())
-        switch h { case 0..<12: "morning"; case 12..<17: "afternoon"; default: "evening" }
+        switch h {
+        case 0..<12: return "morning"
+        case 12..<17: return "afternoon"
+        default: return "evening"
+        }
     }
 
     private struct WeekDay: Hashable {
