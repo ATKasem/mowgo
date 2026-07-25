@@ -1,0 +1,47 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios-native/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ios-native/**'
+  workflow_dispatch:  # manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: ios-native
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        run: sudo xcode-select -switch /Applications/Xcode_16.app
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build (simulator)
+        run: |
+          xcodebuild build \
+            -project MowFlow.xcodeproj \
+            -scheme MowFlow \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            -derivedDataPath build/ \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Archive build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: ios-native/build/Logs/Build/*.xcactivitylog
