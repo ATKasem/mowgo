@@ -6,6 +6,17 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# /api/* is served by Cloudflare Pages Functions (functions/api/**), which
+# Netlify does not run. The SPA catch-all below would otherwise answer those
+# routes with index.html, so requests are only rewritten when they are not API
+# calls. A Netlify deploy still has no backend — treat Cloudflare Pages as the
+# deploy target for anything that needs /api.
+[[redirects]]
+  from = "/api/*"
+  to = "/api/:splat"
+  status = 404
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

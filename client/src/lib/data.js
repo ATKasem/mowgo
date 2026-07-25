@@ -335,13 +335,27 @@ export async function loadProfile() {
   return data;
 }
 
+/**
+ * Fields the account owner may edit. `tier` and `stripe_customer_id` are
+ * deliberately excluded — those are billing state, set from verified Stripe
+ * events, not from the browser.
+ */
+const EDITABLE_PROFILE_FIELDS = ['business_name', 'phone'];
+
 export async function saveProfile(profile) {
   if (isDemoMode()) return profile;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { error } = await supabase.from('profiles').upsert({ id: user.id, ...profile });
+  const updates = {};
+  for (const field of EDITABLE_PROFILE_FIELDS) {
+    if (profile[field] !== undefined) updates[field] = profile[field];
+  }
+
+  // The row is created by the on_auth_user_created trigger, so this is an
+  // update rather than an upsert — no INSERT against profiles is needed.
+  const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
   if (error) throw error;
-  return profile;
+  return { ...profile, ...updates };
 }

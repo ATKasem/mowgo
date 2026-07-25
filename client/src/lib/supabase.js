@@ -12,6 +12,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
+/**
+ * Bearer header for our own /api endpoints, which authenticate the caller
+ * rather than trusting the Origin header. Returns {} when signed out.
+ */
+export async function authHeaders() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : {};
+}
+
 /** Check if we're connected to a real Supabase project */
 export function isDemoMode() {
   // VITE_FORCE_DEMO overrides everything — set on Cloudflare Pages to keep demo accessible

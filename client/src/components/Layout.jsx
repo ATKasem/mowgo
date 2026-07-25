@@ -8,7 +8,7 @@ import {
 import ThemeToggle from './ThemeToggle';
 import InstallPrompt from './InstallPrompt';
 import AutopilotChat from './AutopilotChat';
-import { isCurrentlyOffline } from '../lib/offlineStorage';
+import { isCurrentlyOffline, clearOffline } from '../lib/offlineStorage';
 
 const navItems = [
   { to: '/app', icon: LayoutDashboard, title: 'Home', exact: true },
@@ -38,6 +38,10 @@ export default function Layout() {
     try {
       await supabase.auth.signOut();
     } catch { /* session may already be gone */ }
+    // Drop cached customer data before handing the device to the next user.
+    try {
+      await clearOffline();
+    } catch { /* best effort — never block sign-out */ }
     navigate('/login');
   }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
+import { authHeaders } from '../lib/supabase';
 
 export default function Subscribe() {
   const [searchParams] = useSearchParams();
@@ -13,7 +14,10 @@ export default function Subscribe() {
 
     async function verify() {
       try {
-        const res = await fetch(`/api/stripe/verify-session?session_id=${sessionId}`);
+        const res = await fetch(
+          `/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`,
+          { headers: await authHeaders() }
+        );
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const data = await res.json();
 

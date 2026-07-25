@@ -27,7 +27,7 @@ export const TOOLS = [
   // ── Schedule ──────────────────────────
   {
     name: 'getTodaySchedule',
-    description: "Get all jobs scheduled for today. Shows client names, addresses, times, status, and special notes like gate codes or pet instructions.",
+    description: "Get all jobs scheduled for today. Shows client names, addresses, times, status, pet instructions, and whether a gate or alarm code is on file (the codes themselves stay in the app).",
     parameters: {
       type: 'object', properties: {},
       required: []
@@ -72,7 +72,7 @@ export const TOOLS = [
   // ── Clients ──────────────────────────
   {
     name: 'searchClients',
-    description: "Search for clients by name or address. Returns matching clients with their details: phone, email, address, rate, gate codes, pet instructions, and service notes.",
+    description: "Search for clients by name or address. Returns matching clients with their details: phone, email, address, rate, pet instructions, and service notes.",
     parameters: {
       type: 'object',
       properties: {
@@ -83,7 +83,7 @@ export const TOOLS = [
   },
   {
     name: 'getClientInfo',
-    description: "Get detailed info about a specific client: contact info, address, rate, gate code, pet instructions, alarm code, service notes, recent jobs, and unpaid invoices.",
+    description: "Get detailed info about a specific client: contact info, address, rate, pet instructions, service notes, recent jobs, and unpaid invoices.",
     parameters: {
       type: 'object',
       properties: {
@@ -539,12 +539,17 @@ export async function executeTool(name, args) {
           results.push({ client: group.client?.name, jobs: group.jobs.length, amount });
         }
 
+        // Skipped clients carry a warning and no amount — exclude them from
+        // both the count and the total, or the sum comes out NaN.
+        const invoiced = results.filter(r => typeof r.amount === 'number');
+
         return {
           success: true,
           data: {
             date: invoiceDate,
-            invoiced: results.length,
-            total: results.reduce((sum, r) => sum + r.amount, 0),
+            invoiced: invoiced.length,
+            skipped: results.length - invoiced.length,
+            total: invoiced.reduce((sum, r) => sum + r.amount, 0),
             invoices: results
           }
         };
@@ -563,6 +568,12 @@ export async function executeTool(name, args) {
 // Formatters
 // ──────────────────────────────────────────
 
+/**
+ * Tool results are sent to a third-party LLM provider (OpenRouter → the
+ * configured model). Access credentials for customers' homes must never leave
+ * this device, so we report only whether a code exists — the value itself stays
+ * in the app, where the Clients screen shows it.
+ */
 function formatJob(j) {
   return {
     id: j.id,
@@ -574,9 +585,9 @@ function formatJob(j) {
     status: j.status,
     recurrence: j.recurrence || 'none',
     notes: j.clients?.service_notes || '',
-    gateCode: j.clients?.key_code || null,
+    hasGateCode: Boolean(j.clients?.key_code),
+    hasAlarmCode: Boolean(j.clients?.alarm_code),
     petInstructions: j.clients?.pet_instructions || null,
-    alarmCode: j.clients?.alarm_code || null,
     rate: j.clients?.rate || null
   };
 }
@@ -590,9 +601,9 @@ function formatClient(c) {
     email: c.email,
     rate: c.rate,
     serviceNotes: c.service_notes || '',
-    gateCode: c.key_code || null,
-    petInstructions: c.pet_instructions || null,
-    alarmCode: c.alarm_code || null
+    hasGateCode: Boolean(c.key_code),
+    hasAlarmCode: Boolean(c.alarm_code),
+    petInstructions: c.pet_instructions || null
   };
 }
 
@@ -618,12 +629,12 @@ You have tools to: check the schedule, reschedule jobs (rain delays), look up cl
 - Be friendly and conversational, but efficient — these are busy contractors
 - Never make up data — only report what the tools actually return
 - If you don't have a tool for something, say so honestly
-- Gate codes, alarm codes, and pet instructions are private — only share them when the user specifically asks
+- You never receive gate or alarm codes — tools only tell you whether one exists (hasGateCode / hasAlarmCode). If asked for the value, say it's on the client's card in the Clients tab
 
 ## Lawn Care Context
 - Most clients are on recurring schedules (weekly, biweekly, monthly)
 - Rain delays are common — you'll reschedule jobs a lot
-- The user may ask about "gate codes" or "dogs" — these are in client notes
+- The user may ask about "gate codes" or "dogs" — pet instructions you have; codes you do not, point them to the Clients tab
 - Typical services: Mow, Trim, Edge, Blow, Fertilize, Aerate, Overseed, Leaf cleanup
 - Service rates vary per client (stored in client profile)
 

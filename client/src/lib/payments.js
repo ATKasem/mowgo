@@ -1,3 +1,5 @@
+import { authHeaders } from './supabase';
+
 /**
  * Redirect to Stripe Checkout via Cloudflare Pages Function.
  * The server-side endpoint handles Stripe API calls with the secret key.
@@ -8,11 +10,15 @@ export async function startCheckout(plan) {
   try {
     const res = await fetch('/api/stripe/checkout-subscription', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
       body: JSON.stringify({ plan }),
     });
 
     const data = await res.json();
+
+    if (res.status === 401) {
+      return { error: 'Please sign in before subscribing.' };
+    }
 
     if (data.url) {
       window.location.href = data.url;

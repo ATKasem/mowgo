@@ -1,4 +1,7 @@
-const CACHE_NAME = 'mowflow-v3';
+// Bumped to v4: v3 and earlier cached API responses containing customer data.
+// The activate handler deletes every cache that is not CACHE_NAME, so this
+// rename purges those entries from devices already in the field.
+const CACHE_NAME = 'mowflow-v4';
 const DB_NAME = 'mowflow-offline';
 const DB_VERSION = 1;
 
@@ -58,6 +61,25 @@ self.addEventListener('activate', (event) => {
 });
 
 // ===== Fetch =====
+
+/**
+ * Only the app shell and its static assets are cacheable.
+ *
+ * Responses from /api/* and from Supabase carry customer records — addresses,
+ * phone numbers, gate and alarm codes. Cache Storage is unencrypted, unbounded,
+ * and outlives the session, so anything account-scoped is fetched fresh and
+ * never written to disk.
+ */
+function isCacheable(request, url) {
+  if (request.method !== 'GET') return false;
+  // Same-origin only — never persist third-party or backend responses.
+  if (url.origin !== self.location.origin) return false;
+  if (url.pathname.startsWith('/api/')) return false;
+  // Requests carrying credentials are account-scoped by definition.
+  if (request.headers.has('authorization')) return false;
+  return true;
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
@@ -66,10 +88,12 @@ self.addEventListener('fetch', (event) => {
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
   if (url.hostname === 'm.stripe.network') return;
 
+  const cacheable = isCacheable(event.request, url);
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.ok) {
+        if (cacheable && response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, clone);
@@ -78,6 +102,12 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => {
+        if (!cacheable) {
+          return new Response('Offline — check your connection', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' },
+          });
+        }
         return caches.match(event.request).then((cached) => {
           return cached || new Response('Offline — check your connection', {
             status: 503,
@@ -99,5 +129,20 @@ self.addEventListener('message', (event) => {
     event.waitUntil(dbGet(key).then((val) => {
       if (event.ports?.[0]) event.ports[0].postMessage({ value: val });
     }));
+  } else if (type === 'CLEAR_OFFLINE') {
+    // Called on sign-out so the next user of the device inherits nothing.
+    event.waitUntil(
+      Promise.all([
+        caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))),
+        openDB().then((db) => new Promise((resolve) => {
+          const tx = db.transaction('store', 'readwrite');
+          tx.objectStore('store').clear();
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        })).catch(() => {}),
+      ]).then(() => {
+        if (event.ports?.[0]) event.ports[0].postMessage({ ok: true });
+      })
+    );
   }
 });

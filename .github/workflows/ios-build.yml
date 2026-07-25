@@ -55,7 +55,8 @@ jobs:
         working-directory: client
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: x-access-token:${{ secrets.GITHUB_TOKEN }}
+          # fastlane expects this base64-encoded, not as a raw "user:token" pair.
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.ASC_KEY }}

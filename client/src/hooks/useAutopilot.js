@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { TOOLS, executeTool, SYSTEM_PROMPT } from '../lib/autopilotTools';
+import { authHeaders } from '../lib/supabase';
 
 /**
  * useAutopilot — Manages the AI chat state and LLM ↔ tool execution loop.
@@ -84,7 +85,7 @@ export default function useAutopilot() {
       // Call LLM
       const res = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
