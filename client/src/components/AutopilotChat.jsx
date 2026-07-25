@@ -22,7 +22,7 @@ const QUICK_PROMPTS = [
 ];
 
 export default function AutopilotChat({ compact = false }) {
-  const { messages, status, currentAction, sendMessage, reset, retry } = useAutopilot();
+  const { messages, status, currentAction, sendMessage, reset, retry } = useAutopilot({ compact });
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -113,16 +113,16 @@ export default function AutopilotChat({ compact = false }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Quick prompts (show when only welcome message) */}
+      {/* Quick prompts (show when only welcome message) — more minimal in compact */}
       {messages.length === 1 && messages[0].isWelcome && (
-        <div className="pb-3">
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2 px-1">Try asking:</p>
-          <div className="grid grid-cols-2 gap-2">
-            {QUICK_PROMPTS.map((p, i) => (
+        <div className={compact ? 'pb-2' : 'pb-3'}>
+          {!compact && <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2 px-1">Try asking:</p>}
+          <div className={`${compact ? 'flex flex-wrap gap-1.5' : 'grid grid-cols-2 gap-2'}`}>
+            {QUICK_PROMPTS.slice(0, compact ? 3 : 4).map((p, i) => (
               <button
                 key={i}
                 onClick={() => handleQuickPrompt(p.text)}
-                className="text-left text-xs px-3 py-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-violet-700 dark:hover:text-violet-300 min-h-[44px]"
+                className={`text-left text-xs rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-300 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-3 min-h-[44px]'}`}
               >
                 {p.label}
               </button>
@@ -172,8 +172,8 @@ export default function AutopilotChat({ compact = false }) {
             )}
           </button>
         </div>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2 text-center">
-          AI Autopilot uses your business data to help manage scheduling, invoicing, and clients
+        <p className={`${compact ? 'text-[9px] mt-1.5' : 'text-[10px] mt-2'} text-gray-400 dark:text-gray-500 text-center`}>
+          {compact ? 'Type a command to manage your business' : 'AI Autopilot uses your business data to help manage scheduling, invoicing, and clients'}
         </p>
       </form>
     </div>

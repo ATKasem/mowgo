@@ -176,10 +176,34 @@ If you want to use Gmail instead (e.g., for testing only):
 - The Supabase dashboard needs to be configured manually (steps above)
 - No code changes required — Supabase handles sending through custom SMTP
 
-## Next Steps
+## Current Status (2026-07-25)
 
-1. [ ] Add domain to Resend (or use `onboarding@resend.dev` for testing)
-2. [ ] Configure SMTP in Supabase Dashboard
-3. [ ] Test forgot password flow
+### ✅ Completed
+- [x] Domain `mowflow.app` added to Resend (ID: `d5a10f82-6dd3-41cd-a7cc-fef286dd82d8`)
+- [x] SMTP config updated via Management API:
+  - Host: `smtp.resend.com`, Port: `465`, User: `resend`
+  - Password: Resend API key (set via PATCH, masked in GET)
+  - Sender: `no-reply@mowflow.app` (MowFlow)
+- [x] `site_url` set to `https://mowflow.app`
+- [x] Redirect URLs added: `https://mowflow.app`, `http://localhost:5173`, `http://localhost:3000`
+- [x] Rate limits raised: `rate_limit_email_sent: 60`, `smtp_max_frequency: 30`
+- [x] SMTP connection test passed (both SSL:465 and STARTTLS:587)
+
+### ⏳ Pending: DNS Records (Vercel Dashboard)
+
+Domain is on **Vercel DNS** (`ns1.vercel-dns.com`). Add these 3 records:
+
+| Type | Name | Value | TTL |
+|------|------|-------|-----|
+| TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIbDQEBAQUAA4GNADCBiQKBgQCXRW02JNl+2lXOfxdYBJcLC7NEdfOcEzMVxlfNz7mZxJXSkuIx7VHVa00/mYrOOjuPnhcipTS5zRu4kQtSXUZx+8DqBOVWuR1g0KAPyIUX7RBgxNBG6mhtnoV9yI9K93mvbiMuJcz/HzgobLQhxk9OOgmcbQx6vEbhKJGlJ8oIbwIDAQAB` | Auto |
+| MX | `send` | `feedback-smtp.us-east-1.amazonses.com` (priority 10) | 60 |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` | 60 |
+
+After adding DNS, verify in Resend dashboard → Domains → `mowflow.app` → Verify.
+
+### Next Steps
+
+1. [ ] Add 3 DNS records above in Vercel dashboard
+2. [ ] Verify domain in Resend dashboard
+3. [ ] Test forgot password flow end-to-end
 4. [ ] Verify email deliverability (check spam folder)
-5. [ ] Optionally set up SPF/DKIM/DMARC for domain reputation

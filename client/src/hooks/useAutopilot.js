@@ -27,8 +27,15 @@ const WELCOME_MSG = {
   isWelcome: true
 };
 
-export default function useAutopilot() {
-  const [messages, setMessages] = useState(() => [WELCOME_MSG]);
+export default function useAutopilot({ compact = false } = {}) {
+  const [messages, setMessages] = useState(() => [{
+    id: msgId(),
+    role: 'assistant',
+    content: compact
+      ? "Ask me anything — your schedule, clients, invoices, revenue."
+      : "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
+    isWelcome: true
+  }]);
   const [status, setStatus] = useState('idle'); // idle | thinking | executing | error
   const [currentAction, setCurrentAction] = useState(null); // What the AI is doing right now
   const controllerRef = useRef(null);
@@ -212,7 +219,14 @@ export default function useAutopilot() {
   /** Reset the conversation */
   const reset = useCallback(() => {
     controllerRef.current?.abort();
-    setMessages([{ ...WELCOME_MSG, id: msgId() }]);
+    setMessages([{
+      id: msgId(),
+      role: 'assistant',
+      content: compact
+        ? "Ask me anything — your schedule, clients, invoices, revenue."
+        : "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
+      isWelcome: true
+    }]);
     setStatus('idle');
     setCurrentAction(null);
   }, []);
