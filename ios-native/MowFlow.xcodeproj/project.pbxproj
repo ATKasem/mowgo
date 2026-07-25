@@ -7,240 +7,240 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E35A441DAD887FC3A2C74E42 /* Color+Hex.swift in Sources */ = {
+		8E335D5E6CD64F42B2FAF14A /* Color+Hex.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = AF62B1BC4017057F54555BAE /* Color+Hex.swift */;
+			fileRef = FD571CC6C80B46209DAF98FA /* Color+Hex.swift */;
 		};
-		57832307091FB927BCA11794 /* Models.swift in Sources */ = {
+		4957BC906EE845E6B1B05287 /* Models.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = D216E6C3054321B01C3C6482 /* Models.swift */;
+			fileRef = 29235F7091914556A69C6AC2 /* Models.swift */;
 		};
-		C9B259C4CF26FF588B1F9B99 /* MowFlowApp.swift in Sources */ = {
+		7FCBC68A97494DC0AB95F651 /* MowFlowApp.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = EF693AAE30F5CD695922FEA9 /* MowFlowApp.swift */;
+			fileRef = 49F5D10A75634C46BD7C2EB8 /* MowFlowApp.swift */;
 		};
-		D99169E6EC2FDF00744284D9 /* AuthService.swift in Sources */ = {
+		48670878ADFA429B9E122526 /* AuthService.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 209DE740CC952A1131546744 /* AuthService.swift */;
+			fileRef = E3B68701CD454BA385493CC7 /* AuthService.swift */;
 		};
-		061133DFAB08C06F2F796631 /* ChatService.swift in Sources */ = {
+		64F676436CCB4B19884B5B71 /* ChatService.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = B28B6D31DCD0850D2BBF7784 /* ChatService.swift */;
+			fileRef = 5BDF8700D3854A92BF25C8B3 /* ChatService.swift */;
 		};
-		2C3F8D06E6543EAD5793B234 /* DataStore.swift in Sources */ = {
+		B768B956541946C4BAA5FF32 /* DataStore.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 0BC0E63D87899EC152CC59FD /* DataStore.swift */;
+			fileRef = B96C3999817144C2A6AE24AC /* DataStore.swift */;
 		};
-		1219A19D5D54AA2570DF2B2D /* StripeService.swift in Sources */ = {
+		C5BA1DBFEB0545CFBB1529BC /* StripeService.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 11648032D03BEB1661682FB4 /* StripeService.swift */;
+			fileRef = 6485C87A803646F091D22B51 /* StripeService.swift */;
 		};
-		C72795020704FAEFD18C5C23 /* SupabaseService.swift in Sources */ = {
+		63FED9C401E843ED81D68C2F /* SupabaseService.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 8F83FBB3E21FF6359EE16D92 /* SupabaseService.swift */;
+			fileRef = 7316473EE2FA4EA08B1A4835 /* SupabaseService.swift */;
 		};
-		AFD9D0588BE7692FFEC55563 /* LoginView.swift in Sources */ = {
+		DE0EDAF2C95E44F6BE89B36A /* LoginView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 639962C3344550DFE01DEB2B /* LoginView.swift */;
+			fileRef = 609FC4D29E6E40D68303E573 /* LoginView.swift */;
 		};
-		26755DA8CD954CE13E83860E /* ChatView.swift in Sources */ = {
+		DC47F67BE4B440E99AF7B7E9 /* ChatView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = D10B3158EDF15E5A96BB5BF9 /* ChatView.swift */;
+			fileRef = 0F16F138AD324A4BB2A68AA1 /* ChatView.swift */;
 		};
-		6CF606D16AD1AE6939003650 /* ClientsView.swift in Sources */ = {
+		3E7A5DA547044D07848CC0BA /* ClientsView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = B8BD4E4C41FD3A20823E645B /* ClientsView.swift */;
+			fileRef = 5851CAC6E1DF4E0D93B04F6A /* ClientsView.swift */;
 		};
-		4CD4221648FD4F235E55308E /* NewClientFormView.swift in Sources */ = {
+		2D5B9B2671704E6AB1223C08 /* NewClientFormView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 9469149EC192184C605C1A6A /* NewClientFormView.swift */;
+			fileRef = E2065388B95B4C4288DC4362 /* NewClientFormView.swift */;
 		};
-		6A346559F7266033A53FDA90 /* JobCardView.swift in Sources */ = {
+		8DA2C8E039C446608A1107D9 /* JobCardView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 879ABB8474781D097BCAC9E0 /* JobCardView.swift */;
+			fileRef = BFB79AE742294055A0CBC463 /* JobCardView.swift */;
 		};
-		499BA7931B8B746AA3DE7485 /* MainTabView.swift in Sources */ = {
+		CF78FCEEE150482EABCA4712 /* MainTabView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 2A69D9F9BD14A0AC55B3C661 /* MainTabView.swift */;
+			fileRef = CE2444CB0C874E738202CF8F /* MainTabView.swift */;
 		};
-		1C6F71E58FFE031F186E64F5 /* ReusableViews.swift in Sources */ = {
+		CEA6ADDA02EB4D858D3CC0AA /* ReusableViews.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 4F8430768996916563C04050 /* ReusableViews.swift */;
+			fileRef = A99854736E344556944D2B54 /* ReusableViews.swift */;
 		};
-		1402C91637F3CB46E4E0FEA3 /* HomeView.swift in Sources */ = {
+		974DAEA4B50D4826B31B7610 /* HomeView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 168BED19C455E78E84649CD2 /* HomeView.swift */;
+			fileRef = 21D9662CC32C4D51A88511D7 /* HomeView.swift */;
 		};
-		28CDC438ECBA9875BF916A68 /* InvoicesView.swift in Sources */ = {
+		0AB015D7AC6441A6BD7745A4 /* InvoicesView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 9F6EE075C0BD84B9EA4F9BE7 /* InvoicesView.swift */;
+			fileRef = 27170D81EF364DA0A37978ED /* InvoicesView.swift */;
 		};
-		749917F28BA75B7855C297E1 /* PaymentView.swift in Sources */ = {
+		E326CE52B46A44C5A240D0F1 /* PaymentView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = DB8734D4DE27A598969F15B9 /* PaymentView.swift */;
+			fileRef = E94C11FD301D460DBC7590A1 /* PaymentView.swift */;
 		};
-		0A7751B69DF334302E8C78F6 /* SettingsView.swift in Sources */ = {
+		6BC403B509BB4D8A88753BF9 /* SettingsView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 94F4B94AFB544CFE0A6FBD35 /* SettingsView.swift */;
+			fileRef = 6572B5B2FD1E40CF9D311AFD /* SettingsView.swift */;
 		};
-		D9F436F96275CB9394A2DF17 /* NewJobFormView.swift in Sources */ = {
+		70592973AE2C438A8DE39849 /* NewJobFormView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 724AFBA963A0A6EE19B561EB /* NewJobFormView.swift */;
+			fileRef = A9AD88057BE74546BD14F29F /* NewJobFormView.swift */;
 		};
-		F96408C3C5307554AECC2CE4 /* TodayView.swift in Sources */ = {
+		BFA890BE84D942499855ECFD /* TodayView.swift in Sources */ = {
 			isa = PBXBuildFile;
-			fileRef = 867CC0D01C7A8B6C841EC0B0 /* TodayView.swift */;
+			fileRef = A78D68D70CE34853B9FC44C8 /* TodayView.swift */;
 		};
-		99812033B8BD7CDC0C7E876A /* Assets.xcassets in Resources */ = {
+		D31B76D8EAD94238BA078DA2 /* Assets.xcassets in Resources */ = {
 			isa = PBXBuildFile;
-			fileRef = CC3340C45202B29152467289 /* Assets.xcassets */;
+			fileRef = 7EBCBEE318D44A5D9039AD08 /* Assets.xcassets */;
 		};
-		45383BBD4D9FF8979E22139A /* StripePayments in Frameworks */ = {
+		ACCE19B11E9442BD958B9C5D /* StripePayments in Frameworks */ = {
 			isa = PBXBuildFile;
-			productRef = CEA31008B77646B037783783 /* StripePayments */;
+			productRef = 81E3E9097CCC4A1A9ED65EC5 /* StripePayments */;
 		};
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AF62B1BC4017057F54555BAE /* Color+Hex.swift */ = {
+		FD571CC6C80B46209DAF98FA /* Color+Hex.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = Color+Hex.swift;
 			sourceTree = "<group>";
 		};
-		D216E6C3054321B01C3C6482 /* Models.swift */ = {
+		29235F7091914556A69C6AC2 /* Models.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = Models.swift;
 			sourceTree = "<group>";
 		};
-		EF693AAE30F5CD695922FEA9 /* MowFlowApp.swift */ = {
+		49F5D10A75634C46BD7C2EB8 /* MowFlowApp.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = MowFlowApp.swift;
 			sourceTree = "<group>";
 		};
-		209DE740CC952A1131546744 /* AuthService.swift */ = {
+		E3B68701CD454BA385493CC7 /* AuthService.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = AuthService.swift;
 			sourceTree = "<group>";
 		};
-		B28B6D31DCD0850D2BBF7784 /* ChatService.swift */ = {
+		5BDF8700D3854A92BF25C8B3 /* ChatService.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = ChatService.swift;
 			sourceTree = "<group>";
 		};
-		0BC0E63D87899EC152CC59FD /* DataStore.swift */ = {
+		B96C3999817144C2A6AE24AC /* DataStore.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = DataStore.swift;
 			sourceTree = "<group>";
 		};
-		11648032D03BEB1661682FB4 /* StripeService.swift */ = {
+		6485C87A803646F091D22B51 /* StripeService.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = StripeService.swift;
 			sourceTree = "<group>";
 		};
-		8F83FBB3E21FF6359EE16D92 /* SupabaseService.swift */ = {
+		7316473EE2FA4EA08B1A4835 /* SupabaseService.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = SupabaseService.swift;
 			sourceTree = "<group>";
 		};
-		639962C3344550DFE01DEB2B /* LoginView.swift */ = {
+		609FC4D29E6E40D68303E573 /* LoginView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = LoginView.swift;
 			sourceTree = "<group>";
 		};
-		D10B3158EDF15E5A96BB5BF9 /* ChatView.swift */ = {
+		0F16F138AD324A4BB2A68AA1 /* ChatView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = ChatView.swift;
 			sourceTree = "<group>";
 		};
-		B8BD4E4C41FD3A20823E645B /* ClientsView.swift */ = {
+		5851CAC6E1DF4E0D93B04F6A /* ClientsView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = ClientsView.swift;
 			sourceTree = "<group>";
 		};
-		9469149EC192184C605C1A6A /* NewClientFormView.swift */ = {
+		E2065388B95B4C4288DC4362 /* NewClientFormView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = NewClientFormView.swift;
 			sourceTree = "<group>";
 		};
-		879ABB8474781D097BCAC9E0 /* JobCardView.swift */ = {
+		BFB79AE742294055A0CBC463 /* JobCardView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = JobCardView.swift;
 			sourceTree = "<group>";
 		};
-		2A69D9F9BD14A0AC55B3C661 /* MainTabView.swift */ = {
+		CE2444CB0C874E738202CF8F /* MainTabView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = MainTabView.swift;
 			sourceTree = "<group>";
 		};
-		4F8430768996916563C04050 /* ReusableViews.swift */ = {
+		A99854736E344556944D2B54 /* ReusableViews.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = ReusableViews.swift;
 			sourceTree = "<group>";
 		};
-		168BED19C455E78E84649CD2 /* HomeView.swift */ = {
+		21D9662CC32C4D51A88511D7 /* HomeView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = HomeView.swift;
 			sourceTree = "<group>";
 		};
-		9F6EE075C0BD84B9EA4F9BE7 /* InvoicesView.swift */ = {
+		27170D81EF364DA0A37978ED /* InvoicesView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = InvoicesView.swift;
 			sourceTree = "<group>";
 		};
-		DB8734D4DE27A598969F15B9 /* PaymentView.swift */ = {
+		E94C11FD301D460DBC7590A1 /* PaymentView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = PaymentView.swift;
 			sourceTree = "<group>";
 		};
-		94F4B94AFB544CFE0A6FBD35 /* SettingsView.swift */ = {
+		6572B5B2FD1E40CF9D311AFD /* SettingsView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = SettingsView.swift;
 			sourceTree = "<group>";
 		};
-		724AFBA963A0A6EE19B561EB /* NewJobFormView.swift */ = {
+		A9AD88057BE74546BD14F29F /* NewJobFormView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = NewJobFormView.swift;
 			sourceTree = "<group>";
 		};
-		867CC0D01C7A8B6C841EC0B0 /* TodayView.swift */ = {
+		A78D68D70CE34853B9FC44C8 /* TodayView.swift */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = TodayView.swift;
 			sourceTree = "<group>";
 		};
-		CC3340C45202B29152467289 /* Assets.xcassets */ = {
+		7EBCBEE318D44A5D9039AD08 /* Assets.xcassets */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = folder.assetcatalog;
 			path = Assets.xcassets;
 			sourceTree = "<group>";
 		};
-		4967E8E3E1AB3FC8B7CF789A /* Config.xcconfig */ = {
+		0053E5C2A87E439AABA86E77 /* Config.xcconfig */ = {
 			isa = PBXFileReference;
 			lastKnownFileType = text.xcconfig;
 			path = Config.xcconfig;
 			sourceTree = "<group>";
 		};
-		98FDBAA6D27710DB77A9C0AC /* MowFlow.app */ = {
+		091574F95B0D45378DCB3795 /* MowFlow.app */ = {
 			isa = PBXFileReference;
 			explicitFileType = wrapper.application;
 			includeInIndex = 0;
@@ -250,144 +250,144 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		450B220DE8EEB27904FC3DC4 = {
+		413E90622D7745E5ABCDAAC9 = {
 			isa = PBXGroup;
 			children = (
-				BE8240317E2065AEDB474883 /* MowFlow */,
-				4967E8E3E1AB3FC8B7CF789A /* Config.xcconfig */,
-				9A76A62D587AD0C58292763F /* Products */,
+				86372C46B1254803961929A4 /* MowFlow */,
+				0053E5C2A87E439AABA86E77 /* Config.xcconfig */,
+				B14239B0A0B04C779EA67589 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		9A76A62D587AD0C58292763F = {
+		B14239B0A0B04C779EA67589 = {
 			isa = PBXGroup;
 			children = (
-				98FDBAA6D27710DB77A9C0AC /* MowFlow.app */,
+				091574F95B0D45378DCB3795 /* MowFlow.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BE8240317E2065AEDB474883 = {
+		86372C46B1254803961929A4 = {
 			isa = PBXGroup;
 			children = (
-				AF62B1BC4017057F54555BAE /* Color+Hex.swift */,
-				EF693AAE30F5CD695922FEA9 /* MowFlowApp.swift */,
-				CC3340C45202B29152467289 /* Assets.xcassets */,
-				BA99F69A7ABD808BEE2D55F4 /* Models */,
-				C16C5F61C6E8911A97B3A67C /* Services */,
-				B7AAA3894E69A3FBC1D532D4 /* Views */,
-				4C8917E08F54E03202269CE4 /* Views/Auth */,
-				063E02C25EDBA47812689F17 /* Views/Chat */,
-				E69CA9C939CC09240B5A0A80 /* Views/Clients */,
-				EFF65D8DAADE37EB15DD0526 /* Views/Components */,
-				22DC1D2931A369528DF601BD /* Views/Home */,
-				FFBCAD8F8A9B4B1DDD2795E1 /* Views/Invoices */,
-				ACE9F37303D58BF0FD149DED /* Views/Payments */,
-				B8892A656B3DE346018A3C15 /* Views/Settings */,
-				29648C3D06CE5810C8E97AC6 /* Views/Today */,
+				FD571CC6C80B46209DAF98FA /* Color+Hex.swift */,
+				49F5D10A75634C46BD7C2EB8 /* MowFlowApp.swift */,
+				7EBCBEE318D44A5D9039AD08 /* Assets.xcassets */,
+				8AB1889B5D1A41DCB5F01506 /* Models */,
+				A5E1E7C86FFF4AD4BC6EB01C /* Services */,
+				0D485F194D2640098F37AA3E /* Views */,
+				20B2D0A19D2447C29841FF3C /* Views/Auth */,
+				312CF4B4A9ED4E48A80D41F0 /* Views/Chat */,
+				10247014B02A48988372F469 /* Views/Clients */,
+				C9D92BE6A0C74508BE8D394F /* Views/Components */,
+				2626C26E241F481995B34539 /* Views/Home */,
+				4ED19FC0363D49E180B9621F /* Views/Invoices */,
+				E74FB3958515425F9930AC4C /* Views/Payments */,
+				8B4D96F9076C4853A8AF2C1F /* Views/Settings */,
+				C551F86DD839464C987FC20F /* Views/Today */,
 			);
 			path = MowFlow;
 			sourceTree = "<group>";
 		};
-		BA99F69A7ABD808BEE2D55F4 /* Models */ = {
+		8AB1889B5D1A41DCB5F01506 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				D216E6C3054321B01C3C6482 /* Models.swift */,
+				29235F7091914556A69C6AC2 /* Models.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		C16C5F61C6E8911A97B3A67C /* Services */ = {
+		A5E1E7C86FFF4AD4BC6EB01C /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				209DE740CC952A1131546744 /* AuthService.swift */,
-				B28B6D31DCD0850D2BBF7784 /* ChatService.swift */,
-				0BC0E63D87899EC152CC59FD /* DataStore.swift */,
-				11648032D03BEB1661682FB4 /* StripeService.swift */,
-				8F83FBB3E21FF6359EE16D92 /* SupabaseService.swift */,
+				E3B68701CD454BA385493CC7 /* AuthService.swift */,
+				5BDF8700D3854A92BF25C8B3 /* ChatService.swift */,
+				B96C3999817144C2A6AE24AC /* DataStore.swift */,
+				6485C87A803646F091D22B51 /* StripeService.swift */,
+				7316473EE2FA4EA08B1A4835 /* SupabaseService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		B7AAA3894E69A3FBC1D532D4 /* Views */ = {
+		0D485F194D2640098F37AA3E /* Views */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		4C8917E08F54E03202269CE4 /* Views/Auth */ = {
+		20B2D0A19D2447C29841FF3C /* Views/Auth */ = {
 			isa = PBXGroup;
 			children = (
-				639962C3344550DFE01DEB2B /* LoginView.swift */,
+				609FC4D29E6E40D68303E573 /* LoginView.swift */,
 			);
 			path = Views/Auth;
 			sourceTree = "<group>";
 		};
-		063E02C25EDBA47812689F17 /* Views/Chat */ = {
+		312CF4B4A9ED4E48A80D41F0 /* Views/Chat */ = {
 			isa = PBXGroup;
 			children = (
-				D10B3158EDF15E5A96BB5BF9 /* ChatView.swift */,
+				0F16F138AD324A4BB2A68AA1 /* ChatView.swift */,
 			);
 			path = Views/Chat;
 			sourceTree = "<group>";
 		};
-		E69CA9C939CC09240B5A0A80 /* Views/Clients */ = {
+		10247014B02A48988372F469 /* Views/Clients */ = {
 			isa = PBXGroup;
 			children = (
-				B8BD4E4C41FD3A20823E645B /* ClientsView.swift */,
-				9469149EC192184C605C1A6A /* NewClientFormView.swift */,
+				5851CAC6E1DF4E0D93B04F6A /* ClientsView.swift */,
+				E2065388B95B4C4288DC4362 /* NewClientFormView.swift */,
 			);
 			path = Views/Clients;
 			sourceTree = "<group>";
 		};
-		EFF65D8DAADE37EB15DD0526 /* Views/Components */ = {
+		C9D92BE6A0C74508BE8D394F /* Views/Components */ = {
 			isa = PBXGroup;
 			children = (
-				879ABB8474781D097BCAC9E0 /* JobCardView.swift */,
-				2A69D9F9BD14A0AC55B3C661 /* MainTabView.swift */,
-				4F8430768996916563C04050 /* ReusableViews.swift */,
+				BFB79AE742294055A0CBC463 /* JobCardView.swift */,
+				CE2444CB0C874E738202CF8F /* MainTabView.swift */,
+				A99854736E344556944D2B54 /* ReusableViews.swift */,
 			);
 			path = Views/Components;
 			sourceTree = "<group>";
 		};
-		22DC1D2931A369528DF601BD /* Views/Home */ = {
+		2626C26E241F481995B34539 /* Views/Home */ = {
 			isa = PBXGroup;
 			children = (
-				168BED19C455E78E84649CD2 /* HomeView.swift */,
+				21D9662CC32C4D51A88511D7 /* HomeView.swift */,
 			);
 			path = Views/Home;
 			sourceTree = "<group>";
 		};
-		FFBCAD8F8A9B4B1DDD2795E1 /* Views/Invoices */ = {
+		4ED19FC0363D49E180B9621F /* Views/Invoices */ = {
 			isa = PBXGroup;
 			children = (
-				9F6EE075C0BD84B9EA4F9BE7 /* InvoicesView.swift */,
+				27170D81EF364DA0A37978ED /* InvoicesView.swift */,
 			);
 			path = Views/Invoices;
 			sourceTree = "<group>";
 		};
-		ACE9F37303D58BF0FD149DED /* Views/Payments */ = {
+		E74FB3958515425F9930AC4C /* Views/Payments */ = {
 			isa = PBXGroup;
 			children = (
-				DB8734D4DE27A598969F15B9 /* PaymentView.swift */,
+				E94C11FD301D460DBC7590A1 /* PaymentView.swift */,
 			);
 			path = Views/Payments;
 			sourceTree = "<group>";
 		};
-		B8892A656B3DE346018A3C15 /* Views/Settings */ = {
+		8B4D96F9076C4853A8AF2C1F /* Views/Settings */ = {
 			isa = PBXGroup;
 			children = (
-				94F4B94AFB544CFE0A6FBD35 /* SettingsView.swift */,
+				6572B5B2FD1E40CF9D311AFD /* SettingsView.swift */,
 			);
 			path = Views/Settings;
 			sourceTree = "<group>";
 		};
-		29648C3D06CE5810C8E97AC6 /* Views/Today */ = {
+		C551F86DD839464C987FC20F /* Views/Today */ = {
 			isa = PBXGroup;
 			children = (
-				724AFBA963A0A6EE19B561EB /* NewJobFormView.swift */,
-				867CC0D01C7A8B6C841EC0B0 /* TodayView.swift */,
+				A9AD88057BE74546BD14F29F /* NewJobFormView.swift */,
+				A78D68D70CE34853B9FC44C8 /* TodayView.swift */,
 			);
 			path = Views/Today;
 			sourceTree = "<group>";
@@ -395,13 +395,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		88F56D6A2F90F79D5F551E46 /* MowFlow */ = {
+		27B0C36B61BA4EB9976965F6 /* MowFlow */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 88B610D245C48FE080C8F979 /* Build configuration list for PBXNativeTarget "MowFlow" */;
+			buildConfigurationList = ECD61A8A724C4A49B269DC51 /* Build configuration list for PBXNativeTarget "MowFlow" */;
 			buildPhases = (
-				0998B95F2E75B94331298940 /* Sources */,
-				E07120471D7CAA46DCD94528 /* Frameworks */,
-				90D3309A3EDE29A4CEBB8E14 /* Resources */,
+				387312F9C0EE4BF7B76FF782 /* Sources */,
+				FBA597957BFE432A9EBED179 /* Frameworks */,
+				E284BCB8150E4BC2A00271CC /* Resources */,
 			);
 			buildRules = (
 			);
@@ -409,28 +409,28 @@
 			);
 			name = MowFlow;
 			packageProductDependencies = (
-				CEA31008B77646B037783783 /* StripePayments */,
+				81E3E9097CCC4A1A9ED65EC5 /* StripePayments */,
 			);
 			productName = MowFlow;
-			productReference = 98FDBAA6D27710DB77A9C0AC /* MowFlow.app */;
+			productReference = 091574F95B0D45378DCB3795 /* MowFlow.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+		E31DDF158B3347C3B8FBC4B0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
-					88F56D6A2F90F79D5F551E46 = {
+					27B0C36B61BA4EB9976965F6 = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
-			buildConfigurationList = 171ECEDBB1E323C51A029750 /* Build configuration list for PBXProject "MowFlow" */;
+			buildConfigurationList = 005B87F1F4294FD48B4474B3 /* Build configuration list for PBXProject "MowFlow" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -438,74 +438,74 @@
 				en,
 				Base,
 			);
-			mainGroup = 450B220DE8EEB27904FC3DC4;
+			mainGroup = 413E90622D7745E5ABCDAAC9;
 			packageReferences = (
-				F00E04F44A764A005E3167E4 /* XCRemoteSwiftPackageReference "stripe-ios" */,
+				107024DC49B1424787A4888C /* XCRemoteSwiftPackageReference "stripe-ios" */,
 			);
-			productRefGroup = 9A76A62D587AD0C58292763F /* Products */;
+			productRefGroup = B14239B0A0B04C779EA67589 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				88F56D6A2F90F79D5F551E46 /* MowFlow */,
+				27B0C36B61BA4EB9976965F6 /* MowFlow */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		0998B95F2E75B94331298940 /* Sources */ = {
+		387312F9C0EE4BF7B76FF782 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E35A441DAD887FC3A2C74E42 /* Color+Hex.swift in Sources */,
-				57832307091FB927BCA11794 /* Models.swift in Sources */,
-				C9B259C4CF26FF588B1F9B99 /* MowFlowApp.swift in Sources */,
-				D99169E6EC2FDF00744284D9 /* AuthService.swift in Sources */,
-				061133DFAB08C06F2F796631 /* ChatService.swift in Sources */,
-				2C3F8D06E6543EAD5793B234 /* DataStore.swift in Sources */,
-				1219A19D5D54AA2570DF2B2D /* StripeService.swift in Sources */,
-				C72795020704FAEFD18C5C23 /* SupabaseService.swift in Sources */,
-				AFD9D0588BE7692FFEC55563 /* LoginView.swift in Sources */,
-				26755DA8CD954CE13E83860E /* ChatView.swift in Sources */,
-				6CF606D16AD1AE6939003650 /* ClientsView.swift in Sources */,
-				4CD4221648FD4F235E55308E /* NewClientFormView.swift in Sources */,
-				6A346559F7266033A53FDA90 /* JobCardView.swift in Sources */,
-				499BA7931B8B746AA3DE7485 /* MainTabView.swift in Sources */,
-				1C6F71E58FFE031F186E64F5 /* ReusableViews.swift in Sources */,
-				1402C91637F3CB46E4E0FEA3 /* HomeView.swift in Sources */,
-				28CDC438ECBA9875BF916A68 /* InvoicesView.swift in Sources */,
-				749917F28BA75B7855C297E1 /* PaymentView.swift in Sources */,
-				0A7751B69DF334302E8C78F6 /* SettingsView.swift in Sources */,
-				D9F436F96275CB9394A2DF17 /* NewJobFormView.swift in Sources */,
-				F96408C3C5307554AECC2CE4 /* TodayView.swift in Sources */,
+				8E335D5E6CD64F42B2FAF14A /* Color+Hex.swift in Sources */,
+				4957BC906EE845E6B1B05287 /* Models.swift in Sources */,
+				7FCBC68A97494DC0AB95F651 /* MowFlowApp.swift in Sources */,
+				48670878ADFA429B9E122526 /* AuthService.swift in Sources */,
+				64F676436CCB4B19884B5B71 /* ChatService.swift in Sources */,
+				B768B956541946C4BAA5FF32 /* DataStore.swift in Sources */,
+				C5BA1DBFEB0545CFBB1529BC /* StripeService.swift in Sources */,
+				63FED9C401E843ED81D68C2F /* SupabaseService.swift in Sources */,
+				DE0EDAF2C95E44F6BE89B36A /* LoginView.swift in Sources */,
+				DC47F67BE4B440E99AF7B7E9 /* ChatView.swift in Sources */,
+				3E7A5DA547044D07848CC0BA /* ClientsView.swift in Sources */,
+				2D5B9B2671704E6AB1223C08 /* NewClientFormView.swift in Sources */,
+				8DA2C8E039C446608A1107D9 /* JobCardView.swift in Sources */,
+				CF78FCEEE150482EABCA4712 /* MainTabView.swift in Sources */,
+				CEA6ADDA02EB4D858D3CC0AA /* ReusableViews.swift in Sources */,
+				974DAEA4B50D4826B31B7610 /* HomeView.swift in Sources */,
+				0AB015D7AC6441A6BD7745A4 /* InvoicesView.swift in Sources */,
+				E326CE52B46A44C5A240D0F1 /* PaymentView.swift in Sources */,
+				6BC403B509BB4D8A88753BF9 /* SettingsView.swift in Sources */,
+				70592973AE2C438A8DE39849 /* NewJobFormView.swift in Sources */,
+				BFA890BE84D942499855ECFD /* TodayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E07120471D7CAA46DCD94528 /* Frameworks */ = {
+		FBA597957BFE432A9EBED179 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				45383BBD4D9FF8979E22139A /* StripePayments in Frameworks */,
+				ACCE19B11E9442BD958B9C5D /* StripePayments in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
-		90D3309A3EDE29A4CEBB8E14 /* Resources */ = {
+		E284BCB8150E4BC2A00271CC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				99812033B8BD7CDC0C7E876A /* Assets.xcassets in Resources */,
+				D31B76D8EAD94238BA078DA2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		FE36929CB70328F2965F6490 /* Debug */ = {
+		4EDC641293E541E89B71F97B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -518,17 +518,17 @@
 					"$(inherited)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = MowFlow;
-				INFOPLIST_KEY_CFBundleIdentifier = com.mowflow.app;
-				INFOPLIST_KEY_CFBundleName = MowFlow;
+				INFOPLIST_KEY_CFBundleDisplayName = "MowFlow";
+				INFOPLIST_KEY_CFBundleIdentifier = "com.mowflow.app";
+				INFOPLIST_KEY_CFBundleName = "MowFlow";
 				INFOPLIST_KEY_SUPABASE_URL = "https://vqgiynfrpsqddjrayczc.supabase.co";
 				INFOPLIST_KEY_SUPABASE_ANON_KEY = "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz";
 				INFOPLIST_KEY_StripePublishableKey = "pk_live_REPLACE_ME";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -544,7 +544,7 @@
 			};
 			name = Debug;
 		};
-		36F4BC582F3E2333B1031F6E /* Release */ = {
+		902572D9AC0E497D9494320A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -553,17 +553,17 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = MowFlow;
-				INFOPLIST_KEY_CFBundleIdentifier = com.mowflow.app;
-				INFOPLIST_KEY_CFBundleName = MowFlow;
+				INFOPLIST_KEY_CFBundleDisplayName = "MowFlow";
+				INFOPLIST_KEY_CFBundleIdentifier = "com.mowflow.app";
+				INFOPLIST_KEY_CFBundleName = "MowFlow";
 				INFOPLIST_KEY_SUPABASE_URL = "https://vqgiynfrpsqddjrayczc.supabase.co";
 				INFOPLIST_KEY_SUPABASE_ANON_KEY = "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz";
 				INFOPLIST_KEY_StripePublishableKey = "pk_live_REPLACE_ME";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -579,7 +579,7 @@
 			};
 			name = Release;
 		};
-		C98EF866BB4BEFDA513E70EA /* Debug */ = {
+		5694A7725030494AA131CCFC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -640,7 +640,7 @@
 			};
 			name = Debug;
 		};
-		3B87B266FBCACCE0CE936E20 /* Release */ = {
+		9E4BE681C1A04AD388195020 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -697,20 +697,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		88B610D245C48FE080C8F979 /* Build configuration list for PBXNativeTarget "MowFlow" */ = {
+		ECD61A8A724C4A49B269DC51 /* Build configuration list for PBXNativeTarget "MowFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FE36929CB70328F2965F6490 /* Debug */,
-				36F4BC582F3E2333B1031F6E /* Release */,
+				4EDC641293E541E89B71F97B /* Debug */,
+				902572D9AC0E497D9494320A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		171ECEDBB1E323C51A029750 /* Build configuration list for PBXProject "MowFlow" */ = {
+		005B87F1F4294FD48B4474B3 /* Build configuration list for PBXProject "MowFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C98EF866BB4BEFDA513E70EA /* Debug */,
-				3B87B266FBCACCE0CE936E20 /* Release */,
+				5694A7725030494AA131CCFC /* Debug */,
+				9E4BE681C1A04AD388195020 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -718,7 +718,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		F00E04F44A764A005E3167E4 /* XCRemoteSwiftPackageReference "stripe-ios" */ = {
+		107024DC49B1424787A4888C /* XCRemoteSwiftPackageReference "stripe-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stripe/stripe-ios.git";
 			requirement = {
@@ -729,13 +729,13 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		CEA31008B77646B037783783 /* StripePayments */ = {
+		81E3E9097CCC4A1A9ED65EC5 /* StripePayments */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F00E04F44A764A005E3167E4 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			package = 107024DC49B1424787A4888C /* XCRemoteSwiftPackageReference "stripe-ios" */;
 			productName = StripePayments;
 		};
 /* End XCSwiftPackageProductDependency section */
 
 	};
-	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+	rootObject = E31DDF158B3347C3B8FBC4B0 /* Project object */;
 }
