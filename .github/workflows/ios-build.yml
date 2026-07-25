@@ -14,6 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Configure git for match
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -47,7 +51,6 @@ jobs:
         working-directory: client
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: x-access-token:${{ secrets.GITHUB_TOKEN }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.ASC_KEY }}
