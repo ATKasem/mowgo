@@ -1,14 +1,6 @@
 name: iOS Build + TestFlight
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'client/src/**'
-      - 'client/public/**'
-      - 'client/fastlane/**'
-      - 'client/ios/**'
-      - '.github/workflows/ios-build.yml'
   workflow_dispatch:
 
 permissions:
