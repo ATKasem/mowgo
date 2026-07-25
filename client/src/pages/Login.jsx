@@ -93,13 +93,12 @@ export default function Login() {
           redirectTo: window.location.origin,
         });
         if (resetError) {
-          // Supabase sometimes returns errors with non-string messages
+          // Supabase rate limit errors sometimes return empty objects
           const msg = typeof resetError.message === 'string' && resetError.message.length > 0
             ? resetError.message
-            : resetError.msg || resetError.error_description || JSON.stringify(resetError);
-          // Map rate limit errors to friendly messages
-          if (msg.includes('rate limit') || msg.includes('rate_limit')) {
-            setError('Too many requests. Please wait a moment and try again.');
+            : resetError.msg || resetError.error_description || resetError.code || '';
+          if (!msg || msg === '{}' || msg.includes('rate limit') || msg.includes('rate_limit')) {
+            setError('Too many attempts. Please wait a moment and try again.');
           } else {
             setError(msg);
           }
