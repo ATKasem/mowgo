@@ -66,7 +66,10 @@ export default function Clients({ jobs = [] }) {
       }
       setShowForm(false);
       setEditId(null);
-    } catch (err) { console.error('save client:', err); }
+    } catch (err) {
+      console.error('save client:', err);
+      // TODO: Show user feedback toast
+    }
     setSaving(false);
   }
 
@@ -143,8 +146,8 @@ export default function Clients({ jobs = [] }) {
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{editId ? 'Edit Client' : 'New Client'}</h3>
           <div><label className="label">Name *</label><input placeholder="Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
           <div><label className="label">Address</label><input placeholder="123 Main St, OKC, OK" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
-          <div className="grid grid-cols-2 gap-3"><div><label className="label">Phone</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">Email</label><input placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>
-          <div><label className="label">Rate ($/visit)</label><input type="number" min="0" placeholder="120" value={form.rate} onChange={e => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} className="input" /></div>
+          <div className="grid grid-cols-2 gap-3"><div><label className="label">Phone</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">Email</label><input type="email" placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>
+          <div><label className="label">Rate ($/visit)</label><input type="number" min="0" step="0.01" placeholder="120" value={form.rate} onChange={e => { const v = parseFloat(e.target.value); setForm({ ...form, rate: isNaN(v) ? 0 : Math.max(0, v) }); }} className="input" /></div>
           <div><label className="label">Service Notes</label><textarea placeholder="Focus on front yard..." value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Key Code</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">Alarm Code</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
           <div><label className="label">Pet Instructions</label><input placeholder="1 friendly dog..." value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
@@ -182,7 +185,7 @@ export default function Clients({ jobs = [] }) {
                     {meta?.nextJob && (
                       <span className="badge-info text-[11px]"><Clock className="w-3 h-3" />{meta.nextJob.scheduled_date === new Date().toISOString().split('T')[0] ? 'Today' : new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     )}
-                    <span className="badge-info">${client.rate}</span>
+                    <span className="badge-info">${client.rate ?? 0}</span>
                     <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
                   </div>
                 </div>

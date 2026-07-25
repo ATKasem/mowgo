@@ -80,6 +80,10 @@ export function printSchedule(jobs) {
     <tbody>${rows}</tbody></table></body></html>`;
 
   const w = window.open('', '_blank');
+  if (!w) {
+    alert('Pop-up blocked. Please allow pop-ups for this site and try again.');
+    return;
+  }
   w.document.write(html);
   w.document.close();
   setTimeout(() => w.print(), 500);

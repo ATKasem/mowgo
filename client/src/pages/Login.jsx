@@ -40,7 +40,7 @@ export default function Login() {
       const message = friendlyMessages[errorCode] || decodeURIComponent(errorDesc || errorType);
       setError(message);
       // Clean the hash so refreshing doesn't re-show the error
-      window.history.replaceState({}, '', window.location.pathname + '/#/login');
+      window.history.replaceState({}, '', '/#/login');
       return;
     }
 
@@ -48,7 +48,7 @@ export default function Login() {
     if (hash.includes('type=recovery')) {
       setMode('recovery');
       // Clean the hash so refreshing doesn't re-trigger
-      window.history.replaceState({}, '', window.location.pathname + '/#/login');
+      window.history.replaceState({}, '', '/#/login');
     }
   }, []);
 

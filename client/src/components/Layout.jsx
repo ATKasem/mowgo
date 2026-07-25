@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
@@ -33,6 +33,28 @@ export default function Layout() {
       window.removeEventListener('offline', goOffline);
     };
   }, []);
+
+  // Chat drawer focus trap (WCAG 2.4.3)
+  useEffect(() => {
+    if (!chatOpen) return;
+    const drawer = document.querySelector('[role="dialog"]');
+    if (!drawer) return;
+    const focusable = drawer.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
+    focusable?.[0]?.focus();
+
+    function handleTab(e) {
+      if (e.key !== 'Tab') return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+    drawer.addEventListener('keydown', handleTab);
+    return () => drawer.removeEventListener('keydown', handleTab);
+  }, [chatOpen]);
 
   async function logout() {
     try {
@@ -129,7 +151,7 @@ export default function Layout() {
             onClick={() => setChatOpen(false)}
           />
           {/* Panel — centered compact sheet */}
-          <div className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden"
+          <div role="dialog" aria-modal="true" aria-label="AI assistant" className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden"
                style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             {/* Handle bar + close + reset */}
             <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800">

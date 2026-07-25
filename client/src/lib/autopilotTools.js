@@ -29,8 +29,7 @@ export const TOOLS = [
     name: 'getTodaySchedule',
     description: "Get all jobs scheduled for today. Shows client names, addresses, times, status, and special notes like gate codes or pet instructions.",
     parameters: {
-      type: 'object', properties: {},
-      required: []
+      type: 'object', properties: {}, required: []
     }
   },
   {
@@ -64,15 +63,14 @@ export const TOOLS = [
     description: "Move ALL of today's unfinished (scheduled) jobs to tomorrow. This is the rain delay feature — use when it's raining or about to rain. Tells you how many jobs were moved. SMS notifications not yet available.",
     parameters: {
       type: 'object',
-      properties: {},
-      required: []
+      properties: {}, required: []
     }
   },
 
   // ── Clients ──────────────────────────
   {
     name: 'searchClients',
-    description: "Search for clients by name or address. Returns matching clients with their details: phone, email, address, rate, gate codes, pet instructions, and service notes.",
+    description: "Search for clients by name or address. Returns matching clients with their details: phone, email, address, rate, and service notes.",
     parameters: {
       type: 'object',
       properties: {
@@ -83,7 +81,7 @@ export const TOOLS = [
   },
   {
     name: 'getClientInfo',
-    description: "Get detailed info about a specific client: contact info, address, rate, gate code, pet instructions, alarm code, service notes, recent jobs, and unpaid invoices.",
+    description: "Get detailed info about a specific client: contact info, address, rate, service notes, recent jobs, and unpaid invoices.",
     parameters: {
       type: 'object',
       properties: {
@@ -94,7 +92,7 @@ export const TOOLS = [
   },
   {
     name: 'getClientHistory',
-    description: "Get recent jobs and invoices for a specific client. Shows job history, payment status, and service frequency.",
+    description: "Get recent jobs, invoices, service frequency, and payment history for a specific client. Use this for questions about a client's service history.",
     parameters: {
       type: 'object',
       properties: {
@@ -109,8 +107,7 @@ export const TOOLS = [
     name: 'getUnpaidInvoices',
     description: "List all unpaid invoices. Shows client name, amount owed, and how long it's been outstanding.",
     parameters: {
-      type: 'object', properties: {},
-      required: []
+      type: 'object', properties: {}, required: []
     }
   },
   {
@@ -128,10 +125,9 @@ export const TOOLS = [
   },
   {
     name: 'sendPaymentReminders',
-    description: "Send payment reminder texts to all clients with unpaid invoices. Tells them their balance and includes a payment link. ALWAYS ask for confirmation before sending.",
+    description: "List clients with unpaid invoices so you can follow up with them. SMS integration not yet available — shows who to contact manually.",
     parameters: {
-      type: 'object', properties: {},
-      required: []
+      type: 'object', properties: {}, required: []
     }
   },
 
@@ -166,19 +162,19 @@ export const TOOLS = [
   },
   {
     name: 'updateJobStatus',
-    description: "Mark a job as completed or skipped. Use 'completed' when the job is done (this may trigger invoicing). Use 'skipped' for no-shows or cancellations.",
+    description: "Mark a job as done or reschedule it. Use 'done' when the job is complete (this may trigger invoicing). Use 'scheduled' to reschedule/cancel.",
     parameters: {
       type: 'object',
       properties: {
         jobId: { type: 'string', description: 'Job ID to update' },
-        status: { type: 'string', enum: ['completed', 'skipped'], description: 'New status' }
+        status: { type: 'string', enum: ['done', 'scheduled'], description: 'New status: done or scheduled' }
       },
       required: ['jobId', 'status']
     }
   },
   {
     name: 'invoiceCompletedJobs',
-    description: "Create invoices for all jobs completed today (or on a specific date). Use at end of day after marking jobs as done. This is the 'invoice everything I finished' command.",
+    description: "Create invoices for all jobs completed today (or on a specific date). IMPORTANT: Before calling this tool, list the jobs and amounts and ALWAYS ask for user confirmation. Only call this tool after the user explicitly approves.",
     parameters: {
       type: 'object',
       properties: {
@@ -314,7 +310,7 @@ export async function executeTool(name, args) {
         const allJobs = await loadJobs();
         const clientJobs = allJobs
           .filter(j => j.client_id === client.id || j.clients?.id === client.id)
-          .sort((a, b) => b.scheduled_date?.localeCompare(a.scheduled_date))
+          .sort((a, b) => (b.scheduled_date || '').localeCompare(a.scheduled_date || ''))
           .slice(0, 10);
 
         // Get unpaid invoices
@@ -340,7 +336,61 @@ export async function executeTool(name, args) {
 
       case 'getClientHistory': {
         const { clientName } = args;
-        return executeTool('getClientInfo', { clientName });
+        const clients = await loadClients();
+        const q = clientName.toLowerCase();
+        const client = clients.find(c =>
+          c.name?.toLowerCase().includes(q)
+        );
+        if (!client) return { success: false, error: `No client found matching "${clientName}"` };
+
+        const allJobs = await loadJobs();
+        const clientJobs = allJobs
+          .filter(j => j.client_id === client.id || j.clients?.id === client.id)
+          .sort((a, b) => (b.scheduled_date || '').localeCompare(a.scheduled_date || ''));
+
+        const allInvoices = await loadInvoices();
+        const clientInvoices = allInvoices.filter(
+          inv => inv.clients?.id === client.id
+        );
+
+        // Calculate service frequency
+        const doneJobs = clientJobs.filter(j => j.status === 'done');
+        const serviceDates = doneJobs.map(j => j.scheduled_date).sort();
+        let frequency = 'N/A';
+        if (serviceDates.length >= 2) {
+          const first = new Date(serviceDates[0]);
+          const last = new Date(serviceDates[serviceDates.length - 1]);
+          const daysBetween = (last - first) / (1000 * 60 * 60 * 24);
+          const avgDays = daysBetween / (serviceDates.length - 1);
+          if (avgDays <= 10) frequency = 'Weekly';
+          else if (avgDays <= 18) frequency = 'Biweekly';
+          else if (avgDays <= 35) frequency = 'Monthly';
+          else frequency = `${Math.round(avgDays)} days avg`;
+        }
+
+        const totalRevenue = clientInvoices
+          .filter(inv => inv.status === 'paid')
+          .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+
+        return {
+          success: true,
+          data: {
+            client: formatClient(client),
+            jobCount: clientJobs.length,
+            completedCount: doneJobs.length,
+            frequency,
+            recentJobs: clientJobs.slice(0, 10).map(formatJob),
+            invoices: clientInvoices.map(inv => ({
+              id: inv.id,
+              amount: inv.amount,
+              status: inv.status,
+              created: inv.created_at?.split('T')[0]
+            })),
+            totalRevenue,
+            totalUnpaid: clientInvoices.filter(inv => inv.status === 'unpaid')
+              .reduce((sum, inv) => sum + (inv.amount || 0), 0)
+          }
+        };
       }
 
       // ── Invoices ──────────────────────
@@ -376,6 +426,18 @@ export async function executeTool(name, args) {
           description
         });
 
+        // Send email via Express server (since autopilot creates via Supabase directly)
+        try {
+          const token = (await supabase.auth.getSession()).data.session?.access_token;
+          if (token) {
+            await fetch('/api/invoices/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ invoice_id: invoice.id, client_id: client.id, amount }),
+            });
+          }
+        } catch { /* email failure is non-fatal */ }
+
         return {
           success: true,
           data: {
@@ -399,10 +461,14 @@ export async function executeTool(name, args) {
         return {
           success: true,
           data: {
-            sent: unpaid.length,
-            total: unpaid.reduce((sum, inv) => sum + (inv.amount || 0), 0),
-            clients: unpaid.map(inv => inv.clients?.name).filter(Boolean),
-            note: 'SMS integration pending — reminders would be sent via text with payment links'
+            sent: 0,
+            message: 'SMS integration not available yet. Here are the clients with unpaid invoices — you can contact them manually from the Invoices tab.',
+            clients: unpaid.map(inv => ({
+              name: inv.clients?.name,
+              amount: inv.amount,
+              since: inv.created_at?.split('T')[0],
+            })),
+            totalOwed: unpaid.reduce((sum, inv) => sum + (inv.amount || 0), 0),
           }
         };
       }
@@ -415,6 +481,8 @@ export async function executeTool(name, args) {
         const now = new Date();
 
         let startDate;
+        let endDate = now.toISOString().split('T')[0];
+
         switch (period) {
           case 'week': {
             const d = new Date(now);
@@ -428,9 +496,14 @@ export async function executeTool(name, args) {
             break;
           }
           case 'last_month': {
-            const y = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-            const m = now.getMonth() === 0 ? 12 : now.getMonth();
-            startDate = `${y}-${String(m).padStart(2, '0')}-01`;
+            const d = new Date(now);
+            d.setMonth(d.getMonth() - 1);
+            const ly = d.getFullYear();
+            const lm = d.getMonth(); // 0-indexed
+            startDate = `${ly}-${String(lm + 1).padStart(2, '0')}-01`;
+            // Set endDate to last day of that month
+            const lastDay = new Date(ly, lm + 1, 0).getDate();
+            endDate = `${ly}-${String(lm + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
             break;
           }
           case 'year': {
@@ -441,7 +514,6 @@ export async function executeTool(name, args) {
             startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
         }
 
-        const endDate = now.toISOString().split('T')[0];
         const periodPaid = paid.filter(inv => {
           const d = inv.paid_at?.split('T')[0] || inv.created_at?.split('T')[0];
           return d >= startDate && d <= endDate;
@@ -495,10 +567,13 @@ export async function executeTool(name, args) {
 
       case 'updateJobStatus': {
         const { jobId, status } = args;
-        await updateJobStatus(jobId, status);
+        // Map autopilot statuses to app statuses
+        const statusMap = { completed: 'done', skipped: 'scheduled' };
+        const appStatus = statusMap[status] || status;
+        await updateJobStatus(jobId, appStatus);
         return {
           success: true,
-          data: { jobId, status, message: `Job marked as ${status}` }
+          data: { jobId, status: appStatus, message: `Job marked as ${appStatus}` }
         };
       }
 
@@ -507,7 +582,7 @@ export async function executeTool(name, args) {
         const invoiceDate = date || today();
         const allJobs = await loadJobs();
         const completed = allJobs.filter(
-          j => j.scheduled_date === invoiceDate && j.status === 'completed'
+          j => j.scheduled_date === invoiceDate && (j.status === 'completed' || j.status === 'done')
         );
 
         if (completed.length === 0) {
@@ -560,7 +635,7 @@ export async function executeTool(name, args) {
 }
 
 // ──────────────────────────────────────────
-// Formatters
+// Formatters — redact sensitive PII before sending to LLM
 // ──────────────────────────────────────────
 
 function formatJob(j) {
@@ -574,9 +649,7 @@ function formatJob(j) {
     status: j.status,
     recurrence: j.recurrence || 'none',
     notes: j.clients?.service_notes || '',
-    gateCode: j.clients?.key_code || null,
-    petInstructions: j.clients?.pet_instructions || null,
-    alarmCode: j.clients?.alarm_code || null,
+    // Gate codes, alarm codes, pet instructions redacted — user can ask for them explicitly
     rate: j.clients?.rate || null
   };
 }
@@ -590,9 +663,7 @@ function formatClient(c) {
     email: c.email,
     rate: c.rate,
     serviceNotes: c.service_notes || '',
-    gateCode: c.key_code || null,
-    petInstructions: c.pet_instructions || null,
-    alarmCode: c.alarm_code || null
+    // Sensitive fields (key_code, alarm_code) redacted — user can ask for them explicitly
   };
 }
 
@@ -619,6 +690,7 @@ You have tools to: check the schedule, reschedule jobs (rain delays), look up cl
 - Never make up data — only report what the tools actually return
 - If you don't have a tool for something, say so honestly
 - Gate codes, alarm codes, and pet instructions are private — only share them when the user specifically asks
+- For invoiceCompletedJobs: ALWAYS list the jobs and amounts first and ask for user confirmation before creating invoices
 
 ## Lawn Care Context
 - Most clients are on recurring schedules (weekly, biweekly, monthly)

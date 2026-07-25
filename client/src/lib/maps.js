@@ -12,6 +12,6 @@ export function getMapsUrl(address) {
   const isAndroid = /Android/.test(ua);
 
   if (isIOS || isMac) return `https://maps.apple.com/?q=${q}`;
-  if (isAndroid) return `geo:0,0?q=${q}`; // opens Google Maps app natively
+  if (isAndroid) return `https://www.google.com/maps/search/?api=1&query=${q}`;
   return `https://maps.google.com/?q=${q}`; // web fallback
 }

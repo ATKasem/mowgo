@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
 import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
+import { supabase } from '../lib/supabase';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
@@ -54,7 +55,11 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       if (newJob) {
         setJobs(prev => [newJob, ...prev]);
       }
-    } catch (err) { console.error('createJob:', err); }
+    } catch (err) {
+      console.error('createJob:', err);
+      setCompletedToast({ name: 'Failed to create job — try again', amount: 0, type: 'error' });
+      setTimeout(() => setCompletedToast(null), 4000);
+    }
     setSaving(false);
     setShowForm(false);
     setForm(INITIAL_JOB_FORM);
@@ -137,7 +142,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     updated.splice(toIdx, 0, moved);
   }
 
-  function reorderWithinDate(prev, fromJobId, toJobId, currentDate) {
+  async function reorderWithinDate(prev, fromJobId, toJobId, currentDate) {
     const updated = [...prev];
     // Get date-scoped indices (relative to full array)
     const dateJobs = updated.filter(j => j.scheduled_date === currentDate);
@@ -156,14 +161,18 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         updated[i] = { ...updated[i], route_order: order++ };
       }
     }
-    // Persist reordered jobs
-    updated.forEach(j => {
-      if (j.scheduled_date === currentDate) {
-        updateJob(j.id, { route_order: j.route_order }).catch(err => {
-          console.error('reorderWithinDate: failed to persist', j.id, err);
-        });
-      }
-    });
+    // Persist reordered jobs — use batch endpoint instead of N+1
+    const token = (await supabase.auth.getSession()).data.session?.access_token;
+    if (token) {
+      const updates = updated
+        .filter(j => j.scheduled_date === currentDate)
+        .map(j => ({ id: j.id, route_order: j.route_order }));
+      fetch('/api/jobs/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ orders: updates }),
+      }).catch(err => console.error('reorderWithinDate: batch persist failed', err));
+    }
     return updated;
   }
 
@@ -225,7 +234,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         <div className="mb-5">
           <button
             onClick={() => {
-              const toMove = filtered.filter(j => j.status !== 'done');
+              const toMove = filtered.filter(j => j.status !== 'done' && j.scheduled_date === date);
               if (toMove.length === 0) return;
               if (!window.confirm(`Move ${toMove.length} job${toMove.length > 1 ? 's' : ''} to tomorrow?`)) return;
               const tomorrow = new Date(date);

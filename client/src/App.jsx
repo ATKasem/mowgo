@@ -1,4 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import React from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
@@ -77,6 +78,28 @@ function RequireAuth({ children }) {
   return children;
 }
 
+// ===== Error Boundary =====
+class ErrorBoundary extends React.Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-8">
+          <div className="text-center max-w-md">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Something went wrong</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">{this.state.error.message}</p>
+            <button onClick={() => window.location.reload()} className="btn-primary">
+              Reload App
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // ===== Supabase Error Redirect =====
 // When Supabase redirects back with error params (expired/invalid reset link),
 // the hash may not include a route path (e.g. #error=access_denied&...).
@@ -131,6 +154,7 @@ export default function App() {
   }, []);
 
   return (
+    <ErrorBoundary>
     <HashRouter>
       <AuthProvider>
         <SupabaseErrorRedirect />
@@ -161,5 +185,6 @@ export default function App() {
         </Routes>
       </AuthProvider>
     </HashRouter>
+    </ErrorBoundary>
   );
 }

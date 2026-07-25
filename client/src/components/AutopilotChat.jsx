@@ -90,8 +90,8 @@ export default function AutopilotChat({ compact = false }) {
 
       {/* Messages */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto py-4 space-y-3 overscroll-contain">
-        {messages.filter(m => !m.isToolResult).map((msg, i) => (
-          <MessageBubble key={msg.id} msg={msg} messages={messages} index={i} />
+        {messages.filter(m => !m.isToolResult).map((msg) => (
+          <MessageBubble key={msg.id} msg={msg} messages={messages} index={messages.indexOf(msg)} />
         ))}
 
         {/* Typing indicator */}

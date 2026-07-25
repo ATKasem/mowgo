@@ -20,13 +20,6 @@ const MAX_LOOP = 5; // Prevent infinite tool call loops
 let _msgId = 0;
 function msgId() { return ++_msgId; }
 
-const WELCOME_MSG = {
-  id: msgId(),
-  role: 'assistant',
-  content: "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
-  isWelcome: true
-};
-
 export default function useAutopilot({ compact = false } = {}) {
   const [messages, setMessages] = useState(() => [{
     id: msgId(),
@@ -41,9 +34,15 @@ export default function useAutopilot({ compact = false } = {}) {
   const controllerRef = useRef(null);
   const sendMessageRef = useRef(null);
 
+  // Refs that always hold the latest values — prevents stale closures in async callbacks
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
   /** Send a user message and run the LLM loop */
   const sendMessage = useCallback(async (userText) => {
-    if (!userText.trim() || status !== 'idle') return;
+    if (!userText.trim() || statusRef.current !== 'idle') return;
 
     // Abort any in-flight request
     controllerRef.current?.abort();
@@ -56,7 +55,7 @@ export default function useAutopilot({ compact = false } = {}) {
     setCurrentAction(null);
 
     // Build conversation history for LLM (exclude UI metadata like isWelcome)
-    const conversationHistory = [...messages, userMsg].map(m => ({
+    const conversationHistory = [...messagesRef.current, userMsg].map(m => ({
       role: m.role,
       content: m.content,
       ...(m.tool_calls ? { tool_calls: m.tool_calls } : {}),
@@ -78,7 +77,7 @@ export default function useAutopilot({ compact = false } = {}) {
       }]);
       setStatus('error');
     }
-  }, [messages, status]);
+  }, []); // stable — uses refs instead of closed-over state
 
   /** Core LLM loop: send → receive → execute tools → repeat */
   async function runLLMLoop(history, signal) {
@@ -229,7 +228,7 @@ export default function useAutopilot({ compact = false } = {}) {
     }]);
     setStatus('idle');
     setCurrentAction(null);
-  }, []);
+  }, [compact]);
 
   /** Retry last errored request — find the last user message and re-send it */
   const retry = useCallback(() => {
@@ -237,6 +236,7 @@ export default function useAutopilot({ compact = false } = {}) {
     const send = sendMessageRef.current;
     if (!send) return;
 
+    let lastUserText = null;
     // Remove the last error message, then find and re-send last user message
     setMessages(prev => {
       const last = prev[prev.length - 1];
@@ -244,15 +244,16 @@ export default function useAutopilot({ compact = false } = {}) {
       // Find the most recent user message
       for (let i = cleaned.length - 1; i >= 0; i--) {
         if (cleaned[i].role === 'user') {
-          const text = cleaned[i].content;
-          // Remove that user message from state so it gets re-added fresh
-          const withoutLastUser = cleaned.slice(0, i);
-          setTimeout(() => send(text), 0);
-          return withoutLastUser;
+          lastUserText = cleaned[i].content;
+          return cleaned.slice(0, i);
         }
       }
       return cleaned;
     });
+    // Use ref to avoid stale closure — send outside setState
+    if (lastUserText) {
+      setTimeout(() => send(lastUserText), 0);
+    }
   }, []);
 
   // Keep ref current

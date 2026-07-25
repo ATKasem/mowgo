@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mowflow-v3';
+const CACHE_NAME = 'mowflow-v4';
 const DB_NAME = 'mowflow-offline';
 const DB_VERSION = 1;
 
@@ -65,6 +65,14 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
   if (url.hostname === 'm.stripe.network') return;
+
+  // Don't cache Supabase API calls, auth endpoints, or dynamic API responses
+  if (url.pathname.startsWith('/rest/') ||
+      url.pathname.startsWith('/auth/') ||
+      url.pathname.startsWith('/api/') ||
+      url.hostname.includes('supabase')) {
+    return; // Let the browser handle these normally — no caching
+  }
 
   event.respondWith(
     fetch(event.request)

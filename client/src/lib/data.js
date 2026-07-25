@@ -341,7 +341,11 @@ export async function saveProfile(profile) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { error } = await supabase.from('profiles').upsert({ id: user.id, ...profile });
+  const { business_name, phone, avatar_url } = profile;
+  const { error } = await supabase.from('profiles').upsert({
+    id: user.id,
+    business_name, phone, avatar_url,
+  });
   if (error) throw error;
-  return profile;
+  return { business_name, phone, avatar_url };
 }

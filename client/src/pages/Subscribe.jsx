@@ -13,12 +13,14 @@ export default function Subscribe() {
 
     async function verify() {
       try {
-        const res = await fetch(`/api/stripe/verify-session?session_id=${sessionId}`);
+        const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`);
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const data = await res.json();
 
         if (data.status === 'complete' && data.payment_status === 'paid') {
           setStatus('success');
+          // Clear session ID from URL to prevent leaks
+          window.history.replaceState({}, '', window.location.pathname);
         } else if (data.status === 'complete' && data.payment_status === 'unpaid') {
           // Trial — subscription created but no payment yet
           setStatus('success');

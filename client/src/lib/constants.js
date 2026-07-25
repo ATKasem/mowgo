@@ -18,6 +18,12 @@ export const STATUS_CONFIG = {
     label: 'Done',
     dot: 'bg-emerald-500',
   },
+  skipped: {
+    bg: 'bg-gray-50 dark:bg-gray-950/30 border-gray-200 dark:border-gray-800',
+    badge: 'badge-ghost',
+    label: 'Skipped',
+    dot: 'bg-gray-400',
+  },
 };
 
 export const INVOICE_STATUS = {
