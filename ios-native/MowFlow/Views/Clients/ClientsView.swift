@@ -103,7 +103,9 @@ struct ClientCard: View {
             if isExpanded {
                 VStack(alignment: .leading, spacing: 8) {
                     if let phone = client.phone {
-                        Link(destination: URL(string: "tel:\(phone.replacingOccurrences(of: " ", with: ""))")!) {
+                        Button {
+                            callPhone(phone)
+                        } label: {
                             DetailRow(icon: "phone", text: phone)
                         }
                     }
@@ -137,6 +139,16 @@ struct ClientCard: View {
     private func openMaps(_ address: String) {
         let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         if let url = URL(string: "maps://?q=\(encoded)") {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    private func callPhone(_ phone: String) {
+        let cleaned = phone.replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: "(", with: "")
+            .replacingOccurrences(of: ")", with: "")
+        if let url = URL(string: "tel:\(cleaned)") {
             UIApplication.shared.open(url)
         }
     }

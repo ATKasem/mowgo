@@ -41,11 +41,15 @@ final class SupabaseService {
     }
 
     // MARK: - Init (reads from Info.plist)
-
+    //  Xcode with GENERATE_INFOPLIST_FILE strips the INFOPLIST_KEY_ prefix,
+    //  so INFOPLIST_KEY_SUPABASE_URL → Info.plist key "SUPABASE_URL".
+    //  We check both formats for backward compatibility.
     private init() {
         let info = Bundle.main.infoDictionary
-        self.baseURL = (info?["SupabaseURL"] as? String) ?? ""
-        self.anonKey = (info?["SupabaseAnonKey"] as? String) ?? ""
+        self.baseURL = (info?["SUPABASE_URL"] as? String)
+                     ?? (info?["SupabaseURL"] as? String) ?? ""
+        self.anonKey = (info?["SUPABASE_ANON_KEY"] as? String)
+                     ?? (info?["SupabaseAnonKey"] as? String) ?? ""
     }
 
     // MARK: - Config check (for preview/testing)

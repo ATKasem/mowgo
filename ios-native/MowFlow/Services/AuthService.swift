@@ -27,9 +27,12 @@ final class AuthService: ObservableObject {
             isLoading = false
             Task { await loadProfile() }
         } else if isDemoMode {
-            // No backend configured — allow demo access immediately
-            isAuthenticated = true
-            isLoading = false
+            // No backend configured — show splash briefly, then enter demo
+            Task {
+                try? await Task.sleep(for: .milliseconds(800))
+                isAuthenticated = true
+                isLoading = false
+            }
         } else {
             // No session, real backend — show login
             isLoading = false

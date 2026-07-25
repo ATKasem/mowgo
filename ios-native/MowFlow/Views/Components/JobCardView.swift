@@ -81,12 +81,5 @@ struct JobCardView: View {
         .padding(12)
         .background(Color(hex: "1f2937"))
         .cornerRadius(12)
-        .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                // Delete action would go here
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-        }
     }
 }
