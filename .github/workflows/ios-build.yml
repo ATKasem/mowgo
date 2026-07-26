@@ -45,7 +45,7 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
-        working-directory: client
+          working-directory: client
 
       - name: Build + Upload to TestFlight
         working-directory: client
