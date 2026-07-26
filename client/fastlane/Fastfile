@@ -23,6 +23,8 @@ platform :ios do
       scheme: "App",
       export_method: "app-store",
       output_directory: "build",
+      skip_package_dependencies_resolution: true,
+      clean: false,
     )
 
     # Upload to TestFlight
