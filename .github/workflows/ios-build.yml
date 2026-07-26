@@ -44,8 +44,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          working-directory: client
           bundler-cache: true
+        working-directory: client
 
       - name: Build + Upload to TestFlight
         working-directory: client
