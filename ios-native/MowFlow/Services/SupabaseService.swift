@@ -299,7 +299,8 @@ actor SupabaseService {
 
     func fetch<T: Decodable>(_ table: String, query: [String: String] = [:]) async throws -> [T] {
         var q = query
-        if let uid = try? await getCurrentUserId(), table != "profiles" {
+        if table != "profiles" {
+            guard let uid = try await getCurrentUserId() else { return [] }
             q["user_id"] = "eq.\(uid.uuidString)"
         }
         var path = "/rest/v1/\(table)?select=*"

@@ -104,11 +104,17 @@ struct PaymentView: View {
                 switch result {
                 case .completed:
                     Task {
-                        try? await self.stripe.confirmPayment(
-                            invoiceId: self.invoice.id,
-                            paymentIntentId: paymentId
-                        )
-                        try? await self.store.markInvoicePaid(self.invoice)
+                        do {
+                            try await self.stripe.confirmPayment(
+                                invoiceId: self.invoice.id,
+                                paymentIntentId: paymentId
+                            )
+                            try await self.store.markInvoicePaid(self.invoice)
+                        } catch {
+                            await MainActor.run {
+                                self.paymentError = "Payment succeeded but recording failed: \(error.localizedDescription). Please try again or contact support."
+                            }
+                        }
                     }
                 case .canceled:
                     self.paymentError = "Payment was canceled."

@@ -129,6 +129,9 @@ final class DataStore: ObservableObject {
     // MARK: - Jobs
 
     func createJob(_ job: Job) async throws {
+        guard let clientId = job.clientId else {
+            throw DataStoreError.clientRequired
+        }
         guard await sb.isConfigured else {
             jobs.append(job)
             return
@@ -136,9 +139,6 @@ final class DataStore: ObservableObject {
         do {
             guard let userId = try await sb.getCurrentUserId() else {
                 throw DataStoreError.authenticationRequired
-            }
-            guard let clientId = job.clientId else {
-                throw DataStoreError.clientRequired
             }
             let created: Job = try await sb.insert("jobs", JobInsert(
                 id: job.id,
@@ -155,8 +155,10 @@ final class DataStore: ObservableObject {
                 routeOrder: job.routeOrder,
                 isRecurring: job.isRecurring,
                 recurrenceRule: job.recurrenceRule
-            ))
-            jobs.append(created)
+            )) 
+            if !jobs.contains(where: { $0.id == created.id }) {
+                jobs.append(created)
+            }
         } catch {
             self.error = error.localizedDescription
             throw error
@@ -260,8 +262,10 @@ final class DataStore: ObservableObject {
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
                 petInstructions: client.petInstructions
-            ))
-            clients.append(created)
+            )) 
+            if !clients.contains(where: { $0.id == created.id }) {
+                clients.append(created)
+            }
         } catch {
             self.error = error.localizedDescription
             throw error
@@ -321,8 +325,10 @@ final class DataStore: ObservableObject {
 
     private func nextDay(_ date: String) -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        f.calendar = Calendar(identifier: .gregorian)
+        f.timeZone = TimeZone(secondsFromGMT: 0)!
         guard let d = f.date(from: date) else { return date }
-        guard let next = Calendar.current.date(byAdding: .day, value: 1, to: d) else { return date }
+        guard let next = f.calendar!.date(byAdding: .day, value: 1, to: d) else { return date }
         return f.string(from: next)
     }
 
