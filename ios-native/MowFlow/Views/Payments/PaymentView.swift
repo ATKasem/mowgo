@@ -83,7 +83,7 @@ struct PaymentView: View {
             // without charging the customer's card.
             let intentConfig = PaymentSheet.IntentConfiguration(
                 mode: .payment(amount: amountCents, currency: "usd"),
-                confirmHandler: { intentParams in
+                confirmHandler: { paymentMethod, shouldSavePaymentMethod, intentCreationCallback in
                     // Confirm the PaymentIntent on our server
                     Task { @MainActor in
                         do {
@@ -91,9 +91,9 @@ struct PaymentView: View {
                                 invoiceId: self.invoice.id,
                                 paymentIntentId: result.paymentIntentId
                             )
-                            intentParams.confirm()
+                            intentCreationCallback(.success(result.paymentIntentId))
                         } catch {
-                            intentParams.cancel()
+                            intentCreationCallback(.failure(error))
                         }
                     }
                 }
