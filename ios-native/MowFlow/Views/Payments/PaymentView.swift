@@ -10,7 +10,7 @@ import StripePayments
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
-    @StateObject private var stripe = StripeService.shared
+    @ObservedObject private var stripe = StripeService.shared
     @State private var showingCheckout = false
     @State private var checkoutURL: URL?
     @State private var paymentError: String?
@@ -72,18 +72,57 @@ struct PaymentView: View {
             return
         }
         paymentError = nil
-        let amountCents = Int(invoice.amount * 100)
+        let amountCents = Int((invoice.amount * 100).rounded())
         do {
             let result = try await stripe.createPaymentIntent(
                 amount: amountCents, invoiceId: invoice.id
             )
-            // TODO: Present StripePaymentSheet with result.clientSecret
-            // PaymentSheet.IntentConfiguration(mode: .payment(amount: ..., currency: "usd")) { result in ... }
-            // On successful confirmation, verify via edge function:
-            try await stripe.confirmPayment(invoiceId: invoice.id, paymentIntentId: result.paymentIntentId)
-            // Only mark paid AFTER backend confirmation
-            try await store.markInvoicePaid(invoice)
-            paymentError = nil
+            // CRITICAL FIX: Present PaymentSheet to actually collect payment.
+            // The previous TODO skipped PaymentSheet and marked invoices paid
+            // without charging the customer's card.
+            let intentConfig = PaymentSheet.IntentConfiguration(
+                mode: .payment(amount: amountCents, currency: "usd"),
+                confirmHandler: { intentParams in
+                    // Confirm the PaymentIntent on our server
+                    Task { @MainActor in
+                        do {
+                            try await self.stripe.confirmPayment(
+                                invoiceId: self.invoice.id,
+                                paymentIntentId: result.paymentIntentId
+                            )
+                            intentParams.confirm()
+                        } catch {
+                            intentParams.cancel()
+                        }
+                    }
+                }
+            )
+            var config = PaymentSheet.Configuration()
+            config.merchantDisplayName = "MowFlow"
+            let paymentSheet = PaymentSheet(
+                intentConfiguration: intentConfig,
+                configuration: config
+            )
+            // Present from the key window's root view controller
+            guard let windowScene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene }).first,
+                  let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?
+                    .rootViewController else {
+                paymentError = "Could not present payment sheet."
+                return
+            }
+            paymentSheet.present(from: rootVC) { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .completed:
+                    Task { try? await self.store.markInvoicePaid(self.invoice) }
+                case .canceled:
+                    self.paymentError = "Payment was canceled."
+                case .failed(let error):
+                    self.paymentError = error.localizedDescription
+                }
+            }
+            return  // PaymentSheet handles the rest via its completion handler
         } catch {
             paymentError = error.localizedDescription
         }
@@ -99,7 +138,7 @@ struct SubscriptionPlanCard: View {
     let tier: String
     let isCurrent: Bool
 
-    @StateObject private var stripe = StripeService.shared
+    @ObservedObject private var stripe = StripeService.shared
     @State private var isPurchasing = false
     @State private var error: String?
 

@@ -69,10 +69,10 @@ final class AuthService: ObservableObject {
         isLoading = false
     }
 
-    func signOut() {
-        Task { await sb.signOut() }
+    func signOut() async {
         isAuthenticated = false
         user = nil
+        await sb.signOut()
     }
 
     private func loadProfile() async {

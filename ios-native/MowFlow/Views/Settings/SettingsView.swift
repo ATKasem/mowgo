@@ -35,7 +35,7 @@ struct SettingsView: View {
                 SubscriptionView()
             }
             .alert("Sign Out", isPresented: $showingSignOut) {
-                Button("Sign Out", role: .destructive) { auth.signOut() }
+                Button("Sign Out", role: .destructive) { Task { await auth.signOut() } }
                 Button("Cancel", role: .cancel) {}
             } message: { Text("You'll need to sign in again.") }
         }

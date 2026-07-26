@@ -125,6 +125,7 @@ struct NewClientFormView: View {
             petInstructions: petInstructions.isEmpty ? nil : petInstructions
         )
         Task {
+            error = nil
             do {
                 try await store.createClient(client)
                 dismiss()

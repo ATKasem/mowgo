@@ -60,8 +60,12 @@ struct TodayView: View {
                                     ForEach(todayJobs) { job in
                                         JobCardView(job: job) {
                                             Task {
-                                                do { try await store.toggleJobStatus(job) }
-                                                catch { operationError = error.localizedDescription }
+                                                do {
+                                                    operationError = nil
+                                                    try await store.toggleJobStatus(job)
+                                                } catch {
+                                                    operationError = error.localizedDescription
+                                                }
                                             }
                                         }
                                     }
@@ -92,8 +96,12 @@ struct TodayView: View {
                 Button("Yes, rain delay", role: .destructive) {
                     UINotificationFeedbackGenerator().notificationOccurred(.warning)
                     Task {
-                        do { try await store.rainDelay(for: dateString) }
-                        catch { operationError = error.localizedDescription }
+                        do {
+                            operationError = nil
+                            try await store.rainDelay(for: dateString)
+                        } catch {
+                            operationError = error.localizedDescription
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}

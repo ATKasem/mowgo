@@ -87,13 +87,19 @@ actor SupabaseService {
     }
 
     func signOut() async {
+        _cachedUserId = nil
         token = nil
         refreshToken = nil
         tokenExpiry = nil
         clearSession()
     }
 
+    // Cache the user ID to avoid repeated network calls on every fetch.
+    // getCurrentUserId() was called 3x per loadAll() (jobs, clients, invoices).
+    private var _cachedUserId: UUID?
+
     func getCurrentUserId() async throws -> UUID? {
+        if let cached = _cachedUserId { return cached }
         // Try refresh if token is expired
         if !isAuthenticated, let _ = refreshToken {
             try? await refreshAccessToken()
@@ -104,6 +110,7 @@ actor SupabaseService {
         guard let idStr = json?["id"] as? String, let id = UUID(uuidString: idStr) else {
             return nil
         }
+        _cachedUserId = id
         return id
     }
 
@@ -136,8 +143,16 @@ actor SupabaseService {
         defaults.removeObject(forKey: "sb_token_expiry")
     }
 
+    // Guard against multiple concurrent refresh attempts (thundering herd).
+    // If a refresh is already in flight, skip this one and let the caller
+    // retry with the updated token on its next request.
+    private var isRefreshing = false
+
     private func refreshAccessToken() async throws {
         guard let rt = refreshToken else { return }
+        guard !isRefreshing else { return }  // Another refresh is in flight
+        isRefreshing = true
+        defer { isRefreshing = false }
         let body: [String: Any] = ["refresh_token": rt]
         let data = try await request("POST", "/auth/v1/token?grant_type=refresh_token", body: body)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]

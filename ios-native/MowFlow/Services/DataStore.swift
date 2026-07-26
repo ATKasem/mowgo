@@ -22,7 +22,11 @@ final class DataStore: ObservableObject {
 
     // MARK: - Load
 
+    private var isLoadingData = false
+
     func loadAll() async {
+        guard !isLoadingData else { return }
+        isLoadingData = true
         isLoading = true
         error = nil
 
@@ -30,6 +34,7 @@ final class DataStore: ObservableObject {
             // No backend — use demo data
             loadDemo()
             isLoading = false
+            isLoadingData = false
             return
         }
 
@@ -42,7 +47,10 @@ final class DataStore: ObservableObject {
             self.error = error.localizedDescription
             loadDemo()
         }
-        isLoading = false
+        defer {
+            isLoading = false
+            isLoadingData = false
+        }
     }
 
     // MARK: - Jobs
@@ -52,8 +60,13 @@ final class DataStore: ObservableObject {
             jobs.append(job)
             return
         }
-        let created: Job = try await sb.insert("jobs", job)
-        jobs.append(created)
+        do {
+            let created: Job = try await sb.insert("jobs", job)
+            jobs.append(created)
+        } catch {
+            self.error = error.localizedDescription
+            throw error
+        }
     }
 
     func updateJob(_ job: Job) async throws {
@@ -105,8 +118,13 @@ final class DataStore: ObservableObject {
             clients.append(client)
             return
         }
-        let created: Client = try await sb.insert("clients", client)
-        clients.append(created)
+        do {
+            let created: Client = try await sb.insert("clients", client)
+            clients.append(created)
+        } catch {
+            self.error = error.localizedDescription
+            throw error
+        }
     }
 
     func updateClient(_ client: Client) async throws {
@@ -143,9 +161,14 @@ final class DataStore: ObservableObject {
             }
             return
         }
-        try await sb.update("invoices", id: invoice.id, updated)
-        if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
-            invoices[idx] = updated
+        do {
+            try await sb.update("invoices", id: invoice.id, updated)
+            if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
+                invoices[idx] = updated
+            }
+        } catch {
+            self.error = error.localizedDescription
+            throw error
         }
     }
 

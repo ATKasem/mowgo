@@ -78,6 +78,7 @@ struct NewJobFormView: View {
             routeOrder: store.jobs.filter { $0.scheduledDate == date }.count
         )
         Task {
+            error = nil
             do {
                 try await store.createJob(job)
                 dismiss()
