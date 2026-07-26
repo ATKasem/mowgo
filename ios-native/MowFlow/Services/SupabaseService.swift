@@ -223,7 +223,7 @@ actor SupabaseService {
         guard let rt = refreshToken else { return }
         // If a refresh is already in flight, wait for it to complete
         if let existing = refreshTask {
-            await existing.value
+            try await existing.value
             // After the in-flight refresh, check if we now have a valid token
             guard !isAuthenticated else { return }
         }
