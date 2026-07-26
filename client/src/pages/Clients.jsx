@@ -53,9 +53,12 @@ export default function Clients({ jobs = [] }) {
   function openNew() { setEditId(null); setForm(INITIAL_CLIENT_FORM); setExpandedId(null); setShowForm(true); }
   function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
 
+  const [clientError, setClientError] = useState('');
+
   async function save(e) {
     e.preventDefault();
     setSaving(true);
+    setClientError('');
     try {
       if (editId) {
         const updated = await updateClient(editId, form);
@@ -68,7 +71,7 @@ export default function Clients({ jobs = [] }) {
       setEditId(null);
     } catch (err) {
       console.error('save client:', err);
-      // TODO: Show user feedback toast
+      setClientError(err.message || 'Failed to save client. Please try again.');
     }
     setSaving(false);
   }
@@ -144,6 +147,11 @@ export default function Clients({ jobs = [] }) {
       {showForm && (
         <form onSubmit={save} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{editId ? 'Edit Client' : 'New Client'}</h3>
+          {clientError && (
+            <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
+              {clientError}
+            </div>
+          )}
           <div><label className="label">Name *</label><input placeholder="Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
           <div><label className="label">Address</label><input placeholder="123 Main St, OKC, OK" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">Phone</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">Email</label><input type="email" placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>

@@ -93,8 +93,16 @@ struct Invoice: Codable, Identifiable, Equatable {
     // Prefer amountCents (Int) for all arithmetic. The Supabase schema stores
     // `amount` as numeric — this field mirrors it for decoding compatibility.
     var amount: Double
-    /// Amount in cents (integer) for safe currency arithmetic.
-    var amountCents: Int { Int((amount * 100).rounded()) }
+    /// Safe integer-cents representation. Use this for ALL arithmetic and display.
+    var amountCents: Int {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        guard let number = formatter.number(from: String(format: "%.2f", amount)) else {
+            return Int((amount * 100).rounded())
+        }
+        return Int((number.doubleValue * 100).rounded())
+    }
     var status: InvoiceStatus
     var stripeInvoiceId: String?
     var stripePaymentIntentId: String?

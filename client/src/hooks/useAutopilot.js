@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { TOOLS, executeTool, SYSTEM_PROMPT } from '../lib/autopilotTools';
 
 /**
@@ -78,6 +78,13 @@ export default function useAutopilot({ compact = false } = {}) {
       setStatus('error');
     }
   }, []); // stable — uses refs instead of closed-over state
+
+  // Cleanup AbortController on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort();
+    };
+  }, []);
 
   /** Core LLM loop: send → receive → execute tools → repeat */
   async function runLLMLoop(history, signal) {
@@ -160,6 +167,9 @@ export default function useAutopilot({ compact = false } = {}) {
 
         // Execute each tool
         for (const tc of message.tool_calls) {
+          // Check abort signal before each tool execution
+          if (signal.aborted) return;
+
           const fnName = tc.function.name;
           let fnArgs;
           try {

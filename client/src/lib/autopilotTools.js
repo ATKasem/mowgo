@@ -191,13 +191,14 @@ export const TOOLS = [
 // ──────────────────────────────────────────
 
 function today() {
-  return new Date().toISOString().split('T')[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function tomorrow() {
   const d = new Date();
   d.setDate(d.getDate() + 1);
-  return d.toISOString().split('T')[0];
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export async function executeTool(name, args) {
@@ -426,16 +427,19 @@ export async function executeTool(name, args) {
           description
         });
 
-        // Send email via Express server (since autopilot creates via Supabase directly)
+        // Send email via Express server (server needs Authorization header)
         try {
-          const token = (await supabase.auth.getSession()).data.session?.access_token;
-          if (token) {
-            await fetch('/api/invoices/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ invoice_id: invoice.id, client_id: client.id, amount }),
-            });
+          const { data: { session } } = await supabase.auth.getSession();
+          const headers = { 'Content-Type': 'application/json' };
+          if (session?.access_token) {
+            headers['Authorization'] = `Bearer ${session.access_token}`;
           }
+          const res = await fetch('/api/invoices/send-email', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ invoice_id: invoice.id, client_id: client.id, amount }),
+          });
+          if (!res.ok) console.error('Email send failed:', res.status);
         } catch { /* email failure is non-fatal */ }
 
         return {
@@ -648,8 +652,8 @@ function formatJob(j) {
     time: j.scheduled_time || null,
     status: j.status,
     recurrence: j.recurrence || 'none',
-    notes: j.clients?.service_notes || '',
-    // Gate codes, alarm codes, pet instructions redacted — user can ask for them explicitly
+    notes: redactPII(j.clients?.service_notes || ''),
+    // Gate codes, alarm codes, pet instructions redacted
     rate: j.clients?.rate || null
   };
 }
@@ -662,9 +666,23 @@ function formatClient(c) {
     phone: c.phone,
     email: c.email,
     rate: c.rate,
-    serviceNotes: c.service_notes || '',
+    serviceNotes: redactPII(c.service_notes || ''),
     // Sensitive fields (key_code, alarm_code) redacted — user can ask for them explicitly
   };
+}
+
+/** Redact PII patterns (gate codes, alarm codes, pet info, PINs) from text before sending to LLM */
+function redactPII(text) {
+  if (!text) return '';
+  return text
+    .replace(/\b(gate\s*(?:code|#|num(?:ber)?)?\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(alarm\s*(?:code|#|pin)?\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(door\s*code\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(access\s*code\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(password\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(PIN\s*(?:code|number)?\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(combination\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]')
+    .replace(/\b(security\s*code\s*(?:is\s+)?[:=]?\s*)(\S+)/gi, '$1[REDACTED]');
 }
 
 // ──────────────────────────────────────────

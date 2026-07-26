@@ -22,35 +22,37 @@ final class DataStore: ObservableObject {
 
     // MARK: - Load
 
-    private var isLoadingData = false
+    private var loadTask: Task<Void, Never>?
 
     func loadAll() async {
-        guard !isLoadingData else { return }
-        isLoadingData = true
+        // Cancel any in-flight load and wait for it to finish
+        loadTask?.cancel()
+        _ = await loadTask?.value
+
         isLoading = true
         error = nil
 
         guard await sb.isConfigured else {
-            // No backend — use demo data
             loadDemo()
             isLoading = false
-            isLoadingData = false
             return
         }
 
-        do {
-            async let j = sb.fetchJobs()
-            async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
-            async let i = sb.fetchInvoices()
-            (jobs, clients, invoices) = try await (j, c, i)
-        } catch {
-            self.error = error.localizedDescription
-            loadDemo()
-        }
-        defer {
+        loadTask = Task {
+            do {
+                async let j = sb.fetchJobs()
+                async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
+                async let i = sb.fetchInvoices()
+                (jobs, clients, invoices) = try await (j, c, i)
+            } catch is CancellationError {
+                return // Silently cancelled — the new loadTask will replace us
+            } catch {
+                self.error = error.localizedDescription
+                loadDemo()
+            }
             isLoading = false
-            isLoadingData = false
         }
+        await loadTask?.value
     }
 
     // MARK: - Jobs
@@ -103,11 +105,27 @@ final class DataStore: ObservableObject {
         guard !isRainDelaying else { return }
         isRainDelaying = true
         defer { isRainDelaying = false }
+
         let pending = jobs.filter { $0.scheduledDate == date && $0.status == .scheduled }
+        guard !pending.isEmpty else { return }
         let tomorrow = nextDay(date)
+
+        // Collect all updates first; if any fail, roll back the ones that succeeded
+        var updatedJobs: [Job] = []
+
         for var job in pending {
             job.scheduledDate = tomorrow
-            try await updateJob(job)
+            do {
+                try await updateJob(job)
+                updatedJobs.append(job)
+            } catch {
+                // Rollback: move already-updated jobs back to original date
+                for var rollback in updatedJobs {
+                    rollback.scheduledDate = date
+                    try? await updateJob(rollback)
+                }
+                throw error
+            }
         }
     }
 

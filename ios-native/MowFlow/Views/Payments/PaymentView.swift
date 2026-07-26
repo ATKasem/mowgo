@@ -10,7 +10,7 @@ import StripePayments
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
-    @ObservedObject private var stripe = StripeService.shared
+    private let stripe = StripeService.shared
     @State private var showingCheckout = false
     @State private var checkoutURL: URL?
     @State private var paymentError: String?
@@ -37,7 +37,7 @@ struct PaymentView: View {
 
             // Pay button
             Button {
-                Task { await processPayment() }
+                Task { @MainActor in await processPayment() }
             } label: {
                 HStack {
                     if stripe.isLoading {
@@ -72,7 +72,7 @@ struct PaymentView: View {
             return
         }
         paymentError = nil
-        let amountCents = Int((invoice.amount * 100).rounded())
+        let amountCents = invoice.amountCents
         do {
             let result = try await stripe.createPaymentIntent(
                 amount: amountCents, invoiceId: invoice.id
@@ -105,14 +105,14 @@ struct PaymentView: View {
             )
             // Present from the key window's root view controller
             guard let windowScene = UIApplication.shared.connectedScenes
-                .compactMap({ $0 as? UIWindowScene }).first,
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive }),
                   let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?
                     .rootViewController else {
                 paymentError = "Could not present payment sheet."
                 return
             }
-            paymentSheet.present(from: rootVC) { [weak self] result in
-                guard let self else { return }
+            paymentSheet.present(from: rootVC) { result in
                 switch result {
                 case .completed:
                     Task { try? await self.store.markInvoicePaid(self.invoice) }
@@ -138,7 +138,7 @@ struct SubscriptionPlanCard: View {
     let tier: String
     let isCurrent: Bool
 
-    @ObservedObject private var stripe = StripeService.shared
+    private let stripe = StripeService.shared
     @State private var isPurchasing = false
     @State private var error: String?
 

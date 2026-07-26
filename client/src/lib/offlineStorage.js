@@ -5,13 +5,16 @@
 export async function saveOffline(key, value) {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     return new Promise((resolve) => {
+      let resolved = false;
       const { port1, port2 } = new MessageChannel();
-      port1.onmessage = (e) => resolve(e.data.ok);
+      port1.onmessage = (e) => {
+        if (!resolved) { resolved = true; port1.close(); port2.close(); resolve(e.data.ok); }
+      };
       navigator.serviceWorker.controller.postMessage(
         { type: 'SET_OFFLINE', key, value },
         [port2]
       );
-      setTimeout(() => resolve(false), 2000);
+      setTimeout(() => { if (!resolved) { resolved = true; port1.close(); port2.close(); resolve(false); } }, 2000);
     });
   }
   // Fallback: localStorage
@@ -23,13 +26,16 @@ export async function saveOffline(key, value) {
 export async function loadOffline(key) {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     return new Promise((resolve) => {
+      let resolved = false;
       const { port1, port2 } = new MessageChannel();
-      port1.onmessage = (e) => resolve(e.data.value);
+      port1.onmessage = (e) => {
+        if (!resolved) { resolved = true; port1.close(); port2.close(); resolve(e.data.value); }
+      };
       navigator.serviceWorker.controller.postMessage(
         { type: 'GET_OFFLINE', key },
         [port2]
       );
-      setTimeout(() => resolve(null), 2000);
+      setTimeout(() => { if (!resolved) { resolved = true; port1.close(); port2.close(); resolve(null); } }, 2000);
     });
   }
   // Fallback: localStorage

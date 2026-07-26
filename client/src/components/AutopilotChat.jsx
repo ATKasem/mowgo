@@ -34,9 +34,15 @@ export default function AutopilotChat({ compact = false }) {
     if (!el) return;
     const threshold = 60; // px from bottom before we auto-scroll
     const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    let animationFrame;
     if (isNearBottom) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      animationFrame = requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      });
     }
+    return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    };
   }, [messages]);
 
   // Focus input on mount
@@ -286,7 +292,7 @@ function ToolCallMessage({ msg, messages, index }) {
                     <X className="w-3 h-3 text-red-500" />
                   ) : null}
                 </div>
-                {Object.keys(args).length > 0 && (
+                {args && Object.keys(args).length > 0 && (
                   <div className="text-gray-500 dark:text-gray-400 mb-1">
                     {Object.entries(args).map(([k, v]) => (
                       <span key={k} className="inline-block mr-2">
@@ -351,30 +357,44 @@ function formatToolCallLabel(name, args) {
   }
 }
 
-/** Simple markdown-like formatting for message content — safe against XSS */
+/** Simple markdown-like formatting for message content — safe against XSS (no dangerouslySetInnerHTML) */
 function FormatContent({ content, isUser }) {
   if (!content) return null;
 
-  // Escape HTML entities first, then apply our own formatting
   const lines = content.split('\n');
   return lines.map((line, i) => {
-    // 1. Escape any HTML to prevent XSS from LLM responses
-    const escaped = line
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-    // 2. Bold
-    const bolded = escaped.replace(/\*\*(.*?)\*\*/g, (_, text) =>
-      `<strong class="${isUser ? 'text-white' : 'text-gray-900 dark:text-white'} font-semibold">${text}</strong>`
-    );
-    // 3. Inline code
-    const coded = bolded.replace(/`(.*?)`/g, (_, text) =>
-      `<code class="${isUser ? 'bg-emerald-700/50' : 'bg-gray-200 dark:bg-gray-700'} px-1 py-0.5 rounded text-xs font-mono">${text}</code>`
-    );
+    // Parse bold **...** and code `...` via regex, render as safe React elements
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    const tokenRegex = /\*\*(.*?)\*\*|`(.*?)`/g;
+    while ((match = tokenRegex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(<span key={`t${lastIndex}`}>{line.slice(lastIndex, match.index)}</span>);
+      }
+      if (match[1] !== undefined) {
+        parts.push(
+          <strong key={`b${match.index}`} className={isUser ? 'text-white' : 'text-gray-900 dark:text-white font-semibold'}>
+            {match[1]}
+          </strong>
+        );
+      } else if (match[2] !== undefined) {
+        parts.push(
+          <code key={`c${match.index}`} className={`${isUser ? 'bg-emerald-700/50' : 'bg-gray-200 dark:bg-gray-700'} px-1 py-0.5 rounded text-xs font-mono`}>
+            {match[2]}
+          </code>
+        );
+      }
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < line.length) {
+      parts.push(<span key={`t${lastIndex}`}>{line.slice(lastIndex)}</span>);
+    }
+    if (parts.length === 0) parts.push(<span key="empty">{line}</span>);
+
     return (
       <span key={i}>
-        <span dangerouslySetInnerHTML={{ __html: coded }} />
+        {parts}
         {i < lines.length - 1 && <br />}
       </span>
     );

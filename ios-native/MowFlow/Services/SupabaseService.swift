@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import Security
 
 actor SupabaseService {
     static let shared = SupabaseService()
@@ -102,7 +103,11 @@ actor SupabaseService {
         if let cached = _cachedUserId { return cached }
         // Try refresh if token is expired
         if !isAuthenticated, let _ = refreshToken {
-            try? await refreshAccessToken()
+            do {
+                try await refreshAccessToken()
+            } catch {
+                print("[SupabaseService] Token refresh failed: \(error.localizedDescription)")
+            }
         }
         guard token != nil else { return nil }
         let data = try await request("GET", "/auth/v1/user")
@@ -120,54 +125,126 @@ actor SupabaseService {
     // Use Security.framework (SecItemAdd/SecItemCopyMatching) or a wrapper
     // like KeychainAccess to store sb_token and sb_refresh_token securely.
 
+    // MARK: - Keychain Helpers
+
+    private func saveToKeychain(key: String, value: String) {
+        let data = Data(value.utf8)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "com.mowflow.auth",
+            kSecAttrAccount as String: key,
+        ]
+        SecItemDelete(query as CFDictionary) // Remove any existing item
+        let addQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "com.mowflow.auth",
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
+        ]
+        SecItemAdd(addQuery as CFDictionary, nil)
+    }
+
+    private func loadFromKeychain(key: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "com.mowflow.auth",
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne,
+        ]
+        var item: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
+              let data = item as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    private func deleteFromKeychain(key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "com.mowflow.auth",
+            kSecAttrAccount as String: key,
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+
+    // MARK: - Session persistence (Keychain-backed)
+
     private func saveSession() {
-        let defaults = UserDefaults.standard
-        defaults.set(token, forKey: "sb_token")
-        defaults.set(refreshToken, forKey: "sb_refresh_token")
-        defaults.set(tokenExpiry, forKey: "sb_token_expiry")
+        if let t = token { saveToKeychain(key: "sb_token", value: t) }
+        if let rt = refreshToken { saveToKeychain(key: "sb_refresh_token", value: rt) }
+        if let exp = tokenExpiry {
+            let ts = String(exp.timeIntervalSince1970)
+            saveToKeychain(key: "sb_token_expiry", value: ts)
+        }
     }
 
     func restoreSession() -> Bool {
-        let defaults = UserDefaults.standard
-        guard let t = defaults.string(forKey: "sb_token"), !t.isEmpty else { return false }
+        // Try Keychain first, then fall back to UserDefaults (migration)
+        var t = loadFromKeychain(key: "sb_token")
+        if t == nil || t!.isEmpty {
+            t = UserDefaults.standard.string(forKey: "sb_token")
+            if let migrated = t, !migrated.isEmpty {
+                // Migrate existing UserDefaults tokens to Keychain
+                saveToKeychain(key: "sb_token", value: migrated)
+                if let rt = UserDefaults.standard.string(forKey: "sb_refresh_token") {
+                    saveToKeychain(key: "sb_refresh_token", value: rt)
+                }
+                if let exp = UserDefaults.standard.string(forKey: "sb_token_expiry") {
+                    saveToKeychain(key: "sb_token_expiry", value: exp)
+                }
+                // Clear UserDefaults copies after migration
+                UserDefaults.standard.removeObject(forKey: "sb_token")
+                UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
+                UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
+            }
+        }
+        guard let t = t, !t.isEmpty else { return false }
         token = t
-        refreshToken = defaults.string(forKey: "sb_refresh_token")
-        tokenExpiry = defaults.object(forKey: "sb_token_expiry") as? Date
+        refreshToken = loadFromKeychain(key: "sb_refresh_token")
+        if let ts = loadFromKeychain(key: "sb_token_expiry"),
+           let interval = TimeInterval(ts) {
+            tokenExpiry = Date(timeIntervalSince1970: interval)
+        }
         return isAuthenticated
     }
 
     private func clearSession() {
-        let defaults = UserDefaults.standard
-        defaults.removeObject(forKey: "sb_token")
-        defaults.removeObject(forKey: "sb_refresh_token")
-        defaults.removeObject(forKey: "sb_token_expiry")
+        deleteFromKeychain(key: "sb_token")
+        deleteFromKeychain(key: "sb_refresh_token")
+        deleteFromKeychain(key: "sb_token_expiry")
     }
 
-    // Guard against multiple concurrent refresh attempts (thundering herd).
-    // If a refresh is already in flight, skip this one and let the caller
-    // retry with the updated token on its next request.
-    private var isRefreshing = false
+    // If a refresh is already in flight, new callers await the existing
+    // task instead of silently getting no token update.
+    private var refreshTask: Task<Void, Error>?
 
     private func refreshAccessToken() async throws {
         guard let rt = refreshToken else { return }
-        guard !isRefreshing else { return }  // Another refresh is in flight
-        isRefreshing = true
-        defer { isRefreshing = false }
-        let body: [String: Any] = ["refresh_token": rt]
-        let data = try await request("POST", "/auth/v1/token?grant_type=refresh_token", body: body)
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        if let accessToken = json?["access_token"] as? String {
-            token = accessToken
-            refreshToken = json?["refresh_token"] as? String
-            if let expiresIn = json?["expires_in"] as? Double {
-                tokenExpiry = Date().addingTimeInterval(expiresIn - 300)
-            }
-            saveSession()
-        } else {
-            // Refresh failed — clear the session
-            await signOut()
-            throw AuthError.sessionExpired
+        // If a refresh is already in flight, wait for it to complete
+        if let existing = refreshTask {
+            await existing.value
+            // After the in-flight refresh, check if we now have a valid token
+            guard !isAuthenticated else { return }
         }
+        refreshTask = Task {
+            defer { refreshTask = nil }
+            let body: [String: Any] = ["refresh_token": rt]
+            let data = try await request("POST", "/auth/v1/token?grant_type=refresh_token", body: body)
+            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            if let accessToken = json?["access_token"] as? String {
+                token = accessToken
+                refreshToken = json?["refresh_token"] as? String
+                if let expiresIn = json?["expires_in"] as? Double {
+                    tokenExpiry = Date().addingTimeInterval(expiresIn - 300)
+                }
+                saveSession()
+            } else {
+                await signOut()
+                throw AuthError.sessionExpired
+            }
+        }
+        try await refreshTask?.value
     }
 
     // MARK: - CRUD (filtered by user_id)

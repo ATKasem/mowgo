@@ -107,6 +107,7 @@ class ErrorBoundary extends React.Component {
 // a friendly error message instead of a blank page.
 function SupabaseErrorRedirect() {
   const navigate = useNavigate();
+  const VALID_HASH_PARAMS = new Set(['error', 'error_code', 'error_description', 'type', 'access_token']);
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
@@ -115,15 +116,20 @@ function SupabaseErrorRedirect() {
 
     const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
 
+    // Validate hash params against allowlist before processing
+    const params = new URLSearchParams(hashStr);
+    const paramKeys = [...params.keys()];
+    const hasValidParams = paramKeys.length > 0 && paramKeys.every(k => VALID_HASH_PARAMS.has(k));
+
     // Handle error hashes (expired/invalid reset link)
-    if (hashStr.includes('error=')) {
+    if (hasValidParams && params.has('error')) {
       window.history.replaceState({}, '', window.location.pathname + '#/login&' + hashStr);
       navigate('/login', { replace: true });
       return;
     }
 
     // Handle recovery hashes (access_token + type=recovery) — route to login
-    if (hashStr.includes('type=recovery') && hashStr.includes('access_token=')) {
+    if (hasValidParams && params.get('type') === 'recovery' && params.has('access_token')) {
       window.history.replaceState({}, '', window.location.pathname + '#/login&' + hashStr);
       navigate('/login', { replace: true });
       return;

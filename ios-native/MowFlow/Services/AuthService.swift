@@ -77,11 +77,19 @@ final class AuthService: ObservableObject {
 
     private func loadProfile() async {
         guard await sb.isConfigured else { return }
-        do {
-            user = try await sb.fetchProfile()
-        } catch {
-            // Profile fetch failure is non-fatal
-            print("Failed to load profile: \(error.localizedDescription)")
+        var retries = 2
+        while retries > 0 {
+            do {
+                user = try await sb.fetchProfile()
+                return
+            } catch {
+                retries -= 1
+                if retries > 0 {
+                    try? await Task.sleep(for: .seconds(1))
+                } else {
+                    print("Failed to load profile after retries: \(error.localizedDescription)")
+                }
+            }
         }
     }
 }

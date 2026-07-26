@@ -18,12 +18,15 @@ function getNextDate(currentDate, recurrence) {
     case 'monthly': d.setMonth(d.getMonth() + 1); break;
     default: return null;
   }
-  return d.toISOString().split('T')[0];
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
   const [searchParams] = useSearchParams();
-  const [date, setDate] = useState(() => searchParams.get('date') || new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(() => {
+    if (searchParams.get('date')) return searchParams.get('date');
+    const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
   const [expandedId, setExpandedId] = useState(null);
@@ -40,7 +43,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
 
   const { rainLikely, todayRainChance } = useWeather();
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
   // Load clients for the NewJobForm dropdown
   useEffect(() => { loadClients().then(setClients).catch(err => console.error('loadClients:', err)); }, []);
@@ -161,17 +164,28 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         updated[i] = { ...updated[i], route_order: order++ };
       }
     }
-    // Persist reordered jobs — use batch endpoint instead of N+1
-    const token = (await supabase.auth.getSession()).data.session?.access_token;
-    if (token) {
-      const updates = updated
-        .filter(j => j.scheduled_date === currentDate)
-        .map(j => ({ id: j.id, route_order: j.route_order }));
-      fetch('/api/jobs/reorder', {
+    // Save previous order for rollback on failure
+    const previousOrder = prev
+      .filter(j => j.scheduled_date === currentDate)
+      .map(j => ({ id: j.id, route_order: j.route_order }));
+
+    // Persist reordered jobs — use httpOnly cookie session (no client JWT needed)
+    const updates = updated
+      .filter(j => j.scheduled_date === currentDate)
+      .map(j => ({ id: j.id, route_order: j.route_order }));
+    try {
+      await fetch('/api/jobs/reorder', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orders: updates }),
-      }).catch(err => console.error('reorderWithinDate: batch persist failed', err));
+      });
+    } catch (err) {
+      console.error('reorderWithinDate: batch persist failed', err);
+      // Roll back to previous order
+      return prev.map(j => {
+        const prevItem = previousOrder.find(p => p.id === j.id);
+        return prevItem ? { ...j, route_order: prevItem.route_order } : j;
+      });
     }
     return updated;
   }
@@ -239,7 +253,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               if (!window.confirm(`Move ${toMove.length} job${toMove.length > 1 ? 's' : ''} to tomorrow?`)) return;
               const tomorrow = new Date(date);
               tomorrow.setDate(tomorrow.getDate() + 1);
-              const nextDate = tomorrow.toISOString().split('T')[0];
+              const nextDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
               // Optimistic update
               setJobs(prev => prev.map(j =>
                 j.status !== 'done' && j.scheduled_date === date

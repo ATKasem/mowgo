@@ -34,7 +34,7 @@ export async function loadJobs() {
     .eq('user_id', user.id)
     .order('route_order', { ascending: true });
 
-  if (error) { console.error('loadJobs:', error); return []; }
+  if (error) { console.error('loadJobs:', error); throw new Error('Failed to load jobs: ' + (error.message || 'Unknown error')); }
 
   return (data || []).map(j => ({
     id: j.id,
@@ -177,7 +177,7 @@ export async function loadClients() {
     .eq('user_id', user.id)
     .order('name');
 
-  if (error) { console.error('loadClients:', error); return []; }
+  if (error) { console.error('loadClients:', error); throw new Error('Failed to load clients: ' + (error.message || 'Unknown error')); }
 
   return (data || []).map(c => ({
     id: c.id,
@@ -253,7 +253,7 @@ export async function loadInvoices() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  if (error) { console.error('loadInvoices:', error); return []; }
+  if (error) { console.error('loadInvoices:', error); throw new Error('Failed to load invoices: ' + (error.message || 'Unknown error')); }
 
   return (data || []).map(inv => ({
     id: inv.id,
