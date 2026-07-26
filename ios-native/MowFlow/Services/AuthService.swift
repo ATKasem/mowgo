@@ -17,31 +17,28 @@ final class AuthService: ObservableObject {
 
     private let sb = SupabaseService.shared
 
-    /// Cached at init — SupabaseService configuration doesn't change at runtime.
-    private let isConfigured: Bool
-
     /// True only if Supabase credentials are missing/unconfigured.
-    var isDemoMode: Bool { !isConfigured }
+    /// Updated asynchronously after init completes its Task.
+    @Published var isDemoMode = true
 
     init() {
-        // Cache config state synchronously before any async work
-        // (actor properties can't be read from sync init without await)
-        isConfigured = false  // placeholder, real value set in Task below
         // Try to restore a previous session
         Task {
-            guard await sb.isConfigured else {
+            let configured = await sb.isConfigured
+            if configured {
+                isDemoMode = false
+                if await sb.restoreSession() {
+                    isAuthenticated = true
+                    isLoading = false
+                    await loadProfile()
+                    return
+                }
+                // Real backend, no session — show login
+                isLoading = false
+            } else {
                 // No backend configured — show splash briefly, then enter demo
                 try? await Task.sleep(for: .milliseconds(800))
                 isAuthenticated = true
-                isLoading = false
-                return
-            }
-            if await sb.restoreSession() {
-                isAuthenticated = true
-                isLoading = false
-                await loadProfile()
-            } else {
-                // No session, real backend — show login
                 isLoading = false
             }
         }
