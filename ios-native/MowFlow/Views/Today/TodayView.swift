@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var auth: AuthService
 
     static func todayString() -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
@@ -19,6 +20,7 @@ struct TodayView: View {
     @State private var showingAddJob = false
     @State private var selectedDate = Date()
     @State private var operationError: String?
+    @State private var selectedCrewFilter: UUID? = nil
 
     private static let dateFmt: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
@@ -27,7 +29,13 @@ struct TodayView: View {
     private var dateString: String { Self.dateFmt.string(from: selectedDate) }
 
     private var todayJobs: [Job] {
-        store.jobs.filter { $0.scheduledDate == dateString }
+        store.jobs.filter { job in
+            guard job.scheduledDate == dateString else { return false }
+            if let filterId = selectedCrewFilter {
+                return job.assignedTo == filterId
+            }
+            return true
+        }
     }
 
     private var scheduledCount: Int {
@@ -46,6 +54,7 @@ struct TodayView: View {
                         VStack(spacing: 0) {
                             dateHeader
                             statsBar
+                            crewFilterBar
                             rainDelayButton
 
                             if let err = operationError {
@@ -58,7 +67,7 @@ struct TodayView: View {
                             } else {
                                 LazyVStack(spacing: 8) {
                                     ForEach(todayJobs) { job in
-                                        JobCardView(job: job) {
+                                        JobCardView(job: job, teamMembers: store.teamMembers) {
                                             Task {
                                                 do {
                                                     operationError = nil
@@ -109,7 +118,12 @@ struct TodayView: View {
                 Text("All scheduled jobs for today will be rescheduled.")
             }
             .sheet(isPresented: $showingAddJob) {
-                NewJobFormView(date: dateString)
+                NewJobFormView(date: dateString, teamMembers: store.teamMembers)
+            }
+            .onAppear {
+                if auth.user?.tier == "crew" {
+                    Task { await store.loadTeamMembers() }
+                }
             }
         }
     }
@@ -160,6 +174,38 @@ struct TodayView: View {
         .disabled(scheduledCount == 0).opacity(scheduledCount == 0 ? 0.5 : 1)
     }
 
+    private var crewFilterBar: some View {
+        let canManageCrew = auth.user?.tier == "crew"
+        return Group {
+            if canManageCrew && store.teamMembers.count >= 2 {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        CrewFilterChip(
+                            label: "All",
+                            isSelected: selectedCrewFilter == nil,
+                            color: "16a34a"
+                        ) {
+                            selectedCrewFilter = nil
+                        }
+                        ForEach(Array(store.teamMembers.enumerated()), id: \.element.id) { index, member in
+                            CrewFilterChip(
+                                label: member.businessName?.components(separatedBy: " ").first ?? "Unknown",
+                                isSelected: selectedCrewFilter == member.id,
+                                color: crewChipColors[index % crewChipColors.count]
+                            ) {
+                                selectedCrewFilter = member.id
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                }
+                .padding(.bottom, 12)
+            }
+        }
+    }
+
+    private let crewChipColors = ["16a34a", "3b82f6", "f59e0b", "8b5cf6", "ec4899"]
+
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "leaf").font(.system(size: 40)).foregroundColor(Color(hex: "374151"))
@@ -175,5 +221,27 @@ struct TodayView: View {
         if let d = Calendar.current.date(byAdding: .day, value: days, to: selectedDate) {
             selectedDate = d
         }
+    }
+}
+
+// MARK: - Crew Filter Chip
+
+struct CrewFilterChip: View {
+    let label: String
+    let isSelected: Bool
+    let color: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .foregroundColor(isSelected ? .white : Color(hex: "9ca3af"))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color(hex: color) : Color(hex: "374151"))
+                .cornerRadius(16)
+        }
+        .buttonStyle(.plain)
     }
 }

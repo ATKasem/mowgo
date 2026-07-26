@@ -9,7 +9,20 @@ import SwiftUI
 
 struct JobCardView: View {
     let job: Job
+    var teamMembers: [UserProfile] = []
     var onToggle: (() -> Void)?
+
+    private var assignedMember: UserProfile? {
+        guard let assignedTo = job.assignedTo else { return nil }
+        return teamMembers.first { $0.id == assignedTo }
+    }
+
+    private var memberIndex: Int {
+        guard let member = assignedMember else { return -1 }
+        return teamMembers.firstIndex(where: { $0.id == member.id }) ?? -1
+    }
+
+    private let chipColors = ["16a34a", "3b82f6", "f59e0b", "8b5cf6", "ec4899"]
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

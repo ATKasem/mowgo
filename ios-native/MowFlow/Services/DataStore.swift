@@ -57,6 +57,7 @@ final class DataStore: ObservableObject {
     @Published var jobs: [Job] = []
     @Published var clients: [Client] = []
     @Published var invoices: [Invoice] = []
+    @Published var teamMembers: [UserProfile] = []
     @Published var isLoading = false
     @Published var error: String?
 
@@ -122,6 +123,7 @@ final class DataStore: ObservableObject {
         jobs = []
         clients = []
         invoices = []
+        teamMembers = []
         isLoading = false
         error = nil
     }
@@ -317,6 +319,109 @@ final class DataStore: ObservableObject {
         }
     }
 
+    // MARK: - Team
+
+    func loadTeamMembers() async {
+        guard await sb.isConfigured else {
+            // Demo mode: teamMembers already loaded via loadDemo()
+            return
+        }
+        do {
+            guard let profile = try await sb.fetchProfile() else { return }
+            // Owners: their own id is the business_id. Crew: use their business_id.
+            let bizId = profile.role == "owner" ? profile.id : profile.businessId
+            guard let bizId else { return }
+            // Fetch all profiles where id = bizId (owner) OR business_id = bizId (crew)
+            let all: [UserProfile] = try await sb.fetch("profiles", query: [
+                "or": "(id.eq.\(bizId.uuidString),business_id.eq.\(bizId.uuidString))",
+                "order": "business_name.asc"
+            ])
+            teamMembers = all
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func loadTeamDashboard(date: String) async -> [TeamDashboardRow] {
+        let members = teamMembers
+        guard !members.isEmpty else { return [] }
+
+        // Filter jobs for the target date
+        let dateJobs = jobs.filter { $0.scheduledDate == date }
+
+        return members.map { member in
+            let memberJobs = dateJobs.filter {
+                $0.assignedTo == member.id ||
+                (member.role == "owner" && $0.assignedTo == nil)
+            }
+            return TeamDashboardRow(
+                id: member.id ?? UUID(),
+                name: member.businessName ?? "Unknown",
+                role: member.role ?? "crew",
+                total: memberJobs.count,
+                done: memberJobs.filter { $0.status == .done }.count,
+                inProgress: memberJobs.filter { $0.status == .inProgress }.count
+            )
+        }
+    }
+
+    func inviteTeamMember(email: String) async throws {
+        let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !normalizedEmail.isEmpty else { throw DataStoreError.clientRequired }
+        guard await sb.isConfigured else {
+            // Demo mode: create a fake member
+            let newMember = UserProfile(
+                id: UUID(),
+                businessName: normalizedEmail.split(separator: "@").first.map(String.init) ?? normalizedEmail,
+                phone: nil,
+                tier: "crew",
+                role: "crew",
+                businessId: teamMembers.first(where: { $0.role == "owner" })?.id
+            )
+            teamMembers.append(newMember)
+            return
+        }
+        // Real mode: call edge function or insert via API
+        // For now, insert directly into profiles
+        struct ProfileInsert: Encodable {
+            let id: UUID
+            let businessName: String
+            let tier: String
+            let role: String
+            let businessId: UUID?
+        }
+        guard let currentProfile = try await sb.fetchProfile(),
+              let ownerId = currentProfile.role == "owner" ? currentProfile.id : currentProfile.businessId else {
+            throw DataStoreError.authenticationRequired
+        }
+        let newId = UUID()
+        let member: UserProfile = try await sb.insert("profiles", ProfileInsert(
+            id: newId,
+            businessName: normalizedEmail.split(separator: "@").first.map(String.init) ?? normalizedEmail,
+            tier: "crew",
+            role: "crew",
+            businessId: ownerId
+        ))
+        teamMembers.append(member)
+    }
+
+    func removeTeamMember(_ member: UserProfile) async throws {
+        guard let memberId = member.id else { return }
+        guard await sb.isConfigured else {
+            teamMembers.removeAll { $0.id == memberId }
+            // Unassign jobs from removed member
+            for idx in jobs.indices where jobs[idx].assignedTo == memberId {
+                jobs[idx].assignedTo = nil
+            }
+            return
+        }
+        try await sb.delete("profiles", id: memberId)
+        teamMembers.removeAll { $0.id == memberId }
+        for idx in jobs.indices where jobs[idx].assignedTo == memberId {
+            jobs[idx].assignedTo = nil
+        }
+    }
+
     // MARK: - Helpers
 
     private func nextDay(_ date: String) -> String {
@@ -331,6 +436,7 @@ final class DataStore: ObservableObject {
         jobs = d.jobs
         clients = d.clients
         invoices = d.invoices
+        teamMembers = d.teamMembers
     }
 }
 
@@ -351,11 +457,21 @@ enum DataStoreError: LocalizedError {
 // MARK: - Demo Data
 
 struct DemoData {
+    static let demoOwnerId = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+    static let demoCrewJake = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+    static let demoCrewMaria = UUID(uuidString: "00000000-0000-0000-0000-000000000003")!
+
+    let teamMembers: [UserProfile] = [
+        UserProfile(id: DemoData.demoOwnerId, businessName: "Green Thumb Lawn Care", phone: "405-555-0100", tier: "crew", role: "owner", businessId: nil),
+        UserProfile(id: DemoData.demoCrewJake, businessName: "Jake Torres", phone: "405-555-0201", tier: "crew", role: "crew", businessId: DemoData.demoOwnerId),
+        UserProfile(id: DemoData.demoCrewMaria, businessName: "Maria Santos", phone: "405-555-0202", tier: "crew", role: "crew", businessId: DemoData.demoOwnerId),
+    ]
+
     let jobs: [Job] = [
-        Job(id: UUID(), title: "Weekly Mow", scheduledDate: DemoData.today(), scheduledTime: "08:00", status: .scheduled, routeOrder: 0, clients: Job.ClientRef(id: UUID(), name: "Smith Residence", address: "123 Main St", rate: 45)),
-        Job(id: UUID(), title: "Trim + Mow", scheduledDate: DemoData.today(), scheduledTime: "10:30", status: .scheduled, routeOrder: 1, clients: Job.ClientRef(id: UUID(), name: "Johnson Home", address: "456 Oak Ave", rate: 65)),
-        Job(id: UUID(), title: "Leaf Cleanup", scheduledDate: DemoData.today(), scheduledTime: "14:00", status: .done, routeOrder: 2, clients: Job.ClientRef(id: UUID(), name: "Williams Estate", address: "789 Pine Rd", rate: 80)),
-        Job(id: UUID(), title: "Weekly Mow", scheduledDate: DemoData.tomorrow(), scheduledTime: "09:00", status: .scheduled, routeOrder: 0, clients: Job.ClientRef(id: UUID(), name: "Brown Property", address: "101 Elm St", rate: 45)),
+        Job(id: UUID(), assignedTo: DemoData.demoOwnerId, title: "Weekly Mow", scheduledDate: DemoData.today(), scheduledTime: "08:00", status: .done, routeOrder: 0, clients: Job.ClientRef(id: UUID(), name: "Smith Residence", address: "123 Main St", rate: 45)),
+        Job(id: UUID(), assignedTo: DemoData.demoCrewJake, title: "Trim + Mow", scheduledDate: DemoData.today(), scheduledTime: "09:30", status: .inProgress, routeOrder: 1, clients: Job.ClientRef(id: UUID(), name: "Johnson Home", address: "456 Oak Ave", rate: 65)),
+        Job(id: UUID(), assignedTo: DemoData.demoCrewMaria, title: "Quick Mow", scheduledDate: DemoData.today(), scheduledTime: "11:00", status: .scheduled, routeOrder: 2, clients: Job.ClientRef(id: UUID(), name: "Williams Estate", address: "789 Pine Rd", rate: 80)),
+        Job(id: UUID(), title: "Biweekly Service", scheduledDate: DemoData.today(), scheduledTime: "13:00", status: .scheduled, routeOrder: 3, clients: Job.ClientRef(id: UUID(), name: "Brown Property", address: "101 Elm St", rate: 45)),
     ]
 
     let clients: [Client] = [

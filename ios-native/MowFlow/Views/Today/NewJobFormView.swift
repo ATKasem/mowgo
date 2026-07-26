@@ -9,12 +9,14 @@ import SwiftUI
 
 struct NewJobFormView: View {
     @EnvironmentObject var store: DataStore
-    @Environment(\.dismiss) var dismiss
+    @Environment(\\.dismiss) var dismiss
 
     let date: String
+    var teamMembers: [UserProfile] = []
 
     @State private var title = ""
     @State private var clientId: UUID?
+    @State private var assignedTo: UUID? = nil
     @State private var scheduledTime = Date()
     @State private var duration = 60
     @State private var isSaving = false
@@ -40,6 +42,14 @@ struct NewJobFormView: View {
                             Text("60 min").tag(60)
                             Text("90 min").tag(90)
                             Text("120 min").tag(120)
+                        }
+                        if !teamMembers.isEmpty {
+                            Picker("Assign To", selection: $assignedTo) {
+                                Text("Unassigned").tag(nil as UUID?)
+                                ForEach(teamMembers) { member in
+                                    Text(member.businessName ?? "Unknown").tag(member.id as UUID?)
+                                }
+                            }
                         }
                     }
                     .listRowBackground(Color(hex: "1f2937"))
@@ -90,6 +100,7 @@ struct NewJobFormView: View {
         let timeFmt = DateFormatter(); timeFmt.dateFormat = "HH:mm"
         let job = Job(
             id: UUID(),
+            assignedTo: assignedTo,
             clientId: clientId,
             title: trimmedTitle,
             scheduledDate: date,

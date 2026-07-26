@@ -126,6 +126,8 @@ struct UserProfile: Codable {
     var businessName: String?
     var phone: String?
     var tier: String?
+    var role: String?
+    var businessId: UUID?
     var stripeCustomerId: String?
     var createdAt: String?
 
@@ -137,4 +139,15 @@ struct UserProfile: Codable {
         default: tier ?? "Free"
         }
     }
+}
+
+// MARK: - Team Dashboard Row
+
+struct TeamDashboardRow: Identifiable {
+    let id: UUID
+    let name: String
+    let role: String
+    let total: Int
+    let done: Int
+    let inProgress: Int
 }
