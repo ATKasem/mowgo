@@ -100,8 +100,8 @@ struct NewJobFormView: View {
         let timeFmt = DateFormatter(); timeFmt.dateFormat = "HH:mm"
         let job = Job(
             id: UUID(),
-            assignedTo: assignedTo,
             clientId: clientId,
+            assignedTo: assignedTo,
             title: trimmedTitle,
             scheduledDate: date,
             scheduledTime: timeFmt.string(from: scheduledTime),

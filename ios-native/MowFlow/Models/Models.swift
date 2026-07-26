@@ -121,7 +121,7 @@ struct Invoice: Codable, Identifiable, Equatable {
 
 // MARK: - User Profile
 
-struct UserProfile: Codable {
+struct UserProfile: Codable, Identifiable {
     var id: UUID?
     var businessName: String?
     var phone: String?
