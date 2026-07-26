@@ -9,14 +9,11 @@ on:
     branches: [main]
     paths:
       - 'ios-native/**'
-  workflow_dispatch:  # manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-15
-    defaults:
-      run:
-        working-directory: ios-native
 
     steps:
       - uses: actions/checkout@v4
@@ -28,9 +25,11 @@ jobs:
         run: brew install xcodegen
 
       - name: Generate Xcode project
+        working-directory: ios-native
         run: xcodegen generate
 
       - name: Build (simulator)
+        working-directory: ios-native
         run: |
           xcodebuild build \
             -project MowFlow.xcodeproj \
