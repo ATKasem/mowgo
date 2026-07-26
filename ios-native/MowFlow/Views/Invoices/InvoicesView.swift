@@ -15,7 +15,8 @@ struct InvoicesView: View {
 
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
-    private var totalUnpaid: Double { unpaid.reduce(0) { $0 + $1.amount } }
+    private var totalUnpaidCents: Int { unpaid.reduce(0) { $0 + $1.amountCents } }
+    private var totalUnpaid: Decimal { Decimal(totalUnpaidCents) / 100 }
 
     var body: some View {
         NavigationStack {
@@ -75,7 +76,8 @@ struct InvoicesView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Outstanding").font(.caption).foregroundColor(Color(hex: "9ca3af"))
-                Text("$\(Int(totalUnpaid))").font(.title2.weight(.bold)).foregroundColor(.white)
+                Text(totalUnpaid.formatted(.currency(code: "USD")))
+                    .font(.title2.weight(.bold)).foregroundColor(.white)
             }
             Spacer()
             Text("\(unpaid.count) invoice\(unpaid.count == 1 ? "" : "s")")
@@ -115,7 +117,7 @@ struct InvoiceRow: View {
                 }
             }
             Spacer()
-            Text("$\(Int(invoice.amount))")
+            Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
                 .font(.subheadline.weight(.semibold)).foregroundColor(.white)
 
             if showPay {

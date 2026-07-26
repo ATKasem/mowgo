@@ -11,6 +11,10 @@ struct MowFlowApp: App {
     @StateObject private var store = DataStore()
     @AppStorage("isDarkMode") private var isDarkMode = true
 
+    private var authLoadState: String {
+        "\(auth.isLoading)-\(auth.isAuthenticated)-\(auth.isDemoMode)"
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -27,6 +31,14 @@ struct MowFlowApp: App {
                 }
             }
             .preferredColorScheme(isDarkMode ? .dark : .light)
+            .task(id: authLoadState) {
+                guard !auth.isLoading else { return }
+                if auth.isAuthenticated {
+                    await store.loadAll()
+                } else {
+                    store.clear()
+                }
+            }
         }
     }
 }

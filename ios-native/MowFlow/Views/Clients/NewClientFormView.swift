@@ -97,24 +97,38 @@ struct NewClientFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { save() }
-                        .disabled(name.isEmpty || isSaving)
+                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Button("Done") { focusedField = nil }
                 }
             }
+            .alert("Couldn’t Save Client", isPresented: Binding(
+                get: { error != nil },
+                set: { if !$0 { error = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(error ?? "Please check the form and try again.")
+            }
         }
     }
 
     private func save() {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            error = "Enter a client name."
+            return
+        }
+
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
 
         isSaving = true
         let client = Client(
             id: UUID(),
-            name: name,
+            name: trimmedName,
             address: address.isEmpty ? nil : address,
             phone: phone.isEmpty ? nil : phone,
             email: email.isEmpty ? nil : email,

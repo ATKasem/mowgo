@@ -11,7 +11,7 @@ import StripePaymentSheet
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
-    private let stripe = StripeService.shared
+    @ObservedObject private var stripe = StripeService.shared
     @State private var showingCheckout = false
     @State private var checkoutURL: URL?
     @State private var paymentError: String?
@@ -25,7 +25,7 @@ struct PaymentView: View {
                 Text(invoice.clientName ?? "Invoice")
                     .font(.headline)
                     .foregroundColor(.white)
-                Text("$\(invoice.amount, specifier: "%.2f")")
+                Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
                     .font(.title.weight(.bold))
                     .foregroundColor(Color(hex: "16a34a"))
                 if let date = invoice.createdAt {

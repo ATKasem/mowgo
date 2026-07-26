@@ -38,7 +38,7 @@ struct JobCardView: View {
 
                     Spacer()
                     if let rate = job.clientRate {
-                        Text("$\(Int(rate))")
+                        Text(rate.formatted(.currency(code: "USD")))
                             .font(.subheadline.weight(.medium))
                             .foregroundColor(Color(hex: "16a34a"))
                     }

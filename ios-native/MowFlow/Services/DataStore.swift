@@ -8,51 +8,122 @@
 
 import SwiftUI
 
+private struct ClientInsert: Encodable {
+    let id: UUID
+    let userId: UUID
+    let name: String
+    let address: String?
+    let phone: String?
+    let email: String?
+    let rate: Double
+    let cleaningNotes: String?
+    let keyCode: String?
+    let alarmCode: String?
+    let petInstructions: String?
+}
+
+private struct JobInsert: Encodable {
+    let id: UUID
+    let userId: UUID
+    let clientId: UUID
+    let assignedTo: UUID?
+    let title: String
+    let scheduledDate: String
+    let scheduledTime: String?
+    let durationMinutes: Int?
+    let status: Job.JobStatus
+    let notes: String?
+    let photoUrl: String?
+    let routeOrder: Int?
+    let isRecurring: Bool?
+    let recurrenceRule: String?
+}
+
+private struct JobStatusPatch: Encodable {
+    let status: Job.JobStatus
+}
+
+private struct JobSchedulePatch: Encodable {
+    let scheduledDate: String
+}
+
+private struct InvoicePaidPatch: Encodable {
+    let status: Invoice.InvoiceStatus
+    let paidAt: String
+}
+
 @MainActor
 final class DataStore: ObservableObject {
     @Published var jobs: [Job] = []
     @Published var clients: [Client] = []
     @Published var invoices: [Invoice] = []
-    @Published var isLoading = true
+    @Published var isLoading = false
     @Published var error: String?
 
     private let sb = SupabaseService.shared
 
-    init() { Task { await loadAll() } }
-
     // MARK: - Load
 
     private var loadTask: Task<Void, Never>?
+    private var loadGeneration = 0
 
     func loadAll() async {
+        loadGeneration += 1
+        let generation = loadGeneration
+
         // Cancel any in-flight load and wait for it to finish
         loadTask?.cancel()
         _ = await loadTask?.value
+        guard !Task.isCancelled, generation == loadGeneration else { return }
 
         isLoading = true
         error = nil
 
-        guard await sb.isConfigured else {
+        let isConfigured = await sb.isConfigured
+        guard !Task.isCancelled, generation == loadGeneration else { return }
+        guard isConfigured else {
             loadDemo()
             isLoading = false
             return
         }
+        guard await sb.ensureAuthenticated() else {
+            guard generation == loadGeneration else { return }
+            clear()
+            return
+        }
+        guard !Task.isCancelled, generation == loadGeneration else { return }
 
         loadTask = Task {
             do {
                 async let j = sb.fetchJobs()
                 async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
                 async let i = sb.fetchInvoices()
-                (jobs, clients, invoices) = try await (j, c, i)
+                let loaded = try await (j, c, i)
+                guard !Task.isCancelled, generation == loadGeneration else { return }
+                (jobs, clients, invoices) = loaded
             } catch is CancellationError {
                 return // Silently cancelled — the new loadTask will replace us
             } catch {
+                guard !Task.isCancelled, generation == loadGeneration else { return }
                 self.error = error.localizedDescription
                 loadDemo()
             }
-            isLoading = false
+            if generation == loadGeneration {
+                isLoading = false
+            }
         }
         await loadTask?.value
+    }
+
+    func clear() {
+        loadGeneration += 1
+        loadTask?.cancel()
+        loadTask = nil
+        jobs = []
+        clients = []
+        invoices = []
+        isLoading = false
+        error = nil
     }
 
     // MARK: - Jobs
@@ -63,7 +134,28 @@ final class DataStore: ObservableObject {
             return
         }
         do {
-            let created: Job = try await sb.insert("jobs", job)
+            guard let userId = try await sb.getCurrentUserId() else {
+                throw DataStoreError.authenticationRequired
+            }
+            guard let clientId = job.clientId else {
+                throw DataStoreError.clientRequired
+            }
+            let created: Job = try await sb.insert("jobs", JobInsert(
+                id: job.id,
+                userId: userId,
+                clientId: clientId,
+                assignedTo: job.assignedTo,
+                title: job.title,
+                scheduledDate: job.scheduledDate,
+                scheduledTime: job.scheduledTime,
+                durationMinutes: job.durationMinutes,
+                status: job.status,
+                notes: job.notes,
+                photoUrl: job.photoUrl,
+                routeOrder: job.routeOrder,
+                isRecurring: job.isRecurring,
+                recurrenceRule: job.recurrenceRule
+            ))
             jobs.append(created)
         } catch {
             self.error = error.localizedDescription
@@ -71,16 +163,33 @@ final class DataStore: ObservableObject {
         }
     }
 
-    func updateJob(_ job: Job) async throws {
+    private func updateJobStatus(_ job: Job, status: Job.JobStatus) async throws {
+        var updated = job
+        updated.status = status
         guard await sb.isConfigured else {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
-                jobs[idx] = job
+                jobs[idx] = updated
             }
             return
         }
-        try await sb.update("jobs", id: job.id, job)
+        try await sb.update("jobs", id: job.id, JobStatusPatch(status: status))
         if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
-            jobs[idx] = job
+            jobs[idx] = updated
+        }
+    }
+
+    private func updateJobSchedule(_ job: Job, scheduledDate: String) async throws {
+        var updated = job
+        updated.scheduledDate = scheduledDate
+        guard await sb.isConfigured else {
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            return
+        }
+        try await sb.update("jobs", id: job.id, JobSchedulePatch(scheduledDate: scheduledDate))
+        if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+            jobs[idx] = updated
         }
     }
 
@@ -94,9 +203,8 @@ final class DataStore: ObservableObject {
     }
 
     func toggleJobStatus(_ job: Job) async throws {
-        var updated = job
-        updated.status = job.status == .done ? .scheduled : .done
-        try await updateJob(updated)
+        let status: Job.JobStatus = job.status == .done ? .scheduled : .done
+        try await updateJobStatus(job, status: status)
     }
 
     private var isRainDelaying = false
@@ -113,16 +221,16 @@ final class DataStore: ObservableObject {
         // Collect all updates first; if any fail, roll back the ones that succeeded
         var updatedJobs: [Job] = []
 
-        for var job in pending {
-            job.scheduledDate = tomorrow
+        for job in pending {
             do {
-                try await updateJob(job)
-                updatedJobs.append(job)
+                try await updateJobSchedule(job, scheduledDate: tomorrow)
+                var updated = job
+                updated.scheduledDate = tomorrow
+                updatedJobs.append(updated)
             } catch {
                 // Rollback: move already-updated jobs back to original date
-                for var rollback in updatedJobs {
-                    rollback.scheduledDate = date
-                    try? await updateJob(rollback)
+                for rollback in updatedJobs {
+                    try? await updateJobSchedule(rollback, scheduledDate: date)
                 }
                 throw error
             }
@@ -137,7 +245,22 @@ final class DataStore: ObservableObject {
             return
         }
         do {
-            let created: Client = try await sb.insert("clients", client)
+            guard let userId = try await sb.getCurrentUserId() else {
+                throw DataStoreError.authenticationRequired
+            }
+            let created: Client = try await sb.insert("clients", ClientInsert(
+                id: client.id,
+                userId: userId,
+                name: client.name,
+                address: client.address,
+                phone: client.phone,
+                email: client.email,
+                rate: client.rate,
+                cleaningNotes: client.cleaningNotes,
+                keyCode: client.keyCode,
+                alarmCode: client.alarmCode,
+                petInstructions: client.petInstructions
+            ))
             clients.append(created)
         } catch {
             self.error = error.localizedDescription
@@ -170,9 +293,10 @@ final class DataStore: ObservableObject {
     // MARK: - Invoices
 
     func markInvoicePaid(_ invoice: Invoice) async throws {
+        let paidAt = ISO8601DateFormatter().string(from: Date())
         var updated = invoice
         updated.status = .paid
-        updated.paidAt = ISO8601DateFormatter().string(from: Date())
+        updated.paidAt = paidAt
         guard await sb.isConfigured else {
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
@@ -180,7 +304,10 @@ final class DataStore: ObservableObject {
             return
         }
         do {
-            try await sb.update("invoices", id: invoice.id, updated)
+            try await sb.update("invoices", id: invoice.id, InvoicePaidPatch(
+                status: updated.status,
+                paidAt: paidAt
+            ))
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
@@ -204,6 +331,20 @@ final class DataStore: ObservableObject {
         jobs = d.jobs
         clients = d.clients
         invoices = d.invoices
+    }
+}
+
+enum DataStoreError: LocalizedError {
+    case authenticationRequired
+    case clientRequired
+
+    var errorDescription: String? {
+        switch self {
+        case .authenticationRequired:
+            "Please sign in before saving."
+        case .clientRequired:
+            "Select a client before saving the job."
+        }
     }
 }
 

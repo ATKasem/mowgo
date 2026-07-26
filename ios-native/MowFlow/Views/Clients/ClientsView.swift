@@ -89,7 +89,7 @@ struct ClientCard: View {
                     Spacer()
                     HStack(spacing: 8) {
                         if client.rate > 0 {
-                            Text("$\(Int(client.rate))")
+                            Text(client.rate.formatted(.currency(code: "USD")))
                                 .font(.caption.weight(.medium)).foregroundColor(Color(hex: "16a34a"))
                         }
                         Image(systemName: "chevron.right").font(.caption)

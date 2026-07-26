@@ -41,6 +41,18 @@ actor SupabaseService {
         return !token.isEmpty && Date() < expiry
     }
 
+    func ensureAuthenticated() async -> Bool {
+        if isAuthenticated { return true }
+        guard refreshToken?.isEmpty == false else { return false }
+        do {
+            try await refreshAccessToken()
+            return isAuthenticated
+        } catch {
+            await signOut()
+            return false
+        }
+    }
+
     // MARK: - Init (reads from Info.plist)
     //  Xcode with GENERATE_INFOPLIST_FILE strips the INFOPLIST_KEY_ prefix,
     //  so INFOPLIST_KEY_SUPABASE_URL → Info.plist key "SUPABASE_URL".
@@ -67,7 +79,12 @@ actor SupabaseService {
 
     func signIn(email: String, password: String) async throws -> String {
         let body: [String: Any] = ["email": email, "password": password]
-        let data = try await request("POST", "/auth/v1/token?grant_type=password", body: body)
+        let data = try await request(
+            "POST",
+            "/auth/v1/token?grant_type=password",
+            body: body,
+            allowsTokenRefresh: false
+        )
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         guard let accessToken = json?["access_token"] as? String else {
             throw AuthError.invalidCredentials
@@ -84,7 +101,12 @@ actor SupabaseService {
 
     func signUp(email: String, password: String) async throws {
         let body: [String: Any] = ["email": email, "password": password]
-        _ = try await request("POST", "/auth/v1/signup", body: body)
+        _ = try await request(
+            "POST",
+            "/auth/v1/signup",
+            body: body,
+            allowsTokenRefresh: false
+        )
     }
 
     func signOut() async {
@@ -103,11 +125,7 @@ actor SupabaseService {
         if let cached = _cachedUserId { return cached }
         // Try refresh if token is expired
         if !isAuthenticated, let _ = refreshToken {
-            do {
-                try await refreshAccessToken()
-            } catch {
-                print("[SupabaseService] Token refresh failed: \(error.localizedDescription)")
-            }
+            try await refreshAccessToken()
         }
         guard token != nil else { return nil }
         let data = try await request("GET", "/auth/v1/user")
@@ -179,7 +197,7 @@ actor SupabaseService {
         }
     }
 
-    func restoreSession() -> Bool {
+    func restoreSession() async -> Bool {
         // Try Keychain first, then fall back to UserDefaults (migration)
         var t = loadFromKeychain(key: "sb_token")
         if t == nil || t!.isEmpty {
@@ -199,14 +217,29 @@ actor SupabaseService {
                 UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
             }
         }
-        guard let t = t, !t.isEmpty else { return false }
+        guard let t = t, !t.isEmpty else {
+            await signOut()
+            return false
+        }
         token = t
         refreshToken = loadFromKeychain(key: "sb_refresh_token")
         if let ts = loadFromKeychain(key: "sb_token_expiry"),
            let interval = TimeInterval(ts) {
             tokenExpiry = Date(timeIntervalSince1970: interval)
         }
-        return isAuthenticated
+        if isAuthenticated { return true }
+
+        guard refreshToken?.isEmpty == false else {
+            await signOut()
+            return false
+        }
+        do {
+            try await refreshAccessToken()
+            return isAuthenticated
+        } catch {
+            await signOut()
+            return false
+        }
     }
 
     private func clearSession() {
@@ -223,14 +256,24 @@ actor SupabaseService {
         guard let rt = refreshToken else { return }
         // If a refresh is already in flight, wait for it to complete
         if let existing = refreshTask {
-            try await existing.value
+            do {
+                try await existing.value
+            } catch {
+                await signOut()
+                throw error
+            }
             // After the in-flight refresh, check if we now have a valid token
             guard !isAuthenticated else { return }
         }
         refreshTask = Task {
             defer { refreshTask = nil }
             let body: [String: Any] = ["refresh_token": rt]
-            let data = try await request("POST", "/auth/v1/token?grant_type=refresh_token", body: body)
+            let data = try await request(
+                "POST",
+                "/auth/v1/token?grant_type=refresh_token",
+                body: body,
+                allowsTokenRefresh: false
+            )
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             if let accessToken = json?["access_token"] as? String {
                 token = accessToken
@@ -244,7 +287,12 @@ actor SupabaseService {
                 throw AuthError.sessionExpired
             }
         }
-        try await refreshTask?.value
+        do {
+            try await refreshTask?.value
+        } catch {
+            await signOut()
+            throw error
+        }
     }
 
     // MARK: - CRUD (filtered by user_id)
@@ -282,11 +330,14 @@ actor SupabaseService {
         return profiles.first
     }
 
-    func insert<T: Encodable>(_ table: String, _ item: T) async throws -> T where T: Decodable {
+    func insert<Payload: Encodable, Result: Decodable>(
+        _ table: String,
+        _ item: Payload
+    ) async throws -> Result {
         let data = try await request("POST", "/rest/v1/\(table)",
             body: try JSONSerialization.jsonObject(with: encoder.encode(item)),
             prefer: "return=representation")
-        let items = try decoder.decode([T].self, from: data)
+        let items = try decoder.decode([Result].self, from: data)
         guard let first = items.first else { throw SupabaseError.noRows }
         return first
     }
@@ -314,7 +365,7 @@ actor SupabaseService {
         _ path: String,
         body: Any? = nil,
         prefer: String? = nil,
-        isRetry: Bool = false
+        allowsTokenRefresh: Bool = true
     ) async throws -> Data {
         guard let url = URL(string: "\(baseURL)\(path)") else {
             throw SupabaseError.network
@@ -340,10 +391,15 @@ actor SupabaseService {
             throw SupabaseError.network
         }
         guard (200...299).contains(http.statusCode) else {
-            // Auto-refresh on 401, but only retry once
-            if http.statusCode == 401, !isRetry, refreshToken != nil {
-                try? await refreshAccessToken()
-                return try await request(method, path, body: body, prefer: prefer, isRetry: true)
+            if http.statusCode == 401, allowsTokenRefresh, refreshToken != nil {
+                try await refreshAccessToken()
+                return try await request(
+                    method,
+                    path,
+                    body: body,
+                    prefer: prefer,
+                    allowsTokenRefresh: false
+                )
             }
             throw SupabaseError.httpStatus(http.statusCode)
         }

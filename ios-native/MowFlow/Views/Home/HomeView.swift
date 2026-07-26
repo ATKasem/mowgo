@@ -87,7 +87,12 @@ struct HomeView: View {
             StatCard(title: "Scheduled", value: "\(scheduledCount)", icon: "list.clipboard", color: "f59e0b")
             StatCard(title: "Clients", value: "\(totalClients)", icon: "person.2", color: "3b82f6")
             StatCard(title: "Unpaid", value: "\(unpaidCount)", icon: "doc.text", color: "ef4444")
-            StatCard(title: "This Week", value: "$\(Int(truncating: NSDecimalNumber(decimal: weeklyRevenue / 100)))", icon: "dollarsign.circle", color: "16a34a")
+            StatCard(
+                title: "This Week",
+                value: (weeklyRevenue / 100).formatted(.currency(code: "USD")),
+                icon: "dollarsign.circle",
+                color: "16a34a"
+            )
         }
     }
 

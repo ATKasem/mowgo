@@ -32,7 +32,7 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showSubscription) {
-                SubscriptionView()
+                SubscriptionView(currentTier: auth.user?.tier ?? "free")
             }
             .alert("Sign Out", isPresented: $showingSignOut) {
                 Button("Sign Out", role: .destructive) { Task { await auth.signOut() } }
@@ -136,6 +136,11 @@ struct SettingsView: View {
 
 struct SubscriptionView: View {
     @Environment(\.dismiss) var dismiss
+    let currentTier: String
+
+    private var normalizedCurrentTier: String {
+        currentTier.lowercased()
+    }
 
     var body: some View {
         NavigationStack {
@@ -149,7 +154,7 @@ struct SubscriptionView: View {
                             price: "$0/mo",
                             features: ["5 clients", "Basic scheduling", "Invoice tracking"],
                             tier: "free",
-                            isCurrent: true
+                            isCurrent: normalizedCurrentTier == "free"
                         )
 
                         SubscriptionPlanCard(
@@ -163,7 +168,7 @@ struct SubscriptionView: View {
                                 "Priority support"
                             ],
                             tier: "solo",
-                            isCurrent: false
+                            isCurrent: normalizedCurrentTier == "solo"
                         )
 
                         SubscriptionPlanCard(
@@ -177,7 +182,7 @@ struct SubscriptionView: View {
                                 "Custom branding"
                             ],
                             tier: "crew",
-                            isCurrent: false
+                            isCurrent: normalizedCurrentTier == "crew"
                         )
                     }
                     .padding(16)

@@ -47,6 +47,10 @@ final class StripeService: ObservableObject {
     }
 
     func createPaymentIntent(amount: Int, currency: String = "usd", invoiceId: UUID) async throws -> PaymentIntentResult {
+        guard !isLoading else { throw StripeError.operationInProgress }
+        isLoading = true
+        defer { isLoading = false }
+
         let body: [String: Any] = [
             "amount": amount,
             "currency": currency,
@@ -89,11 +93,13 @@ final class StripeService: ObservableObject {
 enum StripeError: LocalizedError {
     case noClientSecret
     case noCheckoutURL
+    case operationInProgress
     case paymentFailed(String)
     var errorDescription: String? {
         switch self {
         case .noClientSecret: "Could not initialize payment."
         case .noCheckoutURL: "Could not create checkout session."
+        case .operationInProgress: "A payment is already being prepared."
         case .paymentFailed(let msg): "Payment failed: \(msg)"
         }
     }

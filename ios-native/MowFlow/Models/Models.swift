@@ -95,14 +95,9 @@ struct Invoice: Codable, Identifiable, Equatable {
     var amount: Double
     /// Safe integer-cents representation. Use this for ALL arithmetic and display.
     var amountCents: Int {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
-        guard let number = formatter.number(from: String(format: "%.2f", amount)) else {
-            return Int((amount * 100).rounded())
-        }
-        return Int((number.doubleValue * 100).rounded())
+        Int((amount * 100).rounded())
     }
+    var currencyAmount: Decimal { Decimal(amountCents) / 100 }
     var status: InvoiceStatus
     var stripeInvoiceId: String?
     var stripePaymentIntentId: String?

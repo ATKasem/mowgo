@@ -21,7 +21,7 @@ struct StatChip: View {
                 .fill(Color(hex: color))
                 .frame(width: 6, height: 6)
             if let amount {
-                Text("$\(Int(amount))")
+                Text(amount.formatted(.currency(code: "USD")))
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.white)
             } else {

@@ -29,7 +29,6 @@ struct NewJobFormView: View {
                         TextField("Title (e.g. Weekly Mow)", text: $title)
                             .textContentType(.name)
                         Picker("Client", selection: $clientId) {
-                            Text("None").tag(nil as UUID?)
                             ForEach(store.clients) { client in
                                 Text(client.name).tag(client.id as UUID?)
                             }
@@ -55,13 +54,35 @@ struct NewJobFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { save() }
-                        .disabled(title.isEmpty || isSaving)
+                        .disabled(
+                            title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                            clientId == nil ||
+                            isSaving
+                        )
                 }
+            }
+            .alert("Couldn’t Save Job", isPresented: Binding(
+                get: { error != nil },
+                set: { if !$0 { error = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(error ?? "Please check the form and try again.")
             }
         }
     }
 
     private func save() {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTitle.isEmpty else {
+            error = "Enter a job title."
+            return
+        }
+        guard let clientId else {
+            error = "Select a client."
+            return
+        }
+
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
 
@@ -70,7 +91,7 @@ struct NewJobFormView: View {
         let job = Job(
             id: UUID(),
             clientId: clientId,
-            title: title,
+            title: trimmedTitle,
             scheduledDate: date,
             scheduledTime: timeFmt.string(from: scheduledTime),
             durationMinutes: duration,
