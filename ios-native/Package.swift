@@ -12,6 +12,7 @@ let package = Package(
             name: "MowFlow",
             dependencies: [
                 .product(name: "StripePayments", package: "stripe-ios"),
+                .product(name: "StripePaymentSheet", package: "stripe-ios"),
             ],
             path: "MowFlow",
             resources: [

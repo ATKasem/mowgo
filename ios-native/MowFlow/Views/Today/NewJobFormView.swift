@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NewJobFormView: View {
     @EnvironmentObject var store: DataStore
-    @Environment(\\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
 
     let date: String
     var teamMembers: [UserProfile] = []
