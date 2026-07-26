@@ -75,27 +75,14 @@ struct PaymentView: View {
         paymentError = nil
         let amountCents = invoice.amountCents
         do {
-            let result = try await stripe.createPaymentIntent(
+            let paymentIntent = try await stripe.createPaymentIntent(
                 amount: amountCents, invoiceId: invoice.id
             )
-            // CRITICAL FIX: Present PaymentSheet to actually collect payment.
-            // The previous TODO skipped PaymentSheet and marked invoices paid
-            // without charging the customer's card.
+            let paymentId = paymentIntent.paymentIntentId
             let intentConfig = PaymentSheet.IntentConfiguration(
                 mode: .payment(amount: amountCents, currency: "usd"),
-                confirmHandler: { paymentMethod, shouldSavePaymentMethod, intentCreationCallback in
-                    // Confirm the PaymentIntent on our server
-                    Task { @MainActor in
-                        do {
-                            try await self.stripe.confirmPayment(
-                                invoiceId: self.invoice.id,
-                                paymentIntentId: result.paymentIntentId
-                            )
-                            intentCreationCallback(.success(result.paymentIntentId))
-                        } catch {
-                            intentCreationCallback(.failure(error))
-                        }
-                    }
+                confirmHandler: { _, _, intentCreationCallback in
+                    intentCreationCallback(.success(paymentIntent.clientSecret))
                 }
             )
             var config = PaymentSheet.Configuration()
@@ -116,7 +103,13 @@ struct PaymentView: View {
             paymentSheet.present(from: rootVC) { result in
                 switch result {
                 case .completed:
-                    Task { try? await self.store.markInvoicePaid(self.invoice) }
+                    Task {
+                        try? await self.stripe.confirmPayment(
+                            invoiceId: self.invoice.id,
+                            paymentIntentId: paymentId
+                        )
+                        try? await self.store.markInvoicePaid(self.invoice)
+                    }
                 case .canceled:
                     self.paymentError = "Payment was canceled."
                 case .failed(let error):
