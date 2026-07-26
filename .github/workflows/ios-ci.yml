@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'ios-native/**'
+      - '.github/workflows/ios-ci.yml'
   pull_request:
     branches: [main]
     paths:
