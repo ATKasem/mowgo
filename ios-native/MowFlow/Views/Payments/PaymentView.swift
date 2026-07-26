@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StripePayments
+import StripePaymentSheet
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
