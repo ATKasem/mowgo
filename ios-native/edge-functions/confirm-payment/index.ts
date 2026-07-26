@@ -15,6 +15,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function amountToCents(value: unknown): number | null {
+  const match = String(value).match(/^(\d+)(?:\.(\d{1,2}))?$/);
+  if (!match) return null;
+  const cents = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
+  return Number.isSafeInteger(cents) && cents > 0 ? cents : null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -52,33 +59,90 @@ serve(async (req) => {
       );
     }
 
+    const { data: invoice, error: invoiceError } = await supabase
+      .from("invoices")
+      .select("id, user_id, amount, status, stripe_payment_intent_id")
+      .eq("id", invoice_id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (invoiceError || !invoice) {
+      return new Response(JSON.stringify({ error: "Invoice not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (
+      invoice.stripe_payment_intent_id &&
+      invoice.stripe_payment_intent_id !== payment_intent_id
+    ) {
+      return new Response(JSON.stringify({ error: "Payment intent mismatch" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (
+      invoice.status === "paid" &&
+      invoice.stripe_payment_intent_id === payment_intent_id
+    ) {
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Verify the payment intent succeeded via Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (stripeKey) {
-      const resp = await fetch(
-        `https://api.stripe.com/v1/payment_intents/${payment_intent_id}`,
+    if (!stripeKey) {
+      return new Response(
+        JSON.stringify({ error: "Payment verification unavailable" }),
         {
-          headers: { Authorization: `Bearer ${stripeKey}` },
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
-      if (resp.ok) {
-        const pi = await resp.json();
-        if (pi.status !== "succeeded") {
-          return new Response(
-            JSON.stringify({
-              error: `Payment not yet complete (status: ${pi.status})`,
-            }),
-            {
-              status: 400,
-              headers: {
-                ...corsHeaders,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+    }
+
+    const resp = await fetch(
+      `https://api.stripe.com/v1/payment_intents/${payment_intent_id}`,
+      { headers: { Authorization: `Bearer ${stripeKey}` } }
+    );
+    if (!resp.ok) {
+      return new Response(JSON.stringify({ error: "Payment verification failed" }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const pi = await resp.json();
+    if (pi.status !== "succeeded") {
+      return new Response(
+        JSON.stringify({
+          error: `Payment not yet complete (status: ${pi.status})`,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
-      }
-      // If Stripe call fails, proceed anyway (belt-and-suspenders)
+      );
+    }
+    if (
+      pi.metadata?.invoice_id !== invoice_id ||
+      pi.metadata?.user_id !== user.id
+    ) {
+      return new Response(JSON.stringify({ error: "Payment metadata mismatch" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const expectedAmount = amountToCents(invoice.amount);
+    if (expectedAmount === null || pi.amount_received !== expectedAmount) {
+      return new Response(JSON.stringify({ error: "Payment amount mismatch" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Update invoice status
@@ -90,7 +154,8 @@ serve(async (req) => {
         stripe_payment_intent_id: payment_intent_id,
       })
       .eq("id", invoice_id)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .eq("stripe_payment_intent_id", payment_intent_id);
 
     if (updateErr) {
       console.error("Update error:", updateErr);

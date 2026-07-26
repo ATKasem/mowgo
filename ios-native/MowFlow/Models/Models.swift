@@ -51,7 +51,7 @@ struct Job: Codable, Identifiable, Equatable {
         var address: String?
         var phone: String?
         var email: String?
-        var rate: Double?
+        var rate: Decimal?
         var cleaningNotes: String?
         var keyCode: String?
         var alarmCode: String?
@@ -61,7 +61,7 @@ struct Job: Codable, Identifiable, Equatable {
     // Computed helpers (mirrors web app's data.js mapping)
     var clientName: String? { clients?.name }
     var address: String? { clients?.address }
-    var clientRate: Double? { clients?.rate }
+    var clientRate: Decimal? { clients?.rate }
     var recurrence: String { recurrenceRule ?? "none" }
 }
 
@@ -74,7 +74,7 @@ struct Client: Codable, Identifiable, Equatable {
     var address: String?
     var phone: String?
     var email: String?
-    var rate: Double
+    var rate: Decimal
     var cleaningNotes: String?
     var keyCode: String?
     var alarmCode: String?
@@ -89,15 +89,15 @@ struct Invoice: Codable, Identifiable, Equatable {
     var userId: UUID?
     var clientId: UUID?
     var jobId: UUID?
-    // WARNING: Double causes floating-point rounding errors for currency.
-    // Prefer amountCents (Int) for all arithmetic. The Supabase schema stores
-    // `amount` as numeric — this field mirrors it for decoding compatibility.
-    var amount: Double
-    /// Safe integer-cents representation. Use this for ALL arithmetic and display.
+    var amount: Decimal
+    /// Integer-cents representation used by Stripe.
     var amountCents: Int {
-        Int((amount * 100).rounded())
+        var cents = amount * 100
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &cents, 0, .plain)
+        return NSDecimalNumber(decimal: rounded).intValue
     }
-    var currencyAmount: Decimal { Decimal(amountCents) / 100 }
+    var currencyAmount: Decimal { amount }
     var status: InvoiceStatus
     var stripeInvoiceId: String?
     var stripePaymentIntentId: String?

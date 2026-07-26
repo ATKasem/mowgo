@@ -158,8 +158,6 @@ struct HomeView: View {
     private var weekDays: [WeekDay] {
         let cal = Calendar.current; let now = Date()
         let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
-        fmt.calendar = Calendar(identifier: .gregorian)
-        fmt.timeZone = TimeZone(secondsFromGMT: 0)!
         return (-3...3).compactMap { offset in
             guard let d = cal.date(byAdding: .day, value: offset, to: now) else { return nil }
             return WeekDay(

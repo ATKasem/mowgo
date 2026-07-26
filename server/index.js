@@ -97,6 +97,96 @@ async function auth(req, res, next) {
   next();
 }
 
+async function requireCrewOwner(req, res) {
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('id, business_name, tier, role')
+    .eq('id', req.user.id)
+    .single();
+  if (error || !profile) {
+    res.status(403).json({ error: 'Profile not found' });
+    return null;
+  }
+  if (profile.tier !== 'crew' || (profile.role || 'owner') !== 'owner') {
+    res.status(403).json({ error: 'Only a Crew plan owner can manage team members' });
+    return null;
+  }
+  return profile;
+}
+
+// === TEAM ===
+app.post('/api/team/invite', auth, async (req, res) => {
+  const owner = await requireCrewOwner(req, res);
+  if (!owner) return;
+
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'A valid email is required' });
+  }
+
+  const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${process.env.APP_URL || 'http://localhost:5173'}/#/login`,
+    data: { business_id: owner.id, role: 'crew' },
+  });
+  if (inviteError) return res.status(400).json({ error: inviteError.message });
+
+  const invitedUserId = invited.user?.id;
+  if (!invitedUserId) return res.status(500).json({ error: 'Invitation did not create a user' });
+
+  const displayName = email.split('@')[0];
+  const { data: member, error: profileError } = await supabase
+    .from('profiles')
+    .update({
+      business_name: displayName,
+      tier: 'crew',
+      role: 'crew',
+      business_id: owner.id,
+    })
+    .eq('id', invitedUserId)
+    .select('id, business_name, phone, avatar_url, role, business_id, created_at')
+    .single();
+  if (profileError) {
+    await supabase.auth.admin.deleteUser(invitedUserId);
+    return res.status(500).json({ error: profileError.message });
+  }
+
+  res.status(201).json(member);
+});
+
+app.delete('/api/team/:memberId', auth, async (req, res) => {
+  const owner = await requireCrewOwner(req, res);
+  if (!owner) return;
+  if (req.params.memberId === owner.id) {
+    return res.status(400).json({ error: 'The team owner cannot be removed' });
+  }
+
+  const { data: member, error: memberError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', req.params.memberId)
+    .eq('business_id', owner.id)
+    .eq('role', 'crew')
+    .maybeSingle();
+  if (memberError) return res.status(500).json({ error: memberError.message });
+  if (!member) return res.status(404).json({ error: 'Team member not found' });
+
+  const { error: jobsError } = await supabase
+    .from('jobs')
+    .update({ assigned_to: null })
+    .eq('user_id', owner.id)
+    .eq('assigned_to', member.id);
+  if (jobsError) return res.status(500).json({ error: jobsError.message });
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .update({ tier: 'free', role: 'owner', business_id: null })
+    .eq('id', member.id)
+    .eq('business_id', owner.id);
+  if (profileError) return res.status(500).json({ error: profileError.message });
+
+  res.json({ success: true });
+});
+
 // === CLIENTS ===
 app.get('/api/clients', auth, async (req, res) => {
   const { data, error } = await supabase.from('clients').select('*').eq('user_id', req.user.id).order('name');
@@ -158,14 +248,19 @@ app.get('/api/jobs', auth, async (req, res) => {
 });
 
 app.get('/api/jobs/today', auth, async (req, res) => {
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const timezoneOffset = Number(req.query.timezone_offset);
+  const hasValidOffset = Number.isFinite(timezoneOffset) && Math.abs(timezoneOffset) <= 14 * 60;
+  const today = hasValidOffset
+    ? new Date(now.getTime() - timezoneOffset * 60_000).toISOString().split('T')[0]
+    : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const { data, error } = await supabase.from('jobs').select('*, clients(name, address, phone)').eq('user_id', req.user.id).eq('scheduled_date', today).order('route_order', { ascending: true, nullsLast: true });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
 app.post('/api/jobs', auth, async (req, res) => {
-  const { title, client_id, scheduled_date, scheduled_time, duration_minutes, status, route_order, recurrence_rule, notes } = req.body;
+  const { title, client_id, scheduled_date, scheduled_time, duration_minutes, status, route_order, recurrence_rule, notes, assigned_to } = req.body;
   const { data, error } = await supabase.from('jobs').insert({
     title: title || null,
     client_id,
@@ -176,6 +271,7 @@ app.post('/api/jobs', auth, async (req, res) => {
     route_order: route_order || 99,
     recurrence_rule: recurrence_rule || 'none',
     notes: notes || null,
+    assigned_to: assigned_to || null,
     user_id: req.user.id,
   }).select().single();
   if (error) return res.status(500).json({ error: error.message });
@@ -184,7 +280,7 @@ app.post('/api/jobs', auth, async (req, res) => {
 
 app.put('/api/jobs/:id', auth, async (req, res) => {
   const allowed = {};
-  const fields = ['title', 'client_id', 'scheduled_date', 'scheduled_time', 'duration_minutes', 'status', 'route_order', 'recurrence_rule', 'notes'];
+  const fields = ['title', 'client_id', 'scheduled_date', 'scheduled_time', 'duration_minutes', 'status', 'route_order', 'recurrence_rule', 'notes', 'assigned_to'];
   for (const f of fields) {
     if (req.body[f] !== undefined) allowed[f] = req.body[f];
   }
@@ -205,7 +301,8 @@ app.post('/api/jobs/reorder', auth, async (req, res) => {
   const { orders } = req.body; // [{ id, route_order }]
   if (!Array.isArray(orders)) return res.status(400).json({ error: 'orders must be an array' });
   for (const { id, route_order } of orders) {
-    await supabase.from('jobs').update({ route_order }).eq('id', id).eq('user_id', req.user.id);
+    const { error } = await supabase.from('jobs').update({ route_order }).eq('id', id).eq('user_id', req.user.id);
+    if (error) return res.status(500).json({ error: error.message });
   }
   res.json({ success: true });
 });

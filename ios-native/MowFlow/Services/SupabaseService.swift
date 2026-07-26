@@ -138,10 +138,6 @@ actor SupabaseService {
     }
 
     // MARK: - Token persistence
-    // TODO: Migrate token storage from UserDefaults to Keychain for production.
-    // UserDefaults are backed up to iCloud and are not encrypted at rest.
-    // Use Security.framework (SecItemAdd/SecItemCopyMatching) or a wrapper
-    // like KeychainAccess to store sb_token and sb_refresh_token securely.
 
     // MARK: - Keychain Helpers
 
@@ -299,8 +295,7 @@ actor SupabaseService {
 
     func fetch<T: Decodable>(_ table: String, query: [String: String] = [:]) async throws -> [T] {
         var q = query
-        if table != "profiles" {
-            guard let uid = try await getCurrentUserId() else { return [] }
+        if let uid = try? await getCurrentUserId(), table != "profiles" {
             q["user_id"] = "eq.\(uid.uuidString)"
         }
         var path = "/rest/v1/\(table)?select=*"

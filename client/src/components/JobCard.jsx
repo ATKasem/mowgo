@@ -1,14 +1,23 @@
 import { memo } from 'react';
 import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical } from 'lucide-react';
-import { STATUS_CONFIG, RECURRENCE_OPTIONS } from '../lib/constants';
+import { STATUS_CONFIG, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 import { getMapsUrl } from '../lib/maps';
 
-function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown }) {
+function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown, teamMembers }) {
   const client = job.clients;
   const isDone = job.status === 'done';
   const statusInfo = STATUS_CONFIG[job.status] || STATUS_CONFIG.scheduled;
   const recurrenceLabel = job.recurrence && job.recurrence !== 'none'
     ? RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label
+    : null;
+
+  // Resolve assigned member for crew chip
+  const assignedMember = teamMembers && job.assigned_to
+    ? teamMembers.find(m => m.id === job.assigned_to)
+    : null;
+  const assignedMemberIdx = assignedMember ? teamMembers.indexOf(assignedMember) : -1;
+  const assignedColor = assignedMemberIdx >= 0
+    ? TEAM_MEMBER_COLORS[assignedMemberIdx % TEAM_MEMBER_COLORS.length]
     : null;
 
   return (
@@ -55,8 +64,15 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
             <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
             <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{job.title}</span>
             {recurrenceLabel && (
-              <><span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
+              <><span className="text-gray-300 dark:text-gray-600 text-xs">·</span>
               <span className="text-xs text-violet-500 dark:text-violet-400 inline-flex items-center gap-0.5"><RefreshCw className="w-3 h-3" />{recurrenceLabel}</span></>
+            )}
+            {assignedMember && assignedColor && (
+              <><span className="text-gray-300 dark:text-gray-600 text-xs">·</span>
+              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${assignedColor.bg} ${assignedColor.text}`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+                {(assignedMember.business_name || 'Unnamed').split(' ')[0]}
+              </span></>
             )}
           </div>
         </div>

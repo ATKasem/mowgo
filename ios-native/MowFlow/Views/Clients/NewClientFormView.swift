@@ -132,7 +132,7 @@ struct NewClientFormView: View {
             address: address.isEmpty ? nil : address,
             phone: phone.isEmpty ? nil : phone,
             email: email.isEmpty ? nil : email,
-            rate: Double(rate) ?? 0,
+            rate: Decimal(string: rate) ?? 0,
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
             alarmCode: alarmCode.isEmpty ? nil : alarmCode,

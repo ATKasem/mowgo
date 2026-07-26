@@ -15,6 +15,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function amountToCents(value: unknown): number | null {
+  const match = String(value).match(/^(\d+)(?:\.(\d{1,2}))?$/);
+  if (!match) return null;
+  const cents = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
+  return Number.isSafeInteger(cents) && cents > 0 ? cents : null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -41,11 +48,11 @@ serve(async (req) => {
       });
     }
 
-    const { amount, currency = "usd", invoice_id } = await req.json();
+    const { currency = "usd", invoice_id } = await req.json();
 
-    if (!amount || !invoice_id) {
+    if (!invoice_id) {
       return new Response(
-        JSON.stringify({ error: "amount and invoice_id required" }),
+        JSON.stringify({ error: "invoice_id required" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -56,7 +63,7 @@ serve(async (req) => {
     // Verify the invoice belongs to this user
     const { data: invoice, error: invErr } = await supabase
       .from("invoices")
-      .select("id, user_id")
+      .select("id, user_id, amount, status, stripe_payment_intent_id")
       .eq("id", invoice_id)
       .eq("user_id", user.id)
       .single();
@@ -64,6 +71,21 @@ serve(async (req) => {
     if (invErr || !invoice) {
       return new Response(JSON.stringify({ error: "Invoice not found" }), {
         status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (invoice.status === "paid") {
+      return new Response(JSON.stringify({ error: "Invoice is already paid" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const amount = amountToCents(invoice.amount);
+    if (amount === null) {
+      return new Response(JSON.stringify({ error: "Invalid invoice amount" }), {
+        status: 422,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -85,6 +107,7 @@ serve(async (req) => {
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
+        "Idempotency-Key": `mowflow-invoice-${user.id}-${invoice_id}`,
       },
       body: new URLSearchParams({
         amount: String(amount),
@@ -113,10 +136,14 @@ serve(async (req) => {
     await supabase
       .from("invoices")
       .update({ stripe_payment_intent_id: paymentIntent.id })
-      .eq("id", invoice_id);
+      .eq("id", invoice_id)
+      .eq("user_id", user.id);
 
     return new Response(
-      JSON.stringify({ client_secret: paymentIntent.client_secret }),
+      JSON.stringify({
+        client_secret: paymentIntent.client_secret,
+        payment_intent_id: paymentIntent.id,
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

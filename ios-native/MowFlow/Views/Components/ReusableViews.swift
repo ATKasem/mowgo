@@ -12,7 +12,7 @@ import SwiftUI
 struct StatChip: View {
     let label: String
     var count: Int? = nil
-    var amount: Double? = nil
+    var amount: Decimal? = nil
     let color: String
 
     var body: some View {

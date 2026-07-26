@@ -6,12 +6,13 @@
  */
 
 import { supabase, isDemoMode } from './supabase';
-import { demoJobs, demoClients, demoInvoices } from './demoData';
+import { demoJobs, demoClients, demoInvoices, demoTeamMembers } from './demoData';
 
 // ===== In-memory demo state (shared across pages) =====
 let _jobs = [...demoJobs];
 let _clients = [...demoClients];
 let _invoices = [...demoInvoices];
+let _teamMembers = [...demoTeamMembers];
 
 /** Listeners notified when demo state changes */
 const listeners = new Set();
@@ -23,16 +24,40 @@ function uid() { return crypto.randomUUID ? crypto.randomUUID() : String(Date.no
 // ===== Jobs =====
 
 export async function loadJobs() {
-  if (isDemoMode()) return [..._jobs];
+  if (isDemoMode()) {
+    // Crew demo users only see jobs assigned to them
+    const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
+    if (!profile) return [];
+    if (profile.role === 'crew') {
+      return _jobs.filter(j => j.assigned_to === profile.id);
+    }
+    return [..._jobs];
+  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const { data, error } = await supabase
+  // Check if user is a crew member — if so, filter to assigned jobs only
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, business_id')
+    .eq('id', user.id)
+    .single();
+
+  let query = supabase
     .from('jobs')
     .select('*, clients!left(*)')
-    .eq('user_id', user.id)
     .order('route_order', { ascending: true });
+
+  if (profile?.role === 'crew') {
+    // Crew sees only jobs assigned to them (RLS also enforces this)
+    query = query.eq('assigned_to', user.id);
+  } else {
+    // Owner sees jobs they own (RLS also enforces this)
+    query = query.eq('user_id', user.id);
+  }
+
+  const { data, error } = await query;
 
   if (error) { console.error('loadJobs:', error); throw new Error('Failed to load jobs: ' + (error.message || 'Unknown error')); }
 
@@ -46,6 +71,7 @@ export async function loadJobs() {
     status: j.status,
     route_order: j.route_order,
     recurrence: j.recurrence_rule || 'none',
+    assigned_to: j.assigned_to || null,
     clients: j.clients ? {
       id: j.clients.id,
       name: j.clients.name,
@@ -83,6 +109,7 @@ export async function createJob(job) {
     route_order: job.route_order || 99,
     recurrence_rule: job.recurrence || 'none',
     notes: job.notes || null,
+    assigned_to: job.assigned_to || null,
   }).select('*, clients!left(*)').single();
 
   if (error) throw error;
@@ -96,6 +123,7 @@ export async function createJob(job) {
     status: data.status,
     route_order: data.route_order,
     recurrence: data.recurrence_rule || 'none',
+    assigned_to: data.assigned_to || null,
     clients: data.clients ? {
       id: data.clients.id,
       name: data.clients.name,
@@ -138,6 +166,7 @@ export async function updateJob(id, updates) {
     status: data.status,
     route_order: data.route_order,
     recurrence: data.recurrence_rule || 'none',
+    assigned_to: data.assigned_to || null,
     clients: data.clients ? {
       id: data.clients.id,
       name: data.clients.name,
@@ -171,10 +200,24 @@ export async function loadClients() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role, business_id')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError) {
+    console.error('loadClients profile:', profileError);
+    throw new Error('Failed to load profile: ' + (profileError.message || 'Unknown error'));
+  }
+
+  const ownerId = profile?.role === 'crew' ? profile.business_id : user.id;
+  if (!ownerId) return [];
+
   const { data, error } = await supabase
     .from('clients')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', ownerId)
     .order('name');
 
   if (error) { console.error('loadClients:', error); throw new Error('Failed to load clients: ' + (error.message || 'Unknown error')); }
@@ -242,7 +285,10 @@ export async function deleteClient(id) {
 // ===== Invoices =====
 
 export async function loadInvoices() {
-  if (isDemoMode()) return [..._invoices];
+  if (isDemoMode()) {
+    const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
+    return profile?.role === 'owner' ? [..._invoices] : [];
+  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
@@ -325,7 +371,11 @@ export async function updateInvoiceStatus(id, status) {
 // ===== Profile =====
 
 export async function loadProfile() {
-  if (isDemoMode()) return { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo' };
+  if (isDemoMode()) {
+    const userId = _currentDemoUserId();
+    const member = _teamMembers.find(m => m.id === userId);
+    return member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo', role: 'owner', business_id: null };
+  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -336,16 +386,273 @@ export async function loadProfile() {
 }
 
 export async function saveProfile(profile) {
-  if (isDemoMode()) return profile;
+  if (isDemoMode()) {
+    const userId = _currentDemoUserId();
+    const idx = _teamMembers.findIndex(m => m.id === userId);
+    if (idx >= 0) {
+      _teamMembers[idx] = { ..._teamMembers[idx], ...profile };
+    }
+    notify();
+    return profile;
+  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
   const { business_name, phone, avatar_url } = profile;
-  const { error } = await supabase.from('profiles').upsert({
-    id: user.id,
+  const { error } = await supabase.from('profiles').update({
     business_name, phone, avatar_url,
-  });
+  }).eq('id', user.id);
   if (error) throw error;
-  return { business_name, phone, avatar_url };
+  return { ...profile, business_name, phone, avatar_url };
+}
+
+// ===== Team / Crew =====
+
+let _demoCurrentUserId = 'demo-owner-001';
+
+/** Helper: get the current demo-mode user id (owner by default) */
+function _currentDemoUserId() {
+  return _demoCurrentUserId;
+}
+
+/**
+ * Switch which demo user is "logged in".
+ * Call this to test crew-mode filtering.
+ */
+export function setDemoUserId(userId) {
+  _demoCurrentUserId = userId;
+}
+
+/**
+ * Load all team members for the current user's business.
+ * Demo mode: returns all demo team members.
+ * Real mode: queries profiles where business_id matches the owner.
+ */
+export async function loadTeamMembers() {
+  if (isDemoMode()) {
+    const currentMember = _teamMembers.find(m => m.id === _currentDemoUserId());
+    if (!currentMember) return [];
+    const bizId = currentMember.role === 'owner' ? currentMember.id : currentMember.business_id;
+    return _teamMembers.filter(m => m.id === bizId || m.business_id === bizId);
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // Determine the business_id (owner profile id) for this user
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role, business_id, id')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError) {
+    console.error('loadTeamMembers profile:', profileError);
+    throw new Error('Failed to load profile: ' + (profileError.message || 'Unknown error'));
+  }
+  if (!profile) return [];
+
+  // Owners: their own id is the business_id. Crew: use their business_id.
+  const bizId = profile.role === 'owner' ? profile.id : profile.business_id;
+  if (!bizId) return [{ ...profile }]; // standalone owner, no crew
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .or(`id.eq.${bizId},business_id.eq.${bizId}`)
+    .order('business_name');
+
+  if (error) { console.error('loadTeamMembers:', error); throw new Error('Failed to load team: ' + (error.message || 'Unknown error')); }
+
+  return (data || []).map(m => ({
+    id: m.id,
+    business_name: m.business_name,
+    phone: m.phone,
+    avatar_url: m.avatar_url,
+    role: m.role || 'owner',
+    business_id: m.business_id || null,
+    created_at: m.created_at,
+  }));
+}
+
+async function authenticatedApiRequest(path, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Not authenticated');
+
+  const response = await fetch(path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+      ...options.headers,
+    },
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || 'Team request failed');
+  return payload;
+}
+
+export async function reorderJobs(orders) {
+  if (isDemoMode()) {
+    const routeOrders = new Map(orders.map(({ id, route_order }) => [id, route_order]));
+    _jobs = _jobs.map(job => routeOrders.has(job.id)
+      ? { ...job, route_order: routeOrders.get(job.id) }
+      : job);
+    notify();
+    return;
+  }
+
+  await authenticatedApiRequest('/api/jobs/reorder', {
+    method: 'POST',
+    body: JSON.stringify({ orders }),
+  });
+}
+
+export async function inviteTeamMember(email) {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) throw new Error('Email is required');
+
+  if (isDemoMode()) {
+    const owner = _teamMembers.find(m => m.id === _currentDemoUserId() && m.role === 'owner');
+    if (!owner) throw new Error('Only the team owner can invite members');
+    const member = {
+      id: `demo-crew-${Date.now()}`,
+      business_name: normalizedEmail.split('@')[0],
+      email: normalizedEmail,
+      phone: '',
+      avatar_url: null,
+      tier: 'crew',
+      role: 'crew',
+      business_id: owner.id,
+      created_at: new Date().toISOString(),
+    };
+    _teamMembers = [..._teamMembers, member];
+    notify();
+    return member;
+  }
+
+  return authenticatedApiRequest('/api/team/invite', {
+    method: 'POST',
+    body: JSON.stringify({ email: normalizedEmail }),
+  });
+}
+
+export async function removeTeamMember(memberId) {
+  if (isDemoMode()) {
+    const owner = _teamMembers.find(m => m.id === _currentDemoUserId() && m.role === 'owner');
+    const member = _teamMembers.find(m => m.id === memberId);
+    if (!owner || !member || member.business_id !== owner.id) {
+      throw new Error('Only the team owner can remove members');
+    }
+    _teamMembers = _teamMembers.filter(m => m.id !== memberId);
+    _jobs = _jobs.map(job => job.assigned_to === memberId ? { ...job, assigned_to: null } : job);
+    notify();
+    return;
+  }
+
+  await authenticatedApiRequest(`/api/team/${encodeURIComponent(memberId)}`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * Load team dashboard: aggregate job stats per team member for a given date.
+ * Returns: [{ id, name, role, total, done, in_progress }]
+ */
+export async function loadTeamDashboard(date) {
+  if (isDemoMode()) {
+    const targetDate = date || new Date().toISOString().split('T')[0];
+    const currentMember = _teamMembers.find(m => m.id === _currentDemoUserId());
+    if (!currentMember) return [];
+    const bizId = currentMember.role === 'owner' ? currentMember.id : currentMember.business_id;
+    const visibleMembers = currentMember.role === 'crew'
+      ? [currentMember]
+      : _teamMembers.filter(m => m.id === bizId || m.business_id === bizId);
+
+    return visibleMembers
+      .map(member => {
+        const memberJobs = _jobs.filter(j =>
+          j.scheduled_date === targetDate &&
+          (j.assigned_to === member.id || (member.role === 'owner' && !j.assigned_to))
+        );
+        return {
+          id: member.id,
+          name: member.business_name,
+          role: member.role || 'owner',
+          total: memberJobs.length,
+          done: memberJobs.filter(j => j.status === 'done').length,
+          in_progress: memberJobs.filter(j => j.status === 'in_progress').length,
+        };
+      });
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const targetDate = date || new Date().toISOString().split('T')[0];
+
+  // Get the business_id for this user
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role, business_id, id')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError) {
+    console.error('loadTeamDashboard profile:', profileError);
+    throw new Error('Failed to load profile: ' + (profileError.message || 'Unknown error'));
+  }
+  if (!profile) return [];
+
+  const bizId = profile.role === 'owner' ? profile.id : profile.business_id;
+  if (!bizId) return [];
+
+  // Load team members
+  const { data: members, error: membersError } = await supabase
+    .from('profiles')
+    .select('id, business_name, role')
+    .or(`id.eq.${bizId},business_id.eq.${bizId}`);
+
+  if (membersError) {
+    console.error('loadTeamDashboard members:', membersError);
+    throw new Error('Failed to load team: ' + (membersError.message || 'Unknown error'));
+  }
+  if (!members?.length) return [];
+
+  // Crew members can only read their own assigned jobs; showing coworkers with
+  // zeroes would be misleading.
+  const visibleMembers = profile.role === 'crew'
+    ? members.filter(member => member.id === user.id)
+    : members;
+
+  // Load all jobs for this date across the business
+  let jobsQuery = supabase
+    .from('jobs')
+    .select('assigned_to, status')
+    .eq('scheduled_date', targetDate);
+
+  if (profile.role === 'crew') {
+    jobsQuery = jobsQuery.eq('assigned_to', user.id);
+  } else {
+    jobsQuery = jobsQuery.eq('user_id', bizId);
+  }
+
+  const { data: jobs, error: jobsError } = await jobsQuery;
+  if (jobsError) {
+    console.error('loadTeamDashboard jobs:', jobsError);
+    throw new Error('Failed to load team jobs: ' + (jobsError.message || 'Unknown error'));
+  }
+
+  return visibleMembers.map(m => {
+    const memberJobs = (jobs || []).filter(j => j.assigned_to === m.id || (!j.assigned_to && m.id === bizId));
+    return {
+      id: m.id,
+      name: m.business_name,
+      role: m.role || 'owner',
+      total: memberJobs.length,
+      done: memberJobs.filter(j => j.status === 'done').length,
+      in_progress: memberJobs.filter(j => j.status === 'in_progress').length,
+    };
+  });
 }

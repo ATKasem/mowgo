@@ -109,10 +109,10 @@ struct PaymentView: View {
                                 invoiceId: self.invoice.id,
                                 paymentIntentId: paymentId
                             )
-                            try await self.store.markInvoicePaid(self.invoice)
+                            await self.store.loadAll()
                         } catch {
                             await MainActor.run {
-                                self.paymentError = "Payment succeeded but recording failed: \(error.localizedDescription). Please try again or contact support."
+                                self.paymentError = "Payment succeeded, but verification failed: \(error.localizedDescription). Refresh before trying again."
                             }
                         }
                     }

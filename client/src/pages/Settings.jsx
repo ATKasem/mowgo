@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { loadProfile, saveProfile } from '../lib/data';
+import { loadProfile, saveProfile, loadTeamMembers, inviteTeamMember, removeTeamMember } from '../lib/data';
+import { TEAM_MEMBER_COLORS } from '../lib/constants';
 import { isDemoMode } from '../lib/supabase';
 import { useAuth } from '../App';
 import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
@@ -14,12 +15,32 @@ export default function Settings() {
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
   const [notifyOnRain, setNotifyOnRain] = useState(() => localStorage.getItem('mf_notify_rain') !== 'false');
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [teamError, setTeamError] = useState('');
+  const [inviteSuccess, setInviteSuccess] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteSending, setInviteSending] = useState(false);
 
   useEffect(() => {
     loadProfile().then(data => {
       if (data) setProfile(data);
       setProfileLoading(false);
-    }).catch(() => setProfileLoading(false));
+      // Load team members when on crew tier
+      if (data?.tier === 'crew') {
+        setTeamLoading(true);
+        loadTeamMembers()
+          .then(setTeamMembers)
+          .catch(err => {
+            console.error('loadTeamMembers:', err);
+            setTeamError(err.message || 'Failed to load team members');
+          })
+          .finally(() => setTeamLoading(false));
+      }
+    }).catch(err => {
+      setError(err.message || 'Failed to load profile');
+      setProfileLoading(false);
+    });
   }, []);
 
   async function save(e) {
@@ -53,6 +74,40 @@ export default function Settings() {
     setNotifyOnRain(val);
     localStorage.setItem('mf_notify_rain', val);
   }
+
+  async function handleInvite(e) {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+    setInviteSending(true);
+    setTeamError('');
+    setInviteSuccess('');
+    try {
+      const result = await inviteTeamMember(inviteEmail);
+      if (result?.id) setTeamMembers(prev => prev.some(member => member.id === result.id) ? prev : [...prev, result]);
+      setInviteSuccess(isDemoMode() ? 'Demo member added.' : 'Invitation sent.');
+      setInviteEmail('');
+    } catch (err) {
+      console.error('Invite failed:', err);
+      setTeamError(err.message || 'Failed to send invitation');
+    } finally {
+      setInviteSending(false);
+    }
+  }
+
+  async function handleRemoveMember(memberId) {
+    if (!window.confirm('Remove this team member?')) return;
+    setTeamError('');
+    try {
+      await removeTeamMember(memberId);
+      setTeamMembers(prev => prev.filter(m => m.id !== memberId));
+    } catch (err) {
+      console.error('Remove member failed:', err);
+      setTeamError(err.message || 'Failed to remove team member');
+    }
+  }
+
+  const isTeamOwner = profile?.tier === 'crew' && (profile?.role || 'owner') === 'owner';
+  const owner = teamMembers.find(member => member.role === 'owner');
 
   return (
     <div>
@@ -150,15 +205,70 @@ export default function Settings() {
           {profile?.tier !== 'crew' && (
             <p className="text-sm text-gray-500 dark:text-gray-400">Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.</p>
           )}
+          {teamError && (
+            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" role="alert">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {teamError}
+            </div>
+          )}
+          {inviteSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">{inviteSuccess}</p>}
+          {/* Owner row — always shown */}
           <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
             <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400">
-              {(profile?.business_name || user?.email || 'YO').slice(0, 2).toUpperCase()}
+              {(owner?.business_name || profile?.business_name || user?.email || 'YO').slice(0, 2).toUpperCase()}
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{profile?.business_name || (user?.email?.split('@')?.[0]) || 'You'}</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{owner?.business_name || profile?.business_name || (user?.email?.split('@')?.[0]) || 'You'}</p>
               <p className="text-xs text-gray-400 dark:text-gray-500">Owner</p>
             </div>
           </div>
+          {teamLoading && (
+            <div className="flex items-center justify-center py-4" aria-label="Loading team members">
+              <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
+            </div>
+          )}
+          {/* Crew members — crew tier only */}
+          {profile?.tier === 'crew' && !teamLoading && teamMembers.filter(m => m.role !== 'owner').map((m, i) => {
+            const color = TEAM_MEMBER_COLORS[(i + 1) % TEAM_MEMBER_COLORS.length];
+            return (
+              <div key={m.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${color.bg} ${color.text}`}>
+                  {(m.business_name || '??').slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{m.business_name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Crew Member</p>
+                </div>
+                {isTeamOwner && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveMember(m.id)}
+                    className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 min-w-10 min-h-10"
+                    aria-label={`Remove ${m.business_name || 'team member'}`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            );
+          })}
+          {/* Invite form — crew tier only */}
+          {isTeamOwner && (
+            <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2 pt-2">
+              <input
+                type="email"
+                value={inviteEmail}
+                onChange={e => setInviteEmail(e.target.value)}
+                placeholder="Email to invite..."
+                className="input flex-1 min-w-0"
+                required
+              />
+              <button type="submit" disabled={inviteSending} className="btn-primary text-xs gap-1.5 whitespace-nowrap sm:w-auto w-full">
+                {inviteSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
+                Send Invite
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Help */}

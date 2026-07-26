@@ -1,8 +1,8 @@
-import { Sparkles, RefreshCw } from 'lucide-react';
+import { Sparkles, RefreshCw, Users } from 'lucide-react';
 import { demoClients } from '../lib/demoData';
-import { RECURRENCE_OPTIONS } from '../lib/constants';
+import { RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 
-export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving = false, clients }) {
+export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving = false, clients, teamMembers }) {
   // Use real clients when provided, fall back to demo for demo mode
   const clientList = clients ?? demoClients;
 
@@ -45,6 +45,34 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
           {RECURRENCE_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
         </select>
       </div>
+      {/* Assignee dropdown — crew tier only */}
+      {teamMembers && teamMembers.length > 0 && (
+        <div>
+          <label className="label flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />Assign To</label>
+          <select value={form.assigned_to || ''} onChange={e => setForm({ ...form, assigned_to: e.target.value || null })} className="select">
+            <option value="">Unassigned</option>
+            {teamMembers.map(m => (
+              <option key={m.id} value={m.id}>
+                {m.business_name || 'Unnamed member'} ({m.role === 'owner' ? 'Owner' : 'Crew'})
+              </option>
+            ))}
+          </select>
+          {form.assigned_to && (() => {
+            const member = teamMembers.find(m => m.id === form.assigned_to);
+            if (!member) return null;
+            const idx = teamMembers.indexOf(member);
+            const color = TEAM_MEMBER_COLORS[idx % TEAM_MEMBER_COLORS.length];
+            return (
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${color.bg} ${color.text}`}>
+                  <span className="w-2 h-2 rounded-full bg-current opacity-60" />
+                  {member.business_name || 'Unnamed member'}
+                </span>
+              </div>
+            );
+          })()}
+        </div>
+      )}
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={saving} className="btn-primary flex-1">{saving ? 'Adding...' : 'Add Job'}</button>
         <button type="button" onClick={onCancel} disabled={saving} className="btn-secondary flex-1">Cancel</button>

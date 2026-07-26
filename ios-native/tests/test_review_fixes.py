@@ -103,6 +103,50 @@ class IOSReviewFixTests(unittest.TestCase):
         self.assertIn("case operationInProgress", stripe)
         self.assertIn("@ObservedObject private var stripe", payment)
 
+    def test_payment_edge_functions_are_idempotent_and_fail_closed(self) -> None:
+        edge_root = ROOT.parent / "edge-functions"
+        create = (edge_root / "create-payment-intent/index.ts").read_text()
+        confirm = (edge_root / "confirm-payment/index.ts").read_text()
+        payment = source("Views/Payments/PaymentView.swift")
+
+        self.assertIn('"Idempotency-Key"', create)
+        self.assertIn("mowflow-invoice-${user.id}-${invoice_id}", create)
+        self.assertIn("stripe_payment_intent_id", create)
+        self.assertIn("payment_intent_id: paymentIntent.id", create)
+        self.assertIn('.select("id, user_id, amount, status, stripe_payment_intent_id")', create)
+        self.assertNotIn("const { amount,", create)
+
+        self.assertIn('status: 503', confirm)
+        self.assertIn("if (!resp.ok)", confirm)
+        self.assertIn('pi.status !== "succeeded"', confirm)
+        self.assertIn('pi.metadata?.invoice_id !== invoice_id', confirm)
+        self.assertIn('pi.metadata?.user_id !== user.id', confirm)
+        self.assertIn("pi.amount_received !== expectedAmount", confirm)
+        self.assertIn(".eq(\"stripe_payment_intent_id\", payment_intent_id)", confirm)
+        self.assertNotIn("If Stripe call fails, proceed anyway", confirm)
+
+        completed = payment.split("case .completed:", 1)[1].split(
+            "case .canceled:", 1
+        )[0]
+        self.assertIn("try await self.stripe.confirmPayment", completed)
+        self.assertIn("await self.store.loadAll()", completed)
+        self.assertIn("catch", completed)
+        self.assertNotIn("try?", completed)
+        self.assertNotIn("markInvoicePaid", completed)
+
+    def test_currency_models_do_not_use_binary_floating_point(self) -> None:
+        models = source("Models/Models.swift")
+        data_store = source("Services/DataStore.swift")
+        components = source("Views/Components/ReusableViews.swift")
+        client_form = source("Views/Clients/NewClientFormView.swift")
+
+        self.assertNotRegex(models, re.compile(r"(amount|rate): Double"))
+        self.assertNotRegex(data_store, re.compile(r"rate: Double"))
+        self.assertNotRegex(components, re.compile(r"amount: Double"))
+        self.assertIn("var amount: Decimal", models)
+        self.assertIn("var rate: Decimal", models)
+        self.assertIn("Decimal(string: rate)", client_form)
+
     def test_forms_display_errors_and_trim_required_fields(self) -> None:
         client_form = source("Views/Clients/NewClientFormView.swift")
         job_form = source("Views/Today/NewJobFormView.swift")

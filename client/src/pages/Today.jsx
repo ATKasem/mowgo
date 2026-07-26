@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWeather } from '../lib/useWeather';
-import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS } from '../lib/constants';
-import { createJob, updateJobStatus, updateJob, loadJobs, loadClients } from '../lib/data';
-import { supabase } from '../lib/supabase';
+import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
+import { createJob, updateJobStatus, updateJob, reorderJobs, loadClients, loadTeamMembers, loadProfile } from '../lib/data';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
@@ -36,27 +35,61 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const [dragOverId, setDragOverId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [clients, setClients] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [canManageCrew, setCanManageCrew] = useState(false);
+  const [isCrewMember, setIsCrewMember] = useState(false);
+  const [teamLoading, setTeamLoading] = useState(true);
+  const [teamError, setTeamError] = useState('');
+  const [crewFilter, setCrewFilter] = useState(null); // null = show all
   const toggleTimeoutRef = useRef(null);
   const jobsRef = useRef(jobs);
+  const formRef = useRef(form);
 
   useEffect(() => { jobsRef.current = jobs; }, [jobs]);
+  useEffect(() => { formRef.current = form; }, [form]);
 
   const { rainLikely, todayRainChance } = useWeather();
-
-  const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
 
   // Load clients for the NewJobForm dropdown
   useEffect(() => { loadClients().then(setClients).catch(err => console.error('loadClients:', err)); }, []);
 
+  // Load team members when on crew tier
+  useEffect(() => {
+    let active = true;
+    async function loadTeam() {
+      try {
+        const profile = await loadProfile();
+        if (profile?.tier === 'crew') {
+          const members = await loadTeamMembers();
+          if (active) {
+            setTeamMembers(members);
+            setCanManageCrew((profile.role || 'owner') === 'owner');
+            setIsCrewMember(profile.role === 'crew');
+          }
+        }
+      } catch (err) {
+        console.error('loadTeamMembers:', err);
+        if (active) setTeamError('Crew assignments are temporarily unavailable.');
+      } finally {
+        if (active) setTeamLoading(false);
+      }
+    }
+    loadTeam();
+    return () => { active = false; };
+  }, []);
+
   const createJobHandler = useCallback(async (e) => {
     e.preventDefault();
-    if (!form.client_id) return;
+    const currentForm = formRef.current;
+    if (!currentForm.client_id) return;
     setSaving(true);
     try {
       const currentJobs = jobsRef.current;
-      const newJob = await createJob({ ...form, scheduled_date: date, route_order: currentJobs.filter(j => j.scheduled_date === date).length + 1 });
+      const newJob = await createJob({ ...currentForm, scheduled_date: date, route_order: currentJobs.filter(j => j.scheduled_date === date).length + 1 });
       if (newJob) {
         setJobs(prev => [newJob, ...prev]);
+        setShowForm(false);
+        setForm(INITIAL_JOB_FORM);
       }
     } catch (err) {
       console.error('createJob:', err);
@@ -64,9 +97,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       setTimeout(() => setCompletedToast(null), 4000);
     }
     setSaving(false);
-    setShowForm(false);
-    setForm(INITIAL_JOB_FORM);
-  }, [form, date, setJobs]);
+  }, [formRef, date, setJobs]);
 
   const toggleStatus = useCallback(async (job) => {
     setAnimating(job.id);
@@ -99,6 +130,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                 duration_minutes: job.duration_minutes,
                 recurrence: job.recurrence,
                 route_order: 99,
+                assigned_to: job.assigned_to || null,
               }).then(nextJob => {
                 if (nextJob) setJobs(p => [...p, nextJob]);
                 const clientName = job.clients?.name || 'Job';
@@ -145,14 +177,14 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     updated.splice(toIdx, 0, moved);
   }
 
-  async function reorderWithinDate(prev, fromJobId, toJobId, currentDate) {
+  function reorderWithinDate(prev, fromJobId, toJobId, currentDate) {
     const updated = [...prev];
     // Get date-scoped indices (relative to full array)
     const dateJobs = updated.filter(j => j.scheduled_date === currentDate);
     const dateJobIds = dateJobs.map(j => j.id);
     const fromPos = dateJobIds.indexOf(fromJobId);
     const toPos = dateJobIds.indexOf(toJobId);
-    if (fromPos === -1 || toPos === -1 || fromPos === toPos) return prev;
+    if (fromPos === -1 || toPos === -1 || fromPos === toPos) return null;
     // Map filtered indices back to full-array indices
     const fromFullIdx = updated.findIndex(j => j.id === fromJobId);
     const toFullIdx = updated.findIndex(j => j.id === toJobId);
@@ -169,30 +201,31 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       .filter(j => j.scheduled_date === currentDate)
       .map(j => ({ id: j.id, route_order: j.route_order }));
 
-    // Persist reordered jobs — use httpOnly cookie session (no client JWT needed)
     const updates = updated
       .filter(j => j.scheduled_date === currentDate)
       .map(j => ({ id: j.id, route_order: j.route_order }));
+    return { updated, updates, previousOrder };
+  }
+
+  async function persistReorder(fromJobId, toJobId) {
+    const result = reorderWithinDate(jobsRef.current, fromJobId, toJobId, date);
+    if (!result) return;
+
+    setJobs(result.updated);
     try {
-      await fetch('/api/jobs/reorder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orders: updates }),
-      });
+      await reorderJobs(result.updates);
     } catch (err) {
-      console.error('reorderWithinDate: batch persist failed', err);
-      // Roll back to previous order
-      return prev.map(j => {
-        const prevItem = previousOrder.find(p => p.id === j.id);
-        return prevItem ? { ...j, route_order: prevItem.route_order } : j;
-      });
+      console.error('persistReorder: batch persist failed', err);
+      setJobs(current => current.map(job => {
+        const previous = result.previousOrder.find(item => item.id === job.id);
+        return previous ? { ...job, route_order: previous.route_order } : job;
+      }));
     }
-    return updated;
   }
 
   function handleDrop(job) {
     if (!dragId || dragId === job.id) { setDragId(null); setDragOverId(null); return; }
-    setJobs(prev => reorderWithinDate(prev, dragId, job.id, date));
+    void persistReorder(dragId, job.id);
     setDragId(null);
     setDragOverId(null);
   }
@@ -203,17 +236,20 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     const dateJobs = jobs.filter(j => j.scheduled_date === date);
     const pos = dateJobs.findIndex(j => j.id === job.id);
     if (pos <= 0) return;
-    setJobs(prev => reorderWithinDate(prev, job.id, dateJobs[pos - 1].id, date));
+    void persistReorder(job.id, dateJobs[pos - 1].id);
   }
 
   function handleMoveDown(job) {
     const dateJobs = jobs.filter(j => j.scheduled_date === date);
     const pos = dateJobs.findIndex(j => j.id === job.id);
     if (pos === -1 || pos >= dateJobs.length - 1) return;
-    setJobs(prev => reorderWithinDate(prev, job.id, dateJobs[pos + 1].id, date));
+    void persistReorder(job.id, dateJobs[pos + 1].id);
   }
 
-  const filtered = date === today ? jobs : jobs.filter(j => j.scheduled_date === date);
+  const dateFiltered = jobs.filter(j => j.scheduled_date === date);
+  const filtered = crewFilter
+    ? dateFiltered.filter(j => j.assigned_to === crewFilter)
+    : dateFiltered;
   const doneCount = filtered.filter(j => j.status === 'done').length;
 
   if (loading) {
@@ -240,7 +276,9 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             )}
           </div>
         </div>
-        <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
+        {!teamLoading && !isCrewMember && (
+          <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
+        )}
       </div>
 
       {/* Rain delay — always visible when there are incomplete jobs */}
@@ -254,9 +292,10 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               const tomorrow = new Date(date);
               tomorrow.setDate(tomorrow.getDate() + 1);
               const nextDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+              const toMoveIds = new Set(toMove.map(j => j.id));
               // Optimistic update
               setJobs(prev => prev.map(j =>
-                j.status !== 'done' && j.scheduled_date === date
+                toMoveIds.has(j.id)
                   ? { ...j, scheduled_date: nextDate }
                   : j
               ));
@@ -289,7 +328,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             <span className="flex-1 text-left min-w-0">
               <span className="font-semibold">{(todayRainChance() ?? 0)}%</span> chance of rain — move{' '}
               <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">
-                {jobs.filter(j => j.status !== 'done' && j.scheduled_date === date).length} remaining to tomorrow
+                {filtered.filter(j => j.status !== 'done' && j.scheduled_date === date).length} remaining to tomorrow
               </span>
             </span>
             <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">Move All</span>
@@ -310,9 +349,46 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         </div>
       </div>
 
+      {/* Crew filter tabs — only when 2+ members */}
+      {teamError && (
+        <p className="mb-4 text-xs text-amber-700 dark:text-amber-400" role="status">{teamError}</p>
+      )}
+      {canManageCrew && teamMembers.length >= 2 && (
+        <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
+          <button
+            onClick={() => setCrewFilter(null)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              crewFilter === null
+                ? 'bg-emerald-500 text-white shadow-sm'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            All
+          </button>
+          {teamMembers.map((m, i) => {
+            const color = TEAM_MEMBER_COLORS[i % TEAM_MEMBER_COLORS.length];
+            const isActive = crewFilter === m.id;
+            return (
+              <button
+                key={m.id}
+                onClick={() => setCrewFilter(isActive ? null : m.id)}
+                className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  isActive
+                    ? 'bg-emerald-500 text-white shadow-sm'
+                    : `${color.bg} ${color.text} hover:opacity-80`
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white/70' : 'bg-current opacity-50'}`} />
+                {(m.business_name || 'Unnamed').split(' ')[0]}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* New job form */}
-      {showForm && (
-        <NewJobForm form={form} setForm={setForm} onSubmit={createJobHandler} onCancel={() => setShowForm(false)} saving={saving} clients={clients} />
+      {showForm && !isCrewMember && (
+        <NewJobForm form={form} setForm={setForm} onSubmit={createJobHandler} onCancel={() => setShowForm(false)} saving={saving} clients={clients} teamMembers={!teamLoading && canManageCrew ? teamMembers : []} />
       )}
 
       {/* Job list */}
@@ -320,8 +396,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
             <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 font-semibold">No jobs scheduled</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Tap + to add your first job</p>
+            <p className="text-gray-500 dark:text-gray-400 font-semibold">{crewFilter ? 'No jobs assigned' : 'No jobs scheduled'}</p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{crewFilter ? 'Choose All or another crew member.' : 'Tap + to add your first job'}</p>
           </div>
         )}
         {filtered.map((job, i) => (
@@ -341,6 +417,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             onDragEnd={handleDragEnd}
             onMoveUp={() => handleMoveUp(job)}
             onMoveDown={() => handleMoveDown(job)}
+            teamMembers={teamMembers}
           />
         ))}
       </div>

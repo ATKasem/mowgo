@@ -4,27 +4,27 @@ import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
 const features = [
-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Rain tomorrow? One tap moves your whole schedule forward. Clients get notified automatically. The feature no other app has.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes so you spend less time driving and more time mowing. Your route builds itself every morning.', color: 'from-emerald-500 to-teal-500' },
-  { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, chemical notes — the fields you actually use every day. Not generic "custom fields."', color: 'from-violet-500 to-purple-500' },
+  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
+  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes across OKC, Tulsa, Edmond, and beyond. Spend less time on I-35 and more time mowing.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice sends automatically. Client pays via Stripe link. Track paid vs unpaid at a glance.', color: 'from-amber-500 to-orange-500' },
 ];
 
 const differentiators = [
-  { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural areas? MowFlow keeps working without internet and syncs when you are back online.' },
-  { icon: Moon, title: 'Dark Mode Built In', desc: 'Early mornings are hard enough. Dark mode keeps the screen easy on your eyes at 6am. Most lawn care apps are still blinding white.' },
-  { icon: Shield, title: 'Your Data Is Yours', desc: 'Some "free" apps sell your customer data to advertisers. MowFlow never touches your data. You are the customer, not the product.' },
+  { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural Oklahoma? MowFlow keeps working without internet and syncs when you are back in range.' },
+  { icon: Moon, title: 'Dark Mode Built In', desc: 'Early Oklahoma mornings are hard enough. Dark mode at 6am keeps the screen easy on your eyes.' },
+  { icon: Shield, title: 'Built in OKC, Not Silicon Valley', desc: 'We are not a VC-funded startup in California guessing what Oklahoma crews need. We talk to local operators every week.' },
   { icon: Sprout, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
 ];
 
 const plans = [
   { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
   { name: 'Solo', price: '39', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'AI Autopilot — chat to your CRM', 'Offline mode'], cta: 'Start Free Trial', highlight: true },
-  { name: 'Crew', price: '79', period: 'month', desc: 'For small teams of 2-3 landscapers', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'Priority support'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Crew', price: '79', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'Priority support'], cta: 'Start Free Trial', highlight: false },
 ];
 
 const stats = [
-  { value: '556K+', label: 'US lawn care businesses', suffix: 'and growing' },
+  { value: '1,140+', label: 'Landscaping businesses in OK', suffix: 'and growing 6.5% yearly' },
   { value: '0', label: 'Competitors with free rain delay', suffix: '— we\'re the only one' },
   { value: '<1%', label: 'of your revenue', suffix: '— Solo plan costs less than one missed job' },
 ];
@@ -100,17 +100,17 @@ export default function Landing() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <Zap className="w-4 h-4" />
-              Available on iPhone, Android & desktop
+              Built in Oklahoma City, for Oklahoma crews
             </div>
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-              The only lawn care app with <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">free rain delay</span>
+              Lawn care software <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">built in Oklahoma</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Scheduling, routes, and invoicing that just works. No demos. No setup calls. Free for 5 clients — no credit card.
+              Scheduling, routes, and invoicing for Oklahoma lawn care crews. Rain delay that actually understands OK weather. Free for 5 clients — no credit card.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -129,8 +129,8 @@ export default function Landing() {
       {/* Features */}
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Built for lawn care, <span className="text-emerald-500">not office work</span></h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">The other apps are built for 20-person operations with office staff. MowFlow does less. That is the point.</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Built for Oklahoma crews, <span className="text-emerald-500">not office managers</span></h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Other apps were built in Silicon Valley for 20-person operations. MowFlow was built in OKC for the 1,100+ landscaping businesses across Oklahoma.</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color }, i) => (
@@ -244,7 +244,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Simple, transparent pricing</h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-2 text-lg">Start free. Upgrade when you are ready. Cancel anytime.</p>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">Solo <strong>$39/mo</strong> — that's <strong>72% less</strong> than Jobber Connect at $139/mo. Same rain delay, better price.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">Solo <strong>$39/mo</strong> — built for the 1,140+ Oklahoma crews who don't need a $300/mo AI receptionist.</p>
             <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">14-day free trial on paid plans. No setup fees. No contracts.</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">
@@ -276,7 +276,7 @@ export default function Landing() {
             ))}
           </div>
           <FadeIn delay={400}>
-            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">Coming later this summer: online payments via Stripe, multi-user team access, and route optimization. Early adopters get these at no price increase.</p>
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">Coming soon: Stripe payments, multi-user crew access, and route optimization. Oklahoma early adopters get these at no price increase.</p>
           </FadeIn>
         </div>
       </section>
@@ -287,7 +287,7 @@ export default function Landing() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Stop running your business on texts and a notebook</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Built in OKC. Used by Oklahoma crews.</h2>
             <p className="text-emerald-100 text-lg mb-10">Free for 5 clients. No credit card. 2 minutes.</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               Start Free
