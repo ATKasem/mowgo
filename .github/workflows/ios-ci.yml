@@ -10,20 +10,20 @@ on:
     branches: [main]
     paths:
       - 'ios-native/**'
+      - '.github/workflows/ios-ci.yml'
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
-      - name: Diagnostic
-        run: |
-          echo "Runner: $(uname -a)"
-          echo "Xcode: $(xcodebuild -version 2>&1 || echo 'not found')"
-          sw_vers
-
       - uses: actions/checkout@v4
+
+      - name: Select Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
 
       - name: Install xcodegen
         run: brew install xcodegen
