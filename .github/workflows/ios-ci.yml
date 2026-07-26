@@ -14,13 +14,16 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Diagnostic
+        run: |
+          echo "Runner: $(uname -a)"
+          echo "Xcode: $(xcodebuild -version 2>&1 || echo 'not found')"
+          sw_vers
 
-      - name: Select Xcode 16
-        run: sudo xcode-select -switch /Applications/Xcode_16.app
+      - uses: actions/checkout@v4
 
       - name: Install xcodegen
         run: brew install xcodegen
