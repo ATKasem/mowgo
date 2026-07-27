@@ -17,11 +17,19 @@ struct StatChip: View {
     let color: String
 
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var semanticColor: Color {
+        switch color.lowercased() {
+        case "f59e0b": MowGoTheme.warning
+        case "ef4444": MowGoTheme.danger
+        case "3b82f6": MowGoTheme.info
+        default: MowGoTheme.success
+        }
+    }
 
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color(hex: color))
+                .fill(semanticColor)
                 .frame(width: 6, height: 6)
             if let amount {
                 Text(amount.formatted(.currency(code: "USD")))
@@ -53,12 +61,20 @@ struct StatCard: View {
     let color: String
 
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var semanticColor: Color {
+        switch color.lowercased() {
+        case "f59e0b": MowGoTheme.warning
+        case "ef4444": MowGoTheme.danger
+        case "3b82f6": MowGoTheme.info
+        default: MowGoTheme.success
+        }
+    }
 
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.system(size: 16))
-                .foregroundColor(Color(hex: color))
+                .foregroundColor(semanticColor)
             Text(value)
                 .font(.subheadline.weight(.bold))
                 .foregroundColor(theme.textPrimary)
@@ -82,12 +98,20 @@ struct QuickActionRow: View {
     let color: String
 
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var semanticColor: Color {
+        switch color.lowercased() {
+        case "f59e0b": MowGoTheme.warning
+        case "ef4444": MowGoTheme.danger
+        case "3b82f6": MowGoTheme.info
+        default: MowGoTheme.success
+        }
+    }
 
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16))
-                .foregroundColor(Color(hex: color))
+                .foregroundColor(semanticColor)
                 .frame(width: 24)
             Text(label)
                 .font(.subheadline.weight(.medium))

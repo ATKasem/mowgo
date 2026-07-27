@@ -11,6 +11,7 @@ import SwiftUI
 struct MainTabView: View {
     @EnvironmentObject var auth: AuthService
     @EnvironmentObject var store: DataStore
+    @Environment(\.colorScheme) private var colorScheme
     @State private var selectedTab = 0
 
     var body: some View {

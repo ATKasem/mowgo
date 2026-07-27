@@ -129,15 +129,15 @@ function SupabaseErrorRedirect() {
 
     // Handle error hashes (expired/invalid reset link)
     if (hasValidParams && params.has('error')) {
-      window.history.replaceState({}, '', window.location.pathname + '#/login&' + hashStr);
-      navigate('/login', { replace: true });
+      window.history.replaceState({}, '', window.location.pathname + '#/login?' + params.toString());
+      navigate('/login?' + params.toString(), { replace: true });
       return;
     }
 
     // Handle recovery hashes (access_token + type=recovery) — route to reset password page
     if (hasValidParams && params.get('type') === 'recovery' && params.has('access_token')) {
-      window.history.replaceState({}, '', window.location.pathname + '#/reset-password&' + hashStr);
-      navigate('/reset-password', { replace: true });
+      window.history.replaceState({}, '', window.location.pathname + '#/reset-password?' + params.toString());
+      navigate('/reset-password?' + params.toString(), { replace: true });
       return;
     }
   }, [navigate]);

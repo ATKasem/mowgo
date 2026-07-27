@@ -43,6 +43,7 @@ struct JobCardView: View {
                     .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(job.status == .done ? "Mark job as scheduled" : "Mark job complete")
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
@@ -80,13 +81,13 @@ struct JobCardView: View {
                     if let notes = job.clients?.petInstructions, !notes.isEmpty {
                         Image(systemName: "pawprint")
                             .font(.system(size: 10))
-                            .foregroundColor(Color(hex: "f59e0b"))
+                            .foregroundColor(MowGoTheme.warning)
                             .accessibilityHidden(true)
                     }
                     if let key = job.clients?.keyCode, !key.isEmpty {
                         Image(systemName: "lock")
                             .font(.system(size: 10))
-                            .foregroundColor(Color(hex: "3b82f6"))
+                            .foregroundColor(MowGoTheme.info)
                             .accessibilityHidden(true)
                     }
                 }

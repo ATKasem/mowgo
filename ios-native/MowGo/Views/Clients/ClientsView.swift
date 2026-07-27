@@ -58,6 +58,7 @@ struct ClientsView: View {
                         Image(systemName: "plus")
                             .foregroundColor(MowGoTheme.deepGreen)
                     }
+                    .accessibilityLabel("Add client")
                 }
             }
             .sheet(isPresented: $showNewClient) {

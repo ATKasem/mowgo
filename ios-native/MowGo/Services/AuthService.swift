@@ -14,6 +14,8 @@ final class AuthService: ObservableObject {
     @Published var isLoading = true
     @Published var user: UserProfile?
     @Published var error: String?
+    @Published var resetLoading = false
+    @Published var resetMessage: String?
 
     private let sb = SupabaseService.shared
 
@@ -78,15 +80,15 @@ final class AuthService: ObservableObject {
     }
 
     func resetPassword(email: String) async {
-        isLoading = true
-        error = nil
+        resetLoading = true
+        resetMessage = nil
+        defer { resetLoading = false }
         do {
             try await sb.resetPassword(email: email)
-            error = "Check your email for a reset link."
+            resetMessage = "Check your email for a reset link."
         } catch {
-            self.error = error.localizedDescription
+            resetMessage = error.localizedDescription
         }
-        isLoading = false
     }
 
     private func loadProfile() async {

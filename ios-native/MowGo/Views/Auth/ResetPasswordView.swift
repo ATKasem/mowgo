@@ -50,12 +50,12 @@ struct ResetPasswordView: View {
                         .foregroundColor(theme.textPrimary)
 
                     // Success message
-                    if let msg = auth.error, msg.contains("Check your email") {
+                    if let msg = auth.resetMessage, msg.contains("Check your email") {
                         Text(msg)
                             .font(.caption)
                             .foregroundColor(MowGoTheme.deepGreen)
                             .multilineTextAlignment(.center)
-                    } else if let err = auth.error {
+                    } else if let err = auth.resetMessage {
                         Text(err)
                             .font(.caption)
                             .foregroundColor(.red)
@@ -66,7 +66,7 @@ struct ResetPasswordView: View {
                         Task { await auth.resetPassword(email: email) }
                     } label: {
                         HStack {
-                            if auth.isLoading {
+                            if auth.resetLoading {
                                 ProgressView().tint(MowGoTheme.onAccent)
                             }
                             Text("Send Reset Link")
@@ -78,7 +78,7 @@ struct ResetPasswordView: View {
                         .foregroundColor(MowGoTheme.onAccent)
                         .cornerRadius(12)
                     }
-                    .disabled(auth.isLoading || email.isEmpty)
+                    .disabled(auth.resetLoading || email.isEmpty)
 
                     Spacer()
                 }

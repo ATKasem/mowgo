@@ -102,6 +102,7 @@ struct TodayView: View {
                         Image(systemName: "plus")
                             .foregroundColor(MowGoTheme.deepGreen)
                     }
+                    .accessibilityLabel("Add job")
                 }
             }
             .alert("Move \(scheduledCount) jobs to tomorrow?", isPresented: $showingRainConfirm) {
@@ -142,6 +143,7 @@ struct TodayView: View {
                 Button { shiftDate(-1) } label: {
                     Image(systemName: "chevron.left").foregroundColor(theme.textMuted)
                 }
+                .accessibilityLabel("Previous day")
                 Button("Today") { selectedDate = Date() }
                     .font(.caption.weight(.medium))
                     .padding(.horizontal, 12).padding(.vertical, 4)
@@ -150,6 +152,7 @@ struct TodayView: View {
                 Button { shiftDate(1) } label: {
                     Image(systemName: "chevron.right").foregroundColor(theme.textMuted)
                 }
+                .accessibilityLabel("Next day")
             }
         }
         .padding(.vertical, 12)
@@ -186,7 +189,7 @@ struct TodayView: View {
                         CrewFilterChip(
                             label: "All",
                             isSelected: selectedCrewFilter == nil,
-                            color: "16a34a"
+                            color: MowGoTheme.success
                         ) {
                             selectedCrewFilter = nil
                         }
@@ -207,7 +210,13 @@ struct TodayView: View {
         }
     }
 
-    private let crewChipColors = ["16a34a", "3b82f6", "f59e0b", "8b5cf6", "ec4899"]
+    private let crewChipColors = [
+        MowGoTheme.success,
+        MowGoTheme.info,
+        MowGoTheme.warning,
+        MowGoTheme.danger,
+        MowGoTheme.brandGreen
+    ]
 
     private var emptyState: some View {
         VStack(spacing: 12) {
@@ -233,7 +242,7 @@ struct CrewFilterChip: View {
     @Environment(\.colorScheme) private var colorScheme
     let label: String
     let isSelected: Bool
-    let color: String
+    let color: Color
     let action: () -> Void
 
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
@@ -245,7 +254,7 @@ struct CrewFilterChip: View {
                 .foregroundColor(isSelected ? MowGoTheme.onAccent : theme.textMuted)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isSelected ? Color(hex: color) : theme.surfaceElevated)
+                .background(isSelected ? color : theme.surfaceElevated)
                 .cornerRadius(16)
         }
         .buttonStyle(.plain)

@@ -41,6 +41,7 @@ struct ChatView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
+                    .accessibilityLabel("Chat options")
                 }
             }
         }
@@ -146,6 +147,7 @@ struct ChatView: View {
                         .foregroundColor(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? theme.textInverse : MowGoTheme.deepGreen)
                 }
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || chat.isLoading)
+                .accessibilityLabel("Send message")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)

@@ -22,9 +22,12 @@ export default function Login() {
     const hash = window.location.hash;
     if (!hash) return;
 
-    // Strip leading '#' and parse params
-    // Hash may be "#/login&error=..." (after SupabaseErrorRedirect) or "#error=..."
-    const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
+    // Parse route query params separately from HashRouter's route fragment.
+    // Hash may be "#/login?error=..." or a raw Supabase "#error=..." callback.
+    const queryIndex = hash.indexOf('?');
+    const hashStr = queryIndex >= 0
+      ? hash.slice(queryIndex + 1)
+      : (hash.startsWith('#') ? hash.slice(1) : hash);
     const params = new URLSearchParams(hashStr);
 
     const errorType = params.get('error');
