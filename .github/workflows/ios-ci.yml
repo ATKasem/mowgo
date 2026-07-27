@@ -38,7 +38,7 @@ jobs:
           xcodebuild build \
             -project MowGo.xcodeproj \
             -scheme MowGo \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
             -derivedDataPath build/ \
             CODE_SIGNING_ALLOWED=NO
 
@@ -47,4 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-log
-          path: ios-native/build/Logs/Build/*.xcactivitylog
+          path: ios-native/build/Logs/Build/
+          if-no-files-found: warn

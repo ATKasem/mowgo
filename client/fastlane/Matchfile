@@ -1,4 +1,4 @@
-git_url("https://github.com/Mowgo/mowgo.git")
+git_url(ENV.fetch("MATCH_GIT_URL", "https://github.com/Mowgo/mowgo.git"))
 storage_mode("git")
 git_branch("main")
 type("appstore")

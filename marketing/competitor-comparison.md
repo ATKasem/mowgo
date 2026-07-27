@@ -5,7 +5,7 @@
 | | **MowGo** | The Others |
 |---|---|---|
 | **Price** | **Free** | $29-$189/mo |
-| **Usable plan** | **$49/mo** | $169/mo for real features |
+|| **Usable plan** | **$39/mo** | $169/mo for real features |
 | **Setup** | **2 minutes** | 2 hours to 2 days |
 | **Demo required** | **No** | Yes, for most |
 | **Rain delay** | **One button** | Not available under $100/mo |
@@ -24,8 +24,8 @@ Nobody else has this. Storm at 7am? Tap once. Every job moves to tomorrow. Clien
 **Free tier that is actually useful.**
 10 clients. Full scheduling. Rain delay. Auto invoicing. No credit card. Not a "14 day trial." Just free.
 
-**$49. Flat.**
-Not $29 that becomes $169 when you want the features you actually need. $49 is $49. Unlimited clients. Everything included.
+**$39. Flat.**
+Not $29 that becomes $169 when you want the features you actually need. $39 is $39. Unlimited clients. Everything included.
 
 **It does less. That is the point.**
 No CRM. No marketing automation. No inventory management. No "fleet tracking." You already know where your truck is. You need scheduling that just works.
