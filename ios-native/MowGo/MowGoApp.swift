@@ -9,18 +9,31 @@ import SwiftData
 @main
 struct MowGoApp: App {
     @StateObject private var auth = AuthService()
-    @StateObject private var store = DataStore()
+    @StateObject private var store: DataStore
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showSessionExpiredAlert = false
 
     /// SwiftData container for offline cache persistence.
+    /// Falls back to in-memory if the on-disk schema is corrupt.
     private let modelContainer: ModelContainer = {
-        let config = ModelConfiguration(isStoredInMemoryOnly: false)
+        let diskConfig = ModelConfiguration(isStoredInMemoryOnly: false)
+        if let container = try? ModelContainer(
+            for: JobCache.self, ClientCache.self, InvoiceCache.self,
+            configurations: diskConfig
+        ) {
+            return container
+        }
+        // Schema corruption or first-run — use in-memory so the app still launches
+        let memConfig = ModelConfiguration(isStoredInMemoryOnly: true)
         return try! ModelContainer(
             for: JobCache.self, ClientCache.self, InvoiceCache.self,
-            configurations: config
+            configurations: memConfig
         )
     }()
+
+    init() {
+        _store = StateObject(wrappedValue: DataStore(modelContainer: modelContainer))
+    }
 
     private var authLoadState: String {
         "\(auth.isLoading)-\(auth.isAuthenticated)-\(auth.isDemoMode)"
@@ -71,7 +84,7 @@ struct SplashView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var animate = false
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         ZStack {

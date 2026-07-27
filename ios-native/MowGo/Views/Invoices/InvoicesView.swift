@@ -14,7 +14,7 @@ struct InvoicesView: View {
     @State private var selectedInvoice: Invoice?
     @State private var showPayment = false
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
@@ -110,7 +110,7 @@ struct InvoiceRow: View {
     var showPay: Bool
     var onPay: () -> Void
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         HStack(spacing: 12) {

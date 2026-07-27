@@ -14,7 +14,7 @@ struct ChatView: View {
     @State private var inputText = ""
     @FocusState private var isInputFocused: Bool
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         NavigationStack {
@@ -171,7 +171,7 @@ struct MessageBubble: View {
     let message: ChatService.ChatMessage
 
     var isUser: Bool { message.role == .user }
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         HStack {
@@ -202,7 +202,7 @@ struct TypingIndicator: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var animate = false
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         HStack {

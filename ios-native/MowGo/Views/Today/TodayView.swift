@@ -23,7 +23,7 @@ struct TodayView: View {
     @State private var operationError: String?
     @State private var selectedCrewFilter: UUID? = nil
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     private static let dateFmt: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
@@ -257,7 +257,7 @@ struct CrewFilterChip: View {
     let color: Color
     let action: () -> Void
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         Button(action: action) {

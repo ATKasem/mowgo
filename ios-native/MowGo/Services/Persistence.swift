@@ -14,12 +14,8 @@ import SwiftData
 final class Persistence {
     private let modelContainer: ModelContainer
 
-    init() throws {
-        let config = ModelConfiguration(isStoredInMemoryOnly: false)
-        self.modelContainer = try ModelContainer(
-            for: JobCache.self, ClientCache.self, InvoiceCache.self,
-            configurations: config
-        )
+    init(modelContainer: ModelContainer) {
+        self.modelContainer = modelContainer
     }
 
     /// Convenience accessor for the model context.
@@ -33,32 +29,32 @@ final class Persistence {
     func saveJobs(_ jobs: [Job]) {
         // Delete existing cached jobs
         let fetchDescriptor = FetchDescriptor<JobCache>()
-        try? context.delete(matching: fetchDescriptor)
+        do { try context.delete(matching: fetchDescriptor) } catch { print("[Persistence] failed to delete cached jobs: \(error)") }
         // Insert new ones
         for job in jobs {
             context.insert(JobCache(job: job))
         }
-        try? context.save()
+        do { try context.save() } catch { print("[Persistence] failed to save jobs: \(error)") }
     }
 
     /// Replace all cached clients with the provided list.
     func saveClients(_ clients: [Client]) {
         let fetchDescriptor = FetchDescriptor<ClientCache>()
-        try? context.delete(matching: fetchDescriptor)
+        do { try context.delete(matching: fetchDescriptor) } catch { print("[Persistence] failed to delete cached clients: \(error)") }
         for client in clients {
             context.insert(ClientCache(client: client))
         }
-        try? context.save()
+        do { try context.save() } catch { print("[Persistence] failed to save clients: \(error)") }
     }
 
     /// Replace all cached invoices with the provided list.
     func saveInvoices(_ invoices: [Invoice]) {
         let fetchDescriptor = FetchDescriptor<InvoiceCache>()
-        try? context.delete(matching: fetchDescriptor)
+        do { try context.delete(matching: fetchDescriptor) } catch { print("[Persistence] failed to delete cached invoices: \(error)") }
         for invoice in invoices {
             context.insert(InvoiceCache(invoice: invoice))
         }
-        try? context.save()
+        do { try context.save() } catch { print("[Persistence] failed to save invoices: \(error)") }
     }
 
     // MARK: - Load
@@ -66,21 +62,24 @@ final class Persistence {
     /// Read cached jobs from SwiftData, reconstructing via stored JSON.
     func loadJobs() -> [Job] {
         let descriptor = FetchDescriptor<JobCache>(sortBy: [SortDescriptor(\.routeOrder)])
-        guard let cached = try? context.fetch(descriptor) else { return [] }
+        let cached: [JobCache]
+        do { cached = try context.fetch(descriptor) } catch { print("[Persistence] failed to load jobs: \(error)"); return [] }
         return cached.compactMap { $0.toJob() }
     }
 
     /// Read cached clients from SwiftData.
     func loadClients() -> [Client] {
         let descriptor = FetchDescriptor<ClientCache>(sortBy: [SortDescriptor(\.name)])
-        guard let cached = try? context.fetch(descriptor) else { return [] }
+        let cached: [ClientCache]
+        do { cached = try context.fetch(descriptor) } catch { print("[Persistence] failed to load clients: \(error)"); return [] }
         return cached.compactMap { $0.toClient() }
     }
 
     /// Read cached invoices from SwiftData.
     func loadInvoices() -> [Invoice] {
         let descriptor = FetchDescriptor<InvoiceCache>(sortBy: [SortDescriptor(\.createdAt)])
-        guard let cached = try? context.fetch(descriptor) else { return [] }
+        let cached: [InvoiceCache]
+        do { cached = try context.fetch(descriptor) } catch { print("[Persistence] failed to load invoices: \(error)"); return [] }
         return cached.compactMap { $0.toInvoice() }
     }
 
@@ -89,17 +88,20 @@ final class Persistence {
     /// Returns true if any cached data exists (used to decide whether to
     /// show cached data immediately before a network round-trip).
     func hasCachedData() -> Bool {
-        let jobCount = (try? context.fetchCount(FetchDescriptor<JobCache>())) ?? 0
-        let clientCount = (try? context.fetchCount(FetchDescriptor<ClientCache>())) ?? 0
-        let invoiceCount = (try? context.fetchCount(FetchDescriptor<InvoiceCache>())) ?? 0
+        let jobCount: Int
+        do { jobCount = try context.fetchCount(FetchDescriptor<JobCache>()) } catch { print("[Persistence] failed to count jobs: \(error)"); jobCount = 0 }
+        let clientCount: Int
+        do { clientCount = try context.fetchCount(FetchDescriptor<ClientCache>()) } catch { print("[Persistence] failed to count clients: \(error)"); clientCount = 0 }
+        let invoiceCount: Int
+        do { invoiceCount = try context.fetchCount(FetchDescriptor<InvoiceCache>()) } catch { print("[Persistence] failed to count invoices: \(error)"); invoiceCount = 0 }
         return jobCount > 0 || clientCount > 0 || invoiceCount > 0
     }
 
     /// Clear all cached data (e.g. on sign-out).
     func clearAll() {
-        try? context.delete(matching: FetchDescriptor<JobCache>())
-        try? context.delete(matching: FetchDescriptor<ClientCache>())
-        try? context.delete(matching: FetchDescriptor<InvoiceCache>())
-        try? context.save()
+        do { try context.delete(matching: FetchDescriptor<JobCache>()) } catch { print("[Persistence] failed to clear jobs: \(error)") }
+        do { try context.delete(matching: FetchDescriptor<ClientCache>()) } catch { print("[Persistence] failed to clear clients: \(error)") }
+        do { try context.delete(matching: FetchDescriptor<InvoiceCache>()) } catch { print("[Persistence] failed to clear invoices: \(error)") }
+        do { try context.save() } catch { print("[Persistence] failed to save after clear: \(error)") }
     }
 }

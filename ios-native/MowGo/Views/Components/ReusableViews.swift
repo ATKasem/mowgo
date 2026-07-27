@@ -16,7 +16,7 @@ struct StatChip: View {
     var amount: Decimal? = nil
     let color: String
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var semanticColor: Color {
         switch color.lowercased() {
         case "f59e0b": MowGoTheme.warning
@@ -62,7 +62,7 @@ struct StatCard: View {
     let icon: String
     let color: String
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var semanticColor: Color {
         switch color.lowercased() {
         case "f59e0b": MowGoTheme.warning
@@ -101,7 +101,7 @@ struct QuickActionRow: View {
     let label: String
     let color: String
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var semanticColor: Color {
         switch color.lowercased() {
         case "f59e0b": MowGoTheme.warning
@@ -138,7 +138,7 @@ struct InfoRow: View {
     let label: String
     let value: String
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         HStack {

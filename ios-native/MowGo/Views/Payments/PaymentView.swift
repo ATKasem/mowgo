@@ -19,7 +19,7 @@ struct PaymentView: View {
 
     let invoice: Invoice
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -120,13 +120,9 @@ struct PaymentView: View {
                         }
                     }
                 case .canceled:
-                    DispatchQueue.main.async {
-                        self.paymentError = "Payment was canceled."
-                    }
+                    Task { @MainActor in self.paymentError = "Payment was canceled." }
                 case .failed(let error):
-                    DispatchQueue.main.async {
-                        self.paymentError = error.localizedDescription
-                    }
+                    Task { @MainActor in self.paymentError = error.localizedDescription }
                 }
             }
             return  // PaymentSheet handles the rest via its completion handler
@@ -150,7 +146,7 @@ struct SubscriptionPlanCard: View {
     @State private var isPurchasing = false
     @State private var error: String?
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

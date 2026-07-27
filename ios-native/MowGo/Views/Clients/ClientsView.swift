@@ -15,7 +15,7 @@ struct ClientsView: View {
     @State private var showNewClient = false
     @State private var editingClient: Client?
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     private var filtered: [Client] {
         if searchText.isEmpty { return store.clients }
@@ -86,7 +86,7 @@ struct ClientCard: View {
     let onTap: () -> Void
     let onEdit: () -> Void
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -185,7 +185,7 @@ struct DetailRow: View {
     let icon: String
     let text: String
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         HStack(spacing: 8) {

@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct MowGoTheme {
+struct MowGoTheme: Equatable {
     let background: Color
     let surface: Color
     let surfaceElevated: Color
@@ -17,7 +17,16 @@ struct MowGoTheme {
     let textMuted: Color
     let textInverse: Color
 
-    init(_ colorScheme: ColorScheme) {
+    private static var cache: [ColorScheme: MowGoTheme] = [:]
+
+    static func themed(_ scheme: ColorScheme) -> MowGoTheme {
+        if let cached = cache[scheme] { return cached }
+        let theme = MowGoTheme(colorScheme: scheme)
+        cache[scheme] = theme
+        return theme
+    }
+
+    init(colorScheme: ColorScheme) {
         let isDark = colorScheme == .dark
         background = Color(
             light: Color(hex: "f8f9fa"),
@@ -74,10 +83,10 @@ struct MowGoTheme {
 
     // MARK: - Semantic
 
-    static let success = Color(hex: "16a34a")
-    static let warning = Color(hex: "f59e0b")
-    static let danger = Color(hex: "ef4444")
-    static let info = Color(hex: "3b82f6")
+    static let success = Color(light: Color(hex: "16a34a"), dark: Color(hex: "4ade80"))
+    static let warning = Color(light: Color(hex: "f59e0b"), dark: Color(hex: "fbbf24"))
+    static let danger  = Color(light: Color(hex: "ef4444"), dark: Color(hex: "f87171"))
+    static let info    = Color(light: Color(hex: "3b82f6"), dark: Color(hex: "60a5fa"))
     static let onAccent = Color.white
 
     // MARK: - Misc

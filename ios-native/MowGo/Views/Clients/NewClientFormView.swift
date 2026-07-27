@@ -28,7 +28,7 @@ struct NewClientFormView: View {
     @State private var error: String?
 
     private enum Field { case name, address, phone, email, rate, keyCode, alarmCode, pets, notes }
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     init(client: Client? = nil) {
         self.client = client

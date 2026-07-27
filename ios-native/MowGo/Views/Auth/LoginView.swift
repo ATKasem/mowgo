@@ -18,7 +18,7 @@ struct LoginView: View {
     @FocusState private var focusedField: Field?
 
     private enum Field { case email, password }
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     @State private var showResetPassword = false
 

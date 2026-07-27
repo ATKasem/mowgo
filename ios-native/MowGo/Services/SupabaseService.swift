@@ -30,8 +30,8 @@ actor SupabaseService {
     @discardableResult
     func startJobsPolling(
         interval: TimeInterval = 15,
-        previousJobs: @escaping () -> [Job],
-        onChange: @escaping ([Job]) -> Void
+        previousJobs: @escaping @Sendable () -> [Job],
+        onChange: @escaping @Sendable ([Job]) -> Void
     ) -> Task<Void, Never> {
         Task { [interval] in
             while !Task.isCancelled {
@@ -39,7 +39,8 @@ actor SupabaseService {
                 guard !Task.isCancelled, isAuthenticated else { continue }
                 do {
                     let latest = try await fetchJobs()
-                    let current = previousJobs()
+                    // Dispatch to MainActor to safely read @MainActor-isolated DataStore.jobs
+                    let current = await MainActor.run { previousJobs() }
                     if latest.map(\.id) != current.map(\.id) || latest != current {
                         await MainActor.run { onChange(latest) }
                     }
@@ -337,8 +338,7 @@ actor SupabaseService {
         guard let uid = try await getCurrentUserId() else {
             throw SupabaseError.network
         }
-        let timestamp = Int(Date().timeIntervalSince1970)
-        let path = "\(uid.uuidString)/\(jobId.uuidString)/\(timestamp).jpg"
+        let path = "\(uid.uuidString)/\(jobId.uuidString)/\(UUID().uuidString).jpg"
 
         guard let url = URL(string: "\(baseURL)/storage/v1/object/job-photo/\(path)") else {
             throw SupabaseError.network
@@ -372,7 +372,7 @@ actor SupabaseService {
 
     func fetch<T: Decodable>(_ table: String, query: [String: String] = [:]) async throws -> [T] {
         var q = query
-        let uid = try await getCurrentUserId()
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
         if table != "profiles" {
             q["user_id"] = "eq.\(uid.uuidString)"
         }
@@ -383,21 +383,21 @@ actor SupabaseService {
     }
 
     func fetchJobs() async throws -> [Job] {
-        let uid = try await getCurrentUserId()
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
         let path = "/rest/v1/jobs?select=*,clients!left(*)&user_id=eq.\(uid.uuidString)&order=scheduled_date.asc"
         let data = try await request("GET", path)
         return try decoder.decode([Job].self, from: data)
     }
 
     func fetchInvoices() async throws -> [Invoice] {
-        let uid = try await getCurrentUserId()
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
         let path = "/rest/v1/invoices?select=*,clients!left(name)&user_id=eq.\(uid.uuidString)&order=created_at.desc"
         let data = try await request("GET", path)
         return try decoder.decode([Invoice].self, from: data)
     }
 
     func fetchProfile() async throws -> UserProfile? {
-        let uid = try await getCurrentUserId()
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
         let path = "/rest/v1/profiles?select=*&id=eq.\(uid.uuidString)"
         let data = try await request("GET", path)
         let profiles = try decoder.decode([UserProfile].self, from: data)

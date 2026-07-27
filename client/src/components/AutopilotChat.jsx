@@ -66,7 +66,7 @@ export default function AutopilotChat({ compact = false }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!input.trim() || status !== 'idle' || limitReached) return;
+    if (!input.trim() || status !== 'idle' || isSending || limitReached) return;
     sendMessage(input.trim());
     setInput('');
   }

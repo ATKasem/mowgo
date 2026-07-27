@@ -15,7 +15,7 @@ struct ResetPasswordView: View {
     @State private var email = ""
     @FocusState private var isFocused: Bool
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         NavigationStack {

@@ -14,7 +14,7 @@ struct SettingsView: View {
     @State private var showingSignOut = false
     @State private var showSubscription = false
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var appearancePreference: Binding<AppearancePreference> {
         Binding(
             get: { AppearancePreference(rawValue: appearanceMode) ?? .system },
@@ -148,7 +148,7 @@ struct SubscriptionView: View {
     @Environment(\.colorScheme) private var colorScheme
     let currentTier: String
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     private var normalizedCurrentTier: String {
         currentTier.lowercased()

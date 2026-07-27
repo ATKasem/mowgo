@@ -21,7 +21,7 @@ struct JobPhotoPicker: View {
     @State private var isUploading = false
     @State private var uploadError: String? = nil
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         NavigationStack {

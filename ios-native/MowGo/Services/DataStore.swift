@@ -77,8 +77,8 @@ final class DataStore: ObservableObject {
     private let sb = SupabaseService.shared
     let persistence: Persistence?
 
-    init() {
-        self.persistence = try? Persistence()
+    init(modelContainer: ModelContainer) {
+        self.persistence = Persistence(modelContainer: modelContainer)
     }
 
     // MARK: - Load
@@ -265,7 +265,8 @@ final class DataStore: ObservableObject {
         case .scheduled: nextStatus = .inProgress
         case .inProgress: nextStatus = .done
         case .done: nextStatus = .scheduled
-        default: nextStatus = .scheduled
+        case .skipped: nextStatus = .scheduled
+        @unknown default: nextStatus = .scheduled
         }
         try await updateJobStatus(job, status: nextStatus)
     }
@@ -300,11 +301,9 @@ final class DataStore: ObservableObject {
             } catch {
                 // Rollback: re-sync the already-updated jobs to their original dates
                 for jobId in succeeded {
-                    if let original = originalDates[jobId] {
-                        try? await updateJobSchedule(
-                            Job(id: jobId, title: "", scheduledDate: original, status: .scheduled),
-                            scheduledDate: original
-                        )
+                    if let original = originalDates[jobId],
+                       let realJob = self.jobs.first(where: { $0.id == jobId }) {
+                        try? await updateJobSchedule(realJob, scheduledDate: original)
                     }
                 }
                 // Re-sync local state from server to prevent divergence

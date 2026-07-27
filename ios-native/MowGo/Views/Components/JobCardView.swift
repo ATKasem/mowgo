@@ -9,13 +9,14 @@
 import SwiftUI
 
 struct JobCardView: View {
-    @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var store: DataStore
+    @Environment(\\.colorScheme) private var colorScheme
     let job: Job
     var teamMembers: [UserProfile] = []
     var onToggle: (() -> Void)?
     var onSkip: (() -> Void)?
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     @State private var showPhotoPicker = false
     @State private var showSkipConfirm = false
@@ -182,7 +183,12 @@ struct JobCardView: View {
             Text("This job will be marked as skipped and won't appear in your active route.")
         }
         .sheet(isPresented: $showPhotoPicker) {
-            JobPhotoPicker(jobId: job.id)
+            JobPhotoPicker(jobId: job.id) { [store] url in
+                // Persist the uploaded photo URL to the job
+                if let idx = store.jobs.firstIndex(where: { $0.id == job.id }) {
+                    store.jobs[idx].photoUrl = url
+                }
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Job: \(job.title), \(job.status.label), scheduled for \(job.scheduledTime ?? "no time")")

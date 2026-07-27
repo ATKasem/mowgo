@@ -14,7 +14,7 @@ struct HomeView: View {
     @State private var showNewJob = false
     @State private var showNewClient = false
 
-    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     private var scheduledCount: Int { store.jobs.filter { $0.status == .scheduled }.count }
     private var totalClients: Int { store.clients.count }
@@ -163,7 +163,7 @@ struct HomeView: View {
 
     private var weekDays: [WeekDay] {
         let cal = Calendar.current; let now = Date()
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
+        let fmt = HomeView.dayFormatter
         return (-3...3).compactMap { offset in
             guard let d = cal.date(byAdding: .day, value: offset, to: now) else { return nil }
             let dateStr = fmt.string(from: d)
@@ -177,4 +177,9 @@ struct HomeView: View {
             )
         }
     }
+}
+
+private extension HomeView {
+    static let weekdayFormatter: DateFormatter = { let f = DateFormatter(); f.dateFormat = "EEE"; return f }()
+    static let dayFormatter: DateFormatter = { let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f }()
 }
