@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftData
 
 // MARK: - Job
 
@@ -150,4 +151,141 @@ struct TeamDashboardRow: Identifiable {
     let total: Int
     let done: Int
     let inProgress: Int
+}
+
+// MARK: - SwiftData Cache Models
+
+@Model
+final class JobCache {
+    @Attribute(.unique) var id: UUID
+    var userId: UUID?
+    var clientId: UUID?
+    var title: String
+    var scheduledDate: String
+    var scheduledTime: String?
+    var durationMinutes: Int?
+    var status: String          // stores rawValue (e.g. "scheduled", "in_progress")
+    var notes: String?
+    var photoUrl: String?
+    var routeOrder: Int?
+    var clientName: String?
+    var clientAddress: String?
+    var jsonData: Data          // full JSON backup for faithful reconstruction
+    var cachedAt: Date
+
+    init(job: Job) {
+        self.id = job.id
+        self.userId = job.userId
+        self.clientId = job.clientId
+        self.title = job.title
+        self.scheduledDate = job.scheduledDate
+        self.scheduledTime = job.scheduledTime
+        self.durationMinutes = job.durationMinutes
+        self.status = job.status.rawValue
+        self.notes = job.notes
+        self.photoUrl = job.photoUrl
+        self.routeOrder = job.routeOrder
+        self.clientName = job.clients?.name
+        self.clientAddress = job.clients?.address
+        self.cachedAt = Date()
+
+        // Store full JSON so we can reconstruct the Job exactly
+        if let data = try? JSONEncoder().encode(job) {
+            self.jsonData = data
+        } else {
+            self.jsonData = Data()
+        }
+    }
+
+    /// Reconstruct the original Job from the cached JSON.
+    func toJob() -> Job? {
+        guard !jsonData.isEmpty else { return nil }
+        return try? JSONDecoder().decode(Job.self, from: jsonData)
+    }
+}
+
+@Model
+final class ClientCache {
+    @Attribute(.unique) var id: UUID
+    var userId: UUID?
+    var name: String
+    var address: String?
+    var phone: String?
+    var email: String?
+    var rate: Double
+    var cleaningNotes: String?
+    var keyCode: String?
+    var alarmCode: String?
+    var petInstructions: String?
+    var jsonData: Data
+    var cachedAt: Date
+
+    init(client: Client) {
+        self.id = client.id
+        self.userId = client.userId
+        self.name = client.name
+        self.address = client.address
+        self.phone = client.phone
+        self.email = client.email
+        self.rate = NSDecimalNumber(decimal: client.rate).doubleValue
+        self.cleaningNotes = client.cleaningNotes
+        self.keyCode = client.keyCode
+        self.alarmCode = client.alarmCode
+        self.petInstructions = client.petInstructions
+        self.cachedAt = Date()
+
+        if let data = try? JSONEncoder().encode(client) {
+            self.jsonData = data
+        } else {
+            self.jsonData = Data()
+        }
+    }
+
+    func toClient() -> Client? {
+        guard !jsonData.isEmpty else { return nil }
+        return try? JSONDecoder().decode(Client.self, from: jsonData)
+    }
+}
+
+@Model
+final class InvoiceCache {
+    @Attribute(.unique) var id: UUID
+    var userId: UUID?
+    var clientId: UUID?
+    var jobId: UUID?
+    var amount: Double
+    var status: String          // "unpaid" or "paid"
+    var stripeInvoiceId: String?
+    var stripePaymentIntentId: String?
+    var sentAt: String?
+    var paidAt: String?
+    var createdAt: String?
+    var jsonData: Data
+    var cachedAt: Date
+
+    init(invoice: Invoice) {
+        self.id = invoice.id
+        self.userId = invoice.userId
+        self.clientId = invoice.clientId
+        self.jobId = invoice.jobId
+        self.amount = NSDecimalNumber(decimal: invoice.amount).doubleValue
+        self.status = invoice.status.rawValue
+        self.stripeInvoiceId = invoice.stripeInvoiceId
+        self.stripePaymentIntentId = invoice.stripePaymentIntentId
+        self.sentAt = invoice.sentAt
+        self.paidAt = invoice.paidAt
+        self.createdAt = invoice.createdAt
+        self.cachedAt = Date()
+
+        if let data = try? JSONEncoder().encode(invoice) {
+            self.jsonData = data
+        } else {
+            self.jsonData = Data()
+        }
+    }
+
+    func toInvoice() -> Invoice? {
+        guard !jsonData.isEmpty else { return nil }
+        return try? JSONDecoder().decode(Invoice.self, from: jsonData)
+    }
 }

@@ -120,9 +120,13 @@ struct PaymentView: View {
                         }
                     }
                 case .canceled:
-                    self.paymentError = "Payment was canceled."
+                    DispatchQueue.main.async {
+                        self.paymentError = "Payment was canceled."
+                    }
                 case .failed(let error):
-                    self.paymentError = error.localizedDescription
+                    DispatchQueue.main.async {
+                        self.paymentError = error.localizedDescription
+                    }
                 }
             }
             return  // PaymentSheet handles the rest via its completion handler

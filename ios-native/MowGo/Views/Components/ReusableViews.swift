@@ -48,6 +48,8 @@ struct StatChip: View {
         .padding(.vertical, 6)
         .background(theme.surface)
         .cornerRadius(8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(count.map { String($0) } ?? amount.map { $0.formatted(.currency(code: "USD")) } ?? "0") \(label)")
     }
 }
 
@@ -86,6 +88,8 @@ struct StatCard: View {
         .padding(.vertical, 12)
         .background(theme.surface)
         .cornerRadius(12)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(value) \(title)")
     }
 }
 

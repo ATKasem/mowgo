@@ -112,10 +112,13 @@ struct HomeView: View {
                             Circle()
                                 .fill(day.hasJobs ? MowGoTheme.deepGreen : Color.clear)
                                 .frame(width: 6, height: 6)
+                                .accessibilityHidden(!day.hasJobs)
                         }
                         .frame(width: 44).padding(.vertical, 8)
                         .background(day.isToday ? MowGoTheme.deepGreen.opacity(0.2) : theme.surface)
                         .cornerRadius(10)
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(day.label) \(day.day), \(day.jobCount) job\(day.jobCount == 1 ? "" : "s")")
                     }
                 }
             }
@@ -155,7 +158,7 @@ struct HomeView: View {
     }
 
     private struct WeekDay: Hashable {
-        let label: String; let day: Int; let isToday: Bool; let hasJobs: Bool
+        let label: String; let day: Int; let isToday: Bool; let hasJobs: Bool; let jobCount: Int
     }
 
     private var weekDays: [WeekDay] {
@@ -163,11 +166,14 @@ struct HomeView: View {
         let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
         return (-3...3).compactMap { offset in
             guard let d = cal.date(byAdding: .day, value: offset, to: now) else { return nil }
+            let dateStr = fmt.string(from: d)
+            let count = store.jobs.filter { $0.scheduledDate == dateStr }.count
             return WeekDay(
                 label: d.formatted(.dateTime.weekday(.abbreviated)),
                 day: cal.component(.day, from: d),
                 isToday: offset == 0,
-                hasJobs: store.jobs.contains { $0.scheduledDate == fmt.string(from: d) }
+                hasJobs: count > 0,
+                jobCount: count
             )
         }
     }

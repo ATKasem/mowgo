@@ -2,11 +2,12 @@
 //  DataStore.swift
 //  MowGo
 //
-//  Central data store — loads from Supabase, falls back to demo data.
+//  Central data store — loads from Supabase with local SwiftData caching.
 //  All mutations go through SupabaseService and update published arrays.
 //
 
 import SwiftUI
+import SwiftData
 
 private struct ClientInsert: Encodable {
     let id: UUID
@@ -74,11 +75,17 @@ final class DataStore: ObservableObject {
     @Published var error: String?
 
     private let sb = SupabaseService.shared
+    let persistence: Persistence?
+
+    init() {
+        self.persistence = try? Persistence()
+    }
 
     // MARK: - Load
 
     private var loadTask: Task<Void, Never>?
     private var loadGeneration = 0
+    private var pollingTask: Task<Void, Never>?
 
     func loadAll() async {
         loadGeneration += 1
@@ -92,15 +99,34 @@ final class DataStore: ObservableObject {
         isLoading = true
         error = nil
 
+        // ---- Cache-first: show cached data instantly ----
+        if let persistence, persistence.hasCachedData() {
+            self.jobs = persistence.loadJobs()
+            self.clients = persistence.loadClients()
+            self.invoices = persistence.loadInvoices()
+        }
+
         let isConfigured = await sb.isConfigured
         guard !Task.isCancelled, generation == loadGeneration else { return }
         guard isConfigured else {
-            loadDemo()
+            // Supabase not configured — if we have cached data, show it;
+            // otherwise surface the error.
+            if persistence?.hasCachedData() != true {
+                self.error = "Supabase not configured. Please check your settings."
+            }
             isLoading = false
             return
         }
         guard await sb.ensureAuthenticated() else {
             guard generation == loadGeneration else { return }
+            // If we had data loaded previously, the session expired mid-use.
+            // Notify the app so it can show an alert before clearing state.
+            let hadData = !jobs.isEmpty || !clients.isEmpty || !invoices.isEmpty
+            if hadData {
+                await MainActor.run {
+                    NotificationCenter.default.post(name: AuthService.sessionExpired, object: nil)
+                }
+            }
             clear()
             return
         }
@@ -114,12 +140,26 @@ final class DataStore: ObservableObject {
                 let loaded = try await (j, c, i)
                 guard !Task.isCancelled, generation == loadGeneration else { return }
                 (jobs, clients, invoices) = loaded
+                // Persist to local cache for offline fallback
+                persistence?.saveJobs(loaded.0)
+                persistence?.saveClients(loaded.1)
+                persistence?.saveInvoices(loaded.2)
+                // Start real-time polling after successful load
+                startPollingIfNeeded(generation: generation)
             } catch is CancellationError {
                 return // Silently cancelled — the new loadTask will replace us
             } catch {
                 guard !Task.isCancelled, generation == loadGeneration else { return }
-                self.error = error.localizedDescription
-                loadDemo()
+                // Offline fallback: if we have cached data, show it with a
+                // non-blocking informational message instead of a hard error.
+                if let persistence, persistence.hasCachedData() {
+                    self.jobs = persistence.loadJobs()
+                    self.clients = persistence.loadClients()
+                    self.invoices = persistence.loadInvoices()
+                    self.error = "Showing cached data — pull to refresh when online"
+                } else {
+                    self.error = error.localizedDescription
+                }
             }
             if generation == loadGeneration {
                 isLoading = false
@@ -132,12 +172,15 @@ final class DataStore: ObservableObject {
         loadGeneration += 1
         loadTask?.cancel()
         loadTask = nil
+        pollingTask?.cancel()
+        pollingTask = nil
         jobs = []
         clients = []
         invoices = []
         teamMembers = []
         isLoading = false
         error = nil
+        persistence?.clearAll()
     }
 
     // MARK: - Jobs
@@ -217,8 +260,18 @@ final class DataStore: ObservableObject {
     }
 
     func toggleJobStatus(_ job: Job) async throws {
-        let status: Job.JobStatus = job.status == .done ? .scheduled : .done
-        try await updateJobStatus(job, status: status)
+        let nextStatus: Job.JobStatus
+        switch job.status {
+        case .scheduled: nextStatus = .inProgress
+        case .inProgress: nextStatus = .done
+        case .done: nextStatus = .scheduled
+        default: nextStatus = .scheduled
+        }
+        try await updateJobStatus(job, status: nextStatus)
+    }
+
+    func skipJob(_ job: Job) async throws {
+        try await updateJobStatus(job, status: .skipped)
     }
 
     private var isRainDelaying = false
@@ -232,20 +285,30 @@ final class DataStore: ObservableObject {
         guard !pending.isEmpty else { return }
         let tomorrow = nextDay(date)
 
-        // Collect all updates first; if any fail, roll back the ones that succeeded
-        var updatedJobs: [Job] = []
+        // Snapshot original dates for clean rollback
+        let originalDates: [UUID: String] = Dictionary(
+            uniqueKeysWithValues: pending.map { ($0.id, $0.scheduledDate) }
+        )
 
+        // Apply all updates — on ANY failure, re-sync from server instead of
+        // manual rollback (which can diverge if local state was already mutated).
+        var succeeded: [UUID] = []
         for job in pending {
             do {
                 try await updateJobSchedule(job, scheduledDate: tomorrow)
-                var updated = job
-                updated.scheduledDate = tomorrow
-                updatedJobs.append(updated)
+                succeeded.append(job.id)
             } catch {
-                // Rollback: move already-updated jobs back to original date
-                for rollback in updatedJobs {
-                    try? await updateJobSchedule(rollback, scheduledDate: date)
+                // Rollback: re-sync the already-updated jobs to their original dates
+                for jobId in succeeded {
+                    if let original = originalDates[jobId] {
+                        try? await updateJobSchedule(
+                            Job(id: jobId, title: "", scheduledDate: original, status: .scheduled),
+                            scheduledDate: original
+                        )
+                    }
                 }
+                // Re-sync local state from server to prevent divergence
+                await loadAll()
                 throw error
             }
         }
@@ -351,7 +414,7 @@ final class DataStore: ObservableObject {
 
     func loadTeamMembers() async {
         guard await sb.isConfigured else {
-            // Demo mode: teamMembers already loaded via loadDemo()
+            // Offline mode: team data not available without network
             return
         }
         do {
@@ -452,19 +515,26 @@ final class DataStore: ObservableObject {
 
     // MARK: - Helpers
 
+    private func startPollingIfNeeded(generation: Int) {
+        // Don't start a new poll if generation has moved on
+        guard generation == loadGeneration else { return }
+        // Cancel any existing poll
+        pollingTask?.cancel()
+        pollingTask = sb.startJobsPolling(
+            interval: 15,
+            previousJobs: { [weak self] in self?.jobs ?? [] },
+            onChange: { [weak self] latest in
+                guard let self else { return }
+                self.jobs = latest
+            }
+        )
+    }
+
     private func nextDay(_ date: String) -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
         guard let d = f.date(from: date) else { return date }
         guard let next = Calendar.current.date(byAdding: .day, value: 1, to: d) else { return date }
         return f.string(from: next)
-    }
-
-    private func loadDemo() {
-        let d = DemoData()
-        jobs = d.jobs
-        clients = d.clients
-        invoices = d.invoices
-        teamMembers = d.teamMembers
     }
 }
 

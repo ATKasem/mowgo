@@ -81,11 +81,22 @@ serve(async (req) => {
     }
 
     // Look up or create Stripe customer
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("stripe_customer_id")
       .eq("id", user.id)
       .single();
+
+    if (profileError) {
+      console.error("Profile query failed:", profileError.message ?? profileError);
+      return new Response(
+        JSON.stringify({ error: "Could not load user profile: " + (profileError.message ?? "unknown") }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     let customerId = profile?.stripe_customer_id;
 
@@ -103,10 +114,15 @@ serve(async (req) => {
         }).toString(),
       });
       if (!custResp.ok) {
-        const err = await custResp.text();
-        console.error("Stripe customer creation failed:", err);
+        const errBody = await custResp.text();
+        let stripeMsg = "Could not create customer";
+        try {
+          const parsed = JSON.parse(errBody);
+          stripeMsg = parsed.error?.message ?? parsed.error ?? stripeMsg;
+        } catch { /* errBody was not JSON — keep default */ }
+        console.error("Stripe customer creation failed:", errBody);
         return new Response(
-          JSON.stringify({ error: "Could not create customer" }),
+          JSON.stringify({ error: stripeMsg }),
           {
             status: 502,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -163,10 +179,15 @@ serve(async (req) => {
     );
 
     if (!sessionResp.ok) {
-      const err = await sessionResp.text();
-      console.error("Stripe checkout error:", err);
+      const errBody = await sessionResp.text();
+      let stripeMsg = "Could not create checkout session";
+      try {
+        const parsed = JSON.parse(errBody);
+        stripeMsg = parsed.error?.message ?? parsed.error ?? stripeMsg;
+      } catch { /* errBody was not JSON — keep default */ }
+      console.error("Stripe checkout error:", errBody);
       return new Response(
-        JSON.stringify({ error: "Could not create checkout session" }),
+        JSON.stringify({ error: stripeMsg }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

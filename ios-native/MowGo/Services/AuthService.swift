@@ -10,6 +10,10 @@ import SwiftUI
 
 @MainActor
 final class AuthService: ObservableObject {
+    /// Posted when an authenticated session becomes invalid (expired / revoked).
+    /// Observers should show a "please sign in again" alert.
+    static let sessionExpired = Notification.Name("SessionExpired")
+
     @Published var isAuthenticated = false
     @Published var isLoading = true
     @Published var user: UserProfile?
@@ -103,7 +107,8 @@ final class AuthService: ObservableObject {
                 if retries > 0 {
                     try? await Task.sleep(for: .seconds(1))
                 } else {
-                    print("Failed to load profile after retries: \(error.localizedDescription)")
+                    self.error = "Unable to load your profile: \(error.localizedDescription). Please sign in again."
+                    self.isAuthenticated = false
                 }
             }
         }

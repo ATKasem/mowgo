@@ -4,12 +4,23 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct MowGoApp: App {
     @StateObject private var auth = AuthService()
     @StateObject private var store = DataStore()
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
+    @State private var showSessionExpiredAlert = false
+
+    /// SwiftData container for offline cache persistence.
+    private let modelContainer: ModelContainer = {
+        let config = ModelConfiguration(isStoredInMemoryOnly: false)
+        return try! ModelContainer(
+            for: JobCache.self, ClientCache.self, InvoiceCache.self,
+            configurations: config
+        )
+    }()
 
     private var authLoadState: String {
         "\(auth.isLoading)-\(auth.isAuthenticated)-\(auth.isDemoMode)"
@@ -35,6 +46,14 @@ struct MowGoApp: App {
                 }
             }
             .preferredColorScheme(appearancePreference.preferredColorScheme)
+            .onReceive(NotificationCenter.default.publisher(for: AuthService.sessionExpired)) { _ in
+                showSessionExpiredAlert = true
+            }
+            .alert("Session Expired", isPresented: $showSessionExpiredAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Your session has expired. Please sign in again.")
+            }
             .task(id: authLoadState) {
                 guard !auth.isLoading else { return }
                 if auth.isAuthenticated {
@@ -43,6 +62,7 @@ struct MowGoApp: App {
                     store.clear()
                 }
             }
+            .modelContainer(modelContainer)
         }
     }
 }

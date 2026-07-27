@@ -17,4 +17,13 @@ extension Color {
             blue:  Double(rgb & 0xFF) / 255
         )
     }
+
+    /// Dynamic color that adapts to light/dark mode.
+    init(light: Color, dark: Color) {
+        self.init(uiColor: UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark
+                ? UIColor(dark)
+                : UIColor(light)
+        })
+    }
 }

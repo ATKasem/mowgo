@@ -22,7 +22,6 @@ final class StripeService: ObservableObject {
     private var publishableKey: String? {
         let configuredKey = Bundle.main.infoDictionary?["StripePublishableKey"] as? String
         return configuredKey.flatMap { $0.isEmpty ? nil : $0 }
-            ?? "pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj"
     }
 
     /// Cached result of configuration check. Set once on first access
@@ -70,11 +69,35 @@ final class StripeService: ObservableObject {
     // MARK: - Confirm payment (marks invoice as paid via Edge Function)
 
     func confirmPayment(invoiceId: UUID, paymentIntentId: String) async throws {
+        // Idempotency: reuse an existing key for this invoice to prevent
+        // duplicate charges if the app is killed between confirm and ack.
+        let key = idempotencyKey(for: invoiceId)
         let body: [String: Any] = [
             "invoice_id": invoiceId.uuidString,
-            "payment_intent_id": paymentIntentId
+            "payment_intent_id": paymentIntentId,
+            "idempotency_key": key
         ]
         _ = try await sb.requestFunction("confirm-payment", body: body)
+        // Clear the key after successful confirmation
+        clearIdempotencyKey(for: invoiceId)
+    }
+
+    // MARK: - Idempotency Key Persistence
+
+    private func idempotencyKey(for invoiceId: UUID) -> String {
+        let storageKey = "payment_idempotency_\(invoiceId.uuidString)"
+        if let existing = UserDefaults.standard.string(forKey: storageKey),
+           !existing.isEmpty {
+            return existing
+        }
+        let key = UUID().uuidString
+        UserDefaults.standard.set(key, forKey: storageKey)
+        return key
+    }
+
+    private func clearIdempotencyKey(for invoiceId: UUID) {
+        let storageKey = "payment_idempotency_\(invoiceId.uuidString)"
+        UserDefaults.standard.removeObject(forKey: storageKey)
     }
 
     // MARK: - Subscription checkout (Stripe Checkout redirect)

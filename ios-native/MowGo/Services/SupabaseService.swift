@@ -14,9 +14,41 @@ import Security
 
 actor SupabaseService {
     static let shared = SupabaseService()
-
     private let baseURL: String
     private let anonKey: String
+    // MARK: - Realtime Polling
+    /// Extracts the project ref from the base URL (e.g. "https://abc123.supabase.co" → "abc123").
+    nonisolated var projectRef: String? {
+        guard let host = URL(string: baseURL)?.host,
+              host.hasSuffix(".supabase.co") else { return nil }
+        return host.replacingOccurrences(of: ".supabase.co", with: "")
+    }
+
+    /// Starts polling the jobs table at `interval`. Calls `onChange` with the full
+    /// refreshed jobs list each time the server state differs from `previousJobs`.
+    /// Returns a `Task` that can be cancelled to stop polling.
+    @discardableResult
+    func startJobsPolling(
+        interval: TimeInterval = 15,
+        previousJobs: @escaping () -> [Job],
+        onChange: @escaping ([Job]) -> Void
+    ) -> Task<Void, Never> {
+        Task { [interval] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(interval))
+                guard !Task.isCancelled, isAuthenticated else { continue }
+                do {
+                    let latest = try await fetchJobs()
+                    let current = previousJobs()
+                    if latest.map(\.id) != current.map(\.id) || latest != current {
+                        await MainActor.run { onChange(latest) }
+                    }
+                } catch {
+                    // Silently skip — next tick will retry
+                }
+            }
+        }
+    }
 
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
@@ -66,12 +98,8 @@ actor SupabaseService {
                              ?? (info?["SupabaseAnonKey"] as? String)
                              ?? ""
 
-        self.baseURL = configuredBaseURL.isEmpty
-            ? "https://vqgiynfrpsqddjrayczc.supabase.co"
-            : configuredBaseURL
-        self.anonKey = configuredAnonKey.isEmpty
-            ? "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz"
-            : configuredAnonKey
+        self.baseURL = configuredBaseURL
+        self.anonKey = configuredAnonKey
     }
 
     // MARK: - Config check (for preview/testing)
@@ -303,11 +331,49 @@ actor SupabaseService {
         }
     }
 
+    // MARK: - Photo Upload
+
+    func uploadJobPhoto(jobId: UUID, imageData: Data) async throws -> String {
+        guard let uid = try await getCurrentUserId() else {
+            throw SupabaseError.network
+        }
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let path = "\(uid.uuidString)/\(jobId.uuidString)/\(timestamp).jpg"
+
+        guard let url = URL(string: "\(baseURL)/storage/v1/object/job-photo/\(path)") else {
+            throw SupabaseError.network
+        }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue(anonKey, forHTTPHeaderField: "apikey")
+        if let token {
+            req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        req.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
+        req.setValue("public", forHTTPHeaderField: "x-upsert")
+        req.httpBody = imageData
+
+        let (data, response) = try await URLSession.shared.data(for: req)
+        guard let http = response as? HTTPURLResponse,
+              (200...299).contains(http.statusCode) else {
+            let detail = Self.extractErrorMessage(from: data)
+            throw SupabaseError.httpStatus(
+                (response as? HTTPURLResponse)?.statusCode ?? 0,
+                detail: detail
+            )
+        }
+
+        // Construct the public URL
+        let publicURL = "\(baseURL)/storage/v1/object/public/job-photo/\(path)"
+        return publicURL
+    }
+
     // MARK: - CRUD (filtered by user_id)
 
     func fetch<T: Decodable>(_ table: String, query: [String: String] = [:]) async throws -> [T] {
         var q = query
-        if let uid = try? await getCurrentUserId(), table != "profiles" {
+        let uid = try await getCurrentUserId()
+        if table != "profiles" {
             q["user_id"] = "eq.\(uid.uuidString)"
         }
         var path = "/rest/v1/\(table)?select=*"
@@ -317,21 +383,21 @@ actor SupabaseService {
     }
 
     func fetchJobs() async throws -> [Job] {
-        guard let uid = try? await getCurrentUserId() else { return [] }
+        let uid = try await getCurrentUserId()
         let path = "/rest/v1/jobs?select=*,clients!left(*)&user_id=eq.\(uid.uuidString)&order=scheduled_date.asc"
         let data = try await request("GET", path)
         return try decoder.decode([Job].self, from: data)
     }
 
     func fetchInvoices() async throws -> [Invoice] {
-        guard let uid = try? await getCurrentUserId() else { return [] }
+        let uid = try await getCurrentUserId()
         let path = "/rest/v1/invoices?select=*,clients!left(name)&user_id=eq.\(uid.uuidString)&order=created_at.desc"
         let data = try await request("GET", path)
         return try decoder.decode([Invoice].self, from: data)
     }
 
     func fetchProfile() async throws -> UserProfile? {
-        guard let uid = try? await getCurrentUserId() else { return nil }
+        let uid = try await getCurrentUserId()
         let path = "/rest/v1/profiles?select=*&id=eq.\(uid.uuidString)"
         let data = try await request("GET", path)
         let profiles = try decoder.decode([UserProfile].self, from: data)
@@ -409,9 +475,21 @@ actor SupabaseService {
                     allowsTokenRefresh: false
                 )
             }
-            throw SupabaseError.httpStatus(http.statusCode)
+            let detail = Self.extractErrorMessage(from: data)
+            throw SupabaseError.httpStatus(http.statusCode, detail: detail)
         }
         return data
+    }
+
+    /// Extracts a human-readable error from a Supabase/edge-function JSON response body.
+    /// Checks "error", then "message" (both formats are used across the codebase).
+    private nonisolated static func extractErrorMessage(from data: Data) -> String? {
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return nil
+        }
+        if let error = json["error"] as? String { return error }
+        if let message = json["message"] as? String { return message }
+        return nil
     }
 }
 
@@ -431,12 +509,14 @@ enum AuthError: LocalizedError {
 }
 
 enum SupabaseError: LocalizedError {
-    case network, noRows, httpStatus(Int), decodingFailed
+    case network, noRows, httpStatus(Int, detail: String?), decodingFailed
     var errorDescription: String? {
         switch self {
         case .network: "Network error. Check your connection."
         case .noRows: "No data returned."
-        case .httpStatus(let code): "Server error (\(code))."
+        case .httpStatus(let code, let detail):
+            if let detail { "Server error (\(code)): \(detail)" }
+            else { "Server error (\(code))." }
         case .decodingFailed: "Could not parse server response."
         }
     }

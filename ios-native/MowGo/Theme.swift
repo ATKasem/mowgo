@@ -19,22 +19,49 @@ struct MowGoTheme {
 
     init(_ colorScheme: ColorScheme) {
         let isDark = colorScheme == .dark
-        background = Color(hex: isDark ? "111827" : "ffffff")
-        surface = Color(hex: isDark ? "1f2937" : "f3f4f6")
-        surfaceElevated = Color(hex: isDark ? "374151" : "e5e7eb")
-        textPrimary = Color(hex: isDark ? "ffffff" : "111827")
-        textSecondary = Color(hex: isDark ? "d1d5db" : "374151")
-        textMuted = Color(hex: isDark ? "9ca3af" : "6b7280")
-        textInverse = Color(hex: isDark ? "6b7280" : "9ca3af")
+        background = Color(
+            light: Color(hex: "f8f9fa"),
+            dark: Color(hex: "1a1a2e")
+        )
+        surface = Color(
+            light: .white,
+            dark: Color(hex: "16213e")
+        )
+        surfaceElevated = Color(
+            light: Color(hex: "e5e7eb"),
+            dark: Color(hex: "1f2937")
+        )
+        textPrimary = Color(
+            light: Color(hex: "111827"),
+            dark: Color(hex: "e5e7eb")
+        )
+        textSecondary = Color(
+            light: Color(hex: "6b7280"),
+            dark: Color(hex: "9ca3af")
+        )
+        textMuted = Color(
+            light: Color(hex: "6b7280"),
+            dark: Color(hex: "9ca3af")
+        )
+        textInverse = Color(
+            light: Color(hex: "9ca3af"),
+            dark: Color(hex: "6b7280")
+        )
     }
 
     // MARK: - Brand Colors (from app icon)
 
     /// Primary brand green — the icon's lawnmower and grass. Use for CTAs, active states, highlights.
-    static let brandGreen = Color(hex: "22c55e")       // Lime neon (icon foreground)
+    static let brandGreen = Color(
+        light: Color(hex: "22c55e"),
+        dark: Color(hex: "4ade80")
+    )
 
     /// Deep brand green — used for buttons, links, selected states.
-    static let deepGreen = Color(hex: "16a34a")         // Emerald (existing accent)
+    static let deepGreen = Color(
+        light: Color(hex: "16a34a"),
+        dark: Color(hex: "22c55e")
+    )
 
     /// Dark forest — icon background gradient top.
     static let forestDark = Color(hex: "0d2818")

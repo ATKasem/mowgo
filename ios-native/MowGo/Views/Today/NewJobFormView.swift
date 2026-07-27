@@ -20,6 +20,7 @@ struct NewJobFormView: View {
     @State private var assignedTo: UUID? = nil
     @State private var scheduledTime = Date()
     @State private var duration = 60
+    @State private var notes = ""
     @State private var isSaving = false
     @State private var error: String?
 
@@ -54,6 +55,9 @@ struct NewJobFormView: View {
                                 }
                             }
                         }
+                        TextField("Notes (optional)", text: $notes, axis: .vertical)
+                            .lineLimit(3...6)
+                            .textContentType(.none)
                     }
                     .listRowBackground(theme.surface)
                 }
@@ -110,6 +114,7 @@ struct NewJobFormView: View {
             scheduledTime: timeFmt.string(from: scheduledTime),
             durationMinutes: duration,
             status: .scheduled,
+            notes: notes.isEmpty ? nil : notes,
             routeOrder: store.jobs.filter { $0.scheduledDate == date }.count
         )
         Task {

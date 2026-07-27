@@ -70,16 +70,28 @@ struct TodayView: View {
                             } else {
                                 LazyVStack(spacing: 8) {
                                     ForEach(todayJobs) { job in
-                                        JobCardView(job: job, teamMembers: store.teamMembers) {
-                                            Task {
-                                                do {
-                                                    operationError = nil
-                                                    try await store.toggleJobStatus(job)
-                                                } catch {
-                                                    operationError = error.localizedDescription
+                                        JobCardView(job: job, teamMembers: store.teamMembers,
+                                            onToggle: {
+                                                Task {
+                                                    do {
+                                                        operationError = nil
+                                                        try await store.toggleJobStatus(job)
+                                                    } catch {
+                                                        operationError = error.localizedDescription
+                                                    }
+                                                }
+                                            },
+                                            onSkip: {
+                                                Task {
+                                                    do {
+                                                        operationError = nil
+                                                        try await store.skipJob(job)
+                                                    } catch {
+                                                        operationError = error.localizedDescription
+                                                    }
                                                 }
                                             }
-                                        }
+                                        )
                                     }
                                 }
                                 .padding(.horizontal, 16)
