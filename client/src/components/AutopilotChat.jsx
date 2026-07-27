@@ -31,6 +31,8 @@ export default function AutopilotChat({ compact = false }) {
     userMessageCount,
     limitReached,
     shouldSuggestReset,
+    persistenceFailed,
+    isSending,
     sendMessage,
     reset,
     retry
@@ -74,7 +76,8 @@ export default function AutopilotChat({ compact = false }) {
     setInput('');
   }
 
-  const isBusy = status === 'loading' || status === 'thinking' || status === 'executing';
+  const isBusy = status === 'loading' || status === 'thinking' || status === 'executing' || isSending;
+  const loading = status === 'loading';
 
   return (
     <div className={`flex flex-col ${compact ? 'flex-1 min-h-0' : 'h-[calc(100vh-13rem)] max-h-[calc(100vh-13rem)]'}`}>
@@ -88,7 +91,8 @@ export default function AutopilotChat({ compact = false }) {
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{tr("AI Autopilot")}</h2>
             <p className="text-[10px] text-gray-400 dark:text-gray-500">
-              {status === 'thinking' ? tr('Thinking...') :
+              {status === 'loading' ? tr('Setting up...') :
+               status === 'thinking' ? tr('Thinking...') :
                status === 'executing' ? currentAction || tr('Working...') :
                status === 'error' ? tr('Error — tap to retry') :
                tr('Ask me anything about your business')}
@@ -160,7 +164,8 @@ export default function AutopilotChat({ compact = false }) {
               <button
                 key={i}
                 onClick={() => handleQuickPrompt(tr(p.text))}
-                className={`text-left text-xs rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-300 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-3 min-h-[44px]'}`}
+                disabled={isBusy || loading}
+                className={`text-left text-xs rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed ${compact ? 'px-2.5 py-1.5' : 'px-3 py-3 min-h-[44px]'}`}
               >
                 {tr(p.label)}
               </button>
@@ -191,6 +196,7 @@ export default function AutopilotChat({ compact = false }) {
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder={
+              status === 'loading' ? tr('Setting up...') :
               status === 'executing' ? tr('Working on it...') :
               status === 'thinking' ? tr('AI is thinking...') :
               limitReached ? tr('Start a new chat to continue') :
@@ -212,7 +218,13 @@ export default function AutopilotChat({ compact = false }) {
           </button>
         </div>
         <div className={`${compact ? 'mt-1.5' : 'mt-2'} flex items-center justify-between text-[10px] text-gray-400 dark:text-gray-500`}>
-          <span>{limitReached ? tr('Message limit reached') : tr('AI can make changes using your business data')}</span>
+          <span>
+            {persistenceFailed
+              ? <span className="text-amber-600 dark:text-amber-400">{tr('Not saved')}</span>
+              : limitReached
+                ? tr('Message limit reached')
+                : tr('AI can make changes using your business data')}
+          </span>
           <span className={limitReached ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}>
             {userMessageCount}/{MAX_USER_MESSAGES} {tr('messages')}
           </span>

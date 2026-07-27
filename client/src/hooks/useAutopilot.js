@@ -54,9 +54,13 @@ export default function useAutopilot() {
   const [status, setStatus] = useState('loading');
   const [currentAction, setCurrentAction] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+  const [persistenceFailed, setPersistenceFailed] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const controllerRef = useRef(null);
   const userIdRef = useRef(null);
   const sessionIdRef = useRef(null);
+  const sessionReadyRef = useRef(null);
+  const sendInFlightRef = useRef(false);
   const statusRef = useRef(status);
   const messagesRef = useRef(messages);
 
@@ -70,14 +74,14 @@ export default function useAutopilot() {
 
   const createSession = useCallback(async (userId) => {
     const id = crypto.randomUUID();
+    sessionIdRef.current = id;
+    setSessionId(id);
     if (userId && !isDemoMode()) {
       const { error } = await supabase
         .from('autopilot_sessions')
         .insert({ id, user_id: userId });
       if (error) throw error;
     }
-    sessionIdRef.current = id;
-    setSessionId(id);
     return id;
   }, []);
 
@@ -86,18 +90,21 @@ export default function useAutopilot() {
     const activeSessionId = sessionIdRef.current;
     if (!userId || !activeSessionId || isDemoMode() || message.isWelcome || message.isError) return;
 
-    const { error } = await supabase
-      .from('autopilot_messages')
-      .insert(toDatabaseMessage(message, activeSessionId, userId));
-    if (error) {
-      console.error('Could not save autopilot message:', error);
-      return;
-    }
+    try {
+      const { error } = await supabase
+        .from('autopilot_messages')
+        .insert(toDatabaseMessage(message, activeSessionId, userId));
+      if (error) throw error;
 
-    await supabase
-      .from('autopilot_sessions')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', activeSessionId);
+      const { error: sessionError } = await supabase
+        .from('autopilot_sessions')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', activeSessionId);
+      if (sessionError) throw sessionError;
+    } catch (error) {
+      console.error('Could not save autopilot message:', error);
+      setPersistenceFailed(true);
+    }
   }, []);
 
   const appendMessage = useCallback((message) => {
@@ -156,7 +163,7 @@ export default function useAutopilot() {
       }
     }
 
-    void loadSession();
+    sessionReadyRef.current = loadSession();
     return () => {
       cancelled = true;
       controllerRef.current?.abort();
@@ -248,8 +255,23 @@ export default function useAutopilot() {
 
   const sendMessage = useCallback(async (userText) => {
     const text = userText.trim();
+    if (!text || sendInFlightRef.current) return;
+
+    sendInFlightRef.current = true;
+    setIsSending(true);
+    try {
+      if (sessionReadyRef.current) await sessionReadyRef.current;
+    } catch (error) {
+      console.error('Could not prepare autopilot session:', error);
+      setPersistenceFailed(true);
+    }
+
     const currentUserCount = messagesRef.current.filter(message => message.role === 'user').length;
-    if (!text || statusRef.current !== 'idle' || currentUserCount >= MAX_USER_MESSAGES) return;
+    if (statusRef.current !== 'idle' || currentUserCount >= MAX_USER_MESSAGES) {
+      sendInFlightRef.current = false;
+      setIsSending(false);
+      return;
+    }
 
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
@@ -280,19 +302,29 @@ export default function useAutopilot() {
         { isError: true }
       ));
       setStatus('error');
+    } finally {
+      sendInFlightRef.current = false;
+      setIsSending(false);
     }
   }, [appendMessage, runLLMLoop]);
 
   const reset = useCallback(async () => {
     controllerRef.current?.abort();
+    sendInFlightRef.current = false;
+    setIsSending(false);
     setStatus('loading');
     setCurrentAction(null);
     setMessages([welcomeMessage()]);
+    setPersistenceFailed(false);
     try {
-      await createSession(userIdRef.current);
+      const sessionPromise = createSession(userIdRef.current);
+      sessionReadyRef.current = sessionPromise;
+      await sessionPromise;
     } catch (error) {
       console.error('Could not create autopilot session:', error);
+      setPersistenceFailed(true);
     } finally {
+      sessionReadyRef.current = Promise.resolve(sessionIdRef.current);
       setStatus('idle');
     }
   }, [createSession]);
@@ -329,6 +361,8 @@ export default function useAutopilot() {
     userMessageCount,
     limitReached,
     shouldSuggestReset,
+    persistenceFailed,
+    isSending,
     sendMessage,
     reset,
     retry

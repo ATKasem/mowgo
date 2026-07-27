@@ -15,7 +15,8 @@ test('system prompt is tool-first, terse, and no more than eight lines', async (
   const prompt = source.match(/export const SYSTEM_PROMPT = `([\s\S]*?)`;/)?.[1];
   assert.ok(prompt, 'SYSTEM_PROMPT must exist');
   assert.ok(prompt.split('\n').length <= 8, 'SYSTEM_PROMPT exceeds eight lines');
-  assert.match(prompt, /Use tools before answering/i);
+  assert.match(prompt, /If a tool exists for the request, you MUST call it/i);
+  assert.match(prompt, /Only respond with text when no tool applies/i);
   assert.match(prompt, /short/i);
   assert.doesNotMatch(prompt, /friendly|personality/i);
 });
@@ -46,4 +47,15 @@ test('compact chat shows the session counter and disables the limit', async () =
   assert.match(source, /MAX_USER_MESSAGES/);
   assert.match(source, /messages/);
   assert.match(source, /limitReached/);
+  assert.match(source, /disabled=\{isBusy \|\| loading\}/);
+  assert.match(source, /Not saved/);
+});
+
+test('hook serializes sends, waits for session readiness, and publishes reset UUID immediately', async () => {
+  const source = await read('client/src/hooks/useAutopilot.js');
+  assert.match(source, /sendInFlightRef\.current/);
+  assert.match(source, /setIsSending\(true\)/);
+  assert.match(source, /await sessionReadyRef\.current/);
+  assert.match(source, /sessionIdRef\.current = id;\s+setSessionId\(id\)/);
+  assert.match(source, /persistenceFailed/);
 });
