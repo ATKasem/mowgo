@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const { createClient } = require('@supabase/supabase-js');
 const Stripe = require('stripe');
 const { Resend } = require('resend');
+const { constructStripeEvent, handleStripeEvent } = require('./stripe-subscriptions');
 
 const app = express();
 
@@ -39,35 +40,21 @@ app.use('/api/stripe/', rateLimit({
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
-  try { event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); }
+  try { event = constructStripeEvent(stripe, req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); }
   catch (err) { return res.status(400).send(`Webhook Error: ${err.message}`); }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const invoiceId = session.metadata.invoice_id;
-    if (!invoiceId) return res.status(400).send('Missing invoice_id');
-
-    // Verify payment amount matches invoice
-    const { data: invoice } = await supabase
-      .from('invoices')
-      .select('amount')
-      .eq('id', invoiceId)
-      .single();
-
-    if (!invoice) return res.status(404).send('Invoice not found');
-
-    const paidCents = session.amount_total || 0;
-    const invoiceCents = Math.round(Number(invoice.amount) * 100);
-    if (!Number.isSafeInteger(invoiceCents) || paidCents !== invoiceCents) {
-      console.error(`Amount mismatch: invoice=${invoiceCents} cents, paid=${paidCents} cents`);
-      return res.status(400).send('Amount mismatch');
-    }
-
-    await supabase.from('invoices').update({
-      status: 'paid',
-      paid_at: new Date().toISOString(),
-      stripe_payment_intent_id: session.payment_intent,
-    }).eq('id', invoiceId);
+  try {
+    await handleStripeEvent(event, {
+      supabase,
+      stripe,
+      priceToTier: {
+        [process.env.STRIPE_PRICE_SOLO]: 'solo',
+        [process.env.STRIPE_PRICE_CREW]: 'crew',
+      },
+    });
+  } catch (err) {
+    console.error(`Stripe webhook ${event.id} failed:`, err.message);
+    return res.status(err.statusCode || 500).send(err.message);
   }
   res.json({ received: true });
 });

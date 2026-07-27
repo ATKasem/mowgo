@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, RefreshCw, Loader2, Wrench, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import useAutopilot from '../hooks/useAutopilot';
@@ -22,6 +23,7 @@ const QUICK_PROMPTS = [
 ];
 
 export default function AutopilotChat({ compact = false }) {
+  const { tr, t, i18n } = useLocalizedText('autopilotChat');
   const { messages, status, currentAction, sendMessage, reset, retry } = useAutopilot({ compact });
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
@@ -74,12 +76,12 @@ export default function AutopilotChat({ compact = false }) {
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">AI Autopilot</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{tr("AI Autopilot")}</h2>
             <p className="text-[10px] text-gray-400 dark:text-gray-500">
-              {status === 'thinking' ? 'Thinking...' :
-               status === 'executing' ? currentAction || 'Working...' :
-               status === 'error' ? 'Error — tap to retry' :
-               'Ask me anything about your business'}
+              {status === 'thinking' ? tr('Thinking...') :
+               status === 'executing' ? currentAction || tr('Working...') :
+               status === 'error' ? tr('Error — tap to retry') :
+               tr('Ask me anything about your business')}
             </p>
           </div>
         </div>
@@ -89,7 +91,7 @@ export default function AutopilotChat({ compact = false }) {
           disabled={isBusy}
         >
           <RefreshCw className="w-3 h-3" />
-          New chat
+          {tr("New chat")}
         </button>
       </div>
       )}
@@ -122,7 +124,7 @@ export default function AutopilotChat({ compact = false }) {
       {/* Quick prompts (show when only welcome message) — more minimal in compact */}
       {messages.length === 1 && messages[0].isWelcome && (
         <div className={compact ? 'pb-2' : 'pb-3'}>
-          {!compact && <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2 px-1">Try asking:</p>}
+          {!compact && <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2 px-1">{tr("Try asking:")}</p>}
           <div className={`${compact ? 'flex flex-wrap gap-1.5' : 'grid grid-cols-2 gap-2'}`}>
             {QUICK_PROMPTS.slice(0, compact ? 3 : 4).map((p, i) => (
               <button
@@ -130,7 +132,7 @@ export default function AutopilotChat({ compact = false }) {
                 onClick={() => handleQuickPrompt(p.text)}
                 className={`text-left text-xs rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-300 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-3 min-h-[44px]'}`}
               >
-                {p.label}
+                {tr(p.label)}
               </button>
             ))}
           </div>
@@ -145,7 +147,7 @@ export default function AutopilotChat({ compact = false }) {
             className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors min-h-[44px]"
           >
             <RefreshCw className="w-4 h-4" />
-            Retry
+            {tr("Retry")}
           </button>
         </div>
       )}
@@ -159,9 +161,9 @@ export default function AutopilotChat({ compact = false }) {
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder={
-              status === 'executing' ? 'Working on it...' :
-              status === 'thinking' ? 'AI is thinking...' :
-              "Type a command (e.g. 'Show today's schedule')"
+              status === 'executing' ? tr('Working on it...') :
+              status === 'thinking' ? tr('AI is thinking...') :
+              tr("Type a command (e.g. 'Show today's schedule')")
             }
             disabled={isBusy}
             className="flex-1 px-4 py-2.5 text-base bg-gray-100 dark:bg-gray-800 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50 transition-shadow"
@@ -179,7 +181,7 @@ export default function AutopilotChat({ compact = false }) {
           </button>
         </div>
         <p className={`${compact ? 'text-[9px] mt-1.5' : 'text-[10px] mt-2'} text-gray-400 dark:text-gray-500 text-center`}>
-          {compact ? 'Type a command to manage your business' : 'AI Autopilot uses your business data to help manage scheduling, invoicing, and clients'}
+          {tr(compact ? 'Type a command to manage your business' : 'AI Autopilot uses your business data to help manage scheduling, invoicing, and clients')}
         </p>
       </form>
     </div>
@@ -318,6 +320,7 @@ function ToolCallMessage({ msg, messages, index }) {
 
 /** Success/failure badge for collapsed tool calls */
 function ResultBadge({ results }) {
+  const { tr } = useLocalizedText('autopilotChat');
   const allSuccess = results.every(r => {
     const d = safeParse(r.content);
     return d?.success !== false;
@@ -331,7 +334,7 @@ function ResultBadge({ results }) {
         ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
         : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
     }`}>
-      {allSuccess ? 'Done' : 'Error'}
+      {tr(allSuccess ? 'Done' : 'Error')}
     </span>
   );
 }

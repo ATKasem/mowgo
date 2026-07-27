@@ -16,13 +16,25 @@ export async function onRequestPost(context) {
     return json({ error: 'Forbidden' }, 403);
   }
 
+  const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) return json({ error: 'Unauthorized' }, 401, origin);
+
   // Guard: Stripe secret key must be configured before making API calls
-  if (!env.STRIPE_SECRET_KEY) {
-    console.error('Stripe secret key not configured');
+  const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
+  const supabaseServiceKey = env.SUPABASE_SERVICE_KEY;
+  if (!env.STRIPE_SECRET_KEY || !supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+    console.error('Stripe or Supabase server configuration is incomplete');
     return json({ error: 'Payment system not configured' }, 500, origin);
   }
 
   try {
+    const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { Authorization: `Bearer ${token}`, apikey: supabaseAnonKey },
+    });
+    if (!authResponse.ok) return json({ error: 'Unauthorized' }, 401, origin);
+    const user = await authResponse.json();
+
     const { plan } = await request.json();
 
     // Validate plan
@@ -40,6 +52,51 @@ export async function onRequestPost(context) {
     const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS || '14', 10) || 14;
     const appUrl = env.APP_URL || origin || 'https://mowgo.pages.dev';
 
+    const profileResponse = await fetch(
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=stripe_customer_id`,
+      {
+        headers: {
+          Authorization: `Bearer ${supabaseServiceKey}`,
+          apikey: supabaseServiceKey,
+        },
+      },
+    );
+    if (!profileResponse.ok) throw new Error('Could not load billing profile');
+    const [profile] = await profileResponse.json();
+    if (!profile) return json({ error: 'Profile not found' }, 404, origin);
+
+    let customerId = profile.stripe_customer_id;
+    if (!customerId) {
+      const customerResponse = await fetch('https://api.stripe.com/v1/customers', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          email: user.email || '',
+          'metadata[supabase_user_id]': user.id,
+        }).toString(),
+      });
+      const customer = await customerResponse.json();
+      if (!customerResponse.ok || customer.error) throw new Error('Could not create Stripe customer');
+      customerId = customer.id;
+
+      const saveResponse = await fetch(
+        `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${supabaseServiceKey}`,
+            apikey: supabaseServiceKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ stripe_customer_id: customerId }),
+        },
+      );
+      if (!saveResponse.ok) throw new Error('Could not save Stripe customer');
+    }
+
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
@@ -47,10 +104,15 @@ export async function onRequestPost(context) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
+        customer: customerId,
         'line_items[0][price]': priceId,
         'line_items[0][quantity]': '1',
         mode: 'subscription',
         'subscription_data[trial_period_days]': String(trialDays),
+        'metadata[user_id]': user.id,
+        'metadata[tier]': plan,
+        'subscription_data[metadata][user_id]': user.id,
+        'subscription_data[metadata][tier]': plan,
         success_url: `${appUrl}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appUrl}/#/pricing`,
         allow_promotion_codes: 'true',

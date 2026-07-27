@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { loadClients, createClient, updateClient, deleteClient } from '../lib/data';
 import { INITIAL_CLIENT_FORM } from '../lib/constants';
@@ -18,6 +19,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function Clients({ jobs = [] }) {
+  const { tr, t, i18n } = useLocalizedText('clients');
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -71,14 +73,14 @@ export default function Clients({ jobs = [] }) {
       setEditId(null);
     } catch (err) {
       console.error('save client:', err);
-      setClientError(err.message || 'Failed to save client. Please try again.');
+      setClientError(err.message || tr('Failed to save client. Please try again.'));
     }
     setSaving(false);
   }
 
   async function remove(id) {
     const client = clients.find(c => c.id === id);
-    if (!window.confirm(`Delete ${client?.name || 'this client'} and all their jobs? This cannot be undone.`)) return;
+    if (!window.confirm(tr('Delete {{name}} and all their jobs? This cannot be undone.', { name: client?.name || tr('this client') }))) return;
     try {
       await deleteClient(id);
       setClients(prev => prev.filter(c => c.id !== id));
@@ -123,21 +125,21 @@ export default function Clients({ jobs = [] }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <div><h2 className="text-xl font-bold text-gray-900 dark:text-white">Clients</h2><p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{clients.length} total</p></div>
-        <button onClick={openNew} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />Add Client</button>
+        <div><h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Clients")}</h2><p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{clients.length} total</p></div>
+        <button onClick={openNew} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />{tr("Add Client")}</button>
       </div>
 
       <div className="flex gap-2 mb-4">
-        <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Search by name or address..." aria-label="Search clients" value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
+        <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder={tr("Search by name or address...")} aria-label={tr("Search clients")} value={search} onChange={e => setSearch(e.target.value)} className="input pl-10" /></div>
         <div className="relative" ref={sortRef} style={{ overflow: 'visible' }}>
-          <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label="Sort clients"><Filter className="w-4 h-4" /></button>
+          <button onClick={() => setShowSort(!showSort)} className="btn-secondary h-full px-3 gap-1" aria-label={tr("Sort clients")}><Filter className="w-4 h-4" /></button>
           {showSort && (
             <div className="absolute right-0 top-full mt-1 card p-1 z-20 min-w-[140px] shadow-lg"
                  onMouseLeave={() => setShowSort(false)}
                  onKeyDown={e => { if (e.key === 'Escape') { setShowSort(false); } }}
                  onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowSort(false); }}>
               {SORT_OPTIONS.map(o => (
-                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${sortBy === o.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{o.label}</button>
+                <button key={o.value} onClick={() => { setSortBy(o.value); setShowSort(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${sortBy === o.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{tr(o.label)}</button>
               ))}
             </div>
           )}
@@ -146,20 +148,20 @@ export default function Clients({ jobs = [] }) {
 
       {showForm && (
         <form onSubmit={save} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{editId ? 'Edit Client' : 'New Client'}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{tr(editId ? 'Edit Client' : 'New Client')}</h3>
           {clientError && (
             <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
               {clientError}
             </div>
           )}
-          <div><label className="label">Name *</label><input placeholder="Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
-          <div><label className="label">Address</label><input placeholder="123 Main St, OKC, OK" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
-          <div className="grid grid-cols-2 gap-3"><div><label className="label">Phone</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">Email</label><input type="email" placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>
-          <div><label className="label">Rate ($/visit)</label><input type="number" min="0" step="0.01" placeholder="120" value={form.rate} onChange={e => { const v = parseFloat(e.target.value); setForm({ ...form, rate: isNaN(v) ? 0 : Math.max(0, v) }); }} className="input" /></div>
-          <div><label className="label">Service Notes</label><textarea placeholder="Focus on front yard..." value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
-          <div className="grid grid-cols-2 gap-3"><div><label className="label">Key Code</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">Alarm Code</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
-          <div><label className="label">Pet Instructions</label><input placeholder="1 friendly dog..." value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
-          <div className="flex gap-2 pt-1"><button type="submit" disabled={saving} className="btn-primary flex-1">{saving ? 'Saving...' : editId ? 'Save Changes' : 'Add Client'}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">Cancel</button></div>
+          <div><label className="label">{tr("Name *")}</label><input placeholder={tr("Jane Smith")} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input" required /></div>
+          <div><label className="label">{tr("Address")}</label><input placeholder={tr("123 Main St, OKC, OK")} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="input" /></div>
+          <div className="grid grid-cols-2 gap-3"><div><label className="label">{tr("Phone")}</label><input placeholder="405-555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input" /></div><div><label className="label">{tr("Email")}</label><input type="email" placeholder={tr("jane@email.com")} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="input" /></div></div>
+          <div><label className="label">{tr("Rate ($/visit)")}</label><input type="number" min="0" step="0.01" placeholder="120" value={form.rate} onChange={e => { const v = parseFloat(e.target.value); setForm({ ...form, rate: isNaN(v) ? 0 : Math.max(0, v) }); }} className="input" /></div>
+          <div><label className="label">{tr("Service Notes")}</label><textarea placeholder={tr("Focus on front yard...")} value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
+          <div className="grid grid-cols-2 gap-3"><div><label className="label">{tr("Key Code")}</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">{tr("Alarm Code")}</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
+          <div><label className="label">{tr("Pet Instructions")}</label><input placeholder={tr("1 friendly dog...")} value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
+          <div className="flex gap-2 pt-1"><button type="submit" disabled={saving} className="btn-primary flex-1">{tr(saving ? 'Saving...' : editId ? 'Save Changes' : 'Add Client')}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">{tr("Cancel")}</button></div>
         </form>
       )}
 
@@ -167,8 +169,8 @@ export default function Clients({ jobs = [] }) {
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
             <Users className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 font-semibold">{search ? 'No matching clients' : 'No clients yet'}</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{search ? 'Try a different search' : 'Add your first client to get started'}</p>
+            <p className="text-gray-500 dark:text-gray-400 font-semibold">{tr(search ? 'No matching clients' : 'No clients yet')}</p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{tr(search ? 'Try a different search' : 'Add your first client to get started')}</p>
           </div>
         )}
         {filtered.map((client, i) => {
@@ -191,7 +193,7 @@ export default function Clients({ jobs = [] }) {
                   </div>
                   <div className="flex items-center gap-2">
                     {meta?.nextJob && (
-                      <span className="badge-info text-[11px]"><Clock className="w-3 h-3" />{meta.nextJob.scheduled_date === new Date().toISOString().split('T')[0] ? 'Today' : new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      <span className="badge-info text-[11px]"><Clock className="w-3 h-3" />{meta.nextJob.scheduled_date === new Date().toISOString().split('T')[0] ? tr('Today') : new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })}</span>
                     )}
                     <span className="badge-info">${client.rate ?? 0}</span>
                     <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
@@ -200,8 +202,8 @@ export default function Clients({ jobs = [] }) {
                 {isExpanded && (
                   <div className="border-t border-gray-100 dark:border-gray-800 px-4 pb-4 space-y-2.5" style={{ animation: 'slideDown 0.15s ease-out' }}>
                   <div className="flex gap-2 mb-1">
-                    {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-2.5 px-3 gap-1 flex-1 min-h-[44px]"><Phone className="w-3 h-3" />Call</a>}
-                    {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-2.5 px-3 gap-1 flex-1 min-h-[44px]"><Navigation className="w-3 h-3" />Navigate</a>}
+                    {client.phone && <a href={`tel:${client.phone}`} className="btn-secondary text-xs py-2.5 px-3 gap-1 flex-1 min-h-[44px]"><Phone className="w-3 h-3" />{tr("Call")}</a>}
+                    {client.address && <a href={getMapsUrl(client.address)} target="_blank" rel="noreferrer" className="btn-secondary text-xs py-2.5 px-3 gap-1 flex-1 min-h-[44px]"><Navigation className="w-3 h-3" />{tr("Navigate")}</a>}
                   </div>
                   {client.phone && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Phone className="w-3.5 h-3.5 text-gray-400" />{client.phone}</div>}
                   {client.email && <div className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-400"><Mail className="w-3.5 h-3.5 text-gray-400" />{client.email}</div>}
@@ -209,7 +211,7 @@ export default function Clients({ jobs = [] }) {
                   {meta?.nextJob && (
                     <div className="flex items-center gap-2.5 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/20 rounded-lg p-2.5">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>Next: <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5) || '--:--'} — {meta.nextJob.title}</span>
+                      <span>{tr("Next:")} <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5) || '--:--'} — {meta.nextJob.title}</span>
                     </div>
                   )}
                   {meta?.recentDone?.length > 0 && (
@@ -221,7 +223,7 @@ export default function Clients({ jobs = [] }) {
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
                             <span>{new Date(j.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                             <span className="text-gray-300 dark:text-gray-600">&middot;</span>
-                            <span>{j.title}</span>
+                            <span>{tr(j.title)}</span>
                           </div>
                         ))}
                       </div>
@@ -233,8 +235,8 @@ export default function Clients({ jobs = [] }) {
                     {client.pet_instructions && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><PawPrint className="w-3 h-3" />{client.pet_instructions}</span>}
                   </div>
                   <div className="flex gap-2 pt-1">
-                    <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-2.5 px-3 gap-1 min-h-[44px]"><Pencil className="w-3 h-3" />Edit</button>
-                    <button onClick={e => { e.stopPropagation(); remove(client.id); }} className="btn-ghost text-xs py-2.5 px-3 gap-1 min-h-[44px] text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600"><Trash2 className="w-3 h-3" />Delete</button>
+                    <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-2.5 px-3 gap-1 min-h-[44px]"><Pencil className="w-3 h-3" />{tr("Edit")}</button>
+                    <button onClick={e => { e.stopPropagation(); remove(client.id); }} className="btn-ghost text-xs py-2.5 px-3 gap-1 min-h-[44px] text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600"><Trash2 className="w-3 h-3" />{tr("Delete")}</button>
                   </div>
                 </div>
               )}

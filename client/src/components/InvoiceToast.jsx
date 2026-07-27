@@ -1,6 +1,8 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { AlertCircle, Check, CloudRain } from 'lucide-react';
 
 export default function InvoiceToast({ toast }) {
+  const { tr } = useLocalizedText('invoiceToast');
   if (!toast) return null;
 
   const isRain = toast.type === 'rain';
@@ -21,9 +23,11 @@ export default function InvoiceToast({ toast }) {
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <div>
           <p className={`text-sm font-semibold ${textColor}`}>
-            {isRain ? toast.name : toast.type === 'recurring' ? toast.name : `Invoice created for ${toast.name}`}
+            {isRain || toast.type === 'recurring'
+              ? toast.name
+              : tr('Invoice created for {{name}}', { name: toast.name })}
           </p>
-          {!isRain && <p className={`text-xs ${subColor}`}>${toast.amount} — unpaid</p>}
+          {!isRain && <p className={`text-xs ${subColor}`}>${toast.amount} — {tr('unpaid')}</p>}
         </div>
       </div>
     </div>

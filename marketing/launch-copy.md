@@ -20,7 +20,7 @@ MowGo is the lawn care app that just works.
 - Rain hits → one button shifts everything
 - Job done → invoice sends automatically
 
-Free for 10 clients. No credit card. $49/mo for unlimited.
+Free for 10 clients. No credit card. $39/mo for unlimited.
 
 Link in bio → mowgo.pages.dev
 
@@ -46,7 +46,7 @@ The apps out there are either too expensive, too complicated, or both. Most of y
 
 So I built MowGo. It does three things: scheduling, routes, invoicing. That is it. No CRM. No marketing dashboards. No "book a demo." It just works.
 
-Free for 10 clients. $49/mo solo. $79/mo crew. 2 minute setup.
+Free for 10 clients. $39/mo solo. $79/mo crew. 2 minute setup.
 
 Not here to pitch. Genuinely want feedback from actual lawn guys. If you try it, tell me what is broken.
 

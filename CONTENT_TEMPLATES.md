@@ -25,7 +25,7 @@ I'm a dev, so I built her something. Spent 4 weeks on it. Here's what I learned:
 - Built a fancy dashboard. She just wants "who's next and did they pay."
 - Assumed she'd use Stripe. Half her clients pay cash.
 
-**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, $49/mo for unlimited.
+**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, $39/mo for unlimited.
 
 **What I want to know from you:** If you run a service business, what's your current scheduling system? What would it take for you to switch?
 
@@ -77,7 +77,7 @@ I actually built MowGo specifically because Jobber was too expensive for small c
 
 Quick comparison for a 2-person team:
 - **Jobber Core ($39/mo):** Scheduling + invoicing only. No reminders, no GPS, no route optimization. Real plan you need is $119/mo.
-- **MowGo Solo ($49/mo):** Scheduling + routing + invoicing + automated reminders. No per-user fees.
+- **MowGo Solo ($39/mo):** Scheduling + routing + invoicing + automated reminders. No per-user fees.
 
 Jobber is great for 5+ person operations with an office manager. For a solo landscaper or 2-person crew, it's overkill and overpriced.
 
@@ -150,7 +150,7 @@ Just shipped one-button reschedule for MowGo.
 
 Rain day? Sick day? Double-booked? 
 
-One tap moves everything to tomorrow. No other cleaning app does this at our price point. $0 on free tier, $49 for unlimited.
+One tap moves everything to tomorrow. No other cleaning app does this at our price point. $0 on free tier, $39 for unlimited.
 ```
 
 ### Pain Point
@@ -229,7 +229,7 @@ There's a better way.
 
 ### Pricing
 ```
-| Free | Solo $49/mo | Crew $79/mo |
+| Free | Solo $39/mo | Crew $79/mo |
 |------|-------------|-------------|
 | 10 clients | Unlimited | Unlimited |
 | Scheduling | Everything in Free | Everything in Solo |
@@ -244,9 +244,9 @@ There's a better way.
 | Feature | Jobber | MowGo |
 |---------|--------|-----------|
 | Scheduling | ✅ ($39/mo) | ✅ (Free) |
-| Route optimization | ❌ (needs $119) | ✅ ($49/mo) |
-| Reminders | ❌ (needs $119) | ✅ ($49/mo) |
-| Client portal | ❌ (needs $119) | ✅ ($49/mo) |
+| Route optimization | ❌ (needs $119) | ✅ ($39/mo) |
+| Reminders | ❌ (needs $119) | ✅ ($39/mo) |
+| Client portal | ❌ (needs $119) | ✅ ($39/mo) |
 | Extra user fee | $29/user | $0 |
-| Real monthly cost | $119+ | $49 |
+| Real monthly cost | $119+ | $39 |
 ```

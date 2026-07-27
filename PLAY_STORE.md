@@ -12,7 +12,7 @@ WHY MOWGO?
 • The only lawn care app with free rain delay — tap once, your whole schedule moves forward
 • Works offline — perfect for rural routes with spotty cell service (no extra charge)
 • Free tier with full features — up to 10 clients, no credit card required
-• Solo plan at $49/mo — unlimited clients, routes, offline mode, Stripe payments
+• Solo plan at $39/mo — unlimited clients, routes, offline mode, Stripe payments
 • Crew plan at $79/mo — team access, job assignment, route optimization
 
 KEY FEATURES:

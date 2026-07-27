@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
@@ -72,6 +73,7 @@ function StatCard({ icon: Icon, value, label, color, sub }) {
 }
 
 export default function Home({ jobs = [], invoices = [] }) {
+  const { tr, t, i18n } = useLocalizedText('home');
   const { user } = useAuth();
   const today = new Date().toISOString().split('T')[0];
   const userName = user?.email?.split('@')[0] || 'there';
@@ -139,7 +141,7 @@ export default function Home({ jobs = [], invoices = [] }) {
   const wTemp = weather ? Math.round(weather.current.temperature_2m) : '—';
   const wEmoji = weather ? (weatherEmoji[weather.current.weather_code] || '☀️') : '☀️';
   const forecast = weather?.daily ? weather.daily.time.slice(0, 10).map((_, i) => ({
-    day: new Date(weather.daily.time[i] + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' }),
+    day: new Date(weather.daily.time[i] + 'T12:00:00').toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short' }),
     hi: Math.round(weather.daily.temperature_2m_max[i]),
     lo: Math.round(weather.daily.temperature_2m_min[i]),
     code: weather.daily.weather_code[i],
@@ -156,11 +158,11 @@ export default function Home({ jobs = [], invoices = [] }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {getGreeting()}, {userName} {wEmoji}
+            {tr(getGreeting())}, {userName} {wEmoji}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-            {weatherLoading ? ' · Loading weather...' : ` · ${wTemp}°F, ${wLabel}`}
+            {new Date().toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            {weatherLoading ? ` · ${tr('Loading weather...')}` : ` · ${wTemp}°F, ${tr(wLabel)}`}
           </p>
         </div>
         <div className="flex flex-col items-center">
@@ -193,9 +195,9 @@ export default function Home({ jobs = [], invoices = [] }) {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <StatCard icon={CheckCircle} value={totalToday ? `${doneToday}/${totalToday}` : '—'} label="Done today" color="emerald" sub={totalToday ? `${Math.round((doneToday / totalToday) * 100)}%` : ''} />
-        <StatCard icon={DollarSign} value={`$${todayRevenue}`} label="Today's revenue" color="sky" />
-        <StatCard icon={AlertCircle} value={`$${unpaidTotal}`} label="Outstanding" color={unpaidTotal > 0 ? 'amber' : 'emerald'} sub={unpaidInvoices.length ? `${unpaidInvoices.length} unpaid` : 'All clear'} />
+        <StatCard icon={CheckCircle} value={totalToday ? `${doneToday}/${totalToday}` : '—'} label={tr("Done today")} color="emerald" sub={totalToday ? `${Math.round((doneToday / totalToday) * 100)}%` : ''} />
+        <StatCard icon={DollarSign} value={`$${todayRevenue}`} label={tr("Today's revenue")} color="sky" />
+        <StatCard icon={AlertCircle} value={`$${unpaidTotal}`} label={tr("Outstanding")} color={unpaidTotal > 0 ? 'amber' : 'emerald'} sub={unpaidInvoices.length ? tr('{{count}} unpaid', { count: unpaidInvoices.length }) : tr('All clear')} />
       </div>
 
       {/* Monthly Calendar */}
@@ -203,12 +205,12 @@ export default function Home({ jobs = [], invoices = [] }) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <button onClick={prevMonth} className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-white">{MONTHS[calMonth]} {calYear}</h3>
+            <h3 className="font-semibold text-sm text-gray-900 dark:text-white">{tr(MONTHS[calMonth])} {calYear}</h3>
             <button onClick={nextMonth} className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" /></button>
           </div>
           <div className="relative">
             <button onClick={() => setShowExport(!showExport)} className="btn-ghost text-xs gap-1.5 text-emerald-600 dark:text-emerald-400">
-              <Download className="w-3.5 h-3.5" />Export
+              <Download className="w-3.5 h-3.5" />{tr("Export")}
             </button>
             {showExport && (
               <div className="absolute right-0 top-full mt-1 card p-1 z-10 min-w-[190px] shadow-lg"
@@ -217,19 +219,19 @@ export default function Home({ jobs = [], invoices = [] }) {
                    onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowExport(false); }}>
                 <button onClick={() => { downloadICS(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
                   className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
-                  <Download className="w-3.5 h-3.5" />Download .ics (Apple/Outlook)
+                  <Download className="w-3.5 h-3.5" />{tr("Download .ics (Apple/Outlook)")}
                 </button>
                 <button onClick={() => { downloadCSV(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
                   className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
-                  <FileSpreadsheet className="w-3.5 h-3.5" />Download CSV (Excel/Numbers)
+                  <FileSpreadsheet className="w-3.5 h-3.5" />{tr("Download CSV (Excel/Numbers)")}
                 </button>
                 <button onClick={() => { printSchedule(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
                   className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
-                  <Printer className="w-3.5 h-3.5" />Print / Save as PDF
+                  <Printer className="w-3.5 h-3.5" />{tr("Print / Save as PDF")}
                 </button>
                 <button onClick={() => { window.open(generateGoogleCalUrl(jobs.filter(j => j.scheduled_date >= today)), '_blank'); setShowExport(false); }}
                   className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
-                  <ExternalLink className="w-3.5 h-3.5" />Add to Google Calendar
+                  <ExternalLink className="w-3.5 h-3.5" />{tr("Add to Google Calendar")}
                 </button>
               </div>
             )}
@@ -237,7 +239,7 @@ export default function Home({ jobs = [], invoices = [] }) {
         </div>
         {/* Day headers */}
         <div className="grid grid-cols-7 mb-0.5">
-          {DAYS.map(d => <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 py-0.5">{d}</div>)}
+          {DAYS.map(d => <div key={d} className="text-center text-[10px] font-semibold text-gray-400 dark:text-gray-500 py-0.5">{tr(d)}</div>)}
         </div>
         {/* Calendar grid — compact, interactive */}
         <div className="grid grid-cols-7 gap-px">
@@ -271,10 +273,10 @@ export default function Home({ jobs = [], invoices = [] }) {
               <h4 className="font-bold text-sm text-gray-900 dark:text-white">
                 {new Date(showForm.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </h4>
-              <button onClick={() => setShowForm(null)} aria-label="Close calendar popover" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
+              <button onClick={() => setShowForm(null)} aria-label={tr("Close calendar popover")} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
             </div>
             {showForm.jobs.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No jobs scheduled</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("No jobs scheduled")}</p>
             ) : (
               <div className="space-y-2">
                 {showForm.jobs.map((job, ji) => (
@@ -282,7 +284,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${job.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {tr(job.title)}</p>
                     </div>
                   </div>
                 ))}
@@ -304,12 +306,12 @@ export default function Home({ jobs = [], invoices = [] }) {
         <div className="card p-4">
           <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
             <Clock className="w-4 h-4 text-violet-500" />
-            Up Next
+            {tr("Up Next")}
           </h3>
           {upcoming.length === 0 ? (
             <div className="text-center py-5">
               <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">All done for today!</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{tr("All done for today!")}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -318,7 +320,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                   <span className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400 flex-shrink-0">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {tr(job.title)}</p>
                   </div>
                   <ChevronLeft className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-emerald-500 transition-colors rotate-180" />
                 </Link>
@@ -328,20 +330,20 @@ export default function Home({ jobs = [], invoices = [] }) {
         </div>
 
         <div className="card p-4">
-          <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-3">Quick Actions</h3>
+          <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-3">{tr("Quick Actions")}</h3>
           <div className="space-y-2">
             <Link to="/app/today" className="btn-primary w-full justify-start gap-2 text-sm py-2.5">
-              <Calendar className="w-4 h-4" />View Today's Schedule
+              <Calendar className="w-4 h-4" />{tr("View Today's Schedule")}
             </Link>
             <Link to="/app/clients" className="btn-secondary w-full justify-start gap-2 text-sm py-2.5">
-              <Plus className="w-4 h-4" />Add New Client
+              <Plus className="w-4 h-4" />{tr("Add New Client")}
             </Link>
             <Link to="/app/invoices" className="btn-secondary w-full justify-start gap-2 text-sm py-2.5">
               <AlertCircle className="w-4 h-4" />
               {unpaidTotal > 0 ? `$${unpaidTotal} in unpaid invoices` : 'All invoices paid'}
             </Link>
             <Link to="/app/settings" className="btn-ghost w-full justify-start gap-2 text-sm py-2.5">
-              Manage Settings <ArrowRight className="w-3.5 h-3.5 ml-auto" />
+              {tr("Manage Settings")} <ArrowRight className="w-3.5 h-3.5 ml-auto" />
             </Link>
           </div>
         </div>

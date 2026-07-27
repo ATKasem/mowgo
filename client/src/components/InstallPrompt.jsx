@@ -1,7 +1,9 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
 import { Download, X } from 'lucide-react';
 
 export default function InstallPrompt() {
+  const { tr, t, i18n } = useLocalizedText('installPrompt');
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [installed, setInstalled] = useState(false);
@@ -51,13 +53,13 @@ export default function InstallPrompt() {
           <Download className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-gray-900 dark:text-white">Install MowGo</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Add to your home screen for quick access</p>
+          <p className="font-semibold text-sm text-gray-900 dark:text-white">{tr("Install MowGo")}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{tr("Add to your home screen for quick access")}</p>
         </div>
         <button onClick={install} className="btn-primary text-xs px-3 py-2 whitespace-nowrap">
-          Install
+          {tr("Install")}
         </button>
-        <button onClick={() => setShowPrompt(false)} aria-label="Dismiss install prompt" className="p-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <button onClick={() => setShowPrompt(false)} aria-label={tr("Dismiss install prompt")} className="p-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           <X className="w-4 h-4" />
         </button>
       </div>

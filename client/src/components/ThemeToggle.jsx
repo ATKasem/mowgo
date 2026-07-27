@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
 
@@ -14,6 +15,7 @@ export function applyTheme(theme) {
 }
 
 export default function ThemeToggle() {
+  const { tr, t, i18n } = useLocalizedText('themeToggle');
   const [theme, setTheme] = useState(() => getStoredTheme());
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function ThemeToggle() {
   }
 
   const Icon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
-  const label = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'Auto';
+  const label = tr(theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'Auto');
 
   return (
     <button onClick={cycle} className="btn-ghost text-xs gap-1.5" aria-label={`Theme: ${label}`} title={`Theme: ${label}`}>

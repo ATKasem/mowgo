@@ -19,6 +19,8 @@ import SwitchingFromLawnPro from './pages/SwitchingFromLawnPro';
 import JobberPriceIncrease from './pages/JobberPriceIncrease';
 import QuoteIQAlternative from './pages/QuoteIQAlternative';
 import AutopilotChat from './components/AutopilotChat';
+import { useTranslation } from 'react-i18next';
+import i18n from './i18n';
 
 // ===== Auth Context =====
 export const AuthContext = createContext(null);
@@ -89,10 +91,12 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-8">
           <div className="text-center max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Something went wrong</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              {i18n.t('app.something_went_wrong')}
+            </h2>
             <p className="text-gray-500 dark:text-gray-400 mb-4">{this.state.error.message}</p>
             <button onClick={() => window.location.reload()} className="btn-primary">
-              Reload App
+              {i18n.t('app.reload_app')}
             </button>
           </div>
         </div>
@@ -142,6 +146,7 @@ function SupabaseErrorRedirect() {
 
 // ===== App =====
 export default function App() {
+  useTranslation();
   const [jobs, setJobs] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);

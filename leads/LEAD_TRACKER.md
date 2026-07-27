@@ -79,7 +79,7 @@
 - **Email:** —
 - **Crew Size:** 1-2 (locally owned, simple service list — mowing, aeration, dethatching, flowerbeds)
 - **Current System:** Unknown (Jobber-hosted website suggests they may use Jobber or similar)
-- **Pain Points:** Using a generic Jobber site template — may be on Jobber already, or may have no system at all; likely needs simpler, more affordable option ($49-$79 vs Jobber's $169+)
+- **Pain Points:** Using a generic Jobber site template — may be on Jobber already, or may have no system at all; likely needs simpler, more affordable option ($39-$79 vs Jobber's $169+)
 - **Last Contact:**
 - **Next Step:** Warm email — ask about current software, offer MowGo as cheaper alternative
 

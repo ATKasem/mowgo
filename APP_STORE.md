@@ -8,7 +8,7 @@
 - **Category:** Business
 - **Secondary Category:** Productivity
 - **Age Rating:** 4+
-- **Price:** Free (with in-app purchases: Solo $49/mo, Crew $79/mo)
+- **Price:** Free (with in-app purchases: Solo $39/mo, Crew $79/mo)
 - **Territories:** United States, Canada (start here, expand later)
 
 ## App Store Description
@@ -30,7 +30,7 @@ Jobber and Housecall Pro are built for 20-person crews at $119+/month. Yardbook 
 
 **PRICING:**
 • Free: Up to 10 clients, rain delay, basic scheduling, dark mode, installable PWA
-• Solo: $49/month — unlimited clients, routes, offline mode, Stripe payments
+• Solo: $39/month — unlimited clients, routes, offline mode, Stripe payments
 • Crew: $79/month — multi-user team, job assignment, route optimization, priority support
 
 14-day free trial on paid plans. No per-user fees. No contracts. Cancel anytime.

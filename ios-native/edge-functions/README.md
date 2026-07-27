@@ -31,8 +31,8 @@ Set via `supabase secrets set KEY=value`:
 - `OPENROUTER_API_KEY` — your OpenRouter API key
 - `OPENROUTER_MODEL` — optional, defaults to `openai/gpt-4o-mini`
 - `STRIPE_SECRET_KEY` — Stripe secret key (`sk_live_...` or `sk_test_...`)
-- `STRIPE_PRICE_SOLO` — Stripe Price ID for Solo tier ($19/mo)
-- `STRIPE_PRICE_CREW` — Stripe Price ID for Crew tier ($49/mo)
+- `STRIPE_PRICE_SOLO` — `price_1TwmrGGwXKVLlr2I2aLpMVHN` (Solo tier, $39/mo)
+- `STRIPE_PRICE_CREW` — `price_1TwFiUGwXKVLlr2InMLdsc6T` (Crew tier, $79/mo)
 
 ## Test
 

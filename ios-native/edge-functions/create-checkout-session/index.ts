@@ -7,6 +7,7 @@
 //   STRIPE_SECRET_KEY     — your Stripe secret key
 //   STRIPE_PRICE_SOLO     — Stripe Price ID for Solo tier (price_xxx)
 //   STRIPE_PRICE_CREW     — Stripe Price ID for Crew tier (price_xxx)
+//   STRIPE_TRIAL_DAYS     — optional, defaults to 14 to match web checkout
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -127,6 +128,7 @@ serve(async (req) => {
     }
 
     // Create Checkout Session
+    const trialDays = Number.parseInt(Deno.env.get("STRIPE_TRIAL_DAYS") ?? "14", 10) || 14;
     const sessionResp = await fetch(
       "https://api.stripe.com/v1/checkout/sessions",
       {
@@ -142,6 +144,9 @@ serve(async (req) => {
           "line_items[0][quantity]": "1",
           success_url: "https://mowgo.app/settings?upgraded=true",
           cancel_url: "https://mowgo.app/settings",
+          "metadata[user_id]": user.id,
+          "metadata[tier]": tier,
+          "subscription_data[trial_period_days]": String(trialDays),
           "subscription_data[metadata][user_id]": user.id,
           "subscription_data[metadata][tier]": tier,
         }).toString(),

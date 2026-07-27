@@ -125,8 +125,8 @@ struct SettingsView: View {
 
     private var tierPrice: String {
         switch auth.user?.tier {
-        case "solo": "$19/mo"
-        case "crew": "$49/mo"
+        case "solo": "$39/mo"
+        case "crew": "$79/mo"
         default: "$0/mo"
         }
     }
@@ -159,7 +159,7 @@ struct SubscriptionView: View {
 
                         SubscriptionPlanCard(
                             name: "Solo",
-                            price: "$19/mo",
+                            price: "$39/mo",
                             features: [
                                 "15 clients",
                                 "AI Autopilot assistant",
@@ -173,7 +173,7 @@ struct SubscriptionView: View {
 
                         SubscriptionPlanCard(
                             name: "Crew",
-                            price: "$49/mo",
+                            price: "$79/mo",
                             features: [
                                 "Unlimited clients",
                                 "Multi-user / crew",

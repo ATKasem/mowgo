@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { updateInvoiceStatus } from '../lib/data';
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
@@ -29,6 +30,7 @@ const STATUS_FILTERS = [
 ];
 
 export default function Invoices({ invoices, setInvoices }) {
+  const { tr, t, i18n } = useLocalizedText('invoices');
   const [copiedIds, setCopiedIds] = useState(new Set());
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
@@ -85,7 +87,7 @@ export default function Invoices({ invoices, setInvoices }) {
   return (
     <div>
       <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Invoices</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Invoices")}</h2>
         <div className="flex items-center gap-3 mt-0.5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{invoices.length} total</p>
           <span className="text-gray-300 dark:text-gray-600">&middot;</span>
@@ -105,33 +107,33 @@ export default function Invoices({ invoices, setInvoices }) {
 
       <div className="flex items-center gap-2 mb-4">
         <div className="relative" ref={filterRef} style={{ overflow: 'visible' }}>
-          <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1" aria-label="Filter invoices by status"><Filter className="w-4 h-4" /></button>
+          <button onClick={() => setShowFilter(!showFilter)} className="btn-secondary h-full px-3 gap-1" aria-label={tr("Filter invoices by status")}><Filter className="w-4 h-4" /></button>
           {showFilter && (
             <div className="absolute left-0 top-full mt-1 card p-1 z-20 min-w-[110px] shadow-lg"
                  onMouseLeave={() => setShowFilter(false)}
                  onKeyDown={e => { if (e.key === 'Escape') { setShowFilter(false); } }}
                  onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowFilter(false); }}>
               {STATUS_FILTERS.map(f => (
-                <button key={f.value} onClick={() => { setStatusFilter(f.value); setShowFilter(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${statusFilter === f.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{f.label}</button>
+                <button key={f.value} onClick={() => { setStatusFilter(f.value); setShowFilter(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${statusFilter === f.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{tr(f.label)}</button>
               ))}
             </div>
           )}
         </div>
         {statusFilter !== 'all' && (
           <button onClick={() => setStatusFilter('all')} className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full">
-            {STATUS_FILTERS.find(f => f.value === statusFilter)?.label} <X className="w-3 h-3" />
+            {tr(STATUS_FILTERS.find(f => f.value === statusFilter)?.label)} <X className="w-3 h-3" />
           </button>
         )}
       </div>
 
       <div className="space-y-2">
         {filtered.length === 0 && (
-          <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" /><p className="text-gray-500 dark:text-gray-400 font-semibold">No invoices</p><p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{statusFilter !== 'all' ? 'No matching invoices' : 'Invoices are created when you complete a job'}</p></div>
+          <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" /><p className="text-gray-500 dark:text-gray-400 font-semibold">{tr("No invoices")}</p><p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{tr(statusFilter !== 'all' ? 'No matching invoices' : 'Invoices are created when you complete a job')}</p></div>
         )}
         {filtered.map(invoice => {
           const statusInfo = INVOICE_STATUS[invoice.status] || INVOICE_STATUS.unpaid;
           const Icon = iconMap[statusInfo.icon] || AlertCircle;
-          const dateStr = invoice.created_at ? new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown date';
+          const dateStr = invoice.created_at ? new Date(invoice.created_at).toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' }) : tr('Unknown date');
           const isPaid = invoice.status === 'paid';
           const isExpanded = expandedId === invoice.id;
           return (
@@ -149,20 +151,20 @@ export default function Invoices({ invoices, setInvoices }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={statusInfo.badge}>{statusInfo.label}</span>
+                    <span className={statusInfo.badge}>{tr(statusInfo.label)}</span>
                     {!isPaid && (
                       <button
                         onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }}
                         className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 group"
                       >
                         {copiedIds.has(invoice.id) ? (
-                          <><ClipboardCheck className="w-3 h-3" />Copied!
+                          <><ClipboardCheck className="w-3 h-3" />{tr("Copied!")}
                             <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
                               Paste into a text to the client
                               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
                             </span>
                           </>) : (
-                          <><Copy className="w-3 h-3" />Copy
+                          <><Copy className="w-3 h-3" />{tr("Copy")}
                             <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
                               Copy a payment request to send via text
                               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
@@ -176,22 +178,22 @@ export default function Invoices({ invoices, setInvoices }) {
                 {isExpanded && (
                   <div className="border-t border-gray-100 dark:border-gray-800 px-4 pb-4 space-y-3" style={{ animation: 'slideDown 0.15s ease-out' }}>
                     <div className="grid grid-cols-2 gap-3 text-sm pt-3">
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Client</span><span className="font-medium text-gray-900 dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Amount</span><span className="font-bold text-gray-900 dark:text-white">${invoice.amount}</span></div>
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Created</span><span className="text-gray-700 dark:text-gray-300">{dateStr}</span></div>
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">Status</span><span className={statusInfo.badge}>{statusInfo.label}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Client")}</span><span className="font-medium text-gray-900 dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Amount")}</span><span className="font-bold text-gray-900 dark:text-white">${invoice.amount}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Created")}</span><span className="text-gray-700 dark:text-gray-300">{dateStr}</span></div>
+                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Status")}</span><span className={statusInfo.badge}>{tr(statusInfo.label)}</span></div>
                     </div>
                     <div className="flex gap-2 pt-1">
                       <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group min-h-[44px] py-2.5">
-                        <Copy className="w-3.5 h-3.5" />{copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text'}
+                        <Copy className="w-3.5 h-3.5" />{tr(copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text')}
                         <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
-                          Copies a payment request — paste in a text
+                          {tr("Copies a payment request — paste in a text")}
                           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
                         </span>
                       </button>
                     </div>
                     <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
-                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Change status</p>
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">{tr("Change status")}</p>
                       <div className="flex gap-1">
                         {['unpaid', 'paid', 'overdue'].map(s => {
                           const si = INVOICE_STATUS[s];
@@ -207,7 +209,7 @@ export default function Invoices({ invoices, setInvoices }) {
                                   : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                               }`}
                             >
-                              {si.label}
+                              {tr(si.label)}
                             </button>
                           );
                         })}

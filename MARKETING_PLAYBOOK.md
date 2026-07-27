@@ -113,12 +113,12 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 > "Dead simple scheduling and invoicing for lawn care crews who've outgrown pen and paper."
 
 ### Problem statement
-> "Most lawn care business owners run their schedule from texts, memory, and a notebook. They lose $400+/month in missed appointments. Jobber costs $119/month and is built for 10-person operations. MowGo is $49/month and does exactly what a 1-3 person crew needs."
+> "Most lawn care business owners run their schedule from texts, memory, and a notebook. They lose $400+/month in missed appointments. Jobber costs $119/month and is built for 10-person operations. MowGo is $39/month and does exactly what a 1-3 person crew needs."
 
 ### Key differentiators
 1. **Free tier** — 10 clients, no credit card
 2. **Rain delay** — one button reschedules everything (works for any weather/service disruption)
-3. **$49 Solo** — includes what Jobber charges $119 for
+3. **$39 Solo** — includes what Jobber charges $119 for
 4. **No per-user fees** — Jobber charges $29/extra user
 5. **Mobile-first** — built for the phone in your pocket, not an office desktop
 

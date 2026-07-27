@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
 import { Sprout, CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -43,6 +44,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 }
 
 export default function Landing() {
+  const { tr, t, i18n } = useLocalizedText('landing');
   const [paymentError, setPaymentError] = useState('');
 
   async function handleStartCheckout(plan) {
@@ -53,7 +55,7 @@ export default function Landing() {
         setTimeout(() => setPaymentError(''), 5000);
       }
     } catch (e) {
-      setPaymentError(e.message || 'Payment failed');
+      setPaymentError(e.message || tr('Payment failed'));
       setTimeout(() => setPaymentError(''), 5000);
     }
   }
@@ -80,10 +82,10 @@ export default function Landing() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              Compare
+              {tr("Compare")}
             </Link>
             <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              Log In
+              {tr("Log In")}
             </Link>
           </div>
         </div>
@@ -100,28 +102,28 @@ export default function Landing() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <Zap className="w-4 h-4" />
-              Built in Oklahoma City, for Oklahoma crews
+              {tr("Built in Oklahoma City, for Oklahoma crews")}
             </div>
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-              Lawn care software <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">built in Oklahoma</span>
+              {tr("Lawn care software")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("built in Oklahoma")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Scheduling, routes, and invoicing for Oklahoma lawn care crews. Rain delay that actually understands OK weather. Free for 5 clients — no credit card.
+              {tr("Scheduling, routes, and invoicing for Oklahoma lawn care crews. Rain delay that actually understands OK weather. Free for 5 clients — no credit card.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
-                Start Free
+                {tr("Start Free")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">View Pricing <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
+              <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("View Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
             </div>
-            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">Rain delay on free tier. No credit card required.</p>
+            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">{tr("Rain delay on free tier. No credit card required.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -129,8 +131,8 @@ export default function Landing() {
       {/* Features */}
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Built for Oklahoma crews, <span className="text-emerald-500">not office managers</span></h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,100+ landscaping businesses across Oklahoma.</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">{tr("Built for Oklahoma crews,")} <span className="text-emerald-500">{tr("not office managers")}</span></h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,100+ landscaping businesses across Oklahoma.")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color }, i) => (
@@ -150,7 +152,7 @@ export default function Landing() {
 
         {/* Differentiators */}
         <FadeIn>
-          <h3 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-12">Things our competitors won't tell you</h3>
+          <h3 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-12">{tr("Things our competitors won't tell you")}</h3>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5">
           {differentiators.map(({ icon: Icon, title, desc }, i) => (
@@ -169,56 +171,56 @@ export default function Landing() {
         {/* Comparison Callout */}
         <FadeIn delay={200}>
           <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-white mb-1">How MowGo Solo stacks up</h3>
-            <p className="text-sm text-gray-400 mb-6">Same features, fraction of the price.</p>
+            <h3 className="text-lg font-bold text-white mb-1">{tr("How MowGo Solo stacks up")}</h3>
+            <p className="text-sm text-gray-400 mb-6">{tr("Same features, fraction of the price.")}</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-700">
                     <th className="text-left py-2.5 pr-4 text-gray-400 font-medium"></th>
                     <th className="text-center py-2.5 px-3">
-                      <span className="text-emerald-400 font-bold">MowGo Solo</span>
-                      <span className="block text-xs text-gray-500 font-normal">$39/mo</span>
+                      <span className="text-emerald-400 font-bold">{tr("MowGo Solo")}</span>
+                      <span className="block text-xs text-gray-500 font-normal">{tr("$39/mo")}</span>
                     </th>
                     <th className="text-center py-2.5 px-3">
-                      <span className="text-gray-300 font-semibold">Jobber Connect</span>
-                      <span className="block text-xs text-gray-500 font-normal">$139/mo</span>
+                      <span className="text-gray-300 font-semibold">{tr("Jobber Connect")}</span>
+                      <span className="block text-xs text-gray-500 font-normal">{tr("$139/mo")}</span>
                     </th>
                     <th className="text-center py-2.5 pl-3">
-                      <span className="text-gray-300 font-semibold">LawnPro</span>
-                      <span className="block text-xs text-gray-500 font-normal">$39/mo</span>
+                      <span className="text-gray-300 font-semibold">{tr("LawnPro")}</span>
+                      <span className="block text-xs text-gray-500 font-normal">{tr("$39/mo")}</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-300">
                   <tr className="border-b border-gray-800">
-                    <td className="py-2.5 pr-4 text-gray-400">Rain Delay</td>
+                    <td className="py-2.5 pr-4 text-gray-400">{tr("Rain Delay")}</td>
                     <td className="text-center py-2.5 px-3"><Check className="w-4 h-4 text-emerald-400 mx-auto" /></td>
                     <td className="text-center py-2.5 px-3"><X className="w-4 h-4 text-gray-600 mx-auto" /></td>
                     <td className="text-center py-2.5 pl-3"><X className="w-4 h-4 text-gray-600 mx-auto" /></td>
                   </tr>
                   <tr className="border-b border-gray-800">
-                    <td className="py-2.5 pr-4 text-gray-400">Per-User Fees</td>
-                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-medium">None</span></td>
-                    <td className="text-center py-2.5 px-3"><span className="text-gray-500">$30/user</span></td>
-                    <td className="text-center py-2.5 pl-3"><span className="text-gray-500">N/A</span></td>
+                    <td className="py-2.5 pr-4 text-gray-400">{tr("Per-User Fees")}</td>
+                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-medium">{tr("None")}</span></td>
+                    <td className="text-center py-2.5 px-3"><span className="text-gray-500">{tr("$30/user")}</span></td>
+                    <td className="text-center py-2.5 pl-3"><span className="text-gray-500">{tr("N/A")}</span></td>
                   </tr>
                   <tr className="border-b border-gray-800">
-                    <td className="py-2.5 pr-4 text-gray-400">Offline Mode</td>
+                    <td className="py-2.5 pr-4 text-gray-400">{tr("Offline Mode")}</td>
                     <td className="text-center py-2.5 px-3"><Check className="w-4 h-4 text-emerald-400 mx-auto" /></td>
                     <td className="text-center py-2.5 px-3"><Check className="w-4 h-4 text-emerald-400 mx-auto" /></td>
                     <td className="text-center py-2.5 pl-3"><X className="w-4 h-4 text-gray-600 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-gray-400">Price</td>
-                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-bold">$39/mo</span></td>
-                    <td className="text-center py-2.5 px-3"><span className="text-gray-500 line-through">$139/mo</span></td>
-                    <td className="text-center py-2.5 pl-3"><span className="text-gray-500">$39/mo</span></td>
+                    <td className="py-2.5 pr-4 text-gray-400">{tr("Price")}</td>
+                    <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-bold">{tr("$39/mo")}</span></td>
+                    <td className="text-center py-2.5 px-3"><span className="text-gray-500 line-through">{tr("$139/mo")}</span></td>
+                    <td className="text-center py-2.5 pl-3"><span className="text-gray-500">{tr("$39/mo")}</span></td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-gray-500 mt-4 text-center">LawnPro is currently broken — no active mobile app or web dashboard. Jobber Connect charges $30/user/seat on top of $139.</p>
+            <p className="text-xs text-gray-500 mt-4 text-center">{tr("LawnPro is currently broken — no active mobile app or web dashboard. Jobber Connect charges $30/user/seat on top of $139.")}</p>
           </div>
         </FadeIn>
       </section>
@@ -242,41 +244,41 @@ export default function Landing() {
       <section id="pricing" className="bg-gray-50 dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Simple, transparent pricing</h2>
-            <p className="text-center text-gray-500 dark:text-gray-400 mb-2 text-lg">Start free. Upgrade when you are ready. Cancel anytime.</p>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">Solo <strong>$39/mo</strong> — built for the 1,140+ Oklahoma crews who don't need a $300/mo AI receptionist.</p>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">14-day free trial on paid plans. No setup fees. No contracts.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">{tr("Simple, transparent pricing")}</h2>
+            <p className="text-center text-gray-500 dark:text-gray-400 mb-2 text-lg">{tr("Start free. Upgrade when you are ready. Cancel anytime.")}</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">{tr("Solo")} <strong>$39/mo</strong> — built for the 1,140+ Oklahoma crews who don't need a $300/mo AI receptionist.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan, i) => (
               <FadeIn key={plan.name} delay={i * 100}>
                 <div className={`card p-6 flex flex-col transition-all duration-300 ${plan.highlight ? 'ring-2 ring-emerald-500 dark:ring-emerald-400 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 scale-[1.02] relative' : 'hover:scale-[1.01]'}`}>
-                  {plan.highlight && <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">Most Popular</span></div>}
+                  {plan.highlight && <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">{tr("Most Popular")}</span></div>}
                   <h3 className={`text-lg font-bold ${plan.highlight ? 'text-emerald-600 dark:text-emerald-400 mt-3' : 'text-gray-900 dark:text-white'}`}>{plan.name}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{plan.desc}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr(plan.desc)}</p>
                   <div className="mt-5 mb-6">
-                    <span className="text-4xl font-extrabold text-gray-900 dark:text-white">{plan.price === '0' ? 'Free' : `$${plan.price}`}</span>
-                    {plan.price !== '0' && <span className="text-gray-400 dark:text-gray-500 font-medium">/{plan.period}</span>}
+                    <span className="text-4xl font-extrabold text-gray-900 dark:text-white">{plan.price === '0' ? tr('Free') : `$${plan.price}`}</span>
+                    {plan.price !== '0' && <span className="text-gray-400 dark:text-gray-500 font-medium">/{tr(plan.period)}</span>}
                   </div>
                   <ul className="space-y-3 flex-1 border-t border-gray-100 dark:border-gray-800 pt-4">
                     {plan.features.map(f => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400">
                         <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-500" />
-                        <span>{f}</span>
+                        <span>{tr(f)}</span>
                       </li>
                     ))}
                   </ul>
                   {plan.name === 'Free' ? (
-                    <Link to="/login" className="group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200 min-h-[44px]">{plan.cta} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
+                    <Link to="/login" className="group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200 min-h-[44px]">{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
                   ) : (
-                    <button onClick={() => handleStartCheckout(plan.name.toLowerCase())} className={`group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm active:scale-[0.97] transition-all duration-200 min-h-[44px] ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg hover:shadow-xl hover:shadow-gray-900/25 dark:hover:shadow-white/20 hover:-translate-y-0.5' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50'}`}>{plan.cta} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
+                    <button onClick={() => handleStartCheckout(plan.name.toLowerCase())} className={`group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm active:scale-[0.97] transition-all duration-200 min-h-[44px] ${plan.highlight ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg hover:shadow-xl hover:shadow-gray-900/25 dark:hover:shadow-white/20 hover:-translate-y-0.5' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50'}`}>{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
                   )}
                 </div>
               </FadeIn>
             ))}
           </div>
           <FadeIn delay={400}>
-            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">Coming soon: Stripe payments, multi-user crew access, and route optimization. Oklahoma early adopters get these at no price increase.</p>
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">{tr("Coming soon: Stripe payments, multi-user crew access, and route optimization. Oklahoma early adopters get these at no price increase.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -287,13 +289,13 @@ export default function Landing() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Built in OKC. Used by Oklahoma crews.</h2>
-            <p className="text-emerald-100 text-lg mb-10">Free for 5 clients. No credit card. 2 minutes.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Built in OKC. Used by Oklahoma crews.")}</h2>
+            <p className="text-emerald-100 text-lg mb-10">{tr("Free for 5 clients. No credit card. 2 minutes.")}</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
-              Start Free
+              {tr("Start Free")}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="mt-4 text-emerald-200/80 text-sm">Available on iPhone, Android, and desktop.</p>
+            <p className="mt-4 text-emerald-200/80 text-sm">{tr("Available on iPhone, Android, and desktop.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -306,9 +308,9 @@ export default function Landing() {
             MowGo &copy; 2026
           </div>
           <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">App</Link>
-            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Privacy</Link>
-            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Contact</a>
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("App")}</Link>
+            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>
         </div>
       </footer>

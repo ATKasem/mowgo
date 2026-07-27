@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { Sprout, ArrowRight, Check, X, DollarSign, Users, CloudRain, Smartphone, Wifi, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -27,6 +28,7 @@ const comparisonRows = [
 ];
 
 export default function JobberPriceIncrease() {
+  const { tr, t, i18n } = useLocalizedText('jobberPriceIncrease');
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
       {/* Nav */}
@@ -40,10 +42,10 @@ export default function JobberPriceIncrease() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              Home
+              {tr("Home")}
             </Link>
             <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              Log In
+              {tr("Log In")}
             </Link>
           </div>
         </div>
@@ -57,14 +59,14 @@ export default function JobberPriceIncrease() {
         <div className="relative max-w-3xl mx-auto px-4 pt-16 pb-12 md:pt-24 md:pb-16 text-center">
           <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <DollarSign className="w-4 h-4" />
-            Updated July 2026
+            {tr("Updated July 2026")}
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-            Jobber Price Increase 2026: What Lawn Care Businesses Need to Know
+            {tr("Jobber Price Increase 2026: What Lawn Care Businesses Need to Know")}
             <span className="block text-emerald-500 mt-2 text-2xl sm:text-3xl md:text-4xl">(And Better Alternatives)</span>
           </h1>
           <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Jobber just raised prices again. If you're running a small lawn care business with 1–3 crew members, you're probably paying too much. Here's what changed and what to look for instead.
+            {tr("Jobber just raised prices again. If you're running a small lawn care business with 1–3 crew members, you're probably paying too much. Here's what changed and what to look for instead.")}
           </p>
         </div>
       </section>
@@ -75,10 +77,10 @@ export default function JobberPriceIncrease() {
         {/* Section 1: The 2026 Pricing Changes */}
         <section>
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
-            The 2026 Pricing Changes
+            {tr("The 2026 Pricing Changes")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            As of July 2026, Jobber's pricing tiers look like this:
+            {tr("As of July 2026, Jobber's pricing tiers look like this:")}
           </p>
           <div className="grid sm:grid-cols-3 gap-4 mb-6">
             {jobberPlans.map((plan) => (
@@ -86,16 +88,16 @@ export default function JobberPriceIncrease() {
                 <h3 className="font-bold text-gray-900 dark:text-white text-lg">{plan.name}</h3>
                 <div className="mt-2 mb-1">
                   <span className="text-3xl font-extrabold text-gray-900 dark:text-white">${plan.price}</span>
-                  <span className="text-gray-400 dark:text-gray-500 font-medium">/mo</span>
+                  <span className="text-gray-400 dark:text-gray-500 font-medium">{tr("/mo")}</span>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{plan.desc}</p>
-                <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium">{plan.note}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{tr(plan.desc)}</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium">{tr(plan.note)}</p>
               </div>
             ))}
           </div>
           <div className="card p-5 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
             <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-              <strong>The catch:</strong> These prices are per-account, but Jobber charges additional per-user fees for every crew member you add. A 3-person crew on Jobber Connect could easily pay <strong>$200+/month</strong> once you factor in per-seat costs. That adds up fast for a business where every dollar matters.
+              <strong>{tr("The catch:")}</strong> {tr("These prices are per account, but Jobber charges additional per-user fees for every crew member you add. A 3-person crew on Jobber Connect could easily pay")} <strong>{tr("$200+/month")}</strong> {tr("once you factor in per-seat costs. That adds up fast for a business where every dollar matters.")}
             </p>
           </div>
         </section>
@@ -103,30 +105,30 @@ export default function JobberPriceIncrease() {
         {/* Section 2: Why It Matters for Small Crews */}
         <section>
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
-            Why It Matters for Small Crews
+            {tr("Why It Matters for Small Crews")}
           </h2>
           <div className="space-y-4 text-gray-600 dark:text-gray-400 leading-relaxed">
             <p>
-              If you're a solo operator or running a crew of 1–3 people, Jobber's pricing model works against you. Here's the math:
+              {tr("If you're a solo operator or running a crew of 1–3 people, Jobber's pricing model works against you. Here's the math:")}
             </p>
             <div className="card p-5">
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[2rem]">1</span>
-                  <span><strong className="text-gray-900 dark:text-white">Solo operator on Jobber Connect:</strong> $139/mo for features you might not need (advanced reporting, team management). You're paying for a business you don't have yet.</span>
+                  <span><strong className="text-gray-900 dark:text-white">{tr("Solo operator on Jobber Connect:")}</strong> $139/mo for features you might not need (advanced reporting, team management). You're paying for a business you don't have yet.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[2rem]">2</span>
-                  <span><strong className="text-gray-900 dark:text-white">3-person crew on Jobber Connect:</strong> $139 base + $30–50/user in per-seat fees = <strong>~$200–220/mo</strong>. For a lawn care business doing $8–12K/month in revenue, that's 2% going straight to software.</span>
+                  <span><strong className="text-gray-900 dark:text-white">{tr("3-person crew on Jobber Connect:")}</strong> $139 base + $30–50/user in per-seat fees = <strong>{tr("~$200–220/mo")}</strong>. For a lawn care business doing $8–12K/month in revenue, that's 2% going straight to software.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[2rem]">3</span>
-                  <span><strong className="text-gray-900 dark:text-white">Grow plan at $349/mo:</strong> That's over $4,000/year on software. Most small crews don't need advanced reporting dashboards — they need to know where to mow next and whether it's going to rain.</span>
+                  <span><strong className="text-gray-900 dark:text-white">{tr("Grow plan at $349/mo:")}</strong> {tr("That's over $4,000/year on software. Most small crews don't need advanced reporting dashboards — they need to know where to mow next and whether it's going to rain.")}</span>
                 </li>
               </ul>
             </div>
             <p>
-              The lawn care software market has exploded over the past few years, and companies like Jobber have used that leverage to raise prices repeatedly. If you're feeling squeezed, you're not alone — and you have options.
+              {tr("The lawn care software market has exploded over the past few years, and companies like Jobber have used that leverage to raise prices repeatedly. If you're feeling squeezed, you're not alone — and you have options.")}
             </p>
           </div>
         </section>
@@ -134,10 +136,10 @@ export default function JobberPriceIncrease() {
         {/* Section 3: What to Look For */}
         <section>
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
-            What to Look for in an Alternative
+            {tr("What to Look for in an Alternative")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            Not all lawn care apps are created equal. Here's what actually matters when you're comparing alternatives to Jobber:
+            {tr("Not all lawn care apps are created equal. Here's what actually matters when you're comparing alternatives to Jobber:")}
           </p>
           <div className="space-y-4">
             {whatToLookFor.map(({ icon: Icon, title, desc }, i) => (
@@ -157,27 +159,27 @@ export default function JobberPriceIncrease() {
         {/* Section 4: Comparison Table */}
         <section>
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
-            MowGo vs Jobber
+            {tr("MowGo vs Jobber")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            Here's a straightforward comparison of what you get with MowGo Solo ($39/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:
+            {tr("Here's a straightforward comparison of what you get with MowGo Solo ($39/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:")}
           </p>
           <div className="overflow-x-auto">
             <div className="card overflow-hidden min-w-[600px]">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-800">
-                    <th className="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">Feature</th>
+                    <th className="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">{tr("Feature")}</th>
                     <th className="text-center px-5 py-3 font-semibold bg-emerald-50 dark:bg-emerald-950/30">
-                      <span className="text-emerald-600 dark:text-emerald-400">MowGo Solo</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">{tr("MowGo Solo")}</span>
                     </th>
-                    <th className="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">Jobber Connect</th>
+                    <th className="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">{tr("Jobber Connect")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisonRows.map((row, i) => (
-                    <tr key={row.feature} className={`border-b border-gray-50 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
-                      <td className="px-5 py-3 font-medium text-gray-900 dark:text-white">{row.feature}</td>
+                    <tr key={tr(row.feature)} className={`border-b border-gray-50 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
+                      <td className="px-5 py-3 font-medium text-gray-900 dark:text-white">{tr(row.feature)}</td>
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
                           <Check className="w-4 h-4 flex-shrink-0" />
@@ -200,7 +202,7 @@ export default function JobberPriceIncrease() {
           </div>
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              MowGo Solo at <strong className="text-gray-900 dark:text-white">$39/mo</strong> is <strong className="text-emerald-600 dark:text-emerald-400">72% less</strong> than Jobber Connect — with no per-user fees.
+              {tr("MowGo Solo at")} <strong className="text-gray-900 dark:text-white">$39/mo</strong> {tr("is")} <strong className="text-emerald-600 dark:text-emerald-400">{tr("72% less")}</strong> {tr("than Jobber Connect — with no per-user fees.")}
             </p>
           </div>
         </section>
@@ -210,17 +212,17 @@ export default function JobberPriceIncrease() {
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-green-600 to-green-700" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="relative px-8 py-12 text-center">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">Try MowGo Free</h2>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">{tr("Try MowGo Free")}</h2>
             <p className="text-emerald-100 mb-8 max-w-md mx-auto leading-relaxed">
-              Start with 5 clients on the free plan. No credit card required. Upgrade to Solo when you're ready — still less than a third of Jobber Connect.
+              {tr("Start with 5 clients on the free plan. No credit card required. Upgrade to Solo when you're ready — still less than a third of Jobber Connect.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
-                Start Free
+                {tr("Start Free")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link to="/compare" className="group inline-flex items-center gap-2 bg-white/10 text-white font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-white/20 transition-all hover:-translate-y-0.5">
-                See Full Comparison
+                {tr("See Full Comparison")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -236,9 +238,9 @@ export default function JobberPriceIncrease() {
             MowGo &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
-            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
-            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
+            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Home")}</Link>
+            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Privacy")}</Link>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Contact")}</a>
           </div>
         </div>
       </footer>

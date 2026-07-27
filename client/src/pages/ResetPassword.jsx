@@ -1,9 +1,11 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Sprout, Lock, KeyRound, Loader2, AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function ResetPassword() {
+  const { tr, t, i18n } = useLocalizedText('resetPassword');
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -34,12 +36,12 @@ export default function ResetPassword() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError(tr('Passwords do not match.'));
       setLoading(false);
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(tr('Password must be at least 6 characters.'));
       setLoading(false);
       return;
     }
@@ -53,7 +55,7 @@ export default function ResetPassword() {
       }
       setDone(true);
     } catch {
-      setError('Connection failed. Please check your internet and try again.');
+      setError(tr('Connection failed. Please check your internet and try again.'));
     }
     setLoading(false);
   }
@@ -74,18 +76,18 @@ export default function ResetPassword() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-3">
               <Sprout className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">MowGo</h1>
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
           </div>
           <div className="card p-6 text-center space-y-4">
             <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mx-auto">
               <CheckCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white">Password updated</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your password has been changed successfully.</p>
+              <h2 className="font-bold text-gray-900 dark:text-white">{tr("Password updated")}</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Your password has been changed successfully.")}</p>
             </div>
             <button onClick={() => navigate('/app')} className="btn-primary w-full gap-2 text-sm py-2.5">
-              <ArrowRight className="w-4 h-4" />Continue to MowGo
+              <ArrowRight className="w-4 h-4" />{tr("Continue to MowGo")}
             </button>
           </div>
         </div>
@@ -101,14 +103,14 @@ export default function ResetPassword() {
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-3">
             <Sprout className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">MowGo</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Simple scheduling for lawn care crews</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
           <div className="text-center -mt-1 mb-1">
-            <h2 className="font-semibold text-gray-900 dark:text-white">Set New Password</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Choose a new password for your account</p>
+            <h2 className="font-semibold text-gray-900 dark:text-white">{tr("Set New Password")}</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{tr("Choose a new password for your account")}</p>
           </div>
 
           {error && (
@@ -119,7 +121,7 @@ export default function ResetPassword() {
           )}
 
           <div>
-            <label className="label">New Password</label>
+            <label className="label">{tr("New Password")}</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -137,7 +139,7 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label className="label">Confirm Password</label>
+            <label className="label">{tr("Confirm Password")}</label>
             <div className="relative">
               <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -159,7 +161,7 @@ export default function ResetPassword() {
             className="btn-primary w-full gap-2 text-sm py-2.5"
           >
             {loading ? (
-              <><Loader2 className="w-4 h-4 animate-spin" />Setting Password...</>
+              <><Loader2 className="w-4 h-4 animate-spin" />{tr("Setting Password...")}</>
             ) : (
               'Set New Password'
             )}

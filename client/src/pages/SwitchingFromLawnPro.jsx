@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
 import { CloudRain, AlertTriangle, Check, X, ArrowRight, Sprout, Shield, Users, Zap, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -43,6 +44,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 }
 
 export default function SwitchingFromLawnPro() {
+  const { tr, t, i18n } = useLocalizedText('switchingFromLawnPro');
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
       {/* Nav */}
@@ -56,10 +58,10 @@ export default function SwitchingFromLawnPro() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              Home
+              {tr("Home")}
             </Link>
             <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              Log In
+              {tr("Log In")}
             </Link>
           </div>
         </div>
@@ -75,24 +77,24 @@ export default function SwitchingFromLawnPro() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <AlertTriangle className="w-4 h-4" />
-              Looking for a better option?
+              {tr("Looking for a better option?")}
             </div>
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-              Ditching LawnPro?<br />
-              <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Welcome to MowGo</span>
+              {tr("Ditching LawnPro?")}<br />
+              <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Welcome to MowGo")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              You trusted LawnPro with your business. If that trust has been shaken by lost data, broken sync, or surprise price hikes — you're not alone. MowGo was built for operators who are tired of that.
+              {tr("You trusted LawnPro with your business. If that trust has been shaken by lost data, broken sync, or surprise price hikes — you're not alone. MowGo was built for operators who are tired of that.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
-                Start Free
+                {tr("Start Free")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <button onClick={() => document.getElementById('comparison')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">
@@ -100,7 +102,7 @@ export default function SwitchingFromLawnPro() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
-            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">Free for 5 clients. No credit card. 2 minutes to set up.</p>
+            <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">{tr("Free for 5 clients. No credit card. 2 minutes to set up.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -109,10 +111,10 @@ export default function SwitchingFromLawnPro() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">
-            Why users are <span className="text-red-500">leaving LawnPro</span>
+            {tr("Why users are")} <span className="text-red-500">{tr("leaving LawnPro")}</span>
           </h2>
           <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">
-            These aren't rumors — they're real issues raised by real lawn care operators. If any of these sound familiar, keep reading.
+            {tr("These aren't rumors — they're real issues raised by real lawn care operators. If any of these sound familiar, keep reading.")}
           </p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5">
@@ -137,10 +139,10 @@ export default function SwitchingFromLawnPro() {
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">
-              What MowGo <span className="text-emerald-500">does differently</span>
+              {tr("What MowGo")} <span className="text-emerald-500">{tr("does differently")}</span>
             </h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">
-              Every feature was designed by talking to lawn care operators — not accountants. Here's what you actually need.
+              {tr("Every feature was designed by talking to lawn care operators — not accountants. Here's what you actually need.")}
             </p>
           </FadeIn>
           <div className="grid md:grid-cols-2 gap-5">
@@ -165,10 +167,10 @@ export default function SwitchingFromLawnPro() {
       <section id="comparison" className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">
-            Quick feature comparison
+            {tr("Quick feature comparison")}
           </h2>
           <p className="text-center text-gray-500 dark:text-gray-400 mb-10 max-w-xl mx-auto text-lg">
-            Side-by-side, no spin. You decide.
+            {tr("Side-by-side, no spin. You decide.")}
           </p>
         </FadeIn>
         <FadeIn delay={200}>
@@ -177,15 +179,15 @@ export default function SwitchingFromLawnPro() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-800">
-                    <th className="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">Feature</th>
-                    <th className="text-center py-3 px-4 text-emerald-600 dark:text-emerald-400 font-bold">MowGo</th>
-                    <th className="text-center py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">LawnPro</th>
+                    <th className="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{tr("Feature")}</th>
+                    <th className="text-center py-3 px-4 text-emerald-600 dark:text-emerald-400 font-bold">{tr("MowGo")}</th>
+                    <th className="text-center py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{tr("LawnPro")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisons.map(({ feature, mowgo, lawnpro }) => (
                     <tr key={feature} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                      <td className="py-3 px-4 text-gray-700 dark:text-gray-300 font-medium">{feature}</td>
+                      <td className="py-3 px-4 text-gray-700 dark:text-gray-300 font-medium">{tr(feature)}</td>
                       <td className="py-3 px-4 text-center">
                         {mowgo === true ? (
                           <Check className="w-5 h-5 text-emerald-500 mx-auto" />
@@ -201,7 +203,7 @@ export default function SwitchingFromLawnPro() {
                         ) : lawnpro === false ? (
                           <X className="w-5 h-5 text-red-400 mx-auto" />
                         ) : (
-                          <span className="text-xs text-gray-400">unclear</span>
+                          <span className="text-xs text-gray-400">{tr("unclear")}</span>
                         )}
                       </td>
                     </tr>
@@ -213,7 +215,7 @@ export default function SwitchingFromLawnPro() {
         </FadeIn>
         <FadeIn delay={300}>
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
-            * Feature availability based on publicly documented info. Verify on each provider's site before deciding.
+            {tr("* Feature availability based on publicly documented info. Verify on each provider's site before deciding.")}
           </p>
         </FadeIn>
       </section>
@@ -223,54 +225,54 @@ export default function SwitchingFromLawnPro() {
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">
-              Let's talk <span className="text-emerald-500">pricing</span>
+              {tr("Let's talk")} <span className="text-emerald-500">{tr("pricing")}</span>
             </h2>
           </FadeIn>
           <div className="grid md:grid-cols-2 gap-6 mt-10 max-w-3xl mx-auto">
             <FadeIn delay={100}>
               <div className="card p-6 ring-2 ring-emerald-500 dark:ring-emerald-400 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 relative">
-                <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">MowGo Solo</span></div>
+                <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">{tr("MowGo Solo")}</span></div>
                 <div className="mt-3">
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-gray-900 dark:text-white">$39</span>
-                    <span className="text-gray-400 dark:text-gray-500 font-medium">/mo</span>
+                    <span className="text-gray-400 dark:text-gray-500 font-medium">{tr("/mo")}</span>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">What you get:</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{tr("What you get:")}</p>
                   <ul className="space-y-2 mt-3">
                     {['Unlimited clients & jobs', 'Rain delay auto-reschedule', 'Offline mode', 'GPS route navigation', 'One-tap invoicing', 'Data export anytime'].map(f => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400">
                         <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-500" />
-                        <span>{f}</span>
+                        <span>{tr(f)}</span>
                       </li>
                     ))}
                   </ul>
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-4 font-medium">14-day free trial. No credit card to start.</p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-4 font-medium">{tr("14-day free trial. No credit card to start.")}</p>
                 </div>
               </div>
             </FadeIn>
             <FadeIn delay={200}>
               <div className="card p-6 opacity-75">
-                <h3 className="text-lg font-bold text-gray-400 dark:text-gray-500">LawnPro Starter</h3>
+                <h3 className="text-lg font-bold text-gray-400 dark:text-gray-500">{tr("LawnPro Starter")}</h3>
                 <div className="flex items-baseline gap-1 mt-2">
                   <span className="text-4xl font-extrabold text-gray-400 dark:text-gray-500">$39</span>
-                  <span className="text-gray-400 dark:text-gray-500 font-medium">/mo</span>
+                  <span className="text-gray-400 dark:text-gray-500 font-medium">{tr("/mo")}</span>
                 </div>
-                <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">What you get:</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">{tr("What you get:")}</p>
                 <ul className="space-y-2 mt-3">
                   {['Limited client slots', 'Manual rain reschedule', 'Online only', 'Basic invoicing', 'No data export'].map(f => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-gray-400 dark:text-gray-500">
                       <X className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" />
-                      <span>{f}</span>
+                      <span>{tr(f)}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 italic">"Cheaper" isn't cheaper if the features don't work.</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 italic">{tr("\"Cheaper\" isn't cheaper if the features don't work.")}</p>
               </div>
             </FadeIn>
           </div>
           <FadeIn delay={300}>
             <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-6">
-              $10/mo more gets you unlimited everything, offline mode, rain delay, and data ownership. Most operators recoup that in a single rescheduled job.
+              {tr("$10/mo more gets you unlimited everything, offline mode, rain delay, and data ownership. Most operators recoup that in a single rescheduled job.")}
             </p>
           </FadeIn>
         </div>
@@ -280,7 +282,7 @@ export default function SwitchingFromLawnPro() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-10 tracking-tight">
-            Built by someone who's <span className="text-emerald-500">been there</span>
+            {tr("Built by someone who's")} <span className="text-emerald-500">{tr("been there")}</span>
           </h2>
         </FadeIn>
         <div className="card p-8 text-center max-w-2xl mx-auto">
@@ -289,9 +291,9 @@ export default function SwitchingFromLawnPro() {
               <Sprout className="w-6 h-6 text-white" />
             </div>
             <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed italic">
-              "MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving."
+              {tr("\"MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving.\"")}
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-4 font-medium">— The MowGo Team</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-4 font-medium">{tr("— The MowGo Team")}</p>
           </FadeIn>
         </div>
       </section>
@@ -302,13 +304,13 @@ export default function SwitchingFromLawnPro() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Ready to make the switch?</h2>
-            <p className="text-emerald-100 text-lg mb-10">Free for 5 clients. No credit card. Import your data in minutes.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Ready to make the switch?")}</h2>
+            <p className="text-emerald-100 text-lg mb-10">{tr("Free for 5 clients. No credit card. Import your data in minutes.")}</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
-              Start Free
+              {tr("Start Free")}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="mt-4 text-emerald-200/80 text-sm">Available on iPhone, Android, and desktop.</p>
+            <p className="mt-4 text-emerald-200/80 text-sm">{tr("Available on iPhone, Android, and desktop.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -321,10 +323,10 @@ export default function SwitchingFromLawnPro() {
             MowGo &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">App</Link>
-            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
-            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
+            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Home")}</Link>
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("App")}</Link>
+            <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Privacy")}</Link>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Contact")}</a>
           </div>
         </div>
       </footer>

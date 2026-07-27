@@ -1,3 +1,4 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
@@ -21,6 +22,7 @@ function getNextDate(currentDate, recurrence) {
 }
 
 export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
+  const { tr, t, i18n } = useLocalizedText('today');
   const [searchParams] = useSearchParams();
   const [date, setDate] = useState(() => {
     if (searchParams.get('date')) return searchParams.get('date');
@@ -69,7 +71,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         }
       } catch (err) {
         console.error('loadTeamMembers:', err);
-        if (active) setTeamError('Crew assignments are temporarily unavailable.');
+        if (active) setTeamError(tr('Crew assignments are temporarily unavailable.'));
       } finally {
         if (active) setTeamLoading(false);
       }
@@ -266,17 +268,17 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Today</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Today")}</h2>
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-sm text-gray-500 dark:text-gray-400">{filtered.length} job{filtered.length !== 1 ? 's' : ''}</p>
             {doneCount > 0 && <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{doneCount} done</span></>}
             {filtered.some(j => j.recurrence && j.recurrence !== 'none') && (
-              <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-violet-600 dark:text-violet-400 font-medium inline-flex items-center gap-1"><Repeat className="w-3 h-3" />Recurring</span></>
+              <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-violet-600 dark:text-violet-400 font-medium inline-flex items-center gap-1"><Repeat className="w-3 h-3" />{tr("Recurring")}</span></>
             )}
           </div>
         </div>
         {!teamLoading && !isCrewMember && (
-          <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />New Job</button>
+          <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />{tr("New Job")}</button>
         )}
       </div>
 
@@ -287,7 +289,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
             onClick={() => {
               const toMove = filtered.filter(j => j.status !== 'done' && j.scheduled_date === date);
               if (toMove.length === 0) return;
-              if (!window.confirm(`Move ${toMove.length} job${toMove.length > 1 ? 's' : ''} to tomorrow?`)) return;
+              if (!window.confirm(tr('Move {{count}} job to tomorrow?', { count: toMove.length }))) return;
               const tomorrow = new Date(date);
               tomorrow.setDate(tomorrow.getDate() + 1);
               const nextDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
@@ -330,20 +332,20 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                 {filtered.filter(j => j.status !== 'done' && j.scheduled_date === date).length} remaining to tomorrow
               </span>
             </span>
-            <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">Move All</span>
+            <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{tr("Move All")}</span>
           </button>
         </div>
       )}
 
       {/* Date picker + progress */}
       <div className="flex items-center gap-3 mb-5">
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label="Select date" className="input w-auto" />
+        <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label={tr("Select date")} className="input w-auto" />
         <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden"
              role="progressbar"
              aria-valuenow={doneCount}
              aria-valuemin={0}
              aria-valuemax={filtered.length || 1}
-             aria-label="Job completion progress">
+             aria-label={tr("Job completion progress")}>
           <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${filtered.length ? (doneCount / filtered.length) * 100 : 0}%` }} />
         </div>
       </div>
@@ -395,8 +397,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
             <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 font-semibold">{crewFilter ? 'No jobs assigned' : 'No jobs scheduled'}</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{crewFilter ? 'Choose All or another crew member.' : 'Tap + to add your first job'}</p>
+            <p className="text-gray-500 dark:text-gray-400 font-semibold">{tr(crewFilter ? 'No jobs assigned' : 'No jobs scheduled')}</p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{tr(crewFilter ? 'Choose All or another crew member.' : 'Tap + to add your first job')}</p>
           </div>
         )}
         {filtered.map((job, i) => (

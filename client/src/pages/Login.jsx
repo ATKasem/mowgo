@@ -1,9 +1,11 @@
+import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, isDemoMode } from '../lib/supabase';
 import { Sprout, Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export default function Login() {
+  const { tr, t, i18n } = useLocalizedText('login');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,9 +63,9 @@ export default function Login() {
           // Show the actual error — don't mask it
           const msg = resetError.message || resetError.msg || resetError.error_description || resetError.code || '';
           if (!msg || msg === '{}') {
-            setError('Something went wrong. Please try again.');
+            setError(tr('Something went wrong. Please try again.'));
           } else if (msg.includes('rate limit') || msg.includes('rate_limit') || msg.toLowerCase().includes('too many')) {
-            setError('Too many attempts. Please wait a moment and try again.');
+            setError(tr('Too many attempts. Please wait a moment and try again.'));
           } else {
             setError(msg);
           }
@@ -80,14 +82,14 @@ export default function Login() {
         : await supabase.auth.signUp({ email, password });
 
       if (result.error) {
-        setError(typeof result.error.message === 'string' ? result.error.message : (result.error.msg || result.error.error_code || 'Something went wrong. Please try again.'));
+        setError(typeof result.error.message === 'string' ? result.error.message : (result.error.msg || result.error.error_code || tr('Something went wrong. Please try again.')));
         setLoading(false);
         return;
       }
 
       if (mode === 'signup') {
         if (result.data?.user?.identities?.length === 0) {
-          setError('An account with this email already exists.');
+          setError(tr('An account with this email already exists.'));
           setLoading(false);
           return;
         }
@@ -100,7 +102,7 @@ export default function Login() {
 
       navigate('/app');
     } catch (err) {
-      setError('Connection failed. Check your internet and try again.');
+      setError(tr('Connection failed. Check your internet and try again.'));
     }
     setLoading(false);
   }
@@ -113,8 +115,8 @@ export default function Login() {
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-3">
             <Sprout className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">MowGo</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Simple scheduling for lawn care crews</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
         </div>
 
         {confirmSent ? (
@@ -124,8 +126,8 @@ export default function Login() {
               <Mail className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white">Check your email</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.</p>
+              <h2 className="font-bold text-gray-900 dark:text-white">{tr("Check your email")}</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("We sent a confirmation link to")} <strong>{email}</strong>. Click it to activate your account.</p>
             </div>
             <button onClick={() => { setConfirmSent(false); setMode('login'); }} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
               Back to login
@@ -138,8 +140,8 @@ export default function Login() {
               <Mail className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white">Reset link sent</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">If an account exists for <strong>{email}</strong>, you'll receive a password reset link shortly.</p>
+              <h2 className="font-bold text-gray-900 dark:text-white">{tr("Reset link sent")}</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("If an account exists for")} <strong>{email}</strong>, you'll receive a password reset link shortly.</p>
             </div>
             <button onClick={() => { setResetSent(false); setMode('login'); }} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
               Back to login
@@ -158,19 +160,19 @@ export default function Login() {
             {/* Forgot password header */}
             {mode === 'forgot' && (
               <div className="text-center -mt-1 mb-1">
-                <h2 className="font-semibold text-gray-900 dark:text-white">Reset your password</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter your email and we'll send you a reset link</p>
+                <h2 className="font-semibold text-gray-900 dark:text-white">{tr("Reset your password")}</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{tr("Enter your email and we'll send you a reset link")}</p>
               </div>
             )}
 
             {/* Email field */}
             <div>
-              <label className="label">Email</label>
+              <label className="label">{tr("Email")}</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={tr("you@example.com")}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="input pl-10"
@@ -183,7 +185,7 @@ export default function Login() {
             {/* Password — shown except in forgot mode */}
             {mode !== 'forgot' && (
               <div>
-                <label className="label">Password</label>
+                <label className="label">{tr("Password")}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -218,11 +220,11 @@ export default function Login() {
               className="btn-primary w-full gap-2 text-sm py-2.5"
             >
               {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" />{mode === 'forgot' ? 'Sending...' : mode === 'login' ? 'Signing in...' : 'Creating account...'}</>
+                <><Loader2 className="w-4 h-4 animate-spin" />{tr(mode === 'forgot' ? 'Sending...' : mode === 'login' ? 'Signing in...' : 'Creating account...')}</>
               ) : demo ? (
-                <><ArrowRight className="w-4 h-4" />Continue with Demo</>
+                <><ArrowRight className="w-4 h-4" />{tr("Continue with Demo")}</>
               ) : (
-                <>{mode === 'forgot' ? 'Send Reset Link' : mode === 'login' ? 'Log In' : 'Create Account'}</>
+                <>{tr(mode === 'forgot' ? 'Send Reset Link' : mode === 'login' ? 'Log In' : 'Create Account')}</>
               )}
             </button>
 
@@ -233,7 +235,7 @@ export default function Login() {
                 onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
                 className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2.5 min-h-[44px]"
               >
-                {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Log in'}
+                {tr(mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Log in')}
               </button>
             ) : mode === 'forgot' ? (
               <button
@@ -242,14 +244,14 @@ export default function Login() {
                 className="w-full flex items-center justify-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2.5 min-h-[44px]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                Back to login
+                {tr("Back to login")}
               </button>
             ) : null}
 
             {/* Demo mode indicator */}
             {demo && (
               <p className="text-xs text-center text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 rounded-lg py-2">
-                Running in demo mode — no account needed
+                {tr("Running in demo mode — no account needed")}
               </p>
             )}
           </form>
