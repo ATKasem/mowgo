@@ -15,7 +15,7 @@ struct MowGoApp: App {
 
     /// SwiftData container for offline cache persistence.
     /// Falls back to in-memory if the on-disk schema is corrupt.
-    private let modelContainer: ModelContainer = {
+    private static var makeModelContainer: ModelContainer {
         let diskConfig = ModelConfiguration(isStoredInMemoryOnly: false)
         if let container = try? ModelContainer(
             for: JobCache.self, ClientCache.self, InvoiceCache.self,
@@ -23,13 +23,14 @@ struct MowGoApp: App {
         ) {
             return container
         }
-        // Schema corruption or first-run — use in-memory so the app still launches
         let memConfig = ModelConfiguration(isStoredInMemoryOnly: true)
         return try! ModelContainer(
             for: JobCache.self, ClientCache.self, InvoiceCache.self,
             configurations: memConfig
         )
-    }()
+    }
+
+    private let modelContainer: ModelContainer = makeModelContainer
 
     init() {
         _store = StateObject(wrappedValue: DataStore(modelContainer: modelContainer))
