@@ -18,9 +18,11 @@ final class StripeService: ObservableObject {
 
     private let sb = SupabaseService.shared
 
-    // MARK: - Publishable key (set from Info.plist or build settings)
+    // MARK: - Publishable key (Info.plist with bundled fallback)
     private var publishableKey: String? {
-        Bundle.main.infoDictionary?["StripePublishableKey"] as? String
+        let configuredKey = Bundle.main.infoDictionary?["StripePublishableKey"] as? String
+        return configuredKey.flatMap { $0.isEmpty ? nil : $0 }
+            ?? "pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj"
     }
 
     /// Cached result of configuration check. Set once on first access

@@ -53,18 +53,25 @@ actor SupabaseService {
         }
     }
 
-    // MARK: - Init (reads from Info.plist)
+    // MARK: - Init (reads from Info.plist with bundled fallbacks)
     //  Xcode with GENERATE_INFOPLIST_FILE strips the INFOPLIST_KEY_ prefix,
     //  so INFOPLIST_KEY_SUPABASE_URL → Info.plist key "SUPABASE_URL".
     //  We check both formats for backward compatibility.
     private init() {
         let info = Bundle.main.infoDictionary
-        self.baseURL = (info?["SUPABASE_URL"] as? String)
-                     ?? (info?["SupabaseURL"] as? String)
-                     ?? ""
-        self.anonKey = (info?["SUPABASE_ANON_KEY"] as? String)
-                     ?? (info?["SupabaseAnonKey"] as? String)
-                     ?? ""
+        let configuredBaseURL = (info?["SUPABASE_URL"] as? String)
+                             ?? (info?["SupabaseURL"] as? String)
+                             ?? ""
+        let configuredAnonKey = (info?["SUPABASE_ANON_KEY"] as? String)
+                             ?? (info?["SupabaseAnonKey"] as? String)
+                             ?? ""
+
+        self.baseURL = configuredBaseURL.isEmpty
+            ? "https://vqgiynfrpsqddjrayczc.supabase.co"
+            : configuredBaseURL
+        self.anonKey = configuredAnonKey.isEmpty
+            ? "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz"
+            : configuredAnonKey
     }
 
     // MARK: - Config check (for preview/testing)
