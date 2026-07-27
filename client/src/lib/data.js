@@ -38,11 +38,14 @@ export async function loadJobs() {
   if (!user) return [];
 
   // Check if user is a crew member — if so, filter to assigned jobs only
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('role, business_id')
     .eq('id', user.id)
     .single();
+  if (profileError) {
+    console.error('loadJobs: failed to fetch profile, defaulting to owner view', profileError);
+  }
 
   let query = supabase
     .from('jobs')
@@ -400,9 +403,9 @@ export async function saveProfile(profile) {
   if (!user) throw new Error('Not authenticated');
 
   const { business_name, phone, avatar_url } = profile;
-  const { error } = await supabase.from('profiles').update({
-    business_name, phone, avatar_url,
-  }).eq('id', user.id);
+  const { error } = await supabase.from('profiles').upsert({
+    id: user.id, business_name, phone, avatar_url,
+  });
   if (error) throw error;
   return { ...profile, business_name, phone, avatar_url };
 }

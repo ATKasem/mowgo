@@ -38,7 +38,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const [teamMembers, setTeamMembers] = useState([]);
   const [canManageCrew, setCanManageCrew] = useState(false);
   const [isCrewMember, setIsCrewMember] = useState(false);
-  const [teamLoading, setTeamLoading] = useState(true);
+  const [teamLoading, setTeamLoading] = useState(false);
   const [teamError, setTeamError] = useState('');
   const [crewFilter, setCrewFilter] = useState(null); // null = show all
   const toggleTimeoutRef = useRef(null);
@@ -207,20 +207,19 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     return { updated, updates, previousOrder };
   }
 
-  async function persistReorder(fromJobId, toJobId) {
-    const result = reorderWithinDate(jobsRef.current, fromJobId, toJobId, date);
-    if (!result) return;
-
-    setJobs(result.updated);
-    try {
-      await reorderJobs(result.updates);
-    } catch (err) {
-      console.error('persistReorder: batch persist failed', err);
-      setJobs(current => current.map(job => {
-        const previous = result.previousOrder.find(item => item.id === job.id);
-        return previous ? { ...job, route_order: previous.route_order } : job;
-      }));
-    }
+  function persistReorder(fromJobId, toJobId) {
+    setJobs(prev => {
+      const result = reorderWithinDate(prev, fromJobId, toJobId, date);
+      if (!result) return prev;
+      reorderJobs(result.updates).catch(err => {
+        console.error('persistReorder: batch persist failed', err);
+        setJobs(current => current.map(job => {
+          const previous = result.previousOrder.find(item => item.id === job.id);
+          return previous ? { ...job, route_order: previous.route_order } : job;
+        }));
+      });
+      return result.updated;
+    });
   }
 
   function handleDrop(job) {
