@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, RefreshCw, Loader2, Wrench, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
-import useAutopilot from '../hooks/useAutopilot';
+import useAutopilot, { MAX_USER_MESSAGES } from '../hooks/useAutopilot';
 
 /**
  * AutopilotChat — AI assistant chat interface for MowGo.
@@ -16,15 +16,25 @@ import useAutopilot from '../hooks/useAutopilot';
  */
 
 const QUICK_PROMPTS = [
-  { label: "Show today's schedule", text: "Show me today's schedule" },
-  { label: 'Run rain delay', text: "Move today's jobs to tomorrow and notify everyone — it's raining" },
-  { label: 'Check revenue', text: 'How much did I make this month?' },
-  { label: 'Unpaid invoices', text: 'Who has unpaid invoices?' }
+  { label: "Today's jobs", text: "Show today's jobs" },
+  { label: 'Rain delay', text: "Move today's jobs to tomorrow" },
+  { label: 'Revenue', text: 'Revenue this month?' },
+  { label: 'Unpaid', text: 'Show unpaid invoices' }
 ];
 
 export default function AutopilotChat({ compact = false }) {
-  const { tr, t, i18n } = useLocalizedText('autopilotChat');
-  const { messages, status, currentAction, sendMessage, reset, retry } = useAutopilot({ compact });
+  const { tr } = useLocalizedText('autopilotChat');
+  const {
+    messages,
+    status,
+    currentAction,
+    userMessageCount,
+    limitReached,
+    shouldSuggestReset,
+    sendMessage,
+    reset,
+    retry
+  } = useAutopilot();
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -54,7 +64,7 @@ export default function AutopilotChat({ compact = false }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!input.trim() || status !== 'idle') return;
+    if (!input.trim() || status !== 'idle' || limitReached) return;
     sendMessage(input.trim());
     setInput('');
   }
@@ -64,7 +74,7 @@ export default function AutopilotChat({ compact = false }) {
     setInput('');
   }
 
-  const isBusy = status === 'thinking' || status === 'executing';
+  const isBusy = status === 'loading' || status === 'thinking' || status === 'executing';
 
   return (
     <div className={`flex flex-col ${compact ? 'flex-1 min-h-0' : 'h-[calc(100vh-13rem)] max-h-[calc(100vh-13rem)]'}`}>
@@ -75,7 +85,7 @@ export default function AutopilotChat({ compact = false }) {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{tr("AI Autopilot")}</h2>
             <p className="text-[10px] text-gray-400 dark:text-gray-500">
               {status === 'thinking' ? tr('Thinking...') :
@@ -96,8 +106,17 @@ export default function AutopilotChat({ compact = false }) {
       </div>
       )}
 
+      {compact && (
+        <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-200">{tr('AI Autopilot')}</span>
+          <button onClick={reset} disabled={isBusy} className="p-1.5 text-gray-400 hover:text-violet-600 disabled:opacity-40" aria-label={tr('New chat')}>
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Messages */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto py-4 space-y-3 overscroll-contain">
+      <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto ${compact ? 'py-2 space-y-2' : 'py-4 space-y-3'} overscroll-contain`}>
         {messages.filter(m => !m.isToolResult).map((msg) => (
           <MessageBubble key={msg.id} msg={msg} messages={messages} index={messages.indexOf(msg)} />
         ))}
@@ -120,6 +139,17 @@ export default function AutopilotChat({ compact = false }) {
 
         <div ref={bottomRef} />
       </div>
+
+      {shouldSuggestReset && !limitReached && (
+        <button
+          type="button"
+          onClick={reset}
+          disabled={isBusy}
+          className="mb-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-left text-xs text-amber-700 dark:text-amber-300"
+        >
+          {tr('This chat is getting long. Start a new chat for better results.')}
+        </button>
+      )}
 
       {/* Quick prompts (show when only welcome message) — more minimal in compact */}
       {messages.length === 1 && messages[0].isWelcome && (
@@ -163,15 +193,16 @@ export default function AutopilotChat({ compact = false }) {
             placeholder={
               status === 'executing' ? tr('Working on it...') :
               status === 'thinking' ? tr('AI is thinking...') :
+              limitReached ? tr('Start a new chat to continue') :
               tr("Type a command (e.g. 'Show today's schedule')")
             }
-            disabled={isBusy}
-            className="flex-1 px-4 py-2.5 text-base bg-gray-100 dark:bg-gray-800 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50 transition-shadow"
+            disabled={isBusy || limitReached}
+            className={`flex-1 ${compact ? 'px-3 py-2' : 'px-4 py-2.5'} text-base bg-gray-100 dark:bg-gray-800 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50 transition-shadow`}
           />
           <button
             type="submit"
-            disabled={!input.trim() || isBusy}
-            className="px-4 py-3 bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-colors disabled:cursor-not-allowed min-h-[44px]"
+            disabled={!input.trim() || isBusy || limitReached}
+            className={`${compact ? 'px-3 py-2 min-h-[40px]' : 'px-4 py-3 min-h-[44px]'} bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-colors disabled:cursor-not-allowed`}
           >
             {isBusy ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -180,9 +211,12 @@ export default function AutopilotChat({ compact = false }) {
             )}
           </button>
         </div>
-        <p className={`${compact ? 'text-[9px] mt-1.5' : 'text-[10px] mt-2'} text-gray-400 dark:text-gray-500 text-center`}>
-          {tr(compact ? 'Type a command to manage your business' : 'AI Autopilot uses your business data to help manage scheduling, invoicing, and clients')}
-        </p>
+        <div className={`${compact ? 'mt-1.5' : 'mt-2'} flex items-center justify-between text-[10px] text-gray-400 dark:text-gray-500`}>
+          <span>{limitReached ? tr('Message limit reached') : tr('AI can make changes using your business data')}</span>
+          <span className={limitReached ? 'font-semibold text-amber-600 dark:text-amber-400' : ''}>
+            {userMessageCount}/{MAX_USER_MESSAGES} {tr('messages')}
+          </span>
+        </div>
       </form>
     </div>
   );

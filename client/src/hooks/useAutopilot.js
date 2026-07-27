@@ -1,114 +1,183 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { TOOLS, executeTool, SYSTEM_PROMPT } from '../lib/autopilotTools';
-
-/**
- * useAutopilot — Manages the AI chat state and LLM ↔ tool execution loop.
- *
- * Flow:
- *  1. User sends message → added to conversation
- *  2. POST { messages, tools } to /api/autopilot
- *  3. If LLM returns text → display it (done)
- *  4. If LLM returns tool_call → execute tool client-side
- *  5. Send tool result back to LLM → go to step 3
- *  6. Loop until LLM returns final text
- *
- * States: idle, thinking, executing, error
- */
+import { supabase, isDemoMode } from '../lib/supabase';
 
 const API_URL = '/api/autopilot';
-const MAX_LOOP = 5; // Prevent infinite tool call loops
-let _msgId = 0;
-function msgId() { return ++_msgId; }
+const MAX_LOOP = 5;
+export const MAX_USER_MESSAGES = 10;
+const RESET_SUGGESTION_THRESHOLD = 20;
+const WELCOME_MESSAGE = 'Ask about your schedule, clients, invoices, or revenue.';
 
-export default function useAutopilot({ compact = false } = {}) {
-  const [messages, setMessages] = useState(() => [{
-    id: msgId(),
+function welcomeMessage() {
+  return {
+    id: 'welcome',
     role: 'assistant',
-    content: compact
-      ? "Ask me anything — your schedule, clients, invoices, revenue."
-      : "Hey! I'm your MowGo AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
+    content: WELCOME_MESSAGE,
     isWelcome: true
-  }]);
-  const [status, setStatus] = useState('idle'); // idle | thinking | executing | error
-  const [currentAction, setCurrentAction] = useState(null); // What the AI is doing right now
-  const controllerRef = useRef(null);
-  const sendMessageRef = useRef(null);
+  };
+}
 
-  // Refs that always hold the latest values — prevents stale closures in async callbacks
+function newMessage(role, content, metadata = {}) {
+  return { id: crypto.randomUUID(), role, content, ...metadata };
+}
+
+function toDatabaseMessage(message, sessionId, userId) {
+  return {
+    id: message.id,
+    session_id: sessionId,
+    user_id: userId,
+    role: message.role,
+    content: message.content ?? null,
+    tool_calls: message.tool_calls ?? null,
+    tool_call_id: message.tool_call_id ?? null,
+    tool_name: message.toolName ?? null,
+    is_tool_call: Boolean(message.isToolCall),
+    is_tool_result: Boolean(message.isToolResult)
+  };
+}
+
+function fromDatabaseMessage(message) {
+  return {
+    id: message.id,
+    role: message.role,
+    content: message.content,
+    tool_calls: message.tool_calls,
+    tool_call_id: message.tool_call_id,
+    toolName: message.tool_name,
+    isToolCall: message.is_tool_call,
+    isToolResult: message.is_tool_result
+  };
+}
+
+export default function useAutopilot() {
+  const [messages, setMessages] = useState([welcomeMessage()]);
+  const [status, setStatus] = useState('loading');
+  const [currentAction, setCurrentAction] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
+  const controllerRef = useRef(null);
+  const userIdRef = useRef(null);
+  const sessionIdRef = useRef(null);
   const statusRef = useRef(status);
-  statusRef.current = status;
   const messagesRef = useRef(messages);
+
+  statusRef.current = status;
   messagesRef.current = messages;
 
-  /** Send a user message and run the LLM loop */
-  const sendMessage = useCallback(async (userText) => {
-    if (!userText.trim() || statusRef.current !== 'idle') return;
+  const userMessageCount = messages.filter(message => message.role === 'user').length;
+  const persistedMessageCount = messages.filter(message => !message.isWelcome && !message.isError).length;
+  const limitReached = userMessageCount >= MAX_USER_MESSAGES;
+  const shouldSuggestReset = persistedMessageCount >= RESET_SUGGESTION_THRESHOLD;
 
-    // Abort any in-flight request
-    controllerRef.current?.abort();
-    controllerRef.current = new AbortController();
-
-    // Add user message
-    const userMsg = { id: msgId(), role: 'user', content: userText };
-    setMessages(prev => [...prev, userMsg]);
-    setStatus('thinking');
-    setCurrentAction(null);
-
-    // Build conversation history for LLM (exclude UI metadata like isWelcome)
-    const conversationHistory = [...messagesRef.current, userMsg].map(m => ({
-      role: m.role,
-      content: m.content,
-      ...(m.tool_calls ? { tool_calls: m.tool_calls } : {}),
-      ...(m.tool_call_id ? { tool_call_id: m.tool_call_id } : {})
-    }));
-
-    try {
-      await runLLMLoop(conversationHistory, controllerRef.current.signal);
-    } catch (err) {
-      if (err.name === 'AbortError') return;
-      console.error('Autopilot error:', err);
-      setMessages(prev => [...prev, {
-        id: msgId(),
-        role: 'assistant',
-        content: err.message === 'not_configured'
-          ? "⚠️ AI Autopilot isn't configured yet. Add your OpenRouter API key to get started."
-          : '⚠️ Something went wrong. Try again in a moment.',
-        isError: true
-      }]);
-      setStatus('error');
+  const createSession = useCallback(async (userId) => {
+    const id = crypto.randomUUID();
+    if (userId && !isDemoMode()) {
+      const { error } = await supabase
+        .from('autopilot_sessions')
+        .insert({ id, user_id: userId });
+      if (error) throw error;
     }
-  }, []); // stable — uses refs instead of closed-over state
-
-  // Cleanup AbortController on unmount to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      controllerRef.current?.abort();
-    };
+    sessionIdRef.current = id;
+    setSessionId(id);
+    return id;
   }, []);
 
-  /** Core LLM loop: send → receive → execute tools → repeat */
-  async function runLLMLoop(history, signal) {
+  const persistMessage = useCallback(async (message) => {
+    const userId = userIdRef.current;
+    const activeSessionId = sessionIdRef.current;
+    if (!userId || !activeSessionId || isDemoMode() || message.isWelcome || message.isError) return;
+
+    const { error } = await supabase
+      .from('autopilot_messages')
+      .insert(toDatabaseMessage(message, activeSessionId, userId));
+    if (error) {
+      console.error('Could not save autopilot message:', error);
+      return;
+    }
+
+    await supabase
+      .from('autopilot_sessions')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', activeSessionId);
+  }, []);
+
+  const appendMessage = useCallback((message) => {
+    setMessages(previous => [...previous, message]);
+    void persistMessage(message);
+  }, [persistMessage]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSession() {
+      try {
+        if (isDemoMode()) {
+          await createSession(null);
+          if (!cancelled) setStatus('idle');
+          return;
+        }
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        if (!user) {
+          await createSession(null);
+          if (!cancelled) setStatus('idle');
+          return;
+        }
+        userIdRef.current = user.id;
+
+        const { data: session, error: sessionError } = await supabase
+          .from('autopilot_sessions')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (sessionError) throw sessionError;
+
+        const activeSessionId = session?.id || await createSession(user.id);
+        sessionIdRef.current = activeSessionId;
+        if (!cancelled) setSessionId(activeSessionId);
+
+        if (session) {
+          const { data: savedMessages, error: messagesError } = await supabase
+            .from('autopilot_messages')
+            .select('*')
+            .eq('session_id', activeSessionId)
+            .order('created_at', { ascending: true });
+          if (messagesError) throw messagesError;
+          if (!cancelled && savedMessages?.length) {
+            setMessages(savedMessages.map(fromDatabaseMessage));
+          }
+        }
+      } catch (error) {
+        console.error('Could not load autopilot session:', error);
+      } finally {
+        if (!cancelled) setStatus('idle');
+      }
+    }
+
+    void loadSession();
+    return () => {
+      cancelled = true;
+      controllerRef.current?.abort();
+    };
+  }, [createSession]);
+
+  const runLLMLoop = useCallback(async (history, signal) => {
     let currentHistory = [...history];
-    let loopCount = 0;
 
-    while (loopCount < MAX_LOOP) {
-      loopCount++;
-
-      // Call LLM
+    for (let loopCount = 0; loopCount < MAX_LOOP; loopCount++) {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...currentHistory
-          ],
-          tools: TOOLS.map(t => ({
+          messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...currentHistory],
+          tools: TOOLS.map(tool => ({
             type: 'function',
             function: {
-              name: t.name,
-              description: t.description,
-              parameters: t.parameters
+              name: tool.name,
+              description: tool.description,
+              parameters: tool.parameters
             }
           }))
         }),
@@ -116,167 +185,158 @@ export default function useAutopilot({ compact = false } = {}) {
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || `API error ${res.status}`);
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || `API error ${res.status}`);
       }
 
       const { message, error } = await res.json();
+      if (error === 'not_configured') throw new Error('not_configured');
+      if (!message) throw new Error('No response from AI');
 
-      if (error === 'not_configured') {
-        throw new Error('not_configured');
-      }
-
-      if (!message) {
-        throw new Error('No response from AI');
-      }
-
-      // Case 1: LLM returned text → done
-      if (message.content && !message.tool_calls) {
-        setMessages(prev => [...prev, {
-          id: msgId(),
-          role: 'assistant',
-          content: message.content
-        }]);
+      if (message.content && !message.tool_calls?.length) {
+        appendMessage(newMessage('assistant', message.content));
         setStatus('idle');
         setCurrentAction(null);
         return;
       }
 
-      // Case 2: LLM wants to call tools
       if (message.tool_calls?.length) {
-        // Add the assistant's tool call request to history
         currentHistory.push({
           role: 'assistant',
           content: message.content || null,
           tool_calls: message.tool_calls
         });
-
-        // Show what's happening in the UI
-        const toolNames = message.tool_calls.map(tc => tc.function.name);
+        const toolNames = message.tool_calls.map(call => call.function.name);
         setCurrentAction(formatToolAction(toolNames));
         setStatus('executing');
-
-        // Add tool call message to UI
-        setMessages(prev => [...prev, {
-          id: msgId(),
-          role: 'assistant',
-          content: message.content || null,
+        appendMessage(newMessage('assistant', message.content || null, {
           tool_calls: message.tool_calls,
           isToolCall: true
-        }]);
+        }));
 
-        // Execute each tool
-        for (const tc of message.tool_calls) {
-          // Check abort signal before each tool execution
+        for (const toolCall of message.tool_calls) {
           if (signal.aborted) return;
-
-          const fnName = tc.function.name;
-          let fnArgs;
+          let args = {};
           try {
-            fnArgs = JSON.parse(tc.function.arguments);
+            args = JSON.parse(toolCall.function.arguments);
           } catch {
-            fnArgs = {};
+            // Invalid arguments are passed as an empty object for a structured tool error.
           }
-
-          const result = await executeTool(fnName, fnArgs);
-
-          // Add tool result to history
-          currentHistory.push({
-            role: 'tool',
-            tool_call_id: tc.id,
-            content: JSON.stringify(result)
-          });
-
-          // Show tool result in UI
-          setMessages(prev => [...prev, {
-            id: msgId(),
-            role: 'tool',
-            tool_call_id: tc.id,
-            toolName: fnName,
-            content: JSON.stringify(result),
+          const result = await executeTool(toolCall.function.name, args);
+          const content = JSON.stringify(result);
+          currentHistory.push({ role: 'tool', tool_call_id: toolCall.id, content });
+          appendMessage(newMessage('tool', content, {
+            tool_call_id: toolCall.id,
+            toolName: toolCall.function.name,
             isToolResult: true
-          }]);
+          }));
         }
 
         setCurrentAction(null);
         setStatus('thinking');
-        // Loop back to let LLM process results
         continue;
       }
 
-      // Case 3: No content and no tool calls (shouldn't happen)
-      setMessages(prev => [...prev, {
-        id: msgId(),
-        role: 'assistant',
-        content: "I'm not sure how to help with that. Could you rephrase?",
-        isError: true
-      }]);
+      appendMessage(newMessage('assistant', 'Please rephrase that request.', { isError: true }));
       setStatus('idle');
       return;
     }
 
-    // Max loop exceeded
-    setMessages(prev => [...prev, {
-      id: msgId(),
-      role: 'assistant',
-      content: "That took more steps than expected. Let's try a simpler request.",
-      isError: true
-    }]);
+    appendMessage(newMessage('assistant', 'That request needs too many steps. Start a new chat or simplify it.', { isError: true }));
     setStatus('idle');
-  }
+  }, [appendMessage]);
 
-  /** Reset the conversation */
-  const reset = useCallback(() => {
+  const sendMessage = useCallback(async (userText) => {
+    const text = userText.trim();
+    const currentUserCount = messagesRef.current.filter(message => message.role === 'user').length;
+    if (!text || statusRef.current !== 'idle' || currentUserCount >= MAX_USER_MESSAGES) return;
+
     controllerRef.current?.abort();
-    setMessages([{
-      id: msgId(),
-      role: 'assistant',
-      content: compact
-        ? "Ask me anything — your schedule, clients, invoices, revenue."
-        : "Hey! I'm your MowGo AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
-      isWelcome: true
-    }]);
-    setStatus('idle');
+    controllerRef.current = new AbortController();
+    const userMessage = newMessage('user', text);
+    appendMessage(userMessage);
+    setStatus('thinking');
     setCurrentAction(null);
-  }, [compact]);
 
-  /** Retry last errored request — find the last user message and re-send it */
-  const retry = useCallback(() => {
-    // Use ref to always get the latest sendMessage
-    const send = sendMessageRef.current;
-    if (!send) return;
+    const history = [...messagesRef.current, userMessage]
+      .filter(message => !message.isWelcome && !message.isError)
+      .map(message => ({
+        role: message.role,
+        content: message.content,
+        ...(message.tool_calls ? { tool_calls: message.tool_calls } : {}),
+        ...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {})
+      }));
 
-    let lastUserText = null;
-    // Remove the last error message, then find and re-send last user message
-    setMessages(prev => {
-      const last = prev[prev.length - 1];
-      const cleaned = last?.isError ? prev.slice(0, -1) : prev;
-      // Find the most recent user message
-      for (let i = cleaned.length - 1; i >= 0; i--) {
-        if (cleaned[i].role === 'user') {
-          lastUserText = cleaned[i].content;
-          return cleaned.slice(0, i);
-        }
-      }
-      return cleaned;
-    });
-    // Use ref to avoid stale closure — send outside setState
-    if (lastUserText) {
-      setTimeout(() => send(lastUserText), 0);
+    try {
+      await runLLMLoop(history, controllerRef.current.signal);
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+      console.error('Autopilot error:', error);
+      appendMessage(newMessage(
+        'assistant',
+        error.message === 'not_configured'
+          ? 'AI Autopilot is not configured. Add the OpenRouter API key.'
+          : 'Something went wrong. Try again.',
+        { isError: true }
+      ));
+      setStatus('error');
     }
-  }, []);
+  }, [appendMessage, runLLMLoop]);
 
-  // Keep ref current
-  sendMessageRef.current = sendMessage;
+  const reset = useCallback(async () => {
+    controllerRef.current?.abort();
+    setStatus('loading');
+    setCurrentAction(null);
+    setMessages([welcomeMessage()]);
+    try {
+      await createSession(userIdRef.current);
+    } catch (error) {
+      console.error('Could not create autopilot session:', error);
+    } finally {
+      setStatus('idle');
+    }
+  }, [createSession]);
 
-  return { messages, status, currentAction, sendMessage, reset, retry };
+  const retry = useCallback(() => {
+    if (statusRef.current !== 'error') return;
+    const history = messagesRef.current
+      .filter(message => !message.isWelcome && !message.isError)
+      .map(message => ({
+        role: message.role,
+        content: message.content,
+        ...(message.tool_calls ? { tool_calls: message.tool_calls } : {}),
+        ...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {})
+      }));
+    if (!history.some(message => message.role === 'user')) return;
+
+    setMessages(previous => previous.filter(message => !message.isError));
+    setStatus('thinking');
+    controllerRef.current?.abort();
+    controllerRef.current = new AbortController();
+    void runLLMLoop(history, controllerRef.current.signal).catch(error => {
+      if (error.name === 'AbortError') return;
+      console.error('Autopilot retry error:', error);
+      appendMessage(newMessage('assistant', 'Something went wrong. Try again.', { isError: true }));
+      setStatus('error');
+    });
+  }, [appendMessage, runLLMLoop]);
+
+  return {
+    messages,
+    status,
+    currentAction,
+    sessionId,
+    userMessageCount,
+    limitReached,
+    shouldSuggestReset,
+    sendMessage,
+    reset,
+    retry
+  };
 }
 
-/** Human-readable description of what tools are being called */
 function formatToolAction(toolNames) {
   if (toolNames.length === 0) return 'Working...';
-  const first = toolNames[0];
-  const extras = toolNames.length > 1 ? ` +${toolNames.length - 1} more` : '';
   const labels = {
     getTodaySchedule: 'Checking schedule...',
     getSchedule: 'Looking up schedule...',
@@ -293,5 +353,6 @@ function formatToolAction(toolNames) {
     updateJobStatus: 'Updating job...',
     invoiceCompletedJobs: 'Invoicing completed jobs...'
   };
-  return (labels[first] || `Running ${first}...`) + extras;
+  const extras = toolNames.length > 1 ? ` +${toolNames.length - 1} more` : '';
+  return (labels[toolNames[0]] || `Running ${toolNames[0]}...`) + extras;
 }

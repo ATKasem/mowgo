@@ -21,7 +21,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:4173'
 ];
 const OPTS_METHOD = 'OPTIONS';
-const DEFAULT_MODEL = 'google/gemini-2.5-flash-lite';
+const DEFAULT_MODEL = 'deepseek/deepseek-chat';
 const MAX_TOKENS = 1024;
 const TIMEOUT_MS = 20000;
 
