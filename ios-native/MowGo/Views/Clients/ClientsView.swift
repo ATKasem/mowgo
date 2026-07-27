@@ -13,6 +13,7 @@ struct ClientsView: View {
     @State private var expandedId: UUID?
     @State private var searchText = ""
     @State private var showNewClient = false
+    @State private var editingClient: Client?
 
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
@@ -32,11 +33,18 @@ struct ClientsView: View {
                     ScrollView {
                         LazyVStack(spacing: 8) {
                             ForEach(filtered) { client in
-                                ClientCard(client: client, isExpanded: expandedId == client.id) {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        expandedId = expandedId == client.id ? nil : client.id
+                                ClientCard(
+                                    client: client,
+                                    isExpanded: expandedId == client.id,
+                                    onTap: {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            expandedId = expandedId == client.id ? nil : client.id
+                                        }
+                                    },
+                                    onEdit: {
+                                        editingClient = client
                                     }
-                                }
+                                )
                             }
                         }
                         .padding(16)
@@ -64,6 +72,9 @@ struct ClientsView: View {
             .sheet(isPresented: $showNewClient) {
                 NewClientFormView()
             }
+            .sheet(item: $editingClient) { client in
+                NewClientFormView(client: client)
+            }
         }
     }
 }
@@ -73,6 +84,7 @@ struct ClientCard: View {
     let client: Client
     let isExpanded: Bool
     let onTap: () -> Void
+    let onEdit: () -> Void
 
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
@@ -135,6 +147,13 @@ struct ClientCard: View {
                             DetailRow(icon: "map", text: "Navigate")
                         }
                     }
+                    Button("Edit") {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        onEdit()
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(MowGoTheme.deepGreen)
+                    .accessibilityLabel("Edit \(client.name)")
                 }
                 .padding(.horizontal, 12).padding(.bottom, 12)
                 .transition(.opacity.combined(with: .move(edge: .top)))

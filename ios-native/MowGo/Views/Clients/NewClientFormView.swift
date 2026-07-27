@@ -2,7 +2,7 @@
 //  NewClientFormView.swift
 //  MowGo
 //
-//  Form to create a new client with validation.
+//  Form to create or edit a client with validation.
 //
 
 import SwiftUI
@@ -13,20 +13,35 @@ struct NewClientFormView: View {
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var focusedField: Field?
 
-    @State private var name = ""
-    @State private var address = ""
-    @State private var phone = ""
-    @State private var email = ""
-    @State private var rate = ""
-    @State private var keyCode = ""
-    @State private var alarmCode = ""
-    @State private var petInstructions = ""
-    @State private var cleaningNotes = ""
+    let client: Client?
+
+    @State private var name: String
+    @State private var address: String
+    @State private var phone: String
+    @State private var email: String
+    @State private var rate: String
+    @State private var keyCode: String
+    @State private var alarmCode: String
+    @State private var petInstructions: String
+    @State private var cleaningNotes: String
     @State private var isSaving = false
     @State private var error: String?
 
     private enum Field { case name, address, phone, email, rate, keyCode, alarmCode, pets, notes }
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+
+    init(client: Client? = nil) {
+        self.client = client
+        _name = State(initialValue: client?.name ?? "")
+        _address = State(initialValue: client?.address ?? "")
+        _phone = State(initialValue: client?.phone ?? "")
+        _email = State(initialValue: client?.email ?? "")
+        _rate = State(initialValue: client.map { NSDecimalNumber(decimal: $0.rate).stringValue } ?? "")
+        _keyCode = State(initialValue: client?.keyCode ?? "")
+        _alarmCode = State(initialValue: client?.alarmCode ?? "")
+        _petInstructions = State(initialValue: client?.petInstructions ?? "")
+        _cleaningNotes = State(initialValue: client?.cleaningNotes ?? "")
+    }
 
     var body: some View {
         NavigationStack {
@@ -91,7 +106,7 @@ struct NewClientFormView: View {
                 .scrollContentBackground(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("New Client")
+            .navigationTitle(client == nil ? "New Client" : "Edit Client")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -128,8 +143,9 @@ struct NewClientFormView: View {
         generator.impactOccurred()
 
         isSaving = true
-        let client = Client(
-            id: UUID(),
+        let editableClient = Client(
+            id: client?.id ?? UUID(),
+            userId: client?.userId,
             name: trimmedName,
             address: address.isEmpty ? nil : address,
             phone: phone.isEmpty ? nil : phone,
@@ -138,12 +154,19 @@ struct NewClientFormView: View {
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
             alarmCode: alarmCode.isEmpty ? nil : alarmCode,
-            petInstructions: petInstructions.isEmpty ? nil : petInstructions
+            petInstructions: petInstructions.isEmpty ? nil : petInstructions,
+            createdAt: client?.createdAt
         )
         Task {
             error = nil
             do {
-                try await store.createClient(client)
+                if client == nil {
+                    let newClient = editableClient
+                    try await store.createClient(newClient)
+                } else {
+                    let updated = editableClient
+                    try await store.updateClient(updated)
+                }
                 dismiss()
             } catch {
                 self.error = error.localizedDescription

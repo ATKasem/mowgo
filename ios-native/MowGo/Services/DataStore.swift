@@ -22,6 +22,18 @@ private struct ClientInsert: Encodable {
     let petInstructions: String?
 }
 
+private struct ClientUpdate: Encodable {
+    let name: String
+    let address: String?
+    let phone: String?
+    let email: String?
+    let rate: Decimal
+    let cleaningNotes: String?
+    let keyCode: String?
+    let alarmCode: String?
+    let petInstructions: String?
+}
+
 private struct JobInsert: Encodable {
     let id: UUID
     let userId: UUID
@@ -271,15 +283,31 @@ final class DataStore: ObservableObject {
     }
 
     func updateClient(_ client: Client) async throws {
+        var updated = client
+        if let existing = clients.first(where: { $0.id == client.id }) {
+            updated.userId = existing.userId
+            updated.createdAt = existing.createdAt
+        }
+
         guard await sb.isConfigured else {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
-                clients[idx] = client
+                clients[idx] = updated
             }
             return
         }
-        try await sb.update("clients", id: client.id, client)
+        try await sb.update("clients", id: client.id, ClientUpdate(
+            name: updated.name,
+            address: updated.address,
+            phone: updated.phone,
+            email: updated.email,
+            rate: updated.rate,
+            cleaningNotes: updated.cleaningNotes,
+            keyCode: updated.keyCode,
+            alarmCode: updated.alarmCode,
+            petInstructions: updated.petInstructions
+        ))
         if let idx = clients.firstIndex(where: { $0.id == client.id }) {
-            clients[idx] = client
+            clients[idx] = updated
         }
     }
 

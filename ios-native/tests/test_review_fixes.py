@@ -34,12 +34,23 @@ class IOSReviewFixTests(unittest.TestCase):
     def test_updates_use_operation_specific_patch_payloads(self) -> None:
         data_store = source("Services/DataStore.swift")
 
+        self.assertIn("struct ClientUpdate: Encodable", data_store)
         self.assertIn("struct JobStatusPatch: Encodable", data_store)
         self.assertIn("struct JobSchedulePatch: Encodable", data_store)
         self.assertIn("struct InvoicePaidPatch: Encodable", data_store)
+        self.assertIn('sb.update("clients", id: client.id, ClientUpdate(', data_store)
         self.assertIn('sb.update("jobs", id: job.id, JobStatusPatch(', data_store)
         self.assertIn('sb.update("jobs", id: job.id, JobSchedulePatch(', data_store)
         self.assertIn('sb.update("invoices", id: invoice.id, InvoicePaidPatch(', data_store)
+        client_update = data_store.split("private struct ClientUpdate:", 1)[1].split(
+            "private struct JobInsert:", 1
+        )[0]
+        self.assertNotIn("userId", client_update)
+        self.assertNotIn("createdAt", client_update)
+        self.assertNotRegex(
+            data_store,
+            re.compile(r'sb\.update\("clients",\s*id:\s*client\.id,\s*client\)'),
+        )
         self.assertNotRegex(
             data_store,
             re.compile(r'sb\.update\("jobs",\s*id:\s*job\.id,\s*job\)'),
@@ -161,6 +172,29 @@ class IOSReviewFixTests(unittest.TestCase):
         self.assertIn("trimmingCharacters(in: .whitespacesAndNewlines)", job_form)
         self.assertIn("guard let clientId else", job_form)
         self.assertNotIn('Text("None").tag(nil as UUID?)', job_form)
+
+    def test_client_form_supports_editing_and_preserves_identity_fields(self) -> None:
+        client_form = source("Views/Clients/NewClientFormView.swift")
+        clients_view = source("Views/Clients/ClientsView.swift")
+        data_store = source("Services/DataStore.swift")
+
+        self.assertIn("let client: Client?", client_form)
+        self.assertIn("init(client: Client? = nil)", client_form)
+        self.assertIn('_name = State(initialValue: client?.name ?? "")', client_form)
+        self.assertIn('client == nil ? "New Client" : "Edit Client"', client_form)
+        self.assertIn("try await store.updateClient(updated)", client_form)
+        self.assertIn("try await store.createClient(newClient)", client_form)
+
+        self.assertIn("@State private var editingClient: Client?", clients_view)
+        self.assertIn("onEdit:", clients_view)
+        self.assertIn('Button("Edit")', clients_view)
+        self.assertIn("NewClientFormView(client: client)", clients_view)
+
+        local_update = data_store.split("func updateClient(_ client: Client)", 1)[1].split(
+            "func deleteClient", 1
+        )[0]
+        self.assertIn("updated.userId = existing.userId", local_update)
+        self.assertIn("updated.createdAt = existing.createdAt", local_update)
 
     def test_subscription_view_uses_authenticated_tier(self) -> None:
         settings = source("Views/Settings/SettingsView.swift")
