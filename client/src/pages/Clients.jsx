@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import i18n from '../i18n';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { loadClients, createClient, updateClient, deleteClient } from '../lib/data';
 import { INITIAL_CLIENT_FORM } from '../lib/constants';
@@ -125,7 +126,7 @@ export default function Clients({ jobs = [] }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <div><h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Clients")}</h2><p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{clients.length} total</p></div>
+        <div><h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Clients")}</h2><p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{tr("{{count}} total", { count: clients.length })}</p></div>
         <button onClick={openNew} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />{tr("Add Client")}</button>
       </div>
 
@@ -211,17 +212,17 @@ export default function Clients({ jobs = [] }) {
                   {meta?.nextJob && (
                     <div className="flex items-center gap-2.5 text-sm text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/20 rounded-lg p-2.5">
                       <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>{tr("Next:")} <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5) || '--:--'} — {meta.nextJob.title}</span>
+                      <span>{tr("Next:")} <strong>{new Date(meta.nextJob.scheduled_date + 'T12:00:00').toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</strong> at {meta.nextJob.scheduled_time?.slice(0, 5) || '--:--'} — {meta.nextJob.title}</span>
                     </div>
                   )}
                   {meta?.recentDone?.length > 0 && (
                     <div className="pt-1">
-                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Recent service ({meta.totalJobs} total jobs)</p>
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">{tr("Recent service ({{count}} total jobs)", { count: meta.totalJobs })}</p>
                       <div className="space-y-1">
                         {meta.recentDone.map(j => (
                           <div key={j.id} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-                            <span>{new Date(j.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                            <span>{new Date(j.scheduled_date + 'T12:00:00').toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })}</span>
                             <span className="text-gray-300 dark:text-gray-600">&middot;</span>
                             <span>{j.title}</span>
                           </div>
@@ -230,8 +231,8 @@ export default function Clients({ jobs = [] }) {
                     </div>
                   )}
                   <div className="flex flex-wrap gap-1.5">
-                    {client.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><Key className="w-3 h-3" />Key: {client.key_code}</span>}
-                    {client.alarm_code && <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1 text-[11px]"><AlarmCheck className="w-3 h-3" />Alarm: {client.alarm_code}</span>}
+                    {client.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><Key className="w-3 h-3" />{tr("Key")}: {client.key_code}</span>}
+                    {client.alarm_code && <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1 text-[11px]"><AlarmCheck className="w-3 h-3" />{tr("Alarm")}: {client.alarm_code}</span>}
                     {client.pet_instructions && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><PawPrint className="w-3 h-3" />{client.pet_instructions}</span>}
                   </div>
                   <div className="flex gap-2 pt-1">

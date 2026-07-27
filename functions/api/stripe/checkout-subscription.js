@@ -117,8 +117,6 @@ export async function onRequestPost(context) {
         cancel_url: `${appUrl}/#/pricing`,
         allow_promotion_codes: 'true',
         'payment_method_types[0]': 'card',
-        'payment_method_types[1]': 'apple_pay',
-        'payment_method_types[2]': 'google_pay',
       }).toString(),
     });
 

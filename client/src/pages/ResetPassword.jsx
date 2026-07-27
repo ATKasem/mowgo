@@ -163,7 +163,7 @@ export default function ResetPassword() {
             {loading ? (
               <><Loader2 className="w-4 h-4 animate-spin" />{tr("Setting Password...")}</>
             ) : (
-              'Set New Password'
+              tr('Set New Password')
             )}
           </button>
         </form>

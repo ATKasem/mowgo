@@ -168,7 +168,11 @@
     "delete": "Eliminar",
     "jane_email_com": "jane@email.com",
     "cancel": "Cancelar",
-    "delete_name_and_all_their_jobs_this_cannot_be_undone": "¿Quieres eliminar a {{name}} y todos sus trabajos? Esta acción no se puede deshacer."
+    "delete_name_and_all_their_jobs_this_cannot_be_undone": "¿Quieres eliminar a {{name}} y todos sus trabajos? Esta acción no se puede deshacer.",
+    "count_total": "{{count}} total",
+    "recent_service_count_total_jobs": "Servicio reciente ({{count}} trabajos en total)",
+    "key": "Llave",
+    "alarm": "Alarma"
   },
   "compare": {
     "rain_delay": "Reprogramación por lluvia",
@@ -609,7 +613,7 @@
     "passwords_do_not_match": "Las contraseñas no coinciden.",
     "password_must_be_at_least_6_characters": "La contraseña debe tener al menos 6 caracteres.",
     "connection_failed_please_check_your_internet_and_try_again": "Falló la conexión. Revisa tu internet e inténtalo de nuevo.",
-    "set_new_password": "Establecer nueva contraseña",
+    "set_new_password": "Establecer Nueva Contraseña",
     "mowgo": "MowGo",
     "password_updated": "Contraseña actualizada",
     "your_password_has_been_changed_successfully": "Tu contraseña se cambió correctamente.",
@@ -682,7 +686,8 @@
     "try_free": "Probar gratis",
     "no_worries": "No te preocupes",
     "you_can_always_try_the_free_plan_or_subscribe_when_you_re_ready": "Puedes probar el plan gratis o suscribirte cuando estés listo.",
-    "back_home": "Volver al inicio"
+    "back_home": "Volver al inicio",
+    "we_couldn_t_verify_your_payment_please_try_again": "No pudimos verificar su pago. Por favor, inténtelo de nuevo."
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Reportes de pérdida de datos",
@@ -783,6 +788,9 @@
     "failed_to_move_count_job_other": "No se pudieron mover {{count}} trabajos",
     "count_job_moved_to_tomorrow_one": "Se movió {{count}} trabajo a mañana",
     "count_job_moved_to_tomorrow_other": "Se movieron {{count}} trabajos a mañana",
-    "all": "Todos"
+    "all": "Todos",
+    "chance_of_rain_move": "probabilidad de lluvia — mover",
+    "remaining_to_tomorrow": "restantes para mañana",
+    "job_already_scheduled": "trabajo ya programado"
   }
 }

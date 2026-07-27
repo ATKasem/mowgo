@@ -148,8 +148,8 @@ export default function JobberPriceIncrease() {
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{desc}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{tr(title)}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{tr(desc)}</p>
                 </div>
               </div>
             ))}

@@ -168,7 +168,11 @@
     "delete": "Delete",
     "jane_email_com": "jane@email.com",
     "cancel": "Cancel",
-    "delete_name_and_all_their_jobs_this_cannot_be_undone": "Delete {{name}} and all their jobs? This cannot be undone."
+    "delete_name_and_all_their_jobs_this_cannot_be_undone": "Delete {{name}} and all their jobs? This cannot be undone.",
+    "count_total": "{{count}} total",
+    "recent_service_count_total_jobs": "Recent service ({{count}} total jobs)",
+    "key": "Key",
+    "alarm": "Alarm"
   },
   "compare": {
     "rain_delay": "Rain Delay",
@@ -682,7 +686,8 @@
     "try_free": "Try Free",
     "no_worries": "No worries",
     "you_can_always_try_the_free_plan_or_subscribe_when_you_re_ready": "You can always try the free plan or subscribe when you're ready.",
-    "back_home": "Back Home"
+    "back_home": "Back Home",
+    "we_couldn_t_verify_your_payment_please_try_again": "We couldn't verify your payment. Please try again."
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Data Loss Reports",
@@ -783,6 +788,9 @@
     "failed_to_move_count_job_other": "Failed to move {{count}} jobs",
     "count_job_moved_to_tomorrow_one": "{{count}} job moved to tomorrow",
     "count_job_moved_to_tomorrow_other": "{{count}} jobs moved to tomorrow",
-    "all": "All"
+    "all": "All",
+    "chance_of_rain_move": "chance of rain — move",
+    "remaining_to_tomorrow": "remaining to tomorrow",
+    "job_already_scheduled": "job already scheduled"
   }
 }

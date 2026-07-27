@@ -30,13 +30,9 @@ app.use('/api/', rateLimit({
   legacyHeaders: false,
 }));
 
-// Stripe endpoints: stricter limit
-app.use('/api/stripe/', rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-}));
-
-// Webhook needs raw body for Stripe signature verification — mount BEFORE json parser
+// Webhook needs raw body for Stripe signature verification — mount BEFORE rate limiter & json parser
+// Exempt from rate limiting: Stripe retries failed deliveries with exponential backoff;
+// a 429 causes Stripe to eventually disable the endpoint.
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
@@ -58,6 +54,12 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
   }
   res.json({ received: true });
 });
+
+// Stripe endpoints: stricter limit (webhook is exempt — mounted above)
+app.use('/api/stripe/', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+}));
 
 app.use(express.json());
 
@@ -320,12 +322,16 @@ app.post('/api/invoices', auth, async (req, res) => {
 
   // Send invoice via Resend — with HTML escaping to prevent injection
   if (client?.email) {
-    await resend.emails.send({
-      from: 'MowGo <invoices@mowgo.app>',
-      to: client.email,
-      subject: `Invoice from MowGo — $${amount}`,
-      html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice.id}">Pay online</a></p>`,
-    });
+    try {
+      await resend.emails.send({
+        from: 'MowGo <invoices@mowgo.app>',
+        to: client.email,
+        subject: `Invoice from MowGo — $${amount}`,
+        html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice.id}">Pay online</a></p>`,
+      });
+    } catch (emailErr) {
+      console.error('Failed to send invoice email:', emailErr.message);
+    }
   }
 
   res.json(invoice);
@@ -339,14 +345,18 @@ app.post('/api/invoices/send-email', auth, async (req, res) => {
   const { data: client } = await supabase.from('clients').select('email, name').eq('id', client_id).single();
   if (!client?.email) return res.json({ sent: false, reason: 'No email on file' });
 
-  await resend.emails.send({
-    from: 'MowGo <invoices@mowgo.app>',
-    to: client.email,
-    subject: `Invoice from MowGo — $${amount}`,
-    html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice_id}">Pay online</a></p>`,
-  });
-
-  res.json({ sent: true });
+  try {
+    await resend.emails.send({
+      from: 'MowGo <invoices@mowgo.app>',
+      to: client.email,
+      subject: `Invoice from MowGo — $${amount}`,
+      html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice_id}">Pay online</a></p>`,
+    });
+    res.json({ sent: true });
+  } catch (emailErr) {
+    console.error('Failed to send invoice email:', emailErr.message);
+    res.json({ sent: false, reason: 'Email delivery failed' });
+  }
 });
 
 // === STRIPE ===

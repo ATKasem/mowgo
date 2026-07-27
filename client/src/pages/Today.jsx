@@ -148,7 +148,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               });
             } else {
               const clientName = job.clients?.name || tr('Job');
-              setCompletedToast({ name: `${clientName} · ${recLabel} job already scheduled`, amount: job.clients?.rate || 0 });
+              setCompletedToast({ name: tr('{{client}} · {{label}} job already scheduled', { client: clientName, label: recLabel }), amount: job.clients?.rate || 0 });
             }
           } else {
             setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0 });
@@ -327,9 +327,9 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
           >
             <CloudRain className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="flex-1 text-left min-w-0">
-              <span className="font-semibold">{(todayRainChance() ?? 0)}%</span> chance of rain — move{' '}
+              <span className="font-semibold">{(todayRainChance() ?? 0)}%</span> {tr('chance of rain — move')}{' '}
               <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">
-                {filtered.filter(j => j.status !== 'done' && j.scheduled_date === date).length} remaining to tomorrow
+                {filtered.filter(j => j.status !== 'done' && j.scheduled_date === date).length} {tr('remaining to tomorrow')}
               </span>
             </span>
             <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{tr("Move All")}</span>

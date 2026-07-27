@@ -142,8 +142,8 @@ export default function Landing() {
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{desc}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{tr(title)}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{tr(desc)}</p>
                 </div>
               </div>
             </FadeIn>
@@ -160,8 +160,8 @@ export default function Landing() {
               <div className="card p-5 flex gap-3">
                 <Icon className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{title}</h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{desc}</p>
+                  <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{tr(title)}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{tr(desc)}</p>
                 </div>
               </div>
             </FadeIn>

@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import i18n from '../i18n';
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
@@ -181,7 +182,7 @@ export default function Home({ jobs = [], invoices = [] }) {
           {forecast.map((f, i) => {
             const FI = weatherIcons[f.code] || Sun;
             return (
-              <div key={i} className={`card flex-shrink-0 pt-4 pb-3 px-2.5 flex flex-col items-center gap-1.5 w-[76px] box-border ${f.day === new Date().toLocaleDateString('en-US', { weekday: 'short' }) ? 'border-2 border-emerald-400 dark:border-emerald-500' : ''}`}>
+              <div key={i} className={`card flex-shrink-0 pt-4 pb-3 px-2.5 flex flex-col items-center gap-1.5 w-[76px] box-border ${f.day === new Date().toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short' }) ? 'border-2 border-emerald-400 dark:border-emerald-500' : ''}`}>
                 <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{f.day}</span>
                 <FI className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                 <span className="text-xs font-bold text-gray-900 dark:text-white">{f.hi}°</span>

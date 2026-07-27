@@ -623,7 +623,7 @@ export async function executeTool(name, args) {
           data: {
             date: invoiceDate,
             invoiced: results.length,
-            total: results.reduce((sum, r) => sum + r.amount, 0),
+            total: results.reduce((sum, r) => sum + (r.amount || 0), 0),
             invoices: results
           }
         };
