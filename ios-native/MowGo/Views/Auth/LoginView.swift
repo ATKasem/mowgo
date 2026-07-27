@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var auth: AuthService
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var email = ""
     @State private var password = ""
@@ -17,27 +18,28 @@ struct LoginView: View {
     @FocusState private var focusedField: Field?
 
     private enum Field { case email, password }
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         ZStack {
-            Color(hex: "111827").ignoresSafeArea()
+            theme.background.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 24) {
                     // Logo
                     Image(systemName: "leaf.fill")
                         .font(.system(size: 56))
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                         .accessibilityHidden(true)
 
                     Text("MowGo")
                         .font(.largeTitle.weight(.bold))
                         .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textPrimary)
 
                     Text("Lawn Care Scheduling")
                         .font(.subheadline)
-                        .foregroundColor(Color(hex: "9ca3af"))
+                        .foregroundColor(theme.textMuted)
 
                     Spacer().frame(height: 16)
 
@@ -51,9 +53,9 @@ struct LoginView: View {
                             .focused($focusedField, equals: .email)
                             .onSubmit { focusedField = .password }
                             .padding()
-                            .background(Color(hex: "1f2937"))
+                            .background(theme.surface)
                             .cornerRadius(12)
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.textPrimary)
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
 
                         SecureField("Password", text: $password)
@@ -62,9 +64,9 @@ struct LoginView: View {
                             .focused($focusedField, equals: .password)
                             .onSubmit { submit() }
                             .padding()
-                            .background(Color(hex: "1f2937"))
+                            .background(theme.surface)
                             .cornerRadius(12)
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.textPrimary)
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                     }
 
@@ -81,15 +83,15 @@ struct LoginView: View {
                     Button(action: submit) {
                         HStack {
                             if auth.isLoading {
-                                ProgressView().tint(.white)
+                                ProgressView().tint(MowGoTheme.onAccent)
                             }
                             Text(isSignUp ? "Create Account" : "Sign In")
                                 .fontWeight(.semibold)
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(hex: "16a34a"))
-                        .foregroundColor(.white)
+                        .background(MowGoTheme.deepGreen)
+                        .foregroundColor(MowGoTheme.onAccent)
                         .cornerRadius(12)
                     }
                     .disabled(auth.isLoading || email.isEmpty || password.isEmpty)
@@ -101,7 +103,7 @@ struct LoginView: View {
                         auth.error = nil
                     }
                     .font(.footnote)
-                    .foregroundColor(Color(hex: "6b7280"))
+                    .foregroundColor(theme.textInverse)
 
                     // Demo
                     if auth.isDemoMode {
@@ -113,7 +115,7 @@ struct LoginView: View {
                         } label: {
                             Text("Continue with Demo")
                                 .font(.footnote)
-                                .foregroundColor(Color(hex: "16a34a"))
+                                .foregroundColor(MowGoTheme.deepGreen)
                         }
                         .padding(.top, 8)
                         .accessibilityHint("Enter demo mode without real account")

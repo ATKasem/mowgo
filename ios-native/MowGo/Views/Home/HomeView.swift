@@ -10,8 +10,11 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var auth: AuthService
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showNewJob = false
     @State private var showNewClient = false
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     private var scheduledCount: Int { store.jobs.filter { $0.status == .scheduled }.count }
     private var totalClients: Int { store.clients.count }
@@ -33,10 +36,10 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 if store.isLoading {
-                    ProgressView().tint(Color(hex: "16a34a"))
+                    ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
                     ScrollView {
                         VStack(spacing: 16) {
@@ -74,9 +77,9 @@ struct HomeView: View {
     private var greetingSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.subheadline).foregroundColor(Color(hex: "9ca3af"))
+                .font(.subheadline).foregroundColor(theme.textMuted)
             Text("Good \(greeting) 👋")
-                .font(.title2.weight(.bold)).foregroundColor(.white)
+                .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility3)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -98,26 +101,26 @@ struct HomeView: View {
 
     private var weeklyCalendar: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("This Week").font(.headline).foregroundColor(.white)
+            Text("This Week").font(.headline).foregroundColor(theme.textPrimary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(weekDays, id: \.self) { day in
                         VStack(spacing: 4) {
-                            Text(day.label).font(.caption2).foregroundColor(Color(hex: "9ca3af"))
+                            Text(day.label).font(.caption2).foregroundColor(theme.textMuted)
                             Text("\(day.day)").font(.callout.weight(.semibold))
-                                .foregroundColor(day.isToday ? .white : Color(hex: "d1d5db"))
+                                .foregroundColor(day.isToday ? MowGoTheme.onAccent : theme.textSecondary)
                             Circle()
-                                .fill(day.hasJobs ? Color(hex: "16a34a") : Color.clear)
+                                .fill(day.hasJobs ? MowGoTheme.deepGreen : Color.clear)
                                 .frame(width: 6, height: 6)
                         }
                         .frame(width: 44).padding(.vertical, 8)
-                        .background(day.isToday ? Color(hex: "16a34a").opacity(0.2) : Color(hex: "1f2937"))
+                        .background(day.isToday ? MowGoTheme.deepGreen.opacity(0.2) : theme.surface)
                         .cornerRadius(10)
                     }
                 }
             }
         }
-        .padding(16).background(Color(hex: "1f2937")).cornerRadius(16)
+        .padding(16).background(theme.surface).cornerRadius(16)
     }
 
     private var quickActions: some View {

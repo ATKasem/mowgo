@@ -39,7 +39,7 @@ struct MainTabView: View {
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
                 .tag(5)
         }
-        .tint(Color(hex: "16a34a"))
+        .tint(MowGoTheme.deepGreen)
         .sensoryFeedback(.selection, trigger: selectedTab)
     }
 }

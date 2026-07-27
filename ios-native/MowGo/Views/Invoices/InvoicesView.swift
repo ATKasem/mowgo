@@ -10,8 +10,11 @@ import SwiftUI
 
 struct InvoicesView: View {
     @EnvironmentObject var store: DataStore
+    @Environment(\.colorScheme) private var colorScheme
     @State private var selectedInvoice: Invoice?
     @State private var showPayment = false
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
@@ -21,10 +24,10 @@ struct InvoicesView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 if store.isLoading {
-                    ProgressView().tint(Color(hex: "16a34a"))
+                    ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
                     ScrollView {
                         VStack(spacing: 16) {
@@ -75,50 +78,53 @@ struct InvoicesView: View {
     private var totalBar: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Outstanding").font(.caption).foregroundColor(Color(hex: "9ca3af"))
+                Text("Outstanding").font(.caption).foregroundColor(theme.textMuted)
                 Text(totalUnpaid.formatted(.currency(code: "USD")))
-                    .font(.title2.weight(.bold)).foregroundColor(.white)
+                    .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
             }
             Spacer()
             Text("\(unpaid.count) invoice\(unpaid.count == 1 ? "" : "s")")
-                .font(.caption).foregroundColor(Color(hex: "6b7280"))
+                .font(.caption).foregroundColor(theme.textInverse)
         }
-        .padding().background(Color(hex: "1f2937")).cornerRadius(16)
+        .padding().background(theme.surface).cornerRadius(16)
     }
 
     private func sectionHeader(_ title: String) -> some View {
-        Text(title).font(.headline).foregroundColor(.white)
+        Text(title).font(.headline).foregroundColor(theme.textPrimary)
             .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
     }
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Image(systemName: "doc.text").font(.system(size: 40)).foregroundColor(Color(hex: "374151"))
-            Text("No invoices yet").font(.headline).foregroundColor(.white)
-            Text("Complete a job to create one").font(.subheadline).foregroundColor(Color(hex: "6b7280"))
+            Image(systemName: "doc.text").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
+            Text("No invoices yet").font(.headline).foregroundColor(theme.textPrimary)
+            Text("Complete a job to create one").font(.subheadline).foregroundColor(theme.textInverse)
         }
         .padding(.top, 60)
     }
 }
 
 struct InvoiceRow: View {
+    @Environment(\.colorScheme) private var colorScheme
     let invoice: Invoice
     var showPay: Bool
     var onPay: () -> Void
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(invoice.clientName ?? "Invoice")
-                    .font(.subheadline.weight(.medium)).foregroundColor(.white)
+                    .font(.subheadline.weight(.medium)).foregroundColor(theme.textPrimary)
                 if let date = invoice.createdAt {
                     Text(date.prefix(10).description)
-                        .font(.caption).foregroundColor(Color(hex: "9ca3af"))
+                        .font(.caption).foregroundColor(theme.textMuted)
                 }
             }
             Spacer()
             Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
-                .font(.subheadline.weight(.semibold)).foregroundColor(.white)
+                .font(.subheadline.weight(.semibold)).foregroundColor(theme.textPrimary)
 
             if showPay {
                 Button(action: {
@@ -131,14 +137,14 @@ struct InvoiceRow: View {
                         Text("Pay")
                             .font(.caption.weight(.medium))
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(MowGoTheme.onAccent)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color(hex: "16a34a"))
+                    .background(MowGoTheme.deepGreen)
                     .cornerRadius(8)
                 }
             }
         }
-        .padding(12).background(Color(hex: "1f2937")).cornerRadius(12)
+        .padding(12).background(theme.surface).cornerRadius(12)
     }
 }

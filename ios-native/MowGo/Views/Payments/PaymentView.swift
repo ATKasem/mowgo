@@ -11,6 +11,7 @@ import StripePaymentSheet
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var stripe = StripeService.shared
     @State private var showingCheckout = false
     @State private var checkoutURL: URL?
@@ -18,20 +19,22 @@ struct PaymentView: View {
 
     let invoice: Invoice
 
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+
     var body: some View {
         VStack(spacing: 16) {
             // Invoice summary
             VStack(spacing: 8) {
                 Text(invoice.clientName ?? "Invoice")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textPrimary)
                 Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
                     .font(.title.weight(.bold))
-                    .foregroundColor(Color(hex: "16a34a"))
+                    .foregroundColor(MowGoTheme.deepGreen)
                 if let date = invoice.createdAt {
                     Text(date.prefix(10).description)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "9ca3af"))
+                        .foregroundColor(theme.textMuted)
                 }
             }
             .padding()
@@ -42,7 +45,7 @@ struct PaymentView: View {
             } label: {
                 HStack {
                     if stripe.isLoading {
-                        ProgressView().tint(.white)
+                        ProgressView().tint(MowGoTheme.onAccent)
                     } else {
                         Image(systemName: "creditcard.fill")
                     }
@@ -51,8 +54,8 @@ struct PaymentView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(hex: "16a34a"))
-                .foregroundColor(.white)
+                .background(MowGoTheme.deepGreen)
+                .foregroundColor(MowGoTheme.onAccent)
                 .cornerRadius(12)
             }
             .disabled(stripe.isLoading)
@@ -132,6 +135,7 @@ struct PaymentView: View {
 // MARK: - Subscription Plan Card
 
 struct SubscriptionPlanCard: View {
+    @Environment(\.colorScheme) private var colorScheme
     let name: String
     let price: String
     let features: [String]
@@ -142,25 +146,27 @@ struct SubscriptionPlanCard: View {
     @State private var isPurchasing = false
     @State private var error: String?
 
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(name)
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textPrimary)
                     Text(price)
                         .font(.title3.weight(.bold))
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                 }
                 Spacer()
                 if isCurrent {
                     Text("Current")
                         .font(.caption.weight(.medium))
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(Color(hex: "16a34a").opacity(0.15))
+                        .background(MowGoTheme.deepGreen.opacity(MowGoTheme.accentOpacity))
                         .cornerRadius(8)
                 }
             }
@@ -169,10 +175,10 @@ struct SubscriptionPlanCard: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.caption)
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                     Text(feature)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "d1d5db"))
+                        .foregroundColor(theme.textSecondary)
                 }
             }
 
@@ -181,7 +187,7 @@ struct SubscriptionPlanCard: View {
                     Task { await subscribe() }
                 } label: {
                     if isPurchasing {
-                        ProgressView().tint(.white)
+                        ProgressView().tint(MowGoTheme.onAccent)
                     } else {
                         Text("Upgrade")
                             .fontWeight(.semibold)
@@ -189,8 +195,8 @@ struct SubscriptionPlanCard: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .background(Color(hex: "16a34a"))
-                .foregroundColor(.white)
+                .background(MowGoTheme.deepGreen)
+                .foregroundColor(MowGoTheme.onAccent)
                 .cornerRadius(10)
                 .disabled(isPurchasing)
             }
@@ -202,7 +208,7 @@ struct SubscriptionPlanCard: View {
             }
         }
         .padding(16)
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
         .cornerRadius(16)
     }
 

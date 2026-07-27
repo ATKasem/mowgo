@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct JobCardView: View {
+    @Environment(\.colorScheme) private var colorScheme
     let job: Job
     var teamMembers: [UserProfile] = []
     var onToggle: (() -> Void)?
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     private var assignedMember: UserProfile? {
         guard let assignedTo = job.assignedTo else { return nil }
@@ -35,8 +38,8 @@ struct JobCardView: View {
                     : "circle")
                     .font(.title3)
                     .foregroundColor(job.status == .done
-                        ? Color(hex: "16a34a")
-                        : Color(hex: "4b5563"))
+                        ? MowGoTheme.deepGreen
+                        : theme.textInverse)
                     .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
@@ -45,7 +48,7 @@ struct JobCardView: View {
                 HStack {
                     Text(job.title)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textPrimary)
                         .strikethrough(job.status == .done)
                         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
 
@@ -53,14 +56,14 @@ struct JobCardView: View {
                     if let rate = job.clientRate {
                         Text(rate.formatted(.currency(code: "USD")))
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(Color(hex: "16a34a"))
+                            .foregroundColor(MowGoTheme.deepGreen)
                     }
                 }
 
                 if let client = job.clientName {
                     Text(client)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "9ca3af"))
+                        .foregroundColor(theme.textMuted)
                 }
 
                 HStack(spacing: 4) {
@@ -88,11 +91,11 @@ struct JobCardView: View {
                     }
                 }
                 .font(.caption2)
-                .foregroundColor(Color(hex: "6b7280"))
+                .foregroundColor(theme.textInverse)
             }
         }
         .padding(12)
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
         .cornerRadius(12)
     }
 }

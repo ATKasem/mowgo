@@ -9,10 +9,14 @@ import SwiftUI
 struct MowGoApp: App {
     @StateObject private var auth = AuthService()
     @StateObject private var store = DataStore()
-    @AppStorage("isDarkMode") private var isDarkMode = true
+    @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
 
     private var authLoadState: String {
         "\(auth.isLoading)-\(auth.isAuthenticated)-\(auth.isDemoMode)"
+    }
+
+    private var appearancePreference: AppearancePreference {
+        AppearancePreference(rawValue: appearanceMode) ?? .system
     }
 
     var body: some Scene {
@@ -30,7 +34,7 @@ struct MowGoApp: App {
                         .environmentObject(store)
                 }
             }
-            .preferredColorScheme(isDarkMode ? .dark : .light)
+            .preferredColorScheme(appearancePreference.preferredColorScheme)
             .task(id: authLoadState) {
                 guard !auth.isLoading else { return }
                 if auth.isAuthenticated {
@@ -44,20 +48,23 @@ struct MowGoApp: App {
 }
 
 struct SplashView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var animate = false
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         ZStack {
-            Color(hex: "111827").ignoresSafeArea()
+            theme.background.ignoresSafeArea()
             VStack(spacing: 16) {
                 Image(systemName: "leaf.fill")
                     .font(.system(size: 48))
-                    .foregroundColor(Color(hex: "16a34a"))
+                    .foregroundColor(MowGoTheme.deepGreen)
                     .scaleEffect(animate ? 1 : 0.5)
                     .opacity(animate ? 1 : 0)
                 Text("MowGo")
                     .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textPrimary)
             }
         }
         .onAppear {

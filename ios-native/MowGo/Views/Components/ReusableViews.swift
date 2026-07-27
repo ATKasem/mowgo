@@ -10,10 +10,13 @@ import SwiftUI
 // MARK: - StatChip (TodayView stats bar)
 
 struct StatChip: View {
+    @Environment(\.colorScheme) private var colorScheme
     let label: String
     var count: Int? = nil
     var amount: Decimal? = nil
     let color: String
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack(spacing: 4) {
@@ -23,19 +26,19 @@ struct StatChip: View {
             if let amount {
                 Text(amount.formatted(.currency(code: "USD")))
                     .font(.caption.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textPrimary)
             } else {
                 Text("\(count ?? 0)")
                     .font(.caption.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textPrimary)
             }
             Text(label)
                 .font(.caption2)
-                .foregroundColor(Color(hex: "9ca3af"))
+                .foregroundColor(theme.textMuted)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
         .cornerRadius(8)
     }
 }
@@ -43,10 +46,13 @@ struct StatChip: View {
 // MARK: - StatCard (HomeView stats grid)
 
 struct StatCard: View {
+    @Environment(\.colorScheme) private var colorScheme
     let title: String
     let value: String
     let icon: String
     let color: String
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         VStack(spacing: 4) {
@@ -55,14 +61,14 @@ struct StatCard: View {
                 .foregroundColor(Color(hex: color))
             Text(value)
                 .font(.subheadline.weight(.bold))
-                .foregroundColor(.white)
+                .foregroundColor(theme.textPrimary)
             Text(title)
                 .font(.caption2)
-                .foregroundColor(Color(hex: "9ca3af"))
+                .foregroundColor(theme.textMuted)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
         .cornerRadius(12)
     }
 }
@@ -70,9 +76,12 @@ struct StatCard: View {
 // MARK: - QuickActionRow (HomeView quick actions)
 
 struct QuickActionRow: View {
+    @Environment(\.colorScheme) private var colorScheme
     let icon: String
     let label: String
     let color: String
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -82,14 +91,14 @@ struct QuickActionRow: View {
                 .frame(width: 24)
             Text(label)
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(.white)
+                .foregroundColor(theme.textPrimary)
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundColor(Color(hex: "6b7280"))
+                .foregroundColor(theme.textInverse)
         }
         .padding(12)
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
         .cornerRadius(12)
     }
 }
@@ -97,18 +106,21 @@ struct QuickActionRow: View {
 // MARK: - InfoRow (SettingsView)
 
 struct InfoRow: View {
+    @Environment(\.colorScheme) private var colorScheme
     let label: String
     let value: String
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack {
             Text(label)
                 .font(.subheadline)
-                .foregroundColor(Color(hex: "9ca3af"))
+                .foregroundColor(theme.textMuted)
             Spacer()
             Text(value)
                 .font(.subheadline)
-                .foregroundColor(.white)
+                .foregroundColor(theme.textPrimary)
         }
     }
 }

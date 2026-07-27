@@ -3,12 +3,30 @@
 //  MowGo
 //
 //  App-wide design system derived from the MowGo app icon.
-//  Replace Color(hex: "...") calls with these semantic constants.
+//  Neutral colors adapt to the active SwiftUI color scheme.
 //
 
 import SwiftUI
 
-enum MowGoTheme {
+struct MowGoTheme {
+    let background: Color
+    let surface: Color
+    let surfaceElevated: Color
+    let textPrimary: Color
+    let textSecondary: Color
+    let textMuted: Color
+    let textInverse: Color
+
+    init(_ colorScheme: ColorScheme) {
+        let isDark = colorScheme == .dark
+        background = Color(hex: isDark ? "111827" : "ffffff")
+        surface = Color(hex: isDark ? "1f2937" : "f3f4f6")
+        surfaceElevated = Color(hex: isDark ? "374151" : "e5e7eb")
+        textPrimary = Color(hex: isDark ? "ffffff" : "111827")
+        textSecondary = Color(hex: isDark ? "d1d5db" : "374151")
+        textMuted = Color(hex: isDark ? "9ca3af" : "6b7280")
+        textInverse = Color(hex: isDark ? "6b7280" : "9ca3af")
+    }
 
     // MARK: - Brand Colors (from app icon)
 
@@ -27,33 +45,40 @@ enum MowGoTheme {
     /// Light mode icon background.
     static let mintWhite = Color(hex: "f0fdf4")
 
-    // MARK: - Backgrounds
-
-    /// Main app background — matches dark mode icon.
-    static let background = Color(hex: "111827")        // Existing dark bg
-
-    /// Card / surface background.
-    static let surface = Color(hex: "1f2937")
-
-    /// Elevated surface (hover, sheets).
-    static let surfaceElevated = Color(hex: "374151")
-
-    // MARK: - Text
-
-    static let textPrimary = Color.white
-    static let textSecondary = Color(hex: "d1d5db")
-    static let textMuted = Color(hex: "9ca3af")
-    static let textInverse = Color(hex: "6b7280")
-
     // MARK: - Semantic
 
     static let success = Color(hex: "16a34a")
     static let warning = Color(hex: "f59e0b")
     static let danger = Color(hex: "ef4444")
     static let info = Color(hex: "3b82f6")
+    static let onAccent = Color.white
 
     // MARK: - Misc
 
     static let rainBlue = Color(hex: "1e3a5f")          // Rain delay button
     static let accentOpacity = 0.15                      // For background tints
+}
+
+enum AppearancePreference: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: Self { self }
+
+    var label: String {
+        switch self {
+        case .system: "System"
+        case .light: "Light"
+        case .dark: "Dark"
+        }
+    }
+
+    var preferredColorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
 }

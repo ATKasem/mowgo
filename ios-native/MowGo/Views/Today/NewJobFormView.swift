@@ -10,6 +10,7 @@ import SwiftUI
 struct NewJobFormView: View {
     @EnvironmentObject var store: DataStore
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     let date: String
     var teamMembers: [UserProfile] = []
@@ -22,10 +23,12 @@ struct NewJobFormView: View {
     @State private var isSaving = false
     @State private var error: String?
 
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
                 Form {
                     Section("Job Details") {
                         TextField("Title (e.g. Weekly Mow)", text: $title)
@@ -52,7 +55,7 @@ struct NewJobFormView: View {
                             }
                         }
                     }
-                    .listRowBackground(Color(hex: "1f2937"))
+                    .listRowBackground(theme.surface)
                 }
                 .scrollContentBackground(.hidden)
             }

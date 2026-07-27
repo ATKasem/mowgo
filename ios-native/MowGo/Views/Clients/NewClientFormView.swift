@@ -10,6 +10,7 @@ import SwiftUI
 struct NewClientFormView: View {
     @EnvironmentObject var store: DataStore
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @FocusState private var focusedField: Field?
 
     @State private var name = ""
@@ -25,11 +26,12 @@ struct NewClientFormView: View {
     @State private var error: String?
 
     private enum Field { case name, address, phone, email, rate, keyCode, alarmCode, pets, notes }
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
                 Form {
                     Section("Client Info") {
                         TextField("Name", text: $name)
@@ -59,7 +61,7 @@ struct NewClientFormView: View {
                             .submitLabel(.next)
                             .focused($focusedField, equals: .rate)
                     }
-                    .listRowBackground(Color(hex: "1f2937"))
+                    .listRowBackground(theme.surface)
 
                     Section("Access") {
                         TextField("Gate/Key Code", text: $keyCode)
@@ -77,14 +79,14 @@ struct NewClientFormView: View {
                             .focused($focusedField, equals: .pets)
                             .onSubmit { focusedField = .notes }
                     }
-                    .listRowBackground(Color(hex: "1f2937"))
+                    .listRowBackground(theme.surface)
 
                     Section("Notes") {
                         TextField("Service Notes", text: $cleaningNotes, axis: .vertical)
                             .lineLimit(3)
                             .focused($focusedField, equals: .notes)
                     }
-                    .listRowBackground(Color(hex: "1f2937"))
+                    .listRowBackground(theme.surface)
                 }
                 .scrollContentBackground(.hidden)
                 .scrollDismissesKeyboard(.interactively)

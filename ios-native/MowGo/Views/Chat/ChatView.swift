@@ -9,14 +9,17 @@ import SwiftUI
 
 struct ChatView: View {
     @EnvironmentObject var auth: AuthService
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var chat = ChatService.shared
     @State private var inputText = ""
     @FocusState private var isInputFocused: Bool
 
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     if chat.messages.isEmpty {
@@ -79,13 +82,13 @@ struct ChatView: View {
             Spacer()
             Image(systemName: "brain.head.profile.fill")
                 .font(.system(size: 48))
-                .foregroundColor(Color(hex: "16a34a"))
+                .foregroundColor(MowGoTheme.deepGreen)
             Text("MowGo AI")
                 .font(.title2.weight(.bold))
-                .foregroundColor(.white)
+                .foregroundColor(theme.textPrimary)
             Text("Ask me anything about your lawn care business —\nscheduling, pricing, routing, and more.")
                 .font(.subheadline)
-                .foregroundColor(Color(hex: "9ca3af"))
+                .foregroundColor(theme.textMuted)
                 .multilineTextAlignment(.center)
             suggestedPrompts
             Spacer()
@@ -102,10 +105,10 @@ struct ChatView: View {
                 } label: {
                     Text(prompt)
                         .font(.subheadline)
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
-                        .background(Color(hex: "1f2937"))
+                        .background(theme.surface)
                         .cornerRadius(20)
                 }
             }
@@ -123,15 +126,15 @@ struct ChatView: View {
 
     private var inputBar: some View {
         VStack(spacing: 0) {
-            Divider().background(Color(hex: "374151"))
+            Divider().background(theme.surfaceElevated)
             HStack(spacing: 12) {
                 TextField("Ask anything...", text: $inputText, axis: .vertical)
                     .lineLimit(1...4)
                     .padding(10)
-                    .background(Color(hex: "1f2937"))
+                    .background(theme.surface)
                     .cornerRadius(20)
-                    .foregroundColor(.white)
-                    .tint(Color(hex: "16a34a"))
+                    .foregroundColor(theme.textPrimary)
+                    .tint(MowGoTheme.deepGreen)
                     .focused($isInputFocused)
                     .onSubmit { sendMessage() }
 
@@ -140,14 +143,14 @@ struct ChatView: View {
                 } label: {
                     Image(systemName: inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "arrow.up.circle" : "arrow.up.circle.fill")
                         .font(.title2)
-                        .foregroundColor(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color(hex: "4b5563") : Color(hex: "16a34a"))
+                        .foregroundColor(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? theme.textInverse : MowGoTheme.deepGreen)
                 }
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || chat.isLoading)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
         }
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
     }
 
     private func sendMessage() {
@@ -162,9 +165,11 @@ struct ChatView: View {
 // MARK: - Message Bubble
 
 struct MessageBubble: View {
+    @Environment(\.colorScheme) private var colorScheme
     let message: ChatService.ChatMessage
 
     var isUser: Bool { message.role == .user }
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack {
@@ -173,14 +178,14 @@ struct MessageBubble: View {
             VStack(alignment: isUser ? .trailing : .leading, spacing: 4) {
                 Text(message.content)
                     .font(.subheadline)
-                    .foregroundColor(.white)
+                    .foregroundColor(isUser ? MowGoTheme.onAccent : theme.textPrimary)
                     .padding(12)
-                    .background(isUser ? Color(hex: "16a34a") : Color(hex: "1f2937"))
+                    .background(isUser ? MowGoTheme.deepGreen : theme.surface)
                     .cornerRadius(16)
 
                 Text(message.timestamp, style: .time)
                     .font(.caption2)
-                    .foregroundColor(Color(hex: "6b7280"))
+                    .foregroundColor(theme.textInverse)
                     .padding(.horizontal, 4)
             }
 
@@ -192,14 +197,17 @@ struct MessageBubble: View {
 // MARK: - Typing Indicator
 
 struct TypingIndicator: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var animate = false
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack {
             HStack(spacing: 4) {
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
-                        .fill(Color(hex: "6b7280"))
+                        .fill(theme.textInverse)
                         .frame(width: 6, height: 6)
                         .offset(y: animate ? -4 : 4)
                         .animation(
@@ -211,7 +219,7 @@ struct TypingIndicator: View {
                 }
             }
             .padding(12)
-            .background(Color(hex: "1f2937"))
+            .background(theme.surface)
             .cornerRadius(16)
             Spacer()
         }

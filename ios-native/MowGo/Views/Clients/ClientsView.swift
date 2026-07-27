@@ -9,9 +9,12 @@ import SwiftUI
 
 struct ClientsView: View {
     @EnvironmentObject var store: DataStore
+    @Environment(\.colorScheme) private var colorScheme
     @State private var expandedId: UUID?
     @State private var searchText = ""
     @State private var showNewClient = false
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     private var filtered: [Client] {
         if searchText.isEmpty { return store.clients }
@@ -21,10 +24,10 @@ struct ClientsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 if store.isLoading {
-                    ProgressView().tint(Color(hex: "16a34a"))
+                    ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 8) {
@@ -53,7 +56,7 @@ struct ClientsView: View {
                         showNewClient = true
                     } label: {
                         Image(systemName: "plus")
-                            .foregroundColor(Color(hex: "16a34a"))
+                            .foregroundColor(MowGoTheme.deepGreen)
                     }
                 }
             }
@@ -65,9 +68,12 @@ struct ClientsView: View {
 }
 
 struct ClientCard: View {
+    @Environment(\.colorScheme) private var colorScheme
     let client: Client
     let isExpanded: Bool
     let onTap: () -> Void
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -79,21 +85,21 @@ struct ClientCard: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(client.name)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(theme.textPrimary)
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                         if let address = client.address {
                             Text(address).font(.caption)
-                                .foregroundColor(Color(hex: "9ca3af")).lineLimit(1)
+                                .foregroundColor(theme.textMuted).lineLimit(1)
                         }
                     }
                     Spacer()
                     HStack(spacing: 8) {
                         if client.rate > 0 {
                             Text(client.rate.formatted(.currency(code: "USD")))
-                                .font(.caption.weight(.medium)).foregroundColor(Color(hex: "16a34a"))
+                                .font(.caption.weight(.medium)).foregroundColor(MowGoTheme.deepGreen)
                         }
                         Image(systemName: "chevron.right").font(.caption)
-                            .foregroundColor(Color(hex: "6b7280"))
+                            .foregroundColor(theme.textInverse)
                             .rotationEffect(.degrees(isExpanded ? 90 : 0))
                     }
                 }
@@ -133,7 +139,7 @@ struct ClientCard: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .background(Color(hex: "1f2937")).cornerRadius(12)
+        .background(theme.surface).cornerRadius(12)
     }
 
     private func openMaps(_ address: String) {
@@ -155,18 +161,21 @@ struct ClientCard: View {
 }
 
 struct DetailRow: View {
+    @Environment(\.colorScheme) private var colorScheme
     let icon: String
     let text: String
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.caption)
-                .foregroundColor(Color(hex: "6b7280"))
+                .foregroundColor(theme.textInverse)
                 .frame(width: 16)
             Text(text)
                 .font(.caption)
-                .foregroundColor(Color(hex: "d1d5db"))
+                .foregroundColor(theme.textSecondary)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         }
     }

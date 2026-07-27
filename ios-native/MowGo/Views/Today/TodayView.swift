@@ -10,6 +10,7 @@ import SwiftUI
 struct TodayView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var auth: AuthService
+    @Environment(\.colorScheme) private var colorScheme
 
     static func todayString() -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
@@ -21,6 +22,8 @@ struct TodayView: View {
     @State private var selectedDate = Date()
     @State private var operationError: String?
     @State private var selectedCrewFilter: UUID? = nil
+
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
     private static let dateFmt: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
@@ -45,10 +48,10 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 if store.isLoading {
-                    ProgressView().tint(Color(hex: "16a34a"))
+                    ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
                     ScrollView {
                         VStack(spacing: 0) {
@@ -97,7 +100,7 @@ struct TodayView: View {
                         showingAddJob = true
                     } label: {
                         Image(systemName: "plus")
-                            .foregroundColor(Color(hex: "16a34a"))
+                            .foregroundColor(MowGoTheme.deepGreen)
                     }
                 }
             }
@@ -133,19 +136,19 @@ struct TodayView: View {
     private var dateHeader: some View {
         VStack(spacing: 4) {
             Text(selectedDate.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.title3.weight(.semibold)).foregroundColor(.white)
+                .font(.title3.weight(.semibold)).foregroundColor(theme.textPrimary)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
             HStack(spacing: 16) {
                 Button { shiftDate(-1) } label: {
-                    Image(systemName: "chevron.left").foregroundColor(Color(hex: "9ca3af"))
+                    Image(systemName: "chevron.left").foregroundColor(theme.textMuted)
                 }
                 Button("Today") { selectedDate = Date() }
                     .font(.caption.weight(.medium))
                     .padding(.horizontal, 12).padding(.vertical, 4)
-                    .background(isToday ? Color(hex: "16a34a") : Color(hex: "374151"))
-                    .foregroundColor(.white).cornerRadius(8)
+                    .background(isToday ? MowGoTheme.deepGreen : theme.surfaceElevated)
+                    .foregroundColor(isToday ? MowGoTheme.onAccent : theme.textPrimary).cornerRadius(8)
                 Button { shiftDate(1) } label: {
-                    Image(systemName: "chevron.right").foregroundColor(Color(hex: "9ca3af"))
+                    Image(systemName: "chevron.right").foregroundColor(theme.textMuted)
                 }
             }
         }
@@ -168,7 +171,7 @@ struct TodayView: View {
                 Text("Rain Delay").fontWeight(.medium)
             }
             .frame(maxWidth: .infinity).padding(12)
-            .background(Color(hex: "1e3a5f")).foregroundColor(.white).cornerRadius(12)
+            .background(MowGoTheme.rainBlue).foregroundColor(MowGoTheme.onAccent).cornerRadius(12)
         }
         .padding(.horizontal, 16).padding(.bottom, 12)
         .disabled(scheduledCount == 0).opacity(scheduledCount == 0 ? 0.5 : 1)
@@ -208,9 +211,9 @@ struct TodayView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Image(systemName: "leaf").font(.system(size: 40)).foregroundColor(Color(hex: "374151"))
-            Text("No jobs scheduled").font(.headline).foregroundColor(.white)
-            Text("Tap + to add your first job").font(.subheadline).foregroundColor(Color(hex: "6b7280"))
+            Image(systemName: "leaf").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
+            Text("No jobs scheduled").font(.headline).foregroundColor(theme.textPrimary)
+            Text("Tap + to add your first job").font(.subheadline).foregroundColor(theme.textInverse)
         }
         .padding(.top, 60)
     }
@@ -227,19 +230,22 @@ struct TodayView: View {
 // MARK: - Crew Filter Chip
 
 struct CrewFilterChip: View {
+    @Environment(\.colorScheme) private var colorScheme
     let label: String
     let isSelected: Bool
     let color: String
     let action: () -> Void
 
+    private var theme: MowGoTheme { MowGoTheme(colorScheme) }
+
     var body: some View {
         Button(action: action) {
             Text(label)
                 .font(.caption.weight(.medium))
-                .foregroundColor(isSelected ? .white : Color(hex: "9ca3af"))
+                .foregroundColor(isSelected ? MowGoTheme.onAccent : theme.textMuted)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isSelected ? Color(hex: color) : Color(hex: "374151"))
+                .background(isSelected ? Color(hex: color) : theme.surfaceElevated)
                 .cornerRadius(16)
         }
         .buttonStyle(.plain)
