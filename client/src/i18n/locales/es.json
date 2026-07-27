@@ -776,6 +776,13 @@
     "count_done_one": "{{count}} completado",
     "count_done_other": "{{count}} completados",
     "failed_to_create_job_try_again": "No se pudo crear el trabajo. Inténtalo de nuevo.",
+    "job": "Trabajo",
+    "client_next_recurrence_job_created": "{{client}} · Se creó el próximo trabajo {{recurrence}}",
+    "client_failed_to_create_recurring_job": "{{client}} · No se pudo crear el trabajo recurrente",
+    "failed_to_move_count_job_one": "No se pudo mover {{count}} trabajo",
+    "failed_to_move_count_job_other": "No se pudieron mover {{count}} trabajos",
+    "count_job_moved_to_tomorrow_one": "Se movió {{count}} trabajo a mañana",
+    "count_job_moved_to_tomorrow_other": "Se movieron {{count}} trabajos a mañana",
     "all": "Todos"
   }
 }

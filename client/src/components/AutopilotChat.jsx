@@ -287,7 +287,7 @@ function ToolCallMessage({ msg, messages, index }) {
               <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2.5 text-xs">
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="font-medium text-violet-700 dark:text-violet-400">
-                    {tc.function.name}
+                    {formatToolCallLabel(tc.function.name, args, tr)}
                   </span>
                   {resultData?.success ? (
                     <Check className="w-3 h-3 text-emerald-500" />
@@ -295,16 +295,6 @@ function ToolCallMessage({ msg, messages, index }) {
                     <X className="w-3 h-3 text-red-500" />
                   ) : null}
                 </div>
-                {args && Object.keys(args).length > 0 && (
-                  <div className="text-gray-500 dark:text-gray-400 mb-1">
-                    {Object.entries(args).map(([k, v]) => (
-                      <span key={k} className="inline-block mr-2">
-                        <span className="font-medium text-gray-600 dark:text-gray-300">{k}:</span>{' '}
-                        {Array.isArray(v) ? tr('[{{count}} items]', { count: v.length }) : String(v).slice(0, 50)}
-                      </span>
-                    ))}
-                  </div>
-                )}
                 {resultData?.data?.message && (
                   <p className={`${resultData.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                     {resultData.data.message}

@@ -135,26 +135,26 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                 assigned_to: job.assigned_to || null,
               }).then(nextJob => {
                 if (nextJob) setJobs(p => [...p, nextJob]);
-                const clientName = job.clients?.name || 'Job';
-                setCompletedToast({ name: `${clientName} · Next ${recLabel} job created`, amount: job.clients?.rate || 0, type: 'recurring' });
+                const clientName = job.clients?.name || tr('Job');
+                setCompletedToast({ name: tr('{{client}} · Next {{recurrence}} job created', { client: clientName, recurrence: tr(recLabel) }), amount: job.clients?.rate || 0, type: 'recurring' });
                 if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
                 toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
               }).catch(err => {
                 console.error('failed to create recurring job:', err);
-                const clientName = job.clients?.name || 'Job';
-                setCompletedToast({ name: `${clientName} · Failed to create recurring job`, amount: 0, type: 'error' });
+                const clientName = job.clients?.name || tr('Job');
+                setCompletedToast({ name: tr('{{client}} · Failed to create recurring job', { client: clientName }), amount: 0, type: 'error' });
                 if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
                 toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
               });
             } else {
-              const clientName = job.clients?.name || 'Job';
+              const clientName = job.clients?.name || tr('Job');
               setCompletedToast({ name: `${clientName} · ${recLabel} job already scheduled`, amount: job.clients?.rate || 0 });
             }
           } else {
-            setCompletedToast({ name: job.clients?.name || 'Job', amount: job.clients?.rate || 0 });
+            setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0 });
           }
         } else if (job.status !== 'done') {
-          setCompletedToast({ name: job.clients?.name || 'Job', amount: job.clients?.rate || 0 });
+          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0 });
         }
         const toastTimeout = setTimeout(() => setCompletedToast(null), 4000);
         toggleTimeoutRef.current = toastTimeout;
@@ -315,9 +315,9 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                         ? { ...j, scheduled_date: date }
                         : j
                     ));
-                    setCompletedToast({ name: `Failed to move ${failed.length} job${failed.length > 1 ? 's' : ''}`, amount: 0, type: 'rain' });
+                    setCompletedToast({ name: tr('Failed to move {{count}} job', { count: failed.length }), amount: 0, type: 'rain' });
                   } else {
-                    setCompletedToast({ name: `${toMove.length} jobs moved to tomorrow`, amount: 0, type: 'rain' });
+                    setCompletedToast({ name: tr('{{count}} job moved to tomorrow', { count: toMove.length }), amount: 0, type: 'rain' });
                   }
                   if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
                   toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
