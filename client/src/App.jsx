@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Privacy from './pages/Privacy';
 import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import Today from './pages/Today';
 import Clients from './pages/Clients';
@@ -128,10 +129,10 @@ function SupabaseErrorRedirect() {
       return;
     }
 
-    // Handle recovery hashes (access_token + type=recovery) — route to login
+    // Handle recovery hashes (access_token + type=recovery) — route to reset password page
     if (hasValidParams && params.get('type') === 'recovery' && params.has('access_token')) {
-      window.history.replaceState({}, '', window.location.pathname + '#/login&' + hashStr);
-      navigate('/login', { replace: true });
+      window.history.replaceState({}, '', window.location.pathname + '#/reset-password&' + hashStr);
+      navigate('/reset-password', { replace: true });
       return;
     }
   }, [navigate]);
@@ -173,6 +174,7 @@ export default function App() {
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/switch-from-lawnpro" element={<SwitchingFromLawnPro />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected */}
           <Route element={
