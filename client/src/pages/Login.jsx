@@ -163,7 +163,7 @@ export default function Login() {
               </div>
             )}
 
-            {/* Email — hidden in forgot mode? No, always show except in specific modes */}
+            {/* Email field */}
             <div>
               <label className="label">Email</label>
               <div className="relative">

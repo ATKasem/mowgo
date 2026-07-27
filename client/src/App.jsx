@@ -17,6 +17,7 @@ import Subscribe from './pages/Subscribe';
 import Compare from './pages/Compare';
 import SwitchingFromLawnPro from './pages/SwitchingFromLawnPro';
 import JobberPriceIncrease from './pages/JobberPriceIncrease';
+import QuoteIQAlternative from './pages/QuoteIQAlternative';
 import AutopilotChat from './components/AutopilotChat';
 
 // ===== Auth Context =====
@@ -112,8 +113,8 @@ function SupabaseErrorRedirect() {
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
-    // Already on /login — let Login.jsx handle it
-    if (hash.startsWith('#/login')) return;
+    // Already on /login or /reset-password — let the page component handle it
+    if (hash.startsWith('#/login') || hash.startsWith('#/reset-password')) return;
 
     const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
 
@@ -173,6 +174,7 @@ export default function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/switch-from-lawnpro" element={<SwitchingFromLawnPro />} />
+          <Route path="/quoteiq-alternative" element={<QuoteIQAlternative />} />
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 

@@ -10,9 +10,23 @@ export default function ResetPassword() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [checking, setChecking] = useState(true);
 
-  // Supabase auto-processes the recovery token via onAuthStateChange
-  // We just need to show the form — the session is already set
+  // Verify a recovery session exists before showing the form.
+  // Supabase auto-processes the recovery token via onAuthStateChange,
+  // which sets the session before this component renders.
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return;
+      if (!session) {
+        navigate('/login', { replace: true });
+        return;
+      }
+      setChecking(false);
+    });
+    return () => { cancelled = true; };
+  }, [navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -30,15 +44,26 @@ export default function ResetPassword() {
       return;
     }
 
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-    if (updateError) {
-      setError(updateError.message);
-      setLoading(false);
-      return;
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password });
+      if (updateError) {
+        setError(updateError.message);
+        setLoading(false);
+        return;
+      }
+      setDone(true);
+    } catch {
+      setError('Connection failed. Please check your internet and try again.');
     }
-
-    setDone(true);
     setLoading(false);
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
+      </div>
+    );
   }
 
   if (done) {
