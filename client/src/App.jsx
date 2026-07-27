@@ -113,7 +113,7 @@ class ErrorBoundary extends React.Component {
 // a friendly error message instead of a blank page.
 function SupabaseErrorRedirect() {
   const navigate = useNavigate();
-  const VALID_HASH_PARAMS = new Set(['error', 'error_code', 'error_description', 'type', 'access_token']);
+  const VALID_HASH_PARAMS = new Set(['error', 'error_code', 'error_description', 'type', 'access_token', 'expires_at', 'expires_in', 'refresh_token', 'token_type', 'sb']);
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
