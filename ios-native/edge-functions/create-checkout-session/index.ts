@@ -94,14 +94,36 @@ serve(async (req) => {
           "metadata[supabase_user_id]": user.id,
         }).toString(),
       });
+      if (!custResp.ok) {
+        const err = await custResp.text();
+        console.error("Stripe customer creation failed:", err);
+        return new Response(
+          JSON.stringify({ error: "Could not create customer" }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
       const customer = await custResp.json();
       customerId = customer.id;
 
       // Save the customer ID to the profile
-      await supabase
+      const { error: customerSaveError } = await supabase
         .from("profiles")
         .update({ stripe_customer_id: customerId })
         .eq("id", user.id);
+      if (customerSaveError) {
+        console.error("Failed to save Stripe customer ID:", customerSaveError);
+        return new Response(
+          JSON.stringify({ error: "Could not save customer" }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     // Create Checkout Session
@@ -118,8 +140,8 @@ serve(async (req) => {
           mode: "subscription",
           "line_items[0][price]": priceId,
           "line_items[0][quantity]": "1",
-          success_url: "https://mowflow.app/settings?upgraded=true",
-          cancel_url: "https://mowflow.app/settings",
+          success_url: "https://mowgo.app/settings?upgraded=true",
+          cancel_url: "https://mowgo.app/settings",
           "subscription_data[metadata][user_id]": user.id,
           "subscription_data[metadata][tier]": tier,
         }).toString(),

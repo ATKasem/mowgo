@@ -2,19 +2,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "MowFlow",
+    name: "MowGo",
     platforms: [.iOS(.v17)],
     dependencies: [
         .package(url: "https://github.com/stripe/stripe-ios.git", from: "23.0.0"),
     ],
     targets: [
         .target(
-            name: "MowFlow",
+            name: "MowGo",
             dependencies: [
                 .product(name: "StripePayments", package: "stripe-ios"),
                 .product(name: "StripePaymentSheet", package: "stripe-ios"),
             ],
-            path: "MowFlow",
+            path: "MowGo",
             resources: [
                 .process("Assets.xcassets"),
             ]

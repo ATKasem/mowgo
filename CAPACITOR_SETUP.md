@@ -1,4 +1,4 @@
-# MowFlow — Capacitor Native App Setup
+# MowGo — Capacitor Native App Setup
 
 ## Prerequisites (on your Mac)
 - Xcode 16+ (App Store)
@@ -8,7 +8,7 @@
 ## One-Time Setup
 
 ```bash
-cd /path/to/mowflow/client
+cd /path/to/mowgo/client
 
 # Install deps
 npm install
@@ -45,6 +45,6 @@ All required sizes are in `public/icon-*.png`. Xcode picks them up automatically
 - `APP_STORE.md` — App Store metadata, description, keywords
 
 ## Notes
-- Live URL: https://mowflow.pages.dev
-- Privacy policy: https://mowflow.pages.dev/privacy
+- Live URL: https://mowgo.pages.dev
+- Privacy policy: https://mowgo.pages.dev/privacy
 - Capacitor wraps the same code into a native iOS app — same features, native feel

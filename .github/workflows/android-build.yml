@@ -57,5 +57,5 @@ jobs:
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mowflow-release-aab
+          name: mowgo-release-aab
           path: client/android/app/build/outputs/bundle/release/app-release.aab

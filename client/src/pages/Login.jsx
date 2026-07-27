@@ -148,7 +148,7 @@ export default function Login() {
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-3">
             <Sprout className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">MowFlow</h1>
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">MowGo</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Simple scheduling for lawn care crews</p>
         </div>
 
@@ -163,7 +163,7 @@ export default function Login() {
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your password has been changed successfully.</p>
             </div>
             <button onClick={() => navigate('/app')} className="btn-primary w-full gap-2 text-sm py-2.5">
-              <ArrowRight className="w-4 h-4" />Continue to MowFlow
+              <ArrowRight className="w-4 h-4" />Continue to MowGo
             </button>
           </div>
         ) : confirmSent ? (

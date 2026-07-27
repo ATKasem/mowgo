@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
 
-const THEME_KEY = 'mowflow-theme';
+const THEME_KEY = 'mowgo-theme';
 
 export function getStoredTheme() {
   return localStorage.getItem(THEME_KEY) || 'system';

@@ -1,4 +1,4 @@
-# MowFlow iOS Crew Features — Security & Code Quality Review
+# MowGo iOS Crew Features — Security & Code Quality Review
 
 **Review Date:** July 26, 2026  
 **Scope:** Crew feature implementation in iOS native app  

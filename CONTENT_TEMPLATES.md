@@ -1,4 +1,4 @@
-# MowFlow Content Templates
+# MowGo Content Templates
 **Last updated:** 2026-07-23
 
 ---
@@ -25,7 +25,7 @@ I'm a dev, so I built her something. Spent 4 weeks on it. Here's what I learned:
 - Built a fancy dashboard. She just wants "who's next and did they pay."
 - Assumed she'd use Stripe. Half her clients pay cash.
 
-**The app:** MowFlow — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, $49/mo for unlimited.
+**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, $49/mo for unlimited.
 
 **What I want to know from you:** If you run a service business, what's your current scheduling system? What would it take for you to switch?
 
@@ -57,7 +57,7 @@ If you run a service business — what do you use for scheduling? What do you ha
 
 **Body:**
 
-I'm a solo dev building MowFlow — a scheduling + invoicing app specifically for 1-3 person lawn care crews. Not trying to be Jobber. Just the basics.
+I'm a solo dev building MowGo — a scheduling + invoicing app specifically for 1-3 person lawn care crews. Not trying to be Jobber. Just the basics.
 
 Before I build more features, I want to hear from actual cleaners:
 
@@ -73,11 +73,11 @@ Brutal honesty appreciated. If this is a dumb idea, tell me.
 ```
 **For threads asking "Jobber vs X":**
 
-I actually built MowFlow specifically because Jobber was too expensive for small crews. 
+I actually built MowGo specifically because Jobber was too expensive for small crews.
 
 Quick comparison for a 2-person team:
 - **Jobber Core ($39/mo):** Scheduling + invoicing only. No reminders, no GPS, no route optimization. Real plan you need is $119/mo.
-- **MowFlow Solo ($49/mo):** Scheduling + routing + invoicing + automated reminders. No per-user fees.
+- **MowGo Solo ($49/mo):** Scheduling + routing + invoicing + automated reminders. No per-user fees.
 
 Jobber is great for 5+ person operations with an office manager. For a solo landscaper or 2-person crew, it's overkill and overpriced.
 
@@ -96,7 +96,7 @@ Hi [Name],
 
 I found [Business Name] while researching lawn care businesses in [City]. 
 
-I'm a local dev who built MowFlow — a dead-simple scheduling app for small lawn care crews. My neighbor runs a 2-person lawn care business and was losing ~$400/month to missed appointments and late payments.
+I'm a local dev who built MowGo — a dead-simple scheduling app for small lawn care crews. My neighbor runs a 2-person lawn care business and was losing ~$400/month to missed appointments and late payments.
 
 Quick question: What do you currently use to schedule your cleanings and handle invoicing?
 
@@ -112,7 +112,7 @@ Subject: Your post about scheduling in [Group Name]
 
 Hi [Name],
 
-Saw your comment in [Group Name] about [pain point they mentioned]. That exact problem is why I built MowFlow.
+Saw your comment in [Group Name] about [pain point they mentioned]. That exact problem is why I built MowGo.
 
 It's a simple scheduling + invoicing app for small lawn care crews:
 - Free tier (10 clients, no credit card)
@@ -146,7 +146,7 @@ Aaron
 
 ### Build Updates
 ```
-Just shipped one-button reschedule for MowFlow. 
+Just shipped one-button reschedule for MowGo.
 
 Rain day? Sick day? Double-booked? 
 
@@ -176,7 +176,7 @@ Ship that. Ship nothing else.
 ```
 My neighbor runs a 2-person lawn care crew. 
 
-Showed her MowFlow yesterday. She created her schedule, routed tomorrow's jobs, and invoiced a client — all from her phone in 3 minutes.
+Showed her MowGo yesterday. She created her schedule, routed tomorrow's jobs, and invoiced a client — all from her phone in 3 minutes.
 
 "That was faster than finding my notebook."
 
@@ -200,7 +200,7 @@ DM me. I want 10 beta users who'll tell me what sucks about it.
 ```
 # Your cleaning schedule, not your notebook.
 
-Stop losing $400/month to missed appointments and late payments. MowFlow handles scheduling, routing, and invoicing — built for 1-3 person lawn care crews.
+Stop losing $400/month to missed appointments and late payments. MowGo handles scheduling, routing, and invoicing — built for 1-3 person lawn care crews.
 
 [Start Free — 10 Clients, No Card]
 ```
@@ -239,9 +239,9 @@ There's a better way.
 
 ### Comparison
 ```
-## MowFlow vs Jobber for a 2-person crew
+## MowGo vs Jobber for a 2-person crew
 
-| Feature | Jobber | MowFlow |
+| Feature | Jobber | MowGo |
 |---------|--------|-----------|
 | Scheduling | ✅ ($39/mo) | ✅ (Free) |
 | Route optimization | ❌ (needs $119) | ✅ ($49/mo) |

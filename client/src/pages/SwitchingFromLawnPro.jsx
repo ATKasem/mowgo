@@ -11,22 +11,22 @@ const painPoints = [
 
 const solutions = [
   { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One tap moves your entire schedule forward when it rains. Clients get notified automatically. Included on every plan — even free.', color: 'from-emerald-500 to-green-500' },
-  { icon: Wifi, title: 'Offline Mode', desc: 'MowFlow works without internet. Rural areas, bad signal, doesn\'t matter. Your data syncs when you\'re back online.', color: 'from-teal-500 to-cyan-500' },
+  { icon: Wifi, title: 'Offline Mode', desc: 'MowGo works without internet. Rural areas, bad signal, doesn\'t matter. Your data syncs when you\'re back online.', color: 'from-teal-500 to-cyan-500' },
   { icon: Shield, title: '$39 Flat Pricing', desc: 'Solo plan: $39/mo. That\'s it. No per-user fees, no hidden charges, no "gotcha" upsells. Unlimited clients and jobs.', color: 'from-amber-500 to-orange-500' },
   { icon: Sprout, title: 'Your Data Is Yours', desc: 'We don\'t sell your customer data to advertisers. You are the customer, not the product. Full data export whenever you want.', color: 'from-violet-500 to-purple-500' },
 ];
 
 const comparisons = [
-  { feature: 'Rain delay auto-reschedule', mowflow: true, lawnpro: false },
-  { feature: 'Offline mode', mowflow: true, lawnpro: false },
-  { feature: 'Unlimited clients on Solo', mowflow: true, lawnpro: false },
-  { feature: 'Client notes & gate codes', mowflow: true, lawnpro: true },
-  { feature: 'Invoice tracking', mowflow: true, lawnpro: true },
-  { feature: 'Daily route planning', mowflow: true, lawnpro: true },
-  { feature: 'Data export anytime', mowflow: true, lawnpro: false },
-  { feature: 'No data selling', mowflow: true, lawnpro: 'unclear' },
-  { feature: 'Dark mode built-in', mowflow: true, lawnpro: false },
-  { feature: 'PWA install to home screen', mowflow: true, lawnpro: false },
+  { feature: 'Rain delay auto-reschedule', mowgo: true, lawnpro: false },
+  { feature: 'Offline mode', mowgo: true, lawnpro: false },
+  { feature: 'Unlimited clients on Solo', mowgo: true, lawnpro: false },
+  { feature: 'Client notes & gate codes', mowgo: true, lawnpro: true },
+  { feature: 'Invoice tracking', mowgo: true, lawnpro: true },
+  { feature: 'Daily route planning', mowgo: true, lawnpro: true },
+  { feature: 'Data export anytime', mowgo: true, lawnpro: false },
+  { feature: 'No data selling', mowgo: true, lawnpro: 'unclear' },
+  { feature: 'Dark mode built-in', mowgo: true, lawnpro: false },
+  { feature: 'PWA install to home screen', mowgo: true, lawnpro: false },
 ];
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -52,7 +52,7 @@ export default function SwitchingFromLawnPro() {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" />
             </div>
-            MowFlow
+            MowGo
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -81,12 +81,12 @@ export default function SwitchingFromLawnPro() {
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
               Ditching LawnPro?<br />
-              <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Welcome to MowFlow</span>
+              <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Welcome to MowGo</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              You trusted LawnPro with your business. If that trust has been shaken by lost data, broken sync, or surprise price hikes — you're not alone. MowFlow was built for operators who are tired of that.
+              You trusted LawnPro with your business. If that trust has been shaken by lost data, broken sync, or surprise price hikes — you're not alone. MowGo was built for operators who are tired of that.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -137,7 +137,7 @@ export default function SwitchingFromLawnPro() {
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">
-              What MowFlow <span className="text-emerald-500">does differently</span>
+              What MowGo <span className="text-emerald-500">does differently</span>
             </h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">
               Every feature was designed by talking to lawn care operators — not accountants. Here's what you actually need.
@@ -178,18 +178,18 @@ export default function SwitchingFromLawnPro() {
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-800">
                     <th className="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">Feature</th>
-                    <th className="text-center py-3 px-4 text-emerald-600 dark:text-emerald-400 font-bold">MowFlow</th>
+                    <th className="text-center py-3 px-4 text-emerald-600 dark:text-emerald-400 font-bold">MowGo</th>
                     <th className="text-center py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">LawnPro</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {comparisons.map(({ feature, mowflow, lawnpro }) => (
+                  {comparisons.map(({ feature, mowgo, lawnpro }) => (
                     <tr key={feature} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                       <td className="py-3 px-4 text-gray-700 dark:text-gray-300 font-medium">{feature}</td>
                       <td className="py-3 px-4 text-center">
-                        {mowflow === true ? (
+                        {mowgo === true ? (
                           <Check className="w-5 h-5 text-emerald-500 mx-auto" />
-                        ) : mowflow === false ? (
+                        ) : mowgo === false ? (
                           <X className="w-5 h-5 text-red-400 mx-auto" />
                         ) : (
                           <span className="text-xs text-gray-400">?</span>
@@ -229,7 +229,7 @@ export default function SwitchingFromLawnPro() {
           <div className="grid md:grid-cols-2 gap-6 mt-10 max-w-3xl mx-auto">
             <FadeIn delay={100}>
               <div className="card p-6 ring-2 ring-emerald-500 dark:ring-emerald-400 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 relative">
-                <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">MowFlow Solo</span></div>
+                <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">MowGo Solo</span></div>
                 <div className="mt-3">
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-extrabold text-gray-900 dark:text-white">$39</span>
@@ -289,9 +289,9 @@ export default function SwitchingFromLawnPro() {
               <Sprout className="w-6 h-6 text-white" />
             </div>
             <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed italic">
-              "MowFlow was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving."
+              "MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving."
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-4 font-medium">— The MowFlow Team</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-4 font-medium">— The MowGo Team</p>
           </FadeIn>
         </div>
       </section>
@@ -318,13 +318,13 @@ export default function SwitchingFromLawnPro() {
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 text-sm">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sprout className="w-3.5 h-3.5 text-white" /></div>
-            MowFlow &copy; 2026
+            MowGo &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
             <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">App</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
-            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
           </div>
         </div>
       </footer>

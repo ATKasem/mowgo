@@ -1,8 +1,8 @@
-# MowFlow vs Competitors
+# MowGo vs Competitors
 
 ## The "Just Works" Advantage
 
-| | **MowFlow** | The Others |
+| | **MowGo** | The Others |
 |---|---|---|
 | **Price** | **Free** | $29-$189/mo |
 | **Usable plan** | **$49/mo** | $169/mo for real features |
@@ -13,7 +13,7 @@
 | **Auto invoicing** | **Yes, free tier** | Paid plans only |
 | **Credit card for trial** | **No** | Almost always |
 
-## Why MowFlow Just Works
+## Why MowGo Just Works
 
 **No demos. No setup calls.**
 You should not need a training session to use a scheduling app. Sign up. Add a client. Done.

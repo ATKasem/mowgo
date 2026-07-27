@@ -1,20 +1,20 @@
-name: MowFlow
+name: MowGo
 options:
-  bundleIdPrefix: com.mowflow
+  bundleIdPrefix: com.mowgo
   deploymentTarget:
     iOS: "17.0"
   xcodeVersion: "16.0"
 targets:
-  MowFlow:
+  MowGo:
     type: application
     platform: iOS
     sources:
-      - path: MowFlow
+      - path: MowGo
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: MowFlow
-        INFOPLIST_KEY_CFBundleIdentifier: com.mowflow.app
+        INFOPLIST_KEY_CFBundleDisplayName: MowGo
+        INFOPLIST_KEY_CFBundleIdentifier: com.mowgo.app
         INFOPLIST_KEY_CFBundleShortVersionString: "1.0.0"
         INFOPLIST_KEY_CFBundleVersion: "1"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
@@ -22,7 +22,7 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleDarkContent
         INFOPLIST_KEY_UIViewControllerBasedStatusBarAppearance: NO
-        PRODUCT_BUNDLE_IDENTIFIER: com.mowflow.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.mowgo.app
         # Credentials — leave empty for CI (app runs in demo mode)
         INFOPLIST_KEY_SUPABASE_URL: "$(SUPABASE_URL)"
         INFOPLIST_KEY_SUPABASE_ANON_KEY: "$(SUPABASE_ANON_KEY)"

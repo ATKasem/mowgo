@@ -1,7 +1,7 @@
-# MowFlow Marketing Playbook
+# MowGo Marketing Playbook
 **Last updated:** 2026-07-23
-**Product:** MowFlow — Simple scheduling, routing, and invoicing for house lawn care crews
-**URL:** https://mowflow.netlify.app
+**Product:** MowGo — Simple scheduling, routing, and invoicing for house lawn care crews
+**URL:** https://mowgo.netlify.app
 **Target:** Solo operators and 1-3 person lawn care crews
 
 ---
@@ -57,7 +57,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 - Yelp: lawn care businesses with < 10 reviews (small, likely no software)
 - Facebook group members who mention scheduling problems
 
-**Script:** "Saw your lawn care business on Google Maps. I built MowFlow — dead simple scheduling + invoicing for small lawn care crews. Free tier (10 clients, no credit card). Would you be open to trying it and giving feedback? Happy to hop on a 5-min call."
+**Script:** "Saw your lawn care business on Google Maps. I built MowGo — dead simple scheduling + invoicing for small lawn care crews. Free tier (10 clients, no credit card). Would you be open to trying it and giving feedback? Happy to hop on a 5-min call."
 
 ### Channel 3: SEO (long game)
 **Target keywords:**
@@ -68,7 +68,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 - "Jobber alternative for lawn care business"
 
 **Content to create:**
-- Comparison page: "MowFlow vs Jobber for lawn care businesses"
+- Comparison page: "MowGo vs Jobber for lawn care businesses"
 - Blog: "5 signs you've outgrown pen and paper for your lawn care business"
 - Blog: "How to stop losing money to missed cleaning appointments"
 - Landing page for each keyword cluster
@@ -87,7 +87,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 
 **Post cadence:** 3-5x/week
 **Content:**
-- Build updates: "Just shipped rain delay for MowFlow — one button moves all tomorrow's cleanings to the next day"
+- Build updates: "Just shipped rain delay for MowGo — one button moves all tomorrow's cleanings to the next day"
 - Pain points: "Talked to 10 lawn care business owners. 8 of 10 still use pen and paper for scheduling."
 - Lessons: "Building a SaaS taught me the difference between what I THINK users want and what they ACTUALLY need"
 
@@ -113,7 +113,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 > "Dead simple scheduling and invoicing for lawn care crews who've outgrown pen and paper."
 
 ### Problem statement
-> "Most lawn care business owners run their schedule from texts, memory, and a notebook. They lose $400+/month in missed appointments. Jobber costs $119/month and is built for 10-person operations. MowFlow is $49/month and does exactly what a 1-3 person crew needs."
+> "Most lawn care business owners run their schedule from texts, memory, and a notebook. They lose $400+/month in missed appointments. Jobber costs $119/month and is built for 10-person operations. MowGo is $49/month and does exactly what a 1-3 person crew needs."
 
 ### Key differentiators
 1. **Free tier** — 10 clients, no credit card

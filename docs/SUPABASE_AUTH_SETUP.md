@@ -1,4 +1,4 @@
-# Supabase Auth Configuration for MowFlow
+# Supabase Auth Configuration for MowGo
 
 Required settings in the Supabase dashboard for password reset, email confirmation,
 and auth redirects to work correctly.
@@ -59,7 +59,7 @@ Example template:
 
 ```html
 <h2>Reset your password</h2>
-<p>Click the link below to set a new password for your MowFlow account.</p>
+<p>Click the link below to set a new password for your MowGo account.</p>
 <p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>
 <p>This link expires in 24 hours. If you didn't request this, you can safely ignore this email.</p>
 ```
@@ -77,7 +77,7 @@ Similar to above, uses `{{ .ConfirmationURL }}`.
 Example:
 
 ```html
-<h2>Welcome to MowFlow!</h2>
+<h2>Welcome to MowGo!</h2>
 <p>Click the link below to confirm your email and activate your account.</p>
 <p><a href="{{ .ConfirmationURL }}">Confirm Email</a></p>
 ```
@@ -99,7 +99,7 @@ Example:
 1. User clicks expired/invalid link → Supabase detects bad token
 2. Supabase redirects to `redirectTo` URL with error params in hash:
    `#error=access_denied&error_code=otp_expired&error_description=...`
-3. **MowFlow fix:** `SupabaseErrorRedirect` component in `App.jsx` detects
+3. **MowGo fix:** `SupabaseErrorRedirect` component in `App.jsx` detects
    the error hash and rewrites to `/#/login` with error params preserved
 4. `Login.jsx` `useEffect` parses error params and shows friendly message:
    "This password reset link has expired. Please request a new one."

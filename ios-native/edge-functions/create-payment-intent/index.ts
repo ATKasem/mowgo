@@ -107,7 +107,7 @@ serve(async (req) => {
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
-        "Idempotency-Key": `mowflow-invoice-${user.id}-${invoice_id}`,
+        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}`,
       },
       body: new URLSearchParams({
         amount: String(amount),
@@ -133,11 +133,24 @@ serve(async (req) => {
     const paymentIntent = await resp.json();
 
     // Store the payment intent ID on the invoice
-    await supabase
+    const { data: savedInvoice, error: saveErr } = await supabase
       .from("invoices")
       .update({ stripe_payment_intent_id: paymentIntent.id })
       .eq("id", invoice_id)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (saveErr || !savedInvoice) {
+      console.error("Failed to save payment intent ID:", saveErr);
+      return new Response(
+        JSON.stringify({ error: "Failed to save payment intent" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({

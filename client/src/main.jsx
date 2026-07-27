@@ -14,7 +14,7 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // Apply theme before React hydration to prevent flash
-const theme = localStorage.getItem('mowflow-theme') || 'system';
+const theme = localStorage.getItem('mowgo-theme') || 'system';
 const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 document.documentElement.classList.toggle('dark', isDark);
 

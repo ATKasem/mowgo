@@ -1,0 +1,72 @@
+{
+  "date": "2026-07-26",
+  "scanned_threads": [
+    "1529295018429517935 (build log)",
+    "1529667780440227892 (intel engine)",
+    "1529588592098414602 (sales & leads)",
+    "1529588589422444727 (marketing & launch)",
+    "1529588586314338507 (dev & payments)",
+    "1529716720925675561 (bug hunt)"
+  ],
+  "quick_wins": [
+    {
+      "task": "Confirm latest ios-native.zip builds in Xcode",
+      "source": "dev & payments",
+      "detail": "Second ios-native.zip was uploaded with deployment target iOS 17.0 fix and DataStore argument order fix. Blasian asked 'give file again' but no confirmation of successful build. Verify and report back.",
+      "est_minutes": 10
+    },
+    {
+      "task": "Run Mimo audit on iOS native code",
+      "source": "dev & payments",
+      "detail": "Blasian said 'run this with mimo too' — the iOS native app (17 Swift files) needs a full Mimo audit like the React client gets automatically. Currently only the React client/src/ is on the bug hunt cron. Add iOS native code scanning to the bug hunt cron or run a one-shot audit.",
+      "est_minutes": 15
+    },
+    {
+      "task": "Respond to top 3 Reddit threads from latest Reddit Monitor",
+      "source": "sales & leads",
+      "detail": "Most recent scan (2026-07-26 09:17 UTC) found 22 threads. Top 3: (1) r/landscaping 'For my landscapers with 1-3 person crews, what do you actually use?' (2) r/landscaping 'Helping my uncle with paperwork - is Jobber overkill?' (3) r/sweatystartup 'Not happy with Jobber. Beware.' These are active, high-intent prospects. Suggested replies already saved in /opt/data/mowgo/leads/reddit-threads.md.",
+      "est_minutes": 15
+    }
+  ],
+  "important": [
+    {
+      "task": "Build 'Switching from Jobber' landing page",
+      "source": "intel engine / marketing & launch",
+      "detail": "Recommended across 5+ Intel Engine runs. Jobber promo expires July 31 (5 days away). Post-promo window is the best time to launch. Key angle: 'Jobber $99 vs MowGo $39 with rain delay they don't have.' Cost comparison ($1,788/yr Jobber vs $588/yr MowGo for 3-person crew) is devastating.",
+      "est_minutes": null
+    },
+    {
+      "task": "Build 'Switching from LawnPro' landing page",
+      "source": "intel engine / marketing & launch",
+      "detail": "LawnPro is bleeding users — data loss crisis, fraudulent charges, text-only support. Multiple users on LawnSite asking 'what should I switch to?' Target with 'Tired of mystery charges and lost data? MowGo has real support, real billing, real rain delay.'",
+      "est_minutes": null
+    },
+    {
+      "task": "Prepare post-July-31 Jobber exodus content",
+      "source": "intel engine",
+      "detail": "Jobber's 40%-off promo ends July 31. After that, their $49 Core vs MowGo $39 Solo comparison resets cleanly. Prepare blog posts, Reddit replies, and comparison ads to go live Aug 1. 'Jobber promo ended? MowGo is still $39 with rain delay.'",
+      "est_minutes": null
+    },
+    {
+      "task": "Engage LawnSite thread for fleeing LawnPro users",
+      "source": "intel engine",
+      "detail": "The 'Stay Away from LawnProSoftware!!!!!' thread is still active through Jan 2025 with fresh complaints. Users are explicitly asking for alternatives. Post a helpful, non-pitchy response offering migration help.",
+      "est_minutes": null
+    }
+  ],
+  "blocked": [
+    {
+      "task": "Build/compile iOS native app on macOS/Xcode",
+      "source": "dev & payments",
+      "detail": "Fix was provided (set Minimum Deployments to iOS 17.0, DataStore.swift argument order corrected, ios-native.zip re-uploaded). Cannot verify build without macOS/Xcode access in this environment. Requires Blasian to test on Mac.",
+      "blocker": "Requires macOS with Xcode. No macOS available in current Hermes environment."
+    }
+  ],
+  "notes": [
+    "Intel Engine cron (54982fcbf42e) runs every 4 hours automatically — no action needed.",
+    "Reddit Monitor cron (721f9dd1d471) runs and finds threads but nobody is engaging in them. This is the biggest gap right now.",
+    "Bug Hunt (eaa76d30f06f) found no changes in client/src/ this cycle — React client is stable.",
+    "Part 2 (Action) and Part 3 (Report) crons are set to follow this scan at 8am and 9am CST.",
+    "Current build status: React PWA = clean, iOS native = needs Xcode verification, Landing page = deployed at mowgo.pages.dev."
+  ]
+}

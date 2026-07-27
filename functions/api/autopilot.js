@@ -14,9 +14,9 @@
  */
 
 const ALLOWED_ORIGINS = [
-  'https://mowflow.pages.dev',
-  'https://cleanflloww.pages.dev',
-  'https://mowflow.app',
+  'https://mowgo.pages.dev',
+  'https://cleanmowgo.pages.dev',
+  'https://mowgo.app',
   'http://localhost:5173',
   'http://localhost:4173'
 ];
@@ -70,7 +70,7 @@ export async function onRequestPost(context) {
           'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': origin,
-          'X-Title': 'MowFlow AI Autopilot'
+          'X-Title': 'MowGo AI Autopilot'
         },
         body: JSON.stringify({
           model,

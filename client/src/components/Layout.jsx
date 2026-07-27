@@ -83,7 +83,7 @@ export default function Layout() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">MowFlow</h1>
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">MowGo</h1>
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />

@@ -1,6 +1,6 @@
-git_url("https://github.com/Mowflow/mowflow.git")
+git_url("https://github.com/Mowgo/mowgo.git")
 storage_mode("git")
 git_branch("main")
 type("appstore")
-app_identifier("com.mowflow.app")
+app_identifier("com.mowgo.app")
 username("aaronkasem@gmail.com")

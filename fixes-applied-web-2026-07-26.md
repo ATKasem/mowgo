@@ -1,4 +1,4 @@
-# MowFlow Web — Fixes Applied (July 26, 2026)
+# MowGo Web — Fixes Applied (July 26, 2026)
 
 Based on `code-review-web-2026-07-26.md` (Pass 1 + Pass 2 findings).
 

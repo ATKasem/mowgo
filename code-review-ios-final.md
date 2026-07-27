@@ -1,8 +1,8 @@
-# MowFlow iOS Native — Code Review
+# MowGo iOS Native — Code Review
 
 ## Pass 2 — Deep Review
 
-**Reviewed files:** All 23 Swift files in `/ios-native/MowFlow/`
+**Reviewed files:** All 23 Swift files in `/ios-native/MowGo/`
 **Focus areas:** Actor isolation, Combine lifecycle, async correctness, error recovery, payment integrity, token refresh, Keychain migration, crew feature parity.
 
 ---
@@ -32,7 +32,7 @@
 
 The app uses SwiftUI's `@StateObject`, `@ObservedObject`, `@EnvironmentObject`, and `@Published` — all SwiftUI-native observation. No `AnyCancellable`, no `.store(in:)`, no `sink`. **No memory leak risk from Combine.**
 
-The `@StateObject` usage in `MowFlowApp.swift` (lines 10-11) correctly creates long-lived objects owned by the app scene.
+The `@StateObject` usage in `MowGoApp.swift` (lines 10-11) correctly creates long-lived objects owned by the app scene.
 
 **Verdict:** Clean. No Combine lifecycle issues.
 
@@ -82,7 +82,7 @@ init() {
     }
 }
 ```
-This unstructured Task is not stored or cancelled. If `AuthService` is deallocated before the task completes, the task continues running and publishes to deallocated `@Published` properties. **In practice, `AuthService` is owned by `MowFlowApp` via `@StateObject` and lives for the app's lifetime.** No practical issue, but a stored `Task` reference would be more defensive.
+This unstructured Task is not stored or cancelled. If `AuthService` is deallocated before the task completes, the task continues running and publishes to deallocated `@Published` properties. **In practice, `AuthService` is owned by `MowGoApp` via `@StateObject` and lives for the app's lifetime.** No practical issue, but a stored `Task` reference would be more defensive.
 
 ---
 
@@ -277,7 +277,7 @@ Line 109: `loadDemo()` is called when the API fails. Users see fake demo jobs mi
 
 ## Pass 3 — Code Quality Review
 
-After reviewing the MowFlow iOS native codebase for Swift patterns, Combine lifecycle, async/await usage, SwiftUI view patterns, memory management, error handling, and DRY principles, here are the key findings:
+After reviewing the MowGo iOS native codebase for Swift patterns, Combine lifecycle, async/await usage, SwiftUI view patterns, memory management, error handling, and DRY principles, here are the key findings:
 
 ### Swift Patterns & Memory Management
 
@@ -306,7 +306,7 @@ After reviewing the MowFlow iOS native codebase for Swift patterns, Combine life
 
 **✅ View State Management:**
 - Proper use of `@State` for local view state.
-- Correct use of `@StateObject` for long-lived objects in `MowFlowApp.swift`.
+- Correct use of `@StateObject` for long-lived objects in `MowGoApp.swift`.
 - Appropriate use of `@ObservedObject` and `@EnvironmentObject` for data flow.
 - SwiftUI's reactive updates via `@Published` properties work as expected.
 
@@ -369,4 +369,4 @@ After reviewing the MowFlow iOS native codebase for Swift patterns, Combine life
 
 ### Summary
 
-The MowFlow iOS codebase demonstrates good adherence to Swift concurrency patterns, proper memory management, and effective use of SwiftUI's reactive programming model. The main improvements would be in reducing code duplication, improving performance through better date formatter management, and making error handling more explicit in certain scenarios. The codebase avoids many common pitfalls like retain cycles, improper task management, and incorrect SwiftUI state usage.
+The MowGo iOS codebase demonstrates good adherence to Swift concurrency patterns, proper memory management, and effective use of SwiftUI's reactive programming model. The main improvements would be in reducing code duplication, improving performance through better date formatter management, and making error handling more explicit in certain scenarios. The codebase avoids many common pitfalls like retain cycles, improper task management, and incorrect SwiftUI state usage.

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'mowflow-v4';
-const DB_NAME = 'mowflow-offline';
+const CACHE_NAME = 'mowgo-v4';
+const DB_NAME = 'mowgo-offline';
 const DB_VERSION = 1;
 
 // ===== IndexedDB =====

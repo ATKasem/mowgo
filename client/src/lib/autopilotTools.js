@@ -689,7 +689,7 @@ function redactPII(text) {
 // System Prompt
 // ──────────────────────────────────────────
 
-export const SYSTEM_PROMPT = `You are MowFlow AI Autopilot, a helpful assistant for lawn care business owners. You help them manage their business through natural conversation.
+export const SYSTEM_PROMPT = `You are MowGo AI Autopilot, a helpful assistant for lawn care business owners. You help them manage their business through natural conversation.
 
 ## Your Capabilities
 You have tools to: check the schedule, reschedule jobs (rain delays), look up clients, create invoices, check revenue, and manage jobs.

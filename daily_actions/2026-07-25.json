@@ -6,7 +6,7 @@
     {
       "task": "Fix Mimo bug hunt cron — model deprecated",
       "status": "done",
-      "detail": "Updated cron eaa76d30f06f model from xiaomi/mimo-v2-flash (deprecated) → xiaomi/mimo-v2.5. Also fixed codebase paths from /opt/data/cleanflow/ → /opt/data/mowflow/ (the old path didn't exist). Cron will run on next 4-hour interval."
+      "detail": "Updated cron eaa76d30f06f model from xiaomi/mimo-v2-flash (deprecated) → xiaomi/mimo-v2.5. Also fixed codebase paths from /opt/data/cleanflow/ → /opt/data/mowgo/ (the old path didn't exist). Cron will run on next 4-hour interval."
     },
     {
       "task": "Fix ICS double-escaped newlines in ics.js",
@@ -14,7 +14,7 @@
       "detail": "ICS file already has correct '\\n' (newline) and '\\r\\n' (CRLF) — fixed in prior commit ab505a1 (Mimo re-audit). Verified file content."
     },
     {
-      "task": "Verify mowflow.pages.dev Solo pricing ($39 vs $49)",
+      "task": "Verify mowgo.pages.dev Solo pricing ($39 vs $49)",
       "status": "done",
       "detail": "Site is a SPA (client-side render). Source code consistently shows $39/mo for Solo in Landing.jsx pricing cards and comparison table. The only $49 reference is in Compare.jsx ('Free – $49' price range, intentional). The original pricing card discrepancy was already fixed."
     },
@@ -31,14 +31,14 @@
     {
       "task": "Draft 'Switching from Jobber' content for post-July-31 window",
       "status": "done",
-      "detail": "Created /opt/data/mowflow/marketing/switching-from-jobber.md with: pricing math, feature comparison table (Jobber Core/Connect vs MowFlow Solo/Crew), 3-person crew cost analysis, social media posts for Twitter/Reddit/LinkedIn, and landing page comparison table. Ready for review/publishing."
+      "detail": "Created /opt/data/mowgo/marketing/switching-from-jobber.md with: pricing math, feature comparison table (Jobber Core/Connect vs MowGo Solo/Crew), 3-person crew cost analysis, social media posts for Twitter/Reddit/LinkedIn, and landing page comparison table. Ready for review/publishing."
     }
   ],
   "in_progress": [
     {
       "task": "Reply to hot Reddit leads (5 HIGH-priority threads)",
       "status": "needs_aaron",
-      "detail": "Suggested replies already in /opt/data/mowflow/leads/reddit-threads.md. Top target: r/CRM 'Help deciding on a CRM for solo lawncare biz' (37 comments, active). Cannot post to Reddit from server without API credentials. Aaron needs to post replies manually or provide Reddit API access."
+      "detail": "Suggested replies already in /opt/data/mowgo/leads/reddit-threads.md. Top target: r/CRM 'Help deciding on a CRM for solo lawncare biz' (37 comments, active). Cannot post to Reddit from server without API credentials. Aaron needs to post replies manually or provide Reddit API access."
     }
   ],
   "blocked": [

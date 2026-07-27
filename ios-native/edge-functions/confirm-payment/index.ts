@@ -146,7 +146,7 @@ serve(async (req) => {
     }
 
     // Update invoice status
-    const { error: updateErr } = await supabase
+    const { data: updatedInvoice, error: updateErr } = await supabase
       .from("invoices")
       .update({
         status: "paid",
@@ -155,14 +155,20 @@ serve(async (req) => {
       })
       .eq("id", invoice_id)
       .eq("user_id", user.id)
-      .eq("stripe_payment_intent_id", payment_intent_id);
+      .eq("stripe_payment_intent_id", payment_intent_id)
+      .select("id")
+      .maybeSingle();
 
-    if (updateErr) {
+    if (updateErr || !updatedInvoice) {
       console.error("Update error:", updateErr);
       return new Response(
-        JSON.stringify({ error: "Failed to update invoice" }),
+        JSON.stringify({
+          error: updateErr
+            ? "Failed to update invoice"
+            : "Invoice changed before payment could be confirmed",
+        }),
         {
-          status: 500,
+          status: updateErr ? 500 : 409,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );

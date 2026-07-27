@@ -3,7 +3,7 @@ import { Send, Sparkles, RefreshCw, Loader2, Wrench, Check, X, ChevronDown, Chev
 import useAutopilot from '../hooks/useAutopilot';
 
 /**
- * AutopilotChat — AI assistant chat interface for MowFlow.
+ * AutopilotChat — AI assistant chat interface for MowGo.
  *
  * Features:
  *  - Message bubbles with markdown-like formatting

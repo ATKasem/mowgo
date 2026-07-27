@@ -26,7 +26,7 @@ export default function useAutopilot({ compact = false } = {}) {
     role: 'assistant',
     content: compact
       ? "Ask me anything — your schedule, clients, invoices, revenue."
-      : "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
+      : "Hey! I'm your MowGo AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
     isWelcome: true
   }]);
   const [status, setStatus] = useState('idle'); // idle | thinking | executing | error
@@ -233,7 +233,7 @@ export default function useAutopilot({ compact = false } = {}) {
       role: 'assistant',
       content: compact
         ? "Ask me anything — your schedule, clients, invoices, revenue."
-        : "Hey! I'm your MowFlow AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
+        : "Hey! I'm your MowGo AI assistant. I can help with your schedule, clients, invoices, and more. Try:\n\n• **Move today's jobs to Friday and text everyone**\n• **Show me today's schedule**\n• **How much did I make this month?**\n• **Who has unpaid invoices?**\n\nWhat can I help with?",
       isWelcome: true
     }]);
     setStatus('idle');

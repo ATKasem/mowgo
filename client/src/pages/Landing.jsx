@@ -11,7 +11,7 @@ const features = [
 ];
 
 const differentiators = [
-  { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural Oklahoma? MowFlow keeps working without internet and syncs when you are back in range.' },
+  { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural Oklahoma? MowGo keeps working without internet and syncs when you are back in range.' },
   { icon: Moon, title: 'Dark Mode Built In', desc: 'Early Oklahoma mornings are hard enough. Dark mode at 6am keeps the screen easy on your eyes.' },
   { icon: Shield, title: 'Built in OKC, Not Silicon Valley', desc: 'We are not a VC-funded startup in California guessing what Oklahoma crews need. We talk to local operators every week.' },
   { icon: Sprout, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
@@ -76,7 +76,7 @@ export default function Landing() {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" />
             </div>
-            MowFlow
+            MowGo
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -130,7 +130,7 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">Built for Oklahoma crews, <span className="text-emerald-500">not office managers</span></h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Other apps were built in Silicon Valley for 20-person operations. MowFlow was built in OKC for the 1,100+ landscaping businesses across Oklahoma.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,100+ landscaping businesses across Oklahoma.</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color }, i) => (
@@ -169,7 +169,7 @@ export default function Landing() {
         {/* Comparison Callout */}
         <FadeIn delay={200}>
           <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-white mb-1">How MowFlow Solo stacks up</h3>
+            <h3 className="text-lg font-bold text-white mb-1">How MowGo Solo stacks up</h3>
             <p className="text-sm text-gray-400 mb-6">Same features, fraction of the price.</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -177,7 +177,7 @@ export default function Landing() {
                   <tr className="border-b border-gray-700">
                     <th className="text-left py-2.5 pr-4 text-gray-400 font-medium"></th>
                     <th className="text-center py-2.5 px-3">
-                      <span className="text-emerald-400 font-bold">MowFlow Solo</span>
+                      <span className="text-emerald-400 font-bold">MowGo Solo</span>
                       <span className="block text-xs text-gray-500 font-normal">$39/mo</span>
                     </th>
                     <th className="text-center py-2.5 px-3">
@@ -303,12 +303,12 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 text-sm">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sprout className="w-3.5 h-3.5 text-white" /></div>
-            MowFlow &copy; 2026
+            MowGo &copy; 2026
           </div>
           <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">App</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Privacy</Link>
-            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Contact</a>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Contact</a>
           </div>
         </div>
       </footer>

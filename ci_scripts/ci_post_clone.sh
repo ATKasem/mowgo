@@ -1,10 +1,10 @@
 #!/bin/bash
-# Xcode Cloud post-clone script for MowFlow Capacitor iOS
+# Xcode Cloud post-clone script for MowGo Capacitor iOS
 # Runs automatically after repo clone, before Xcode builds
 
 set -e
 
-echo "📦 MowFlow CI: Installing web dependencies..."
+echo "📦 MowGo CI: Installing web dependencies..."
 cd "$CI_WORKSPACE/client" || exit 1
 
 # Use the same Node version as the project
@@ -23,7 +23,7 @@ fi
 npm ci
 npm run build
 
-echo "📱 MowFlow CI: Syncing Capacitor..."
+echo "📱 MowGo CI: Syncing Capacitor..."
 npx cap sync ios
 
-echo "✅ MowFlow CI: Web build synced — Xcode can now archive"
+echo "✅ MowGo CI: Web build synced — Xcode can now archive"

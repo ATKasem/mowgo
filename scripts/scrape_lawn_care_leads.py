@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MowFlow Lead Scraper — Google Maps
+MowGo Lead Scraper — Google Maps
 Scrapes lawn care businesses from Google Maps in target cities.
 Uses Hound (smart_search + smart_fetch) since we don't have Google Maps API key.
 
@@ -34,14 +34,14 @@ SEARCH_QUERIES = [
     "lawn care company {city}",
 ]
 
-OUTPUT_DIR = Path("/opt/data/mowflow/leads")
+OUTPUT_DIR = Path("/opt/data/mowgo/leads")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def main():
     city = sys.argv[1] if len(sys.argv) > 1 else "Oklahoma City OK"
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
     
-    print(f"=== MowFlow Lead Scraper ===")
+    print(f"=== MowGo Lead Scraper ===")
     print(f"Target: {city}")
     print(f"Timestamp: {timestamp}")
     print()

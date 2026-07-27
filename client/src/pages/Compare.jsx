@@ -2,7 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 
 const competitors = [
-  { name: 'MowFlow', price: 'Free – $49', highlight: true },
+  { name: 'MowGo', price: 'Free – $49', highlight: true },
   { name: 'QuoteIQ', price: '$29.99/mo' },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
@@ -87,7 +87,7 @@ export default function Compare() {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" aria-hidden="true" />
             </div>
-            MowFlow
+            MowGo
           </Link>
           <div className="flex items-center gap-2">
             <a
@@ -111,15 +111,15 @@ export default function Compare() {
             <Zap className="w-4 h-4" aria-hidden="true" /> The honest comparison
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-4">
-            MowFlow vs <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Everyone</span>
+            MowGo vs <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Everyone</span>
           </h1>
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-8">
-            We built MowFlow because the other options are either too expensive, too complicated, or sell your data.
+            We built MowGo because the other options are either too expensive, too complicated, or sell your data.
             Here's how we compare — no fluff, no asterisks.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-              Try MowFlow Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+              Try MowGo Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Link>
             <a href="#comparison" className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               See the table
@@ -162,7 +162,7 @@ export default function Compare() {
 
         <div className="overflow-x-auto -mx-4 px-4" role="region" aria-label="Feature comparison table — scroll horizontally on mobile">
           <table className="w-full text-sm border-collapse">
-            <caption className="sr-only">Feature comparison between MowFlow and 7 competitors including pricing and availability of 14 key features</caption>
+            <caption className="sr-only">Feature comparison between MowGo and 7 competitors including pricing and availability of 14 key features</caption>
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-800">
                 <th scope="col" className="text-left py-3 px-3 font-semibold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-950 z-10">Feature</th>
@@ -195,16 +195,16 @@ export default function Compare() {
 
         <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong>QuoteIQ note:</strong> QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowFlow is purpose-built for you.
+            <strong>QuoteIQ note:</strong> QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you.
           </p>
         </div>
 
         <div className="mt-10 text-center space-y-6">
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            Think something's wrong? <a href="mailto:hello@mowflow.app" className="text-emerald-500 hover:underline">Tell us</a> and we'll fix it. We're not afraid of the truth.
+            Think something's wrong? <a href="mailto:hello@mowgo.app" className="text-emerald-500 hover:underline">Tell us</a> and we'll fix it. We're not afraid of the truth.
           </p>
           <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
-            Try MowFlow Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+            Try MowGo Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
       </section>
@@ -227,14 +227,14 @@ export default function Compare() {
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-3.5 h-3.5 text-white" aria-hidden="true" />
             </div>
-            MowFlow © 2026
+            MowGo © 2026
           </div>
           <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Home</Link>
             <a href="#" onClick={goToPricing} className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Pricing</a>
             <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">App</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Privacy</Link>
-            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Contact</a>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">Contact</a>
           </div>
         </div>
       </footer>

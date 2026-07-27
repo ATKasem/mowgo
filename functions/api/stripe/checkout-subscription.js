@@ -5,7 +5,7 @@
  * Returns: { url: 'https://checkout.stripe.com/...' }
  */
 
-const ALLOWED_ORIGINS = ['https://mowflow.pages.dev', 'https://cleanflloww.pages.dev', 'https://mowflow.app'];
+const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://cleanmowgo.pages.dev', 'https://mowgo.app'];
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -38,7 +38,7 @@ export async function onRequestPost(context) {
     }
 
     const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS || '14', 10) || 14;
-    const appUrl = env.APP_URL || origin || 'https://mowflow.pages.dev';
+    const appUrl = env.APP_URL || origin || 'https://mowgo.pages.dev';
 
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',

@@ -3,7 +3,7 @@ import re
 import unittest
 
 
-ROOT = Path(__file__).resolve().parents[1] / "MowFlow"
+ROOT = Path(__file__).resolve().parents[1] / "MowGo"
 
 
 def source(relative_path: str) -> str:
@@ -51,7 +51,7 @@ class IOSReviewFixTests(unittest.TestCase):
 
     def test_data_loading_waits_for_authenticated_app_state(self) -> None:
         data_store = source("Services/DataStore.swift")
-        app = source("MowFlowApp.swift")
+        app = source("MowGoApp.swift")
 
         self.assertNotIn("init() { Task { await loadAll() } }", data_store)
         self.assertIn("guard await sb.ensureAuthenticated() else", data_store)
@@ -110,7 +110,7 @@ class IOSReviewFixTests(unittest.TestCase):
         payment = source("Views/Payments/PaymentView.swift")
 
         self.assertIn('"Idempotency-Key"', create)
-        self.assertIn("mowflow-invoice-${user.id}-${invoice_id}", create)
+        self.assertIn("mowgo-invoice-${user.id}-${invoice_id}", create)
         self.assertIn("stripe_payment_intent_id", create)
         self.assertIn("payment_intent_id: paymentIntent.id", create)
         self.assertIn('.select("id, user_id, amount, status, stripe_payment_intent_id")', create)
@@ -123,6 +123,10 @@ class IOSReviewFixTests(unittest.TestCase):
         self.assertIn('pi.metadata?.user_id !== user.id', confirm)
         self.assertIn("pi.amount_received !== expectedAmount", confirm)
         self.assertIn(".eq(\"stripe_payment_intent_id\", payment_intent_id)", confirm)
+        self.assertIn("error: saveErr", create)
+        self.assertIn(".maybeSingle()", create)
+        self.assertIn("data: updatedInvoice", confirm)
+        self.assertIn("!updatedInvoice", confirm)
         self.assertNotIn("If Stripe call fails, proceed anyway", confirm)
 
         completed = payment.split("case .completed:", 1)[1].split(

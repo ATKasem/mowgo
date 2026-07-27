@@ -12,7 +12,7 @@ This is the one-time setup to get automated TestFlight builds working via GitHub
 - Download the `.p8` file and note the Key ID and Issuer ID
 
 ## 3. Fastlane Match (Certificate Storage)
-The signing certificates are stored in the same repo (`ATKasem/mowflow.git`) via Fastlane Match with git storage mode. Run locally on your Mac:
+The signing certificates are stored in the same repo (`ATKasem/mowgo.git`) via Fastlane Match with git storage mode. Run locally on your Mac:
 ```bash
 cd client
 bundle install                          # install fastlane from Gemfile

@@ -1,11 +1,11 @@
 {
-  "name": "MowFlow — Lawn Care Business Software",
-  "short_name": "MowFlow",
+  "name": "MowGo — Lawn Care Business Software",
+  "short_name": "MowGo",
   "description": "Simple scheduling, routing, and invoicing for lawn care crews",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#22c55e",
+  "theme_color": "#16a34a",
   "orientation": "portrait-primary",
   "categories": ["business", "productivity"],
   "icons": [

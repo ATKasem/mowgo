@@ -7,7 +7,7 @@
 ## 2. Signing Key
 Generate a signing keystore on your machine:
 ```bash
-keytool -genkey -v -keystore mowflow-release.keystore -alias mowflow -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore mowgo-release.keystore -alias mowgo -keyalg RSA -keysize 2048 -validity 10000
 ```
 Keep the keystore file and passwords safe — you can't recover them.
 
@@ -16,9 +16,9 @@ Add to Settings → Secrets and variables → Actions:
 
 | Secret | Value |
 |--------|-------|
-| `ANDROID_KEYSTORE` | Base64 of mowflow-release.keystore (`base64 mowflow-release.keystore`) |
+| `ANDROID_KEYSTORE` | Base64 of mowgo-release.keystore (`base64 mowgo-release.keystore`) |
 | `ANDROID_KEYSTORE_PASSWORD` | Password from step 2 |
-| `ANDROID_KEY_ALIAS` | `mowflow` (default from step 2) |
+| `ANDROID_KEY_ALIAS` | `mowgo` (default from step 2) |
 | `ANDROID_KEY_PASSWORD` | Password from step 2 (same as keystore or separate) |
 
 ## 4. Store Listing

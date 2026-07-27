@@ -1,11 +1,11 @@
-# MowFlow iOS Code Review Report
+# MowGo iOS Code Review Report
 **Date:** July 26, 2026  
 **Files Analyzed:** 23 Swift files (3,018 lines total)  
 **Review Type:** Pass 1 Broad Scan + Pass 2 Deep Review  
 **Reviewers:** Claude (Pass 1), MiMo (Pass 2)
 
 ## Executive Summary
-The MowFlow iOS app is generally well-structured with good separation of concerns and modern SwiftUI patterns. However, several critical security vulnerabilities and logic errors were identified that require immediate attention, particularly around authentication token storage and payment processing. Pass 2 verified all findings against source code, corrected inaccuracies, and discovered additional edge cases in actor isolation, Combine lifecycle, and async error recovery.
+The MowGo iOS app is generally well-structured with good separation of concerns and modern SwiftUI patterns. However, several critical security vulnerabilities and logic errors were identified that require immediate attention, particularly around authentication token storage and payment processing. Pass 2 verified all findings against source code, corrected inaccuracies, and discovered additional edge cases in actor isolation, Combine lifecycle, and async error recovery.
 
 ---
 
@@ -30,13 +30,13 @@ private func saveToKeychain(key: String, value: String) {
     let data = Data(value.utf8)
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: "com.mowflow.auth",
+        kSecAttrService as String: "com.mowgo.auth",
         kSecAttrAccount as String: key,
     ]
     SecItemDelete(query as CFDictionary) // Remove any existing item
     let addQuery: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: "com.mowflow.auth",
+        kSecAttrService as String: "com.mowgo.auth",
         kSecAttrAccount as String: key,
         kSecValueData as String: data,
         kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
@@ -47,7 +47,7 @@ private func saveToKeychain(key: String, value: String) {
 private func loadFromKeychain(key: String) -> String? {
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: "com.mowflow.auth",
+        kSecAttrService as String: "com.mowgo.auth",
         kSecAttrAccount as String: key,
         kSecReturnData as String: true,
         kSecMatchLimit as String: kSecMatchLimitOne,
@@ -61,7 +61,7 @@ private func loadFromKeychain(key: String) -> String? {
 private func deleteFromKeychain(key: String) {
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: "com.mowflow.auth",
+        kSecAttrService as String: "com.mowgo.auth",
         kSecAttrAccount as String: key,
     ]
     SecItemDelete(query as CFDictionary)
@@ -662,7 +662,7 @@ Button { Task { @MainActor in await processPayment() } }
 
 ---
 
-**HIGH | MowFlowApp.swift:10-11 | DataStore init() fires loadAll() during StateObject creation**
+**HIGH | MowGoApp.swift:10-11 | DataStore init() fires loadAll() during StateObject creation**
 - Line 11: `@StateObject private var store = DataStore()`
 - DataStore.init() (line 21): `init() { Task { await loadAll() } }`
 - **Issue:** `StateObject` initialization happens before the object is inserted into the view hierarchy. The `Task` created in `init()` runs on the main actor, but `loadAll()` calls `sb.isConfigured` which is an actor-isolated property on `SupabaseService`. This works, but the `Task` is unstructured and could outlive the `StateObject` if the app is torn down quickly.
@@ -761,7 +761,7 @@ private func submit() {
 - **Action:** Review for client/job creation edge cases (duplicate detection, rate validation).
 
 **LOW | Package.swift uses .target() not .executableTarget()**
-- Line 11: `.target(name: "MowFlow", ...)` — This is correct for an iOS app. `.executableTarget` is for CLI tools. No issue here.
+- Line 11: `.target(name: "MowGo", ...)` — This is correct for an iOS app. `.executableTarget` is for CLI tools. No issue here.
 
 ---
 

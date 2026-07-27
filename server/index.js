@@ -56,9 +56,10 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 
     if (!invoice) return res.status(404).send('Invoice not found');
 
-    const paidAmount = (session.amount_total || 0) / 100;
-    if (Math.abs(paidAmount - invoice.amount) > 0.01) {
-      console.error(`Amount mismatch: invoice=${invoice.amount}, paid=${paidAmount}`);
+    const paidCents = session.amount_total || 0;
+    const invoiceCents = Math.round(Number(invoice.amount) * 100);
+    if (!Number.isSafeInteger(invoiceCents) || paidCents !== invoiceCents) {
+      console.error(`Amount mismatch: invoice=${invoiceCents} cents, paid=${paidCents} cents`);
       return res.status(400).send('Amount mismatch');
     }
 
@@ -300,10 +301,15 @@ app.delete('/api/jobs/:id', auth, async (req, res) => {
 app.post('/api/jobs/reorder', auth, async (req, res) => {
   const { orders } = req.body; // [{ id, route_order }]
   if (!Array.isArray(orders)) return res.status(400).json({ error: 'orders must be an array' });
-  for (const { id, route_order } of orders) {
-    const { error } = await supabase.from('jobs').update({ route_order }).eq('id', id).eq('user_id', req.user.id);
-    if (error) return res.status(500).json({ error: error.message });
+  if (!orders.every(({ id, route_order }) =>
+    typeof id === 'string' && Number.isInteger(route_order))) {
+    return res.status(400).json({ error: 'Each order requires an id and integer route_order' });
   }
+  const { error } = await supabase.rpc('reorder_jobs', {
+    p_user_id: req.user.id,
+    p_orders: orders,
+  });
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
 });
 
@@ -328,9 +334,9 @@ app.post('/api/invoices', auth, async (req, res) => {
   // Send invoice via Resend — with HTML escaping to prevent injection
   if (client?.email) {
     await resend.emails.send({
-      from: 'MowFlow <invoices@mowflow.app>',
+      from: 'MowGo <invoices@mowgo.app>',
       to: client.email,
-      subject: `Invoice from MowFlow — $${amount}`,
+      subject: `Invoice from MowGo — $${amount}`,
       html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice.id}">Pay online</a></p>`,
     });
   }
@@ -347,9 +353,9 @@ app.post('/api/invoices/send-email', auth, async (req, res) => {
   if (!client?.email) return res.json({ sent: false, reason: 'No email on file' });
 
   await resend.emails.send({
-    from: 'MowFlow <invoices@mowflow.app>',
+    from: 'MowGo <invoices@mowgo.app>',
     to: client.email,
-    subject: `Invoice from MowFlow — $${amount}`,
+    subject: `Invoice from MowGo — $${amount}`,
     html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice_id}">Pay online</a></p>`,
   });
 
@@ -387,4 +393,4 @@ app.post('/api/stripe/checkout', auth, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`MowFlow API running on port ${PORT}`));
+app.listen(PORT, () => console.log(`MowGo API running on port ${PORT}`));

@@ -1,7 +1,7 @@
-# MowFlow — SEO & Landing Page Copy
+# MowGo — SEO & Landing Page Copy
 
 ## Title Tag (60 chars max)
-MowFlow — Lawn Care Scheduling That Just Works | Free
+MowGo — Lawn Care Scheduling That Just Works | Free
 
 ## Meta Description (155 chars max)
 The lawn care app that just works. Scheduling, routes, and invoicing from your phone. Free for 10 clients. No credit card. Takes 2 minutes.
@@ -26,7 +26,7 @@ Mark a job complete. Invoice sends automatically. Client pays with one tap. No S
 Not a trial. Not a demo. Just free. Upgrade when you need more.
 
 ## Social Proof
-"I tried three apps before this. The other ones wanted a demo call before I could even see the thing. MowFlow took 2 minutes and I was scheduling. It just works."
+"I tried three apps before this. The other ones wanted a demo call before I could even see the thing. MowGo took 2 minutes and I was scheduling. It just works."
 — Actual lawn care owner
 
 ## FAQ Section

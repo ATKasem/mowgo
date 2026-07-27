@@ -1,5 +1,5 @@
 /** Generate .ics calendar file from jobs array and trigger download */
-export function downloadICS(jobs, filename = 'mowflow-schedule.ics') {
+export function downloadICS(jobs, filename = 'mowgo-schedule.ics') {
   const blob = new Blob([generateICS(jobs)], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -18,7 +18,7 @@ export function generateGoogleCalUrl(jobs) {
   const time = (first.scheduled_time || '09:00').replace(':', '') + '00';
   const endTime = addMinutes(time, first.duration_minutes || 60);
   const params = new URLSearchParams({
-    text: `${first.title} - ${first.clients?.name || 'MowFlow Job'}`,
+    text: `${first.title} - ${first.clients?.name || 'MowGo Job'}`,
     dates: `${date}T${time}/${date}T${endTime}`,
     details: jobs.map(j => `${j.title} - ${j.clients?.name || ''} at ${j.scheduled_time?.slice(0, 5)}`).join('\n'),
     location: first.clients?.address || '',
@@ -27,7 +27,7 @@ export function generateGoogleCalUrl(jobs) {
 }
 
 /** Generate and download CSV (opens in Excel, Numbers, Google Sheets) */
-export function downloadCSV(jobs, filename = 'mowflow-schedule.csv') {
+export function downloadCSV(jobs, filename = 'mowgo-schedule.csv') {
   const headers = ['Date', 'Time', 'Client', 'Service', 'Address', 'Duration', 'Rate', 'Status'];
   const rows = jobs.map(j => [
     j.scheduled_date,
@@ -70,12 +70,12 @@ export function printSchedule(jobs) {
       <td>$${escapeHtml(String(j.clients?.rate || 0))}</td>
     </tr>`).join('');
 
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>MowFlow Schedule</title>
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>MowGo Schedule</title>
     <style>body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}
     h1{color:#22c55e}table{width:100%;border-collapse:collapse;margin-top:1rem}
     th,td{text-align:left;padding:8px 12px;border-bottom:1px solid #e5e7eb}th{background:#f3f4f6;font-weight:600}
     @media print{body{margin:0;padding:1cm}}</style></head>
-    <body><h1>🌱 MowFlow Schedule</h1><p>${new Date().toLocaleDateString()}</p>
+    <body><h1>🌱 MowGo Schedule</h1><p>${new Date().toLocaleDateString()}</p>
     <table><thead><tr><th>Date</th><th>Time</th><th>Client</th><th>Service</th><th>Address</th><th>Rate</th></tr></thead>
     <tbody>${rows}</tbody></table></body></html>`;
 
@@ -104,7 +104,7 @@ export function generateICS(jobs) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//MowFlow//Lawn Care Scheduling//EN',
+    'PRODID:-//MowGo//Lawn Care Scheduling//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
   ];
@@ -114,7 +114,7 @@ export function generateICS(jobs) {
     const date = job.scheduled_date.replace(/-/g, '');
     const time = (job.scheduled_time || '09:00').replace(':', '') + '00';
     const endTime = addMinutes(time, job.duration_minutes || 60);
-    const uid = `${job.id}@mowflow`;
+    const uid = `${job.id}@mowgo`;
 
     lines.push(
       'BEGIN:VEVENT',

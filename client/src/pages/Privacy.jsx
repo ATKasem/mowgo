@@ -6,7 +6,7 @@ export default function Privacy() {
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="max-w-2xl mx-auto px-4 py-12">
         <Link to="/" className="inline-flex items-center gap-2 text-sky-600 dark:text-sky-400 text-sm mb-8 hover:underline">
-          <ArrowLeft className="w-4 h-4" /> Back to MowFlow
+          <ArrowLeft className="w-4 h-4" /> Back to MowGo
         </Link>
 
         <div className="flex items-center gap-2 mb-8">
@@ -19,7 +19,7 @@ export default function Privacy() {
         <div className="prose dark:prose-invert max-w-none space-y-6 text-gray-700 dark:text-gray-300">
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">1. Information We Collect</h2>
-            <p>MowFlow collects only the information necessary to provide our scheduling and invoicing service:</p>
+            <p>MowGo collects only the information necessary to provide our scheduling and invoicing service:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li><strong>Account information:</strong> name, email, business name, and phone number when you create an account.</li>
               <li><strong>Client data:</strong> names, addresses, phone numbers, and service notes you enter for your lawn care clients.</li>
@@ -30,7 +30,7 @@ export default function Privacy() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">2. How We Use Your Data</h2>
             <ul className="list-disc pl-5 space-y-1">
-              <li>To provide and maintain the MowFlow service</li>
+              <li>To provide and maintain the MowGo service</li>
               <li>To process payments via Stripe (we never store your full payment details)</li>
               <li>To send service-related communications (appointment reminders, invoices)</li>
               <li>To improve and personalize the app experience</li>
@@ -60,7 +60,7 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">5. Contact</h2>
-            <p>For privacy questions, contact us at <a href="mailto:privacy@mowflow.app" className="text-sky-600 dark:text-sky-400">privacy@mowflow.app</a>.</p>
+            <p>For privacy questions, contact us at <a href="mailto:privacy@mowgo.app" className="text-sky-600 dark:text-sky-400">privacy@mowgo.app</a>.</p>
           </section>
         </div>
       </div>

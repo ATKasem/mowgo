@@ -1,6 +1,6 @@
 {
-  "appId": "com.mowflow.app",
-  "appName": "MowFlow",
+  "appId": "com.mowgo.app",
+  "appName": "MowGo",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

@@ -1,4 +1,4 @@
-# MowFlow Code Review Fixes — 2026-07-25
+# MowGo Code Review Fixes — 2026-07-25
 
 **Fixed by:** Hermes Agent (automated)  
 **Based on:** Code review report at `/code-review-2026-07-25.md` (52 findings)  
@@ -90,7 +90,7 @@ Fixed **45 of 52** findings across all severity levels. 7 findings skipped (arch
 **Fix:** Added exclusion rules before cache logic:
 - Skip all `/rest/`, `/auth/`, `/api/` paths
 - Skip any hostname containing `supabase`
-- Updated cache name to `mowflow-v4` to force cache bust
+- Updated cache name to `mowgo-v4` to force cache bust
 
 ### 12. ✅ N+1 API Calls During Drag Reorder
 **File:** `client/src/pages/Today.jsx:160-166`  

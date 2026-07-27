@@ -36,8 +36,8 @@ jobs:
         working-directory: ios-native
         run: |
           xcodebuild build \
-            -project MowFlow.xcodeproj \
-            -scheme MowFlow \
+            -project MowGo.xcodeproj \
+            -scheme MowGo \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
             -derivedDataPath build/ \
             CODE_SIGNING_ALLOWED=NO

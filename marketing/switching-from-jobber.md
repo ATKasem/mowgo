@@ -1,4 +1,4 @@
-# Switching from Jobber to MowFlow
+# Switching from Jobber to MowGo
 
 > **Timing:** Jobber's 40%-off new-customer promo expires **July 31, 2026**. After that, prices revert.
 > **Editor:** Use as blog post, landing page section, or social campaign.
@@ -11,7 +11,7 @@
 **Stop paying Jobber $139 for features you can get for $39.**
 
 ### After July 31 (post-promo window)
-**Jobber's sale ends July 31. Their real prices come back. MowFlow stays $39.**
+**Jobber's sale ends July 31. Their real prices come back. MowGo stays $39.**
 
 ### Emotional
 **You signed up for Jobber's $21/mo promo. What happens when it's $49?**
@@ -20,7 +20,7 @@
 
 ## The Math
 
-| | Jobber Core | Jobber Connect | MowFlow Solo |
+| | Jobber Core | Jobber Connect | MowGo Solo |
 |---|---|---|---|
 | **Monthly price** | $49/mo | $139/mo | **$39/mo** |
 | **Annual price (solo)** | $588/yr | $1,668/yr | **$468/yr** |
@@ -35,26 +35,26 @@
 
 ### 3-Person Crew Math
 - **Jobber Connect:** $139/mo × 3 users × 12 months = **$5,004/yr**
-- **MowFlow:** $79/mo Crew × 12 months = **$948/yr**
+- **MowGo:** $79/mo Crew × 12 months = **$948/yr**
 - **Savings: $4,056/yr (81%)**
 
 Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts to $49/mo.
 - Year 1 with Jobber: ($30 × 3) + ($49 × 9) = **$531**
-- Year 1 with MowFlow Solo: $39 × 12 = **$468**
-- Year 2+: Jobber $588/yr vs MowFlow **$468/yr**
+- Year 1 with MowGo Solo: $39 × 12 = **$468**
+- Year 2+: Jobber $588/yr vs MowGo **$468/yr**
 
 ---
 
 ## What You Keep vs What You Lose
 
-### What MowFlow keeps from Jobber
+### What MowGo keeps from Jobber
 - ✅ Recurring scheduling (weekly, biweekly, monthly)
 - ✅ Auto route building
 - ✅ Invoicing + payment links
 - ✅ Client history & notes
 - ✅ Mobile app / installable PWA
 
-### What MowFlow removes (because you didn't need it)
+### What MowGo removes (because you didn't need it)
 - ❌ Payroll management (you use Gusto/ADP)
 - ❌ GPS fleet tracking (you know where your truck is)
 - ❌ Marketing automation (Nextdoor works better)
@@ -84,14 +84,14 @@ Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts 
 > 
 > After that: $49/mo for Core. $139/mo for Connect (where the real features live).
 > 
-> MowFlow? $39/mo. Everything included. Rain delay. No per-user fees.
+> MowGo? $39/mo. Everything included. Rain delay. No per-user fees.
 > 
 > The math is mathing.
 
 ### Reddit (r/LawnCarePros, r/smallbusiness)
 > PSA: Jobber's new-customer promo ends July 31. After that, their $30/mo Core becomes $49/mo — and that's still their bare-bones plan. You need Connect ($139/mo) for SMS, client portal, and scheduling.
 > 
-> I switched to MowFlow ($39/mo flat). Took 2 minutes to set up. Rain delay with one button. No per-user fees. No demo calls.
+> I switched to MowGo ($39/mo flat). Took 2 minutes to set up. Rain delay with one button. No per-user fees. No demo calls.
 > 
 > Happy to answer questions.
 
@@ -100,7 +100,7 @@ Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts 
 > 
 > Three months goes fast.
 > 
-> Built MowFlow because this pattern is exhausting. $39/mo. Flat. Rain delay with one button — nobody else has it. No per-user fees.
+> Built MowGo because this pattern is exhausting. $39/mo. Flat. Rain delay with one button — nobody else has it. No per-user fees.
 > 
 > If you're a lawn care owner tired of the pricing games, DM me.
 
@@ -108,7 +108,7 @@ Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts 
 
 ## Comparison Table for Landing Page
 
-| Feature | Jobber Core ($49) | Jobber Connect ($139) | MowFlow Solo ($39) |
+| Feature | Jobber Core ($49) | Jobber Connect ($139) | MowGo Solo ($39) |
 |---|---|---|---|
 | Scheduling & routing | ✅ | ✅ | ✅ |
 | Invoicing | ✅ | ✅ | ✅ |

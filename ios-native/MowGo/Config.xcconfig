@@ -1,0 +1,28 @@
+// MowGo.xcconfig
+// Xcode → Project → Info → Configurations → set for Debug & Release
+
+// MARK: - Info.plist generation
+INFOPLIST_KEY_CFBundleIdentifier = com.mowgo.app
+INFOPLIST_KEY_CFBundleName = MowGo
+INFOPLIST_KEY_CFBundleDisplayName = MowGo
+INFOPLIST_KEY_CFBundleExecutable = MowGo
+INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0
+INFOPLIST_KEY_CFBundleVersion = 1
+INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64
+INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
+INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES
+
+// MARK: - Supabase
+INFOPLIST_KEY_SUPABASE_URL = https://vqgiynfrpsqddjrayczc.supabase.co
+INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
+
+// MARK: - Stripe
+INFOPLIST_KEY_StripePublishableKey = pk_test_YOUR_STRIPE_TEST_KEY
+
+// MARK: - Build
+PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
+SWIFT_EMIT_LOC_STRINGS = YES
+GENERATE_INFOPLIST_FILE = YES

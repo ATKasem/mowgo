@@ -1,4 +1,4 @@
-# MowFlow Code Review — 2026-07-25
+# MowGo Code Review — 2026-07-25
 
 **Reviewer:** Hermes Agent (automated) — Pass 2 Deep Review  
 **Scope:** Full codebase — React PWA client, Express API server, Cloudflare Pages Functions, iOS native, service worker  
@@ -8,7 +8,7 @@
 
 ## Summary
 
-MowFlow is a well-structured lawn care scheduling SaaS with a clean React PWA, Supabase backend, Stripe payments, and an AI autopilot feature. The code quality is generally high — consistent patterns, good error handling in most paths, thoughtful UX. The main areas of concern are **security gaps in the Express API**, **status mismatch bugs in the AI autopilot**, **missing user feedback for failed operations**, and **an architectural split where client-side Supabase calls bypass Express server validation entirely**.
+MowGo is a well-structured lawn care scheduling SaaS with a clean React PWA, Supabase backend, Stripe payments, and an AI autopilot feature. The code quality is generally high — consistent patterns, good error handling in most paths, thoughtful UX. The main areas of concern are **security gaps in the Express API**, **status mismatch bugs in the AI autopilot**, **missing user feedback for failed operations**, and **an architectural split where client-side Supabase calls bypass Express server validation entirely**.
 
 ### Pass 2 Changes from Pass 1
 - **#1 downgraded** from Critical to Medium (anon key is public by design; rotation concern is hygiene, not exploit)
@@ -785,7 +785,7 @@ Both Home.jsx and Today.jsx (via useWeather hook) independently call the Open-Me
 ---
 
 ### 27. iOS Native App `isDemoMode` Always Returns `true`
-**File:** `ios-native/MowFlow/Services/AuthService.swift`  
+**File:** `ios-native/MowGo/Services/AuthService.swift`
 **Status:** ✅ CONFIRMED (pass-through from Pass 1)
 
 The iOS app is hardcoded to demo mode, bypassing authentication.

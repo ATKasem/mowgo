@@ -1,4 +1,4 @@
-# MowFlow — App Store Listing (iOS)
+# MowGo — App Store Listing (iOS)
 
 ## App Icon
 - `icon-1024.png` — 1024×1024, no transparency, no rounded corners (Apple applies mask)
@@ -7,10 +7,10 @@
 
 ## App Store Description
 
-MowFlow is the simplest way for solo lawn care crews to manage their business from their phone. Schedule jobs, plan routes, track clients, and send invoices — all in one app built specifically for lawn care.
+MowGo is the simplest way for solo lawn care crews to manage their business from their phone. Schedule jobs, plan routes, track clients, and send invoices — all in one app built specifically for lawn care.
 
-**WHY MOWFLOW**
-Jobber and Housecall Pro are built for big crews at $119+/month. Yardbook is "free" but sells your data. MowFlow is the only app with free rain delay — tap once when it rains, your whole schedule moves. Built for 1-3 person lawn care crews.
+**WHY MOWGO**
+Jobber and Housecall Pro are built for big crews at $119+/month. Yardbook is "free" but sells your data. MowGo is the only app with free rain delay — tap once when it rains, your whole schedule moves. Built for 1-3 person lawn care crews.
 
 **FREE TIER: 5 CLIENTS, FOREVER**
 • Rain delay auto-reschedule — one tap, done
@@ -54,10 +54,10 @@ Place screenshots in `screenshots/` folder. Required: 6-8 screenshots.
 | 5 | AI Autopilot — chat drawer with command | Dark |
 | 6 | Dark mode showcase — Today tab | Dark |
 | 7 | Landing page — pricing cards | Light |
-| 8 | Comparison page — MowFlow vs competitors | Light |
+| 8 | Comparison page — MowGo vs competitors | Light |
 
 **How to take screenshots:**
-1. Open Safari on iPhone → mowflow.pages.dev
+1. Open Safari on iPhone → mowgo.pages.dev
 2. Log in (or use Demo mode)
 3. Take screenshot (side button + volume up)
 4. Save to Photos
@@ -77,9 +77,9 @@ Screen record (Control Center → Screen Recording):
 ---
 
 ## App Store Connect URLs
-- **Privacy Policy:** https://mowflow.pages.dev/privacy
-- **Support:** https://mowflow.pages.dev
-- **Marketing:** https://mowflow.pages.dev/#/compare
+- **Privacy Policy:** https://mowgo.pages.dev/privacy
+- **Support:** https://mowgo.pages.dev
+- **Marketing:** https://mowgo.pages.dev/#/compare
 
 ---
 

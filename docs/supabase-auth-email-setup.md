@@ -1,4 +1,4 @@
-# MowFlow Supabase Auth Email — Setup Guide
+# MowGo Supabase Auth Email — Setup Guide
 
 ## Problem
 
@@ -43,7 +43,7 @@ Supabase's **default SMTP** has a strict limit of **2 auth emails per hour** and
 - Better email deliverability (dedicated transactional email service)
 - No personal Gmail account at risk of being flagged
 - 3,000 emails/month is more than enough for auth flows (password resets, confirmations)
-- Professional sender domain support (e.g., `no-reply@mowflow.app`)
+- Professional sender domain support (e.g., `no-reply@mowgo.app`)
 - Resend officially documents the Supabase SMTP integration
 
 ---
@@ -54,7 +54,7 @@ Supabase's **default SMTP** has a strict limit of **2 auth emails per hour** and
 
 1. Log into [Resend dashboard](https://resend.com)
 2. Go to **Domains** → click **Add Domain**
-3. Enter your domain (e.g., `mowflow.app`)
+3. Enter your domain (e.g., `mowgo.app`)
 4. Resend provides DNS records to add. Add these to your DNS provider:
 
    | Type | Name | Value |
@@ -86,7 +86,7 @@ Supabase's **default SMTP** has a strict limit of **2 auth emails per hour** and
    | Username | `resend` |
    | Password | *(your Resend API key — e.g., `re_...`)* |
    | Sender Email | `no-reply@yourdomain.com` |
-   | Sender Name | `MowFlow` |
+   | Sender Name | `MowGo` |
 
 4. Click **Save**
 
@@ -141,7 +141,7 @@ If you want to use Gmail instead (e.g., for testing only):
    | Username | `aaronkasem@gmail.com` |
    | Password | *(16-char App Password)* |
    | Sender Email | `aaronkasem@gmail.com` |
-   | Sender Name | `MowFlow` |
+   | Sender Name | `MowGo` |
 
 ### Gmail Limits
 - **500 emails/day** (free Gmail)
@@ -179,13 +179,13 @@ If you want to use Gmail instead (e.g., for testing only):
 ## Current Status (2026-07-25)
 
 ### ✅ Completed
-- [x] Domain `mowflow.app` added to Resend (ID: `d5a10f82-6dd3-41cd-a7cc-fef286dd82d8`)
+- [x] Domain `mowgo.app` added to Resend (ID: `d5a10f82-6dd3-41cd-a7cc-fef286dd82d8`)
 - [x] SMTP config updated via Management API:
   - Host: `smtp.resend.com`, Port: `465`, User: `resend`
   - Password: Resend API key (set via PATCH, masked in GET)
-  - Sender: `no-reply@mowflow.app` (MowFlow)
-- [x] `site_url` set to `https://mowflow.app`
-- [x] Redirect URLs added: `https://mowflow.app`, `http://localhost:5173`, `http://localhost:3000`
+  - Sender: `no-reply@mowgo.app` (MowGo)
+- [x] `site_url` set to `https://mowgo.app`
+- [x] Redirect URLs added: `https://mowgo.app`, `http://localhost:5173`, `http://localhost:3000`
 - [x] Rate limits raised: `rate_limit_email_sent: 60`, `smtp_max_frequency: 30`
 - [x] SMTP connection test passed (both SSL:465 and STARTTLS:587)
 
@@ -199,7 +199,7 @@ Domain is on **Vercel DNS** (`ns1.vercel-dns.com`). Add these 3 records:
 | MX | `send` | `feedback-smtp.us-east-1.amazonses.com` (priority 10) | 60 |
 | TXT | `send` | `v=spf1 include:amazonses.com ~all` | 60 |
 
-After adding DNS, verify in Resend dashboard → Domains → `mowflow.app` → Verify.
+After adding DNS, verify in Resend dashboard → Domains → `mowgo.app` → Verify.
 
 ### Next Steps
 

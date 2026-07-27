@@ -16,14 +16,14 @@ const whatToLookFor = [
 ];
 
 const comparisonRows = [
-  { feature: 'Monthly price (solo operator)', mowflow: '$39/mo', jobber: '$139/mo (Connect)' },
-  { feature: 'Per-user fees', mowflow: 'None', jobber: 'Yes — each crew member costs extra' },
-  { feature: 'Free tier', mowflow: 'Yes — 5 clients, forever', jobber: '14-day trial only' },
-  { feature: 'Rain delay auto-reschedule', mowflow: 'Yes — one tap', jobber: 'No built-in rain delay' },
-  { feature: 'Offline mode', mowflow: 'Yes — works without cell service', jobber: 'Limited offline support' },
-  { feature: 'Mobile-first design', mowflow: 'Yes — built for the truck', jobber: 'Desktop-first, mobile feels secondary' },
-  { feature: 'One-tap invoicing', mowflow: 'Yes — automatic on job complete', jobber: 'Manual invoicing workflow' },
-  { feature: 'Setup required', mowflow: 'None — start in 2 minutes', jobber: 'Sales call + onboarding' },
+  { feature: 'Monthly price (solo operator)', mowgo: '$39/mo', jobber: '$139/mo (Connect)' },
+  { feature: 'Per-user fees', mowgo: 'None', jobber: 'Yes — each crew member costs extra' },
+  { feature: 'Free tier', mowgo: 'Yes — 5 clients, forever', jobber: '14-day trial only' },
+  { feature: 'Rain delay auto-reschedule', mowgo: 'Yes — one tap', jobber: 'No built-in rain delay' },
+  { feature: 'Offline mode', mowgo: 'Yes — works without cell service', jobber: 'Limited offline support' },
+  { feature: 'Mobile-first design', mowgo: 'Yes — built for the truck', jobber: 'Desktop-first, mobile feels secondary' },
+  { feature: 'One-tap invoicing', mowgo: 'Yes — automatic on job complete', jobber: 'Manual invoicing workflow' },
+  { feature: 'Setup required', mowgo: 'None — start in 2 minutes', jobber: 'Sales call + onboarding' },
 ];
 
 export default function JobberPriceIncrease() {
@@ -36,7 +36,7 @@ export default function JobberPriceIncrease() {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" />
             </div>
-            MowFlow
+            MowGo
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -157,10 +157,10 @@ export default function JobberPriceIncrease() {
         {/* Section 4: Comparison Table */}
         <section>
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
-            MowFlow vs Jobber
+            MowGo vs Jobber
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            Here's a straightforward comparison of what you get with MowFlow Solo ($39/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:
+            Here's a straightforward comparison of what you get with MowGo Solo ($39/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:
           </p>
           <div className="overflow-x-auto">
             <div className="card overflow-hidden min-w-[600px]">
@@ -169,7 +169,7 @@ export default function JobberPriceIncrease() {
                   <tr className="border-b border-gray-100 dark:border-gray-800">
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">Feature</th>
                     <th className="text-center px-5 py-3 font-semibold bg-emerald-50 dark:bg-emerald-950/30">
-                      <span className="text-emerald-600 dark:text-emerald-400">MowFlow Solo</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">MowGo Solo</span>
                     </th>
                     <th className="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">Jobber Connect</th>
                   </tr>
@@ -181,7 +181,7 @@ export default function JobberPriceIncrease() {
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
                           <Check className="w-4 h-4 flex-shrink-0" />
-                          {row.mowflow}
+                          {row.mowgo}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-center">
@@ -200,7 +200,7 @@ export default function JobberPriceIncrease() {
           </div>
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              MowFlow Solo at <strong className="text-gray-900 dark:text-white">$39/mo</strong> is <strong className="text-emerald-600 dark:text-emerald-400">72% less</strong> than Jobber Connect — with no per-user fees.
+              MowGo Solo at <strong className="text-gray-900 dark:text-white">$39/mo</strong> is <strong className="text-emerald-600 dark:text-emerald-400">72% less</strong> than Jobber Connect — with no per-user fees.
             </p>
           </div>
         </section>
@@ -210,7 +210,7 @@ export default function JobberPriceIncrease() {
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-green-600 to-green-700" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
           <div className="relative px-8 py-12 text-center">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">Try MowFlow Free</h2>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">Try MowGo Free</h2>
             <p className="text-emerald-100 mb-8 max-w-md mx-auto leading-relaxed">
               Start with 5 clients on the free plan. No credit card required. Upgrade to Solo when you're ready — still less than a third of Jobber Connect.
             </p>
@@ -233,12 +233,12 @@ export default function JobberPriceIncrease() {
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 text-sm">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sprout className="w-3.5 h-3.5 text-white" /></div>
-            MowFlow &copy; 2026
+            MowGo &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy</Link>
-            <a href="mailto:hello@mowflow.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
+            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Contact</a>
           </div>
         </div>
       </footer>

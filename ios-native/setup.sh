@@ -1,5 +1,5 @@
 #!/bin/bash
-# MowFlow iOS — one-command setup
+# MowGo iOS — one-command setup
 # Run on your Mac: bash setup.sh
 # Requires: xcodegen (brew install xcodegen)
 #
@@ -8,7 +8,7 @@
 set -e
 
 echo ""
-echo "🌱 MowFlow iOS Setup"
+echo "🌱 MowGo iOS Setup"
 echo "===================="
 echo ""
 
@@ -19,7 +19,7 @@ if ! command -v xcodegen &>/dev/null; then
 fi
 
 # ── Clean previous build ──
-rm -rf MowFlow.xcodeproj MowFlow.xcworkspace 2>/dev/null
+rm -rf MowGo.xcodeproj MowGo.xcworkspace 2>/dev/null
 
 # ── Inject credentials if available ──
 if [ -n "$SUPABASE_URL" ]; then
@@ -52,4 +52,4 @@ if [ -z "$SUPABASE_URL" ]; then
 fi
 echo ""
 
-open MowFlow.xcodeproj
+open MowGo.xcodeproj

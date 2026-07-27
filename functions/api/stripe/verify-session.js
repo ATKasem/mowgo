@@ -4,7 +4,7 @@
  * Returns: { status: 'complete' | 'expired' | 'open', customer_email, ... }
  */
 
-const ALLOWED_ORIGINS = ['https://mowflow.pages.dev', 'https://cleanflloww.pages.dev', 'https://mowflow.app'];
+const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://cleanmowgo.pages.dev', 'https://mowgo.app'];
 
 export async function onRequestGet(context) {
   const { request, env } = context;

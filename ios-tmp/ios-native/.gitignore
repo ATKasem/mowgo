@@ -1,0 +1,28 @@
+# Xcode
+# Note: .xcodeproj is tracked
+# xcuserdata/ is still excluded below
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Supabase
+supabase/.temp/
+
+# Secrets — never commit these
+*.env
+.env.local
+.env.production

@@ -1,6 +1,6 @@
-# MowFlow iOS code review
+# MowGo iOS code review
 
-Scope: static review of `ios-native/MowFlow/`, with supporting checks against
+Scope: static review of `ios-native/MowGo/`, with supporting checks against
 `ios-native/Package.swift`, `ios-native/project.yml`, and the Supabase schema in
 `supabase/migrations/001_initial_schema.sql`. Findings are ordered by severity.
 
@@ -55,8 +55,8 @@ Never perform the local/direct paid transition after a failed confirmation.
 
 ### High — Data loading races authentication and is not refreshed after sign-in
 
-`MowFlowApp` creates `AuthService` and `DataStore` independently
-(`MowFlowApp.swift:10-11`). Both start unstructured tasks in their initializers
+`MowGoApp` creates `AuthService` and `DataStore` independently
+(`MowGoApp.swift:10-11`). Both start unstructured tasks in their initializers
 (`Services/AuthService.swift:24-44`, `Services/DataStore.swift:21`). The store
 can fetch before session restoration finishes. `fetchJobs`/`fetchInvoices`
 then return empty arrays when no user ID is available, while generic client

@@ -13,7 +13,7 @@ Generated via AI (FLUX 2 Klein 9B).
 | 5 | `05-autopilot-dark.png` ✅ | AI Autopilot — chat drawer with schedule response |
 | 6 | `06-dark-showcase.png` ✅ | Dark mode showcase — Today tab in dark theme |
 | 7 | `07-pricing-dark.png` ✅ | Landing page — Free, Solo $39, Crew $79 pricing |
-| 8 | `08-compare-dark.png` ✅ | Comparison page — MowFlow vs competitors table |
+| 8 | `08-compare-dark.png` ✅ | Comparison page — MowGo vs competitors table |
 
 ## Notes
 - Generated with AI image generation — good for submission previews
