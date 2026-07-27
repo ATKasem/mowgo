@@ -5,7 +5,7 @@ let package = Package(
     name: "MowGo",
     platforms: [.iOS(.v17)],
     dependencies: [
-        .package(url: "https://github.com/stripe/stripe-ios.git", from: "23.0.0"),
+        .package(url: "https://github.com/stripe/stripe-ios.git", "23.2.0"..<"24.0.0"),
     ],
     targets: [
         .target(

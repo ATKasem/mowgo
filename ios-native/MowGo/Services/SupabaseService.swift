@@ -237,7 +237,7 @@ actor SupabaseService {
     func restoreSession() async -> Bool {
         // Try Keychain first, then fall back to UserDefaults (migration)
         var t = loadFromKeychain(key: "sb_token")
-        if t == nil || t!.isEmpty {
+        if t?.isEmpty != false {
             t = UserDefaults.standard.string(forKey: "sb_token")
             if let migrated = t, !migrated.isEmpty {
                 // Migrate existing UserDefaults tokens to Keychain
