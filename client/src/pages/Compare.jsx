@@ -54,7 +54,7 @@ function Cell({ value, isFirst }) {
   if (value === true) return <td className={base} aria-label={tr("Available")}><Check className="w-4 h-4 text-emerald-500 mx-auto" aria-hidden="true" /></td>;
   if (value === false) return <td className={base} aria-label={tr("Not available")}><X className="w-4 h-4 text-gray-300 dark:text-gray-600 mx-auto" aria-hidden="true" /></td>;
   if (value === 'soon') return <td className={base} aria-label={tr("Coming soon")}><span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">{tr("Soon")}</span></td>;
-  return <td className={base} aria-label={`Value: ${value}`}><span className="text-xs text-gray-400">{value}</span></td>;
+  return <td className={base} aria-label={tr('Value: {{value}}', { value })}><span className="text-xs text-gray-400">{value}</span></td>;
 }
 
 export default function Compare() {
@@ -80,7 +80,7 @@ export default function Compare() {
         href="#comparison"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:dark:bg-gray-900 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold"
       >
-        Skip to comparison table
+        {tr("Skip to comparison table")}
       </a>
 
       {/* Sticky Nav */}
@@ -98,7 +98,7 @@ export default function Compare() {
               onClick={goToPricing}
               className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              Pricing
+              {tr("Pricing")}
             </a>
             <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
               {tr("Log In")}
@@ -117,8 +117,8 @@ export default function Compare() {
             {tr("MowGo vs")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Everyone")}</span>
           </h1>
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-8">
-            We built MowGo because the other options are either too expensive, too complicated, or sell your data.
-            Here's how we compare — no fluff, no asterisks.
+            {tr('We built MowGo because the other options are either too expensive, too complicated, or sell your data.')}{' '}
+            {tr("Here's how we compare — no fluff, no asterisks.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
@@ -198,7 +198,7 @@ export default function Compare() {
 
         <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong>{tr("QuoteIQ note:")}</strong> QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you.
+            <strong>{tr("QuoteIQ note:")}</strong> {tr('QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you.')}
           </p>
         </div>
 

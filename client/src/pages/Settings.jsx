@@ -273,7 +273,7 @@ export default function Settings() {
                     type="button"
                     onClick={() => handleRemoveMember(m.id)}
                     className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 min-w-10 min-h-10"
-                    aria-label={`Remove ${m.business_name || 'team member'}`}
+                    aria-label={tr('Remove {{name}}', { name: m.business_name || tr('team member') })}
                   >
                     ✕
                   </button>
@@ -294,7 +294,7 @@ export default function Settings() {
               />
               <button type="submit" disabled={inviteSending} className="btn-primary text-xs gap-1.5 whitespace-nowrap sm:w-auto w-full">
                 {inviteSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
-                Send Invite
+                {tr("Send Invite")}
               </button>
             </form>
           )}

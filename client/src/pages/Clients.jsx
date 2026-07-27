@@ -223,7 +223,7 @@ export default function Clients({ jobs = [] }) {
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
                             <span>{new Date(j.scheduled_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                             <span className="text-gray-300 dark:text-gray-600">&middot;</span>
-                            <span>{tr(j.title)}</span>
+                            <span>{j.title}</span>
                           </div>
                         ))}
                       </div>

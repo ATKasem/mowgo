@@ -64,7 +64,7 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)}</span>
             <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{tr(job.title)}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{job.title}</span>
             {recurrenceLabel && (
               <><span className="text-gray-300 dark:text-gray-600 text-xs">·</span>
               <span className="text-xs text-violet-500 dark:text-violet-400 inline-flex items-center gap-0.5"><RefreshCw className="w-3 h-3" />{tr(recurrenceLabel)}</span></>

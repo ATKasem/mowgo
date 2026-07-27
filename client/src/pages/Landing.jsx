@@ -232,8 +232,8 @@ export default function Landing() {
             <FadeIn key={label}>
               <div className="card p-6 text-center hover:border-emerald-200 dark:hover:border-emerald-800 transition-all">
                 <div className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{value}</div>
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">{label}</div>
-                <div className="text-xs text-gray-400 mt-0.5">{suffix}</div>
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">{tr(label)}</div>
+                <div className="text-xs text-gray-400 mt-0.5">{tr(suffix)}</div>
               </div>
             </FadeIn>
           ))}
@@ -246,7 +246,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-4 tracking-tight">{tr("Simple, transparent pricing")}</h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-2 text-lg">{tr("Start free. Upgrade when you are ready. Cancel anytime.")}</p>
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">{tr("Solo")} <strong>$39/mo</strong> — built for the 1,140+ Oklahoma crews who don't need a $300/mo AI receptionist.</p>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} AI receptionist.", { price: '$39/month', competitorPrice: '$300/month' })}</p>
             <p className="text-center text-xs text-gray-400 dark:text-gray-500 mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">

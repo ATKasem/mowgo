@@ -7,20 +7,20 @@ import { INVOICE_STATUS } from '../lib/constants';
 const iconMap = { CheckCircle, AlertCircle };
 
 /** Generate invoice text for clipboard */
-function invoiceText(invoice) {
-  const name = invoice.clients?.name || 'Client';
+function invoiceText(invoice, tr, language) {
+  const name = invoice.clients?.name || tr('Client');
   const amount = invoice.amount || 0;
   const date = invoice.created_at
-    ? new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    : 'today';
+    ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
+    : tr('today');
   const phone = localStorage.getItem('mf_business_phone') || '';
   const bizName = localStorage.getItem('mf_business_name') || '';
 
   const payInfo = phone
-    ? `Pay via Venmo @${bizName || 'YourBiz'} or Zelle: ${phone}`
-    : 'Please send payment at your earliest convenience.';
+    ? tr('Pay via Venmo @{{business}} or Zelle: {{phone}}', { business: bizName || 'YourBiz', phone })
+    : tr('Please send payment at your earliest convenience.');
 
-  return `Hi ${name} — your lawn was serviced on ${date}. $${amount} due. ${payInfo} Thanks!`;
+  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}} Thanks!', { name, date, amount, paymentInfo: payInfo });
 }
 
 const STATUS_FILTERS = [
@@ -55,11 +55,11 @@ export default function Invoices({ invoices, setInvoices }) {
 
   const copyToClipboard = useCallback(async (invoice) => {
     try {
-      await navigator.clipboard.writeText(invoiceText(invoice));
+      await navigator.clipboard.writeText(invoiceText(invoice, tr, i18n.resolvedLanguage));
       setCopiedIds(prev => new Set([...prev, invoice.id]));
       setTimeout(() => setCopiedIds(prev => { const n = new Set(prev); n.delete(invoice.id); return n; }), 2500);
     } catch { /* clipboard denied */ }
-  }, []);
+  }, [i18n.resolvedLanguage, tr]);
 
   const markAsPaid = useCallback(async (id) => {
     try {
@@ -89,10 +89,10 @@ export default function Invoices({ invoices, setInvoices }) {
       <div className="mb-5">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Invoices")}</h2>
         <div className="flex items-center gap-3 mt-0.5">
-          <p className="text-sm text-gray-500 dark:text-gray-400">{invoices.length} total</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{tr('{{count}} total', { count: invoices.length })}</p>
           <span className="text-gray-300 dark:text-gray-600">&middot;</span>
-          {unpaid.length > 0 && <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">${totalUnpaid} outstanding</p>}
-          {totalPaid > 0 && <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">${totalPaid} collected</p>}
+          {unpaid.length > 0 && <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">{tr('${{amount}} outstanding', { amount: totalUnpaid })}</p>}
+          {totalPaid > 0 && <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{tr('${{amount}} collected', { amount: totalPaid })}</p>}
         </div>
       </div>
 
@@ -100,7 +100,7 @@ export default function Invoices({ invoices, setInvoices }) {
         <div className="card p-4 mb-4 bg-gradient-to-r from-amber-50 to-white dark:from-amber-950/20 dark:to-gray-900 border-amber-200 dark:border-amber-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center"><AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" /></div>
-            <div><p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">${totalUnpaid} in unpaid invoices</p><p className="text-xs text-amber-600 dark:text-amber-400">{unpaid.length} invoice{unpaid.length !== 1 ? 's' : ''} need{unpaid.length === 1 ? 's' : ''} attention</p></div>
+            <div><p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">{tr('${{amount}} in unpaid invoices', { amount: totalUnpaid })}</p><p className="text-xs text-amber-600 dark:text-amber-400">{tr('{{count}} invoice needs attention', { count: unpaid.length })}</p></div>
           </div>
         </div>
       )}
@@ -160,13 +160,13 @@ export default function Invoices({ invoices, setInvoices }) {
                         {copiedIds.has(invoice.id) ? (
                           <><ClipboardCheck className="w-3 h-3" />{tr("Copied!")}
                             <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
-                              Paste into a text to the client
+                              {tr("Paste into a text to the client")}
                               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
                             </span>
                           </>) : (
                           <><Copy className="w-3 h-3" />{tr("Copy")}
                             <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
-                              Copy a payment request to send via text
+                              {tr("Copy a payment request to send via text")}
                               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
                             </span>
                           </>)}

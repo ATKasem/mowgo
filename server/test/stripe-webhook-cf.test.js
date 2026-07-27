@@ -14,9 +14,8 @@ async function loadWebhook() {
   return import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 }
 
-function signedRequest(event, secret = WEBHOOK_SECRET) {
+function signedRequest(event, secret = WEBHOOK_SECRET, timestamp = Math.floor(Date.now() / 1000)) {
   const body = JSON.stringify(event);
-  const timestamp = '1720000000';
   const signature = crypto
     .createHmac('sha256', secret)
     .update(`${timestamp}.${body}`)
@@ -55,6 +54,35 @@ test('invalid signatures return 200 without making external requests', async () 
   try {
     const response = await onRequestPost({
       request: signedRequest({ type: 'customer.subscription.deleted' }, 'wrong_secret'),
+      env: webhookEnv(),
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(fetchCount, 0);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('signed webhook requests older than five minutes are ignored', async () => {
+  const { onRequestPost } = await loadWebhook();
+  const originalFetch = global.fetch;
+  let fetchCount = 0;
+  global.fetch = async () => {
+    fetchCount += 1;
+    throw new Error('fetch should not be called');
+  };
+
+  try {
+    const response = await onRequestPost({
+      request: signedRequest(
+        {
+          type: 'customer.subscription.deleted',
+          data: { object: { customer: 'cus_stale', metadata: { user_id: 'user_stale' } } },
+        },
+        WEBHOOK_SECRET,
+        Math.floor(Date.now() / 1000) - 301,
+      ),
       env: webhookEnv(),
     });
 

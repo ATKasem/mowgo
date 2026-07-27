@@ -39,8 +39,10 @@ export default function ThemeToggle() {
   const Icon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
   const label = tr(theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'Auto');
 
+  const accessibleLabel = tr('Theme: {{label}}', { label });
+
   return (
-    <button onClick={cycle} className="btn-ghost text-xs gap-1.5" aria-label={`Theme: ${label}`} title={`Theme: ${label}`}>
+    <button onClick={cycle} className="btn-ghost text-xs gap-1.5" aria-label={accessibleLabel} title={accessibleLabel}>
       <Icon className="w-4 h-4" />
       {label}
     </button>

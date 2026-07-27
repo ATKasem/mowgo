@@ -23,7 +23,7 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
       </div>
       <div>
         <label className="label">{tr("Job Title")}</label>
-        <input type="text" value={tr(form.title)} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={tr("e.g. Full Service")} className="input" />
+        <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={tr("e.g. Full Service")} className="input" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -68,7 +68,7 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
               <div className="flex items-center gap-2 mt-1.5">
                 <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${color.bg} ${color.text}`}>
                   <span className="w-2 h-2 rounded-full bg-current opacity-60" />
-                  {member.business_name || 'Unnamed member'}
+                  {member.business_name || tr('Unnamed member')}
                 </span>
               </div>
             );

@@ -95,7 +95,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
       }
     } catch (err) {
       console.error('createJob:', err);
-      setCompletedToast({ name: 'Failed to create job — try again', amount: 0, type: 'error' });
+      setCompletedToast({ name: tr('Failed to create job. Try again.'), amount: 0, type: 'error' });
       setTimeout(() => setCompletedToast(null), 4000);
     }
     setSaving(false);
@@ -270,8 +270,8 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Today")}</h2>
           <div className="flex items-center gap-2 mt-0.5">
-            <p className="text-sm text-gray-500 dark:text-gray-400">{filtered.length} job{filtered.length !== 1 ? 's' : ''}</p>
-            {doneCount > 0 && <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{doneCount} done</span></>}
+            <p className="text-sm text-gray-500 dark:text-gray-400">{tr('{{count}} job', { count: filtered.length })}</p>
+            {doneCount > 0 && <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{tr('{{count}} done', { count: doneCount })}</span></>}
             {filtered.some(j => j.recurrence && j.recurrence !== 'none') && (
               <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-violet-600 dark:text-violet-400 font-medium inline-flex items-center gap-1"><Repeat className="w-3 h-3" />{tr("Recurring")}</span></>
             )}
@@ -364,7 +364,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            All
+            {tr("All")}
           </button>
           {teamMembers.map((m, i) => {
             const color = TEAM_MEMBER_COLORS[i % TEAM_MEMBER_COLORS.length];

@@ -129,7 +129,7 @@ export default function AutopilotChat({ compact = false }) {
             {QUICK_PROMPTS.slice(0, compact ? 3 : 4).map((p, i) => (
               <button
                 key={i}
-                onClick={() => handleQuickPrompt(p.text)}
+                onClick={() => handleQuickPrompt(tr(p.text))}
                 className={`text-left text-xs rounded-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-300 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-3 min-h-[44px]'}`}
               >
                 {tr(p.label)}
@@ -227,6 +227,7 @@ function MessageBubble({ msg, messages, index }) {
 
 /** Tool call + result display (collapsed by default, expandable) */
 function ToolCallMessage({ msg, messages, index }) {
+  const { tr } = useLocalizedText('autopilotChat');
   const [expanded, setExpanded] = useState(false);
 
   // Find the tool result that follows this tool call
@@ -242,7 +243,7 @@ function ToolCallMessage({ msg, messages, index }) {
 
   const toolCallLabels = msg.tool_calls?.map(tc => {
     const args = safeParse(tc.function.arguments);
-    return formatToolCallLabel(tc.function.name, args);
+    return formatToolCallLabel(tc.function.name, args, tr);
   }) || [];
 
   return (
@@ -256,11 +257,11 @@ function ToolCallMessage({ msg, messages, index }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-violet-700 dark:text-violet-300 truncate">
-            {toolCallLabels[0] || 'Running...'}
+            {toolCallLabels[0] || tr('Running...')}
           </p>
           {toolCallLabels.length > 1 && (
             <p className="text-[10px] text-violet-500 dark:text-violet-400">
-              +{toolCallLabels.length - 1} more action{toolCallLabels.length > 2 ? 's' : ''}
+              {tr('{{count}} more action', { count: toolCallLabels.length - 1 })}
             </p>
           )}
         </div>
@@ -299,7 +300,7 @@ function ToolCallMessage({ msg, messages, index }) {
                     {Object.entries(args).map(([k, v]) => (
                       <span key={k} className="inline-block mr-2">
                         <span className="font-medium text-gray-600 dark:text-gray-300">{k}:</span>{' '}
-                        {Array.isArray(v) ? `[${v.length} items]` : String(v).slice(0, 50)}
+                        {Array.isArray(v) ? tr('[{{count}} items]', { count: v.length }) : String(v).slice(0, 50)}
                       </span>
                     ))}
                   </div>
@@ -340,22 +341,22 @@ function ResultBadge({ results }) {
 }
 
 /** Human-readable label for a tool call */
-function formatToolCallLabel(name, args) {
+function formatToolCallLabel(name, args, tr) {
   switch (name) {
-    case 'getTodaySchedule': return 'Checking schedule';
-    case 'getSchedule': return `Schedule: ${args.startDate || ''} – ${args.endDate || ''}`;
-    case 'rescheduleJobs': return `Moving ${args.jobIds?.length || '?'} jobs to ${args.newDate || '?'}`;
-    case 'runRainDelay': return `Rain delay — moving today to tomorrow`;
-    case 'searchClients': return `Searching: "${args.query || ''}"`;
-    case 'getClientInfo': return `Looking up: ${args.clientName || ''}`;
-    case 'getClientHistory': return `History for: ${args.clientName || ''}`;
-    case 'getUnpaidInvoices': return 'Checking unpaid invoices';
-    case 'createInvoice': return `Invoice: ${args.clientName || ''} — $${args.amount || 0}`;
-    case 'sendPaymentReminders': return 'Sending payment reminders';
-    case 'getRevenue': return `Revenue: ${args.period || ''}`;
-    case 'createJob': return `Schedule: ${args.service || ''} for ${args.clientName || ''}`;
-    case 'updateJobStatus': return `Marking job as ${args.status || ''}`;
-    case 'invoiceCompletedJobs': return `Invoicing for ${args.date || 'today'}`;
+    case 'getTodaySchedule': return tr('Checking schedule');
+    case 'getSchedule': return tr('Schedule: {{startDate}} – {{endDate}}', { startDate: args.startDate || '', endDate: args.endDate || '' });
+    case 'rescheduleJobs': return tr('Moving {{count}} jobs to {{date}}', { count: args.jobIds?.length || '?', date: args.newDate || '?' });
+    case 'runRainDelay': return tr('Rain delay — moving today to tomorrow');
+    case 'searchClients': return tr('Searching: "{{query}}"', { query: args.query || '' });
+    case 'getClientInfo': return tr('Looking up: {{name}}', { name: args.clientName || '' });
+    case 'getClientHistory': return tr('History for: {{name}}', { name: args.clientName || '' });
+    case 'getUnpaidInvoices': return tr('Checking unpaid invoices');
+    case 'createInvoice': return tr('Invoice: {{name}} — ${{amount}}', { name: args.clientName || '', amount: args.amount || 0 });
+    case 'sendPaymentReminders': return tr('Sending payment reminders');
+    case 'getRevenue': return tr('Revenue: {{period}}', { period: args.period || '' });
+    case 'createJob': return tr('Schedule: {{service}} for {{name}}', { service: args.service || '', name: args.clientName || '' });
+    case 'updateJobStatus': return tr('Marking job as {{status}}', { status: args.status || '' });
+    case 'invoiceCompletedJobs': return tr('Invoicing for {{date}}', { date: args.date || tr('today') });
     default: return name;
   }
 }

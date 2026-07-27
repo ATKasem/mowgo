@@ -135,7 +135,7 @@ export default function QuoteIQAlternative() {
                 </thead>
                 <tbody>
                   {comparisonRows.map((row, i) => (
-                    <tr key={tr(row.feature)} className={`border-b border-gray-50 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
+                    <tr key={row.feature} className={`border-b border-gray-50 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
                       <td className="px-5 py-3 font-medium text-gray-900 dark:text-white">{tr(row.feature)}</td>
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">

@@ -33,14 +33,14 @@ export default function Login() {
     // Handle error params from Supabase redirect (expired/invalid reset link)
     if (errorType) {
       const friendlyMessages = {
-        'otp_expired': 'This password reset link has expired. Please request a new one.',
-        'access_denied': 'This password reset link is invalid or has expired. Please request a new one.',
+        'otp_expired': tr('This password reset link has expired. Please request a new one.'),
+        'access_denied': tr('This password reset link is invalid or has expired. Please request a new one.'),
       };
       const message = friendlyMessages[errorCode] || decodeURIComponent(errorDesc || errorType);
       setError(message);
       window.history.replaceState({}, '', '/#/login');
     }
-  }, []);
+  }, [tr]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -127,10 +127,10 @@ export default function Login() {
             </div>
             <div>
               <h2 className="font-bold text-gray-900 dark:text-white">{tr("Check your email")}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("We sent a confirmation link to")} <strong>{email}</strong>. Click it to activate your account.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("We sent a confirmation link to {{email}}. Click it to activate your account.", { email })}</p>
             </div>
             <button onClick={() => { setConfirmSent(false); setMode('login'); }} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
-              Back to login
+              {tr("Back to login")}
             </button>
           </div>
         ) : resetSent ? (
@@ -141,10 +141,10 @@ export default function Login() {
             </div>
             <div>
               <h2 className="font-bold text-gray-900 dark:text-white">{tr("Reset link sent")}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("If an account exists for")} <strong>{email}</strong>, you'll receive a password reset link shortly.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("If an account exists for {{email}}, you'll receive a password reset link shortly.", { email })}</p>
             </div>
             <button onClick={() => { setResetSent(false); setMode('login'); }} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
-              Back to login
+              {tr("Back to login")}
             </button>
           </div>
         ) : (
@@ -209,7 +209,7 @@ export default function Login() {
                 onClick={() => { setMode('forgot'); setError(''); }}
                 className="text-xs text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors -mt-2"
               >
-                Forgot your password?
+                {tr("Forgot your password?")}
               </button>
             )}
 

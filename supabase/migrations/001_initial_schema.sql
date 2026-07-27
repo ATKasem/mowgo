@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   business_name TEXT,
   phone TEXT,
   avatar_url TEXT,
-  tier TEXT DEFAULT 'solo',
+  tier TEXT DEFAULT 'free',
   stripe_customer_id TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );

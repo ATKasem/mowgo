@@ -4,6 +4,7 @@
  */
 
 const STRIPE_API = 'https://api.stripe.com/v1';
+const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
 
 export async function onRequestPost({ request, env }) {
   const body = await request.text();
@@ -78,6 +79,12 @@ async function hasValidSignature(body, header, secret) {
   if (!timestamp || signatures.length === 0) return false;
 
   try {
+    const signedAt = Number(timestamp);
+    const now = Math.floor(Date.now() / 1000);
+    if (!Number.isFinite(signedAt) || Math.abs(now - signedAt) > SIGNATURE_TOLERANCE_SECONDS) {
+      return false;
+    }
+
     const encoder = new TextEncoder();
     const key = await globalThis.crypto.subtle.importKey(
       'raw',

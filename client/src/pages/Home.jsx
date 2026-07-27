@@ -256,7 +256,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                   ${isToday ? 'bg-emerald-500 text-white font-bold shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}
                   ${dayJobs.length > 0 && !isToday ? 'ring-1 ring-inset ring-amber-300 dark:ring-amber-700' : ''}
                 `}
-                title={dayJobs.length ? `${dayJobs.length} job${dayJobs.length > 1 ? 's' : ''}` : ''}
+                title={dayJobs.length ? tr('{{count}} job', { count: dayJobs.length }) : ''}
               >
                 {dayNum}
               </button>
@@ -271,7 +271,7 @@ export default function Home({ jobs = [], invoices = [] }) {
           <div className="card p-4 m-4 max-w-xs w-full shadow-2xl" onClick={e => e.stopPropagation()} style={{ animation: 'scaleIn 0.15s ease-out' }}>
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-bold text-sm text-gray-900 dark:text-white">
-                {new Date(showForm.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                {new Date(showForm.date + 'T12:00:00').toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </h4>
               <button onClick={() => setShowForm(null)} aria-label={tr("Close calendar popover")} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
             </div>
@@ -284,7 +284,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${job.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {tr(job.title)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
                     </div>
                   </div>
                 ))}
@@ -293,7 +293,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                   onClick={() => setShowForm(null)}
                   className="btn-primary w-full text-xs py-2 justify-center mt-1"
                 >
-                  View in Schedule
+                  {tr("View in Schedule")}
                 </Link>
               </div>
             )}
@@ -320,7 +320,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                   <span className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400 flex-shrink-0">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {tr(job.title)}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
                   </div>
                   <ChevronLeft className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-emerald-500 transition-colors rotate-180" />
                 </Link>
@@ -340,7 +340,7 @@ export default function Home({ jobs = [], invoices = [] }) {
             </Link>
             <Link to="/app/invoices" className="btn-secondary w-full justify-start gap-2 text-sm py-2.5">
               <AlertCircle className="w-4 h-4" />
-              {unpaidTotal > 0 ? `$${unpaidTotal} in unpaid invoices` : 'All invoices paid'}
+              {unpaidTotal > 0 ? tr('${{amount}} in unpaid invoices', { amount: unpaidTotal }) : tr('All invoices paid')}
             </Link>
             <Link to="/app/settings" className="btn-ghost w-full justify-start gap-2 text-sm py-2.5">
               {tr("Manage Settings")} <ArrowRight className="w-3.5 h-3.5 ml-auto" />

@@ -63,7 +63,7 @@ export default function JobberPriceIncrease() {
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
             {tr("Jobber Price Increase 2026: What Lawn Care Businesses Need to Know")}
-            <span className="block text-emerald-500 mt-2 text-2xl sm:text-3xl md:text-4xl">(And Better Alternatives)</span>
+            <span className="block text-emerald-500 mt-2 text-2xl sm:text-3xl md:text-4xl">{tr("(And Better Alternatives)")}</span>
           </h1>
           <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
             {tr("Jobber just raised prices again. If you're running a small lawn care business with 1–3 crew members, you're probably paying too much. Here's what changed and what to look for instead.")}
@@ -115,11 +115,11 @@ export default function JobberPriceIncrease() {
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[2rem]">1</span>
-                  <span><strong className="text-gray-900 dark:text-white">{tr("Solo operator on Jobber Connect:")}</strong> $139/mo for features you might not need (advanced reporting, team management). You're paying for a business you don't have yet.</span>
+                  <span>{tr("A solo operator on Jobber Connect pays {{price}} for features they might not need (advanced reporting and team management). You're paying for a business you don't have yet.", { price: '$139/month' })}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[2rem]">2</span>
-                  <span><strong className="text-gray-900 dark:text-white">{tr("3-person crew on Jobber Connect:")}</strong> $139 base + $30–50/user in per-seat fees = <strong>{tr("~$200–220/mo")}</strong>. For a lawn care business doing $8–12K/month in revenue, that's 2% going straight to software.</span>
+                  <span>{tr("A 3-person crew on Jobber Connect pays a {{base}} base plus {{perUser}} per user, about {{total}}. For a lawn care business earning {{revenue}} per month, that's 2% going straight to software.", { base: '$139', perUser: '$30–50', total: '$200–220/month', revenue: '$8–12K' })}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[2rem]">3</span>
@@ -178,7 +178,7 @@ export default function JobberPriceIncrease() {
                 </thead>
                 <tbody>
                   {comparisonRows.map((row, i) => (
-                    <tr key={tr(row.feature)} className={`border-b border-gray-50 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
+                    <tr key={row.feature} className={`border-b border-gray-50 dark:border-gray-800/50 ${i % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
                       <td className="px-5 py-3 font-medium text-gray-900 dark:text-white">{tr(row.feature)}</td>
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
@@ -202,7 +202,7 @@ export default function JobberPriceIncrease() {
           </div>
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {tr("MowGo Solo at")} <strong className="text-gray-900 dark:text-white">$39/mo</strong> {tr("is")} <strong className="text-emerald-600 dark:text-emerald-400">{tr("72% less")}</strong> {tr("than Jobber Connect — with no per-user fees.")}
+              {tr("MowGo Solo costs {{price}}, 72% less than Jobber Connect, with no per-user fees.", { price: '$39/month' })}
             </p>
           </div>
         </section>

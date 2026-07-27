@@ -43,9 +43,9 @@ export default function Privacy() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("3. Data Sharing")}</h2>
             <p>{tr("We do not sell your data. We share data only with:")}</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>{tr("Stripe")}</strong> — for payment processing</li>
-              <li><strong>{tr("Supabase")}</strong> — our database provider (your data is encrypted at rest)</li>
-              <li><strong>{tr("Law enforcement")}</strong> — only when required by valid legal process</li>
+              <li><strong>{tr("Stripe")}</strong> — {tr("for payment processing")}</li>
+              <li><strong>{tr("Supabase")}</strong> — {tr("our database provider (your data is encrypted at rest)")}</li>
+              <li><strong>{tr("Law enforcement")}</strong> — {tr("only when required by valid legal process")}</li>
             </ul>
           </section>
 

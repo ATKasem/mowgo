@@ -15,9 +15,13 @@ export async function onRequestGet(context) {
     return json({ error: 'Forbidden' }, 403);
   }
 
-  // Guard: Stripe secret key must be configured before making API calls
-  if (!env.STRIPE_SECRET_KEY) {
-    console.error('Stripe secret key not configured');
+  const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) return json({ error: 'Unauthorized' }, 401, origin);
+
+  const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
+  if (!env.STRIPE_SECRET_KEY || !supabaseUrl || !supabaseAnonKey) {
+    console.error('Stripe or Supabase configuration is incomplete');
     return json({ error: 'Payment system not configured' }, 500, origin);
   }
 
@@ -29,8 +33,14 @@ export async function onRequestGet(context) {
   }
 
   try {
+    const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { Authorization: `Bearer ${token}`, apikey: supabaseAnonKey },
+    });
+    if (!authResponse.ok) return json({ error: 'Unauthorized' }, 401, origin);
+    const user = await authResponse.json();
+
     const stripeResponse = await fetch(
-      `https://api.stripe.com/v1/checkout/sessions/${sessionId}`,
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
       {
         headers: {
           'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
@@ -43,6 +53,10 @@ export async function onRequestGet(context) {
     if (session.error) {
       console.error('Stripe verify error:', session.error);
       return json({ status: 'error', error: session.error.message }, 400, origin);
+    }
+
+    if (session.metadata?.user_id !== user.id) {
+      return json({ error: 'Forbidden' }, 403, origin);
     }
 
     return json({
