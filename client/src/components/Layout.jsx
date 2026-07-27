@@ -7,7 +7,6 @@ import {
   Sprout, LogOut, WifiOff, LayoutDashboard, MessageSquare, X
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import InstallPrompt from './InstallPrompt';
 import AutopilotChat from './AutopilotChat';
 import { isCurrentlyOffline } from '../lib/offlineStorage';
 
@@ -118,9 +117,6 @@ export default function Layout() {
       <main id="main-content" className="max-w-2xl mx-auto px-4 pt-5 pb-6">
         <Outlet />
       </main>
-
-      {/* Install prompt */}
-      <InstallPrompt />
 
       {/* Bottom navigation */}
       <nav aria-label={tr("Main navigation")} className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 z-20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
