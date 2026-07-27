@@ -77,6 +77,18 @@ final class AuthService: ObservableObject {
         await sb.signOut()
     }
 
+    func resetPassword(email: String) async {
+        isLoading = true
+        error = nil
+        do {
+            try await sb.resetPassword(email: email)
+            error = "Check your email for a reset link."
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isLoading = false
+    }
+
     private func loadProfile() async {
         guard await sb.isConfigured else { return }
         var retries = 2

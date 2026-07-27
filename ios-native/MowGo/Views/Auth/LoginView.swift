@@ -20,12 +20,16 @@ struct LoginView: View {
     private enum Field { case email, password }
     private var theme: MowGoTheme { MowGoTheme(colorScheme) }
 
+    @State private var showResetPassword = false
+
     var body: some View {
         ZStack {
             theme.background.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 24) {
+                    Spacer().frame(minHeight: 40)
+
                     // Logo
                     Image(systemName: "leaf.fill")
                         .font(.system(size: 56))
@@ -40,8 +44,6 @@ struct LoginView: View {
                     Text("Lawn Care Scheduling")
                         .font(.subheadline)
                         .foregroundColor(theme.textMuted)
-
-                    Spacer().frame(height: 16)
 
                     // Fields
                     VStack(spacing: 12) {
@@ -97,6 +99,15 @@ struct LoginView: View {
                     .disabled(auth.isLoading || email.isEmpty || password.isEmpty)
                     .accessibilityLabel(isSignUp ? "Create Account" : "Sign In")
 
+                    // Forgot Password (sign in only)
+                    if !isSignUp {
+                        Button("Forgot Password?") {
+                            showResetPassword = true
+                        }
+                        .font(.footnote)
+                        .foregroundColor(theme.textMuted)
+                    }
+
                     // Toggle
                     Button(isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up") {
                         withAnimation { isSignUp.toggle() }
@@ -120,10 +131,16 @@ struct LoginView: View {
                         .padding(.top, 8)
                         .accessibilityHint("Enter demo mode without real account")
                     }
+
+                    Spacer().frame(minHeight: 40)
                 }
                 .padding(.horizontal, 24)
+                .frame(minHeight: UIScreen.main.bounds.height * 0.85)
             }
             .scrollDismissesKeyboard(.interactively)
+            .sheet(isPresented: $showResetPassword) {
+                ResetPasswordView()
+            }
         }
     }
 

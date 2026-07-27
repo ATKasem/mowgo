@@ -124,6 +124,11 @@ actor SupabaseService {
         clearSession()
     }
 
+    func resetPassword(email: String) async throws {
+        let body: [String: Any] = ["email": email]
+        _ = try await request("POST", "/auth/v1/recover", body: body, allowsTokenRefresh: false)
+    }
+
     // Cache the user ID to avoid repeated network calls on every fetch.
     // getCurrentUserId() was called 3x per loadAll() (jobs, clients, invoices).
     private var _cachedUserId: UUID?

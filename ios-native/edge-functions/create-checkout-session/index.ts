@@ -8,6 +8,9 @@
 //   STRIPE_PRICE_SOLO     — Stripe Price ID for Solo tier (price_xxx)
 //   STRIPE_PRICE_CREW     — Stripe Price ID for Crew tier (price_xxx)
 //   STRIPE_TRIAL_DAYS     — optional, defaults to 14 to match web checkout
+//
+// Supabase automatically provides SUPABASE_URL, SUPABASE_ANON_KEY, and
+// SUPABASE_SERVICE_ROLE_KEY to hosted Edge Functions.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -34,6 +37,10 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       { global: { headers: { Authorization: authHeader } } }
+    );
+    const adminSupabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
     const {
@@ -111,7 +118,9 @@ serve(async (req) => {
       customerId = customer.id;
 
       // Save the customer ID to the profile
-      const { error: customerSaveError } = await supabase
+      // This is trusted server-side billing state. Persist it with the service
+      // role instead of depending on an end-user UPDATE grant for this column.
+      const { error: customerSaveError } = await adminSupabase
         .from("profiles")
         .update({ stripe_customer_id: customerId })
         .eq("id", user.id);
