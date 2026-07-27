@@ -27,34 +27,50 @@ final class Persistence {
 
     /// Replace all cached jobs with the provided list.
     func saveJobs(_ jobs: [Job]) {
-        // Delete existing cached jobs
-        let fetchDescriptor = FetchDescriptor<JobCache>()
-        do { try context.delete(matching: fetchDescriptor) } catch { print("[Persistence] failed to delete cached jobs: \(error)") }
-        // Insert new ones
+        do {
+            let existing = try context.fetch(FetchDescriptor<JobCache>())
+            for item in existing { context.delete(item) }
+        } catch {
+            print("[Persistence] failed to clear cached jobs: \(error)")
+        }
         for job in jobs {
             context.insert(JobCache(job: job))
         }
-        do { try context.save() } catch { print("[Persistence] failed to save jobs: \(error)") }
+        do { try context.save() } catch {
+            print("[Persistence] failed to save jobs: \(error)")
+        }
     }
 
     /// Replace all cached clients with the provided list.
     func saveClients(_ clients: [Client]) {
-        let fetchDescriptor = FetchDescriptor<ClientCache>()
-        do { try context.delete(matching: fetchDescriptor) } catch { print("[Persistence] failed to delete cached clients: \(error)") }
+        do {
+            let existing = try context.fetch(FetchDescriptor<ClientCache>())
+            for item in existing { context.delete(item) }
+        } catch {
+            print("[Persistence] failed to clear cached clients: \(error)")
+        }
         for client in clients {
             context.insert(ClientCache(client: client))
         }
-        do { try context.save() } catch { print("[Persistence] failed to save clients: \(error)") }
+        do { try context.save() } catch {
+            print("[Persistence] failed to save clients: \(error)")
+        }
     }
 
     /// Replace all cached invoices with the provided list.
     func saveInvoices(_ invoices: [Invoice]) {
-        let fetchDescriptor = FetchDescriptor<InvoiceCache>()
-        do { try context.delete(matching: fetchDescriptor) } catch { print("[Persistence] failed to delete cached invoices: \(error)") }
+        do {
+            let existing = try context.fetch(FetchDescriptor<InvoiceCache>())
+            for item in existing { context.delete(item) }
+        } catch {
+            print("[Persistence] failed to clear cached invoices: \(error)")
+        }
         for invoice in invoices {
             context.insert(InvoiceCache(invoice: invoice))
         }
-        do { try context.save() } catch { print("[Persistence] failed to save invoices: \(error)") }
+        do { try context.save() } catch {
+            print("[Persistence] failed to save invoices: \(error)")
+        }
     }
 
     // MARK: - Load
@@ -63,7 +79,9 @@ final class Persistence {
     func loadJobs() -> [Job] {
         let descriptor = FetchDescriptor<JobCache>(sortBy: [SortDescriptor(\.routeOrder)])
         let cached: [JobCache]
-        do { cached = try context.fetch(descriptor) } catch { print("[Persistence] failed to load jobs: \(error)"); return [] }
+        do { cached = try context.fetch(descriptor) } catch {
+            print("[Persistence] failed to load jobs: \(error)"); return []
+        }
         return cached.compactMap { $0.toJob() }
     }
 
@@ -71,7 +89,9 @@ final class Persistence {
     func loadClients() -> [Client] {
         let descriptor = FetchDescriptor<ClientCache>(sortBy: [SortDescriptor(\.name)])
         let cached: [ClientCache]
-        do { cached = try context.fetch(descriptor) } catch { print("[Persistence] failed to load clients: \(error)"); return [] }
+        do { cached = try context.fetch(descriptor) } catch {
+            print("[Persistence] failed to load clients: \(error)"); return []
+        }
         return cached.compactMap { $0.toClient() }
     }
 
@@ -79,7 +99,9 @@ final class Persistence {
     func loadInvoices() -> [Invoice] {
         let descriptor = FetchDescriptor<InvoiceCache>(sortBy: [SortDescriptor(\.createdAt)])
         let cached: [InvoiceCache]
-        do { cached = try context.fetch(descriptor) } catch { print("[Persistence] failed to load invoices: \(error)"); return [] }
+        do { cached = try context.fetch(descriptor) } catch {
+            print("[Persistence] failed to load invoices: \(error)"); return []
+        }
         return cached.compactMap { $0.toInvoice() }
     }
 
@@ -88,20 +110,34 @@ final class Persistence {
     /// Returns true if any cached data exists (used to decide whether to
     /// show cached data immediately before a network round-trip).
     func hasCachedData() -> Bool {
-        let jobCount: Int
-        do { jobCount = try context.fetchCount(FetchDescriptor<JobCache>()) } catch { print("[Persistence] failed to count jobs: \(error)"); jobCount = 0 }
-        let clientCount: Int
-        do { clientCount = try context.fetchCount(FetchDescriptor<ClientCache>()) } catch { print("[Persistence] failed to count clients: \(error)"); clientCount = 0 }
-        let invoiceCount: Int
-        do { invoiceCount = try context.fetchCount(FetchDescriptor<InvoiceCache>()) } catch { print("[Persistence] failed to count invoices: \(error)"); invoiceCount = 0 }
+        let jobCount = (try? context.fetch(FetchDescriptor<JobCache>()).count) ?? 0
+        let clientCount = (try? context.fetch(FetchDescriptor<ClientCache>()).count) ?? 0
+        let invoiceCount = (try? context.fetch(FetchDescriptor<InvoiceCache>()).count) ?? 0
         return jobCount > 0 || clientCount > 0 || invoiceCount > 0
     }
 
     /// Clear all cached data (e.g. on sign-out).
     func clearAll() {
-        do { try context.delete(matching: FetchDescriptor<JobCache>()) } catch { print("[Persistence] failed to clear jobs: \(error)") }
-        do { try context.delete(matching: FetchDescriptor<ClientCache>()) } catch { print("[Persistence] failed to clear clients: \(error)") }
-        do { try context.delete(matching: FetchDescriptor<InvoiceCache>()) } catch { print("[Persistence] failed to clear invoices: \(error)") }
-        do { try context.save() } catch { print("[Persistence] failed to save after clear: \(error)") }
+        do {
+            let jobs = try context.fetch(FetchDescriptor<JobCache>())
+            for item in jobs { context.delete(item) }
+        } catch {
+            print("[Persistence] failed to clear jobs: \(error)")
+        }
+        do {
+            let clients = try context.fetch(FetchDescriptor<ClientCache>())
+            for item in clients { context.delete(item) }
+        } catch {
+            print("[Persistence] failed to clear clients: \(error)")
+        }
+        do {
+            let invoices = try context.fetch(FetchDescriptor<InvoiceCache>())
+            for item in invoices { context.delete(item) }
+        } catch {
+            print("[Persistence] failed to clear invoices: \(error)")
+        }
+        do { try context.save() } catch {
+            print("[Persistence] failed to save after clear: \(error)")
+        }
     }
 }

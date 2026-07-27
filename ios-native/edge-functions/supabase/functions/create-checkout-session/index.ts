@@ -90,7 +90,7 @@ serve(async (req) => {
     if (profileError) {
       console.error("Profile query failed:", profileError.message ?? profileError);
       return new Response(
-        JSON.stringify({ error: "Could not load user profile: " + (profileError.message ?? "unknown") }),
+        JSON.stringify({ error: "Could not load user profile" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -122,7 +122,7 @@ serve(async (req) => {
         } catch { /* errBody was not JSON — keep default */ }
         console.error("Stripe customer creation failed:", errBody);
         return new Response(
-          JSON.stringify({ error: stripeMsg }),
+          JSON.stringify({ error: "Could not create customer" }),
           {
             status: 502,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -187,7 +187,7 @@ serve(async (req) => {
       } catch { /* errBody was not JSON — keep default */ }
       console.error("Stripe checkout error:", errBody);
       return new Response(
-        JSON.stringify({ error: stripeMsg }),
+        JSON.stringify({ error: "Could not create checkout session" }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
