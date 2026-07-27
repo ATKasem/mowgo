@@ -8,6 +8,9 @@ targets:
   MowGo:
     type: application
     platform: iOS
+    configFiles:
+      Debug: MowGo/Config.xcconfig
+      Release: MowGo/Config.xcconfig
     sources:
       - path: MowGo
     settings:

@@ -14,8 +14,14 @@ INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
 INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES
 
 // MARK: - Supabase
-INFOPLIST_KEY_SUPABASE_URL = https://vqgiynfrpsqddjrayczc.supabase.co
-INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
+// XcodeGen's project.yml maps these build settings into generated Info.plist
+// entries named SUPABASE_URL and SUPABASE_ANON_KEY. The explicit mappings below
+// also support projects that attach this xcconfig directly in Xcode.
+// $() expands to an empty string, preserving // instead of starting a comment.
+SUPABASE_URL = https:/$()/vqgiynfrpsqddjrayczc.supabase.co
+SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
+INFOPLIST_KEY_SUPABASE_URL = $(SUPABASE_URL)
+INFOPLIST_KEY_SUPABASE_ANON_KEY = $(SUPABASE_ANON_KEY)
 
 // MARK: - Stripe
 INFOPLIST_KEY_StripePublishableKey = pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj

@@ -369,7 +369,7 @@ app.post('/api/stripe/checkout', auth, async (req, res) => {
   if (amountInCents <= 0) return res.status(400).json({ error: 'Invalid invoice amount' });
 
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
+    payment_method_types: ['card', 'apple_pay', 'google_pay'],
     line_items: [{ price_data: { currency: 'usd', product_data: { name: 'Service Invoice' }, unit_amount: amountInCents }, quantity: 1 }],
     mode: 'payment',
     success_url: `${process.env.APP_URL}/invoices?paid=true`,

@@ -26,17 +26,37 @@ Or simpler: **drag the `MowGo/` folder into the Xcode project navigator.**
 
 ### 3. Set the xcconfig
 
+When generating the project with XcodeGen, `project.yml` attaches
+`MowGo/Config.xcconfig` to both Debug and Release automatically:
+
+```bash
+cd ios-native
+xcodegen generate
+```
+
+If you created the Xcode project manually instead:
+
 ```
 Project Navigator → click MowGo project (blue icon at top)
 → Info tab → Configurations
 → Set Config.xcconfig for both Debug and Release
 ```
 
-This auto-fills the bundle ID, Supabase keys, and Stripe key.
+The `INFOPLIST_KEY_` prefix is Xcode's generated-Info.plist convention on both
+devices and the simulator. At runtime those settings appear without the prefix,
+as `SUPABASE_URL` and `SUPABASE_ANON_KEY`, which matches `SupabaseService`.
+There are no simulator-specific key names.
 
 ### 4. Run
 
-Select iPhone simulator → Cmd+R. Works in demo mode immediately.
+Select iPhone simulator → Cmd+R.
+
+With valid Supabase credentials and no saved session, the first screen after
+the splash is `LoginView`. If the simulator has authenticated this app before,
+its Keychain session may be restored automatically. Delete MowGo from the
+simulator and run again. If the session still restores (Keychain data can
+survive app deletion), use **Device → Erase All Content and Settings** to test a
+true first launch.
 
 ---
 

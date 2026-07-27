@@ -116,6 +116,9 @@ export async function onRequestPost(context) {
         success_url: `${appUrl}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appUrl}/#/pricing`,
         allow_promotion_codes: 'true',
+        'payment_method_types[0]': 'card',
+        'payment_method_types[1]': 'apple_pay',
+        'payment_method_types[2]': 'google_pay',
       }).toString(),
     });
 

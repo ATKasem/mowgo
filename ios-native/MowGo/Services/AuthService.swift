@@ -18,8 +18,9 @@ final class AuthService: ObservableObject {
     private let sb = SupabaseService.shared
 
     /// True only if Supabase credentials are missing/unconfigured.
-    /// Updated asynchronously after init completes its Task.
-    @Published var isDemoMode = true
+    /// Defaults to false so startup cannot enter demo mode before configuration
+    /// has been checked.
+    @Published var isDemoMode = false
 
     init() {
         // Try to restore a previous session
@@ -38,6 +39,7 @@ final class AuthService: ObservableObject {
             } else {
                 // No backend configured — show splash briefly, then enter demo
                 try? await Task.sleep(for: .milliseconds(800))
+                isDemoMode = true
                 isAuthenticated = true
                 isLoading = false
             }
