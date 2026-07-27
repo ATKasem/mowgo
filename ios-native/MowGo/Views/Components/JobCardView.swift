@@ -10,7 +10,7 @@ import SwiftUI
 
 struct JobCardView: View {
     @EnvironmentObject var store: DataStore
-    @Environment(\\.colorScheme) private var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
     let job: Job
     var teamMembers: [UserProfile] = []
     var onToggle: (() -> Void)?
