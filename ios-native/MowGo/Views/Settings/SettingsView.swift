@@ -87,7 +87,9 @@ struct SettingsView: View {
 
             if isPaidTier {
                 // Paid users see "Manage Subscription" → Stripe Customer Portal
-                Button { Task { openCustomerPortal() } label: {
+                Button {
+                    Task { openCustomerPortal() }
+                } label: {
                         HStack {
                             Image(systemName: "gearshape.2.fill")
                             Text("Manage Subscription")

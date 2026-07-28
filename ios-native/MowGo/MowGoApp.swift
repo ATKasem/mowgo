@@ -85,6 +85,8 @@ struct MowGoApp: App {
                 guard url.scheme == "mowgo" else { return }
                 let upgraded = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                     .queryItems?.first(where: { $0.name == "upgraded" })?.value == "true"
+                let portalReturned = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                    .queryItems?.first(where: { $0.name == "portal_returned" })?.value == "true"
                 Task {
                     var didUpgrade = false
                     // Poll for webhook to update profiles.tier (1-5s async)
@@ -97,6 +99,10 @@ struct MowGoApp: App {
                             }
                             try? await Task.sleep(for: .seconds(Double(delay)))
                         }
+                    }
+                    // After returning from Customer Portal, refresh profile
+                    if portalReturned && !upgraded {
+                        await auth.loadProfile()
                     }
                     await store.loadAll()
                     if didUpgrade {
