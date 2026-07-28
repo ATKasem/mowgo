@@ -81,6 +81,9 @@ struct TodayView: View {
                             // 2×2 stats grid
                             statsGrid
 
+                            // Week strip — quick day nav
+                            weekStrip
+
                             // Crew filter
                             crewFilterBar
 
@@ -268,6 +271,47 @@ struct TodayView: View {
                 color: "16a34a"
             )
         }
+    }
+
+    // MARK: - Week Strip (compact day nav)
+
+    private var weekDays: [(date: Date, label: String, hasJob: Bool)] {
+        let cal = Calendar.current
+        guard let weekStart = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: selectedDate)) else { return [] }
+        let jobDates = Set(store.jobs.map { $0.scheduledDate })
+        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
+        return (0..<7).compactMap { offset in
+            guard let date = cal.date(byAdding: .day, value: offset, to: weekStart) else { return nil }
+            let dateStr = fmt.string(from: date)
+            let dayFmt = DateFormatter(); dayFmt.dateFormat = "EEE"
+            return (date: date, label: String(dayFmt.string(from: date).prefix(3)), hasJob: jobDates.contains(dateStr))
+        }
+    }
+
+    private var weekStrip: some View {
+        HStack(spacing: 0) {
+            ForEach(weekDays, id: \.label) { day in
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) { selectedDate = day.date }
+                } label: {
+                    VStack(spacing: 3) {
+                        Text(day.label)
+                            .font(.caption2.weight(.medium))
+                            .foregroundColor(Calendar.current.isDate(day.date, inSameDayAs: selectedDate)
+                                ? MowGoTheme.onAccent : theme.textSecondary)
+                            .frame(width: 28, height: 22)
+                            .background(Calendar.current.isDate(day.date, inSameDayAs: selectedDate)
+                                ? MowGoTheme.deepGreen : Color.clear)
+                            .cornerRadius(11)
+                        Circle()
+                            .fill(day.hasJob ? MowGoTheme.deepGreen : Color.clear)
+                            .frame(width: 4, height: 4)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.vertical, 6)
     }
 
     // MARK: - Crew Filter
