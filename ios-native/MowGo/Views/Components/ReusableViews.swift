@@ -75,10 +75,10 @@ struct StatCard: View {
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(.system(size: 14))
                 .foregroundColor(semanticColor)
             Text(value)
-                .font(.subheadline.weight(.bold))
+                .font(.caption.weight(.bold))
                 .foregroundColor(theme.textPrimary)
             Text(title)
                 .font(.caption2)

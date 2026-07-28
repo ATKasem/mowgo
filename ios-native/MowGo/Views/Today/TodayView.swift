@@ -104,6 +104,7 @@ struct TodayView: View {
                                 LazyVStack(spacing: 8) {
                                     ForEach(todayJobs) { job in
                                         JobCardView(job: job, teamMembers: store.teamMembers,
+                                            showDate: !isToday,
                                             onToggle: {
                                                 Task {
                                                     do {
@@ -201,7 +202,7 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 2) {
                 if isToday {
                     Text("Good \(greeting) 👋")
-                        .font(.caption2)
+                        .font(.subheadline)
                         .foregroundColor(theme.textMuted)
                 }
                 Text("Today")

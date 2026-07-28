@@ -15,6 +15,7 @@ struct JobCardView: View {
     var teamMembers: [UserProfile] = []
     var onToggle: (() -> Void)?
     var onSkip: (() -> Void)?
+    var showDate: Bool = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -32,6 +33,13 @@ struct JobCardView: View {
     }
 
     private let chipColors = ["16a34a", "3b82f6", "f59e0b", "8b5cf6", "ec4899"]
+
+    private var dayAbbreviation: String {
+        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
+        guard let date = fmt.date(from: job.scheduledDate) else { return "" }
+        fmt.dateFormat = "EEE"
+        return fmt.string(from: date)
+    }
 
     // MARK: - Status icon helpers (computed outside ViewBuilder)
 
@@ -77,6 +85,15 @@ struct JobCardView: View {
             .accessibilityLabel(statusAccessibilityLabel)
 
             VStack(alignment: .leading, spacing: 4) {
+                if showDate {
+                    Text(dayAbbreviation)
+                        .font(.caption2.weight(.medium))
+                        .foregroundColor(MowGoTheme.deepGreen)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(MowGoTheme.deepGreen.opacity(0.15))
+                        .cornerRadius(4)
+                }
                 HStack {
                     Text(job.title)
                         .font(.subheadline.weight(.semibold))
