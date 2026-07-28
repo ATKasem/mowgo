@@ -316,6 +316,14 @@ final class DataStore: ObservableObject {
     // MARK: - Clients
 
     func createClient(_ client: Client) async throws {
+        // Free tier limit: max 5 clients
+        let freeClientLimit = 5
+        let freeTiers: [String?] = [nil, "", "free"]
+        let ownerTier = teamMembers.first(where: { $0.role == "owner" })?.tier
+        if freeTiers.contains(ownerTier) && clients.count >= freeClientLimit {
+            throw DataStoreError.freeTierLimit("Free plan is limited to \(freeClientLimit) clients. Upgrade to Solo or Crew for unlimited.")
+        }
+
         guard await sb.isConfigured else {
             clients.append(client)
             return
@@ -546,6 +554,7 @@ final class DataStore: ObservableObject {
 enum DataStoreError: LocalizedError {
     case authenticationRequired
     case clientRequired
+    case freeTierLimit(String)
 
     var errorDescription: String? {
         switch self {
@@ -553,6 +562,8 @@ enum DataStoreError: LocalizedError {
             "Please sign in before saving."
         case .clientRequired:
             "Select a client before saving the job."
+        case .freeTierLimit(let message):
+            message
         }
     }
 }

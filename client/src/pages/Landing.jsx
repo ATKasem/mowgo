@@ -21,7 +21,7 @@ const differentiators = [
 const plans = [
   { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
   { name: 'Solo', price: '39', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'AI Autopilot — chat to your CRM', 'Offline mode'], cta: 'Start Free Trial', highlight: true },
-  { name: 'Crew', price: '79', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'Priority support'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Crew', price: '79', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
 ];
 
 const stats = [

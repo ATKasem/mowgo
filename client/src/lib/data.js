@@ -240,14 +240,41 @@ export async function loadClients() {
 }
 
 export async function createClient(client) {
+  // Free tier limit: max 5 clients
+  const FREE_CLIENT_LIMIT = 5;
+  const FREE_TIERS = [undefined, null, '', 'free'];
+
   if (isDemoMode()) {
+    const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
+    if (FREE_TIERS.includes(profile?.tier) && _clients.length >= FREE_CLIENT_LIMIT) {
+      throw new Error(`Free plan is limited to ${FREE_CLIENT_LIMIT} clients. Upgrade to Solo or Crew for unlimited.`);
+    }
     const newClient = { ...client, id: uid() };
     _clients = [..._clients, newClient];
     notify();
     return newClient;
   }
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
+
+  // Check tier and client count for free-tier enforcement
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, business_id, tier')
+    .eq('id', user.id)
+    .single();
+
+  const ownerId = profile?.role === 'crew' ? profile.business_id : user.id;
+  if (ownerId && FREE_TIERS.includes(profile?.tier)) {
+    const { count } = await supabase
+      .from('clients')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', ownerId);
+    if ((count || 0) >= FREE_CLIENT_LIMIT) {
+      throw new Error(`Free plan is limited to ${FREE_CLIENT_LIMIT} clients. Upgrade to Solo or Crew for unlimited.`);
+    }
+  }
 
   const { data, error } = await supabase.from('clients').insert({
     user_id: user.id,

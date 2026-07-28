@@ -187,11 +187,11 @@ struct SubscriptionView: View {
                             name: "Crew",
                             price: "$79/mo",
                             features: [
+                                "Everything in Solo",
                                 "Unlimited clients",
                                 "Multi-user / crew",
-                                "Everything in Solo",
-                                "API access",
-                                "Custom branding"
+                                "Job assignment & tracking",
+                                "Team progress dashboard"
                             ],
                             tier: "crew",
                             isCurrent: normalizedCurrentTier == "crew"

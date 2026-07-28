@@ -2,7 +2,7 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, updateJob, reorderJobs, loadClients, loadTeamMembers, loadProfile } from '../lib/data';
+import { createJob, updateJobStatus, updateJob, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard } from '../lib/data';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
@@ -43,6 +43,7 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const [teamLoading, setTeamLoading] = useState(false);
   const [teamError, setTeamError] = useState('');
   const [crewFilter, setCrewFilter] = useState(null); // null = show all
+  const [teamDashboard, setTeamDashboard] = useState([]);
   const toggleTimeoutRef = useRef(null);
   const jobsRef = useRef(jobs);
   const formRef = useRef(form);
@@ -79,6 +80,24 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     loadTeam();
     return () => { active = false; };
   }, []);
+
+  // Load team dashboard stats for crew owners
+  useEffect(() => {
+    let active = true;
+    async function loadDashboard() {
+      try {
+        const profile = await loadProfile();
+        if (profile?.tier === 'crew' && (profile.role || 'owner') === 'owner') {
+          const data = await loadTeamDashboard(date);
+          if (active) setTeamDashboard(data);
+        }
+      } catch (err) {
+        console.error('loadTeamDashboard:', err);
+      }
+    }
+    loadDashboard();
+    return () => { active = false; };
+  }, [date]);
 
   const createJobHandler = useCallback(async (e) => {
     e.preventDefault();
@@ -384,6 +403,35 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Team Progress Dashboard — crew owners only */}
+      {canManageCrew && teamDashboard.length > 0 && (
+        <div className="card p-4 mb-5">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{tr("Team Progress")}</h3>
+          <div className="space-y-2">
+            {teamDashboard.map((member, i) => {
+              const color = TEAM_MEMBER_COLORS[i % TEAM_MEMBER_COLORS.length];
+              const pct = member.total > 0 ? Math.round((member.done / member.total) * 100) : 0;
+              return (
+                <div key={member.id} className="flex items-center gap-3">
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${color.bg} ${color.text}`}>
+                    {(member.name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{member.name}</span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">{member.done}/{member.total} {tr("done")}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
