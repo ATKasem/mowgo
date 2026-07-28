@@ -23,23 +23,21 @@ struct ChatOverlay: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                theme.background.ignoresSafeArea()
-
-                VStack(spacing: 0) {
-                    if chat.messages.isEmpty {
-                        emptyState
-                    } else {
-                        messageList
-                    }
-                    inputBar
+            VStack(spacing: 0) {
+                // Message list — takes all available space above the keyboard.
+                if chat.messages.isEmpty {
+                    emptyState
+                } else {
+                    messageList
                 }
             }
+            .background(theme.background.ignoresSafeArea())
             .navigationTitle("AI Assistant")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
+                        chat.cancelCurrentRequest()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
@@ -59,16 +57,24 @@ struct ChatOverlay: View {
                     .accessibilityLabel("Chat options")
                 }
             }
+            // Input bar pinned to bottom, lifts above keyboard.
+            .safeAreaInset(edge: .bottom) {
+                inputBar
+            }
         }
         .onAppear {
             guard !pageContext.isEmpty else { return }
-            // Remove any previous context message, then inject the current one
+            // Remove any previous context message, then inject the current one.
             chat.messages.removeAll { $0.role == .system }
             let contextMsg = ChatService.ChatMessage(
                 role: .system,
                 content: "Current screen: \(pageContext). Use this context to provide relevant suggestions."
             )
             chat.messages.insert(contextMsg, at: 0)
+        }
+        .onDisappear {
+            // Cancel any in-flight API call when user dismisses the sheet.
+            chat.cancelCurrentRequest()
         }
     }
 
@@ -183,6 +189,8 @@ struct ChatOverlay: View {
     private func sendMessage() {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
+        // Debounce: if a request is already in-flight, ignore.
+        guard !chat.isLoading else { return }
         inputText = ""
         isInputFocused = false
         Task { await chat.send(text) }

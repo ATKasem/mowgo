@@ -18,6 +18,9 @@ final class ChatService: ObservableObject {
 
     private let sb = SupabaseService.shared
 
+    /// The in-flight send Task — cancelled on sheet dismiss or new send.
+    private var currentSendTask: Task<Void, Never>?
+
     struct ChatMessage: Identifiable, Equatable {
         let id: UUID
         let role: Role
@@ -66,6 +69,9 @@ final class ChatService: ObservableObject {
     private let maxMessages = 100
 
     func send(_ text: String) async {
+        // Debounce: if already loading, ignore duplicate sends.
+        guard !isLoading else { return }
+
         let userMsg = ChatMessage(role: .user, content: text)
         messages.append(userMsg)
         // Cap messages to prevent unbounded memory growth.
@@ -85,21 +91,41 @@ final class ChatService: ObservableObject {
         }
 
         let body: [String: Any] = ["messages": history]
-        do {
-            let data = try await sb.requestFunction("ai-chat", body: body)
-            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            let reply = json?["reply"] as? String ?? "Sorry, I couldn't process that."
-            let assistantMsg = ChatMessage(role: .assistant, content: reply)
-            messages.append(assistantMsg)
-        } catch {
-            self.error = error.localizedDescription
-            let errorMsg = ChatMessage(role: .assistant, content: "⚠️ Connection error. Please try again.")
-            messages.append(errorMsg)
+
+        // Store the task so it can be cancelled on sheet dismiss.
+        let sendTask = Task { @MainActor in
+            do {
+                let data = try await sb.requestFunction("ai-chat", body: body)
+                // Check if cancelled after the await.
+                guard !Task.isCancelled else { return }
+                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                let reply = json?["reply"] as? String ?? "Sorry, I couldn't process that."
+                let assistantMsg = ChatMessage(role: .assistant, content: reply)
+                messages.append(assistantMsg)
+            } catch is CancellationError {
+                // User cancelled — silently stop.
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.error = error.localizedDescription
+                let errorMsg = ChatMessage(role: .assistant, content: "⚠️ Connection error. Please try again.")
+                messages.append(errorMsg)
+            }
+            isLoading = false
+            currentSendTask = nil
         }
+        currentSendTask = sendTask
+        await sendTask.value
+    }
+
+    /// Cancel any in-flight API call (e.g. when the chat sheet is dismissed).
+    func cancelCurrentRequest() {
+        currentSendTask?.cancel()
+        currentSendTask = nil
         isLoading = false
     }
 
     func clearChat() {
+        cancelCurrentRequest()
         messages.removeAll()
         error = nil
     }

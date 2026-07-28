@@ -10,11 +10,28 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// In-memory rate limiter (per-user, per-minute, resets on cold start)
+const RL_WINDOW_MS = 60_000;
+const RL_MAX = 30;
+const rlMap = new Map<string, { count: number; window: number }>();
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rlMap.get(userId);
+  if (!entry || now - entry.window > RL_WINDOW_MS) {
+    rlMap.set(userId, { count: 1, window: now });
+    return true;
+  }
+  if (entry.count >= RL_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
-};
+}
 
 serve(async (req) => {
   // CORS preflight
@@ -42,6 +59,14 @@ serve(async (req) => {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Rate limit: 30 requests per minute per user
+    if (!checkRateLimit(user.id)) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please wait." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Parse request body
