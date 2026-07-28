@@ -137,10 +137,10 @@ export default function Home({ jobs = [], invoices = [] }) {
   const upcoming = todayJobs.filter(j => j.status !== 'done').slice(0, 4);
 
   // ===== Weather rendering =====
-  const WIcon = weather ? (weatherIcons[weather.current.weather_code] || Sun) : Sun;
-  const wLabel = weather ? wmoToLabel(weather.current.weather_code) : 'Clear';
-  const wTemp = weather ? Math.round(weather.current.temperature_2m) : '—';
-  const wEmoji = weather ? (weatherEmoji[weather.current.weather_code] || '☀️') : '☀️';
+  const WIcon = weather?.current ? (weatherIcons[weather.current.weather_code] || Sun) : Sun;
+  const wLabel = weather?.current ? wmoToLabel(weather.current.weather_code) : 'Clear';
+  const wTemp = weather?.current ? Math.round(weather.current.temperature_2m) : '—';
+  const wEmoji = weather?.current ? (weatherEmoji[weather.current.weather_code] || '☀️') : '☀️';
   const forecast = weather?.daily ? weather.daily.time.slice(0, 10).map((_, i) => ({
     day: new Date(weather.daily.time[i] + 'T12:00:00').toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short' }),
     hi: Math.round(weather.daily.temperature_2m_max[i]),

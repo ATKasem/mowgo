@@ -23,11 +23,11 @@ export default function InvoiceToast({ toast }) {
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <div>
           <p className={`text-sm font-semibold ${textColor}`}>
-            {isRain || toast.type === 'recurring'
+            {isRain || isError || toast.type === 'recurring'
               ? toast.name
               : tr('Invoice created for {{name}}', { name: toast.name })}
           </p>
-          {!isRain && <p className={`text-xs ${subColor}`}>${toast.amount} — {tr('unpaid')}</p>}
+          {!isRain && !isError && <p className={`text-xs ${subColor}`}>${toast.amount} — {tr('unpaid')}</p>}
         </div>
       </div>
     </div>
