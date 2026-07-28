@@ -122,6 +122,17 @@ final class StripeService: ObservableObject {
         }
         return url
     }
+
+    // MARK: - Cancel Subscription
+
+    func cancelSubscription() async throws {
+        let data = try await sb.requestFunction("cancel-subscription", body: [:])
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        guard json?["success"] as? Bool == true else {
+            let msg = json?["error"] as? String ?? "Could not cancel subscription"
+            throw StripeError.cancelFailed(msg)
+        }
+    }
 }
 
 // MARK: - Stripe Errors
@@ -132,6 +143,7 @@ enum StripeError: LocalizedError {
     case noPortalURL
     case operationInProgress
     case paymentFailed(String)
+    case cancelFailed(String)
     var errorDescription: String? {
         switch self {
         case .noClientSecret: "Could not initialize payment."
@@ -139,6 +151,7 @@ enum StripeError: LocalizedError {
         case .noPortalURL: "Could not open subscription management."
         case .operationInProgress: "A payment is already being prepared."
         case .paymentFailed(let msg): "Payment failed: \(msg)"
+        case .cancelFailed(let msg): msg
         }
     }
 }

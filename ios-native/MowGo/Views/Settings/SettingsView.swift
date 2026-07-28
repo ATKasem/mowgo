@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var showSubscription = false
     @State private var showManagePortal = false
     @State private var portalError: String?
+    @State private var showCancelConfirmation = false
+    @State private var cancelError: String?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var appearancePreference: Binding<AppearancePreference> {
@@ -52,6 +54,14 @@ struct SettingsView: View {
                 Button("Sign Out", role: .destructive) { Task { await auth.signOut() } }
                 Button("Cancel", role: .cancel) {}
             } message: { Text("You'll need to sign in again.") }
+            .alert("Cancel Subscription", isPresented: $showCancelConfirmation) {
+                Button("Cancel Subscription", role: .destructive) {
+                    Task { await handleCancelSubscription() }
+                }
+                Button("Keep Subscription", role: .cancel) {}
+            } message: {
+                Text("Cancel your \(auth.user?.tierLabel ?? "Solo") subscription? You'll lose access at the end of your billing period.")
+            }
         }
     }
 
@@ -100,6 +110,29 @@ struct SettingsView: View {
                     .padding(.vertical, 10)
                     .background(MowGoTheme.deepGreen)
                     .cornerRadius(10)
+                }
+
+                Button {
+                    showCancelConfirmation = true
+                } label: {
+                    HStack {
+                        Image(systemName: "xmark.circle")
+                        Text("Cancel Subscription")
+                    }
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(.red)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(.red, lineWidth: 1)
+                    )
+                }
+
+                if let cancelError {
+                    Text(cancelError)
+                        .font(.caption2)
+                        .foregroundColor(.red)
                 }
             }
 
@@ -150,6 +183,16 @@ struct SettingsView: View {
             } catch {
                 portalError = error.localizedDescription
             }
+        }
+    }
+
+    private func handleCancelSubscription() async {
+        cancelError = nil
+        do {
+            try await StripeService.shared.cancelSubscription()
+            await auth.loadProfile()
+        } catch {
+            cancelError = error.localizedDescription
         }
     }
 
