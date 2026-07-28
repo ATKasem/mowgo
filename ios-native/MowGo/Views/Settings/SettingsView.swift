@@ -85,24 +85,40 @@ struct SettingsView: View {
             }
             Divider().background(theme.surfaceElevated)
 
+            // Action buttons
             if isPaidTier {
-                // Paid users see "Manage Subscription" → Stripe Customer Portal
                 Button {
                     Task { openCustomerPortal() }
                 } label: {
-                        HStack {
-                            Image(systemName: "gearshape.2.fill")
-                            Text("Manage Subscription")
-                        }
-                        .font(.subheadline.weight(.medium))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(MowGoTheme.deepGreen)
-                        .cornerRadius(10)
+                    HStack {
+                        Image(systemName: "gearshape.2.fill")
+                        Text("Manage Subscription")
                     }
-                } else {
-                // Free users see "View Plans" to upgrade
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(MowGoTheme.deepGreen)
+                    .cornerRadius(10)
+                }
+            }
+
+            // Show higher-tier plan cards
+            if !higherTiers.isEmpty {
+                Divider().background(theme.surfaceElevated)
+                Text("Upgrade").font(.caption.weight(.semibold))
+                    .foregroundColor(theme.textMuted)
+                ForEach(higherTiers, id: \.self) { tier in
+                    SubscriptionPlanCard(
+                        name: tierLabel(for: tier),
+                        price: priceLabel(for: tier),
+                        features: features(for: tier),
+                        tier: tier,
+                        isCurrent: false,
+                        userTier: auth.user?.tier ?? "free"
+                    )
+                }
+            } else if !isPaidTier {
                 Button { showSubscription = true } label: {
                     Text("View Plans")
                         .font(.subheadline.weight(.medium))
@@ -134,6 +150,51 @@ struct SettingsView: View {
             } catch {
                 portalError = error.localizedDescription
             }
+        }
+    }
+
+    private var higherTiers: [String] {
+        let tier = auth.user?.tier ?? "free"
+        switch tier {
+        case "free": return ["solo", "crew"]
+        case "solo": return ["crew"]
+        default: return []
+        }
+    }
+
+    private func tierLabel(for tier: String) -> String {
+        switch tier {
+        case "solo": return "Solo"
+        case "crew": return "Crew"
+        default: return tier.capitalized
+        }
+    }
+
+    private func priceLabel(for tier: String) -> String {
+        switch tier {
+        case "solo": return "$39/mo"
+        case "crew": return "$79/mo"
+        default: return ""
+        }
+    }
+
+    private func features(for tier: String) -> [String] {
+        switch tier {
+        case "solo": return [
+            "15 clients",
+            "AI Autopilot assistant",
+            "Route optimization",
+            "Photo attachments",
+            "Priority support"
+        ]
+        case "crew": return [
+            "Unlimited clients",
+            "Team job assignment",
+            "GPS tracking",
+            "QuickBooks sync",
+            "Everything in Solo"
+        ]
+        default: return []
         }
     }
 

@@ -60,6 +60,10 @@ private struct JobSchedulePatch: Encodable {
     let scheduledDate: String
 }
 
+private struct JobAssignedPatch: Encodable {
+    let assignedTo: UUID?  // nil = unassign
+}
+
 private struct InvoicePaidPatch: Encodable {
     let status: Invoice.InvoiceStatus
     let paidAt: String
@@ -316,9 +320,10 @@ final class DataStore: ObservableObject {
     // MARK: - Clients
 
     func createClient(_ client: Client) async throws {
-        // Free tier limit: max 5 clients
+        // Free tier limit: max 5 clients. Unknown tier (nil) defaults to
+        // allowing — the limit applies on next load when tier is confirmed.
         let freeClientLimit = 5
-        let freeTiers: [String?] = [nil, "", "free"]
+        let freeTiers: [String?] = ["", "free"]
         let ownerTier = teamMembers.first(where: { $0.role == "owner" })?.tier
         if freeTiers.contains(ownerTier) && clients.count >= freeClientLimit {
             throw DataStoreError.freeTierLimit("Free plan is limited to \(freeClientLimit) clients. Upgrade to Solo or Crew for unlimited.")
@@ -515,8 +520,12 @@ final class DataStore: ObservableObject {
         }
         try await sb.delete("profiles", id: memberId)
         teamMembers.removeAll { $0.id == memberId }
+        // Sync unassigned jobs to server
         for idx in jobs.indices where jobs[idx].assignedTo == memberId {
-            jobs[idx].assignedTo = nil
+            var updated = jobs[idx]
+            updated.assignedTo = nil
+            try? await sb.update("jobs", id: updated.id, JobAssignedPatch(assignedTo: nil))
+            jobs[idx] = updated
         }
     }
 

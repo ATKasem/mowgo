@@ -14,11 +14,13 @@ INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
 INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES
 
 // MARK: - Supabase
-// Direct INFOPLIST_KEY_ entries — GENERATE_INFOPLIST_FILE strips the prefix
-// so these appear in Info.plist as SUPABASE_URL / SUPABASE_ANON_KEY.
-// $() expands to an empty string, preserving // instead of starting a comment.
-INFOPLIST_KEY_SUPABASE_URL = https:/$()/vqgiynfrpsqddjrayczc.supabase.co
-INFOPLIST_KEY_SUPABASE_ANON_KEY = eyJhbG...ZXFM
+// _SLASH variable trick: xcconfig treats // as comment start, so we build
+// the double-slash from two variable expansions. GENERATE_INFOPLIST_FILE
+// strips the INFOPLIST_KEY_ prefix, producing SUPABASE_URL / SUPABASE_ANON_KEY
+// in the final Info.plist.
+_SLASH = /
+INFOPLIST_KEY_SUPABASE_URL = https:$(_SLASH)$(_SLASH)vqgiynfrpsqddjrayczc.supabase.co
+INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
 
 // MARK: - Stripe
 INFOPLIST_KEY_StripePublishableKey = pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj

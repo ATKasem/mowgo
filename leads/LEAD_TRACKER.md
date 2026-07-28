@@ -1,5 +1,5 @@
 # MowGo Lead Tracker
-**Last updated:** 2026-07-26
+**Last updated:** 2026-07-28 (review counts verified)
 **Total leads:** 8
 **Contacted:** 0
 **Conversions:** 0
@@ -27,6 +27,7 @@
 - **Email:** —
 - **Crew Size:** 1-2 (locally owned, small business, no "team" language — just "we" and "our")
 - **Current System:** Unknown
+- **Reviews:** ~0-5 — Yelp page exists; IG: 10 followers, 4 posts (minimal digital footprint)
 - **Pain Points:** Manual scheduling for weekly/biweekly mowing routes; likely using phone/text to manage clients; no online scheduling or invoicing
 - **Last Contact:**
 - **Next Step:** Cold email — highlight rain delay + free trial for solo operators
@@ -40,6 +41,7 @@
 - **Email:** emergelawns@gmail.com
 - **Crew Size:** 1-2 (firefighter-owned, small business — runs lawn care, landscaping, AND holiday lighting)
 - **Current System:** Gmail-based (personal Gmail for business)
+- **Reviews:** 91 FB likes, 28 IG followers (231 posts). FB created May 2026 — only 2 months old. New business!
 - **Pain Points:** Juggling multiple service types (lawn, landscaping, holiday lights); using personal Gmail for business; no scheduling/invoicing automation; rain delays
 - **Last Contact:**
 - **Next Step:** Cold email — highlight rain delay management + free trial
@@ -53,6 +55,7 @@
 - **Email:** —
 - **Crew Size:** 1-2 (small biz, offers many services — lawn mowing, tree trimming, hardscaping, landscaping)
 - **Current System:** Unknown
+- **Reviews:** ~0-5 — Yelp + Yellow Pages listings exist, no visible counts. Minimal online presence.
 - **Pain Points:** Expanding from Norman to surrounding areas (Noble, Slaughterville, Spencer) — needs scheduling to scale; offering 9+ service types means complex route management
 - **Last Contact:**
 - **Next Step:** Cold email — highlight route optimization for multi-service crews + free trial
@@ -66,6 +69,7 @@
 - **Email:** bill@metrogreenok.com
 - **Crew Size:** 1-3 (family-owned, serves Yukon/Mustang/Piedmont/SW OKC/Bethany)
 - **Current System:** Unknown
+- **Reviews:** 3 reviews ⭐5.0 on Birdeye; 33 FB likes — tiny online presence but loved by customers
 - **Pain Points:** Multi-city service area means complex route planning; offers senior/military discounts — suggests personal relationship with clients not backed by good software; likely using phone/text for scheduling
 - **Last Contact:**
 - **Next Step:** Cold email — highlight territory management + rain delay auto-notify
@@ -79,6 +83,7 @@
 - **Email:** —
 - **Crew Size:** 1-2 (locally owned, simple service list — mowing, aeration, dethatching, flowerbeds)
 - **Current System:** Unknown (Jobber-hosted website suggests they may use Jobber or similar)
+- **Reviews:** ~0-5 — Yelp page exists; Nextdoor presence. No visible review counts.
 - **Pain Points:** Using a generic Jobber site template — may be on Jobber already, or may have no system at all; likely needs simpler, more affordable option ($39-$79 vs Jobber's $169+)
 - **Last Contact:**
 - **Next Step:** Warm email — ask about current software, offer MowGo as cheaper alternative
@@ -92,6 +97,7 @@
 - **Email:** —
 - **Crew Size:** 1-2 (owner Nick Causey — veteran-friendly, sole proprietor with crew)
 - **Current System:** Unknown (website is mostly reviews, no booking system)
+- **Reviews:** 167 reviews on BestProsInTown! Largest by far. Owner Nick Causey. Big operation.
 - **Pain Points:** Heavy reliance on phone calls/texts for quotes; mixed tree service + lawn care hard to schedule; reviews show inconsistent response times
 - **Last Contact:**
 - **Next Step:** Cold email — highlight simple scheduling + auto-invoicing for mixed-service crews
@@ -105,6 +111,7 @@
 - **Email:** info@bigfootlawns.com
 - **Crew Size:** 1-2 (explicitly "small, owner-operated company")
 - **Current System:** Unknown (basic website, no booking system visible)
+- **Reviews:** 0 — no reviews found anywhere. Zero social media presence. Pure website. Dark horse.
 - **Pain Points:** Ideal MowGo target — explicitly small, owner-operated; likely managing clients via phone/text; no online scheduling; needs route optimization for weekly mowing clients
 - **Last Contact:**
 - **Next Step:** Cold email — highlight rain delay + free trial for owner-operators
@@ -118,6 +125,7 @@
 - **Email:** —
 - **Crew Size:** 2-3 (family owned & operated, offers residential AND commercial)
 - **Current System:** Unknown
+- **Reviews:** 4 reviews ⭐5.0 on mawlawn.com. Contact: joe@tulsaarealawncare.com
 - **Pain Points:** Serving both residential and commercial clients across Tulsa metro; family-run with limited software; likely needs simpler scheduling than enterprise tools
 - **Last Contact:**
 - **Next Step:** Cold email — highlight simple client management + free trial

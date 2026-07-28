@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ⚠️  SOURCE OF TRUTH: Config.xcconfig (INFOPLIST_KEY_* keys).        -->
+<!-- This plist is overwritten by GENERATE_INFOPLIST_FILE=YES.             -->
+<!-- Edit xcconfig, not this file.                                         -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
