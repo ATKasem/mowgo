@@ -55,7 +55,9 @@ serve(async (req) => {
       });
     }
 
-    const { tier } = await req.json();
+    let { tier } = await req.json();
+    // "free" plan users upgrade to Solo
+    if (tier === "free") tier = "solo";
 
     if (!tier || !tierToEnvKey[tier]) {
       return new Response(

@@ -1,0 +1,212 @@
+{
+  "scan_date": "2026-07-28",
+  "part": "2/3 — 8am CST Action",
+  "completed_at": "2026-07-28T13:15:00Z",
+  "quick_wins": {
+    "executed": [
+      {
+        "task": "Create supabase_keepalive.sh",
+        "status": "✅ DONE",
+        "detail": "Script created at /opt/data/scripts/supabase_keepalive.sh. Tested successfully (exit 0 — Supabase reachable). Pings Supabase REST API every 5 min to prevent cold-start.",
+        "time_spent_min": 5,
+        "impact": "Fixes 6-day-old repeating cron failure"
+      }
+    ],
+    "blocked": [
+      {
+        "task": "Set VITE_FORCE_DEMO=false in CF Pages",
+        "status": "❌ BLOCKED",
+        "detail": "Local client .env does NOT have VITE_FORCE_DEMO set (commented out). If CF Pages has it set as an env var, needs dashboard access. CF API token expired — cannot verify via API.",
+        "blocker": "CF API token needs regeneration (dash.cloudflare.com → Profile → API Tokens)"
+      },
+      {
+        "task": "Fix VITE_STRIPE_PRICE_SOLO price ID mismatch",
+        "status": "❌ BLOCKED",
+        "detail": "Server .env uses STRIPE_PRICE_SOLO=price_1TwFiDGwXKVLlr2IIyi3NmBi (reported as old $49 deactivated price). Client has no VITE_STRIPE_PRICE_SOLO defined. CF Pages Functions use env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO. Need new price ID from Stripe dashboard + CF API to update.",
+        "blocker": "Need new Stripe price ID + CF API token to update env vars"
+      },
+      {
+        "task": "Submit MowGo to Tolodora.com",
+        "status": "❌ BLOCKED",
+        "detail": "Tolodora launch page (https://tolodora.com/launch) is a Next.js SPA — form requires JavaScript rendering. Playwright browser not installed in this environment. Cannot submit via HTTP API either (405 method not allowed).",
+        "blocker": "Need JS-capable browser or manual submission on Tolodora.com"
+      },
+      {
+        "task": "Submit MowGo to Briostack",
+        "status": "❌ BLOCKED",
+        "detail": "Briostack is a competitor (lawn care software themselves) — unlikely to list competitors. Their 'lawn care software comparison' page ranks themselves #1.",
+        "blocker": "Competitor platform — need different approach"
+      },
+      {
+        "task": "Post Reddit replies (2 threads)",
+        "status": "❌ BLOCKED",
+        "detail": "Reddit blocks automated access from this environment (403). Drafts ready at /opt/data/mowgo/marketing/reddit-replies-2026-07-27.md. r/Entrepreneur 'dad+daughter landscaping' (PRIME) and r/landscaping '1-3 person crews' (GOLDEN) threads.",
+        "blocker": "Aaron must post manually from his Reddit account"
+      },
+      {
+        "task": "Cron setup for keepalive",
+        "status": "❌ BLOCKED",
+        "detail": "crontab command not available in this environment. Keepalive script runs via cron job context but cannot self-register.",
+        "blocker": "Add cron via Hermes cron system or system crontab externally"
+      }
+    ]
+  },
+  "bug_fixes_researched": {
+    "stripe_production_issues": {
+      "status": "DIAGNOSED — needs Aaron",
+      "findings": {
+        "cf_pages_functions_not_deployed": "CONFIRMED. GET https://mowgo.pages.dev/api/stripe/checkout-subscription returns SPA HTML (200) instead of JSON — the functions/ directory is NOT being detected by Cloudflare Pages. Project has no wrangler.toml. Netlify.toml exists but deployment is on CF Pages.",
+        "env_vars_empty": "CANNOT VERIFY via API (token expired). Local server .env HAS values (SUPABASE_URL, SUPABASE_SERVICE_KEY, STRIPE_SECRET_KEY, RESEND_API_KEY) but STRIPE_WEBHOOK_SECRET is MISSING from server .env. CF Pages env vars unknown.",
+        "vite_force_demo_true": "NOT IN LOCAL CLIENT .ENV. If CF Pages has this set, it blocks auth. Cannot verify without CF API.",
+        "price_id_mismatch": "Server uses STRIPE_PRICE_SOLO=price_1TwFiDGwXKVLlr2IIyi3NmBi (old $49 deactivated). Client has no VITE_STRIPE_PRICE_SOLO. CF Functions use env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO. Need new price ID.",
+        "fix_steps": [
+          "1. Log into dash.cloudflare.com → Pages → mowgo",
+          "2. Add build command: empty (just deploy from functions/)",
+          "3. Set 4 env vars: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_KEY, OPENROUTER_API_KEY",
+          "4. Remove VITE_FORCE_DEMO or set to false",
+          "5. Update STRIPE_PRICE_SOLO to current $39 price ID"
+        ]
+      }
+    }
+  },
+  "research_tasks": {
+    "completed": [
+      {
+        "task": "Servinix competitive intel",
+        "findings": {
+          "launch_date": "July 31, 2026 (3 days)",
+          "pricing": {
+            "ai_service_assistant": "$300/mo flat (unlimited calls, AI Maya, universal inbox)",
+            "field_service_management": "$20/tech/mo (dispatch, route opt, GPS, invoicing, QB sync)",
+            "gps_fleet_tracking": "$20/vehicle/mo (OBD-II hardware optional)"
+          },
+          "key_features": [
+            "AI phone agent 'Maya' — 24/7 call answering + booking",
+            "Route optimization native (not separate add-on)",
+            "Phone-GPS tracking (no hardware), optional OBD-II",
+            "Lead Engine — exclusive Google leads",
+            "Pricebook, invoicing, QuickBooks sync",
+            "Targets ALL field service (HVAC, plumbing, lawn care)"
+          ],
+          "weaknesses": [
+            "NOT lawn-specific — no rain delay auto-reschedule",
+            "No gate codes/pet notes/yard size tracking",
+            "Unlimited users but high base price ($300+$20/tech)"
+          ],
+          "threat_level": "HIGH — broad feature set at aggressive pricing, launching in 3 days"
+        }
+      },
+      {
+        "task": "QuoteIQ competitive intel",
+        "findings": {
+          "pricing_tiers": {
+            "essentials": "$29.99/mo (1 user, AI features)",
+            "beginner": "$74.99/mo (MapMeasure Pro, e-signatures)",
+            "pro": "$149.99/mo (4 users, job costing, CRM, phone)",
+            "elite": "$249.99/mo (route optimization, inventory)",
+            "max": "$399.99/mo (unlimited users)"
+          },
+          "recent_features_july_2026": [
+            "AI AutoMeasure — satellite property measurement",
+            "Ask AI Reports — natural-language report builder",
+            "Expenses Analytics Dashboard"
+          ],
+          "seo_dominance": [
+            "5+ comparison-style pages in last 30 days",
+            "SBA (Service Business Academy) ranks QuoteIQ #1 for lawn care",
+            "Running 'Top 10 Lawn Care Software' lists (self-ranking)"
+          ],
+          "threat_level": "HIGH — dominating SEO, AI feature sprint, aggressive content marketing"
+        }
+      },
+      {
+        "task": "Comparison site submission feasibility",
+        "findings": {
+          "tolodora": "Next.js SPA → needs JS browser. Manual submission at https://tolodora.com/launch",
+          "briostack": "Competitor platform → unlikely to list MowGo (lawn care software themselves)",
+          "servicebusinessacademy": "Partnership with QuoteIQ → unlikely",
+          "costbench": "Collects pricing data — possible listing target",
+          "sourceforge": "General software directory — can submit",
+          "capterra": "Requires account creation — possible"
+        }
+      }
+    ]
+  },
+  "tasks_for_aaron": [
+    {
+      "priority": "🔴 CRITICAL",
+      "task": "Fix CF Pages production deployment",
+      "detail": "mowgo.pages.dev serves SPA HTML for ALL routes — CF Pages Functions not deployed. API endpoints return 200 HTML instead of JSON. No checkout works. No subscriptions. No revenue.",
+      "action_required": [
+        "Log into dash.cloudflare.com → Pages → mowgo",
+        "Set build command to empty string (functions/ detection)",
+        "Add env vars: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_KEY, OPENROUTER_API_KEY",
+        "Remove VITE_FORCE_DEMO or set to false",
+        "Update STRIPE_PRICE_SOLO to current $39 price ID"
+      ],
+      "effort": "15 min",
+      "impact": "Unblocks entire Stripe checkout pipeline"
+    },
+    {
+      "priority": "🔴 CRITICAL",
+      "task": "Regenerate CF API token",
+      "detail": "Current token (in /opt/data/.env) returns 401. Cannot verify env vars or trigger deployments via API.",
+      "action_required": "dash.cloudflare.com → Profile → API Tokens → Create token with Pages:Edit permission",
+      "effort": "5 min"
+    },
+    {
+      "priority": "🔴 HIGH",
+      "task": "Comparison site submissions — manual",
+      "detail": "MowGo is invisible on ALL 5 major comparison sites. Every 'best lawn care software 2026' search funnels to QuoteIQ/Jobber. Urgently need submissions.",
+      "action_required": [
+        "Submit to Tolodora.com/launch (easiest, freshest list — published Jul 27)",
+        "Submit to SoftwareWorld, Guideflow, FieldServiceStack",
+        "Create accounts on Capterra, Software Advice, SourceForge"
+      ],
+      "effort": "60 min",
+      "impact": "Directly drives organic discovery — #1 growth blocker"
+    },
+    {
+      "priority": "🔴 HIGH",
+      "task": "Post Reddit replies (MUST be manual)",
+      "detail": "3 goldmine threads with drafts ready. Cannot automate — Reddit blocks this environment.",
+      "action_required": [
+        "r/Entrepreneur — dad+daughter landscaping software (PRIME)",
+        "r/landscaping — '1-3 person crews — what do you use?' (GOLDEN)",
+        "r/sweatystartup — 'Not happy with Jobber' (HIGH switch intent)"
+      ],
+      "drafts_location": "/opt/data/mowgo/marketing/reddit-replies-2026-07-27.md",
+      "effort": "15 min",
+      "impact": "Direct engagement with warm ICPs"
+    },
+    {
+      "priority": "🟡 HIGH",
+      "task": "Cold email outreach to leads",
+      "detail": "22 leads in tracker, ZERO contacted. Bigfoot Lawns, Emerge Lawns, Metro Green are highest ROI targets.",
+      "action_required": "Send first 5 emails today — 30 min effort",
+      "effort": "30 min"
+    },
+    {
+      "priority": "🟡 MEDIUM",
+      "task": "Set up keepalive cron externally",
+      "detail": "Script created and tested at /opt/data/scripts/supabase_keepalive.sh but crontab not available in this environment.",
+      "action_required": "Add to host crontab: */5 * * * * /opt/data/scripts/supabase_keepalive.sh",
+      "effort": "2 min"
+    },
+    {
+      "priority": "🟡 MEDIUM",
+      "task": "Prepare Jul 31 Jobber promo expiration messaging",
+      "detail": "Jobber promo expires Jul 31. Aug 1-7 is prime switching window.",
+      "action_required": "Create comparison ad: 'Jobber promo expired? MowGo is $39 flat — no add-on creep.'",
+      "effort": "20 min"
+    },
+    {
+      "priority": "🟡 MEDIUM",
+      "task": "Monitor Servinix launch (Jul 31)",
+      "detail": "Servinix launches in 3 days. Need pricing + features confirmed on launch day.",
+      "action_required": "Check servinix.com on Jul 31 for pricing announcement",
+      "effort": "10 min"
+    }
+  ],
+  "summary": "Executed 1 quick win (supabase keepalive script, tested ✅). 6 other quick wins blocked (CF API token expired, Playwright unavailable, crontab missing, Reddit 403). Completed full competitor intel on Servinix ($300+$20/tech/mo, launching Jul 31) and QuoteIQ ($29.99-$399.99/mo, sprinting on AI). MowGo remains invisible on all 5 comparison sites. Stripe production is confirmed DEAD (CF Functions return HTML). 22 leads untouched. The single highest-ROI action Aaron can take today: fix CF Pages deployment → unblocks Stripe → revenue."
+}
