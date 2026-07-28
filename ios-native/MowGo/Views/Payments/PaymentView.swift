@@ -84,7 +84,7 @@ struct PaymentView: View {
             let paymentId = paymentIntent.paymentIntentId
             let intentConfig = PaymentSheet.IntentConfiguration(
                 mode: .payment(amount: amountCents, currency: "usd"),
-                confirmHandler: { _, intentCreationCallback in
+                confirmHandler: { _, _, intentCreationCallback in
                     intentCreationCallback(.success(paymentIntent.clientSecret))
                 }
             )
