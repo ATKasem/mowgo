@@ -12,6 +12,7 @@ struct TodayView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
+    @Binding var selectedTab: Int
     @State private var showingRainConfirm = false
     @State private var showingAddJob = false
     @State private var showingAddClient = false
@@ -360,7 +361,9 @@ struct TodayView: View {
             } label: {
                 QuickActionRow(icon: "person.badge.plus", label: "Add Client", color: "3b82f6")
             }
-            NavigationLink(destination: InvoicesView()) {
+            Button {
+                selectedTab = 2
+            } label: {
                 QuickActionRow(icon: "doc.badge.plus", label: "View Invoices", color: "f59e0b")
             }
         }
@@ -372,7 +375,7 @@ struct TodayView: View {
         VStack(spacing: 12) {
             Image(systemName: "leaf").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
             Text("No jobs scheduled").font(.headline).foregroundColor(theme.textPrimary)
-            Text("Tap + to add your first job").font(.subheadline).foregroundColor(theme.textInverse)
+            Text("Tap + to add your first job").font(.subheadline).foregroundColor(theme.textMuted)
         }
         .padding(.top, 60)
     }

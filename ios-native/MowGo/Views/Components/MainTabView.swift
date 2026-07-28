@@ -16,7 +16,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            TodayView()
+            TodayView(selectedTab: $selectedTab)
                 .tabItem { Label("Today", systemImage: "sun.max.fill") }
                 .tag(0)
 
