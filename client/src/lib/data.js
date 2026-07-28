@@ -21,6 +21,27 @@ export function onDataChange(fn) { listeners.add(fn); return () => listeners.del
 
 function uid() { return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()); }
 
+// ===== Webhook helper =====
+
+/**
+ * Fire a webhook event to the send-webhook Edge Function.
+ * Non-blocking — errors are logged but never thrown so they
+ * don't break the calling flow.
+ */
+export async function fireWebhook(event, payload = {}) {
+  if (isDemoMode()) return;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.functions.invoke('send-webhook', {
+      body: { user_id: user.id, event, payload },
+    });
+  } catch (err) {
+    // Webhook failures must never break the main flow
+    console.warn('fireWebhook:', event, err?.message || err);
+  }
+}
+
 // ===== Jobs =====
 
 export async function loadJobs() {
@@ -116,6 +137,14 @@ export async function createJob(job) {
   }).select('*, clients!left(*)').single();
 
   if (error) throw error;
+  // Fire webhook (non-blocking)
+  fireWebhook('job.created', {
+    job_id: data.id,
+    title: data.title,
+    client_id: data.client_id,
+    scheduled_date: data.scheduled_date,
+    status: data.status,
+  });
   return {
     id: data.id,
     client_id: data.client_id,
@@ -159,6 +188,16 @@ export async function updateJob(id, updates) {
   }
   const { data, error } = await supabase.from('jobs').update(supabaseUpdates).eq('id', id).select('*, clients!left(*)').single();
   if (error) throw error;
+  // Fire webhook when job status changes (non-blocking)
+  if (updates.status) {
+    fireWebhook('job.updated', {
+      job_id: data.id,
+      title: data.title,
+      client_id: data.client_id,
+      scheduled_date: data.scheduled_date,
+      status: data.status,
+    });
+  }
   return {
     id: data.id,
     client_id: data.client_id,
@@ -290,6 +329,15 @@ export async function createClient(client) {
   }).select().single();
 
   if (error) throw error;
+  // Fire webhook (non-blocking)
+  fireWebhook('customer.created', {
+    client_id: data.id,
+    name: data.name,
+    address: data.address,
+    phone: data.phone,
+    email: data.email,
+    rate: data.rate,
+  });
   return { ...data, service_notes: data.cleaning_notes };
 }
 
@@ -395,6 +443,15 @@ export async function updateInvoiceStatus(id, status) {
   if (status === 'paid') updates.paid_at = new Date().toISOString();
   const { data, error } = await supabase.from('invoices').update(updates).eq('id', id).select().single();
   if (error) throw error;
+  // Fire webhook when invoice is paid (non-blocking)
+  if (status === 'paid') {
+    fireWebhook('invoice.paid', {
+      invoice_id: data.id,
+      client_id: data.client_id,
+      amount: data.amount,
+      paid_at: data.paid_at,
+    });
+  }
   return data;
 }
 

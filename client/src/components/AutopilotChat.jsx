@@ -41,12 +41,12 @@ export default function AutopilotChat({ compact = false, pageContext = null, ini
   const bottomRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
-  const initialSentRef = useRef(false);
+  const lastSentMessageRef = useRef(null);
 
-  // Auto-send initialMessage (e.g. from quick-prompts) once when provided
+  // Auto-send initialMessage (e.g. from quick-prompts) once per unique message
   useEffect(() => {
-    if (initialMessage && !initialSentRef.current && status === 'idle') {
-      initialSentRef.current = true;
+    if (initialMessage && initialMessage !== lastSentMessageRef.current && status === 'idle') {
+      lastSentMessageRef.current = initialMessage;
       sendMessage(initialMessage);
     }
   }, [initialMessage, status, sendMessage]);
