@@ -100,7 +100,6 @@ struct TodayView: View {
                                 LazyVStack(spacing: 8) {
                                     ForEach(todayJobs) { job in
                                         JobCardView(job: job, teamMembers: store.teamMembers,
-                                            showDate: !isToday,
                                             onToggle: {
                                                 Task {
                                                     do {
@@ -120,7 +119,8 @@ struct TodayView: View {
                                                         operationError = error.localizedDescription
                                                     }
                                                 }
-                                            }
+                                            },
+                                            showDate: !isToday
                                         )
                                     }
                                 }
