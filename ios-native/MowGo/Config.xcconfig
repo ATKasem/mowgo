@@ -19,7 +19,7 @@ INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES
 // also support projects that attach this xcconfig directly in Xcode.
 // $() expands to an empty string, preserving // instead of starting a comment.
 SUPABASE_URL = https:/$()/vqgiynfrpsqddjrayczc.supabase.co
-SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
+SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ2l5bmZycHNxZGRqcmF5Y3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTg5NjcsImV4cCI6MjA1NTU3NDk2N30.FqF_BmD7r8qnggEeOGYVS0mWqKpHhRIN3hG-xLgZXFM
 INFOPLIST_KEY_SUPABASE_URL = $(SUPABASE_URL)
 INFOPLIST_KEY_SUPABASE_ANON_KEY = $(SUPABASE_ANON_KEY)
 
