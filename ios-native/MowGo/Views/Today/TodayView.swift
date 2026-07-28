@@ -2,8 +2,8 @@
 //  TodayView.swift
 //  MowGo
 //
-//  Combined dashboard + today's jobs: greeting, stats, calendar,
-//  date navigation, rain delay, crew filter, and quick actions.
+//  Single-screen dashboard: compact header, slim calendar strip,
+//  2×2 stats, rain delay pill, and jobs visible above the fold.
 //
 
 import SwiftUI
@@ -14,6 +14,7 @@ struct TodayView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Binding var selectedTab: Int
     @State private var showingRainConfirm = false
+    @State private var showingActionSheet = false
     @State private var showingAddJob = false
     @State private var showingAddClient = false
     @State private var selectedDate = Date()
@@ -47,7 +48,7 @@ struct TodayView: View {
         todayJobs.filter { $0.status == .scheduled }.count
     }
 
-    // MARK: - HomeView-derived stats
+    // MARK: - Stats
 
     private var totalClients: Int { store.clients.count }
     private var unpaidCount: Int { store.invoices.filter { $0.status == .unpaid }.count }
@@ -74,35 +75,29 @@ struct TodayView: View {
                     ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
                     ScrollView {
-                        VStack(spacing: 16) {
-                            // Greeting
-                            greetingSection
+                        VStack(spacing: 12) {
+                            // Compact header
+                            headerRow
 
-                            // Dashboard stats grid
+                            // Slim date strip
+                            dateStrip
+
+                            // 2×2 stats grid
                             statsGrid
-
-                            // Date navigation
-                            dateHeader
-
-                            // Daily stats bar
-                            statsBar
 
                             // Crew filter
                             crewFilterBar
 
-                            // Weekly calendar
-                            weeklyCalendar
+                            // Rain delay pill (today only)
+                            rainDelayPill
 
                             // Error
                             if let err = operationError {
                                 Text(err).font(.caption).foregroundColor(.red)
-                                    .padding(.horizontal, 8)
+                                    .padding(.horizontal, 4)
                             }
 
-                            // Rain delay
-                            rainDelayButton
-
-                            // Today's jobs
+                            // Job list — visible above the fold
                             if todayJobs.isEmpty {
                                 emptyState
                             } else {
@@ -132,11 +127,8 @@ struct TodayView: View {
                                         )
                                     }
                                 }
-                                .padding(.horizontal, 16)
+                                .padding(.horizontal, 4)
                             }
-
-                            // Quick actions
-                            quickActions
                         }
                         .padding(.horizontal, 16)
                     }
@@ -151,15 +143,28 @@ struct TodayView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        showingAddJob = true
+                        showingActionSheet = true
                     } label: {
                         Image(systemName: "plus")
+                            .font(.title3.weight(.semibold))
                             .foregroundColor(MowGoTheme.deepGreen)
                     }
-                    .accessibilityLabel("Add job")
+                    .accessibilityLabel("Actions")
                 }
             }
-            .alert("Move \\(scheduledCount) jobs to tomorrow?", isPresented: $showingRainConfirm) {
+            .confirmationDialog("Actions", isPresented: $showingActionSheet, titleVisibility: .visible) {
+                Button("New Job") {
+                    showingAddJob = true
+                }
+                Button("Add Client") {
+                    showingAddClient = true
+                }
+                Button("View Invoices") {
+                    selectedTab = 2
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .alert("Move \\\\(scheduledCount) jobs to tomorrow?", isPresented: $showingRainConfirm) {
                 Button("Yes, rain delay", role: .destructive) {
                     UINotificationFeedbackGenerator().notificationOccurred(.warning)
                     Task {
@@ -189,23 +194,23 @@ struct TodayView: View {
         }
     }
 
-    // MARK: - Greeting
+    // MARK: - Header (compact)
 
-    private var greetingSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if isToday {
-                Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                    .font(.subheadline).foregroundColor(theme.textMuted)
-                Text("Good \(greeting) 👋")
-                    .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
+    private var headerRow: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                if isToday {
+                    Text("Good \(greeting) 👋")
+                        .font(.caption2)
+                        .foregroundColor(theme.textMuted)
+                }
+                Text("Today")
+                    .font(.title2.weight(.bold))
+                    .foregroundColor(theme.textPrimary)
                     .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-            } else {
-                Text(selectedDate.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                    .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
             }
+            Spacer()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var greeting: String {
@@ -217,55 +222,54 @@ struct TodayView: View {
         }
     }
 
-    // MARK: - Stats Grid (from HomeView)
+    // MARK: - Date Strip (slim)
+
+    private var dateStrip: some View {
+        HStack(spacing: 12) {
+            Button { shiftDate(-1) } label: {
+                Image(systemName: "chevron.left")
+                    .font(.caption)
+                    .foregroundColor(theme.textMuted)
+            }
+            .accessibilityLabel("Previous day")
+
+            Text(selectedDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(theme.textPrimary)
+
+            Button { shiftDate(1) } label: {
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(theme.textMuted)
+            }
+            .accessibilityLabel("Next day")
+
+            Spacer()
+
+            Button("Today") { selectedDate = Date() }
+                .font(.caption2.weight(.medium))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(isToday ? MowGoTheme.deepGreen : theme.surfaceElevated)
+                .foregroundColor(isToday ? MowGoTheme.onAccent : theme.textPrimary)
+                .cornerRadius(8)
+        }
+        .frame(height: 24)
+    }
+
+    // MARK: - Stats Grid (2×2 compact)
 
     private var statsGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
             StatCard(title: "Scheduled", value: "\(scheduledCount)", icon: "list.clipboard", color: "f59e0b")
             StatCard(title: "Clients", value: "\(totalClients)", icon: "person.2", color: "3b82f6")
             StatCard(title: "Unpaid", value: "\(unpaidCount)", icon: "doc.text", color: "ef4444")
             StatCard(
-                title: "This Week",
+                title: "Revenue",
                 value: (weeklyRevenue / 100).formatted(.currency(code: "USD")),
                 icon: "dollarsign.circle",
                 color: "16a34a"
             )
-        }
-    }
-
-    // MARK: - Date Header
-
-    private var dateHeader: some View {
-        VStack(spacing: 4) {
-            Text(selectedDate.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.title3.weight(.semibold)).foregroundColor(theme.textPrimary)
-                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-            HStack(spacing: 16) {
-                Button { shiftDate(-1) } label: {
-                    Image(systemName: "chevron.left").foregroundColor(theme.textMuted)
-                }
-                .accessibilityLabel("Previous day")
-                Button("Today") { selectedDate = Date() }
-                    .font(.caption.weight(.medium))
-                    .padding(.horizontal, 12).padding(.vertical, 4)
-                    .background(isToday ? MowGoTheme.deepGreen : theme.surfaceElevated)
-                    .foregroundColor(isToday ? MowGoTheme.onAccent : theme.textPrimary).cornerRadius(8)
-                Button { shiftDate(1) } label: {
-                    Image(systemName: "chevron.right").foregroundColor(theme.textMuted)
-                }
-                .accessibilityLabel("Next day")
-            }
-        }
-        .padding(.vertical, 12)
-    }
-
-    // MARK: - Stats Bar
-
-    private var statsBar: some View {
-        HStack(spacing: 12) {
-            StatChip(label: "Scheduled", count: todayJobs.filter { $0.status == .scheduled }.count, color: "f59e0b")
-            StatChip(label: "Done", count: todayJobs.filter { $0.status == .done }.count, color: "16a34a")
-            StatChip(label: "Revenue", count: nil, amount: todayJobs.filter { $0.status == .done }.compactMap { $0.clientRate }.reduce(0, +), color: "3b82f6")
         }
     }
 
@@ -306,70 +310,26 @@ struct TodayView: View {
         MowGoTheme.brandGreen
     ]
 
-    // MARK: - Weekly Calendar
+    // MARK: - Rain Delay Pill
 
-    private var weeklyCalendar: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("This Week").font(.headline).foregroundColor(theme.textPrimary)
-            HStack(spacing: 8) {
-                ForEach(weekDays, id: \.self) { day in
-                    VStack(spacing: 4) {
-                        Text(day.label).font(.caption2).foregroundColor(theme.textMuted)
-                        Text("\(day.day)").font(.callout.weight(.semibold))
-                            .foregroundColor(day.isToday ? MowGoTheme.onAccent : theme.textSecondary)
-                        Circle()
-                            .fill(day.hasJobs ? MowGoTheme.deepGreen : Color.clear)
-                            .frame(width: 6, height: 6)
-                            .accessibilityHidden(!day.hasJobs)
+    private var rainDelayPill: some View {
+        Group {
+            if isToday {
+                Button { showingRainConfirm = true } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "cloud.rain.fill")
+                            .font(.caption)
+                        Text("Rain Delay")
+                            .font(.caption.weight(.medium))
                     }
-                    .frame(width: 44).padding(.vertical, 8)
-                    .background(day.isToday ? MowGoTheme.deepGreen.opacity(0.2) : theme.surface)
-                    .cornerRadius(10)
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("\(day.label) \(day.day), \(day.jobCount) job\(day.jobCount == 1 ? "" : "s")")
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(MowGoTheme.rainBlue)
+                    .foregroundColor(MowGoTheme.onAccent)
+                    .cornerRadius(20)
                 }
-            }
-        }
-        .padding(16).background(theme.surface).cornerRadius(16)
-    }
-
-    // MARK: - Rain Delay
-
-    private var rainDelayButton: some View {
-        guard isToday else { return AnyView(EmptyView()) }
-        return AnyView(
-            Button { showingRainConfirm = true } label: {
-                HStack {
-                    Image(systemName: "cloud.rain.fill")
-                    Text("Rain Delay").fontWeight(.medium)
-                }
-                .frame(maxWidth: .infinity).padding(12)
-                .background(MowGoTheme.rainBlue).foregroundColor(MowGoTheme.onAccent).cornerRadius(12)
-            }
-            .disabled(scheduledCount == 0).opacity(scheduledCount == 0 ? 0.5 : 1)
-        )
-    }
-
-    // MARK: - Quick Actions
-
-    private var quickActions: some View {
-        VStack(spacing: 8) {
-            Button {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                showingAddJob = true
-            } label: {
-                QuickActionRow(icon: "plus.circle", label: "New Job", color: "16a34a")
-            }
-            Button {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                showingAddClient = true
-            } label: {
-                QuickActionRow(icon: "person.badge.plus", label: "Add Client", color: "3b82f6")
-            }
-            Button {
-                selectedTab = 2
-            } label: {
-                QuickActionRow(icon: "doc.badge.plus", label: "View Invoices", color: "f59e0b")
+                .disabled(scheduledCount == 0)
+                .opacity(scheduledCount == 0 ? 0.5 : 1)
             }
         }
     }
@@ -377,12 +337,18 @@ struct TodayView: View {
     // MARK: - Empty State
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "leaf").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
-            Text("No jobs scheduled").font(.headline).foregroundColor(theme.textPrimary)
-            Text("Tap + to add your first job").font(.subheadline).foregroundColor(theme.textMuted)
+        VStack(spacing: 8) {
+            Image(systemName: "leaf")
+                .font(.system(size: 32))
+                .foregroundColor(theme.surfaceElevated)
+            Text("No jobs scheduled")
+                .font(.subheadline.weight(.medium))
+                .foregroundColor(theme.textPrimary)
+            Text("Tap + to add your first job")
+                .font(.caption)
+                .foregroundColor(theme.textMuted)
         }
-        .padding(.top, 60)
+        .padding(.top, 40)
     }
 
     // MARK: - Helpers
@@ -394,32 +360,6 @@ struct TodayView: View {
             selectedDate = d
         }
     }
-
-    // WeekDay model and data (from HomeView)
-    private struct WeekDay: Hashable {
-        let label: String; let day: Int; let isToday: Bool; let hasJobs: Bool; let jobCount: Int
-    }
-
-    private var weekDays: [WeekDay] {
-        let cal = Calendar.current; let now = Date()
-        let fmt = TodayView.dayFormatter
-        return (-3...3).compactMap { offset in
-            guard let d = cal.date(byAdding: .day, value: offset, to: now) else { return nil }
-            let dateStr = fmt.string(from: d)
-            let count = store.jobs.filter { $0.scheduledDate == dateStr }.count
-            return WeekDay(
-                label: d.formatted(.dateTime.weekday(.abbreviated)),
-                day: cal.component(.day, from: d),
-                isToday: offset == 0,
-                hasJobs: count > 0,
-                jobCount: count
-            )
-        }
-    }
-}
-
-private extension TodayView {
-    static let dayFormatter: DateFormatter = { let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f }()
 }
 
 // MARK: - Crew Filter Chip
