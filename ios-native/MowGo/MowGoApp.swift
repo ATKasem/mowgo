@@ -75,6 +75,11 @@ struct MowGoApp: App {
                 }
             }
             .modelContainer(Self.modelContainer)
+            .onOpenURL { url in
+                guard url.scheme == "mowgo" else { return }
+                // Refresh data after returning from Stripe checkout
+                Task { await store.loadAll() }
+            }
         }
     }
 }
