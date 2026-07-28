@@ -53,7 +53,7 @@ struct StatChip: View {
     }
 }
 
-// MARK: - StatCard (HomeView stats grid)
+// MARK: - StatCard (TodayView stats grid)
 
 struct StatCard: View {
     @Environment(\.colorScheme) private var colorScheme

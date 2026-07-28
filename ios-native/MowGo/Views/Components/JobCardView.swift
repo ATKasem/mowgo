@@ -34,11 +34,17 @@ struct JobCardView: View {
 
     private let chipColors = ["16a34a", "3b82f6", "f59e0b", "8b5cf6", "ec4899"]
 
+    private static let dateFmt: DateFormatter = {
+        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"; return fmt
+    }()
+
+    private static let dayFmt: DateFormatter = {
+        let fmt = DateFormatter(); fmt.dateFormat = "EEE"; return fmt
+    }()
+
     private var dayAbbreviation: String {
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
-        guard let date = fmt.date(from: job.scheduledDate) else { return "" }
-        fmt.dateFormat = "EEE"
-        return fmt.string(from: date)
+        guard let date = Self.dateFmt.date(from: job.scheduledDate) else { return "" }
+        return Self.dayFmt.string(from: date)
     }
 
     // MARK: - Status icon helpers (computed outside ViewBuilder)

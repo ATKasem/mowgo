@@ -23,14 +23,11 @@ struct TodayView: View {
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
-    static func todayString() -> String {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: Date())
-    }
-
     private static let dateFmt: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
     }()
+
+    private static let isoFormatter: ISO8601DateFormatter = ISO8601DateFormatter()
 
     private var dateString: String { Self.dateFmt.string(from: selectedDate) }
 
@@ -58,8 +55,7 @@ struct TodayView: View {
             .filter { $0.status == .paid }
             .compactMap { inv -> Decimal? in
                 guard let paid = inv.paidAt else { return nil }
-                let f = ISO8601DateFormatter()
-                guard let d = f.date(from: paid) else { return nil }
+                guard let d = Self.isoFormatter.date(from: paid) else { return nil }
                 return cal.isDate(d, equalTo: Date(), toGranularity: .weekOfYear)
                     ? Decimal(inv.amountCents) : nil
             }
@@ -255,7 +251,7 @@ struct TodayView: View {
                 .foregroundColor(isToday ? MowGoTheme.onAccent : theme.textPrimary)
                 .cornerRadius(8)
         }
-        .frame(height: 24)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     // MARK: - Stats Grid (2×2 compact)
