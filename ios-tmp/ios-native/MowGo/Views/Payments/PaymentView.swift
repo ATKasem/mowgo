@@ -7,15 +7,19 @@
 
 import SwiftUI
 import StripePayments
+import StripePaymentSheet
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
-    @StateObject private var stripe = StripeService.shared
+    @Environment(\.colorScheme) private var colorScheme
+    @ObservedObject private var stripe = StripeService.shared
     @State private var showingCheckout = false
     @State private var checkoutURL: URL?
     @State private var paymentError: String?
 
     let invoice: Invoice
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -23,25 +27,25 @@ struct PaymentView: View {
             VStack(spacing: 8) {
                 Text(invoice.clientName ?? "Invoice")
                     .font(.headline)
-                    .foregroundColor(.white)
-                Text("$\(invoice.amount, specifier: "%.2f")")
+                    .foregroundColor(theme.textPrimary)
+                Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
                     .font(.title.weight(.bold))
-                    .foregroundColor(Color(hex: "16a34a"))
+                    .foregroundColor(MowGoTheme.deepGreen)
                 if let date = invoice.createdAt {
                     Text(date.prefix(10).description)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "9ca3af"))
+                        .foregroundColor(theme.textMuted)
                 }
             }
             .padding()
 
             // Pay button
             Button {
-                Task { await processPayment() }
+                Task { @MainActor in await processPayment() }
             } label: {
                 HStack {
                     if stripe.isLoading {
-                        ProgressView().tint(.white)
+                        ProgressView().tint(MowGoTheme.onAccent)
                     } else {
                         Image(systemName: "creditcard.fill")
                     }
@@ -50,8 +54,8 @@ struct PaymentView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(hex: "16a34a"))
-                .foregroundColor(.white)
+                .background(MowGoTheme.deepGreen)
+                .foregroundColor(MowGoTheme.onAccent)
                 .cornerRadius(12)
             }
             .disabled(stripe.isLoading)
@@ -72,17 +76,55 @@ struct PaymentView: View {
             return
         }
         paymentError = nil
-        let amountCents = Int(invoice.amount * 100)
+        let amountCents = invoice.amountCents
         do {
-            let clientSecret = try await stripe.createPaymentIntent(
+            let paymentIntent = try await stripe.createPaymentIntent(
                 amount: amountCents, invoiceId: invoice.id
             )
-            // In a real app, present StripePaymentSheet here
-            // PaymentSheet.IntentConfiguration(...)
-            _ = clientSecret
-            // Mark as paid after successful payment
-            try await store.markInvoicePaid(invoice)
-            paymentError = nil
+            let paymentId = paymentIntent.paymentIntentId
+            let intentConfig = PaymentSheet.IntentConfiguration(
+                mode: .payment(amount: amountCents, currency: "usd"),
+                confirmHandler: { _, _, intentCreationCallback in
+                    intentCreationCallback(.success(paymentIntent.clientSecret))
+                }
+            )
+            var config = PaymentSheet.Configuration()
+            config.merchantDisplayName = "MowGo"
+            let paymentSheet = PaymentSheet(
+                intentConfiguration: intentConfig,
+                configuration: config
+            )
+            // Present from the key window's root view controller
+            guard let windowScene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive }),
+                  let rootVC = windowScene.keyWindow?.rootViewController else {
+                paymentError = "Could not present payment sheet."
+                return
+            }
+            paymentSheet.present(from: rootVC) { result in
+                switch result {
+                case .completed:
+                    Task {
+                        do {
+                            try await self.stripe.confirmPayment(
+                                invoiceId: self.invoice.id,
+                                paymentIntentId: paymentId
+                            )
+                            await self.store.loadAll()
+                        } catch {
+                            await MainActor.run {
+                                self.paymentError = "Payment succeeded, but verification failed: \(error.localizedDescription). Refresh before trying again."
+                            }
+                        }
+                    }
+                case .canceled:
+                    Task { @MainActor in self.paymentError = "Payment was canceled." }
+                case .failed(let error):
+                    Task { @MainActor in self.paymentError = error.localizedDescription }
+                }
+            }
+            return  // PaymentSheet handles the rest via its completion handler
         } catch {
             paymentError = error.localizedDescription
         }
@@ -92,35 +134,53 @@ struct PaymentView: View {
 // MARK: - Subscription Plan Card
 
 struct SubscriptionPlanCard: View {
+    @Environment(\\.colorScheme) private var colorScheme
     let name: String
     let price: String
     let features: [String]
     let tier: String
     let isCurrent: Bool
+    var userTier: String = "free"
 
-    @StateObject private var stripe = StripeService.shared
+    private let stripe = StripeService.shared
     @State private var isPurchasing = false
     @State private var error: String?
 
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    private var tierOrder: Int {
+        switch tier {
+        case "crew": return 2
+        case "solo": return 1
+        default: return 0
+        }
+    }
+    private var userTierOrder: Int {
+        switch userTier.lowercased() {
+        case "crew": return 2
+        case "solo": return 1
+        default: return 0
+        }
+    }
+    private var canUpgrade: Bool { !isCurrent && tierOrder > userTierOrder }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(name)
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textPrimary)
                     Text(price)
                         .font(.title3.weight(.bold))
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                 }
                 Spacer()
                 if isCurrent {
                     Text("Current")
                         .font(.caption.weight(.medium))
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(Color(hex: "16a34a").opacity(0.15))
+                        .background(MowGoTheme.deepGreen.opacity(MowGoTheme.accentOpacity))
                         .cornerRadius(8)
                 }
             }
@@ -129,19 +189,19 @@ struct SubscriptionPlanCard: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.caption)
-                        .foregroundColor(Color(hex: "16a34a"))
+                        .foregroundColor(MowGoTheme.deepGreen)
                     Text(feature)
                         .font(.caption)
-                        .foregroundColor(Color(hex: "d1d5db"))
+                        .foregroundColor(theme.textSecondary)
                 }
             }
 
-            if !isCurrent {
+            if canUpgrade {
                 Button {
                     Task { await subscribe() }
                 } label: {
                     if isPurchasing {
-                        ProgressView().tint(.white)
+                        ProgressView().tint(MowGoTheme.onAccent)
                     } else {
                         Text("Upgrade")
                             .fontWeight(.semibold)
@@ -149,8 +209,8 @@ struct SubscriptionPlanCard: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .background(Color(hex: "16a34a"))
-                .foregroundColor(.white)
+                .background(MowGoTheme.deepGreen)
+                .foregroundColor(MowGoTheme.onAccent)
                 .cornerRadius(10)
                 .disabled(isPurchasing)
             }
@@ -162,7 +222,7 @@ struct SubscriptionPlanCard: View {
             }
         }
         .padding(16)
-        .background(Color(hex: "1f2937"))
+        .background(theme.surface)
         .cornerRadius(16)
     }
 

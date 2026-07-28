@@ -13,6 +13,8 @@ struct SettingsView: View {
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showingSignOut = false
     @State private var showSubscription = false
+    @State private var showManagePortal = false
+    @State private var portalError: String?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var appearancePreference: Binding<AppearancePreference> {
@@ -36,6 +38,9 @@ struct SettingsView: View {
                         signOutButton
                     }
                     .padding(16)
+                }
+                .refreshable {
+                    await auth.loadProfile()
                 }
             }
             .navigationTitle("Settings")
@@ -79,13 +84,55 @@ struct SettingsView: View {
                     .font(.subheadline.weight(.semibold)).foregroundColor(MowGoTheme.deepGreen)
             }
             Divider().background(theme.surfaceElevated)
-            Button { showSubscription = true } label: {
-                Text("View Plans")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundColor(MowGoTheme.deepGreen)
+
+            if isPaidTier {
+                // Paid users see "Manage Subscription" → Stripe Customer Portal
+                Button { Task { openCustomerPortal() } label: {
+                        HStack {
+                            Image(systemName: "gearshape.2.fill")
+                            Text("Manage Subscription")
+                        }
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(MowGoTheme.deepGreen)
+                        .cornerRadius(10)
+                    }
+                } else {
+                // Free users see "View Plans" to upgrade
+                Button { showSubscription = true } label: {
+                    Text("View Plans")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(MowGoTheme.deepGreen)
+                }
+            }
+
+            if let err = portalError {
+                Text(err)
+                    .font(.caption2)
+                    .foregroundColor(.red)
             }
         }
         .padding(16).background(theme.surface).cornerRadius(16)
+    }
+
+    private var isPaidTier: Bool {
+        let tier = auth.user?.tier ?? "free"
+        return tier == "solo" || tier == "crew"
+    }
+
+    private func openCustomerPortal() {
+        Task {
+            portalError = nil
+            do {
+                let stripe = StripeService.shared
+                let url = try await stripe.createCustomerPortal()
+                await UIApplication.shared.open(url)
+            } catch {
+                portalError = error.localizedDescription
+            }
+        }
     }
 
     private var preferencesCard: some View {
@@ -144,9 +191,12 @@ struct SettingsView: View {
 // MARK: - Subscription View
 
 struct SubscriptionView: View {
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\\.dismiss) var dismiss
+    @Environment(\\.colorScheme) private var colorScheme
     let currentTier: String
+
+    /// When true, Free card is hidden (user is already above Free).
+    private var showFreeCard: Bool { normalizedCurrentTier == "free" }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -161,6 +211,7 @@ struct SubscriptionView: View {
 
                 ScrollView {
                     VStack(spacing: 16) {
+                        if showFreeCard {
                         SubscriptionPlanCard(
                             name: "Free",
                             price: "$0/mo",
@@ -168,6 +219,7 @@ struct SubscriptionView: View {
                             tier: "free",
                             isCurrent: normalizedCurrentTier == "free"
                         )
+                        }
 
                         SubscriptionPlanCard(
                             name: "Solo",

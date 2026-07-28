@@ -9,14 +9,23 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var auth: AuthService
-    @AppStorage("isDarkMode") private var isDarkMode = true
+    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showingSignOut = false
     @State private var showSubscription = false
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    private var appearancePreference: Binding<AppearancePreference> {
+        Binding(
+            get: { AppearancePreference(rawValue: appearanceMode) ?? .system },
+            set: { appearanceMode = $0.rawValue }
+        )
+    }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 16) {
@@ -28,14 +37,17 @@ struct SettingsView: View {
                     }
                     .padding(16)
                 }
+                .refreshable {
+                    await auth.loadProfile()
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showSubscription) {
-                SubscriptionView()
+                SubscriptionView(currentTier: auth.user?.tier ?? "free")
             }
             .alert("Sign Out", isPresented: $showingSignOut) {
-                Button("Sign Out", role: .destructive) { auth.signOut() }
+                Button("Sign Out", role: .destructive) { Task { await auth.signOut() } }
                 Button("Cancel", role: .cancel) {}
             } message: { Text("You'll need to sign in again.") }
         }
@@ -44,53 +56,53 @@ struct SettingsView: View {
     private var profileCard: some View {
         VStack(spacing: 12) {
             Image(systemName: "person.circle.fill")
-                .font(.system(size: 48)).foregroundColor(Color(hex: "16a34a"))
+                .font(.system(size: 48)).foregroundColor(MowGoTheme.deepGreen)
             VStack(spacing: 2) {
                 Text(auth.user?.businessName ?? "MowGo")
-                    .font(.headline).foregroundColor(.white)
+                    .font(.headline).foregroundColor(theme.textPrimary)
                 Text(auth.user?.tierLabel ?? "Free Plan")
-                    .font(.caption).foregroundColor(Color(hex: "9ca3af"))
+                    .font(.caption).foregroundColor(theme.textMuted)
             }
         }
         .frame(maxWidth: .infinity).padding(20)
-        .background(Color(hex: "1f2937")).cornerRadius(16)
+        .background(theme.surface).cornerRadius(16)
     }
 
     private var subscriptionCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Subscription").font(.headline).foregroundColor(.white)
+            Text("Subscription").font(.headline).foregroundColor(theme.textPrimary)
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(auth.user?.tierLabel ?? "Free Plan")
-                        .font(.subheadline.weight(.medium)).foregroundColor(.white)
-                    Text(tierDescription).font(.caption).foregroundColor(Color(hex: "9ca3af"))
+                        .font(.subheadline.weight(.medium)).foregroundColor(theme.textPrimary)
+                    Text(tierDescription).font(.caption).foregroundColor(theme.textMuted)
                 }
                 Spacer()
                 Text(tierPrice)
-                    .font(.subheadline.weight(.semibold)).foregroundColor(Color(hex: "16a34a"))
+                    .font(.subheadline.weight(.semibold)).foregroundColor(MowGoTheme.deepGreen)
             }
-            Divider().background(Color(hex: "374151"))
+            Divider().background(theme.surfaceElevated)
             Button { showSubscription = true } label: {
                 Text("View Plans")
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(Color(hex: "16a34a"))
+                    .foregroundColor(MowGoTheme.deepGreen)
             }
         }
-        .padding(16).background(Color(hex: "1f2937")).cornerRadius(16)
+        .padding(16).background(theme.surface).cornerRadius(16)
     }
 
     private var preferencesCard: some View {
-        VStack(spacing: 0) {
-            Toggle(isOn: $isDarkMode) {
-                HStack(spacing: 8) {
-                    Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
-                        .foregroundColor(isDarkMode ? Color(hex: "6366f1") : Color(hex: "f59e0b"))
-                    Text("Dark Mode").foregroundColor(.white)
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Appearance", systemImage: "circle.lefthalf.filled")
+                .foregroundColor(theme.textPrimary)
+            Picker("Appearance", selection: appearancePreference) {
+                ForEach(AppearancePreference.allCases) { preference in
+                    Text(preference.label).tag(preference)
                 }
             }
-            .tint(Color(hex: "16a34a"))
+            .pickerStyle(.segmented)
         }
-        .padding(16).background(Color(hex: "1f2937")).cornerRadius(16)
+        .padding(16).background(theme.surface).cornerRadius(16)
     }
 
     private var appInfoCard: some View {
@@ -98,9 +110,8 @@ struct SettingsView: View {
             InfoRow(label: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
             InfoRow(label: "Bundle", value: Bundle.main.bundleIdentifier ?? "com.mowgo.app")
             InfoRow(label: "Made in", value: "OKC 🌾")
-            InfoRow(label: "Backend", value: SupabaseService.shared.isConfigured ? "Connected" : "Demo Mode")
         }
-        .padding(16).background(Color(hex: "1f2937")).cornerRadius(16)
+        .padding(16).background(theme.surface).cornerRadius(16)
     }
 
     private var signOutButton: some View {
@@ -110,7 +121,7 @@ struct SettingsView: View {
         }) {
             Text("Sign Out").fontWeight(.medium).foregroundColor(.red)
                 .frame(maxWidth: .infinity).padding()
-                .background(Color(hex: "1f2937")).cornerRadius(12)
+                .background(theme.surface).cornerRadius(12)
         }
     }
 
@@ -126,8 +137,8 @@ struct SettingsView: View {
 
     private var tierPrice: String {
         switch auth.user?.tier {
-        case "solo": "$19/mo"
-        case "crew": "$49/mo"
+        case "solo": "$39/mo"
+        case "crew": "$79/mo"
         default: "$0/mo"
         }
     }
@@ -136,26 +147,39 @@ struct SettingsView: View {
 // MARK: - Subscription View
 
 struct SubscriptionView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\\.dismiss) var dismiss
+    @Environment(\\.colorScheme) private var colorScheme
+    let currentTier: String
+
+    /// When true, Free card is hidden (user is already above Free).
+    private var showFreeCard: Bool { normalizedCurrentTier == "free" }
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    private var normalizedCurrentTier: String {
+        currentTier.lowercased()
+    }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "111827").ignoresSafeArea()
+                theme.background.ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 16) {
+                        if showFreeCard {
                         SubscriptionPlanCard(
                             name: "Free",
                             price: "$0/mo",
                             features: ["5 clients", "Basic scheduling", "Invoice tracking"],
                             tier: "free",
-                            isCurrent: true
+                            isCurrent: normalizedCurrentTier == "free"
                         )
+                        }
 
                         SubscriptionPlanCard(
                             name: "Solo",
-                            price: "$19/mo",
+                            price: "$39/mo",
                             features: [
                                 "15 clients",
                                 "AI Autopilot assistant",
@@ -164,21 +188,21 @@ struct SubscriptionView: View {
                                 "Priority support"
                             ],
                             tier: "solo",
-                            isCurrent: false
+                            isCurrent: normalizedCurrentTier == "solo"
                         )
 
                         SubscriptionPlanCard(
                             name: "Crew",
-                            price: "$49/mo",
+                            price: "$79/mo",
                             features: [
+                                "Everything in Solo",
                                 "Unlimited clients",
                                 "Multi-user / crew",
-                                "Everything in Solo",
-                                "API access",
-                                "Custom branding"
+                                "Job assignment & tracking",
+                                "Team progress dashboard"
                             ],
                             tier: "crew",
-                            isCurrent: false
+                            isCurrent: normalizedCurrentTier == "crew"
                         )
                     }
                     .padding(16)

@@ -134,19 +134,34 @@ struct PaymentView: View {
 // MARK: - Subscription Plan Card
 
 struct SubscriptionPlanCard: View {
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\\.colorScheme) private var colorScheme
     let name: String
     let price: String
     let features: [String]
     let tier: String
     let isCurrent: Bool
+    var userTier: String = "free"
 
     private let stripe = StripeService.shared
     @State private var isPurchasing = false
     @State private var error: String?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-
+    private var tierOrder: Int {
+        switch tier {
+        case "crew": return 2
+        case "solo": return 1
+        default: return 0
+        }
+    }
+    private var userTierOrder: Int {
+        switch userTier.lowercased() {
+        case "crew": return 2
+        case "solo": return 1
+        default: return 0
+        }
+    }
+    private var canUpgrade: Bool { !isCurrent && tierOrder > userTierOrder }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -181,7 +196,7 @@ struct SubscriptionPlanCard: View {
                 }
             }
 
-            if !isCurrent {
+            if canUpgrade {
                 Button {
                     Task { await subscribe() }
                 } label: {

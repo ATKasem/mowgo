@@ -111,6 +111,17 @@ final class StripeService: ObservableObject {
         }
         return url
     }
+
+    // MARK: - Customer Portal (manage/cancel subscription)
+
+    func createCustomerPortal() async throws -> URL {
+        let data = try await sb.requestFunction("create-customer-portal", body: [:])
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        guard let urlString = json?["url"] as? String, let url = URL(string: urlString) else {
+            throw StripeError.noPortalURL
+        }
+        return url
+    }
 }
 
 // MARK: - Stripe Errors
@@ -118,12 +129,14 @@ final class StripeService: ObservableObject {
 enum StripeError: LocalizedError {
     case noClientSecret
     case noCheckoutURL
+    case noPortalURL
     case operationInProgress
     case paymentFailed(String)
     var errorDescription: String? {
         switch self {
         case .noClientSecret: "Could not initialize payment."
         case .noCheckoutURL: "Could not create checkout session."
+        case .noPortalURL: "Could not open subscription management."
         case .operationInProgress: "A payment is already being prepared."
         case .paymentFailed(let msg): "Payment failed: \(msg)"
         }

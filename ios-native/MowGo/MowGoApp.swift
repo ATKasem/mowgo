@@ -12,6 +12,7 @@ struct MowGoApp: App {
     @StateObject private var store: DataStore
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showSessionExpiredAlert = false
+    @State private var showUpgradeSuccessToast = false
 
     /// SwiftData container for offline cache persistence.
     /// Falls back to in-memory if the on-disk schema is corrupt.
@@ -66,6 +67,11 @@ struct MowGoApp: App {
             } message: {
                 Text("Your session has expired. Please sign in again.")
             }
+            .alert("Upgrade Successful!", isPresented: $showUpgradeSuccessToast) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Your subscription has been upgraded. Enjoy your new features!")
+            }
             .task(id: authLoadState) {
                 guard !auth.isLoading else { return }
                 if auth.isAuthenticated {
@@ -80,15 +86,22 @@ struct MowGoApp: App {
                 let upgraded = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                     .queryItems?.first(where: { $0.name == "upgraded" })?.value == "true"
                 Task {
+                    var didUpgrade = false
                     // Poll for webhook to update profiles.tier (1-5s async)
                     if upgraded {
                         for delay in [2, 5, 10] {
                             await auth.loadProfile()
-                            if auth.user?.tier != "free" { break }
+                            if auth.user?.tier != "free" {
+                                didUpgrade = true
+                                break
+                            }
                             try? await Task.sleep(for: .seconds(Double(delay)))
                         }
                     }
                     await store.loadAll()
+                    if didUpgrade {
+                        showUpgradeSuccessToast = true
+                    }
                 }
             }
         }
