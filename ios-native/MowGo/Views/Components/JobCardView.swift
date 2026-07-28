@@ -183,8 +183,7 @@ struct JobCardView: View {
             Text("This job will be marked as skipped and won't appear in your active route.")
         }
         .sheet(isPresented: $showPhotoPicker) {
-            JobPhotoPicker(jobId: job.id) { [store] url in
-                // Persist the uploaded photo URL to the job
+            JobPhotoPicker(jobId: job.id) { url in
                 if let idx = store.jobs.firstIndex(where: { $0.id == job.id }) {
                     store.jobs[idx].photoUrl = url
                 }
