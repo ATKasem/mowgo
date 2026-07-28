@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-07-28T09:51:00Z",
-  "market_intel_lane": 0,
+  "last_run": "2026-07-28T13:57:00Z",
+  "market_intel_lane": 2,
   "lanes_total": 4,
   "lane_names": ["competitor_monitoring", "industry_trends", "pricing_intelligence", "feature_ideas"],
   "seen_reddit_urls": [
@@ -9,7 +9,9 @@
     "https://www.reddit.com/r/Entrepreneur/comments/1amrvmy/lessons_learned_during_6_years_of_founderled/",
     "https://www.reddit.com/r/Entrepreneur/comments/1dl2i2e/for_those_of_you_with_a_business_that_sells/",
     "https://www.reddit.com/r/Entrepreneur/comments/1i3pv4b/my_gfs_24_dad_asked_her_to_put_his_landscaping/",
-    "https://www.reddit.com/r/Entrepreneur/comments/1dmnqlf/what_online_business_do_you_run_how_did_you_start/"
+    "https://www.reddit.com/r/Entrepreneur/comments/1dmnqlf/what_online_business_do_you_run_how_did_you_start/",
+    "https://www.reddit.com/r/sweatystartup/comments/1jq5iuu/starting_a_lawn_care_company_week_one/",
+    "https://www.reddit.com/r/sweatystartup/comments/1jeq8ch/year_2_of_landscaping_business_revenue_owners_pay/"
   ],
   "weekly_digest_week": "2026-W31",
   "version": 2
