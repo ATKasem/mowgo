@@ -27,12 +27,14 @@ CREATE INDEX IF NOT EXISTS autopilot_messages_session_created_idx
 ALTER TABLE autopilot_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE autopilot_messages ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can CRUD own autopilot sessions" ON autopilot_sessions;
 CREATE POLICY "Users can CRUD own autopilot sessions"
   ON autopilot_sessions
   FOR ALL
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can CRUD own autopilot messages" ON autopilot_messages;
 CREATE POLICY "Users can CRUD own autopilot messages"
   ON autopilot_messages
   FOR ALL

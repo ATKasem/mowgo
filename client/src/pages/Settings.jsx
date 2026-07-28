@@ -6,6 +6,7 @@ import { isDemoMode } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
 import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
+import WebhookSettings from '../components/WebhookSettings';
 
 export default function Settings() {
   const { tr, t, i18n } = useLocalizedText('settings');
@@ -299,6 +300,9 @@ export default function Settings() {
             </form>
           )}
         </div>
+
+        {/* Zapier Webhooks */}
+        {(profile?.tier === 'solo' || profile?.tier === 'crew') && <WebhookSettings />}
 
         {/* Help */}
         <div className="card p-5 space-y-3">

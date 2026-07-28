@@ -15,7 +15,8 @@
 import {
   loadJobs, loadClients, loadInvoices,
   createJob, updateJob, updateJobStatus, deleteJob,
-  createInvoice, loadProfile
+  createInvoice, loadProfile,
+  fireWebhook
 } from './data';
 import { supabase, isDemoMode } from './supabase';
 
@@ -267,6 +268,13 @@ export async function executeTool(name, args) {
           // Preserve original time
           await updateJob(j.id, { scheduled_date: tomorrowStr });
         }
+        // Fire webhook for Zapier integrations
+        fireWebhook('rain.delay.applied', {
+          moved: todaysScheduled.length,
+          from: todayStr,
+          to: tomorrowStr,
+          jobs: todaysScheduled.map(j => ({ id: j.id, client: j.clients?.name }))
+        });
         return {
           success: true,
           data: {

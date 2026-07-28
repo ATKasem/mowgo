@@ -77,7 +77,7 @@ CREATE POLICY "Profiles: update own" ON profiles
 
 -- Membership is managed by trusted invitation/admin flows, not profile edits.
 REVOKE UPDATE ON profiles FROM authenticated;
-GRANT UPDATE (business_name, phone, avatar_url) ON profiles TO authenticated;
+GRANT UPDATE (business_name, phone) ON profiles TO authenticated;
 
 -- Clients: owner full CRUD, crew SELECT only
 DROP POLICY IF EXISTS "Users can CRUD own clients" ON clients;

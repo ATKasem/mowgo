@@ -197,6 +197,14 @@ export async function updateJob(id, updates) {
       scheduled_date: data.scheduled_date,
       status: data.status,
     });
+    if (updates.status === 'done') {
+      fireWebhook('job.completed', {
+        job_id: data.id,
+        title: data.title,
+        client_id: data.client_id,
+        scheduled_date: data.scheduled_date,
+      });
+    }
   }
   return {
     id: data.id,

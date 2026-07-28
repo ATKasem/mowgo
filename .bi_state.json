@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-07-28T01:43:39Z",
-  "market_intel_lane": 2,
+  "last_run": "2026-07-28T09:51:00Z",
+  "market_intel_lane": 0,
   "lanes_total": 4,
   "lane_names": ["competitor_monitoring", "industry_trends", "pricing_intelligence", "feature_ideas"],
   "seen_reddit_urls": [
@@ -12,5 +12,5 @@
     "https://www.reddit.com/r/Entrepreneur/comments/1dmnqlf/what_online_business_do_you_run_how_did_you_start/"
   ],
   "weekly_digest_week": "2026-W31",
-  "version": 1
+  "version": 2
 }
