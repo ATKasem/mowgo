@@ -32,11 +32,16 @@ struct SettingsView: View {
                 theme.background.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 16) {
+                    VStack(spacing: 8) {
+                        SectionHeader("Account")
                         profileCard
+                        signOutButton
+
+                        SectionHeader("Preferences")
                         preferencesCard
                         appInfoCard
-                        signOutButton
+
+                        SectionHeader("Billing")
                         subscriptionCard
                     }
                     .padding(16)
@@ -366,5 +371,17 @@ struct SubscriptionView: View {
                 }
             }
         }
+    }
+}
+
+private struct SectionHeader: View {
+    let title: String
+    init(_ title: String) { self.title = title }
+    var body: some View {
+        Text(title.uppercased())
+            .font(.caption.weight(.semibold))
+            .foregroundColor(.gray)
+            .padding(.top, 12)
+            .padding(.leading, 4)
     }
 }
