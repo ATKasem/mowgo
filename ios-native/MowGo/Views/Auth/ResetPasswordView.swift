@@ -41,7 +41,7 @@ struct ResetPasswordView: View {
 
                     TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
+                        .textInputAutocapitalization(.never)
                         .textContentType(.emailAddress)
                         .focused($isFocused)
                         .padding()

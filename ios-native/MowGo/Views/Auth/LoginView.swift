@@ -49,7 +49,7 @@ struct LoginView: View {
                     VStack(spacing: 12) {
                         TextField("Email", text: $email)
                             .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
+                            .textInputAutocapitalization(.never)
                             .textContentType(.emailAddress)
                             .submitLabel(.next)
                             .focused($focusedField, equals: .email)
