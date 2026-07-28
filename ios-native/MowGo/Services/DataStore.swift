@@ -515,18 +515,24 @@ final class DataStore: ObservableObject {
     // MARK: - Helpers
 
     private func startPollingIfNeeded(generation: Int) {
-        // Don't start a new poll if generation has moved on
         guard generation == loadGeneration else { return }
-        // Cancel any existing poll
         pollingTask?.cancel()
-        pollingTask = sb.startJobsPolling(
-            interval: 15,
-            previousJobs: { [weak self] in self?.jobs ?? [] },
-            onChange: { [weak self] latest in
-                guard let self else { return }
-                self.jobs = latest
+        pollingTask = Task { [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(15))
+                guard !Task.isCancelled, await sb.isAuthenticated else { continue }
+                do {
+                    let latest = try await sb.fetchJobs()
+                    guard !Task.isCancelled, self.loadGeneration == generation else { return }
+                    if latest.map(\.id) != self.jobs.map(\.id) || latest != self.jobs {
+                        self.jobs = latest
+                    }
+                } catch {
+                    // Silently skip — next tick will retry
+                }
             }
-        )
+        }
     }
 
     private func nextDay(_ date: String) -> String {

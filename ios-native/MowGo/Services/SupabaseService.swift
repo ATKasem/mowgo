@@ -16,40 +16,6 @@ actor SupabaseService {
     static let shared = SupabaseService()
     private let baseURL: String
     private let anonKey: String
-    // MARK: - Realtime Polling
-    /// Extracts the project ref from the base URL (e.g. "https://abc123.supabase.co" → "abc123").
-    nonisolated var projectRef: String? {
-        guard let host = URL(string: baseURL)?.host,
-              host.hasSuffix(".supabase.co") else { return nil }
-        return host.replacingOccurrences(of: ".supabase.co", with: "")
-    }
-
-    /// Starts polling the jobs table at `interval`. Calls `onChange` with the full
-    /// refreshed jobs list each time the server state differs from `previousJobs`.
-    /// Returns a `Task` that can be cancelled to stop polling.
-    @discardableResult
-    func startJobsPolling(
-        interval: TimeInterval = 15,
-        previousJobs: @escaping @Sendable () -> [Job],
-        onChange: @escaping @Sendable ([Job]) -> Void
-    ) -> Task<Void, Never> {
-        Task { [interval] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(interval))
-                guard !Task.isCancelled, isAuthenticated else { continue }
-                do {
-                    let latest = try await fetchJobs()
-                    // Dispatch to MainActor to safely read @MainActor-isolated DataStore.jobs
-                    let current = await MainActor.run { previousJobs() }
-                    if latest.map(\.id) != current.map(\.id) || latest != current {
-                        await MainActor.run { onChange(latest) }
-                    }
-                } catch {
-                    // Silently skip — next tick will retry
-                }
-            }
-        }
-    }
 
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
