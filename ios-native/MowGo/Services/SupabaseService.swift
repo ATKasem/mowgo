@@ -59,7 +59,7 @@ actor SupabaseService {
     private init() {
         // Hardcoded — Info.plist approach was unreliable across XcodeGen/Xcode versions
         self.baseURL = "https://vqgiynfrpsqddjrayczc.supabase.co"
-        self.anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ2l5bmZycHNxZGRqcmF5Y3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTg5NjcsImV4cCI6MjA1NTU3NDk2N30.FqF_BmD7r8qnggEeOGYVS0mWqKpHhRIN3hG-xLgZXFM"
+        self.anonKey = "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz"
     }
 
     // MARK: - Config check (for preview/testing)
