@@ -15,7 +15,7 @@ targets:
       - path: MowGo
     settings:
       base:
-        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: MowGo/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: MowGo
         INFOPLIST_KEY_CFBundleIdentifier: com.mowgo.app
         INFOPLIST_KEY_CFBundleShortVersionString: "1.0.0"
@@ -25,8 +25,8 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.mowgo.app
         # Credentials — leave empty for CI (app runs in demo mode)
-        INFOPLIST_KEY_SUPABASE_URL: "$(SUPABASE_URL)"
-        INFOPLIST_KEY_SUPABASE_ANON_KEY: "$(SUPABASE_ANON_KEY)"
+        INFOPLIST_KEY_SUPABASE_URL: "https://vqgiynfrpsqddjrayczc.supabase.co"
+        INFOPLIST_KEY_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ2l5bmZycHNxZGRqcmF5Y3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTg5NjcsImV4cCI6MjA1NTU3NDk2N30.FqF_BmD7r8qnggEeOGYVS0mWqKpHhRIN3hG-xLgZXFM"
         INFOPLIST_KEY_StripePublishableKey: "$(STRIPE_PUBLISHABLE_KEY)"
     dependencies:
       - package: stripe-ios
