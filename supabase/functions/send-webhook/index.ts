@@ -13,27 +13,71 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://mowgo.pages.dev",
+  "https://mowgo.app",
+  "http://localhost:5173",
+];
+
+function originHeaders(origin) {
+  const allowed = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 serve(async (req) => {
+  const origin = req.headers.get("origin");
+  const cors = originHeaders(origin);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: cors });
   }
 
   try {
+    // Verify JWT — the caller must be the authenticated user
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Missing authorization" }), {
+        status: 401,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SB_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user: caller }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !caller) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const { user_id, event, payload } = body;
+
+    // Only allow the authenticated user to fire their own webhooks
+    if (user_id !== caller.id) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
 
     if (!user_id || !event) {
       return new Response(
         JSON.stringify({ error: "user_id and event are required" }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         }
       );
     }
@@ -57,7 +101,7 @@ serve(async (req) => {
         JSON.stringify({ error: "Failed to load webhook configs" }),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         }
       );
     }
@@ -65,7 +109,7 @@ serve(async (req) => {
     if (!configs || configs.length === 0) {
       return new Response(JSON.stringify({ sent: 0, message: "No active webhooks configured" }), {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -79,7 +123,7 @@ serve(async (req) => {
         JSON.stringify({ sent: 0, message: "No webhooks configured for this event" }),
         {
           status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         }
       );
     }
@@ -119,14 +163,14 @@ serve(async (req) => {
       JSON.stringify({ sent, failed, total: matchingConfigs.length }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       }
     );
   } catch (err) {
     console.error("send-webhook error:", err);
     return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 });

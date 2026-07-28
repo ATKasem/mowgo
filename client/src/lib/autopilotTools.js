@@ -493,13 +493,13 @@ export async function executeTool(name, args) {
         const now = new Date();
 
         let startDate;
-        let endDate = now.toISOString().split('T')[0];
+        let endDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
         switch (period) {
           case 'week': {
             const d = new Date(now);
             d.setDate(d.getDate() - 7);
-            startDate = d.toISOString().split('T')[0];
+            startDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             break;
           }
           case 'month':

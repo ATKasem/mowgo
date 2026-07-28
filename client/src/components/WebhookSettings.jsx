@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { supabase, isDemoMode } from '../lib/supabase';
 import { useAuth } from '../App';
@@ -6,11 +6,13 @@ import { Webhook, Save, CheckCircle, Loader2, AlertCircle, Trash2, Zap } from 'l
 
 const AVAILABLE_EVENTS = [
   { key: 'job.created',        label: 'Job Created',         desc: 'Fired when a new job is scheduled' },
+  { key: 'job.updated',        label: 'Job Updated',         desc: 'Fired when job status, date, or details change' },
   { key: 'job.completed',      label: 'Job Completed',       desc: 'Fired when a job status changes to completed' },
   { key: 'invoice.paid',       label: 'Invoice Paid',        desc: 'Fired when an invoice is marked paid' },
   { key: 'customer.created',   label: 'Customer Created',    desc: 'Fired when a new client is added' },
   { key: 'payment.failed',     label: 'Payment Failed',      desc: 'Fired when a Stripe payment fails' },
   { key: 'rain.delay.applied', label: 'Rain Delay Applied',  desc: 'Fired when jobs are rescheduled due to rain' },
+  // Note: payment.failed requires Stripe webhook wiring (Cloudflare Pages → Supabase edge function)
 ];
 
 export default function WebhookSettings() {
@@ -23,6 +25,11 @@ export default function WebhookSettings() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const savedTimer = useRef(null);
+
+  useEffect(() => {
+    return () => { if (savedTimer.current) clearTimeout(savedTimer.current); };
+  }, []);
 
   useEffect(() => {
     loadConfig();
@@ -102,7 +109,8 @@ export default function WebhookSettings() {
         if (data) setConfigId(data.id);
       }
       setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaved(false), 2500);
     } catch (err) {
       console.error('save webhook config:', err);
       setError(err.message || tr('Failed to save webhook config'));

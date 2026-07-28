@@ -5,24 +5,25 @@ import { Link } from 'react-router-dom';
 
 // Ruunly platform fee rates (percentage of monthly revenue)
 const RUUNLY_PLANS = {
-  starter: { name: 'Starter', base: 19, feeRate: 0.025 },
-  pro:     { name: 'Pro',     base: 59, feeRate: 0.015 },
-  growth:  { name: 'Growth',  base: 129, feeRate: 0.0075 },
+  starter: { name: 'Starter', base: 19, feeRate: 0.025, feeCap: Infinity },
+  pro:     { name: 'Pro',     base: 59, feeRate: 0.015, feeCap: 118 },
+  growth:  { name: 'Growth',  base: 129, feeRate: 0.0075, feeCap: 258 },
 };
 
 const MOWGO_SOLO = 39;
 
 function calcRuunlyTotal(plan, revenue) {
   const p = RUUNLY_PLANS[plan];
-  return Math.round(p.base + p.feeRate * revenue);
+  const fee = Math.min(p.feeRate * revenue, p.feeCap);
+  return Math.round(p.base + fee);
 }
 
 const features = [
   { label: 'Price',             mowgoFree: '$0',          mowgoSolo: '$39/mo',    ruunlyStarter: '$19 + fees',   ruunlyPro: '$59 + fees',  type: 'price' },
   { label: 'Clients',           mowgoFree: '5',           mowgoSolo: 'Unlimited',  ruunlyStarter: '25',           ruunlyPro: '100',         type: 'text' },
   { label: 'Rain Delay',        mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
-  { label: 'AI',                mowgoFree: '3 quotes',    mowgoSolo: 'Unlimited',  ruunlyStarter: '13 quotes',    ruunlyPro: '26 quotes',   type: 'text' },
-  { label: 'Route Optimization',mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
+  { label: 'AI',                mowgoFree: 'No AI',       mowgoSolo: 'Unlimited',  ruunlyStarter: '13 quotes',    ruunlyPro: '26 quotes',   type: 'text' },
+  { label: 'Route Optimization',mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
   { label: 'SMS Campaigns',     mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
   { label: 'QuickBooks',        mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
   { label: 'Mobile App',        mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
@@ -394,10 +395,10 @@ export default function RuunlyComparison() {
                 <h3 className="font-bold text-gray-900 dark:text-white text-lg">Ruunly AI</h3>
               </div>
               <p className="text-2xl md:text-3xl font-extrabold text-red-500 mb-2">
-                {tr("Capped at 13–30 quotes")}
+                {tr("Capped at 13–26 quotes")}
               </p>
               <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                {tr("Ruunly Starter limits you to 13 AI-generated quotes per month. Pro gets 30. Hit the cap? You're generating quotes by hand.")}
+                {tr("Ruunly Starter limits you to 13 AI-generated quotes per month. Pro gets 26. Hit the cap? You're generating quotes by hand.")}
               </p>
             </div>
           </div>

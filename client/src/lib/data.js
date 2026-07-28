@@ -324,7 +324,7 @@ export async function createClient(client) {
   }
 
   const { data, error } = await supabase.from('clients').insert({
-    user_id: user.id,
+    user_id: ownerId,
     name: client.name,
     address: client.address,
     phone: client.phone,
@@ -449,13 +449,14 @@ export async function updateInvoiceStatus(id, status) {
   }
   const updates = { status };
   if (status === 'paid') updates.paid_at = new Date().toISOString();
-  const { data, error } = await supabase.from('invoices').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('invoices').update(updates).eq('id', id).select('*, clients!left(name)').single();
   if (error) throw error;
   // Fire webhook when invoice is paid (non-blocking)
   if (status === 'paid') {
     fireWebhook('invoice.paid', {
       invoice_id: data.id,
       client_id: data.client_id,
+      client_name: data.clients?.name,
       amount: data.amount,
       paid_at: data.paid_at,
     });
