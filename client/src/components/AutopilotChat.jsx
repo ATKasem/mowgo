@@ -217,6 +217,7 @@ export default function AutopilotChat({ compact = false, pageContext = null, ini
           <button
             type="submit"
             disabled={!input.trim() || isBusy || limitReached}
+            aria-label={tr("Send message")}
             className={`${compact ? 'px-3 py-2 min-h-[40px]' : 'px-4 py-3 min-h-[44px]'} bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-colors disabled:cursor-not-allowed`}
           >
             {isBusy ? (

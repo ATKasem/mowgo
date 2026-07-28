@@ -175,13 +175,13 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
               });
             } else {
               const clientName = job.clients?.name || tr('Job');
-              setCompletedToast({ name: tr('{{client}} · {{label}} job already scheduled', { client: clientName, label: recLabel }), amount: job.clients?.rate || 0 });
+              setCompletedToast({ name: tr('{{client}} · {{label}} job already scheduled', { client: clientName, label: recLabel }), amount: job.clients?.rate || 0, type: 'recurring' });
             }
           } else {
-            setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0 });
+            setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0, type: 'recurring' });
           }
         } else if (job.status !== 'done') {
-          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0 });
+          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0, type: 'recurring' });
         }
         const toastTimeout = setTimeout(() => setCompletedToast(null), 4000);
         toggleTimeoutRef.current = toastTimeout;
