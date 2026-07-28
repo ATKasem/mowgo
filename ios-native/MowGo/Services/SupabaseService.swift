@@ -57,16 +57,9 @@ actor SupabaseService {
     //  so INFOPLIST_KEY_SUPABASE_URL → Info.plist key "SUPABASE_URL".
     //  We check both formats for backward compatibility.
     private init() {
-        let info = Bundle.main.infoDictionary
-        let configuredBaseURL = (info?["SUPABASE_URL"] as? String)
-                             ?? (info?["SupabaseURL"] as? String)
-                             ?? ""
-        let configuredAnonKey = (info?["SUPABASE_ANON_KEY"] as? String)
-                             ?? (info?["SupabaseAnonKey"] as? String)
-                             ?? ""
-
-        self.baseURL = configuredBaseURL
-        self.anonKey = configuredAnonKey
+        // Hardcoded — Info.plist approach was unreliable across XcodeGen/Xcode versions
+        self.baseURL = "https://vqgiynfrpsqddjrayczc.supabase.co"
+        self.anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ2l5bmZycHNxZGRqcmF5Y3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTg5NjcsImV4cCI6MjA1NTU3NDk2N30.FqF_BmD7r8qnggEeOGYVS0mWqKpHhRIN3hG-xLgZXFM"
     }
 
     // MARK: - Config check (for preview/testing)
