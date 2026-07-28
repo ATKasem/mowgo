@@ -696,4 +696,13 @@ Look up a client before creating their job or invoice.
 Before changing data, state the action; confirm completed-job invoices before creating them.
 Keep private access details hidden unless the user explicitly requests them.
 If a tool fails or is unavailable, say so plainly.
-Give short, direct answers; use bullets only when useful.`;
+Keep responses to 1-3 sentences unless the user asks for details. Use bullet points only when listing multiple items. Be direct and actionable.`;
+
+/**
+ * Build a page-aware system prompt that tells the LLM what the user is looking at.
+ * @param {{ page: string, description: string } | null} pageContext
+ */
+export function buildSystemPrompt(pageContext) {
+  if (!pageContext) return SYSTEM_PROMPT;
+  return `${SYSTEM_PROMPT}\n\nThe user is currently on the ${pageContext.page} page. ${pageContext.description} Respond with awareness of what they are seeing.`;
+}

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { TOOLS, executeTool, SYSTEM_PROMPT } from '../lib/autopilotTools';
+import { TOOLS, executeTool, buildSystemPrompt } from '../lib/autopilotTools';
 import { supabase, isDemoMode } from '../lib/supabase';
 
 const API_URL = '/api/autopilot';
@@ -49,7 +49,7 @@ function fromDatabaseMessage(message) {
   };
 }
 
-export default function useAutopilot() {
+export default function useAutopilot({ pageContext = null } = {}) {
   const [messages, setMessages] = useState([welcomeMessage()]);
   const [status, setStatus] = useState('loading');
   const [currentAction, setCurrentAction] = useState(null);
@@ -63,6 +63,10 @@ export default function useAutopilot() {
   const sendInFlightRef = useRef(false);
   const statusRef = useRef(status);
   const messagesRef = useRef(messages);
+  const pageContextRef = useRef(pageContext);
+
+  // Keep page context current across renders
+  pageContextRef.current = pageContext;
 
   statusRef.current = status;
   messagesRef.current = messages;
@@ -178,7 +182,7 @@ export default function useAutopilot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...currentHistory],
+          messages: [{ role: 'system', content: buildSystemPrompt(pageContextRef.current) }, ...currentHistory],
           tools: TOOLS.map(tool => ({
             type: 'function',
             function: {

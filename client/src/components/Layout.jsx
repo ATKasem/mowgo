@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   Calendar, Users, FileText, Settings,
@@ -21,8 +21,22 @@ const navItems = [
 export default function Layout() {
   const { tr, t, i18n } = useLocalizedText('layout');
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOffline, setIsOffline] = useState(isCurrentlyOffline());
   const [chatOpen, setChatOpen] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState(null);
+  const [hasBadge, setHasBadge] = useState(false);
+
+  // Derive page context from current route
+  const pageContext = (() => {
+    const path = location.pathname;
+    if (path === '/app' || path === '/app/') return { page: 'Home', description: 'You are on the home dashboard.' };
+    if (path.startsWith('/app/today')) return { page: 'Today', description: 'You are viewing today\'s schedule.' };
+    if (path.startsWith('/app/clients')) return { page: 'Clients', description: 'You are viewing the client list.' };
+    if (path.startsWith('/app/invoices')) return { page: 'Invoices', description: 'You are viewing invoices.' };
+    if (path.startsWith('/app/settings')) return { page: 'Settings', description: 'You are on the settings page.' };
+    return { page: 'App', description: 'You are in the MowGo app.' };
+  })();
 
   useEffect(() => {
     const goOnline = () => setIsOffline(false);
@@ -32,6 +46,23 @@ export default function Layout() {
     return () => {
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
+  // Listen for quick-prompt events from child pages (e.g. Today.jsx)
+  useEffect(() => {
+    function handleSend(e) {
+      setPendingMessage(e.detail?.message || null);
+      setChatOpen(true);
+    }
+    function handleBadge(e) {
+      setHasBadge(e.detail?.show ?? false);
+    }
+    window.addEventListener('mowgo:autopilot-send', handleSend);
+    window.addEventListener('mowgo:autopilot-badge', handleBadge);
+    return () => {
+      window.removeEventListener('mowgo:autopilot-send', handleSend);
+      window.removeEventListener('mowgo:autopilot-badge', handleBadge);
     };
   }, []);
 
@@ -154,6 +185,9 @@ export default function Layout() {
           aria-label={tr("Open assistant")}
         >
           <MessageSquare className="w-5 h-5" />
+          {hasBadge && (
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-400 border-2 border-white dark:border-gray-950 animate-pulse" />
+          )}
         </button>
       )}
 
@@ -163,7 +197,7 @@ export default function Layout() {
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setChatOpen(false)}
+            onClick={() => { setChatOpen(false); setPendingMessage(null); }}
           />
           {/* Panel — centered compact sheet */}
           <div role="dialog" aria-modal="true" aria-label={tr("AI assistant")} className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden"
@@ -178,7 +212,7 @@ export default function Layout() {
               </div>
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => setChatOpen(false)}
+                  onClick={() => { setChatOpen(false); setPendingMessage(null); }}
                   className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   aria-label={tr("Close")}
                 >
@@ -188,7 +222,7 @@ export default function Layout() {
             </div>
             {/* Chat content */}
             <div className="flex-1 overflow-hidden px-4 pt-2 pb-4">
-              <AutopilotChat compact />
+              <AutopilotChat compact pageContext={pageContext} initialMessage={pendingMessage} />
             </div>
           </div>
         </div>

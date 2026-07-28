@@ -22,7 +22,7 @@ const QUICK_PROMPTS = [
   { label: 'Unpaid', text: 'Show unpaid invoices' }
 ];
 
-export default function AutopilotChat({ compact = false }) {
+export default function AutopilotChat({ compact = false, pageContext = null, initialMessage = null }) {
   const { tr } = useLocalizedText('autopilotChat');
   const {
     messages,
@@ -36,11 +36,20 @@ export default function AutopilotChat({ compact = false }) {
     sendMessage,
     reset,
     retry
-  } = useAutopilot();
+  } = useAutopilot({ pageContext });
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
+  const initialSentRef = useRef(false);
+
+  // Auto-send initialMessage (e.g. from quick-prompts) once when provided
+  useEffect(() => {
+    if (initialMessage && !initialSentRef.current && status === 'idle') {
+      initialSentRef.current = true;
+      sendMessage(initialMessage);
+    }
+  }, [initialMessage, status, sendMessage]);
 
   // Auto-scroll to bottom — but not if user has scrolled up to read history
   useEffect(() => {
