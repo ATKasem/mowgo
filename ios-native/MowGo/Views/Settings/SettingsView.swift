@@ -34,10 +34,10 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         profileCard
-                        subscriptionCard
                         preferencesCard
                         appInfoCard
                         signOutButton
+                        subscriptionCard
                     }
                     .padding(16)
                 }
