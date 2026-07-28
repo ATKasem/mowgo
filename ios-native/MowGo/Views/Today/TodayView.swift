@@ -81,8 +81,8 @@ struct TodayView: View {
                             // 2×2 stats grid
                             statsGrid
 
-                            // Week strip — quick day nav
-                            weekStrip
+                            // Month calendar
+                            monthGrid
 
                             // Crew filter
                             crewFilterBar
@@ -273,45 +273,88 @@ struct TodayView: View {
         }
     }
 
-    // MARK: - Week Strip (compact day nav)
+    // MARK: - Month Calendar
 
-    private var weekDays: [(date: Date, label: String, hasJob: Bool)] {
-        let cal = Calendar.current
-        guard let weekStart = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: selectedDate)) else { return [] }
-        let jobDates = Set(store.jobs.map { $0.scheduledDate })
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
-        return (0..<7).compactMap { offset in
-            guard let date = cal.date(byAdding: .day, value: offset, to: weekStart) else { return nil }
-            let dateStr = fmt.string(from: date)
-            let dayFmt = DateFormatter(); dayFmt.dateFormat = "EEE"
-            return (date: date, label: String(dayFmt.string(from: date).prefix(3)), hasJob: jobDates.contains(dateStr))
-        }
+    private struct DayCell: Identifiable {
+        let id = UUID()
+        let date: Date
+        let day: Int
+        let isCurrentMonth: Bool
+        let isToday: Bool
+        let isSelected: Bool
+        let hasJob: Bool
     }
 
-    private var weekStrip: some View {
-        HStack(spacing: 0) {
-            ForEach(weekDays, id: \.label) { day in
-                Button {
-                    withAnimation(.easeInOut(duration: 0.15)) { selectedDate = day.date }
-                } label: {
-                    VStack(spacing: 3) {
-                        Text(day.label)
-                            .font(.caption2.weight(.medium))
-                            .foregroundColor(Calendar.current.isDate(day.date, inSameDayAs: selectedDate)
-                                ? MowGoTheme.onAccent : theme.textSecondary)
-                            .frame(width: 28, height: 22)
-                            .background(Calendar.current.isDate(day.date, inSameDayAs: selectedDate)
-                                ? MowGoTheme.deepGreen : Color.clear)
-                            .cornerRadius(11)
-                        Circle()
-                            .fill(day.hasJob ? MowGoTheme.deepGreen : Color.clear)
-                            .frame(width: 4, height: 4)
-                    }
+    private var monthDays: [DayCell] {
+        let cal = Calendar.current
+        guard let monthStart = cal.date(from: cal.dateComponents([.year, .month], from: selectedDate)) else { return [] }
+        let weekday = cal.component(.weekday, from: monthStart) - 1
+        let daysInMonth = cal.range(of: .day, in: .month, for: selectedDate)?.count ?? 30
+        let jobDates = Set(store.jobs.map { $0.scheduledDate })
+        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
+        let today = Date()
+
+        var cells: [DayCell] = []
+        // Leading blanks
+        for _ in 0..<weekday {
+            cells.append(DayCell(date: Date(), day: 0, isCurrentMonth: false, isToday: false, isSelected: false, hasJob: false))
+        }
+        // Month days
+        for day in 1...daysInMonth {
+            guard let date = cal.date(bySetting: .day, value: day, of: monthStart) else { continue }
+            let dateStr = fmt.string(from: date)
+            cells.append(DayCell(
+                date: date, day: day, isCurrentMonth: true,
+                isToday: cal.isDate(date, inSameDayAs: today),
+                isSelected: cal.isDate(date, inSameDayAs: selectedDate),
+                hasJob: jobDates.contains(dateStr)
+            ))
+        }
+        return cells
+    }
+
+    private var monthGrid: some View {
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
+        let monthFmt = DateFormatter(); monthFmt.dateFormat = "MMMM yyyy"
+        return VStack(spacing: 6) {
+            HStack {
+                Text(monthFmt.string(from: selectedDate))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(theme.textPrimary)
+                Spacer()
+            }
+            // Day headers
+            HStack(spacing: 0) {
+                ForEach(["Su","Mo","Tu","We","Th","Fr","Sa"], id: \.self) { d in
+                    Text(d).font(.caption2).foregroundColor(theme.textMuted)
+                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.plain)
+            }
+            LazyVGrid(columns: columns, spacing: 2) {
+                ForEach(monthDays) { cell in
+                    Button {
+                        if cell.isCurrentMonth {
+                            withAnimation(.easeInOut(duration: 0.15)) { selectedDate = cell.date }
+                        }
+                    } label: {
+                        VStack(spacing: 2) {
+                            Text(cell.isCurrentMonth ? String(cell.day) : "")
+                                .font(.caption2.weight(cell.isToday ? .bold : .regular))
+                                .foregroundColor(cell.isSelected ? MowGoTheme.onAccent : cell.isToday ? MowGoTheme.deepGreen : theme.textSecondary)
+                                .frame(width: 28, height: 28)
+                                .background(cell.isSelected ? MowGoTheme.deepGreen : Color.clear)
+                                .cornerRadius(14)
+                            Circle()
+                                .fill(cell.hasJob ? MowGoTheme.deepGreen : Color.clear)
+                                .frame(width: 3, height: 3)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!cell.isCurrentMonth)
+                }
             }
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 4)
     }
 
     // MARK: - Crew Filter
