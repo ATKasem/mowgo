@@ -134,7 +134,7 @@ struct PaymentView: View {
 // MARK: - Subscription Plan Card
 
 struct SubscriptionPlanCard: View {
-    @Environment(\\.colorScheme) private var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
     let name: String
     let price: String
     let features: [String]

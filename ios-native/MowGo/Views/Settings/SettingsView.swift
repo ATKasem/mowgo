@@ -193,8 +193,8 @@ struct SettingsView: View {
 // MARK: - Subscription View
 
 struct SubscriptionView: View {
-    @Environment(\\.dismiss) var dismiss
-    @Environment(\\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     let currentTier: String
 
     /// When true, Free card is hidden (user is already above Free).
