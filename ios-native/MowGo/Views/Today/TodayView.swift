@@ -193,11 +193,17 @@ struct TodayView: View {
 
     private var greetingSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.subheadline).foregroundColor(theme.textMuted)
-            Text("Good \(greeting) 👋")
-                .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
-                .dynamicTypeSize(...DynamicTypeSize.accessibility3)
+            if isToday {
+                Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                    .font(.subheadline).foregroundColor(theme.textMuted)
+                Text("Good \(greeting) 👋")
+                    .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility3)
+            } else {
+                Text(selectedDate.formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                    .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -269,23 +275,21 @@ struct TodayView: View {
         let canManageCrew = auth.user?.tier == "crew"
         return Group {
             if canManageCrew && store.teamMembers.count >= 2 {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
+                HStack(spacing: 8) {
+                    CrewFilterChip(
+                        label: "All",
+                        isSelected: selectedCrewFilter == nil,
+                        color: MowGoTheme.success
+                    ) {
+                        selectedCrewFilter = nil
+                    }
+                    ForEach(Array(store.teamMembers.enumerated()), id: \.element.id) { index, member in
                         CrewFilterChip(
-                            label: "All",
-                            isSelected: selectedCrewFilter == nil,
-                            color: MowGoTheme.success
+                            label: member.businessName?.components(separatedBy: " ").first ?? "Unknown",
+                            isSelected: selectedCrewFilter == member.id,
+                            color: crewChipColors[index % crewChipColors.count]
                         ) {
-                            selectedCrewFilter = nil
-                        }
-                        ForEach(Array(store.teamMembers.enumerated()), id: \.element.id) { index, member in
-                            CrewFilterChip(
-                                label: member.businessName?.components(separatedBy: " ").first ?? "Unknown",
-                                isSelected: selectedCrewFilter == member.id,
-                                color: crewChipColors[index % crewChipColors.count]
-                            ) {
-                                selectedCrewFilter = member.id
-                            }
+                            selectedCrewFilter = member.id
                         }
                     }
                 }
@@ -307,24 +311,22 @@ struct TodayView: View {
     private var weeklyCalendar: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("This Week").font(.headline).foregroundColor(theme.textPrimary)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(weekDays, id: \.self) { day in
-                        VStack(spacing: 4) {
-                            Text(day.label).font(.caption2).foregroundColor(theme.textMuted)
-                            Text("\(day.day)").font(.callout.weight(.semibold))
-                                .foregroundColor(day.isToday ? MowGoTheme.onAccent : theme.textSecondary)
-                            Circle()
-                                .fill(day.hasJobs ? MowGoTheme.deepGreen : Color.clear)
-                                .frame(width: 6, height: 6)
-                                .accessibilityHidden(!day.hasJobs)
-                        }
-                        .frame(width: 44).padding(.vertical, 8)
-                        .background(day.isToday ? MowGoTheme.deepGreen.opacity(0.2) : theme.surface)
-                        .cornerRadius(10)
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel("\(day.label) \(day.day), \(day.jobCount) job\(day.jobCount == 1 ? "" : "s")")
+            HStack(spacing: 8) {
+                ForEach(weekDays, id: \.self) { day in
+                    VStack(spacing: 4) {
+                        Text(day.label).font(.caption2).foregroundColor(theme.textMuted)
+                        Text("\(day.day)").font(.callout.weight(.semibold))
+                            .foregroundColor(day.isToday ? MowGoTheme.onAccent : theme.textSecondary)
+                        Circle()
+                            .fill(day.hasJobs ? MowGoTheme.deepGreen : Color.clear)
+                            .frame(width: 6, height: 6)
+                            .accessibilityHidden(!day.hasJobs)
                     }
+                    .frame(width: 44).padding(.vertical, 8)
+                    .background(day.isToday ? MowGoTheme.deepGreen.opacity(0.2) : theme.surface)
+                    .cornerRadius(10)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(day.label) \(day.day), \(day.jobCount) job\(day.jobCount == 1 ? "" : "s")")
                 }
             }
         }
@@ -334,15 +336,18 @@ struct TodayView: View {
     // MARK: - Rain Delay
 
     private var rainDelayButton: some View {
-        Button { showingRainConfirm = true } label: {
-            HStack {
-                Image(systemName: "cloud.rain.fill")
-                Text("Rain Delay").fontWeight(.medium)
+        guard isToday else { return AnyView(EmptyView()) }
+        return AnyView(
+            Button { showingRainConfirm = true } label: {
+                HStack {
+                    Image(systemName: "cloud.rain.fill")
+                    Text("Rain Delay").fontWeight(.medium)
+                }
+                .frame(maxWidth: .infinity).padding(12)
+                .background(MowGoTheme.rainBlue).foregroundColor(MowGoTheme.onAccent).cornerRadius(12)
             }
-            .frame(maxWidth: .infinity).padding(12)
-            .background(MowGoTheme.rainBlue).foregroundColor(MowGoTheme.onAccent).cornerRadius(12)
-        }
-        .disabled(scheduledCount == 0).opacity(scheduledCount == 0 ? 0.5 : 1)
+            .disabled(scheduledCount == 0).opacity(scheduledCount == 0 ? 0.5 : 1)
+        )
     }
 
     // MARK: - Quick Actions
