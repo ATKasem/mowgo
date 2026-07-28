@@ -1,0 +1,54 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios-native/**'
+      - '.github/workflows/ios-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ios-native/**'
+      - '.github/workflows/ios-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Create Config.xcconfig with CI placeholders
+        working-directory: ios-native
+        run: |
+          cat > MowGo/Config.xcconfig << 'EOF'
+          INFOPLIST_KEY_CFBundleIdentifier = com.mowgo.app
+          INFOPLIST_KEY_CFBundleName = MowGo
+          INFOPLIST_KEY_CFBundleDisplayName = MowGo
+          INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0
+          INFOPLIST_KEY_CFBundleVersion = 1
+          INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
+          INFOPLIST_KEY_SUPABASE_URL = https://placeholder.supabase.co
+          INFOPLIST_KEY_SUPABASE_ANON_KEY = placeholder-anon-key
+          INFOPLIST_KEY_StripePublishableKey = pk_placeholder
+          PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
+          GENERATE_INFOPLIST_FILE = YES
+          EOF
+
+      - name: Generate Xcode project
+        working-directory: ios-native
+        run: xcodegen generate
+
+      - name: Build (simulator)
+        working-directory: ios-native
+        run: |
+          xcodebuild -project MowGo.xcodeproj \
+            -scheme MowGo \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -configuration Debug build \
+            CODE_SIGNING_ALLOWED=NO
