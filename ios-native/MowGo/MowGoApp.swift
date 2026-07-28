@@ -77,8 +77,19 @@ struct MowGoApp: App {
             .modelContainer(Self.modelContainer)
             .onOpenURL { url in
                 guard url.scheme == "mowgo" else { return }
-                // Refresh data after returning from Stripe checkout
-                Task { await store.loadAll() }
+                let upgraded = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                    .queryItems?.first(where: { $0.name == "upgraded" })?.value == "true"
+                Task {
+                    // Poll for webhook to update profiles.tier (1-5s async)
+                    if upgraded {
+                        for delay in [2, 5, 10] {
+                            await auth.loadProfile()
+                            if auth.user?.tier != "free" { break }
+                            try? await Task.sleep(for: .seconds(Double(delay)))
+                        }
+                    }
+                    await store.loadAll()
+                }
             }
         }
     }

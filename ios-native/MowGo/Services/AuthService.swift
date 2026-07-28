@@ -95,7 +95,7 @@ final class AuthService: ObservableObject {
         }
     }
 
-    private func loadProfile() async {
+    func loadProfile() async {
         guard await sb.isConfigured else { return }
         var retries = 2
         while retries > 0 {
