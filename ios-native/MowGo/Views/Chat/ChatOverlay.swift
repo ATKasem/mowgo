@@ -12,7 +12,7 @@ struct ChatOverlay: View {
     @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var chat = ChatService.shared
+    @ObservedObject private var chat = ChatService.shared
     @State private var inputText = ""
     @FocusState private var isInputFocused: Bool
     @State private var hasInjectedContext = false
@@ -61,10 +61,13 @@ struct ChatOverlay: View {
             }
         }
         .onAppear {
-            guard !hasInjectedContext, !pageContext.isEmpty else { return }
-            hasInjectedContext = true
-            // Inject page context as a system message the AI can reference
-            let contextMsg = ChatService.ChatMessage(role: .system, content: "The user opened the AI assistant from: \(pageContext). Use this context to provide relevant suggestions.")
+            guard !pageContext.isEmpty else { return }
+            // Remove any previous context message, then inject the current one
+            chat.messages.removeAll { $0.role == .system }
+            let contextMsg = ChatService.ChatMessage(
+                role: .system,
+                content: "Current screen: \(pageContext). Use this context to provide relevant suggestions."
+            )
             chat.messages.insert(contextMsg, at: 0)
         }
     }
