@@ -207,7 +207,5 @@ struct JobCardView: View {
                 }
             })
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Job: \(job.title), \(job.status.label), scheduled for \(job.scheduledTime ?? "no time")")
     }
 }

@@ -165,7 +165,7 @@ struct TodayView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
-            .alert("Move \\\\(scheduledCount) jobs to tomorrow?", isPresented: $showingRainConfirm) {
+            .alert("Move \(scheduledCount) jobs to tomorrow?", isPresented: $showingRainConfirm) {
                 Button("Yes, rain delay", role: .destructive) {
                     UINotificationFeedbackGenerator().notificationOccurred(.warning)
                     Task {
