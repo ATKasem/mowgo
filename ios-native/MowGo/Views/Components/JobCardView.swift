@@ -33,41 +33,48 @@ struct JobCardView: View {
 
     private let chipColors = ["16a34a", "3b82f6", "f59e0b", "8b5cf6", "ec4899"]
 
+    // MARK: - Status icon helpers (computed outside ViewBuilder)
+
+    private var statusIconName: String {
+        switch job.status {
+        case .scheduled: return "play.circle"
+        case .inProgress: return "checkmark.circle.fill"
+        case .done: return "arrow.counterclockwise.circle"
+        case .skipped: return "forward.circle"
+        }
+    }
+
+    private var statusIconColor: Color {
+        switch job.status {
+        case .scheduled: return .gray
+        case .inProgress: return .orange
+        case .done: return MowGoTheme.deepGreen
+        case .skipped: return MowGoTheme.warning
+        }
+    }
+
+    private var statusAccessibilityLabel: String {
+        switch job.status {
+        case .done: return "Reset job to scheduled"
+        case .inProgress: return "Mark job as complete"
+        case .skipped: return "Unskip job"
+        case .scheduled: return "Start job"
+        }
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Button {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onToggle?()
             } label: {
-                let iconName: String
-                let iconColor: Color
-                switch job.status {
-                case .scheduled:
-                    iconName = "play.circle"
-                    iconColor = .gray
-                case .inProgress:
-                    iconName = "checkmark.circle.fill"
-                    iconColor = .orange
-                case .done:
-                    iconName = "arrow.counterclockwise.circle"
-                    iconColor = MowGoTheme.deepGreen
-                case .skipped:
-                    iconName = "forward.circle"
-                    iconColor = MowGoTheme.warning
-                }
-                Image(systemName: iconName)
+                Image(systemName: statusIconName)
                     .font(.title3)
-                    .foregroundColor(iconColor)
+                    .foregroundColor(statusIconColor)
                     .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(job.status == .done
-                ? "Reset job to scheduled"
-                : job.status == .inProgress
-                    ? "Mark job as complete"
-                    : job.status == .skipped
-                        ? "Unskip job"
-                        : "Start job")
+            .accessibilityLabel(statusAccessibilityLabel)
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
@@ -156,16 +163,12 @@ struct JobCardView: View {
         .cornerRadius(12)
         .contextMenu {
             if job.status != .skipped {
-                Button {
-                    showSkipConfirm = true
-                } label: {
+                Button { showSkipConfirm = true } label: {
                     Label("Skip Job", systemImage: "forward")
                 }
             }
             if job.status == .skipped {
-                Button {
-                    onToggle?()
-                } label: {
+                Button { onToggle?() } label: {
                     Label("Unskip Job", systemImage: "arrow.counterclockwise")
                 }
             }
@@ -175,19 +178,17 @@ struct JobCardView: View {
             isPresented: $showSkipConfirm,
             titleVisibility: .visible
         ) {
-            Button("Skip Job", role: .destructive) {
-                onSkip?()
-            }
+            Button("Skip Job", role: .destructive) { onSkip?() }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This job will be marked as skipped and won't appear in your active route.")
         }
         .sheet(isPresented: $showPhotoPicker) {
-            JobPhotoPicker(jobId: job.id) { url in
+            JobPhotoPicker(jobId: job.id, onPhotoUploaded: { url in
                 if let idx = store.jobs.firstIndex(where: { $0.id == job.id }) {
                     store.jobs[idx].photoUrl = url
                 }
-            }
+            })
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Job: \(job.title), \(job.status.label), scheduled for \(job.scheduledTime ?? "no time")")
