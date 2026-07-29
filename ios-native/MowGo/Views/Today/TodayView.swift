@@ -75,9 +75,6 @@ struct TodayView: View {
                             // Compact header
                             headerRow
 
-                            // Slim date strip
-                            dateStrip
-
                             // Month calendar
                             monthGrid
 
@@ -87,8 +84,8 @@ struct TodayView: View {
                             // Crew filter
                             crewFilterBar
 
-                            // Rain delay pill (today only)
-                            rainDelayPill
+                            // Control bar — date nav + rain delay
+                            controlBar
 
                             // Error
                             if let err = operationError {
@@ -396,7 +393,56 @@ struct TodayView: View {
 
     // MARK: - Rain Delay Pill
 
-    private var rainDelayPill: some View {
+    private var controlBar: some View {
+        HStack(spacing: 8) {
+            // Date nav
+            Button { shiftDate(-1) } label: {
+                Image(systemName: "chevron.left")
+                    .font(.caption2)
+                    .foregroundColor(theme.textMuted)
+            }
+
+            Button { selectedDate = Date() } label: {
+                Text("Today")
+                    .font(.caption.weight(.medium))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(isToday ? MowGoTheme.deepGreen : theme.surfaceElevated)
+                    .foregroundColor(isToday ? MowGoTheme.onAccent : theme.textPrimary)
+                    .cornerRadius(12)
+            }
+
+            Button { shiftDate(1) } label: {
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundColor(theme.textMuted)
+            }
+
+            Spacer()
+
+            // Rain delay (today only)
+            if isToday {
+                Button { showingRainConfirm = true } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "cloud.rain.fill")
+                            .font(.caption2)
+                        Text("Rain Delay")
+                            .font(.caption.weight(.medium))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(MowGoTheme.rainBlue)
+                    .foregroundColor(MowGoTheme.onAccent)
+                    .cornerRadius(16)
+                }
+                .disabled(scheduledCount == 0)
+                .opacity(scheduledCount == 0 ? 0.5 : 1)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var controlBar_OLD: some View {
         Group {
             if isToday {
                 Button { showingRainConfirm = true } label: {
