@@ -172,35 +172,6 @@ export default function Home({ jobs = [], invoices = [] }) {
         </div>
       </div>
 
-      {/* 5-day forecast strip */}
-      {!weatherLoading && forecast.length > 0 && (
-        <div className="flex gap-2 mb-6 overflow-x-auto overflow-y-visible pb-2 -mx-1 px-1
-          [&::-webkit-scrollbar]:h-1.5
-          [&::-webkit-scrollbar-track]:bg-transparent
-          [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700
-          [&::-webkit-scrollbar-thumb]:rounded-full">
-          {forecast.map((f, i) => {
-            const FI = weatherIcons[f.code] || Sun;
-            return (
-              <div key={i} className={`card flex-shrink-0 pt-4 pb-3 px-2.5 flex flex-col items-center gap-1.5 w-[76px] box-border ${f.day === new Date().toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short' }) ? 'border-2 border-emerald-400 dark:border-emerald-500' : ''}`}>
-                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{f.day}</span>
-                <FI className="w-5 h-5 text-amber-500 dark:text-amber-400" />
-                <span className="text-xs font-bold text-gray-900 dark:text-white">{f.hi}°</span>
-                <span className="text-[10px] text-gray-400 dark:text-gray-500">{f.lo}°</span>
-                {f.rain > 0 && <span className="text-[10px] text-sky-500 dark:text-sky-400">{f.rain}%</span>}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <StatCard icon={CheckCircle} value={totalToday ? `${doneToday}/${totalToday}` : '—'} label={tr("Done today")} color="emerald" sub={totalToday ? `${Math.round((doneToday / totalToday) * 100)}%` : ''} />
-        <StatCard icon={DollarSign} value={`$${todayRevenue}`} label={tr("Today's revenue")} color="sky" />
-        <StatCard icon={AlertCircle} value={`$${unpaidTotal}`} label={tr("Outstanding")} color={unpaidTotal > 0 ? 'amber' : 'emerald'} sub={unpaidInvoices.length ? tr('{{count}} unpaid', { count: unpaidInvoices.length }) : tr('All clear')} />
-      </div>
-
       {/* Monthly Calendar */}
       <div className="card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
@@ -301,6 +272,35 @@ export default function Home({ jobs = [], invoices = [] }) {
           </div>
         </div>
       )}
+
+      {/* 5-day forecast strip */}
+      {!weatherLoading && forecast.length > 0 && (
+        <div className="flex gap-2 mb-6 overflow-x-auto overflow-y-visible pb-2 -mx-1 px-1
+          [&::-webkit-scrollbar]:h-1.5
+          [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700
+          [&::-webkit-scrollbar-thumb]:rounded-full">
+          {forecast.map((f, i) => {
+            const FI = weatherIcons[f.code] || Sun;
+            return (
+              <div key={i} className={`card flex-shrink-0 pt-4 pb-3 px-2.5 flex flex-col items-center gap-1.5 w-[76px] box-border ${f.day === new Date().toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { weekday: 'short' }) ? 'border-2 border-emerald-400 dark:border-emerald-500' : ''}`}>
+                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{f.day}</span>
+                <FI className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+                <span className="text-xs font-bold text-gray-900 dark:text-white">{f.hi}°</span>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500">{f.lo}°</span>
+                {f.rain > 0 && <span className="text-[10px] text-sky-500 dark:text-sky-400">{f.rain}%</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <StatCard icon={CheckCircle} value={totalToday ? `${doneToday}/${totalToday}` : '—'} label={tr("Done today")} color="emerald" sub={totalToday ? `${Math.round((doneToday / totalToday) * 100)}%` : ''} />
+        <StatCard icon={DollarSign} value={`$${todayRevenue}`} label={tr("Today's revenue")} color="sky" />
+        <StatCard icon={AlertCircle} value={`$${unpaidTotal}`} label={tr("Outstanding")} color={unpaidTotal > 0 ? 'amber' : 'emerald'} sub={unpaidInvoices.length ? tr('{{count}} unpaid', { count: unpaidInvoices.length }) : tr('All clear')} />
+      </div>
 
       {/* Up Next + Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
