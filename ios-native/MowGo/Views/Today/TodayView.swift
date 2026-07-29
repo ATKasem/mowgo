@@ -20,6 +20,9 @@ struct TodayView: View {
     @State private var selectedDate = Date()
     @State private var operationError: String?
     @State private var selectedCrewFilter: UUID? = nil
+    @State private var routeMode = false
+    @State private var notificationMessage: String?
+    @State private var showNotificationBanner = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -32,13 +35,21 @@ struct TodayView: View {
     private var dateString: String { Self.dateFmt.string(from: selectedDate) }
 
     private var todayJobs: [Job] {
-        store.jobs.filter { job in
+        var filtered = store.jobs.filter { job in
             guard job.scheduledDate == dateString else { return false }
             if let filterId = selectedCrewFilter {
                 return job.assignedTo == filterId
             }
             return true
         }
+        if routeMode {
+            filtered.sort { a, b in
+                let orderA = a.routeOrder ?? Int.max
+                let orderB = b.routeOrder ?? Int.max
+                return orderA < orderB
+            }
+        }
+        return filtered
     }
 
     private var scheduledCount: Int {
@@ -104,7 +115,11 @@ struct TodayView: View {
                                                 Task {
                                                     do {
                                                         operationError = nil
+                                                        let wasDone = job.status == .inProgress
                                                         try await store.toggleJobStatus(job)
+                                                        if wasDone {
+                                                            showBanner("Job marked done — client notified ✅")
+                                                        }
                                                     } catch {
                                                         operationError = error.localizedDescription
                                                     }
@@ -115,6 +130,7 @@ struct TodayView: View {
                                                     do {
                                                         operationError = nil
                                                         try await store.skipJob(job)
+                                                        showBanner("Job skipped — client notified ✅")
                                                     } catch {
                                                         operationError = error.localizedDescription
                                                     }
@@ -131,6 +147,24 @@ struct TodayView: View {
                     }
                     .refreshable {
                         await store.loadAll()
+                    }
+                }
+
+                // Toast banner
+                if showNotificationBanner, let msg = notificationMessage {
+                    VStack {
+                        Spacer()
+                        Text(msg)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(MowGoTheme.deepGreen)
+                            .cornerRadius(12)
+                            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+                            .padding(.bottom, 16)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .animation(.easeInOut(duration: 0.3), value: showNotificationBanner)
                     }
                 }
             }
@@ -418,6 +452,29 @@ struct TodayView: View {
                     .foregroundColor(theme.textMuted)
             }
 
+            // Route sort button
+            Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                routeMode.toggle()
+                if routeMode && todayJobs.contains(where: { $0.routeOrder == nil }) {
+                    reorderJobsByRoute()
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.triangle.branch")
+                        .font(.caption2)
+                    Text("Route")
+                        .font(.caption.weight(.medium))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(routeMode ? MowGoTheme.deepGreen : theme.surfaceElevated)
+                .foregroundColor(routeMode ? MowGoTheme.onAccent : theme.textPrimary)
+                .cornerRadius(16)
+            }
+            .disabled(todayJobs.count < 2)
+            .opacity(todayJobs.count < 2 ? 0.5 : 1)
+
             Spacer()
 
             // Rain delay (today only)
@@ -488,6 +545,35 @@ struct TodayView: View {
     private func shiftDate(_ days: Int) {
         if let d = Calendar.current.date(byAdding: .day, value: days, to: selectedDate) {
             selectedDate = d
+        }
+    }
+
+    private func showBanner(_ message: String) {
+        notificationMessage = message
+        withAnimation { showNotificationBanner = true }
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation { showNotificationBanner = false }
+        }
+    }
+
+    /// Assign routeOrder to today's jobs by sorting addresses alphabetically.
+    /// This is a simple proxy for proximity — crew members pick the order,
+    /// and alphabetizing by street gives a reasonable geographic grouping.
+    private func reorderJobsByRoute() {
+        let jobsToOrder = todayJobs.filter { $0.scheduledDate == dateString }
+        guard !jobsToOrder.isEmpty else { return }
+
+        // Sort by client address alphabetically (street-first grouping)
+        let sorted = jobsToOrder.sorted { a, b in
+            (a.address ?? "") < (b.address ?? "")
+        }
+
+        // Persist route orders to the store
+        for (index, job) in sorted.enumerated() {
+            Task {
+                try? await store.updateRouteOrder(job, order: index)
+            }
         }
     }
 }

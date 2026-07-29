@@ -64,6 +64,10 @@ private struct JobAssignedPatch: Encodable {
     let assignedTo: UUID?  // nil = unassign
 }
 
+private struct JobRoutePatch: Encodable {
+    let routeOrder: Int?
+}
+
 private struct InvoicePaidPatch: Encodable {
     let status: Invoice.InvoiceStatus
     let paidAt: String
@@ -263,6 +267,21 @@ final class DataStore: ObservableObject {
         jobs.removeAll { $0.id == job.id }
     }
 
+    func updateRouteOrder(_ job: Job, order: Int) async throws {
+        var updated = job
+        updated.routeOrder = order
+        guard await sb.isConfigured else {
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            return
+        }
+        try await sb.update("jobs", id: job.id, JobRoutePatch(routeOrder: order))
+        if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+            jobs[idx] = updated
+        }
+    }
+
     func toggleJobStatus(_ job: Job) async throws {
         let nextStatus: Job.JobStatus
         switch job.status {
@@ -273,10 +292,26 @@ final class DataStore: ObservableObject {
         @unknown default: nextStatus = .scheduled
         }
         try await updateJobStatus(job, status: nextStatus)
+        // Fire webhook on Done — Zapier handles client email/SMS
+        if nextStatus == .done {
+            await fireWebhookJobCompleted(job)
+        }
     }
 
     func skipJob(_ job: Job) async throws {
         try await updateJobStatus(job, status: .skipped)
+        await fireWebhookJobSkipped(job)
+    }
+    // MARK: - Webhook Notifications
+
+    private func fireWebhookJobCompleted(_ job: Job) async {
+        guard let userId = auth.user?.id else { return }
+        await WebhookService.shared.jobCompleted(job, userId: userId)
+    }
+
+    private func fireWebhookJobSkipped(_ job: Job) async {
+        guard let userId = auth.user?.id else { return }
+        await WebhookService.shared.jobSkipped(job, userId: userId)
     }
 
     private var isRainDelaying = false
