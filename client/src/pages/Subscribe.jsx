@@ -22,7 +22,7 @@ export default function Subscribe() {
         if (data.status === 'complete' && data.payment_status === 'paid') {
           setStatus('success');
           // Clear session ID from URL to prevent leaks
-          window.history.replaceState({}, '', window.location.pathname);
+          window.history.replaceState({}, '', '#/subscribe');
         } else if (data.status === 'complete' && data.payment_status === 'unpaid') {
           // Trial — subscription created but no payment yet
           setStatus('success');

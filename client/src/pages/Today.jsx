@@ -1,5 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 import { createJob, updateJobStatus, updateJob, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard } from '../lib/data';
@@ -54,17 +54,17 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   const { rainLikely, todayRainChance } = useWeather();
 
   // Filtered jobs computed early for use in effects and render
-  const dateFiltered = jobs.filter(j => j.scheduled_date === date);
-  const filtered = crewFilter
+  const dateFiltered = useMemo(() => jobs.filter(j => j.scheduled_date === date), [jobs, date]);
+  const filtered = useMemo(() => crewFilter
     ? dateFiltered.filter(j => j.assigned_to === crewFilter)
-    : dateFiltered;
-  const doneCount = filtered.filter(j => j.status === 'done').length;
+    : dateFiltered, [dateFiltered, crewFilter]);
+  const doneCount = useMemo(() => filtered.filter(j => j.status === 'done').length, [filtered]);
 
   // Signal badge on FAB when there's something the AI can help with
   useEffect(() => {
     const incompleteJobs = filtered.some(j => j.status !== 'done');
     const completedJobs = doneCount > 0;
-    const shouldShowBadge = (incompleteJobs && rainLikely) || completedJobs;
+    const shouldShowBadge = (incompleteJobs && rainLikely()) || completedJobs;
     window.dispatchEvent(new CustomEvent('mowgo:autopilot-badge', { detail: { show: shouldShowBadge } }));
   }, [filtered, doneCount, rainLikely]);
 

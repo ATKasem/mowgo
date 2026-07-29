@@ -82,6 +82,7 @@ export default function WebhookSettings() {
   }
 
   async function handleSave() {
+    if (!user) { setError(tr('Session expired. Please sign in again.')); return; }
     setSaving(true);
     setError('');
     setSaved(false);
