@@ -46,17 +46,24 @@ function FadeIn({ children, className = '', delay = 0 }) {
 export default function Landing() {
   const { tr, t, i18n } = useLocalizedText('landing');
   const [paymentError, setPaymentError] = useState('');
+  const errorTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => { if (errorTimerRef.current) clearTimeout(errorTimerRef.current); };
+  }, []);
 
   async function handleStartCheckout(plan) {
     try {
       const r = await startCheckout(plan);
       if (r?.error) {
         setPaymentError(r.error);
-        setTimeout(() => setPaymentError(''), 5000);
+        if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = setTimeout(() => setPaymentError(''), 5000);
       }
     } catch (e) {
       setPaymentError(e.message || tr('Payment failed'));
-      setTimeout(() => setPaymentError(''), 5000);
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = setTimeout(() => setPaymentError(''), 5000);
     }
   }
 

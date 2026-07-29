@@ -34,7 +34,9 @@ export default function Clients({ jobs = [] }) {
   const sortRef = useRef(null);
 
   useEffect(() => {
-    loadClients().then(data => { setClients(data); setLoading(false); }).catch(() => setLoading(false));
+    let active = true;
+    loadClients().then(data => { if (active) { setClients(data); setLoading(false); } }).catch(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, []);
 
   // Close sort dropdown on click outside (handles touch devices)

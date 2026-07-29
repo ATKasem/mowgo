@@ -24,6 +24,7 @@ export function useWeather(lat = 35.47, lon = -97.52) {
         const res = await fetch(
           `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=precipitation_probability_max,weather_code&temperature_unit=fahrenheit&timezone=auto&forecast_days=3`
         );
+        if (!res.ok) throw new Error(`Weather API ${res.status}`);
         const data = await res.json();
         if (!cancelled) {
           setWeather(data);
