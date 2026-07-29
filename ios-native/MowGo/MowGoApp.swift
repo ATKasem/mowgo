@@ -8,8 +8,10 @@ import SwiftData
 
 @main
 struct MowGoApp: App {
+    @UIApplicationDelegateAdaptor(PushAppDelegate.self) private var appDelegate
     @StateObject private var auth = AuthService()
     @StateObject private var store: DataStore
+    @StateObject private var push = PushNotificationService.shared
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showSessionExpiredAlert = false
     @State private var showUpgradeSuccessToast = false
@@ -76,7 +78,15 @@ struct MowGoApp: App {
                 guard !auth.isLoading else { return }
                 if auth.isAuthenticated {
                     await store.loadAll()
+                    // Register for push notifications after authentication
+                    await MainActor.run {
+                        PushNotificationService.shared.registerForPushNotifications()
+                    }
                 } else {
+                    // Clear device token when signed out
+                    await MainActor.run {
+                        PushNotificationService.shared.clearDeviceToken()
+                    }
                     store.clear()
                 }
             }

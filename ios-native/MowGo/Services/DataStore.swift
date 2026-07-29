@@ -68,6 +68,21 @@ private struct JobRoutePatch: Encodable {
     let routeOrder: Int?
 }
 
+private struct RecurringJobInsert: Encodable {
+    let id: UUID
+    let userId: UUID
+    let clientId: UUID
+    let title: String
+    let scheduledTime: String?
+    let durationMinutes: Int?
+    let assignedTo: UUID?
+    let notes: String?
+    let frequency: String
+    let daysOfWeek: [Int]
+    let isActive: Bool
+    let startDate: String
+}
+
 private struct InvoicePaidPatch: Encodable {
     let status: Invoice.InvoiceStatus
     let paidAt: String
@@ -79,6 +94,7 @@ final class DataStore: ObservableObject {
     @Published var clients: [Client] = []
     @Published var invoices: [Invoice] = []
     @Published var teamMembers: [UserProfile] = []
+    @Published var recurringJobs: [RecurringJob] = []
     @Published var isLoading = false
     @Published var error: String?
 
@@ -145,9 +161,10 @@ final class DataStore: ObservableObject {
                 async let j = sb.fetchJobs()
                 async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
                 async let i = sb.fetchInvoices()
-                let loaded = try await (j, c, i)
+                async let r: [RecurringJob] = sb.fetch("recurring_jobs")
+                let loaded = try await (j, c, i, r)
                 guard !Task.isCancelled, generation == loadGeneration else { return }
-                (jobs, clients, invoices) = loaded
+                (jobs, clients, invoices, recurringJobs) = loaded
                 // Persist to local cache for offline fallback
                 persistence?.saveJobs(loaded.0)
                 persistence?.saveClients(loaded.1)
@@ -186,6 +203,7 @@ final class DataStore: ObservableObject {
         clients = []
         invoices = []
         teamMembers = []
+        recurringJobs = []
         isLoading = false
         error = nil
         persistence?.clearAll()
@@ -296,6 +314,10 @@ final class DataStore: ObservableObject {
         if nextStatus == .done {
             await fireWebhookJobCompleted(job)
         }
+        // Send push notification for job completion
+        if nextStatus == .done {
+            await firePushJobCompleted(job)
+        }
     }
 
     func skipJob(_ job: Job) async throws {
@@ -312,6 +334,31 @@ final class DataStore: ObservableObject {
     private func fireWebhookJobSkipped(_ job: Job) async {
         guard let userId = auth.user?.id else { return }
         await WebhookService.shared.jobSkipped(job, userId: userId)
+    }
+
+    // MARK: - Push Notifications
+
+    private func firePushJobCompleted(_ job: Job) async {
+        guard let userId = AuthService.shared.user?.id else { return }
+        let clientName = job.clients?.name ?? "client"
+        await PushNotificationService.shared.sendPush(
+            userId: userId,
+            title: "Job Completed ✓",
+            body: "\(job.title) for \(clientName) marked as done."
+        )
+    }
+
+    private func firePushRainDelay(_ jobs: [Job], date: String) async {
+        guard let userId = AuthService.shared.user?.id else { return }
+        let count = jobs.count
+        let f = DateFormatter()
+        f.dateFormat = "EEEE, MMM d"
+        let displayDate = f.string(from: ISO8601DateFormatter().date(from: date + "T00:00:00Z") ?? Date())
+        await PushNotificationService.shared.sendPush(
+            userId: userId,
+            title: "Rain Delay Applied 🌧",
+            body: "\(count) job\(count == 1 ? "" : "s") rescheduled to \(displayDate)."
+        )
     }
 
     private var isRainDelaying = false
@@ -350,6 +397,88 @@ final class DataStore: ObservableObject {
                 throw error
             }
         }
+        // Send push notification after successful rain delay
+        await firePushRainDelay(pending, date: tomorrow)
+    }
+
+    // MARK: - Recurring Jobs
+
+    func createRecurringJob(_ template: RecurringJob) async throws {
+        guard await sb.isConfigured else {
+            recurringJobs.append(template)
+            return
+        }
+        do {
+            guard let userId = try await sb.getCurrentUserId() else {
+                throw DataStoreError.authenticationRequired
+            }
+            let created: RecurringJob = try await sb.insert("recurring_jobs", RecurringJobInsert(
+                id: template.id,
+                userId: userId,
+                clientId: template.clientId,
+                title: template.title,
+                scheduledTime: template.scheduledTime,
+                durationMinutes: template.durationMinutes,
+                assignedTo: template.assignedTo,
+                notes: template.notes,
+                frequency: template.frequency.rawValue,
+                daysOfWeek: template.daysOfWeek,
+                isActive: template.isActive,
+                startDate: template.startDate
+            ))
+            recurringJobs.append(created)
+        } catch {
+            self.error = error.localizedDescription
+            throw error
+        }
+    }
+
+    func deleteRecurringJob(_ template: RecurringJob) async throws {
+        guard await sb.isConfigured else {
+            recurringJobs.removeAll { $0.id == template.id }
+            return
+        }
+        try await sb.delete("recurring_jobs", id: template.id)
+        recurringJobs.removeAll { $0.id == template.id }
+    }
+
+    /// Check all active recurring job templates and create Job instances for today
+    /// if they match the pattern and no job already exists for that client today.
+    func generateJobsFromRecurring() async {
+        let todayStr = Self.dateString(from: Date())
+        for template in recurringJobs where template.isActive {
+            // Skip if a job already exists for this client today
+            let alreadyExists = jobs.contains { job in
+                job.clientId == template.clientId && job.scheduledDate == todayStr
+            }
+            guard !alreadyExists else { continue }
+
+            // Check if today matches the recurring pattern
+            guard template.matchesDate(Date()) else { continue }
+
+            // Create a job instance from the template
+            let job = Job(
+                id: UUID(),
+                clientId: template.clientId,
+                assignedTo: template.assignedTo,
+                title: template.title,
+                scheduledDate: todayStr,
+                scheduledTime: template.scheduledTime,
+                durationMinutes: template.durationMinutes,
+                status: .scheduled,
+                notes: template.notes,
+                isRecurring: true,
+                recurrenceRule: template.frequency.rawValue
+            )
+            try? await createJob(job)
+        }
+    }
+
+    private static let dateFmt: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
+    }()
+    private static func dateString(from date: Date) -> String {
+        dateFmt.string(from: date)
     }
 
     // MARK: - Clients

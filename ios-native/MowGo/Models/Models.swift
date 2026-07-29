@@ -9,6 +9,94 @@
 import Foundation
 import SwiftData
 
+// MARK: - Recurring Job Template
+
+/// A recurring job template stores the pattern for auto-generating Job instances.
+/// Stored in the `recurring_jobs` Supabase table.
+struct RecurringJob: Codable, Identifiable, Equatable {
+    let id: UUID
+    var userId: UUID?
+    var clientId: UUID
+    var title: String
+    var scheduledTime: String?       // "09:00"
+    var durationMinutes: Int?
+    var assignedTo: UUID?
+    var notes: String?
+    var frequency: Frequency
+    /// Weekday indices: 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+    var daysOfWeek: [Int]
+    var isActive: Bool
+    /// ISO date when the pattern started (UTC): "2026-07-01"
+    var startDate: String
+    var createdAt: String?
+
+    enum Frequency: String, Codable, CaseIterable {
+        case weekly, biweekly, monthly
+
+        var label: String {
+            switch self {
+            case .weekly:   "Every week"
+            case .biweekly: "Every 2 weeks"
+            case .monthly:  "Monthly"
+            }
+        }
+    }
+
+    // MARK: - Pattern Matching
+
+    private static let dateFmt: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = .utc; return f
+    }()
+
+    /// Returns true if `targetDate` should receive a job from this template.
+    func matchesDate(_ targetDate: Date) -> Bool {
+        let cal = Calendar.current
+        let calendarWeekday = cal.component(.weekday, from: targetDate) // 1=Sun, 2=Mon…7=Sat
+        let dayOfWeek = calendarWeekday - 1 // → 0=Sun(excl), 1=Mon, …, 6=Sat
+
+        // Must match one of the selected days
+        guard daysOfWeek.contains(dayOfWeek) else { return false }
+
+        guard let startDate = Self.dateFmt.date(from: startDate) else { return false }
+
+        switch frequency {
+        case .weekly:
+            return true
+
+        case .biweekly:
+            guard let weeks = cal.dateComponents([.weekOfYear], from: startDate, to: targetDate).weekOfYear else {
+                return false
+            }
+            return weeks % 2 == 0
+
+        case .monthly:
+            // Generate on the Nth occurrence of this weekday in the month,
+            // where N is derived from the start date's occurrence in its month.
+            let startCalendarWeekday = cal.component(.weekday, from: startDate)
+            guard calendarWeekday == startCalendarWeekday else { return false }
+            let todayNth = Self.nthWeekday(calendarWeekday, upTo: targetDate, cal: cal)
+            let startNth = Self.nthWeekday(startCalendarWeekday, upTo: startDate, cal: cal)
+            return todayNth == startNth
+        }
+    }
+
+    /// Count which occurrence of `weekday` (1=Sun…7=Sat) `date` is in its month (1-based).
+    private static func nthWeekday(_ weekday: Int, upTo date: Date, cal: Calendar) -> Int {
+        guard let monthStart = cal.date(from: cal.dateComponents([.year, .month], from: date)) else {
+            return 0
+        }
+        var count = 0
+        var d = monthStart
+        while d <= date {
+            if cal.component(.weekday, from: d) == weekday {
+                count += 1
+            }
+            d = cal.date(byAdding: .day, value: 1, to: d) ?? d
+        }
+        return count
+    }
+}
+
 // MARK: - Job
 
 struct Job: Codable, Identifiable, Equatable {

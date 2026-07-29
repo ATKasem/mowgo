@@ -391,6 +391,16 @@ actor SupabaseService {
         _ = try await request("DELETE", "/rest/v1/\(table)?id=eq.\(id.uuidString)")
     }
 
+    // MARK: - Push Notifications
+
+    /// Update the device token on the user's profile row.
+    func updateDeviceToken(userId: UUID, token: String?) async throws {
+        struct DeviceTokenPatch: Encodable {
+            let deviceToken: String?
+        }
+        try await update("profiles", id: userId, DeviceTokenPatch(deviceToken: token))
+    }
+
     // MARK: - Edge Functions
 
     func requestFunction(_ name: String, body: [String: Any]) async throws -> Data {

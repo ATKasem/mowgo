@@ -221,6 +221,8 @@ struct TodayView: View {
                 if auth.user?.tier == "crew" {
                     Task { await store.loadTeamMembers() }
                 }
+                // Auto-generate jobs from recurring templates for today
+                Task { await store.generateJobsFromRecurring() }
             }
         }
     }

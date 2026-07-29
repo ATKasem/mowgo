@@ -108,6 +108,12 @@ struct JobCardView: View {
                         .strikethrough(job.status == .done || job.status == .skipped)
                         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
 
+                    if job.isRecurring == true {
+                        Text("🔄")
+                            .font(.caption2)
+                            .accessibilityLabel("Recurring job")
+                    }
+
                     Spacer()
 
                     if let rate = job.clientRate {

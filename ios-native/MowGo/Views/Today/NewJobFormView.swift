@@ -23,6 +23,13 @@ struct NewJobFormView: View {
     @State private var notes = ""
     @State private var isSaving = false
     @State private var error: String?
+    @State private var repeatFrequency: RecurringJob.Frequency? = nil
+    @State private var selectedDays: Set<Int> = [] // 1=Mon, 2=Tue, ..., 6=Sat
+
+    private static let dayLabels = [
+        (1, "Mon"), (2, "Tue"), (3, "Wed"),
+        (4, "Thu"), (5, "Fri"), (6, "Sat")
+    ]
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -60,6 +67,43 @@ struct NewJobFormView: View {
                             .textContentType(.none)
                     }
                     .listRowBackground(theme.surface)
+
+                    // MARK: - Repeat Section
+                    Section("Repeat") {
+                        Picker("Schedule", selection: $repeatFrequency) {
+                            Text("Does not repeat").tag(nil as RecurringJob.Frequency?)
+                            ForEach(RecurringJob.Frequency.allCases, id: \.self) { freq in
+                                Text(freq.label).tag(freq as RecurringJob.Frequency?)
+                            }
+                        }
+                        .onChange(of: repeatFrequency) { _, newFreq in
+                            if newFreq != nil && selectedDays.isEmpty {
+                                selectedDays = Set(1...6)
+                            }
+                        }
+
+                        if repeatFrequency != nil {
+                            Text("On which days?")
+                                .font(.caption)
+                                .foregroundColor(theme.textMuted)
+                            HStack(spacing: 6) {
+                                ForEach(Self.dayLabels, id: \.0) { day, label in
+                                    DayToggleButton(
+                                        label: label,
+                                        isSelected: selectedDays.contains(day),
+                                        theme: theme
+                                    ) {
+                                        if selectedDays.contains(day) {
+                                            selectedDays.remove(day)
+                                        } else {
+                                            selectedDays.insert(day)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .listRowBackground(theme.surface)
                 }
                 .scrollContentBackground(.hidden)
             }
@@ -78,7 +122,7 @@ struct NewJobFormView: View {
                         )
                 }
             }
-            .alert("Couldn’t Save Job", isPresented: Binding(
+            .alert("Couldn't Save Job", isPresented: Binding(
                 get: { error != nil },
                 set: { if !$0 { error = nil } }
             )) {
@@ -115,17 +159,61 @@ struct NewJobFormView: View {
             durationMinutes: duration,
             status: .scheduled,
             notes: notes.isEmpty ? nil : notes,
-            routeOrder: store.jobs.filter { $0.scheduledDate == date }.count
+            routeOrder: store.jobs.filter { $0.scheduledDate == date }.count,
+            isRecurring: repeatFrequency != nil ? true : nil,
+            recurrenceRule: repeatFrequency?.rawValue
         )
         Task {
             error = nil
             do {
                 try await store.createJob(job)
+
+                // If repeat is selected, also save the recurring template
+                if let freq = repeatFrequency, !selectedDays.isEmpty {
+                    let dateFmt = DateFormatter(); dateFmt.dateFormat = "yyyy-MM-dd"
+                    let template = RecurringJob(
+                        id: UUID(),
+                        clientId: clientId,
+                        title: trimmedTitle,
+                        scheduledTime: timeFmt.string(from: scheduledTime),
+                        durationMinutes: duration,
+                        assignedTo: assignedTo,
+                        notes: notes.isEmpty ? nil : notes,
+                        frequency: freq,
+                        daysOfWeek: Array(selectedDays).sorted(),
+                        isActive: true,
+                        startDate: date
+                    )
+                    try? await store.createRecurringJob(template)
+                }
+
                 dismiss()
             } catch {
                 self.error = error.localizedDescription
                 isSaving = false
             }
         }
+    }
+}
+
+// MARK: - Day Toggle Button
+
+struct DayToggleButton: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let label: String
+    let isSelected: Bool
+    let theme: MowGoTheme
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .frame(width: 38, height: 32)
+                .background(isSelected ? MowGoTheme.deepGreen : theme.surfaceElevated)
+                .foregroundColor(isSelected ? MowGoTheme.onAccent : theme.textMuted)
+                .cornerRadius(8)
+        }
+        .buttonStyle(.plain)
     }
 }
