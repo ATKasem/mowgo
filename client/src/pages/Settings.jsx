@@ -28,24 +28,30 @@ export default function Settings() {
   const [inviteSending, setInviteSending] = useState(false);
 
   useEffect(() => {
+    let active = true;
     loadProfile().then(data => {
+      if (!active) return;
       if (data) setProfile(data);
       setProfileLoading(false);
       // Load team members when on crew tier
       if (data?.tier === 'crew') {
         setTeamLoading(true);
         loadTeamMembers()
-          .then(setTeamMembers)
+          .then(members => { if (active) setTeamMembers(members); })
           .catch(err => {
             console.error('loadTeamMembers:', err);
-            setTeamError(err.message || tr('Failed to load team members'));
+            if (active) setTeamError(err.message || tr('Failed to load team members'));
           })
-          .finally(() => setTeamLoading(false));
+          .finally(() => { if (active) setTeamLoading(false); });
       }
     }).catch(err => {
-      setError(err.message || tr('Failed to load profile'));
-      setProfileLoading(false);
+      console.error('loadProfile:', err);
+      if (active) {
+        setError(err.message || tr('Failed to load profile'));
+        setProfileLoading(false);
+      }
     });
+    return () => { active = false; };
   }, []);
 
   async function save(e) {

@@ -105,6 +105,65 @@ final class Persistence {
         return cached.compactMap { $0.toInvoice() }
     }
 
+    // MARK: - Mutation Queue (Offline → Sync)
+
+    /// Monotonically increasing sequence for deterministic FIFO ordering.
+    /// Persisted to UserDefaults so ordering survives app restarts even
+    /// when pending mutations from a previous session are still queued.
+    private var nextSequence: Int {
+        get { UserDefaults.standard.integer(forKey: "mowgo.mutation.seq") }
+        set { UserDefaults.standard.set(newValue, forKey: "mowgo.mutation.seq") }
+    }
+
+    /// Enqueue a mutation made while offline for later replay.
+    func enqueueMutation(operation: String, entityId: UUID, payload: Data, userId: UUID?) {
+        let seq = nextSequence
+        nextSequence += 1
+        let mutation = PendingMutation(
+            operation: operation,
+            entityId: entityId,
+            payload: payload,
+            sequence: seq,
+            userId: userId
+        )
+        context.insert(mutation)
+        do { try context.save() } catch {
+            print("[Persistence] failed to enqueue mutation: \(error)")
+        }
+    }
+
+    /// Load all pending mutations in FIFO order (oldest first).
+    func loadPendingMutations() -> [PendingMutation] {
+        let descriptor = FetchDescriptor<PendingMutation>(
+            sortBy: [SortDescriptor(\.sequence)]
+        )
+        do {
+            return try context.fetch(descriptor)
+        } catch {
+            print("[Persistence] failed to load mutations: \(error)")
+            return []
+        }
+    }
+
+    /// Remove a successfully replayed mutation from the queue.
+    func removeMutation(_ mutation: PendingMutation) {
+        context.delete(mutation)
+        do { try context.save() } catch {
+            print("[Persistence] failed to remove mutation: \(error)")
+        }
+    }
+
+    /// Clear all pending mutations (e.g. on sign-out).
+    func clearAllMutations() {
+        do {
+            let mutations = try context.fetch(FetchDescriptor<PendingMutation>())
+            for item in mutations { context.delete(item) }
+            try context.save()
+        } catch {
+            print("[Persistence] failed to clear mutations: \(error)")
+        }
+    }
+
     // MARK: - Helpers
 
     /// Returns true if any cached data exists (used to decide whether to
@@ -139,5 +198,6 @@ final class Persistence {
         do { try context.save() } catch {
             print("[Persistence] failed to save after clear: \(error)")
         }
+        clearAllMutations()
     }
 }

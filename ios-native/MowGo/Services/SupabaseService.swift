@@ -77,6 +77,31 @@ actor SupabaseService {
                !baseURL.isEmpty && !anonKey.isEmpty
     }
 
+    /// Auto-recovering connectivity flag. Reads return true if the last
+    /// request succeeded or if 30+ seconds have passed since the last
+    /// failure (allowing retry). Always access with `await` from outside
+    /// the actor; internal request() method calls markOnline/markOffline directly.
+    private var _isOnline = true
+    private var _lastNetworkFailure: Date?
+    var isOnline: Bool {
+        if !_isOnline, let lastFail = _lastNetworkFailure {
+            if Date().timeIntervalSince(lastFail) > 30 {
+                _isOnline = true
+                _lastNetworkFailure = nil
+            }
+        }
+        return _isOnline
+    }
+
+    func markOffline() {
+        _isOnline = false
+        _lastNetworkFailure = Date()
+    }
+
+    func markOnline() {
+        _isOnline = true
+    }
+
     // MARK: - Auth
 
     func signIn(email: String, password: String) async throws -> String {
@@ -436,10 +461,25 @@ actor SupabaseService {
             req.httpBody = try JSONSerialization.data(withJSONObject: body)
         }
 
-        let (data, response) = try await URLSession.shared.data(for: req)
-        guard let http = response as? HTTPURLResponse else {
+        let data: Data
+        let http: HTTPURLResponse
+        do {
+            let (d, r) = try await URLSession.shared.data(for: req)
+            data = d
+            guard let h = r as? HTTPURLResponse else {
+                markOffline()
+                throw SupabaseError.network
+            }
+            http = h
+        } catch let error as SupabaseError {
+            throw error
+        } catch is CancellationError {
+            throw error
+        } catch {
+            markOffline()
             throw SupabaseError.network
         }
+        markOnline()  // server reached — reset offline state regardless of status code
         guard (200...299).contains(http.statusCode) else {
             if http.statusCode == 401, allowsTokenRefresh, refreshToken != nil {
                 try await refreshAccessToken()

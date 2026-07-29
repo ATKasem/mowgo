@@ -79,7 +79,7 @@ export default function Subscribe() {
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">{tr("Something went wrong")}</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">{error || tr("We couldn't verify your payment. Please try again.")}</p>
           <div className="flex gap-3 justify-center">
-            <Link to="/" className="btn-primary text-sm px-6 py-2.5">{tr("Try Again")}</Link>
+            <Link to="/subscribe" className="btn-primary text-sm px-6 py-2.5">{tr("Try Again")}</Link>
             <Link to="/login" className="btn-secondary text-sm px-6 py-2.5">{tr("Try Free")}</Link>
           </div>
         </div>

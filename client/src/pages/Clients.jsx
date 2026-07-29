@@ -54,7 +54,7 @@ export default function Clients({ jobs = [] }) {
   }, [showSort]);
 
   function openNew() { setEditId(null); setForm(INITIAL_CLIENT_FORM); setExpandedId(null); setShowForm(true); }
-  function openEdit(client) { setEditId(client.id); setForm(client); setExpandedId(null); setShowForm(true); }
+  function openEdit(client) { setEditId(client.id); setForm({ ...client }); setExpandedId(null); setShowForm(true); }
 
   const [clientError, setClientError] = useState('');
 

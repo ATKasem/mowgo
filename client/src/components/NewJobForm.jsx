@@ -23,7 +23,7 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
       </div>
       <div>
         <label className="label">{tr("Job Title")}</label>
-        <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={tr("e.g. Full Service")} className="input" />
+        <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={tr("e.g. Full Service")} className="input" required />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

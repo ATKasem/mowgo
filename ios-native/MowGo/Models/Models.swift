@@ -335,6 +335,31 @@ final class ClientCache {
     }
 }
 
+// MARK: - Offline Mutation Queue
+
+/// A mutation made while offline that needs to be replayed against the server
+/// when connectivity is restored. Operations are replayed in FIFO order.
+@Model
+final class PendingMutation {
+    @Attribute(.unique) var id: UUID
+    var operation: String       // "job:create", "job:status", "job:delete", etc.
+    var entityId: UUID          // id of the affected entity
+    var payload: Data           // JSON-encoded mutation payload
+    var sequence: Int           // monotonically increasing for deterministic FIFO
+    var userId: UUID?           // the authenticated user who created this mutation
+    var createdAt: Date
+
+    init(id: UUID = UUID(), operation: String, entityId: UUID, payload: Data, sequence: Int, userId: UUID?, createdAt: Date = Date()) {
+        self.id = id
+        self.operation = operation
+        self.entityId = entityId
+        self.payload = payload
+        self.sequence = sequence
+        self.userId = userId
+        self.createdAt = createdAt
+    }
+}
+
 @Model
 final class InvoiceCache {
     @Attribute(.unique) var id: UUID

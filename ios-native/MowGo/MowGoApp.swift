@@ -21,14 +21,14 @@ struct MowGoApp: App {
     private static let modelContainer: ModelContainer = {
         let diskConfig = ModelConfiguration(isStoredInMemoryOnly: false)
         if let container = try? ModelContainer(
-            for: JobCache.self, ClientCache.self, InvoiceCache.self,
+            for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
             configurations: diskConfig
         ) {
             return container
         }
         let memConfig = ModelConfiguration(isStoredInMemoryOnly: true)
         return try! ModelContainer(
-            for: JobCache.self, ClientCache.self, InvoiceCache.self,
+            for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
             configurations: memConfig
         )
     }()

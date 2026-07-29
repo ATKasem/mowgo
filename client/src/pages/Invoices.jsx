@@ -29,7 +29,7 @@ const STATUS_FILTERS = [
   { value: 'paid', label: 'Paid' },
 ];
 
-export default function Invoices({ invoices, setInvoices }) {
+export default function Invoices({ invoices = [], setInvoices }) {
   const { tr, t, i18n } = useLocalizedText('invoices');
   const [copiedIds, setCopiedIds] = useState(new Set());
   const [statusFilter, setStatusFilter] = useState('all');

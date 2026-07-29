@@ -145,13 +145,18 @@ final class DataStore: ObservableObject {
             guard generation == loadGeneration else { return }
             // If we had data loaded previously, the session expired mid-use.
             // Notify the app so it can show an alert before clearing state.
+            // IMPORTANT: don't call clear() — this would wipe pending offline mutations.
             let hadData = !jobs.isEmpty || !clients.isEmpty || !invoices.isEmpty
             if hadData {
                 await MainActor.run {
                     NotificationCenter.default.post(name: AuthService.sessionExpired, object: nil)
                 }
             }
-            clear()
+            jobs = []
+            clients = []
+            invoices = []
+            recurringJobs = []
+            isLoading = false
             return
         }
         guard !Task.isCancelled, generation == loadGeneration else { return }
@@ -169,6 +174,8 @@ final class DataStore: ObservableObject {
                 persistence?.saveJobs(loaded.0)
                 persistence?.saveClients(loaded.1)
                 persistence?.saveInvoices(loaded.2)
+                // Replay any offline mutations queued while disconnected
+                await syncPendingMutations()
                 // Start real-time polling after successful load
                 startPollingIfNeeded(generation: generation)
             } catch is CancellationError {
@@ -193,12 +200,297 @@ final class DataStore: ObservableObject {
         await loadTask?.value
     }
 
+    // MARK: - Offline Sync
+
+    private var isSyncing = false
+    private var syncTask: Task<Void, Never>?
+
+    /// Replay all pending offline mutations against the server in FIFO order.
+    /// Called after a successful loadAll() when connectivity is restored.
+    func syncPendingMutations() async {
+        guard !isSyncing, let persistence else { return }
+        isSyncing = true
+        defer { isSyncing = false; syncTask = nil }
+
+        // Track this sync so clear() can cancel it
+        syncTask = Task { [weak self] in
+            await self?.runSync(persistence: persistence)
+        }
+        await syncTask?.value
+    }
+
+    private func runSync(persistence: Persistence) async {
+        let mutations = persistence.loadPendingMutations()
+        guard !mutations.isEmpty else { return }
+
+        guard await sb.isConfigured, await sb.ensureAuthenticated() else { return }
+
+        // Only replay mutations belonging to the current user
+        let currentUserId = AuthService.shared.user?.id
+        let mine = mutations.filter { $0.userId == currentUserId }
+        // Remove mutations from other users (orphaned from a previous session)
+        for stale in mutations where stale.userId != currentUserId {
+            persistence.removeMutation(stale)
+        }
+        guard !mine.isEmpty else { return }
+
+        var replayedCount = 0
+        for mutation in mine {
+            do {
+                try await replayMutation(mutation)
+                persistence.removeMutation(mutation)
+                replayedCount += 1
+            } catch {
+                print("[DataStore] replay failed for \(mutation.operation) \(mutation.entityId): \(error)")
+                // Remove permanently broken or already-done mutations
+                if error is DecodingError || error is PendingMutationError {
+                    persistence.removeMutation(mutation)
+                } else if case SupabaseError.httpStatus(404, _) = error,
+                          mutation.operation.hasSuffix(":delete") {
+                    // Entity already deleted on server — safe to remove
+                    persistence.removeMutation(mutation)
+                } else {
+                    break // Stop on first retryable failure — preserve FIFO order
+                }
+            }
+        }
+
+        // Refresh local state directly (no recursive loadAll) to reflect replayed changes
+        if replayedCount > 0 {
+            do {
+                let j = try await sb.fetchJobs()
+                let c: [Client] = try await sb.fetch("clients", query: ["order": "name.asc"])
+                let i = try await sb.fetchInvoices()
+                let r: [RecurringJob] = try await sb.fetch("recurring_jobs")
+                jobs = j
+                clients = c
+                invoices = i
+                recurringJobs = r
+                persistence.saveJobs(j)
+                persistence.saveClients(c)
+                persistence.saveInvoices(i)
+            } catch {
+                print("[DataStore] post-replay refresh failed: \(error)")
+            }
+        }
+    }
+
+    private func replayMutation(_ mutation: PendingMutation) async throws {
+        switch mutation.operation {
+        case "job:create":
+            let job = try JSONDecoder().decode(Job.self, from: mutation.payload)
+            _ = try await upsertJob(job)
+
+        case "job:status":
+            struct P: Decodable { let status: String }
+            let p = try JSONDecoder().decode(P.self, from: mutation.payload)
+            guard let status = Job.JobStatus(rawValue: p.status) else {
+                throw PendingMutationError.invalidPayload("Unknown job status: \(p.status)")
+            }
+            try await sb.update("jobs", id: mutation.entityId, JobStatusPatch(status: status))
+
+        case "job:delete":
+            try await sb.delete("jobs", id: mutation.entityId)
+
+        case "job:schedule":
+            struct P: Decodable { let scheduledDate: String }
+            let p = try JSONDecoder().decode(P.self, from: mutation.payload)
+            try await sb.update("jobs", id: mutation.entityId, JobSchedulePatch(scheduledDate: p.scheduledDate))
+
+        case "job:route":
+            struct P: Decodable { let routeOrder: Int }
+            let p = try JSONDecoder().decode(P.self, from: mutation.payload)
+            try await sb.update("jobs", id: mutation.entityId, JobRoutePatch(routeOrder: p.routeOrder))
+
+        case "client:create":
+            let client = try JSONDecoder().decode(Client.self, from: mutation.payload)
+            _ = try await upsertClient(client)
+
+        case "client:update":
+            let client = try JSONDecoder().decode(Client.self, from: mutation.payload)
+            try await sb.update("clients", id: mutation.entityId, ClientUpdate(
+                name: client.name,
+                address: client.address,
+                phone: client.phone,
+                email: client.email,
+                rate: client.rate,
+                cleaningNotes: client.cleaningNotes,
+                keyCode: client.keyCode,
+                alarmCode: client.alarmCode,
+                petInstructions: client.petInstructions
+            ))
+
+        case "client:delete":
+            try await sb.delete("clients", id: mutation.entityId)
+
+        case "invoice:pay":
+            struct P: Decodable { let paidAt: String }
+            let p = try JSONDecoder().decode(P.self, from: mutation.payload)
+            try await sb.update("invoices", id: mutation.entityId, InvoicePaidPatch(
+                status: .paid,
+                paidAt: p.paidAt
+            ))
+
+        case "recurring:create":
+            let template = try JSONDecoder().decode(RecurringJob.self, from: mutation.payload)
+            _ = try await upsertRecurringJob(template)
+
+        case "recurring:delete":
+            try await sb.delete("recurring_jobs", id: mutation.entityId)
+
+        default:
+            throw PendingMutationError.unknownOperation(mutation.operation)
+        }
+    }
+
+    /// Insert a job, falling back to update if the ID already exists on the server.
+    private func upsertJob(_ job: Job) async throws -> Job {
+        do {
+            return try await createJobOnServer(job)
+        } catch let SupabaseError.httpStatus(code, _) where code == 409 {
+            // Conflict — record already exists, update instead
+            let userId = (try? await sb.getCurrentUserId()) ?? job.userId ?? UUID()
+            try await sb.update("jobs", id: job.id, JobInsert(
+                id: job.id,
+                userId: userId,
+                clientId: job.clientId ?? UUID(),
+                assignedTo: job.assignedTo,
+                title: job.title,
+                scheduledDate: job.scheduledDate,
+                scheduledTime: job.scheduledTime,
+                durationMinutes: job.durationMinutes,
+                status: job.status,
+                notes: job.notes,
+                photoUrl: job.photoUrl,
+                routeOrder: job.routeOrder,
+                isRecurring: job.isRecurring,
+                recurrenceRule: job.recurrenceRule
+            ))
+            return job
+        }
+    }
+
+    /// Insert a client, falling back to update if the ID already exists.
+    private func upsertClient(_ client: Client) async throws -> Client {
+        do {
+            return try await createClientOnServer(client)
+        } catch let SupabaseError.httpStatus(code, _) where code == 409 {
+            try await sb.update("clients", id: client.id, ClientUpdate(
+                name: client.name,
+                address: client.address,
+                phone: client.phone,
+                email: client.email,
+                rate: client.rate,
+                cleaningNotes: client.cleaningNotes,
+                keyCode: client.keyCode,
+                alarmCode: client.alarmCode,
+                petInstructions: client.petInstructions
+            ))
+            return client
+        }
+    }
+
+    /// Insert a recurring job, falling back to update if the ID already exists.
+    private func upsertRecurringJob(_ template: RecurringJob) async throws -> RecurringJob {
+        do {
+            return try await createRecurringJobOnServer(template)
+        } catch let SupabaseError.httpStatus(code, _) where code == 409 {
+            let userId = (try? await sb.getCurrentUserId()) ?? template.userId ?? UUID()
+            try await sb.update("recurring_jobs", id: template.id, RecurringJobInsert(
+                id: template.id,
+                userId: userId,
+                clientId: template.clientId,
+                title: template.title,
+                scheduledTime: template.scheduledTime,
+                durationMinutes: template.durationMinutes,
+                assignedTo: template.assignedTo,
+                notes: template.notes,
+                frequency: template.frequency.rawValue,
+                daysOfWeek: template.daysOfWeek,
+                isActive: template.isActive,
+                startDate: template.startDate
+            ))
+            return template
+        }
+    }
+
+    /// Server-only create (no offline fallback, no local state mutation).
+    /// Used by replayMutation to avoid the enqueue path.
+    private func createJobOnServer(_ job: Job) async throws -> Job {
+        guard let userId = try await sb.getCurrentUserId() else {
+            throw DataStoreError.authenticationRequired
+        }
+        guard let clientId = job.clientId else {
+            throw DataStoreError.clientRequired
+        }
+        return try await sb.insert("jobs", JobInsert(
+            id: job.id,
+            userId: userId,
+            clientId: clientId,
+            assignedTo: job.assignedTo,
+            title: job.title,
+            scheduledDate: job.scheduledDate,
+            scheduledTime: job.scheduledTime,
+            durationMinutes: job.durationMinutes,
+            status: job.status,
+            notes: job.notes,
+            photoUrl: job.photoUrl,
+            routeOrder: job.routeOrder,
+            isRecurring: job.isRecurring,
+            recurrenceRule: job.recurrenceRule
+        ))
+    }
+
+    /// Server-only create (no offline fallback, no local state mutation).
+    private func createClientOnServer(_ client: Client) async throws -> Client {
+        guard let userId = try await sb.getCurrentUserId() else {
+            throw DataStoreError.authenticationRequired
+        }
+        return try await sb.insert("clients", ClientInsert(
+            id: client.id,
+            userId: userId,
+            name: client.name,
+            address: client.address,
+            phone: client.phone,
+            email: client.email,
+            rate: client.rate,
+            cleaningNotes: client.cleaningNotes,
+            keyCode: client.keyCode,
+            alarmCode: client.alarmCode,
+            petInstructions: client.petInstructions
+        ))
+    }
+
+    /// Server-only create (no offline fallback, no local state mutation).
+    private func createRecurringJobOnServer(_ template: RecurringJob) async throws -> RecurringJob {
+        guard let userId = try await sb.getCurrentUserId() else {
+            throw DataStoreError.authenticationRequired
+        }
+        return try await sb.insert("recurring_jobs", RecurringJobInsert(
+            id: template.id,
+            userId: userId,
+            clientId: template.clientId,
+            title: template.title,
+            scheduledTime: template.scheduledTime,
+            durationMinutes: template.durationMinutes,
+            assignedTo: template.assignedTo,
+            notes: template.notes,
+            frequency: template.frequency.rawValue,
+            daysOfWeek: template.daysOfWeek,
+            isActive: template.isActive,
+            startDate: template.startDate
+        ))
+    }
+
     func clear() {
         loadGeneration += 1
         loadTask?.cancel()
         loadTask = nil
         pollingTask?.cancel()
         pollingTask = nil
+        syncTask?.cancel()
+        isSyncing = false
+        persistence?.clearAll()  // clears caches + pending mutations
         jobs = []
         clients = []
         invoices = []
@@ -206,14 +498,14 @@ final class DataStore: ObservableObject {
         recurringJobs = []
         isLoading = false
         error = nil
-        persistence?.clearAll()
     }
 
     // MARK: - Jobs
 
     func createJob(_ job: Job) async throws {
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             jobs.append(job)
+            enqueue("job:create", id: job.id, payload: job)
             return
         }
         do {
@@ -241,7 +533,10 @@ final class DataStore: ObservableObject {
             ))
             jobs.append(created)
         } catch {
-            self.error = error.localizedDescription
+            // Network failed — save locally and queue for sync
+            jobs.append(job)
+            enqueue("job:create", id: job.id, payload: job)
+            self.error = "Saved offline — will sync when connected"
             throw error
         }
     }
@@ -249,54 +544,95 @@ final class DataStore: ObservableObject {
     private func updateJobStatus(_ job: Job, status: Job.JobStatus) async throws {
         var updated = job
         updated.status = status
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
+            struct P: Encodable { let status: String }
+            enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             return
         }
-        try await sb.update("jobs", id: job.id, JobStatusPatch(status: status))
-        if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
-            jobs[idx] = updated
+        do {
+            try await sb.update("jobs", id: job.id, JobStatusPatch(status: status))
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+        } catch {
+            // Network failed — apply local update and queue
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            struct P: Encodable { let status: String }
+            enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
+            throw error
         }
     }
 
     private func updateJobSchedule(_ job: Job, scheduledDate: String) async throws {
         var updated = job
         updated.scheduledDate = scheduledDate
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
+            struct P: Encodable { let scheduledDate: String }
+            enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             return
         }
-        try await sb.update("jobs", id: job.id, JobSchedulePatch(scheduledDate: scheduledDate))
-        if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
-            jobs[idx] = updated
+        do {
+            try await sb.update("jobs", id: job.id, JobSchedulePatch(scheduledDate: scheduledDate))
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+        } catch {
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            struct P: Encodable { let scheduledDate: String }
+            enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
+            throw error
         }
     }
 
     func deleteJob(_ job: Job) async throws {
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             jobs.removeAll { $0.id == job.id }
+            enqueueEmpty("job:delete", id: job.id)
             return
         }
-        try await sb.delete("jobs", id: job.id)
-        jobs.removeAll { $0.id == job.id }
+        do {
+            try await sb.delete("jobs", id: job.id)
+            jobs.removeAll { $0.id == job.id }
+        } catch {
+            jobs.removeAll { $0.id == job.id }
+            enqueueEmpty("job:delete", id: job.id)
+            throw error
+        }
     }
 
     func updateRouteOrder(_ job: Job, order: Int) async throws {
         var updated = job
         updated.routeOrder = order
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
+            struct P: Encodable { let routeOrder: Int }
+            enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             return
         }
-        try await sb.update("jobs", id: job.id, JobRoutePatch(routeOrder: order))
-        if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
-            jobs[idx] = updated
+        do {
+            try await sb.update("jobs", id: job.id, JobRoutePatch(routeOrder: order))
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+        } catch {
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            struct P: Encodable { let routeOrder: Int }
+            enqueue("job:route", id: job.id, payload: P(routeOrder: order))
+            throw error
         }
     }
 
@@ -404,8 +740,9 @@ final class DataStore: ObservableObject {
     // MARK: - Recurring Jobs
 
     func createRecurringJob(_ template: RecurringJob) async throws {
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             recurringJobs.append(template)
+            enqueue("recurring:create", id: template.id, payload: template)
             return
         }
         do {
@@ -428,18 +765,27 @@ final class DataStore: ObservableObject {
             ))
             recurringJobs.append(created)
         } catch {
-            self.error = error.localizedDescription
+            recurringJobs.append(template)
+            enqueue("recurring:create", id: template.id, payload: template)
+            self.error = "Saved offline — will sync when connected"
             throw error
         }
     }
 
     func deleteRecurringJob(_ template: RecurringJob) async throws {
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             recurringJobs.removeAll { $0.id == template.id }
+            enqueueEmpty("recurring:delete", id: template.id)
             return
         }
-        try await sb.delete("recurring_jobs", id: template.id)
-        recurringJobs.removeAll { $0.id == template.id }
+        do {
+            try await sb.delete("recurring_jobs", id: template.id)
+            recurringJobs.removeAll { $0.id == template.id }
+        } catch {
+            recurringJobs.removeAll { $0.id == template.id }
+            enqueueEmpty("recurring:delete", id: template.id)
+            throw error
+        }
     }
 
     /// Check all active recurring job templates and create Job instances for today
@@ -493,8 +839,9 @@ final class DataStore: ObservableObject {
             throw DataStoreError.freeTierLimit("Free plan is limited to \(freeClientLimit) clients. Upgrade to Solo or Crew for unlimited.")
         }
 
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             clients.append(client)
+            enqueue("client:create", id: client.id, payload: client)
             return
         }
         do {
@@ -516,7 +863,9 @@ final class DataStore: ObservableObject {
             ))
             clients.append(created)
         } catch {
-            self.error = error.localizedDescription
+            clients.append(client)
+            enqueue("client:create", id: client.id, payload: client)
+            self.error = "Saved offline — will sync when connected"
             throw error
         }
     }
@@ -528,35 +877,51 @@ final class DataStore: ObservableObject {
             updated.createdAt = existing.createdAt
         }
 
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
+            enqueue("client:update", id: client.id, payload: updated)
             return
         }
-        try await sb.update("clients", id: client.id, ClientUpdate(
-            name: updated.name,
-            address: updated.address,
-            phone: updated.phone,
-            email: updated.email,
-            rate: updated.rate,
-            cleaningNotes: updated.cleaningNotes,
-            keyCode: updated.keyCode,
-            alarmCode: updated.alarmCode,
-            petInstructions: updated.petInstructions
-        ))
-        if let idx = clients.firstIndex(where: { $0.id == client.id }) {
-            clients[idx] = updated
+        do {
+            try await sb.update("clients", id: client.id, ClientUpdate(
+                name: updated.name,
+                address: updated.address,
+                phone: updated.phone,
+                email: updated.email,
+                rate: updated.rate,
+                cleaningNotes: updated.cleaningNotes,
+                keyCode: updated.keyCode,
+                alarmCode: updated.alarmCode,
+                petInstructions: updated.petInstructions
+            ))
+            if let idx = clients.firstIndex(where: { $0.id == client.id }) {
+                clients[idx] = updated
+            }
+        } catch {
+            if let idx = clients.firstIndex(where: { $0.id == client.id }) {
+                clients[idx] = updated
+            }
+            enqueue("client:update", id: client.id, payload: updated)
+            throw error
         }
     }
 
     func deleteClient(_ client: Client) async throws {
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             clients.removeAll { $0.id == client.id }
+            enqueueEmpty("client:delete", id: client.id)
             return
         }
-        try await sb.delete("clients", id: client.id)
-        clients.removeAll { $0.id == client.id }
+        do {
+            try await sb.delete("clients", id: client.id)
+            clients.removeAll { $0.id == client.id }
+        } catch {
+            clients.removeAll { $0.id == client.id }
+            enqueueEmpty("client:delete", id: client.id)
+            throw error
+        }
     }
 
     // MARK: - Invoices
@@ -566,10 +931,12 @@ final class DataStore: ObservableObject {
         var updated = invoice
         updated.status = .paid
         updated.paidAt = paidAt
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
+            struct P: Encodable { let paidAt: String }
+            enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             return
         }
         do {
@@ -581,7 +948,12 @@ final class DataStore: ObservableObject {
                 invoices[idx] = updated
             }
         } catch {
-            self.error = error.localizedDescription
+            if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
+                invoices[idx] = updated
+            }
+            struct P: Encodable { let paidAt: String }
+            enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
+            self.error = "Saved offline — will sync when connected"
             throw error
         }
     }
@@ -589,7 +961,7 @@ final class DataStore: ObservableObject {
     // MARK: - Team
 
     func loadTeamMembers() async {
-        guard await sb.isConfigured else {
+        guard await canSync() else {
             // Offline mode: team data not available without network
             return
         }
@@ -722,6 +1094,31 @@ final class DataStore: ObservableObject {
         guard let next = Calendar.current.date(byAdding: .day, value: 1, to: d) else { return date }
         return f.string(from: next)
     }
+
+    // MARK: - Mutation Queue Helpers
+
+    /// Returns true if the device is configured AND reachable. When false,
+    /// mutations should enqueue locally instead of hitting the network.
+    private func canSync() async -> Bool {
+        guard await sb.isConfigured else { return false }
+        return await sb.isOnline
+    }
+
+    /// Enqueue an offline mutation for later replay.
+    private func enqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) {
+        guard let data = try? JSONEncoder().encode(payload) else {
+            print("[DataStore] failed to encode mutation payload for \(operation)")
+            return
+        }
+        let currentUserId = AuthService.shared.user?.id
+        persistence?.enqueueMutation(operation: operation, entityId: id, payload: data, userId: currentUserId)
+    }
+
+    /// Enqueue an empty-payload mutation (delete operations).
+    private func enqueueEmpty(_ operation: String, id: UUID) {
+        struct Empty: Encodable {}
+        enqueue(operation, id: id, payload: Empty())
+    }
 }
 
 enum DataStoreError: LocalizedError {
@@ -737,6 +1134,20 @@ enum DataStoreError: LocalizedError {
             "Select a client before saving the job."
         case .freeTierLimit(let message):
             message
+        }
+    }
+}
+
+enum PendingMutationError: LocalizedError {
+    case unknownOperation(String)
+    case invalidPayload(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unknownOperation(let op):
+            "Unknown mutation operation: \(op)"
+        case .invalidPayload(let detail):
+            "Invalid mutation payload: \(detail)"
         }
     }
 }

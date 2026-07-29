@@ -1,7 +1,7 @@
 # MowGo Lead Tracker
-**Last updated:** 2026-07-28 (review counts verified)
+**Last updated:** 2026-07-29 (4 cold emails sent)
 **Total leads:** 8
-**Contacted:** 0
+**Contacted:** 4
 **Conversions:** 0
 
 ---
@@ -33,7 +33,7 @@
 - **Next Step:** Cold email — highlight rain delay + free trial for solo operators
 
 ### Emerge Lawns
-- **Status:** 🔴
+- **Status:** 🟡
 - **Source:** Hound (lawn care search)
 - **City:** Norman, OK
 - **Website:** https://emergelawns.com/
@@ -43,8 +43,8 @@
 - **Current System:** Gmail-based (personal Gmail for business)
 - **Reviews:** 91 FB likes, 28 IG followers (231 posts). FB created May 2026 — only 2 months old. New business!
 - **Pain Points:** Juggling multiple service types (lawn, landscaping, holiday lights); using personal Gmail for business; no scheduling/invoicing automation; rain delays
-- **Last Contact:**
-- **Next Step:** Cold email — highlight rain delay management + free trial
+- **Last Contact:** 2026-07-29 — Email (Template E2: multi-service pain points)
+- **Next Step:** Follow-up email in 3 days if no response
 
 ### Frankies Lawn Care LLC
 - **Status:** 🔴
@@ -61,7 +61,7 @@
 - **Next Step:** Cold email — highlight route optimization for multi-service crews + free trial
 
 ### Metro Green LLC
-- **Status:** 🔴
+- **Status:** 🟡
 - **Source:** Hound (lawn care search)
 - **City:** Yukon, OK
 - **Website:** https://www.metrogreenok.com/
@@ -71,8 +71,8 @@
 - **Current System:** Unknown
 - **Reviews:** 3 reviews ⭐5.0 on Birdeye; 33 FB likes — tiny online presence but loved by customers
 - **Pain Points:** Multi-city service area means complex route planning; offers senior/military discounts — suggests personal relationship with clients not backed by good software; likely using phone/text for scheduling
-- **Last Contact:**
-- **Next Step:** Cold email — highlight territory management + rain delay auto-notify
+- **Last Contact:** 2026-07-29 — Email (Template E1: price/value, multi-city routing)
+- **Next Step:** Follow-up email in 3 days if no response
 
 ### Aaron's Lawn Maintenance
 - **Status:** 🔴
@@ -103,7 +103,7 @@
 - **Next Step:** Cold email — highlight simple scheduling + auto-invoicing for mixed-service crews
 
 ### Bigfoot Lawns LLC
-- **Status:** 🔴
+- **Status:** 🟡
 - **Source:** Hound (lawn care search)
 - **City:** Tulsa, OK
 - **Website:** https://bigfootlawns.com/
@@ -113,22 +113,22 @@
 - **Current System:** Unknown (basic website, no booking system visible)
 - **Reviews:** 0 — no reviews found anywhere. Zero social media presence. Pure website. Dark horse.
 - **Pain Points:** Ideal MowGo target — explicitly small, owner-operated; likely managing clients via phone/text; no online scheduling; needs route optimization for weekly mowing clients
-- **Last Contact:**
-- **Next Step:** Cold email — highlight rain delay + free trial for owner-operators
+- **Last Contact:** 2026-07-29 — Email (Template E2: small owner-operator pain points)
+- **Next Step:** Follow-up email in 3 days if no response
 
 ### Simply LawnCare
-- **Status:** 🔴
+- **Status:** 🟡
 - **Source:** Hound (lawn care search)
 - **City:** Broken Arrow / Tulsa, OK
 - **Website:** https://tulsaarealawncare.com/
 - **Phone:** (918) 928-5757
-- **Email:** —
+- **Email:** joe@tulsaarealawncare.com
 - **Crew Size:** 2-3 (family owned & operated, offers residential AND commercial)
 - **Current System:** Unknown
 - **Reviews:** 4 reviews ⭐5.0 on mawlawn.com. Contact: joe@tulsaarealawncare.com
 - **Pain Points:** Serving both residential and commercial clients across Tulsa metro; family-run with limited software; likely needs simpler scheduling than enterprise tools
-- **Last Contact:**
-- **Next Step:** Cold email — highlight simple client management + free trial
+- **Last Contact:** 2026-07-29 — Email (Template E1: price/value, resi+commercial)
+- **Next Step:** Follow-up email in 3 days if no response
 
 ---
 
@@ -136,7 +136,10 @@
 
 | Date | Business | Method | Response | Notes |
 |------|----------|--------|----------|-------|
-|      |          |        |          |       |
+| 7/29 | Emerge Lawns | Email (E2) | — | Multi-service pain points: lawns + landscaping + holiday lights, personal Gmail |
+| 7/29 | Metro Green LLC | Email (E1) | — | Price/value hook: multi-city routing across 5 OKC suburbs, 1-3 crews |
+| 7/29 | Bigfoot Lawns LLC | Email (E2) | — | Owner-operator pain points: small, solo, no online scheduling |
+| 7/29 | Simply LawnCare | Email (E1) | — | Price/value hook: 2-3 crew family business, residential + commercial |
 
 ---
 
@@ -145,4 +148,4 @@
 | Week | New Leads | Contacted | Responses | Trials | Paid |
 |------|-----------|-----------|-----------|--------|------|
 | 7/21 | 0 | 0 | 0 | 0 | 0 |
-| 7/26 | 8 | 0 | 0 | 0 | 0 |
+| 7/26 | 8 | 4 | 0 | 0 | 0 |

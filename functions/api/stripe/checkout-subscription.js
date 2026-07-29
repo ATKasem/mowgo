@@ -94,7 +94,19 @@ export async function onRequestPost(context) {
           body: JSON.stringify({ stripe_customer_id: customerId }),
         },
       );
-      if (!saveResponse.ok) throw new Error('Could not save Stripe customer');
+      if (!saveResponse.ok) {
+        const deleteResponse = await fetch(
+          `https://api.stripe.com/v1/customers/${encodeURIComponent(customerId)}`,
+          {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+          },
+        );
+        if (!deleteResponse.ok) {
+          console.error('Could not clean up Stripe customer after profile save failure', customerId);
+        }
+        throw new Error('Could not save Stripe customer');
+      }
     }
 
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {

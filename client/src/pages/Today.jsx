@@ -21,7 +21,7 @@ function getNextDate(currentDate, recurrence) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export default function Today({ jobs, setJobs, invoices, setInvoices, loading }) {
+export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, loading }) {
   const { tr, t, i18n } = useLocalizedText('today');
   const [searchParams] = useSearchParams();
   const [date, setDate] = useState(() => {
@@ -69,7 +69,11 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   }, [filtered, doneCount, rainLikely]);
 
   // Load clients for the NewJobForm dropdown
-  useEffect(() => { loadClients().then(setClients).catch(err => console.error('loadClients:', err)); }, []);
+  useEffect(() => {
+    let active = true;
+    loadClients().then(clients => { if (active) setClients(clients); }).catch(err => console.error('loadClients:', err));
+    return () => { active = false; };
+  }, []);
 
   // Load team members when on crew tier
   useEffect(() => {

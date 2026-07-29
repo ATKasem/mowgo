@@ -1,148 +1,208 @@
 {
-  "scan_date": "2026-07-28",
-  "scan_time_utc": "12:00",
+  "scan_date": "2026-07-29",
+  "scan_time_utc": "12:10",
   "scan_label": "7am CST Overnight Scan (Part 1/3)",
   "channels_scanned": {
     "🌱mowgo_general": {"id": "1529248227394850916", "messages_since_midnight": 7, "status": "active_cron_output"},
-    "🌱mowgo_outreach": {"id": "1529711006023024680", "messages_since_midnight": 0, "status": "last_activity_jul26"},
+    "🌱mowgo_outreach": {"id": "1529711006023024680", "messages_since_midnight": 0, "status": "last_active_jul26"},
     "🤝mowgo_cowork": {"id": "1529736297847980153", "messages_since_midnight": 0, "status": "empty"},
-    "🌱mowgo_leads": {"id": "1529707289014042804", "messages_since_midnight": 0, "status": "last_activity_jul26"}
+    "🌱mowgo_leads": {"id": "1529707289014042804", "messages_since_midnight": 0, "status": "blasian_question_jul28"}
   },
   "overnight_messages_needing_attention": [
     {
+      "priority": "HIGH",
+      "source": "#🌱mowgo-leads · Blasian (17:03 UTC Jul 28)",
+      "summary": "Blasian asked 'How would we get leads for MowGo' — has a ✅ reaction but no reply visible in channel. This is a direct human question about lead generation strategy. Needs an answer or discussion thread.",
+      "reported_by": "blasian3836 (human user)",
+      "is_blocker": false,
+      "tags": ["human_enagement", "leads_strategy", "needs_reply"]
+    },
+    {
       "priority": "CRITICAL",
-      "source": "#🌱mowgo · Stripe Health Check (09:13 UTC)",
-      "summary": "MowGo Stripe integration is NON-FUNCTIONAL in production. 3 blocking issues: (1) Cloudflare Pages Functions NOT deployed — all API endpoints return SPA HTML/405 instead of JSON. (2) All 4 secret env vars are empty (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_KEY, OPENROUTER_API_KEY). (3) VITE_FORCE_DEMO=true still active — production site runs in demo mode, no real auth tokens exist, checkout returns 401.",
+      "source": "#🌱mowgo · Stripe Health Check (09:08 UTC Jul 29)",
+      "summary": "MowGo Stripe integration STILL non-functional. All 4 secret env vars confirmed empty via CF API. Pages Functions not deployed (SPA HTML returned for all API routes). VITE_FORCE_DEMO=true still active. No progress since Jul 28.",
       "sub_issues": [
-        "CF Pages has no build command configured (build_command: None) — functions/ directory exists in repo but isn't detected",
-        "VITE_STRIPE_PRICE_SOLO points to OLD $49 deactivated price (price_1TwFiDGwXKVLlr2IIyi3NmBi) — server uses correct $39 but client doesn't match",
-        "cleanflloww.pages.dev is dead domain — still referenced in ALLOWED_ORIGINS"
+        "CF Pages Functions NOT deployed — all API endpoints return SPA HTML/405 instead of JSON",
+        "STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_KEY, OPENROUTER_API_KEY all empty",
+        "VITE_FORCE_DEMO=true still active — demo mode blocks real auth/checkout",
+        "VITE_STRIPE_PRICE_SOLO still points to old $49 deactivated price (price_1TwFiDGwXKVLlr2IIyi3NmBi)"
       ],
       "reported_by": "HeremesV2 (cron 9f622e63f4b8)",
       "is_blocker": true,
-      "blocks": "Stripe checkout, subscriptions, MowGo revenue"
+      "blocks": "Stripe checkout, subscriptions, MowGo revenue — UNCHANGED since Jul 28"
     },
     {
-      "priority": "HIGH",
-      "source": "#🌱mowgo · Intel Engine (09:56 UTC)",
-      "summary": "MowGo MISSING from ALL 5 major comparison sites checked (Briostack, Tolodora, LawnStarter, Repair-CRM, Software Advice) — all updated within days. Every Google search for 'best lawn care software 2026' leads prospects to competitors. This is the #1 growth blocker.",
+      "priority": "CRITICAL",
+      "source": "#🌱mowgo · Intel Engine (10:29 UTC Jul 29)",
+      "summary": "MowGo STILL missing from ALL comparison sites. SoftwareWorld updated TODAY (Jul 29) with no MowGo. SoloOp confirmed as real free forever competitor. 4 premium Reddit threads still queued unposted.",
       "sub_issues": [
-        "QuoteIQ shipped 3 major AI features: AI AutoMeasure (satellite property measurement), Ask AI Reports, Expenses Analytics — sprinting on AI",
-        "Servinix launches Jul 31 (3 days away) with rain delay auto-reschedule — closest feature match to MowGo",
-        "MowGo has no route optimization yet — competitors winning on this feature"
+        "SoftwareWorld AI Lawn Care list (updated Jul 29, TODAY) — 4 products, no MowGo",
+        "SoloOp (solo-op.com) confirmed real: $0/mo with route optimization, rain mode, offline mode, invoicing — major pricing threat",
+        "Servinix now LIVE ahead of Jul 31 launch — $300 AI assistant + $20/tech/mo",
+        "AI adoption hits 67% in landscaping — table stakes, not optional"
       ],
       "reported_by": "HeremesV2 (cron 54982fcbf42e)",
       "is_blocker": true,
-      "blocks": "New customer acquisition, organic discovery"
+      "blocks": "New customer acquisition, organic discovery — worsening daily"
     },
     {
       "priority": "MEDIUM",
-      "source": "#🌱mowgo · Supabase Keep-Alive (06:00 UTC)",
-      "summary": "Supabase keep-alive cron failed AGAIN — script not found at /opt/data/scripts/supabase_keepalive.sh. This has been failing since at least Jul 23 (5 consecutive missed runs).",
+      "source": "#🌱mowgo · Supabase Keep-Alive (06:00 UTC Jul 29)",
+      "summary": "Keepalive cron FAILED again — path mismatch. Script exists at /opt/data/scripts/supabase_keepalive.sh (created Jul 28) but cron still points to /opt/data/scripts/.hermes/scripts/supabase_keepalive.sh. 7+ consecutive failures.",
       "reported_by": "HeremesV2 (cron 80b29781c0dc)",
       "is_blocker": false,
-      "blocks": "Supabase cold-start latency"
+      "blocks": "Supabase cold-start latency — easy fix (symlink)",
+      "quick_fix": "Create symlink: ln -s /opt/data/scripts/supabase_keepalive.sh /opt/data/scripts/.hermes/scripts/supabase_keepalive.sh"
     }
   ],
   "open_tasks_from_yesterday": [
     {
-      "task": "Reddit outreach replies never posted",
-      "detail": "HeremesV2 has drafted replies for 8+ Reddit threads but cannot post (bot limitations). Threads identified: r/Entrepreneur 'dad+daughter landscaping software' (PRIME), r/landscaping '1-3 person crews' (GOLDEN), r/sweatystartup 'not happy with Jobber' (HIGH switch intent). Aaron needs to manually post these.",
-      "priority": "HIGH",
-      "effort": "15 min"
+      "task": "Fix Stripe production deployment",
+      "detail": "CF Pages Functions not deploying, 4 env vars empty, VITE_FORCE_DEMO=true, price ID mismatch. All same as yesterday. NO progress. Unblocks entire revenue pipeline.",
+      "status": "STILL OPEN — needs Aaron on Cloudflare dashboard",
+      "priority": "CRITICAL",
+      "effort": "15 min (dashboard work)"
     },
     {
-      "task": "Cold email outreach to 8 leads — all still NEW, none contacted",
-      "detail": "Leads from Jul 26 discovery: Bigfoot Lawns LLC (Tulsa), Emerge Lawns (Norman), Metro Green LLC (Yukon), NG Outdoor (Edmond), Frankies Lawn Care (Norman), Grass & Trees (Moore), Simply LawnCare (Broken Arrow), Aaron's Lawn Maintenance (Yukon). Another 12 from Jul 23 also untouched. Total: 22 leads, 0 contacted.",
+      "task": "Comparison site submissions",
+      "detail": "MowGo absent from ALL major comparison sites. SoftwareWorld updated TODAY — still no MowGo. Growth blocker worsening daily.",
+      "status": "STILL OPEN — Tolodora blocked (JS SPA), Briostack is competitor, SourceForge/Capterra viable but need account creation",
+      "priority": "CRITICAL",
+      "effort": "60 min manual work"
+    },
+    {
+      "task": "Reddit outreach replies — NEVER POSTED",
+      "detail": "4 premium threads queued: (1) r/landscaping '1-3 person crews what do you use?' (PRIME), (2) r/landscaping 'Is Jobber overkill for my uncle?' (HIGH), (3) r/Entrepreneur 'dad+daughter landscaping software' (PRIME), (4) r/sweatystartup 'Not happy with Jobber' (HIGH). Drafts exist at /opt/data/mowgo/marketing/reddit-replies-2026-07-27.md.",
+      "status": "STILL OPEN — Reddit blocks automated posting",
+      "priority": "HIGH",
+      "effort": "15 min (Aaron must post manually)"
+    },
+    {
+      "task": "Cold email outreach to 22+ leads — ALL untouched",
+      "detail": "22 leads in tracker (LEAD_TRACKER.md), ZERO contacted. Top 3: Bigfoot Lawns (Tulsa, owner-operated, has email), Emerge Lawns (Norman, Gmail-based, firefighter-owned), Metro Green (Yukon, family-owned).",
+      "status": "STILL OPEN — no outreach started",
       "priority": "HIGH",
       "effort": "30 min for first 5 emails"
     },
     {
-      "task": "Comparison site submissions",
-      "detail": "MowGo absent from Tolodora, Briostack, SoftwareWorld, Guideflow, FieldServiceStack — all have submission forms. Tolodora is easiest target (freshest list, simple form).",
-      "priority": "HIGH",
-      "effort": "15 min per site (~75 min total)"
-    },
-    {
       "task": "Prepare Jul 31 Jobber promo expiration messaging",
-      "detail": "Jobber's current promo expires Jul 31. Post-expiration window is prime for comparison ads: 'Jobber promo expired? MowGo is $39 flat — no add-on creep.'",
-      "priority": "MEDIUM",
+      "detail": "Jobber promo expires Jul 31 (2 days!). Aug 1-7 is prime switching window. Messaging angle: 'Jobber promo expired? MowGo is $39 flat — no add-on creep.'",
+      "status": "STILL OPEN — messaging not drafted",
+      "priority": "HIGH",
       "effort": "20 min"
     },
     {
       "task": "Monitor Servinix launch (Jul 31)",
-      "detail": "Closest feature competitor launching in 3 days. Need pricing + feature set immediately on launch day.",
+      "detail": "Now LIVE ahead of schedule. Pricing confirmed: $300/mo AI assistant + $20/tech/mo FSM. 4-5x MowGo pricing for small crews. Need launch-day feature confirmation.",
+      "status": "UPDATED — now live, launch Jul 31 still confirmed",
       "priority": "MEDIUM",
-      "effort": "10 min"
+      "effort": "10 min on Jul 31"
+    },
+    {
+      "task": "Regenerate CF API token",
+      "detail": "Current token (in /opt/data/.env) returns 401. Blocks env var verification, deployment management via API.",
+      "status": "STILL OPEN — needs Aaron on Cloudflare dashboard",
+      "priority": "HIGH",
+      "effort": "5 min"
+    },
+    {
+      "task": "Set up keepalive cron at correct path",
+      "detail": "Script exists at /opt/data/scripts/supabase_keepalive.sh but cron looks at /opt/data/scripts/.hermes/scripts/supabase_keepalive.sh. Simple symlink fix.",
+      "status": "NEW — script exists, path mismatch",
+      "priority": "MEDIUM",
+      "effort": "2 min (symlink)"
     }
   ],
   "blockers_or_questions_for_aaron": [
     {
       "blocker": "CF Pages Functions not deploying in production",
-      "detail": "No build command set on Cloudflare Pages project. The functions/ directory is in the repo but CF isn't detecting it. Need to: add build command, populate 4 empty secret env vars, switch VITE_FORCE_DEMO to false.",
-      "action_required": "Cloudflare Pages dashboard → Settings → Build command (set empty = just deploy from functions/) → Environment variables (add 4 secrets)",
-      "location": "dash.cloudflare.com → Pages → mowgo"
+      "detail": "Still broken. functions/ directory exists but CF Pages doesn't detect it. All 4 secret env vars empty. VITE_FORCE_DEMO=true still blocks auth. NO PROGRESS since Jul 28.",
+      "action_required": "dash.cloudflare.com → Pages → mowgo → Settings → Build command (set empty) → Environment variables (add 4 secrets) → Remove VITE_FORCE_DEMO",
+      "location": "dash.cloudflare.com — needs Aaron's manual login"
     },
     {
       "blocker": "CF API token expired/revoked",
-      "detail": "The token in /opt/data/.env (cfk_hVA8YJ3iWxbGjjAfsVF0tNyNIoTYx8gJkiU7XBT15396badd) returns 401. Cannot verify env vars via API. Needs regeneration from Cloudflare Dashboard.",
-      "action_required": "Regenerate API token with Pages:Edit permission",
-      "location": "dash.cloudflare.com → Profile → API Tokens"
+      "detail": "Token cfk_hVA8YJ3iWxbGjjAfsVF0tNyNIoTYx8gJkiU7XBT15396badd returns 401. Cannot verify env vars or trigger deployments via API.",
+      "action_required": "dash.cloudflare.com → Profile → API Tokens → Create token with Pages:Edit permission",
+      "location": "dash.cloudflare.com — needs Aaron's manual login"
     },
     {
       "blocker": "Cannot automate Reddit posting",
-      "detail": "Reddit blocks all automated access from this environment (403 on every method). HeremesV2 can discover threads and draft replies but Aaron must manually post from his Reddit account.",
-      "action_required": "Post replies manually on Reddit account"
+      "detail": "Reddit blocks all automated access (403). 4 premium threads queued with drafts. Aaron must manually post from his Reddit account.",
+      "action_required": "Post replies to 4 threads from Aaron's Reddit account. Drafts at /opt/data/mowgo/marketing/reddit-replies-2026-07-27.md",
+      "location": "Reddit — manual human action required"
     },
     {
-      "blocker": "Supabase keepalive script missing",
-      "detail": "Cron at /opt/data/scripts/.hermes/scripts/supabase_keepalive.sh not found. Quick fix: create a simple curl script to ping Supabase DB to prevent cold-start.",
-      "action_required": "Create supabase_keepalive.sh script"
+      "blocker": "Comparison site submissions need browser/JS",
+      "detail": "Tolodora.com/launch is Next.js SPA — cannot submit via curl. Briostack is competitor (won't list). SourceForge/Capterra need account creation. All need manual browser.",
+      "action_required": "Manually submit MowGo to: Tolodora, SoftwareWorld, Guideflow, FieldServiceStack, Capterra, SourceForge",
+      "location": "Multiple sites — manual browser work"
+    },
+    {
+      "question": "Blasian: 'How would we get leads for MowGo?' — needs strategy discussion",
+      "detail": "Blasian asked in #🌱mowgo-leads (Jul 28, 17:03 UTC). Has ✅ reaction but no reply. This is a human asking about lead generation strategy — needs a thoughtful response.",
+      "suggested_answer": "Multi-channel approach: (1) Reddit threaded replies in lawn care subreddits, (2) cold email to 22 local leads, (3) comparison site listings, (4) Facebook group engagement in lawn care groups. Each channel feeds the same funnel."
     }
   ],
   "quick_wins_sub_30_min": [
     {
-      "task": "Create supabase_keepalive.sh",
-      "detail": "Simple curl script to ping Supabase REST API to keep DB warm. ~5 min.",
-      "est_minutes": 5,
-      "impact": "Fixes 5-day-old repeating cron failure"
-    },
-    {
-      "task": "Submit MowGo to Tolodora.com",
-      "detail": "Easiest comparison site — one form, freshest list (Jul 27). ~10 min.",
-      "est_minutes": 10,
-      "impact": "Instantly visible on a current comparison page"
-    },
-    {
-      "task": "Set VITE_FORCE_DEMO=false in CF Pages",
-      "detail": "Single toggle in Cloudflare dashboard. Unblocks Stripe auth flow. ~2 min.",
+      "task": "Fix supabase keepalive cron path",
+      "detail": "Script exists at /opt/data/scripts/supabase_keepalive.sh but cron looks at /opt/data/scripts/.hermes/scripts/supabase_keepalive.sh. Create symlink to fix 7-day-old failure.",
       "est_minutes": 2,
-      "impact": "Unblocks production auth"
+      "impact": "Fixes 7-day-old repeating cron failure instantly"
     },
     {
-      "task": "Fix VITE_STRIPE_PRICE_SOLO to match server price ID",
-      "detail": "Client env var points to old $49 deactivated price. Update to match server's correct $39 price ID. ~5 min.",
+      "task": "Answer Blasian's lead generation question",
+      "detail": "Direct human question in #🌱mowgo-leads. Reply with 3-5 channel strategy: Reddit threaded replies, cold email to local leads, comparison site listings, Facebook group engagement.",
       "est_minutes": 5,
-      "impact": "Ensures consistent pricing display"
+      "impact": "Keeps human collaborator engaged and unblocks lead gen discussion"
     },
     {
-      "task": "Post the r/Entrepreneur Reddit reply",
-      "detail": "Draft ready: 'dad+daughter landscaping software' thread. Perfect MowGo buyer persona. ~5 min.",
-      "est_minutes": 5,
-      "impact": "Direct engagement with ideal ICP"
-    },
-    {
-      "task": "Post the r/landscaping '1-3 person crews' reply",
-      "detail": "Draft ready: OP explicitly asking what 1-3 person crews use. MowGo's exact target. ~5 min.",
-      "est_minutes": 5,
-      "impact": "Warm lead in perfect-fit audience"
-    },
-    {
-      "task": "Submit MowGo to Briostack software listing",
-      "detail": "Second-easiest comparison site. ~15 min.",
+      "task": "Draft Jul 31 Jobber promo expiration posts",
+      "detail": "Jobber promo expires in 2 days. Create 2-3 social posts / ad copy drafts for the Aug 1-7 switch window. Angle: 'Jobber promo expired? MowGo is $39 flat — unlimited crew, no add-on creep.'",
       "est_minutes": 15,
-      "impact": "Visible on another high-traffic comparison page"
+      "impact": "Ready for prime switching window — captures Jobber leavers"
+    },
+    {
+      "task": "Submit MowGo to SourceForge directory",
+      "detail": "General software directory, simple form, no JS required. Quick way to get MowGo on at least one listing site.",
+      "est_minutes": 10,
+      "impact": "Gets MowGo on a software directory — better than zero"
+    },
+    {
+      "task": "Research programmatic comparison site submission options",
+      "detail": "Check what comparison sites accept simple form submissions vs JS-rendered forms. May find 2-3 more that are curl-friendly.",
+      "est_minutes": 10,
+      "impact": "Could unlock more automated listing submissions"
+    },
+    {
+      "task": "Create FB group engagement drafts",
+      "detail": "Lawn Care & Landscaping Business Group and others identified. Draft 2 short posts about scheduling pain points (not product pitches). Ready for Aaron to post.",
+      "est_minutes": 15,
+      "impact": "Expands outreach channel beyond Reddit"
     }
   ],
-  "summary": "3 critical issues overnight: Stripe non-functional in production (env vars empty + CF Functions not deployed + demo mode), MowGo absent from all comparison sites (growth blocker), and Supabase keepalive failing for 6th day. 22 untouched leads in tracker. Reddit drafts ready but Aaron must manually post. Servinix launches Jul 31 — 3 days away. CF API token needs regeneration."
+  "new_threats_overnight": [
+    {
+      "threat": "SoloOp — FREE FOREVER competitor confirmed real",
+      "detail": "solo-op.com is a fully built app with route optimization, rain mode, offline (Bush Mode), invoicing, AutoPay — all at $0/mo. Revenue via transaction fees (1.75%+$1.30, capped $19.95). Targets same 1-3 person crew ICP. THIS IS THE BIGGEST PRICING THREAT.",
+      "should_monitor": true
+    },
+    {
+      "threat": "Servinix now LIVE ahead of Jul 31 launch",
+      "detail": "Pricing confirmed live at $300/mo AI assistant + $20/tech/mo FSM. Strong AI (Maya agent), QuickBooks sync, route optimization. Not lawn-specific (no rain delay) but broadest feature set of any new entrant.",
+      "should_monitor": true
+    },
+    {
+      "threat": "QuoteIQ sprinting on AI — dominating SEO",
+      "detail": "Shipped AI AutoMeasure (satellite property measurement), Ask AI Reports, Expenses Analytics in Jul 2026 update. Running self-ranking comparison lists. 5+ comparison pages in 30 days.",
+      "should_monitor": true
+    },
+    {
+      "signal": "AI adoption hits 67% — no longer optional",
+      "detail": "Verified stat from GitNux: 67% of commercial landscapers use AI for scheduling. MowGo needs to brand features as 'AI-powered.' Route optimization and AI Autopilot should lead marketing messaging.",
+      "should_act": true
+    }
+  ],
+  "summary": "Day 2 of same critical issues: Stripe production is DEAD (CF Functions not deploying, env vars empty, demo mode), MowGo absent from ALL comparison sites (SoftwareWorld updated TODAY without us), and Reddit posts never happened. SoloOp confirmed as real $0/mo competitor — massive pricing threat. Servinix went LIVE early. 22 leads untouched. Only bright spot: supabase keepalive script exists (but cron path is wrong). Blasian asked about lead gen strategy — needs a reply. Jobber promo expires in 2 days — need messaging ready. The highest-ROI action Aaron can take remains: fix CF Pages deployment → unblocks Stripe → enables revenue."
 }

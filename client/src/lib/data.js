@@ -355,7 +355,7 @@ export async function updateClient(id, updates) {
     notify();
     return _clients.find(c => c.id === id);
   }
-  const supabaseUpdates = { ...updates };
+  const { id: _excludeId, ...supabaseUpdates } = { ...updates };
   if (updates.service_notes !== undefined) { supabaseUpdates.cleaning_notes = updates.service_notes; delete supabaseUpdates.service_notes; }
   const { data, error } = await supabase.from('clients').update(supabaseUpdates).eq('id', id).select().single();
   if (error) throw error;
