@@ -14,6 +14,7 @@ export function generateGoogleCalUrl(jobs) {
   const base = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
   if (jobs.length === 0) return base;
   const first = jobs[0];
+  if (!first.scheduled_date) return base;
   const date = first.scheduled_date.replace(/-/g, '');
   const time = (first.scheduled_time || '09:00').replace(':', '') + '00';
   const endTime = addMinutes(time, first.duration_minutes || 60);
@@ -110,7 +111,7 @@ export function generateICS(jobs) {
   ];
 
   jobs.forEach(job => {
-    if (!job.clients) return;
+    if (!job.clients || !job.scheduled_date) return;
     const date = job.scheduled_date.replace(/-/g, '');
     const time = (job.scheduled_time || '09:00').replace(':', '') + '00';
     const endTime = addMinutes(time, job.duration_minutes || 60);

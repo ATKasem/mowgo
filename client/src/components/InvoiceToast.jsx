@@ -27,7 +27,7 @@ export default function InvoiceToast({ toast }) {
               ? toast.name
               : tr('Invoice created for {{name}}', { name: toast.name })}
           </p>
-          {!isRain && !isError && <p className={`text-xs ${subColor}`}>${toast.amount} — {tr('unpaid')}</p>}
+          {!isRain && !isError && <p className={`text-xs ${subColor}`}>${toast.amount ?? '0'} — {tr('unpaid')}</p>}
         </div>
       </div>
     </div>

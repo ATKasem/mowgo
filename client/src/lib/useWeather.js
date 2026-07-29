@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 const WEATHER_CACHE_KEY = 'mf_weather_cache';
 const WEATHER_TTL = 30 * 60 * 1000; // 30 minutes
@@ -49,7 +49,7 @@ export function useWeather(lat = 35.47, lon = -97.52) {
   }, []);
 
   /** Check if rain is likely today or tomorrow (precip > 30%) */
-  function rainLikely() {
+  const rainLikely = useCallback(() => {
     if (!weather?.daily) return false;
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -62,15 +62,15 @@ export function useWeather(lat = 35.47, lon = -97.52) {
       }
     }
     return false;
-  }
+  }, [weather]);
 
-  function todayRainChance() {
+  const todayRainChance = useCallback(() => {
     if (!weather?.daily) return 0;
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const idx = weather.daily.time.indexOf(today);
     return idx >= 0 ? weather.daily.precipitation_probability_max[idx] : 0;
-  }
+  }, [weather]);
 
-  return { weather, loading, rainLikely, todayRainChance };
+  return useMemo(() => ({ weather, loading, rainLikely, todayRainChance }), [weather, loading, rainLikely, todayRainChance]);
 }

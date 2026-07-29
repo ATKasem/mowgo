@@ -53,6 +53,13 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
 
   const { rainLikely, todayRainChance } = useWeather();
 
+  // Filtered jobs computed early for use in effects and render
+  const dateFiltered = jobs.filter(j => j.scheduled_date === date);
+  const filtered = crewFilter
+    ? dateFiltered.filter(j => j.assigned_to === crewFilter)
+    : dateFiltered;
+  const doneCount = filtered.filter(j => j.status === 'done').length;
+
   // Signal badge on FAB when there's something the AI can help with
   useEffect(() => {
     const incompleteJobs = filtered.some(j => j.status !== 'done');
@@ -203,7 +210,9 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
   // Shared date-scoped reorder — prevents cross-date corruption
   function reorderInPlace(updated, fromIdx, toIdx) {
     const [moved] = updated.splice(fromIdx, 1);
-    updated.splice(toIdx, 0, moved);
+    // After splice, indices shift — adjust target when moving down
+    const adjustedIdx = fromIdx < toIdx ? toIdx - 1 : toIdx;
+    updated.splice(adjustedIdx, 0, moved);
   }
 
   function reorderWithinDate(prev, fromJobId, toJobId, currentDate) {
@@ -273,12 +282,6 @@ export default function Today({ jobs, setJobs, invoices, setInvoices, loading })
     if (pos === -1 || pos >= dateJobs.length - 1) return;
     void persistReorder(job.id, dateJobs[pos + 1].id);
   }
-
-  const dateFiltered = jobs.filter(j => j.scheduled_date === date);
-  const filtered = crewFilter
-    ? dateFiltered.filter(j => j.assigned_to === crewFilter)
-    : dateFiltered;
-  const doneCount = filtered.filter(j => j.status === 'done').length;
 
   if (loading) {
     return (

@@ -6,27 +6,21 @@ export default function PortalReturn() {
   const { tr } = useLocalizedText('portalReturn');
   const [fallback, setFallback] = useState(false);
 
-  const handleOpen = () => {
+  useEffect(() => {
     // Attempt deep link
     window.location.href = 'mowgo://settings?portal_returned=true';
 
-    // If still here after 2s, app probably didn't open
+    // If still here after 2s, app probably didn't open — show fallback
     const timer = setTimeout(() => setFallback(true), 2000);
-    return () => clearTimeout(timer);
-  };
-
-  useEffect(() => {
-    let timer;
-    const cleanup = () => clearTimeout(timer);
 
     const onVisibility = () => {
-      // Page becomes hidden → app likely opened
-      if (document.hidden) cleanup();
+      // Page becomes hidden → app likely opened, cancel fallback
+      if (document.hidden) clearTimeout(timer);
     };
-
     document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
-      cleanup();
+      clearTimeout(timer);
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
@@ -49,7 +43,10 @@ export default function PortalReturn() {
 
         {/* Primary button */}
         <button
-          onClick={handleOpen}
+          onClick={() => {
+            window.location.href = 'mowgo://settings?portal_returned=true';
+            setTimeout(() => setFallback(true), 2000);
+          }}
           className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold text-lg py-4 px-6 rounded-xl shadow-sm transition-colors cursor-pointer"
         >
           {tr('Open MowGo')}
