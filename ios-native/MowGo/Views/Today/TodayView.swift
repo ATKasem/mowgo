@@ -78,11 +78,11 @@ struct TodayView: View {
                             // Slim date strip
                             dateStrip
 
-                            // 2×2 stats grid
-                            statsGrid
-
                             // Month calendar
                             monthGrid
+
+                            // 2×2 stats grid
+                            statsGrid
 
                             // Crew filter
                             crewFilterBar
