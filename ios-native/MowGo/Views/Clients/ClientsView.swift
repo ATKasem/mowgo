@@ -163,7 +163,6 @@ struct ClientCard: View {
                 .font(.caption.weight(.semibold))
                     .foregroundColor(MowGoTheme.deepGreen)
                     .accessibilityLabel("Edit \(client.name)")
-                }
                 .padding(.horizontal, 12).padding(.bottom, 12)
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
