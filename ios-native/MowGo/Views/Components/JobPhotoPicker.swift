@@ -135,7 +135,9 @@ struct JobPhotoPicker: View {
                             .padding(.vertical, 18)
                     }
                 }
-                .presentationDetents([.medium])
+                .presentationDetents([.height(140)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.thickMaterial)
             }
             .photosPicker(
                 isPresented: $showLibraryPicker,
