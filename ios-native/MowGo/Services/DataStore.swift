@@ -173,6 +173,7 @@ final class DataStore: ObservableObject {
             invoices = []
             recurringJobs = []
             isLoading = false
+            self.error = "Unable to load your account. Please try again."
             return
         }
 
