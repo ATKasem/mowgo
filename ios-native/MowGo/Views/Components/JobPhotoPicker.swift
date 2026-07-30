@@ -112,19 +112,30 @@ struct JobPhotoPicker: View {
                     }
                 }
             }
-            .confirmationDialog(
-                "Add Job Photo",
-                isPresented: $showSourcePicker,
-                titleVisibility: .visible
-            ) {
-                Button("Take Photo") {
-                    showCamera = true
+            .sheet(isPresented: $showSourcePicker) {
+                VStack(spacing: 0) {
+                    Button {
+                        showSourcePicker = false
+                        showCamera = true
+                    } label: {
+                        Label("Take Photo", systemImage: "camera.fill")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                    }
+                    .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
+
+                    Divider()
+
+                    Button {
+                        showSourcePicker = false
+                        showLibraryPicker = true
+                    } label: {
+                        Label("Choose from Library", systemImage: "photo.on.rectangle")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                    }
                 }
-                .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
-                Button("Choose from Library") {
-                    showLibraryPicker = true
-                }
-                Button("Cancel", role: .cancel) {}
+                .presentationDetents([.medium])
             }
             .photosPicker(
                 isPresented: $showLibraryPicker,
