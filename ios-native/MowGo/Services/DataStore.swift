@@ -663,19 +663,10 @@ final class DataStore: ObservableObject {
         @unknown default: nextStatus = .scheduled
         }
         try await updateJobStatus(job, status: nextStatus)
-        // Fire webhook on Done — Zapier handles client email/SMS
-        if nextStatus == .done {
-            await fireWebhookJobCompleted(job)
-        }
-        // Send push notification for job completion
-        if nextStatus == .done {
-            await firePushJobCompleted(job)
-        }
     }
 
     func skipJob(_ job: Job) async throws {
         try await updateJobStatus(job, status: .skipped)
-        await fireWebhookJobSkipped(job)
     }
     // MARK: - Webhook Notifications
 

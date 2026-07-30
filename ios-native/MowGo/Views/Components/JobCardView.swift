@@ -68,6 +68,15 @@ struct JobCardView: View {
         }
     }
 
+    private var statusLabelText: String {
+        switch job.status {
+        case .scheduled: return "Start"
+        case .inProgress: return "Complete"
+        case .done: return "Reset"
+        case .skipped: return "Unskip"
+        }
+    }
+
     private var statusAccessibilityLabel: String {
         switch job.status {
         case .done: return "Reset job to scheduled"
@@ -83,10 +92,14 @@ struct JobCardView: View {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onToggle?()
             } label: {
-                Image(systemName: statusIconName)
-                    .font(.title3)
-                    .foregroundColor(statusIconColor)
-                    .contentTransition(.symbolEffect(.replace))
+                VStack(spacing: 1) {
+                    Image(systemName: statusIconName)
+                        .font(.title3)
+                        .contentTransition(.symbolEffect(.replace))
+                    Text(statusLabelText)
+                        .font(.caption2)
+                }
+                .foregroundColor(statusIconColor)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(statusAccessibilityLabel)
