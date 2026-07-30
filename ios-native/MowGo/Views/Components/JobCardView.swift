@@ -138,7 +138,6 @@ struct JobCardView: View {
                             Image(systemName: "pawprint")
                                 .font(.system(size: 10))
                             Text("Pets: \(notes)")
-                                .lineLimit(1)
                         }
                         .foregroundColor(MowGoTheme.warning)
                     }
@@ -147,7 +146,6 @@ struct JobCardView: View {
                             Image(systemName: "lock")
                                 .font(.system(size: 10))
                             Text("Key: \(key)")
-                                .lineLimit(1)
                         }
                         .foregroundColor(MowGoTheme.info)
                     }
