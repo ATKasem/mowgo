@@ -113,7 +113,7 @@ struct NewClientFormView: View {
                                 .keyboardType(.numberPad)
                                 .submitLabel(.next)
                                 .focused($focusedField, equals: .alarmCode)
-                                .onSubmit { focusedField = .pets }
+                                .onSubmit { focusedField = hasPets ? .pets : .notes }
                         }
                         Toggle("Has Pets", isOn: $hasPets)
                         if hasPets {
@@ -190,9 +190,7 @@ struct NewClientFormView: View {
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
             alarmCode: alarmCode.isEmpty ? nil : alarmCode,
-            petInstructions: hasPets && (!petInstructions.isEmpty || petCount > 0)
-                ? "\(petCount) pet\(petCount == 1 ? "" : "s")\(petInstructions.isEmpty ? "" : ": \(petInstructions)")"
-                : nil,
+            petInstructions: hasPets ? "\(petCount) pet\(petCount == 1 ? "" : "s")\(petInstructions.isEmpty ? "" : ": \(petInstructions)")" : nil,
             createdAt: client?.createdAt
         )
         Task {

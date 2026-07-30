@@ -137,8 +137,8 @@ struct ClientCard: View {
                     if let notes = client.cleaningNotes {
                         items.append(("note.text", notes, nil))
                     }
-                    if client.address != nil {
-                        items.append(("map", "Navigate", { openMaps(client.address!) }))
+                    if let address = client.address {
+                        items.append(("map", "Navigate", { openMaps(address) }))
                     }
                     return items
                 }()
