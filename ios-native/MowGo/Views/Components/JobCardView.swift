@@ -51,39 +51,19 @@ struct JobCardView: View {
     // MARK: - Status icon helpers (computed outside ViewBuilder)
 
     private var statusIconName: String {
-        switch job.status {
-        case .scheduled: return "play.circle"
-        case .inProgress: return "checkmark.circle.fill"
-        case .done: return "arrow.counterclockwise.circle"
-        case .skipped: return "forward.circle"
-        }
+        job.status == .done ? "checkmark.circle.fill" : "circle"
     }
 
     private var statusIconColor: Color {
-        switch job.status {
-        case .scheduled: return .gray
-        case .inProgress: return .orange
-        case .done: return MowGoTheme.deepGreen
-        case .skipped: return MowGoTheme.warning
-        }
+        job.status == .done ? MowGoTheme.deepGreen : .gray
     }
 
     private var statusLabelText: String {
-        switch job.status {
-        case .scheduled: return "Start"
-        case .inProgress: return "Complete"
-        case .done: return "Reset"
-        case .skipped: return "Unskip"
-        }
+        job.status == .done ? "Undo" : "Complete"
     }
 
     private var statusAccessibilityLabel: String {
-        switch job.status {
-        case .done: return "Reset job to scheduled"
-        case .inProgress: return "Mark job as complete"
-        case .skipped: return "Unskip job"
-        case .scheduled: return "Start job"
-        }
+        job.status == .done ? "Undo job completion" : "Mark job as complete"
     }
 
     var body: some View {

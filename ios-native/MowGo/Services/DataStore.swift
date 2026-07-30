@@ -654,14 +654,7 @@ final class DataStore: ObservableObject {
     }
 
     func toggleJobStatus(_ job: Job) async throws {
-        let nextStatus: Job.JobStatus
-        switch job.status {
-        case .scheduled: nextStatus = .inProgress
-        case .inProgress: nextStatus = .done
-        case .done: nextStatus = .scheduled
-        case .skipped: nextStatus = .scheduled
-        @unknown default: nextStatus = .scheduled
-        }
+        let nextStatus: Job.JobStatus = job.status == .done ? .scheduled : .done
         try await updateJobStatus(job, status: nextStatus)
     }
 
