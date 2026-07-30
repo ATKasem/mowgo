@@ -145,7 +145,7 @@ struct JobPhotoPicker: View {
                     }
                     .padding(.vertical, 14)
                 }
-                .presentationDetents([.height(140)])
+                .presentationDetents([.height(200)])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(.thickMaterial)
             }

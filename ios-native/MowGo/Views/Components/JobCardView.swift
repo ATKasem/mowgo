@@ -253,6 +253,8 @@ struct JobCardView: View {
                     store.jobs[idx].photoUrl = url
                 }
             })
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
 }
