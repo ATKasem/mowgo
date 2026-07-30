@@ -456,8 +456,11 @@ struct TodayView: View {
             Button {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 routeMode.toggle()
-                if routeMode && todayJobs.contains(where: { $0.routeOrder == nil }) {
-                    reorderJobsByRoute()
+                if routeMode {
+                    showBanner("Drag jobs to reorder your driving route")
+                    if todayJobs.contains(where: { $0.routeOrder == nil }) {
+                        reorderJobsByRoute()
+                    }
                 }
             } label: {
                 HStack(spacing: 4) {
