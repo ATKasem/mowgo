@@ -133,25 +133,28 @@ struct JobCardView: View {
                             .font(.caption2)
                     }
                     Spacer()
-                    if let notes = job.clients?.petInstructions, !notes.isEmpty {
-                        HStack(spacing: 2) {
-                            Image(systemName: "pawprint")
-                                .font(.system(size: 10))
-                            Text("Pets: \(notes)")
-                        }
-                        .foregroundColor(MowGoTheme.warning)
-                    }
-                    if let key = job.clients?.keyCode, !key.isEmpty {
-                        HStack(spacing: 2) {
-                            Image(systemName: "lock")
-                                .font(.system(size: 10))
-                            Text("Key: \(key)")
-                        }
-                        .foregroundColor(MowGoTheme.info)
-                    }
                 }
                 .font(.caption2)
                 .foregroundColor(theme.textInverse)
+
+                if let notes = job.clients?.petInstructions, !notes.isEmpty {
+                    HStack(spacing: 2) {
+                        Image(systemName: "pawprint")
+                            .font(.system(size: 9))
+                        Text("Pets: \(notes)")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(MowGoTheme.warning)
+                }
+                if let key = job.clients?.keyCode, !key.isEmpty {
+                    HStack(spacing: 2) {
+                        Image(systemName: "lock")
+                            .font(.system(size: 9))
+                        Text("Key: \(key)")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(MowGoTheme.info)
+                }
 
                 // Photo thumbnail row
                 if let photoUrl = job.photoUrl, !photoUrl.isEmpty {
