@@ -116,7 +116,9 @@ struct JobPhotoPicker: View {
                 VStack(spacing: 0) {
                     Button {
                         showSourcePicker = false
-                        showCamera = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            showCamera = true
+                        }
                     } label: {
                         Label("Take Photo", systemImage: "camera.fill")
                             .frame(maxWidth: .infinity)
@@ -128,12 +130,20 @@ struct JobPhotoPicker: View {
 
                     Button {
                         showSourcePicker = false
-                        showLibraryPicker = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            showLibraryPicker = true
+                        }
                     } label: {
                         Label("Choose from Library", systemImage: "photo.on.rectangle")
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 18)
                     }
+
+                    Divider()
+                    Button("Cancel", role: .cancel) {
+                        showSourcePicker = false
+                    }
+                    .padding(.vertical, 14)
                 }
                 .presentationDetents([.height(140)])
                 .presentationDragIndicator(.visible)
