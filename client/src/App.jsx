@@ -158,8 +158,14 @@ export default function App() {
     let mounted = true;
     async function fetchData() {
       setDataLoading(true);
-      const [j, inv] = await Promise.all([loadJobs(), loadInvoices()]);
-      if (mounted) { setJobs(j); setInvoices(inv); setDataLoading(false); }
+      try {
+        const [j, inv] = await Promise.all([loadJobs(), loadInvoices()]);
+        if (mounted) { setJobs(j); setInvoices(inv); }
+      } catch (err) {
+        console.error('fetchData:', err);
+      } finally {
+        if (mounted) setDataLoading(false);
+      }
     }
     fetchData();
 

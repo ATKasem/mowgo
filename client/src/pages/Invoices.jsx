@@ -140,6 +140,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
             <div key={invoice.id}>
               <div className="card hover:border-emerald-200 dark:hover:border-emerald-800 transition-all cursor-pointer"
                    role="button" tabIndex={0}
+                   aria-expanded={isExpanded}
                    onClick={() => setExpandedId(isExpanded ? null : invoice.id)}
                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : invoice.id); } }}>
                 <div className="p-4 flex items-center justify-between">

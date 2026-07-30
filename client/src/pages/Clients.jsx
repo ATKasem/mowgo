@@ -184,6 +184,7 @@ export default function Clients({ jobs = [] }) {
             <div key={client.id} className={isEditing ? 'opacity-40 pointer-events-none' : ''}>
               <div className="card cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-800 transition-all"
                    role="button" tabIndex={0}
+                   aria-expanded={isExpanded}
                    onClick={() => setExpandedId(isExpanded ? null : client.id)}
                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : client.id); } }}>
                 <div className="p-4 flex items-center gap-3">
