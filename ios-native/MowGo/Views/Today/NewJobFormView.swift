@@ -41,9 +41,14 @@ struct NewJobFormView: View {
                     Section("Job Details") {
                         TextField("Title (e.g. Weekly Mow)", text: $title)
                             .textContentType(.name)
-                        Picker("Client", selection: $clientId) {
+                        Picker(selection: $clientId) {
                             ForEach(store.clients) { client in
                                 Text(client.name).tag(client.id as UUID?)
+                            }
+                        } label: {
+                            HStack(spacing: 0) {
+                                Text("Client")
+                                Text(" *").foregroundColor(.red)
                             }
                         }
                         DatePicker("Time", selection: $scheduledTime, displayedComponents: .hourAndMinute)

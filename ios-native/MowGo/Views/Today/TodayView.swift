@@ -175,7 +175,7 @@ struct TodayView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        showingAddJob = true
+                        showingActionSheet = true
                     } label: {
                         Image(systemName: "plus")
                             .font(.title3.weight(.semibold))
