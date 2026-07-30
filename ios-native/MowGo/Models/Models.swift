@@ -45,7 +45,7 @@ struct RecurringJob: Codable, Identifiable, Equatable {
     // MARK: - Pattern Matching
 
     private static let dateFmt: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = .utc; return f
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0); return f
     }()
 
     /// Returns true if `targetDate` should receive a job from this template.

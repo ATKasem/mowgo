@@ -473,7 +473,7 @@ actor SupabaseService {
             http = h
         } catch let error as SupabaseError {
             throw error
-        } catch is CancellationError {
+        } catch let error as CancellationError {
             throw error
         } catch {
             markOffline()
