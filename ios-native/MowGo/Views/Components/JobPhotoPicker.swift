@@ -49,7 +49,7 @@ struct JobPhotoPicker: View {
                                 .font(.subheadline)
                                 .foregroundColor(theme.textSecondary)
                         }
-                        .frame(maxHeight: 300)
+                        .frame(maxHeight: 150)
                     }
 
                     Button {
