@@ -232,11 +232,9 @@ struct TodayView: View {
     private var headerRow: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                if isToday {
-                    Text("Good \(greeting) 👋")
-                        .font(.subheadline)
-                        .foregroundColor(theme.textMuted)
-                }
+                Text("Good \(greeting) 👋")
+                    .font(.subheadline)
+                    .foregroundColor(theme.textMuted)
                 Text("Today")
                     .font(.title2.weight(.bold))
                     .foregroundColor(theme.textPrimary)
