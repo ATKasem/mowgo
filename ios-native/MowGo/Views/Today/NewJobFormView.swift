@@ -39,8 +39,12 @@ struct NewJobFormView: View {
                 theme.background.ignoresSafeArea()
                 Form {
                     Section("Job Details") {
-                        TextField("Title (e.g. Weekly Mow)", text: $title)
-                            .textContentType(.name)
+                        HStack(spacing: 0) {
+                            TextField("Title (e.g. Weekly Mow)", text: $title)
+                                .textContentType(.name)
+                            Text(" *").foregroundColor(.red).font(.caption)
+                        }
+                        .accessibilityLabel("Title, required")
                         Picker(selection: $clientId) {
                             ForEach(store.clients) { client in
                                 Text(client.name).tag(client.id as UUID?)
@@ -51,6 +55,7 @@ struct NewJobFormView: View {
                                 Text(" *").foregroundColor(.red)
                             }
                         }
+                        .accessibilityLabel("Client, required")
                         DatePicker("Time", selection: $scheduledTime, displayedComponents: .hourAndMinute)
                         Picker("Duration", selection: $duration) {
                             Text("30 min").tag(30)
