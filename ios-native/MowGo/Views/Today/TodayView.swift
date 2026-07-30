@@ -175,13 +175,13 @@ struct TodayView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        showingActionSheet = true
+                        showingAddJob = true
                     } label: {
                         Image(systemName: "plus")
                             .font(.title3.weight(.semibold))
                             .foregroundColor(MowGoTheme.deepGreen)
                     }
-                    .accessibilityLabel("Actions")
+                    .accessibilityLabel("New Job")
                 }
             }
             .confirmationDialog("Actions", isPresented: $showingActionSheet, titleVisibility: .visible) {
