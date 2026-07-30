@@ -679,12 +679,12 @@ final class DataStore: ObservableObject {
     // MARK: - Webhook Notifications
 
     private func fireWebhookJobCompleted(_ job: Job) async {
-        guard let userId = auth.user?.id else { return }
+        guard let userId = self.currentUserId else { return }
         await WebhookService.shared.jobCompleted(job, userId: userId)
     }
 
     private func fireWebhookJobSkipped(_ job: Job) async {
-        guard let userId = auth.user?.id else { return }
+        guard let userId = self.currentUserId else { return }
         await WebhookService.shared.jobSkipped(job, userId: userId)
     }
 
