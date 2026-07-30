@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import UIKit
 
 struct JobPhotoPicker: View {
     @EnvironmentObject var store: DataStore
@@ -20,6 +21,9 @@ struct JobPhotoPicker: View {
     @State private var selectedImage: UIImage? = nil
     @State private var isUploading = false
     @State private var uploadError: String? = nil
+    @State private var showSourcePicker = false
+    @State private var showLibraryPicker = false
+    @State private var showCamera = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -48,12 +52,10 @@ struct JobPhotoPicker: View {
                         .frame(maxHeight: 300)
                     }
 
-                    PhotosPicker(
-                        selection: $selectedItem,
-                        matching: .images,
-                        photoLibrary: .shared()
-                    ) {
-                        Label("Choose Photo", systemImage: "photo.on.rectangle")
+                    Button {
+                        showSourcePicker = true
+                    } label: {
+                        Label("Add Photo", systemImage: "camera")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -108,6 +110,31 @@ struct JobPhotoPicker: View {
                        let uiImage = UIImage(data: data) {
                         selectedImage = uiImage
                     }
+                }
+            }
+            .confirmationDialog(
+                "Add Job Photo",
+                isPresented: $showSourcePicker,
+                titleVisibility: .visible
+            ) {
+                Button("Take Photo") {
+                    showCamera = true
+                }
+                .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
+                Button("Choose from Library") {
+                    showLibraryPicker = true
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .photosPicker(
+                isPresented: $showLibraryPicker,
+                selection: $selectedItem,
+                matching: .images
+            )
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraView(jobId: jobId) { url in
+                    onPhotoUploaded?(url)
+                    dismiss()
                 }
             }
         }

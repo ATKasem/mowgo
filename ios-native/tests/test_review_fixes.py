@@ -223,6 +223,55 @@ class IOSReviewFixTests(unittest.TestCase):
         self.assertIn("private var totalUnpaidCents: Int", invoices)
         self.assertIn("$0 + $1.amountCents", invoices)
 
+    def test_job_card_labels_pet_and_key_details(self) -> None:
+        job_card = source("Views/Components/JobCardView.swift")
+
+        self.assertIn('Text("Pets: \\(notes)")', job_card)
+        self.assertIn('Text("Key: \\(key)")', job_card)
+
+    def test_job_photo_picker_offers_camera_and_library_sources(self) -> None:
+        picker = source("Views/Components/JobPhotoPicker.swift")
+
+        self.assertIn('@State private var showSourcePicker = false', picker)
+        self.assertRegex(
+            picker,
+            re.compile(r'\.confirmationDialog\(\s*"Add Job Photo"'),
+        )
+        self.assertIn('Button("Take Photo")', picker)
+        self.assertIn(
+            ".disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))",
+            picker,
+        )
+        self.assertIn('Button("Choose from Library")', picker)
+        self.assertRegex(
+            picker,
+            re.compile(r"CameraView\(jobId:\s*jobId\)\s*\{\s*url\s+in"),
+        )
+        self.assertIn("onPhotoUploaded?(url)", picker)
+        self.assertIn("dismiss()", picker)
+
+    def test_camera_view_uploads_captured_photo_for_the_job(self) -> None:
+        camera = source("Views/Components/CameraView.swift")
+
+        self.assertIn("let jobId: UUID", camera)
+        self.assertIn("var onPhotoUploaded: ((String) -> Void)?", camera)
+        self.assertIn("UIImagePickerController", camera)
+        self.assertIn("picker.sourceType = .camera", camera)
+        self.assertRegex(
+            camera,
+            re.compile(
+                r"SupabaseService\.shared\.uploadJobPhoto\(\s*jobId:\s*jobId"
+            ),
+        )
+        self.assertIn("onPhotoUploaded?(url)", camera)
+
+    def test_camera_usage_description_is_generated(self) -> None:
+        config = source("Config.xcconfig")
+        project = (ROOT.parent / "project.yml").read_text()
+
+        self.assertIn("INFOPLIST_KEY_NSCameraUsageDescription", config)
+        self.assertIn("INFOPLIST_KEY_NSCameraUsageDescription", project)
+
 
 if __name__ == "__main__":
     unittest.main()
