@@ -239,6 +239,8 @@ struct TodayView: View {
                 Image(systemName: "leaf.fill")
                     .font(.title2)
                     .foregroundColor(MowGoTheme.deepGreen)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility3)
+                    .accessibilityLabel("Today")
             }
             Spacer()
         }
