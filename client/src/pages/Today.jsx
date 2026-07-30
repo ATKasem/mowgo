@@ -15,7 +15,13 @@ function getNextDate(currentDate, recurrence) {
   switch (recurrence) {
     case 'weekly': d.setDate(d.getDate() + 7); break;
     case 'biweekly': d.setDate(d.getDate() + 14); break;
-    case 'monthly': d.setMonth(d.getMonth() + 1); break;
+    case 'monthly': {
+      const origDay = d.getDate();
+      d.setMonth(d.getMonth() + 1);
+      // Clamp to last day of target month (handles 31st → Feb, etc.)
+      if (d.getDate() !== origDay) d.setDate(0); // day 0 = last day of prev month
+      break;
+    }
     default: return null;
   }
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
