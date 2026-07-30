@@ -120,38 +120,47 @@ struct ClientCard: View {
             }
 
             if isExpanded {
-                VStack(alignment: .leading, spacing: 8) {
+                let details: [(icon: String, text: String, action: (() -> Void)?)] = {
+                    var items: [(icon: String, text: String, action: (() -> Void)?)] = []
                     if let phone = client.phone {
-                        Button {
-                            callPhone(phone)
-                        } label: {
-                            DetailRow(icon: "phone", text: phone)
-                        }
+                        items.append(("phone", phone, { callPhone(phone) }))
                     }
                     if let key = client.keyCode {
-                        DetailRow(icon: "lock", text: "Gate: \(key)")
+                        items.append(("lock", "Gate: \(key)", nil))
                     }
                     if let alarm = client.alarmCode {
-                        DetailRow(icon: "bell", text: "Alarm: \(alarm)")
+                        items.append(("bell", "Alarm: \(alarm)", nil))
                     }
                     if let pets = client.petInstructions {
-                        DetailRow(icon: "pawprint", text: pets)
+                        items.append(("pawprint", pets, nil))
                     }
                     if let notes = client.cleaningNotes {
-                        DetailRow(icon: "note.text", text: notes)
+                        items.append(("note.text", notes, nil))
                     }
-                    if let address = client.address {
-                        Button {
-                            openMaps(address)
-                        } label: {
-                            DetailRow(icon: "map", text: "Navigate")
+                    if client.address != nil {
+                        items.append(("map", "Navigate", { openMaps(client.address!) }))
+                    }
+                    return items
+                }()
+
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
+                    ForEach(Array(details.enumerated()), id: \.offset) { _, detail in
+                        if let action = detail.action {
+                            Button(action: action) {
+                                DetailRow(icon: detail.icon, text: detail.text)
+                            }
+                        } else {
+                            DetailRow(icon: detail.icon, text: detail.text)
                         }
                     }
-                    Button("Edit") {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        onEdit()
-                    }
-                    .font(.caption.weight(.semibold))
+                }
+                .padding(.horizontal, 12).padding(.bottom, 8)
+
+                Button("Edit") {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onEdit()
+                }
+                .font(.caption.weight(.semibold))
                     .foregroundColor(MowGoTheme.deepGreen)
                     .accessibilityLabel("Edit \(client.name)")
                 }
