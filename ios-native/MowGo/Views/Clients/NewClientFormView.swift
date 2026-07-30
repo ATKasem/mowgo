@@ -22,6 +22,8 @@ struct NewClientFormView: View {
     @State private var rate: String
     @State private var keyCode: String
     @State private var alarmCode: String
+    @State private var hasPets: Bool
+    @State private var petCount: Int
     @State private var petInstructions: String
     @State private var cleaningNotes: String
     @State private var isSaving = false
@@ -39,7 +41,10 @@ struct NewClientFormView: View {
         _rate = State(initialValue: client.map { NSDecimalNumber(decimal: $0.rate).stringValue } ?? "")
         _keyCode = State(initialValue: client?.keyCode ?? "")
         _alarmCode = State(initialValue: client?.alarmCode ?? "")
-        _petInstructions = State(initialValue: client?.petInstructions ?? "")
+        let petDetails = Self.parsePetInstructions(client?.petInstructions)
+        _hasPets = State(initialValue: petDetails.hasPets)
+        _petCount = State(initialValue: petDetails.count)
+        _petInstructions = State(initialValue: petDetails.notes)
         _cleaningNotes = State(initialValue: client?.cleaningNotes ?? "")
     }
 
@@ -49,57 +54,88 @@ struct NewClientFormView: View {
                 theme.background.ignoresSafeArea()
                 Form {
                     Section("Client Info") {
-                        TextField("Name", text: $name)
-                            .textContentType(.name)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .name)
-                            .onSubmit { focusedField = .address }
-                        TextField("Address", text: $address)
-                            .textContentType(.fullStreetAddress)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .address)
-                            .onSubmit { focusedField = .phone }
-                        TextField("Phone", text: $phone)
-                            .keyboardType(.phonePad)
-                            .textContentType(.telephoneNumber)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .phone)
-                            .onSubmit { focusedField = .email }
-                        TextField("Email", text: $email)
-                            .keyboardType(.emailAddress)
-                            .textContentType(.emailAddress)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .email)
-                            .onSubmit { focusedField = .rate }
-                        TextField("Rate ($)", text: $rate)
-                            .keyboardType(.decimalPad)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .rate)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Name").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $name)
+                                .textContentType(.name)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .name)
+                                .onSubmit { focusedField = .address }
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Address").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $address)
+                                .textContentType(.fullStreetAddress)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .address)
+                                .onSubmit { focusedField = .phone }
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Phone").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $phone)
+                                .keyboardType(.phonePad)
+                                .textContentType(.telephoneNumber)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .phone)
+                                .onSubmit { focusedField = .email }
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Email").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $email)
+                                .keyboardType(.emailAddress)
+                                .textContentType(.emailAddress)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .email)
+                                .onSubmit { focusedField = .rate }
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Rate ($)").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $rate)
+                                .keyboardType(.decimalPad)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .rate)
+                        }
                     }
                     .listRowBackground(theme.surface)
 
                     Section("Access") {
-                        TextField("Gate/Key Code", text: $keyCode)
-                            .keyboardType(.numberPad)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .keyCode)
-                            .onSubmit { focusedField = .alarmCode }
-                        TextField("Alarm Code", text: $alarmCode)
-                            .keyboardType(.numberPad)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .alarmCode)
-                            .onSubmit { focusedField = .pets }
-                        TextField("Pet Instructions", text: $petInstructions)
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .pets)
-                            .onSubmit { focusedField = .notes }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Gate/Key Code").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $keyCode)
+                                .keyboardType(.numberPad)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .keyCode)
+                                .onSubmit { focusedField = .alarmCode }
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Alarm Code").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $alarmCode)
+                                .keyboardType(.numberPad)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .alarmCode)
+                                .onSubmit { focusedField = .pets }
+                        }
+                        Toggle("Has Pets", isOn: $hasPets)
+                        if hasPets {
+                            Stepper("Number of Pets: \(petCount)", value: $petCount, in: 0...20)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Pet Notes").font(.caption).foregroundColor(.secondary)
+                                TextField("", text: $petInstructions)
+                                    .submitLabel(.next)
+                                    .focused($focusedField, equals: .pets)
+                                    .onSubmit { focusedField = .notes }
+                            }
+                        }
                     }
                     .listRowBackground(theme.surface)
 
                     Section("Notes") {
-                        TextField("Service Notes", text: $cleaningNotes, axis: .vertical)
-                            .lineLimit(3)
-                            .focused($focusedField, equals: .notes)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Service Notes").font(.caption).foregroundColor(.secondary)
+                            TextField("", text: $cleaningNotes, axis: .vertical)
+                                .lineLimit(3)
+                                .focused($focusedField, equals: .notes)
+                        }
                     }
                     .listRowBackground(theme.surface)
                 }
@@ -154,7 +190,9 @@ struct NewClientFormView: View {
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
             alarmCode: alarmCode.isEmpty ? nil : alarmCode,
-            petInstructions: petInstructions.isEmpty ? nil : petInstructions,
+            petInstructions: hasPets && (!petInstructions.isEmpty || petCount > 0)
+                ? "\(petCount) pet\(petCount == 1 ? "" : "s")\(petInstructions.isEmpty ? "" : ": \(petInstructions)")"
+                : nil,
             createdAt: client?.createdAt
         )
         Task {
@@ -173,5 +211,31 @@ struct NewClientFormView: View {
                 isSaving = false
             }
         }
+    }
+
+    private static func parsePetInstructions(_ instructions: String?) -> (hasPets: Bool, count: Int, notes: String) {
+        guard let instructions, !instructions.isEmpty else {
+            return (false, 0, "")
+        }
+
+        let parts = instructions.split(maxSplits: 1, whereSeparator: \.isWhitespace)
+        guard let firstPart = parts.first, let parsedCount = Int(firstPart) else {
+            return (true, 0, instructions)
+        }
+        let count = min(max(parsedCount, 0), 20)
+
+        guard parts.count > 1 else {
+            return (true, count, "")
+        }
+
+        var notes = String(parts[1])
+        if notes == "pet" || notes == "pets" {
+            notes = ""
+        } else if notes.hasPrefix("pet:") {
+            notes = String(notes.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+        } else if notes.hasPrefix("pets:") {
+            notes = String(notes.dropFirst(5)).trimmingCharacters(in: .whitespaces)
+        }
+        return (true, count, notes)
     }
 }
