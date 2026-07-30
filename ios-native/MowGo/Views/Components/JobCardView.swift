@@ -134,18 +134,20 @@ struct JobCardView: View {
                     }
                     Spacer()
                     if let notes = job.clients?.petInstructions, !notes.isEmpty {
-                        Label {
-                            Text("Pets: \(notes)")
-                        } icon: {
+                        HStack(spacing: 2) {
                             Image(systemName: "pawprint")
+                                .font(.system(size: 10))
+                            Text("Pets: \(notes)")
+                                .lineLimit(1)
                         }
                         .foregroundColor(MowGoTheme.warning)
                     }
                     if let key = job.clients?.keyCode, !key.isEmpty {
-                        Label {
-                            Text("Key: \(key)")
-                        } icon: {
+                        HStack(spacing: 2) {
                             Image(systemName: "lock")
+                                .font(.system(size: 10))
+                            Text("Key: \(key)")
+                                .lineLimit(1)
                         }
                         .foregroundColor(MowGoTheme.info)
                     }
