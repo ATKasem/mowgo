@@ -236,11 +236,6 @@ struct TodayView: View {
                 Text("Good \(greeting) 👋")
                     .font(.subheadline)
                     .foregroundColor(theme.textMuted)
-                Image(systemName: "leaf.fill")
-                    .font(.title2)
-                    .foregroundColor(MowGoTheme.deepGreen)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-                    .accessibilityLabel("Today")
             }
             Spacer()
         }
