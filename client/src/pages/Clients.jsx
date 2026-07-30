@@ -31,12 +31,15 @@ export default function Clients({ jobs = [] }) {
   const [sortBy, setSortBy] = useState('name');
   const [showSort, setShowSort] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const sortRef = useRef(null);
 
   useEffect(() => {
     let active = true;
-    loadClients().then(data => { if (active) { setClients(data); setLoading(false); } }).catch(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+    loadClients()
+      .then(data => { if (active) { setClients(data); setLoading(false); } })
+      .catch(() => { if (active) { setError(tr('Failed to load clients. Please try again.')); setLoading(false); } });
+    return () => { active = false; }
   }, []);
 
   // Close sort dropdown on click outside (handles touch devices)
@@ -121,6 +124,15 @@ export default function Clients({ jobs = [] }) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>
+        <button onClick={() => { setLoading(true); setError(''); loadClients().then(data => setClients(data)).catch(() => setError(tr('Failed to load clients. Please try again.'))).finally(() => setLoading(false)); }} className="btn-secondary text-sm">{tr('Retry')}</button>
       </div>
     );
   }
