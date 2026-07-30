@@ -143,14 +143,18 @@ struct ClientCard: View {
                     return items
                 }()
 
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-                    ForEach(Array(details.enumerated()), id: \.offset) { _, detail in
-                        if let action = detail.action {
-                            Button(action: action) {
-                                DetailRow(icon: detail.icon, text: detail.text)
-                            }
+                let pairs = stride(from: 0, to: details.count, by: 2).map { i in
+                    (details[i], i + 1 < details.count ? details[i + 1] : nil)
+                }
+                ForEach(Array(pairs.enumerated()), id: \.offset) { _, pair in
+                    HStack(spacing: 6) {
+                        detailButton(pair.0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if let second = pair.1 {
+                            detailButton(second)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         } else {
-                            DetailRow(icon: detail.icon, text: detail.text)
+                            Spacer().frame(maxWidth: .infinity)
                         }
                     }
                 }
@@ -168,6 +172,17 @@ struct ClientCard: View {
             }
         }
         .background(theme.surface).cornerRadius(12)
+    }
+
+    @ViewBuilder
+    private func detailButton(_ detail: (icon: String, text: String, action: (() -> Void)?)) -> some View {
+        if let action = detail.action {
+            Button(action: action) {
+                DetailRow(icon: detail.icon, text: detail.text)
+            }
+        } else {
+            DetailRow(icon: detail.icon, text: detail.text)
+        }
     }
 
     private func openMaps(_ address: String) {
