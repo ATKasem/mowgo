@@ -16,6 +16,9 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     @Published var isRegistered = false
     @Published var permissionGranted = false
 
+    // TODO: Set from MowGoApp when auth state changes
+    var currentUserId: UUID?
+
     private let sb = SupabaseService.shared
     private var deviceToken: Data?
 
@@ -61,7 +64,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     // MARK: - Token Storage
 
     private func saveDeviceToken(_ token: String) {
-        guard let user = AuthService.shared.user, let userId = user.id else { return }
+        guard let userId = currentUserId else { return }
         Task {
             do {
                 // Upsert device_token on the user's profile
@@ -74,7 +77,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
 
     /// Clear the device token on sign-out.
     func clearDeviceToken() {
-        guard let userId = AuthService.shared.user?.id else { return }
+        guard let userId = currentUserId else { return }
         Task {
             try? await sb.updateDeviceToken(userId: userId, token: nil)
         }
@@ -104,7 +107,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     // MARK: - UNUserNotificationCenterDelegate
 
     /// Show notification even when app is in foreground.
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
@@ -113,7 +116,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     }
 
     /// Handle notification tap.
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
