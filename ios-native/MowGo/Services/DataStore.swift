@@ -226,7 +226,7 @@ final class DataStore: ObservableObject {
         guard await sb.isConfigured, await sb.ensureAuthenticated() else { return }
 
         // Only replay mutations belonging to the current user
-        let currentUserId = AuthService.shared.user?.id
+        let currentUserId = try? await sb.getCurrentUserId()
         let mine = mutations.filter { $0.userId == currentUserId }
         // Remove mutations from other users (orphaned from a previous session)
         for stale in mutations where stale.userId != currentUserId {
@@ -505,7 +505,7 @@ final class DataStore: ObservableObject {
     func createJob(_ job: Job) async throws {
         guard await canSync() else {
             jobs.append(job)
-            enqueue("job:create", id: job.id, payload: job)
+            await enqueue("job:create", id: job.id, payload: job)
             return
         }
         do {
@@ -535,7 +535,7 @@ final class DataStore: ObservableObject {
         } catch {
             // Network failed — save locally and queue for sync
             jobs.append(job)
-            enqueue("job:create", id: job.id, payload: job)
+            await enqueue("job:create", id: job.id, payload: job)
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -549,7 +549,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             struct P: Encodable { let status: String }
-            enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
+            await enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             return
         }
         do {
@@ -563,7 +563,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             struct P: Encodable { let status: String }
-            enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
+            await enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             throw error
         }
     }
@@ -576,7 +576,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             struct P: Encodable { let scheduledDate: String }
-            enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
+            await enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             return
         }
         do {
@@ -589,7 +589,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             struct P: Encodable { let scheduledDate: String }
-            enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
+            await enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             throw error
         }
     }
@@ -618,7 +618,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             struct P: Encodable { let routeOrder: Int }
-            enqueue("job:route", id: job.id, payload: P(routeOrder: order))
+            await enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             return
         }
         do {
@@ -631,7 +631,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             struct P: Encodable { let routeOrder: Int }
-            enqueue("job:route", id: job.id, payload: P(routeOrder: order))
+            await enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             throw error
         }
     }
@@ -675,7 +675,7 @@ final class DataStore: ObservableObject {
     // MARK: - Push Notifications
 
     private func firePushJobCompleted(_ job: Job) async {
-        guard let userId = AuthService.shared.user?.id else { return }
+        guard let userId = try? await sb.getCurrentUserId() else { return }
         let clientName = job.clients?.name ?? "client"
         await PushNotificationService.shared.sendPush(
             userId: userId,
@@ -685,7 +685,7 @@ final class DataStore: ObservableObject {
     }
 
     private func firePushRainDelay(_ jobs: [Job], date: String) async {
-        guard let userId = AuthService.shared.user?.id else { return }
+        guard let userId = try? await sb.getCurrentUserId() else { return }
         let count = jobs.count
         let f = DateFormatter()
         f.dateFormat = "EEEE, MMM d"
@@ -742,7 +742,7 @@ final class DataStore: ObservableObject {
     func createRecurringJob(_ template: RecurringJob) async throws {
         guard await canSync() else {
             recurringJobs.append(template)
-            enqueue("recurring:create", id: template.id, payload: template)
+            await enqueue("recurring:create", id: template.id, payload: template)
             return
         }
         do {
@@ -766,7 +766,7 @@ final class DataStore: ObservableObject {
             recurringJobs.append(created)
         } catch {
             recurringJobs.append(template)
-            enqueue("recurring:create", id: template.id, payload: template)
+            await enqueue("recurring:create", id: template.id, payload: template)
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -841,7 +841,7 @@ final class DataStore: ObservableObject {
 
         guard await canSync() else {
             clients.append(client)
-            enqueue("client:create", id: client.id, payload: client)
+            await enqueue("client:create", id: client.id, payload: client)
             return
         }
         do {
@@ -864,7 +864,7 @@ final class DataStore: ObservableObject {
             clients.append(created)
         } catch {
             clients.append(client)
-            enqueue("client:create", id: client.id, payload: client)
+            await enqueue("client:create", id: client.id, payload: client)
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -881,7 +881,7 @@ final class DataStore: ObservableObject {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
-            enqueue("client:update", id: client.id, payload: updated)
+            await enqueue("client:update", id: client.id, payload: updated)
             return
         }
         do {
@@ -903,7 +903,7 @@ final class DataStore: ObservableObject {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
-            enqueue("client:update", id: client.id, payload: updated)
+            await enqueue("client:update", id: client.id, payload: updated)
             throw error
         }
     }
@@ -936,7 +936,7 @@ final class DataStore: ObservableObject {
                 invoices[idx] = updated
             }
             struct P: Encodable { let paidAt: String }
-            enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
+            await enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             return
         }
         do {
@@ -952,7 +952,7 @@ final class DataStore: ObservableObject {
                 invoices[idx] = updated
             }
             struct P: Encodable { let paidAt: String }
-            enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
+            await enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -1105,19 +1105,19 @@ final class DataStore: ObservableObject {
     }
 
     /// Enqueue an offline mutation for later replay.
-    private func enqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) {
+    private func enqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) async {
         guard let data = try? JSONEncoder().encode(payload) else {
             print("[DataStore] failed to encode mutation payload for \(operation)")
             return
         }
-        let currentUserId = AuthService.shared.user?.id
+        let currentUserId = try? await sb.getCurrentUserId()
         persistence?.enqueueMutation(operation: operation, entityId: id, payload: data, userId: currentUserId)
     }
 
     /// Enqueue an empty-payload mutation (delete operations).
-    private func enqueueEmpty(_ operation: String, id: UUID) {
+    private func enqueueEmpty(_ operation: String, id: UUID) async {
         struct Empty: Encodable {}
-        enqueue(operation, id: id, payload: Empty())
+        await enqueue(operation, id: id, payload: Empty())
     }
 }
 
