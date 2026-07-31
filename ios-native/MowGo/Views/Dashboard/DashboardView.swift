@@ -19,6 +19,8 @@ struct DashboardView: View {
     @State private var inviteEmail = ""
     @State private var inviteError: String?
     @State private var isInviting = false
+    @State private var memberToRemove: UserProfile?
+    @State private var showRemoveConfirm = false
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
@@ -131,6 +133,21 @@ struct DashboardView: View {
         }
         .sheet(isPresented: $showInviteCrew) {
             inviteCrewSheet
+        }
+        .alert("Remove Crew Member", isPresented: $showRemoveConfirm) {
+            Button("Remove", role: .destructive) {
+                guard let member = memberToRemove else { return }
+                Task {
+                    do {
+                        try await store.removeTeamMember(member)
+                    } catch {
+                        inviteError = error.localizedDescription
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("\(memberToRemove?.businessName ?? "This member") will be removed from your team. Their jobs will be unassigned.")
         }
     }
 
@@ -369,15 +386,10 @@ struct DashboardView: View {
 
             Spacer()
 
-            if member.role != "owner" {
+            if member.role == "crew" {
                 Button {
-                    Task {
-                        do {
-                            try await store.removeTeamMember(member)
-                        } catch {
-                            // silently handle
-                        }
-                    }
+                    memberToRemove = member
+                    showRemoveConfirm = true
                 } label: {
                     Image(systemName: "trash")
                         .font(.caption)
@@ -452,12 +464,12 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        inviteEmail = ""
-                        inviteError = nil
-                        showInviteCrew = false
-                    }
+                    Button("Cancel") { showInviteCrew = false }
                 }
+            }
+            .onDisappear {
+                inviteEmail = ""
+                inviteError = nil
             }
         }
     }
