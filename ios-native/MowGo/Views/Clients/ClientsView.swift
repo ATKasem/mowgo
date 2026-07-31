@@ -174,6 +174,20 @@ struct ClientCard: View {
                         .buttonStyle(.plain)
                         .accessibilityLabel("Navigate to \(address)")
                     }
+
+                    // Camera — placeholder for client photo feature
+                    Button {
+                        // TODO: client photo attachment
+                    } label: {
+                        Image(systemName: "camera.fill")
+                            .font(.caption)
+                            .foregroundColor(theme.textMuted)
+                            .frame(width: 28, height: 28)
+                            .background(theme.surfaceElevated)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Add client photo")
                 }
                 .padding(.horizontal, 12)
 
