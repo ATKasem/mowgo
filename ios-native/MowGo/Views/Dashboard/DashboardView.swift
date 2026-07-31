@@ -105,7 +105,7 @@ struct DashboardView: View {
                 statCardsSection
                 if isOwner { quickActionsSection }
                 todayPreviewSection
-                if isOwner && !teamMembers.isEmpty { teamProgressSection }
+                if isOwner && !teamProgressRows.isEmpty { teamProgressSection }
             }
             .padding(16)
         }
@@ -118,6 +118,11 @@ struct DashboardView: View {
         .sheet(isPresented: $showAddClient) {
             NewClientFormView()
                 .environmentObject(store)
+        }
+        .onAppear {
+            if isOwner {
+                Task { await store.loadTeamMembers() }
+            }
         }
     }
 
@@ -242,14 +247,22 @@ struct DashboardView: View {
 
     // MARK: - Team Progress
 
-    private var teamMembers: [(member: UserProfile, done: Int, inProgress: Int, total: Int)] {
-        store.teamMembers.compactMap { member in
+    private var teamProgressRows: [(label: String, done: Int, inProgress: Int, total: Int, color: Color)] {
+        var rows: [(String, Int, Int, Int, Color)] = []
+        for member in store.teamMembers {
             let jobs = todayJobs.filter { $0.assignedTo == member.id }
-            guard !jobs.isEmpty else { return nil }
+            guard !jobs.isEmpty else { continue }
             let done = jobs.filter { $0.status == .done }.count
-            let inProgress = jobs.filter { $0.status == .inProgress }.count
-            return (member, done, inProgress, jobs.count)
+            let ip = jobs.filter { $0.status == .inProgress }.count
+            rows.append((member.businessName ?? "Crew", done, ip, jobs.count, MowGoTheme.deepGreen))
         }
+        let unassigned = todayJobs.filter { $0.assignedTo == nil }
+        if !unassigned.isEmpty {
+            let done = unassigned.filter { $0.status == .done }.count
+            let ip = unassigned.filter { $0.status == .inProgress }.count
+            rows.append(("Unassigned", done, ip, unassigned.count, .gray))
+        }
+        return rows
     }
 
     private var teamProgressSection: some View {
@@ -258,8 +271,8 @@ struct DashboardView: View {
                 .font(.headline)
                 .foregroundColor(theme.textPrimary)
 
-            ForEach(teamMembers, id: \.member.id) { item in
-                teamMemberRow(item)
+            ForEach(teamProgressRows.indices, id: \.self) { i in
+                teamProgressRow(teamProgressRows[i])
             }
         }
         .padding(16)
@@ -267,20 +280,20 @@ struct DashboardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private func teamMemberRow(_ item: (member: UserProfile, done: Int, inProgress: Int, total: Int)) -> some View {
-        let completed = item.done + item.inProgress
-        let pct = item.total > 0 ? Double(completed) / Double(item.total) : 0
+    private func teamProgressRow(_ row: (label: String, done: Int, inProgress: Int, total: Int, color: Color)) -> some View {
+        let completed = row.done + row.inProgress
+        let pct = row.total > 0 ? Double(completed) / Double(row.total) : 0
 
         return VStack(spacing: 6) {
             HStack {
                 Circle()
-                    .fill(MowGoTheme.deepGreen)
+                    .fill(row.color)
                     .frame(width: 8, height: 8)
-                Text(item.member.businessName ?? "Crew")
+                Text(row.label)
                     .font(.subheadline.weight(.medium))
                     .foregroundColor(theme.textPrimary)
                 Spacer()
-                Text("\(completed)/\(item.total)")
+                Text("\(completed)/\(row.total)")
                     .font(.caption.weight(.semibold))
                     .foregroundColor(theme.textSecondary)
             }
@@ -290,7 +303,7 @@ struct DashboardView: View {
                         .fill(theme.surfaceElevated)
                         .frame(height: 6)
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(MowGoTheme.deepGreen)
+                        .fill(row.color)
                         .frame(width: geo.size.width * pct, height: 6)
                 }
             }
@@ -313,7 +326,7 @@ struct DashboardView: View {
                         .foregroundColor(theme.textPrimary)
                     // Tag badges
                     if let tags = clientTags(for: job), !tags.isEmpty {
-                        ForEach(tags.prefix(2), id: \.self) { tag in
+                        ForEach(Array(Set(tags.prefix(2))), id: \.self) { tag in
                             Text(tagLabel(tag))
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundColor(tagColor(tag))
