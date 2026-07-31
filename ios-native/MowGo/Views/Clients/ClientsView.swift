@@ -189,7 +189,7 @@ struct ClientCard: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel("Add client photo")
                 }
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 12).padding(.bottom, 8)
 
                 Button("Edit") {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
