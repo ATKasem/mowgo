@@ -380,7 +380,7 @@ struct DashboardView: View {
         switch tag {
         case "do-not-service": .red
         case "late-payer": .orange
-        case "vip": .yellow
+        case "vip": .orange
         case "needs-quote": .purple
         default: .gray
         }
