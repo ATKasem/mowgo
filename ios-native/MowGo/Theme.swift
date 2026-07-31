@@ -27,6 +27,7 @@ struct MowGoTheme: Equatable {
     }
 
     init(colorScheme: ColorScheme) {
+        _ = colorScheme // required API — themed() passes ColorScheme for future use
         background = Color(
             light: Color(hex: "f8f9fa"),
             dark: Color(hex: "1a1a2e")

@@ -13,7 +13,7 @@ struct DashboardView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private static let dateFormatter: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0)
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
         f.locale = Locale(identifier: "en_US_POSIX"); f.calendar = Calendar(identifier: .gregorian); return f
     }()
 
