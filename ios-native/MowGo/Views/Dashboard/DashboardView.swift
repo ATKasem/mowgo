@@ -11,10 +11,9 @@ struct DashboardView: View {
     @EnvironmentObject var auth: AuthService
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
-    @State private var refreshID = UUID()
 
     private let dateFormatter: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0); return f
     }()
 
     // MARK: - Stats
@@ -85,7 +84,7 @@ struct DashboardView: View {
             VStack(spacing: 16) {
                 if isOwner {
                     // Owner — 4 cards
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 12) {
                         StatCard(
                             icon: "dollarsign.circle.fill",
                             color: .green,
@@ -117,7 +116,7 @@ struct DashboardView: View {
                     }
                 } else {
                     // Crew — 2 cards, no revenue
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 12) {
                         StatCard(
                             icon: "checkmark.circle.fill",
                             color: .green,

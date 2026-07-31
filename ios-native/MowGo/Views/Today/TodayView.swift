@@ -188,7 +188,7 @@ struct TodayView: View {
                     showingAddClient = true
                 }
                 Button("View Invoices") {
-                    selectedTab = 2
+                    selectedTab = 3
                 }
                 Button("Cancel", role: .cancel) {}
             }
