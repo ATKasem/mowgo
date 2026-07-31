@@ -17,7 +17,8 @@
 - ✅ Crew / team management
 - ✅ iOS app (App Store)
 - ✅ Android app (Google Play)
-- ✅ AI estimates & measurements
+- ✅ AI chat assistant (Autopilot — 14 tools, function-calling)
+- ⚠️ ~~AI estimates & measurements~~ — CLAIMED shipped, **NOT found in code** (audit 2026-07-31). No estimate/measurement generator exists in client or functions. Compare page correctly shows MowGo AI = ❌. Roadmap was wrong; corrected.
 - ✅ Competitor comparison page (/compare)
 
 ## 🟢 Planned — Short Term
@@ -77,3 +78,4 @@
 | Date | Change |
 |------|--------|
 | 2026-07-27 | Created roadmap. Added booking link as #1 short-term priority. Added QuoteIQ alternative page to in-progress. |
+| 2026-07-31 | Corrected false "✅ AI estimates & measurements" claim — feature does not exist in code (audit). Autopilot AI chat is the shipped AI feature. |

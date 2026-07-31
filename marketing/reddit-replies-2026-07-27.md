@@ -1,5 +1,5 @@
 # Reddit Response Drafts — MowGo Cowork
-## July 27, 2026
+## July 27, 2026 (Thread 4 added Jul 31)
 
 ---
 
@@ -47,3 +47,24 @@
 > Yardbook is also worth a mention for a free option but the ads are annoying.
 >
 > Stay away from Jobber until you've got 10+ clients — too expensive for what a new business needs.
+
+---
+
+### Thread 4: r/LawnCarePros — "What apps/software do you recommend for managing customers and payments?" 🔴 POST TODAY
+**Context:** OP is a solo operator looking for customer management + payment/invoicing tooling. Exact ICP. Thread ~8 days old (id `1v6ce6e`) — **POST TODAY (Jul 31) or it's dead**. Window 12:00-20:00 UTC. (Draft created Jul 31 by 8am action — was missing from this file.)
+
+**Draft response:**
+> Managing customers and payments is exactly why I switched to MowGo (mowgo.app) — I was losing track of who owed what with a spreadsheet.
+>
+> What sold me:
+> - Auto-invoicing — job marked done, invoice created and emailed to the client automatically
+> - Card payments built in (Stripe) — clients pay online, no more "bring a check next time"
+> - Client notes on every job card — gate codes, pets, mow height, payment terms
+> - Flat pricing, no per-user fees: $39/mo solo, $79/mo crew — and no transaction % on top of Stripe
+> - Free tier if you're just starting (5 clients, no card required)
+>
+> The one-tap rain delay reschedule is a bonus that saves me every spring. 14-day free trial, no card.
+>
+> Not affiliated, just a happy user — tried Jobber (too expensive for what I need) and Yardbook (too clunky) first.
+
+---
