@@ -145,6 +145,38 @@ struct ClientCard: View {
                 }
                 .padding(.horizontal, 12).padding(.bottom, 8)
 
+                HStack(spacing: 6) {
+                    if let phone = client.phone, !phone.isEmpty {
+                        Button {
+                            callPhone(phone)
+                        } label: {
+                            Image(systemName: "phone.fill")
+                                .font(.caption)
+                                .foregroundColor(MowGoTheme.success)
+                                .frame(width: 28, height: 28)
+                                .background(theme.surfaceElevated)
+                                .cornerRadius(6)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Call \(phone)")
+                    }
+                    if let address = client.address, !address.isEmpty {
+                        Button {
+                            openMaps(address)
+                        } label: {
+                            Image(systemName: "location.fill")
+                                .font(.caption)
+                                .foregroundColor(MowGoTheme.info)
+                                .frame(width: 28, height: 28)
+                                .background(theme.surfaceElevated)
+                                .cornerRadius(6)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Navigate to \(address)")
+                    }
+                }
+                .padding(.horizontal, 12)
+
                 Button("Edit") {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onEdit()
