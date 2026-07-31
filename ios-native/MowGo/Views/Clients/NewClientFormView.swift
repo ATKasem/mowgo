@@ -137,6 +137,7 @@ struct NewClientFormView: View {
                                 .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
                                 .padding(.top, 4)
                                 .transition(.opacity.combined(with: .move(edge: .top)))
+                                .animation(.easeInOut(duration: 0.15), value: isShowingSuggestions)
                             }
                         }
                         VStack(alignment: .leading, spacing: 2) {
