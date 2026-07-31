@@ -519,22 +519,25 @@ final class DataStore: ObservableObject {
 
     // MARK: - Jobs
 
+    private func attachClientRef(to job: inout Job) {
+        guard let client = clients.first(where: { $0.id == job.clientId }) else { return }
+        job.clients = Job.ClientRef(
+            id: client.id,
+            name: client.name,
+            address: client.address,
+            phone: client.phone,
+            email: client.email,
+            rate: client.rate,
+            cleaningNotes: client.cleaningNotes,
+            keyCode: client.keyCode,
+            alarmCode: client.alarmCode,
+            petInstructions: client.petInstructions
+        )
+    }
+
     func createJob(_ job: Job) async throws {
         var job = job
-        if let client = clients.first(where: { $0.id == job.clientId }) {
-            job.clients = Job.ClientRef(
-                id: client.id,
-                name: client.name,
-                address: client.address,
-                phone: client.phone,
-                email: client.email,
-                rate: client.rate,
-                cleaningNotes: client.cleaningNotes,
-                keyCode: client.keyCode,
-                alarmCode: client.alarmCode,
-                petInstructions: client.petInstructions
-            )
-        }
+        attachClientRef(to: &job)
         guard await canSync() else {
             jobs.append(job)
             enqueue("job:create", id: job.id, payload: job)
@@ -563,20 +566,7 @@ final class DataStore: ObservableObject {
                 isRecurring: job.isRecurring,
                 recurrenceRule: job.recurrenceRule
             ))
-            if let client = clients.first(where: { $0.id == created.clientId }) {
-                created.clients = Job.ClientRef(
-                    id: client.id,
-                    name: client.name,
-                    address: client.address,
-                    phone: client.phone,
-                    email: client.email,
-                    rate: client.rate,
-                    cleaningNotes: client.cleaningNotes,
-                    keyCode: client.keyCode,
-                    alarmCode: client.alarmCode,
-                    petInstructions: client.petInstructions
-                )
-            }
+            attachClientRef(to: &created)
             jobs.append(created)
         } catch {
             // Network failed — save locally and queue for sync
