@@ -415,6 +415,7 @@ struct DashboardView: View {
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
+                    .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                     .padding(12)
                     .background(theme.surfaceElevated)
