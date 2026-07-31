@@ -37,9 +37,7 @@ export default function Dashboard() {
         if (!mounted) return;
 
         // Set role for crew filtering — conservative default: no profile = no revenue
-        const userRole = profile?.role;
-        setRole(userRole);
-        if (!userRole) setRole('unknown'); // safety: unknown role sees limited view
+        setRole(profile?.role || 'unknown');
 
         const today = localDate();
         const weekAgo = localDate(-6); // Mon-Sun = 7 days inclusive

@@ -31,7 +31,7 @@ export default function Layout() {
   const pageContext = (() => {
     const path = location.pathname;
     if (path === '/app' || path === '/app/') return { page: 'Dashboard', description: 'You are viewing the business dashboard.' };
-    if (path.startsWith('/app/home')) return { page: 'Home', description: 'You are viewing the home calendar and schedule.' };
+    if (path === '/app/home' || path === '/app/home/') return { page: 'Home', description: 'You are viewing the home calendar and schedule.' };
     if (path.startsWith('/app/today')) return { page: 'Today', description: 'You are viewing today\'s schedule.' };
     if (path.startsWith('/app/clients')) return { page: 'Clients', description: 'You are viewing the client list.' };
     if (path.startsWith('/app/invoices')) return { page: 'Invoices', description: 'You are viewing invoices.' };
