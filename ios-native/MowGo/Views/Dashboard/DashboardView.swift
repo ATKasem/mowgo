@@ -25,6 +25,10 @@ struct DashboardView: View {
         let f = NumberFormatter(); f.numberStyle = .currency; f.currencySymbol = "$"; return f
     }()
 
+    private static let displayFormatter: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "EEEE, MMMM d"; return f
+    }()
+
     private let ownerRole = "owner"
 
     // MARK: - Stats
@@ -142,8 +146,7 @@ struct DashboardView: View {
     }
 
     private var dateDisplay: String {
-        let f = DateFormatter(); f.dateFormat = "EEEE, MMMM d"
-        return f.string(from: Date())
+        Self.displayFormatter.string(from: Date())
     }
 
     private var statCardsSection: some View {
@@ -228,8 +231,8 @@ struct DashboardView: View {
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.blue.opacity(0.12))
-                    .foregroundColor(.blue)
+                    .background(MowGoTheme.info.opacity(0.12))
+                    .foregroundColor(MowGoTheme.info)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
