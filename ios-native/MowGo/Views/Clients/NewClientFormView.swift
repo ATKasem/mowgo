@@ -30,6 +30,7 @@ struct NewClientFormView: View {
     @State private var error: String?
     @State private var addressSuggestions: [MKLocalSearchCompletion] = []
     @State private var isShowingSuggestions = false
+    @State private var isSelectingAddress = false
 
     private enum Field { case name, address, phone, email, rate, keyCode, pets, notes }
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -80,6 +81,10 @@ struct NewClientFormView: View {
                                 .focused($focusedField, equals: .address)
                                 .onSubmit { focusedField = .phone }
                                 .onChange(of: address) { _, newValue in
+                                    guard !isSelectingAddress else {
+                                        isSelectingAddress = false
+                                        return
+                                    }
                                     if newValue.count >= 3 {
                                         searchCompleter.queryFragment = newValue
                                         isShowingSuggestions = true
@@ -94,6 +99,7 @@ struct NewClientFormView: View {
                                     LazyVStack(alignment: .leading, spacing: 0) {
                                         ForEach(Array(addressSuggestions.enumerated()), id: \.offset) { idx, suggestion in
                                             Button {
+                                                isSelectingAddress = true
                                                 address = suggestion.title + (suggestion.subtitle.isEmpty ? "" : ", \(suggestion.subtitle)")
                                                 isShowingSuggestions = false
                                                 addressSuggestions = []
