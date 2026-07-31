@@ -31,8 +31,6 @@ struct TodayView: View {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
     }()
 
-    private static let isoFormatter: ISO8601DateFormatter = ISO8601DateFormatter()
-
     private var dateString: String { Self.dateFmt.string(from: selectedDate) }
 
     private var todayJobs: [Job] {
@@ -61,21 +59,16 @@ struct TodayView: View {
         todayJobs.filter { $0.status == .done }.count
     }
 
+    private var todayRevenue: Decimal {
+        todayJobs
+            .filter { $0.status == .done }
+            .compactMap { job in store.clients.first(where: { $0.id == job.clientId })?.rate }
+            .reduce(0, +)
+    }
+
     // MARK: - Stats
 
     private var totalClients: Int { store.clients.count }
-    private var weeklyRevenue: Decimal {
-        let cal = Calendar.current
-        return store.invoices
-            .filter { $0.status == .paid }
-            .compactMap { inv -> Decimal? in
-                guard let paid = inv.paidAt else { return nil }
-                guard let d = Self.isoFormatter.date(from: paid) else { return nil }
-                return cal.isDate(d, equalTo: Date(), toGranularity: .weekOfYear)
-                    ? Decimal(inv.amountCents) : nil
-            }
-            .reduce(0, +)
-    }
 
     var body: some View {
         NavigationStack {
@@ -297,7 +290,7 @@ struct TodayView: View {
             StatCard(title: "Done", value: "\(completedCount)", icon: "checkmark.circle", color: "10b981")
             StatCard(
                 title: "Revenue",
-                value: (weeklyRevenue / 100).formatted(.currency(code: "USD")),
+                value: todayRevenue.formatted(.currency(code: "USD")),
                 icon: "dollarsign.circle",
                 color: "16a34a"
             )
