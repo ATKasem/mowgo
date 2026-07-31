@@ -107,6 +107,7 @@ export async function loadJobs() {
       key_code: j.clients.key_code,
       alarm_code: j.clients.alarm_code,
       pet_instructions: j.clients.pet_instructions,
+      tags: j.clients.tags || [],
     } : null,
   }));
 }
@@ -283,6 +284,7 @@ export async function loadClients() {
     key_code: c.key_code,
     alarm_code: c.alarm_code,
     pet_instructions: c.pet_instructions,
+    tags: c.tags || [],
   }));
 }
 
@@ -334,6 +336,7 @@ export async function createClient(client) {
     key_code: client.key_code,
     alarm_code: client.alarm_code,
     pet_instructions: client.pet_instructions,
+    tags: client.tags || [],
   }).select().single();
 
   if (error) throw error;
@@ -345,6 +348,7 @@ export async function createClient(client) {
     phone: data.phone,
     email: data.email,
     rate: data.rate,
+    tags: data.tags || [],
   });
   return { ...data, service_notes: data.cleaning_notes };
 }
@@ -406,8 +410,13 @@ export async function loadInvoices() {
 }
 
 export async function createInvoice(invoice) {
+  const amount = Number(invoice.amount);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Invoice amount must be a positive number');
+  }
+
   if (isDemoMode()) {
-    const newInvoice = { ...invoice, id: uid(), status: 'unpaid' };
+    const newInvoice = { ...invoice, amount, id: uid(), status: 'unpaid' };
     _invoices = [newInvoice, ..._invoices];
     notify();
     return newInvoice;
@@ -418,7 +427,7 @@ export async function createInvoice(invoice) {
   const { data, error } = await supabase.from('invoices').insert({
     user_id: user.id,
     client_id: invoice.client_id || invoice.clients?.id,
-    amount: invoice.amount,
+    amount,
     status: 'unpaid',
   }).select('*, clients!left(*)').single();
 

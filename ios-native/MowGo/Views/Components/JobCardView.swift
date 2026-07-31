@@ -164,16 +164,6 @@ struct JobCardView: View {
                     .font(.caption2)
                     .foregroundColor(theme.textMuted)
                 }
-                if let address = job.clients?.address, !address.isEmpty {
-                    HStack(spacing: 2) {
-                        Image(systemName: "mappin")
-                            .font(.system(size: 9))
-                        Text(address)
-                            .lineLimit(1)
-                    }
-                    .font(.caption2)
-                    .foregroundColor(theme.textMuted)
-                }
 
                 // Photo thumbnail row
                 if let photoUrl = job.photoUrl, !photoUrl.isEmpty {

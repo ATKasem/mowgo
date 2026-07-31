@@ -61,12 +61,12 @@
   },
   "jobCard": {
     "drag_to_reorder": "Arrastra para reordenar",
-    "undo_completion": "Deshacer finalización",
-    "mark_job_complete": "Marcar trabajo como completado",
+    "undo_completion": "Deshacer",
+    "mark_job_complete": "Marcar completado",
     "unknown": "Desconocido",
     "unnamed": "Sin nombre",
     "undo": "Deshacer",
-    "mark_complete": "Marcar como completado",
+    "mark_complete": "Completar",
     "move_up": "Mover arriba",
     "move_down": "Mover abajo",
     "navigate": "Navegar",
@@ -78,7 +78,8 @@
     "scheduled": "Programado",
     "in_progress": "En curso",
     "done": "Completado",
-    "skipped": "Omitido"
+    "skipped": "Omitido",
+    "start_work": "Iniciar"
   },
   "layout": {
     "home": "Inicio",
@@ -272,7 +273,6 @@
     "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter": "Tienes que subir al plan Pro ($59/mes) solo para obtener reprogramación por lluvia. El plan Starter no la incluye.",
     "platform_fee_exposé": "Exposé de cargos de plataforma",
     "ruunly_s_sticker_price_is_a_lie_here_s_what_you_actually_pay": "El precio de etiqueta de Ruunly es una mentira. Esto es lo que realmente pagas.",
-    "monthly_revenue": "Ingresos mensuales",
     "you_save": "Ahorras",
     "per_mo": "/mes",
     "_based_on_ruunly_s_published_platform_fee_percentages_applied_to_monthly": "* Basado en los porcentajes de cargo de plataforma publicados por Ruunly aplicados a los ingresos mensuales. MowGo Solo cuesta $39 fijos, sin cargos por porcentaje.",
@@ -842,6 +842,22 @@
     "all": "Todos",
     "chance_of_rain_move": "probabilidad de lluvia — mover",
     "remaining_to_tomorrow": "restantes para mañana",
-    "job_already_scheduled": "trabajo ya programado"
+    "job_already_scheduled": "trabajo ya programado",
+    "completed": "completado",
+    "count_completed": "{{count}} completados"
+  },
+  "dashboard": {
+    "revenue_today": "Ingresos Hoy",
+    "jobs_done": "trabajos hechos",
+    "outstanding": "Pendiente",
+    "unpaid_invoices": "Facturas sin pagar",
+    "jobs_this_week": "Trabajos Esta Semana",
+    "revenue": "ingresos",
+    "active_clients": "Clientes Activos",
+    "recurring": "recurrentes",
+    "dashboard": "Panel",
+    "done": "hecho",
+    "no_jobs_today": "Sin trabajos hoy",
+    "retry": "Reintentar"
   }
 }

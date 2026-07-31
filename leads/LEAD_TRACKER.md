@@ -1,7 +1,7 @@
 # MowGo Lead Tracker
-**Last updated:** 2026-07-29 (4 cold emails sent)
-**Total leads:** 8
-**Contacted:** 4
+**Last updated:** 2026-07-31 (5 cold emails sent)
+**Total leads:** 9
+**Contacted:** 5
 **Conversions:** 0
 
 ---
@@ -130,6 +130,20 @@
 - **Last Contact:** 2026-07-29 — Email (Template E1: price/value, resi+commercial)
 - **Next Step:** Follow-up email in 3 days if no response
 
+### Campbell & Sons Lawn Services LLC
+- **Status:** 🟡
+- **Source:** OK_LEADS_100.md (Hound)
+- **City:** Oklahoma City
+- **Website:** https://www.campbellandsonslawnservices.com
+- **Phone:** (405) 415-5300
+- **Email:** campbellandsonslawnservicesllc@yahoo.com
+- **Crew Size:** 2-4 (veteran-owned since 2018, serves OKC/Edmond/Moore/Norman)
+- **Current System:** Unknown (has booking form on Duda website — likely manual or basic)
+- **Reviews:** Established 2018, veteran-owned. Duda-built website with quote form.
+- **Pain Points:** Multi-city routing across 4 OKC suburbs; booking form suggests no automated scheduling; DIY website builder (Duda) implies low-tech operations
+- **Last Contact:** 2026-07-31 — Email (Template E1: price/value, multi-city routing)
+- **Next Step:** Follow-up email in 3 days if no response
+
 ---
 
 ## Outreach Log
@@ -140,6 +154,7 @@
 | 7/29 | Metro Green LLC | Email (E1) | — | Price/value hook: multi-city routing across 5 OKC suburbs, 1-3 crews |
 | 7/29 | Bigfoot Lawns LLC | Email (E2) | — | Owner-operator pain points: small, solo, no online scheduling |
 | 7/29 | Simply LawnCare | Email (E1) | — | Price/value hook: 2-3 crew family business, residential + commercial |
+| 7/31 | Campbell & Sons Lawn Services | Email (E1) | — | Price/value hook: 2-4 crew veteran-owned, multi-city routing across 4 OKC suburbs |
 
 ---
 
@@ -148,4 +163,4 @@
 | Week | New Leads | Contacted | Responses | Trials | Paid |
 |------|-----------|-----------|-----------|--------|------|
 | 7/21 | 0 | 0 | 0 | 0 | 0 |
-| 7/26 | 8 | 4 | 0 | 0 | 0 |
+| 7/26 | 9 | 5 | 0 | 0 | 0 |

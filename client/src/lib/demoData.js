@@ -2,11 +2,11 @@
 const today = new Date().toISOString().split('T')[0];
 
 export const demoClients = [
-  { id: '1', name: 'Bill Henderson', address: '123 Oak St, Edmond, OK', phone: '405-555-0101', email: 'bill@email.com', rate: 50, service_notes: 'Mow front + back, edge driveway, trim hedges. Use mulching blade.', key_code: '4829', alarm_code: '', pet_instructions: '1 friendly golden retriever. Give treat on counter.' },
-  { id: '2', name: 'Karen Walsh', address: '456 Elm Ave, OKC, OK', phone: '405-555-0102', email: 'karen@email.com', rate: 65, service_notes: 'Large yard — 0.4 acres. Mow, edge, blow. Fertilize every 6 weeks.', key_code: '7712', alarm_code: '1234', pet_instructions: '' },
-  { id: '3', name: 'Marcus Lee', address: '789 Maple Dr, Edmond, OK', phone: '405-555-0103', email: 'marcus@email.com', rate: 40, service_notes: 'Small lawn. Quick mow + edge. Gate on left side of house.', key_code: '5591', alarm_code: '', pet_instructions: 'No pets. Leave gate unlocked.' },
-  { id: '4', name: 'David & Emma Ruiz', address: '321 Pine Ln, OKC, OK', phone: '405-555-0104', email: 'david@email.com', rate: 55, service_notes: 'Biweekly service. Mow, trim, blow. Both front and back.', key_code: '', alarm_code: '5678', pet_instructions: '2 cats — do NOT let outside.' },
-  { id: '5', name: 'Tom Harrison', address: '654 Birch Ct, Nichols Hills, OK', phone: '405-555-0105', email: 'tom@email.com', rate: 80, service_notes: 'Premium lawn — 0.6 acres. Mow with stripes, edge, blow, bag clippings.', key_code: '9023', alarm_code: '', pet_instructions: '' },
+  { id: '1', name: 'Bill Henderson', address: '123 Oak St, Edmond, OK', phone: '405-555-0101', email: 'bill@email.com', rate: 50, service_notes: 'Mow front + back, edge driveway, trim hedges. Use mulching blade.', key_code: '4829', alarm_code: '', pet_instructions: '1 friendly golden retriever. Give treat on counter.', tags: ['vip'] },
+  { id: '2', name: 'Karen Walsh', address: '456 Elm Ave, OKC, OK', phone: '405-555-0102', email: 'karen@email.com', rate: 65, service_notes: 'Large yard — 0.4 acres. Mow, edge, blow. Fertilize every 6 weeks.', key_code: '7712', alarm_code: '1234', pet_instructions: '', tags: [] },
+  { id: '3', name: 'Marcus Lee', address: '789 Maple Dr, Edmond, OK', phone: '405-555-0103', email: 'marcus@email.com', rate: 40, service_notes: 'Small lawn. Quick mow + edge. Gate on left side of house.', key_code: '5591', alarm_code: '', pet_instructions: 'No pets. Leave gate unlocked.', tags: ['late-payer'] },
+  { id: '4', name: 'David & Emma Ruiz', address: '321 Pine Ln, OKC, OK', phone: '405-555-0104', email: 'david@email.com', rate: 55, service_notes: 'Biweekly service. Mow, trim, blow. Both front and back.', key_code: '', alarm_code: '5678', pet_instructions: '2 cats — do NOT let outside.', tags: [] },
+  { id: '5', name: 'Tom Harrison', address: '654 Birch Ct, Nichols Hills, OK', phone: '405-555-0105', email: 'tom@email.com', rate: 80, service_notes: 'Premium lawn — 0.6 acres. Mow with stripes, edge, blow, bag clippings.', key_code: '9023', alarm_code: '', pet_instructions: '', tags: ['do-not-service'] },
 ];
 
 // Demo owner profile id — all demo crew point here

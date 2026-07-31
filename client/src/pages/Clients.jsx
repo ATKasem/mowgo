@@ -2,8 +2,8 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import i18n from '../i18n';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { loadClients, createClient, updateClient, deleteClient } from '../lib/data';
-import { INITIAL_CLIENT_FORM } from '../lib/constants';
-import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar, Loader2 } from 'lucide-react';
+import { INITIAL_CLIENT_FORM, CLIENT_TAGS } from '../lib/constants';
+import { Search, Plus, Pencil, Trash2, MapPin, Phone, Mail, Key, AlarmCheck, PawPrint, StickyNote, ChevronRight, Users, Filter, Navigation, Clock, Calendar, Loader2, Tag, X } from 'lucide-react';
 import { getMapsUrl } from '../lib/maps';
 
 function getInitials(name) {
@@ -176,6 +176,28 @@ export default function Clients({ jobs = [] }) {
           <div><label className="label">{tr("Service Notes")}</label><textarea placeholder={tr("Focus on front yard...")} value={form.service_notes} onChange={e => setForm({ ...form, service_notes: e.target.value })} className="input" rows={2} /></div>
           <div className="grid grid-cols-2 gap-3"><div><label className="label">{tr("Key Code")}</label><input placeholder="4829" value={form.key_code} onChange={e => setForm({ ...form, key_code: e.target.value })} className="input" /></div><div><label className="label">{tr("Alarm Code")}</label><input placeholder="1234" value={form.alarm_code} onChange={e => setForm({ ...form, alarm_code: e.target.value })} className="input" /></div></div>
           <div><label className="label">{tr("Pet Instructions")}</label><input placeholder={tr("1 friendly dog...")} value={form.pet_instructions} onChange={e => setForm({ ...form, pet_instructions: e.target.value })} className="input" /></div>
+          <div>
+            <label className="label">{tr("Tags")}</label>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label={tr("Client tags")}>
+              {CLIENT_TAGS.map((tag) => {
+                const active = (form.tags || []).includes(tag.value);
+                return (
+                  <button
+                    key={tag.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => {
+                      const current = form.tags || [];
+                      setForm({ ...form, tags: active ? current.filter(t => t !== tag.value) : [...current, tag.value] });
+                    }}
+                    className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border transition-colors min-h-[44px] ${active ? tag.color : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  >
+                    {tag.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <div className="flex gap-2 pt-1"><button type="submit" disabled={saving} className="btn-primary flex-1">{tr(saving ? 'Saving...' : editId ? 'Save Changes' : 'Add Client')}</button><button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="btn-secondary flex-1">{tr("Cancel")}</button></div>
         </form>
       )}
@@ -202,7 +224,14 @@ export default function Clients({ jobs = [] }) {
                 <div className="p-4 flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${avatarColors[i % avatarColors.length]}`}>{getInitials(client.name)}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-1.5">
+                      {client.name}
+                      {(client.tags || []).map(tv => {
+                        const tagDef = CLIENT_TAGS.find(t => t.value === tv);
+                        if (!tagDef) return null;
+                        return <span key={tv} className={`w-2 h-2 rounded-full flex-shrink-0 ${tagDef.color.split(' ')[0]}`} title={tagDef.label} />;
+                      })}
+                    </p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {client.address && <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><MapPin className="w-3 h-3" />{client.address}</span>}
                     </div>
@@ -249,6 +278,11 @@ export default function Clients({ jobs = [] }) {
                     {client.key_code && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><Key className="w-3 h-3" />{tr("Key")}: {client.key_code}</span>}
                     {client.alarm_code && <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1 text-[11px]"><AlarmCheck className="w-3 h-3" />{tr("Alarm")}: {client.alarm_code}</span>}
                     {client.pet_instructions && <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1 text-[11px]"><PawPrint className="w-3 h-3" />{client.pet_instructions}</span>}
+                    {(client.tags || []).map(tv => {
+                      const tagDef = CLIENT_TAGS.find(t => t.value === tv);
+                      if (!tagDef) return null;
+                      return <span key={tv} className={`badge inline-flex items-center gap-1 text-[11px] ${tagDef.color}`}><Tag className="w-3 h-3" />{tagDef.label}</span>;
+                    })}
                   </div>
                   <div className="flex gap-2 pt-1">
                     <button onClick={e => { e.stopPropagation(); openEdit(client); }} className="btn-secondary text-xs py-2.5 px-3 gap-1 min-h-[44px]"><Pencil className="w-3 h-3" />{tr("Edit")}</button>

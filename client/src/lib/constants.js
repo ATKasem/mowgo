@@ -60,7 +60,15 @@ export const RECURRENCE_OPTIONS = [
 
 /** Default form values for new jobs and clients. */
 export const INITIAL_JOB_FORM = { client_id: '', title: 'Mow + Edge', scheduled_time: '09:00', duration_minutes: 120, recurrence: 'none', assigned_to: null };
-export const INITIAL_CLIENT_FORM = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '' };
+export const INITIAL_CLIENT_FORM = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '', tags: [] };
+
+/** Pre-built client tags — common labels lawn crews use to flag clients */
+export const CLIENT_TAGS = [
+  { value: 'do-not-service', label: 'Do Not Service', color: 'bg-red-100 border-red-300 text-red-700 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400' },
+  { value: 'late-payer', label: 'Late Payer', color: 'bg-amber-100 border-amber-300 text-amber-700 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-400' },
+  { value: 'vip', label: 'VIP', color: 'bg-purple-100 border-purple-300 text-purple-700 dark:bg-purple-950/30 dark:border-purple-800 dark:text-purple-400' },
+  { value: 'needs-quote', label: 'Needs Quote', color: 'bg-blue-100 border-blue-300 text-blue-700 dark:bg-blue-950/30 dark:border-blue-800 dark:text-blue-400' },
+];
 
 // ===== Crew / Team =====
 

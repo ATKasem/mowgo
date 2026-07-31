@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { memo } from 'react';
-import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical } from 'lucide-react';
+import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical, Clock } from 'lucide-react';
 import { STATUS_CONFIG, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 import { getMapsUrl } from '../lib/maps';
 
@@ -8,6 +8,8 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
   const { tr } = useLocalizedText('jobCard');
   const client = job.clients;
   const isDone = job.status === 'done';
+  const isInProgress = job.status === 'in_progress';
+  const isActive = !isDone && !isInProgress;
   const statusInfo = STATUS_CONFIG[job.status] || STATUS_CONFIG.scheduled;
   const recurrenceLabel = job.recurrence && job.recurrence !== 'none'
     ? RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label
@@ -24,9 +26,9 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
 
   return (
     <div
-      className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-60' : ''} ${isDragging ? 'opacity-40 scale-95' : ''} ${isDragOver ? 'ring-2 ring-sky-400 dark:ring-sky-500 border-sky-400' : ''}`}
-      draggable={!isDone}
-      onDragStart={(e) => { if (!isDone) { e.dataTransfer.effectAllowed = 'move'; onDragStart?.(); } }}
+      className={`card transition-all duration-300 ${isAnimating ? 'scale-[0.98] opacity-70' : ''} ${isDone ? 'opacity-60' : isInProgress ? 'opacity-90' : ''} ${isDragging ? 'opacity-40 scale-95' : ''} ${isDragOver ? 'ring-2 ring-sky-400 dark:ring-sky-500 border-sky-400' : ''}`}
+      draggable={isActive}
+      onDragStart={(e) => { if (isActive) { e.dataTransfer.effectAllowed = 'move'; onDragStart?.(); } }}
       onDragOver={(e) => { e.preventDefault(); onDragOver?.(e); }}
       onDrop={(e) => { e.preventDefault(); onDrop?.(); }}
       onDragEnd={onDragEnd}
@@ -41,19 +43,19 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
         onClick={onToggleExpand}
       >
         {/* Drag handle */}
-        {!isDone && (
+        {isActive && (
           <div className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing flex-shrink-0" aria-label={tr("Drag to reorder")}>
             <GripVertical className="w-4 h-4" />
           </div>
         )}
 
-        {/* Status toggle — tap to mark done/undo */}
+        {/* Status toggle — 3-state: scheduled → in_progress → done */}
         <button
-          aria-label={tr(isDone ? 'Undo completion' : 'Mark job complete')}
+          aria-label={tr(isDone ? 'Undo completion' : isInProgress ? 'Mark job complete' : 'Start work')}
           onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60 hover:scale-105'}`}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : isInProgress ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 hover:scale-105' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60 hover:scale-105'}`}
         >
-          {isDone ? <Check className="w-6 h-6" /> : <span>{index + 1}</span>}
+          {isDone ? <Check className="w-6 h-6" /> : isInProgress ? <Clock className="w-5 h-5" /> : <span>{index + 1}</span>}
         </button>
 
         {/* Info */}
@@ -125,13 +127,13 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
             )}
             <button
               onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-              className={`flex-1 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 min-h-[44px] ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'}`}
+              className={`flex-1 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 min-h-[44px] ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : isInProgress ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'}`}
             >
-              {tr(isDone ? 'Undo' : 'Mark Complete')}
+              {tr(isDone ? 'Undo' : isInProgress ? 'Mark Complete' : 'Start Work')}
             </button>
           </div>
           {/* Keyboard reordering buttons — hidden from mouse users, accessible to keyboard */}
-          {!isDone && (
+          {isActive && (
             <div className="flex gap-2">
               {onMoveUp && (
                 <button onClick={e => { e.stopPropagation(); onMoveUp(); }} className="sr-only focus:not-sr-only focus:btn-secondary focus:text-xs focus:gap-1" aria-label={tr("Move up")}>

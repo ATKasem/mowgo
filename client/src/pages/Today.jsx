@@ -51,6 +51,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [crewFilter, setCrewFilter] = useState(null); // null = show all
   const [teamDashboard, setTeamDashboard] = useState([]);
   const toggleTimeoutRef = useRef(null);
+  const statusToggleTimeoutsRef = useRef(new Map());
+  const pendingRecurringRef = useRef(new Set());
   const jobsRef = useRef(jobs);
   const formRef = useRef(form);
 
@@ -64,7 +66,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const filtered = useMemo(() => crewFilter
     ? dateFiltered.filter(j => j.assigned_to === crewFilter)
     : dateFiltered, [dateFiltered, crewFilter]);
-  const doneCount = useMemo(() => filtered.filter(j => j.status === 'done').length, [filtered]);
+  const doneCount = useMemo(() => filtered.filter(j => j.status === 'done' || j.status === 'in_progress').length, [filtered]);
 
   // Signal badge on FAB when there's something the AI can help with
   useEffect(() => {
@@ -147,27 +149,32 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
 
   const toggleStatus = useCallback(async (job) => {
     setAnimating(job.id);
-    if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
-    toggleTimeoutRef.current = setTimeout(async () => {
+    const pendingToggle = statusToggleTimeoutsRef.current.get(job.id);
+    if (pendingToggle) clearTimeout(pendingToggle);
+    const toggleTimeout = setTimeout(async () => {
+      statusToggleTimeoutsRef.current.delete(job.id);
       try {
-        const newStatus = job.status === 'done' ? 'scheduled' : 'done';
+        const newStatus = job.status === 'scheduled' ? 'in_progress' : job.status === 'in_progress' ? 'done' : 'scheduled';
         await updateJobStatus(job.id, newStatus);
 
         // Update state outside the callback to avoid race condition
         setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: newStatus } : j));
 
         // Auto-regenerate recurring jobs (outside setJobs to avoid race)
-        if (job.status !== 'done' && job.recurrence && job.recurrence !== 'none') {
+        // Only generate next occurrence when job is newly completed
+        if (newStatus === 'done' && job.recurrence && job.recurrence !== 'none') {
           const nextDate = getNextDate(job.scheduled_date, job.recurrence);
           if (nextDate) {
             // Check if next occurrence already exists to prevent duplicates
+            const dedupeKey = `${job.client_id}:${nextDate}:${job.title}`;
             const alreadyExists = jobsRef.current.some(j =>
               j.client_id === job.client_id &&
               j.scheduled_date === nextDate &&
               j.title === job.title
-            );
+            ) || pendingRecurringRef.current.has(dedupeKey);
             const recLabel = RECURRENCE_OPTIONS.find(r => r.value === job.recurrence)?.label || job.recurrence;
             if (!alreadyExists) {
+              pendingRecurringRef.current.add(dedupeKey);
               createJob({
                 client_id: job.client_id,
                 title: job.title,
@@ -178,12 +185,14 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
                 route_order: 99,
                 assigned_to: job.assigned_to || null,
               }).then(nextJob => {
+                pendingRecurringRef.current.delete(dedupeKey);
                 if (nextJob) setJobs(p => [...p, nextJob]);
                 const clientName = job.clients?.name || tr('Job');
                 setCompletedToast({ name: tr('{{client}} · Next {{recurrence}} job created', { client: clientName, recurrence: tr(recLabel) }), amount: job.clients?.rate || 0, type: 'recurring' });
                 if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
                 toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
               }).catch(err => {
+                pendingRecurringRef.current.delete(dedupeKey);
                 console.error('failed to create recurring job:', err);
                 const clientName = job.clients?.name || tr('Job');
                 setCompletedToast({ name: tr('{{client}} · Failed to create recurring job', { client: clientName }), amount: 0, type: 'error' });
@@ -205,12 +214,16 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       } catch (err) { console.error('toggleStatus:', err); }
       setAnimating(null);
     }, 150);
+    statusToggleTimeoutsRef.current.set(job.id, toggleTimeout);
   }, [setJobs]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
+    const statusToggleTimeouts = statusToggleTimeoutsRef.current;
     return () => {
       if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+      statusToggleTimeouts.forEach(clearTimeout);
+      statusToggleTimeouts.clear();
     };
   }, []);
 
@@ -311,7 +324,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Today")}</h2>
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-sm text-gray-500 dark:text-gray-400">{tr('{{count}} job', { count: filtered.length })}</p>
-            {doneCount > 0 && <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{tr('{{count}} done', { count: doneCount })}</span></>}
+            {doneCount > 0 && <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{tr('{{count}} completed', { count: doneCount })}</span></>}
             {filtered.some(j => j.recurrence && j.recurrence !== 'none') && (
               <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-violet-600 dark:text-violet-400 font-medium inline-flex items-center gap-1"><Repeat className="w-3 h-3" />{tr("Recurring")}</span></>
             )}
@@ -459,7 +472,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           <div className="space-y-2">
             {teamDashboard.map((member, i) => {
               const color = TEAM_MEMBER_COLORS[i % TEAM_MEMBER_COLORS.length];
-              const pct = member.total > 0 ? Math.round((member.done / member.total) * 100) : 0;
+              const completed = (member.done || 0) + (member.in_progress || 0);
+              const pct = member.total > 0 ? Math.round((completed / member.total) * 100) : 0;
               return (
                 <div key={member.id} className="flex items-center gap-3">
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${color.bg} ${color.text}`}>
@@ -468,7 +482,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{member.name}</span>
-                      <span className="text-[11px] text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">{member.done}/{member.total} {tr("done")}</span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">{completed}/{member.total} {tr("completed")}</span>
                     </div>
                     <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />

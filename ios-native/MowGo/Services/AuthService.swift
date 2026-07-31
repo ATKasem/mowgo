@@ -108,7 +108,7 @@ final class AuthService: ObservableObject {
                     try? await Task.sleep(for: .seconds(1))
                 } else {
                     self.error = "Unable to load your profile: \(error.localizedDescription). Please sign in again."
-                    self.isAuthenticated = false
+                    await signOut()
                 }
             }
         }

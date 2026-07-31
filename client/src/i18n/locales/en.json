@@ -842,6 +842,22 @@
     "all": "All",
     "chance_of_rain_move": "chance of rain — move",
     "remaining_to_tomorrow": "remaining to tomorrow",
+    "completed": "completed",
+    "count_completed": "{{count}} completed",
     "job_already_scheduled": "job already scheduled"
+  },
+  "dashboard": {
+    "revenue_today": "Revenue Today",
+    "jobs_done": "jobs done",
+    "outstanding": "Outstanding",
+    "unpaid_invoices": "Unpaid invoices",
+    "jobs_this_week": "Jobs This Week",
+    "revenue": "revenue",
+    "active_clients": "Active Clients",
+    "recurring": "recurring",
+    "dashboard": "Dashboard",
+    "done": "done",
+    "no_jobs_today": "No jobs today",
+    "retry": "Retry"
   }
 }

@@ -3,7 +3,7 @@
  * POST /api/stripe/create-portal-session
  */
 
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://cleanmowgo.pages.dev', 'https://mowgo.app'];
+const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgo.app'];
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get('origin');

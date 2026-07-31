@@ -11,7 +11,7 @@ import AutopilotChat from './AutopilotChat';
 import { isCurrentlyOffline } from '../lib/offlineStorage';
 
 const navItems = [
-  { to: '/app', icon: LayoutDashboard, title: 'Home', exact: true },
+  { to: '/app', icon: LayoutDashboard, title: 'Dashboard', exact: true },
   { to: '/app/today', icon: Calendar, title: 'Today' },
   { to: '/app/clients', icon: Users, title: 'Clients' },
   { to: '/app/invoices', icon: FileText, title: 'Invoices' },
@@ -30,7 +30,7 @@ export default function Layout() {
   // Derive page context from current route
   const pageContext = (() => {
     const path = location.pathname;
-    if (path === '/app' || path === '/app/') return { page: 'Home', description: 'You are on the home dashboard.' };
+    if (path === '/app' || path === '/app/') return { page: 'Dashboard', description: 'You are viewing the business dashboard.' };
     if (path.startsWith('/app/today')) return { page: 'Today', description: 'You are viewing today\'s schedule.' };
     if (path.startsWith('/app/clients')) return { page: 'Clients', description: 'You are viewing the client list.' };
     if (path.startsWith('/app/invoices')) return { page: 'Invoices', description: 'You are viewing invoices.' };

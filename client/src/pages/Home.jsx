@@ -93,6 +93,7 @@ export default function Home({ jobs = [], invoices = [] }) {
           `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&temperature_unit=fahrenheit&timezone=auto&forecast_days=10`,
           { signal }
         );
+        if (!res.ok) throw new Error(`Weather API ${res.status}`);
         const data = await res.json();
         if (!signal.aborted) setWeather(data);
       } catch { /* offline or API down — silent fallback */ }
@@ -129,7 +130,7 @@ export default function Home({ jobs = [], invoices = [] }) {
 
   // ===== Stats =====
   const todayJobs = useMemo(() => jobs.filter(j => j.scheduled_date === today), [jobs, today]);
-  const doneToday = todayJobs.filter(j => j.status === 'done').length;
+  const doneToday = todayJobs.filter(j => j.status === 'done' || j.status === 'in_progress').length;
   const totalToday = todayJobs.length;
   const todayRevenue = todayJobs.filter(j => j.status === 'done').reduce((s, j) => s + (j.clients?.rate || 0), 0);
   const unpaidInvoices = invoices.filter(i => i.status !== 'paid');
@@ -253,7 +254,7 @@ export default function Home({ jobs = [], invoices = [] }) {
               <div className="space-y-2">
                 {showForm.jobs.map((job, ji) => (
                   <div key={job.id} className="flex items-center gap-2.5 p-2 -mx-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${job.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${job.status === 'done' ? 'bg-emerald-400' : job.status === 'in_progress' ? 'bg-sky-400' : 'bg-amber-400'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>

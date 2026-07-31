@@ -15,7 +15,6 @@
 
 const ALLOWED_ORIGINS = [
   'https://mowgo.pages.dev',
-  'https://cleanmowgo.pages.dev',
   'https://mowgo.app',
   'http://localhost:5173',
   'http://localhost:4173'
