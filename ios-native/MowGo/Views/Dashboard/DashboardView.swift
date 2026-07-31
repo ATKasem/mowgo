@@ -12,11 +12,12 @@ struct DashboardView: View {
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
 
-    private let dateFormatter: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0); return f
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0)
+        f.locale = Locale(identifier: "en_US_POSIX"); f.calendar = Calendar(identifier: .gregorian); return f
     }()
 
-    private let currencyFormatter: NumberFormatter = {
+    private static let currencyFormatter: NumberFormatter = {
         let f = NumberFormatter(); f.numberStyle = .currency; f.currencySymbol = "$"; return f
     }()
 
@@ -25,14 +26,14 @@ struct DashboardView: View {
     // MARK: - Stats
 
     private var today: String {
-        dateFormatter.string(from: Date())
+        Self.dateFormatter.string(from: Date())
     }
 
     private func localDate(_ offsetDays: Int) -> String {
         guard let d = Calendar.current.date(byAdding: .day, value: offsetDays, to: Date()) else {
-            return today // fallback to today on overflow
+            return today
         }
-        return dateFormatter.string(from: d)
+        return Self.dateFormatter.string(from: d)
     }
 
     private var todayJobs: [Job] {
@@ -150,7 +151,7 @@ struct DashboardView: View {
     // MARK: - Helpers
 
     private func formatCurrency(_ amount: Decimal) -> String {
-        return currencyFormatter.string(from: amount as NSDecimalNumber) ?? "$0"
+        return Self.currencyFormatter.string(from: amount as NSDecimalNumber) ?? "$0"
     }
 }
 
