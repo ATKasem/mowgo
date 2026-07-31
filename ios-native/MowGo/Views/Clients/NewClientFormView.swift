@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct NewClientFormView: View {
     @EnvironmentObject var store: DataStore
@@ -28,11 +29,22 @@ struct NewClientFormView: View {
     @State private var cleaningNotes: String
     @State private var isSaving = false
     @State private var error: String?
+    @State private var addressSuggestions: [MKLocalSearchCompletion] = []
+    @State private var isShowingSuggestions = false
 
     private enum Field { case name, address, phone, email, rate, keyCode, alarmCode, pets, notes }
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    private let searchCompleter: MKLocalSearchCompleter
+    private let searchDelegate: SearchDelegate
 
     init(client: Client? = nil) {
+        let searchCompleter = MKLocalSearchCompleter()
+        searchCompleter.resultTypes = .address
+        let searchDelegate = SearchDelegate { _ in }
+        searchCompleter.delegate = searchDelegate
+        self.searchCompleter = searchCompleter
+        self.searchDelegate = searchDelegate
+
         self.client = client
         _name = State(initialValue: client?.name ?? "")
         _address = State(initialValue: client?.address ?? "")
@@ -62,13 +74,50 @@ struct NewClientFormView: View {
                                 .focused($focusedField, equals: .name)
                                 .onSubmit { focusedField = .address }
                         }
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 0) {
                             Text("Address").font(.caption).foregroundColor(.secondary)
                             TextField("", text: $address)
                                 .textContentType(.fullStreetAddress)
                                 .submitLabel(.next)
                                 .focused($focusedField, equals: .address)
                                 .onSubmit { focusedField = .phone }
+                                .onChange(of: address) { _, newValue in
+                                    if newValue.count >= 3 {
+                                        searchCompleter.queryFragment = newValue
+                                        isShowingSuggestions = true
+                                    } else {
+                                        addressSuggestions = []
+                                        isShowingSuggestions = false
+                                    }
+                                }
+
+                            if isShowingSuggestions && !addressSuggestions.isEmpty {
+                                ScrollView {
+                                    LazyVStack(alignment: .leading, spacing: 0) {
+                                        ForEach(addressSuggestions, id: \.self) { suggestion in
+                                            Button {
+                                                address = suggestion.title + ", " + suggestion.subtitle
+                                                isShowingSuggestions = false
+                                                addressSuggestions = []
+                                            } label: {
+                                                VStack(alignment: .leading) {
+                                                    Text(suggestion.title).font(.caption)
+                                                    if !suggestion.subtitle.isEmpty {
+                                                        Text(suggestion.subtitle)
+                                                            .font(.caption2)
+                                                            .foregroundColor(.secondary)
+                                                    }
+                                                }
+                                                .padding(.vertical, 8)
+                                            }
+                                            Divider()
+                                        }
+                                    }
+                                }
+                                .frame(maxHeight: 200)
+                                .background(Color(.systemBackground))
+                                .cornerRadius(8)
+                            }
                         }
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Phone").font(.caption).foregroundColor(.secondary)
@@ -142,6 +191,15 @@ struct NewClientFormView: View {
                 .scrollContentBackground(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
+            .onAppear {
+                searchDelegate.onUpdate = { results in
+                    addressSuggestions = results
+                }
+            }
+            .onDisappear {
+                searchCompleter.cancel()
+                searchDelegate.onUpdate = { _ in }
+            }
             .navigationTitle(client == nil ? "New Client" : "Edit Client")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -165,6 +223,18 @@ struct NewClientFormView: View {
             } message: {
                 Text(error ?? "Please check the form and try again.")
             }
+        }
+    }
+
+    private final class SearchDelegate: NSObject, MKLocalSearchCompleterDelegate {
+        var onUpdate: ([MKLocalSearchCompletion]) -> Void
+
+        init(onUpdate: @escaping ([MKLocalSearchCompletion]) -> Void) {
+            self.onUpdate = onUpdate
+        }
+
+        func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+            onUpdate(completer.results)
         }
     }
 
