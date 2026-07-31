@@ -57,10 +57,13 @@ struct TodayView: View {
         todayJobs.filter { $0.status == .scheduled }.count
     }
 
+    private var completedCount: Int {
+        todayJobs.filter { $0.status == .done }.count
+    }
+
     // MARK: - Stats
 
     private var totalClients: Int { store.clients.count }
-    private var unpaidCount: Int { store.invoices.filter { $0.status == .unpaid }.count }
     private var weeklyRevenue: Decimal {
         let cal = Calendar.current
         return store.invoices
@@ -291,7 +294,7 @@ struct TodayView: View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
             StatCard(title: "Scheduled", value: "\(scheduledCount)", icon: "list.clipboard", color: "f59e0b")
             StatCard(title: "Clients", value: "\(totalClients)", icon: "person.2", color: "3b82f6")
-            StatCard(title: "Unpaid", value: "\(unpaidCount)", icon: "doc.text", color: "ef4444")
+            StatCard(title: "Done", value: "\(completedCount)", icon: "checkmark.circle", color: "10b981")
             StatCard(
                 title: "Revenue",
                 value: (weeklyRevenue / 100).formatted(.currency(code: "USD")),
