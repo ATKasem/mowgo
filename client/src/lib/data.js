@@ -168,6 +168,7 @@ export async function createJob(job) {
       key_code: data.clients.key_code,
       alarm_code: data.clients.alarm_code,
       pet_instructions: data.clients.pet_instructions,
+      tags: data.clients.tags || [],
     } : null,
   };
 }
@@ -355,7 +356,8 @@ export async function createClient(client) {
 
 export async function updateClient(id, updates) {
   if (isDemoMode()) {
-    _clients = _clients.map(c => c.id === id ? { ...c, ...updates } : c);
+    const { id: _excludeId, ...safeUpdates } = { ...updates };
+    _clients = _clients.map(c => c.id === id ? { ...c, ...safeUpdates } : c);
     notify();
     return _clients.find(c => c.id === id);
   }

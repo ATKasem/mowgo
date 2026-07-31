@@ -32,6 +32,7 @@ export default function Clients({ jobs = [] }) {
   const [showSort, setShowSort] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [actionError, setActionError] = useState('');
   const sortRef = useRef(null);
 
   useEffect(() => {
@@ -93,6 +94,8 @@ export default function Clients({ jobs = [] }) {
       if (expandedId === id) setExpandedId(null);
     } catch (err) {
       console.error('remove client:', err);
+      setActionError(tr('Failed to delete client. Please try again.'));
+      setTimeout(() => setActionError(''), 4000);
     }
   }
 
@@ -160,6 +163,12 @@ export default function Clients({ jobs = [] }) {
           )}
         </div>
       </div>
+
+      {actionError && (
+        <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3 mb-4" role="alert">
+          {actionError}
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={save} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
