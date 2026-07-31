@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useContext } from 'react';
-import { loadJobs, loadInvoices, loadClients, loadProfile } from '../lib/data';
+import { loadJobs, loadInvoices, loadProfile } from '../lib/data';
 import { AuthContext } from '../App';
 import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle } from 'lucide-react';
 
@@ -25,16 +25,18 @@ export default function Dashboard() {
     let mounted = true;
     async function fetchStats() {
       try {
-        const [jobs, invoices, clients, profile] = await Promise.all([
-          loadJobs(), loadInvoices(), loadClients(), loadProfile(),
+        const [jobs, invoices, profile] = await Promise.all([
+          loadJobs(), loadInvoices(), loadProfile(),
         ]);
         if (!mounted) return;
 
-        // Set role for crew filtering — default to 'unknown' so failures don't leak revenue
-        setRole(profile?.role || 'unknown');
+        // Set role for crew filtering — conservative default: no profile = no revenue
+        const userRole = profile?.role;
+        setRole(userRole);
+        if (!userRole) setRole('unknown'); // safety: unknown role sees limited view
 
         const today = localDate();
-        const weekAgo = localDate(-7);
+        const weekAgo = localDate(-6); // Mon-Sun = 7 days inclusive
 
         // Today
         const todayJobs = jobs.filter(j => j.scheduled_date === today);
@@ -53,13 +55,13 @@ export default function Dashboard() {
 
         // Recurring — count unique CLIENT IDs with recurring jobs, not total jobs
         const recurringClientIds = new Set(
-          jobs.filter(j => j.recurrence && j.recurrence !== 'none').map(j => j.client_id)
+          jobs.filter(j => j.client_id && j.recurrence && j.recurrence !== 'none').map(j => j.client_id)
         );
 
         // Active clients — only those with jobs in the last 30 days (not future)
         const thirtyDaysAgo = localDate(-30);
         const activeClientIds = new Set(
-          jobs.filter(j => j.scheduled_date >= thirtyDaysAgo && j.scheduled_date <= today).map(j => j.client_id)
+          jobs.filter(j => j.client_id && j.scheduled_date >= thirtyDaysAgo && j.scheduled_date <= today).map(j => j.client_id)
         );
 
         setStats({
@@ -110,8 +112,8 @@ export default function Dashboard() {
     );
   }
 
-  // Crew members see a limited view — no revenue numbers
-  if (role === 'crew') {
+  // Only confirmed owners see revenue — crew, unknown, and null roles get limited view
+  if (role !== 'owner') {
     return (
       <div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-5">{tr('Dashboard')}</h2>
