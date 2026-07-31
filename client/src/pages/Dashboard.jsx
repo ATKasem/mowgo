@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [role, setRole] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -84,7 +85,7 @@ export default function Dashboard() {
     }
     fetchStats();
     return () => { mounted = false; };
-  }, [user]);
+  }, [user, retryKey]);
 
   if (loading) {
     return (
@@ -99,7 +100,7 @@ export default function Dashboard() {
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <AlertCircle className="w-8 h-8 text-amber-500" />
         <p className="text-sm text-gray-500 dark:text-gray-400">{error}</p>
-        <button onClick={() => window.location.reload()} className="btn-secondary text-sm">{tr('Retry')}</button>
+        <button onClick={() => { setError(''); setLoading(true); setRetryKey(k => k + 1); }} className="btn-secondary text-sm">{tr('Retry')}</button>
       </div>
     );
   }
