@@ -51,19 +51,19 @@ struct JobCardView: View {
     // MARK: - Status icon helpers (computed outside ViewBuilder)
 
     private var statusIconName: String {
-        job.status == .done ? "checkmark.circle.fill" : "circle"
+        job.status == .done ? "checkmark.circle.fill" : job.status == .inProgress ? "clock.fill" : "circle"
     }
 
     private var statusIconColor: Color {
-        job.status == .done ? MowGoTheme.deepGreen : .gray
+        job.status == .done ? MowGoTheme.deepGreen : job.status == .inProgress ? .cyan : .gray
     }
 
     private var statusLabelText: String {
-        job.status == .done ? "Undo" : "Complete"
+        job.status == .done ? "Undo" : job.status == .inProgress ? "Complete" : "Start"
     }
 
     private var statusAccessibilityLabel: String {
-        job.status == .done ? "Undo job completion" : "Mark job as complete"
+        job.status == .done ? "Undo job completion" : job.status == .inProgress ? "Mark job complete" : "Start job"
     }
 
     var body: some View {
