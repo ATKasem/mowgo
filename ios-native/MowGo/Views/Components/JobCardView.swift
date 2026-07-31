@@ -198,7 +198,7 @@ struct JobCardView: View {
                 Button {
                     showMapPicker = true
                 } label: {
-                    Image(systemName: "map.fill")
+                    Image(systemName: "location.fill")
                         .font(.caption)
                         .foregroundColor(MowGoTheme.info)
                         .frame(width: 28, height: 28)
