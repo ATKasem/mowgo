@@ -11,6 +11,7 @@ struct DashboardView: View {
     @EnvironmentObject var auth: AuthService
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
+    @Binding var selectedTab: Int
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
@@ -101,6 +102,7 @@ struct DashboardView: View {
                             label: "Revenue Today",
                             sub: todayJobs.isEmpty ? "No jobs today" : "\(todayDone.count)/\(todayJobs.count) jobs done"
                         )
+                        .onTapGesture { selectedTab = 1 }
                         DashboardCard(
                             icon: "doc.text.fill",
                             color: .orange,
@@ -108,6 +110,7 @@ struct DashboardView: View {
                             label: "Outstanding",
                             sub: "Unpaid invoices"
                         )
+                        .onTapGesture { selectedTab = 3 }
                         DashboardCard(
                             icon: "checkmark.circle.fill",
                             color: .purple,
@@ -115,6 +118,7 @@ struct DashboardView: View {
                             label: "Jobs This Week",
                             sub: "\(formatCurrency(weeklyRevenue)) revenue"
                         )
+                        .onTapGesture { selectedTab = 1 }
                         DashboardCard(
                             icon: "person.2.fill",
                             color: .blue,
@@ -122,6 +126,7 @@ struct DashboardView: View {
                             label: "Active Clients",
                             sub: "\(recurringClients) recurring"
                         )
+                        .onTapGesture { selectedTab = 2 }
                     }
                 } else {
                     // Crew — 2 cards, no revenue
@@ -133,6 +138,7 @@ struct DashboardView: View {
                             label: "Jobs This Week",
                             sub: "\(weeklyDone.count) done"
                         )
+                        .onTapGesture { selectedTab = 1 }
                         DashboardCard(
                             icon: "person.2.fill",
                             color: .blue,
@@ -140,6 +146,7 @@ struct DashboardView: View {
                             label: "Active Clients",
                             sub: nil
                         )
+                        .onTapGesture { selectedTab = 2 }
                     }
                 }
             }
@@ -158,11 +165,14 @@ struct DashboardView: View {
 // MARK: - Dashboard Card
 
 private struct DashboardCard: View {
+    @Environment(\.colorScheme) private var colorScheme
     let icon: String
     let color: Color
     let value: String
     let label: String
     let sub: String?
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -175,22 +185,22 @@ private struct DashboardCard: View {
 
             Text(value)
                 .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.primary)
+                .foregroundColor(theme.textPrimary)
 
             Text(label)
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(.secondary)
+                .foregroundColor(theme.textSecondary)
 
             if let sub = sub {
                 Text(sub)
                     .font(.caption)
-                    .foregroundColor(.secondary.opacity(0.7))
+                    .foregroundColor(theme.textMuted)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(theme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
     }

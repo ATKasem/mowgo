@@ -16,7 +16,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            DashboardView()
+            DashboardView(selectedTab: $selectedTab)
                 .tabItem { Label("Dashboard", systemImage: "rectangle.grid.1x2.fill") }
                 .tag(0)
 
