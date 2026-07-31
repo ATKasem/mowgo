@@ -15,6 +15,10 @@ struct DashboardView: View {
     @Binding var selectedTab: Int
     @State private var showAddJob = false
     @State private var showAddClient = false
+    @State private var showInviteCrew = false
+    @State private var inviteEmail = ""
+    @State private var inviteError: String?
+    @State private var isInviting = false
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
@@ -106,6 +110,7 @@ struct DashboardView: View {
                 if isOwner { quickActionsSection }
                 todayPreviewSection
                 if isOwner && !teamProgressRows.isEmpty { teamProgressSection }
+                if isOwner { crewRosterSection }
             }
             .padding(16)
         }
@@ -123,6 +128,9 @@ struct DashboardView: View {
             if isOwner {
                 Task { await store.loadTeamMembers() }
             }
+        }
+        .sheet(isPresented: $showInviteCrew) {
+            inviteCrewSheet
         }
     }
 
@@ -308,6 +316,149 @@ struct DashboardView: View {
                 }
             }
             .frame(height: 6)
+        }
+    }
+
+    // MARK: - Crew Roster
+
+    private var crewRosterSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Crew")
+                    .font(.headline)
+                    .foregroundColor(theme.textPrimary)
+                Spacer()
+                Button { showInviteCrew = true } label: {
+                    Label("Invite", systemImage: "person.badge.plus")
+                        .font(.caption.weight(.semibold))
+                }
+                .foregroundColor(MowGoTheme.deepGreen)
+            }
+
+            if store.teamMembers.isEmpty {
+                Text("No crew members yet")
+                    .font(.subheadline)
+                    .foregroundColor(theme.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 12)
+            } else {
+                ForEach(store.teamMembers) { member in
+                    crewMemberRow(member)
+                }
+            }
+        }
+        .padding(16)
+        .background(theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func crewMemberRow(_ member: UserProfile) -> some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(member.role == "owner" ? MowGoTheme.deepGreen : MowGoTheme.info)
+                .frame(width: 8, height: 8)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(member.businessName ?? "Crew Member")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(theme.textPrimary)
+                Text(member.role == "owner" ? "Owner" : "Crew")
+                    .font(.caption)
+                    .foregroundColor(theme.textMuted)
+            }
+
+            Spacer()
+
+            if member.role != "owner" {
+                Button {
+                    Task {
+                        do {
+                            try await store.removeTeamMember(member)
+                        } catch {
+                            // silently handle
+                        }
+                    }
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    // MARK: - Invite Sheet
+
+    private var inviteCrewSheet: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("Invite a crew member to join your team.")
+                    .font(.subheadline)
+                    .foregroundColor(theme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 20)
+
+                TextField("Email address", text: $inviteEmail)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .padding(12)
+                    .background(theme.surfaceElevated)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal, 16)
+
+                if let error = inviteError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+
+                Button {
+                    Task {
+                        isInviting = true
+                        inviteError = nil
+                        do {
+                            try await store.inviteTeamMember(email: inviteEmail)
+                            inviteEmail = ""
+                            showInviteCrew = false
+                        } catch {
+                            inviteError = error.localizedDescription
+                        }
+                        isInviting = false
+                    }
+                } label: {
+                    HStack {
+                        if isInviting {
+                            ProgressView().tint(.white)
+                        }
+                        Text("Send Invite")
+                    }
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(inviteEmail.trimmingCharacters(in: .whitespaces).isEmpty ? Color.gray : MowGoTheme.deepGreen)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .disabled(inviteEmail.trimmingCharacters(in: .whitespaces).isEmpty || isInviting)
+                .padding(.horizontal, 16)
+
+                Spacer()
+            }
+            .background(theme.background)
+            .navigationTitle("Invite Crew")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        inviteEmail = ""
+                        inviteError = nil
+                        showInviteCrew = false
+                    }
+                }
+            }
         }
     }
 
