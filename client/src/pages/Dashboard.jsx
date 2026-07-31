@@ -24,6 +24,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     let mounted = true;
+    // Reset state on user change to prevent stale data leak
+    setLoading(true);
+    setError('');
+    setStats(null);
+    setRole(null);
     async function fetchStats() {
       try {
         const [jobs, invoices, profile] = await Promise.all([
@@ -54,13 +59,13 @@ export default function Dashboard() {
         const weeklyDone = weeklyJobs.filter(j => j.status === 'done');
         const weeklyRevenue = weeklyDone.reduce((sum, j) => sum + (j.clients?.rate || 0), 0);
 
-        // Recurring — count unique CLIENT IDs with recurring jobs, not total jobs
+        // Recurring — count unique CLIENTS with active recurring jobs (future or today)
         const recurringClientIds = new Set(
-          jobs.filter(j => j.client_id && j.recurrence && j.recurrence !== 'none').map(j => j.client_id)
+          jobs.filter(j => j.client_id && j.recurrence && j.recurrence !== 'none' && j.scheduled_date >= today).map(j => j.client_id)
         );
 
         // Active clients — only those with jobs in the last 30 days (not future)
-        const thirtyDaysAgo = localDate(-30);
+        const thirtyDaysAgo = localDate(-29);
         const activeClientIds = new Set(
           jobs.filter(j => j.client_id && j.scheduled_date >= thirtyDaysAgo && j.scheduled_date <= today).map(j => j.client_id)
         );
