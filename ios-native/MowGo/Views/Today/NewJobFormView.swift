@@ -15,7 +15,6 @@ struct NewJobFormView: View {
     let date: String
     var teamMembers: [UserProfile] = []
 
-    @State private var title = ""
     @State private var clientId: UUID?
     @State private var assignedTo: UUID? = nil
     @State private var scheduledTime = Date()
@@ -39,12 +38,6 @@ struct NewJobFormView: View {
                 theme.background.ignoresSafeArea()
                 Form {
                     Section("Job Details") {
-                        HStack(spacing: 0) {
-                            TextField("Title (e.g. Weekly Mow)", text: $title)
-                                .textContentType(.name)
-                            Text(" *").foregroundColor(.red).font(.caption)
-                        }
-                        .accessibilityLabel("Title, required")
                         Picker(selection: $clientId) {
                             ForEach(store.clients) { client in
                                 Text(client.name).tag(client.id as UUID?)
@@ -126,7 +119,6 @@ struct NewJobFormView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { save() }
                         .disabled(
-                            title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
                             clientId == nil ||
                             isSaving
                         )
@@ -144,15 +136,11 @@ struct NewJobFormView: View {
     }
 
     private func save() {
-        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedTitle.isEmpty else {
-            error = "Enter a job title."
-            return
-        }
         guard let clientId else {
             error = "Select a client."
             return
         }
+        let jobTitle = store.clients.first(where: { $0.id == clientId })?.name ?? "Job"
 
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
@@ -163,7 +151,7 @@ struct NewJobFormView: View {
             id: UUID(),
             clientId: clientId,
             assignedTo: assignedTo,
-            title: trimmedTitle,
+            title: jobTitle,
             scheduledDate: date,
             scheduledTime: timeFmt.string(from: scheduledTime),
             durationMinutes: duration,
@@ -184,7 +172,7 @@ struct NewJobFormView: View {
                     let template = RecurringJob(
                         id: UUID(),
                         clientId: clientId,
-                        title: trimmedTitle,
+                        title: jobTitle,
                         scheduledTime: timeFmt.string(from: scheduledTime),
                         durationMinutes: duration,
                         assignedTo: assignedTo,
