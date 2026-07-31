@@ -120,39 +120,27 @@ struct ClientCard: View {
             }
 
             if isExpanded {
-                let details: [(icon: String, text: String, action: (() -> Void)?)] = {
-                    var items: [(icon: String, text: String, action: (() -> Void)?)] = []
-                    if let phone = client.phone {
-                        items.append(("phone", phone, { callPhone(phone) }))
-                    }
-                    if let key = client.keyCode {
-                        items.append(("lock", "Gate: \(key)", nil))
-                    }
-                    if let pets = client.petInstructions {
-                        items.append(("pawprint", pets, nil))
-                    }
-                    if let notes = client.cleaningNotes {
-                        items.append(("note.text", notes, nil))
-                    }
-                    if let address = client.address {
-                        items.append(("map", "Navigate", { openMaps(address) }))
-                    }
-                    return items
-                }()
-
-                let pairs = stride(from: 0, to: details.count, by: 2).map { i in
-                    (details[i], i + 1 < details.count ? details[i + 1] : nil)
-                }
-                ForEach(Array(pairs.enumerated()), id: \.offset) { _, pair in
-                    HStack(spacing: 6) {
-                        detailButton(pair.0)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        if let second = pair.1 {
-                            detailButton(second)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        } else {
-                            Spacer().frame(maxWidth: .infinity)
+                VStack(alignment: .leading, spacing: 4) {
+                    if let phone = client.phone, !phone.isEmpty {
+                        Button(action: { callPhone(phone) }) {
+                            DetailRow(icon: "phone", text: phone)
                         }
+                        .accessibilityLabel("Call \(phone)")
+                    }
+                    if let key = client.keyCode, !key.isEmpty {
+                        DetailRow(icon: "lock", text: "Gate: \(key)")
+                    }
+                    if let pets = client.petInstructions, !pets.isEmpty {
+                        DetailRow(icon: "pawprint", text: pets)
+                    }
+                    if let address = client.address, !address.isEmpty {
+                        Button(action: { openMaps(address) }) {
+                            DetailRow(icon: "map", text: address)
+                        }
+                        .accessibilityLabel("Navigate to \(address)")
+                    }
+                    if let notes = client.cleaningNotes, !notes.isEmpty {
+                        DetailRow(icon: "note.text", text: notes)
                     }
                 }
                 .padding(.horizontal, 12).padding(.bottom, 8)
@@ -169,17 +157,6 @@ struct ClientCard: View {
             }
         }
         .background(theme.surface).cornerRadius(12)
-    }
-
-    @ViewBuilder
-    private func detailButton(_ detail: (icon: String, text: String, action: (() -> Void)?)) -> some View {
-        if let action = detail.action {
-            Button(action: action) {
-                DetailRow(icon: detail.icon, text: detail.text)
-            }
-        } else {
-            DetailRow(icon: detail.icon, text: detail.text)
-        }
     }
 
     private func openMaps(_ address: String) {
@@ -208,13 +185,13 @@ struct DetailRow: View {
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 2) {
             Image(systemName: icon)
-                .font(.caption)
+                .font(.system(size: 9))
                 .foregroundColor(theme.textInverse)
                 .frame(width: 16)
             Text(text)
-                .font(.caption)
+                .font(.caption2)
                 .foregroundColor(theme.textSecondary)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         }

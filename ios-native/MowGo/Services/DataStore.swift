@@ -535,6 +535,12 @@ final class DataStore: ObservableObject {
         )
     }
 
+    private func refreshJobClientRefs(for clientId: UUID) {
+        for idx in jobs.indices where jobs[idx].clientId == clientId {
+            attachClientRef(to: &jobs[idx])
+        }
+    }
+
     func createJob(_ job: Job) async throws {
         var job = job
         attachClientRef(to: &job)
@@ -901,6 +907,7 @@ final class DataStore: ObservableObject {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
+            refreshJobClientRefs(for: updated.id)
             enqueue("client:update", id: client.id, payload: updated)
             return
         }
@@ -919,10 +926,12 @@ final class DataStore: ObservableObject {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
+            refreshJobClientRefs(for: updated.id)
         } catch {
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
+            refreshJobClientRefs(for: updated.id)
             enqueue("client:update", id: client.id, payload: updated)
             throw error
         }
