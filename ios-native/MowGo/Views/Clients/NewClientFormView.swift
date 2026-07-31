@@ -92,29 +92,45 @@ struct NewClientFormView: View {
                             if isShowingSuggestions && !addressSuggestions.isEmpty {
                                 ScrollView {
                                     LazyVStack(alignment: .leading, spacing: 0) {
-                                        ForEach(addressSuggestions, id: \.self) { suggestion in
+                                        ForEach(Array(addressSuggestions.enumerated()), id: \.offset) { idx, suggestion in
                                             Button {
-                                                address = suggestion.title + ", " + suggestion.subtitle
+                                                address = suggestion.title + (suggestion.subtitle.isEmpty ? "" : ", \(suggestion.subtitle)")
                                                 isShowingSuggestions = false
                                                 addressSuggestions = []
+                                                searchCompleter.cancel()
                                             } label: {
-                                                VStack(alignment: .leading) {
-                                                    Text(suggestion.title).font(.caption)
-                                                    if !suggestion.subtitle.isEmpty {
-                                                        Text(suggestion.subtitle)
-                                                            .font(.caption2)
-                                                            .foregroundColor(.secondary)
+                                                HStack {
+                                                    Image(systemName: "mappin.and.ellipse")
+                                                        .font(.caption)
+                                                        .foregroundColor(.secondary)
+                                                    VStack(alignment: .leading, spacing: 1) {
+                                                        Text(suggestion.title)
+                                                            .font(.caption)
+                                                            .foregroundColor(.primary)
+                                                        if !suggestion.subtitle.isEmpty {
+                                                            Text(suggestion.subtitle)
+                                                                .font(.caption2)
+                                                                .foregroundColor(.secondary)
+                                                        }
                                                     }
                                                 }
-                                                .padding(.vertical, 8)
+                                                .padding(.horizontal, 12)
+                                                .padding(.vertical, 10)
                                             }
-                                            Divider()
+                                            .buttonStyle(.plain)
+                                            if idx < addressSuggestions.count - 1 {
+                                                Divider().padding(.leading, 36)
+                                            }
                                         }
                                     }
+                                    .padding(.vertical, 4)
                                 }
-                                .frame(maxHeight: 200)
-                                .background(Color(.systemBackground))
-                                .cornerRadius(8)
+                                .frame(maxHeight: 220)
+                                .background(theme.surface)
+                                .cornerRadius(10)
+                                .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+                                .padding(.top, 4)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }
                         VStack(alignment: .leading, spacing: 2) {
