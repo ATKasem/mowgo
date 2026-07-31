@@ -193,34 +193,50 @@ struct JobCardView: View {
 
             Spacer(minLength: 0)
 
-            // Map pin — opens preferred GPS with client address
-            if let address = job.address, !address.isEmpty {
-                Button {
-                    showMapPicker = true
-                } label: {
-                    Image(systemName: "location.fill")
-                        .font(.caption)
-                        .foregroundColor(MowGoTheme.info)
-                        .frame(width: 28, height: 28)
-                        .background(theme.surfaceElevated)
-                        .cornerRadius(6)
-                }
-                .buttonStyle(.plain)
-                .confirmationDialog("Navigate", isPresented: $showMapPicker) {
-                    if let enc = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                        Button("Apple Maps") {
-                            UIApplication.shared.open(URL(string: "https://maps.apple.com/?q=\(enc)")!)
-                        }
-                        Button("Google Maps") {
-                            UIApplication.shared.open(URL(string: "comgooglemaps://?q=\(enc)")!)
-                        }
-                        Button("Waze") {
-                            UIApplication.shared.open(URL(string: "waze://?q=\(enc)")!)
-                        }
+            // Quick actions: Call + Navigate
+            HStack(spacing: 6) {
+                if let phone = job.clients?.phone, !phone.isEmpty {
+                    Button {
+                        let cleaned = phone.replacingOccurrences(of: " ", with: "")
+                            .replacingOccurrences(of: "-", with: "")
+                            .replacingOccurrences(of: "(", with: "")
+                            .replacingOccurrences(of: ")", with: "")
+                        UIApplication.shared.open(URL(string: "tel:\(cleaned)")!)
+                    } label: {
+                        Image(systemName: "phone.fill")
+                            .font(.caption)
+                            .foregroundColor(MowGoTheme.success)
+                            .frame(width: 28, height: 28)
+                            .background(theme.surfaceElevated)
+                            .cornerRadius(6)
                     }
-                    Button("Cancel", role: .cancel) { }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Call \(phone)")
                 }
-                .accessibilityLabel("Navigate to \(address)")
+
+                // Map pin — opens preferred GPS with client address
+                if let address = job.address, !address.isEmpty {
+                    Button {
+                        showMapPicker = true
+                    } label: {
+                        Image(systemName: "location.fill")
+                            .font(.caption)
+                            .foregroundColor(MowGoTheme.info)
+                            .frame(width: 28, height: 28)
+                            .background(theme.surfaceElevated)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .confirmationDialog("Navigate", isPresented: $showMapPicker) {
+                        if let enc = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                            Button("Apple Maps") { UIApplication.shared.open(URL(string: "https://maps.apple.com/?q=\(enc)")!) }
+                            Button("Google Maps") { UIApplication.shared.open(URL(string: "comgooglemaps://?q=\(enc)")!) }
+                            Button("Waze") { UIApplication.shared.open(URL(string: "waze://?q=\(enc)")!) }
+                        }
+                        Button("Cancel", role: .cancel) { }
+                    }
+                    .accessibilityLabel("Navigate to \(address)")
+                }
             }
 
             // Camera button
