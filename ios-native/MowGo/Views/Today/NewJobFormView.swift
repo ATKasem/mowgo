@@ -140,7 +140,11 @@ struct NewJobFormView: View {
             error = "Select a client."
             return
         }
-        let jobTitle = store.clients.first(where: { $0.id == clientId })?.name ?? "Job"
+        guard let clientName = store.clients.first(where: { $0.id == clientId })?.name else {
+            error = "The selected client is no longer available."
+            return
+        }
+        let jobTitle = clientName
 
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()

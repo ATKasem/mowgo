@@ -62,7 +62,7 @@ struct TodayView: View {
     private var todayRevenue: Decimal {
         todayJobs
             .filter { $0.status == .done }
-            .compactMap { job in store.clients.first(where: { $0.id == job.clientId })?.rate }
+            .map { job in store.clients.first(where: { $0.id == job.clientId })?.rate ?? 0 }
             .reduce(0, +)
     }
 

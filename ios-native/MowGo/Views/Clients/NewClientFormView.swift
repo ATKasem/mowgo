@@ -31,6 +31,7 @@ struct NewClientFormView: View {
     @State private var addressSuggestions: [MKLocalSearchCompletion] = []
     @State private var isShowingSuggestions = false
     @State private var isSelectingAddress = false
+    @State private var dropdownFrame: CGRect = .zero
 
     private enum Field { case name, address, phone, email, rate, keyCode, pets, notes }
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -80,6 +81,18 @@ struct NewClientFormView: View {
                                 .submitLabel(.next)
                                 .focused($focusedField, equals: .address)
                                 .onSubmit { focusedField = .phone }
+                                .background {
+                                    GeometryReader { proxy in
+                                        let frame = proxy.frame(in: .named("clientForm"))
+                                        Color.clear
+                                            .onAppear {
+                                                dropdownFrame = frame
+                                            }
+                                            .onChange(of: frame) { _, newFrame in
+                                                dropdownFrame = newFrame
+                                            }
+                                    }
+                                }
                                 .onChange(of: address) { _, newValue in
                                     guard !isSelectingAddress else {
                                         isSelectingAddress = false
@@ -94,52 +107,6 @@ struct NewClientFormView: View {
                                         isShowingSuggestions = false
                                     }
                                 }
-
-                            if isShowingSuggestions && !addressSuggestions.isEmpty {
-                                ScrollView {
-                                    LazyVStack(alignment: .leading, spacing: 0) {
-                                        ForEach(Array(addressSuggestions.enumerated()), id: \.offset) { idx, suggestion in
-                                            Button {
-                                                isSelectingAddress = true
-                                                address = suggestion.title + (suggestion.subtitle.isEmpty ? "" : ", \(suggestion.subtitle)")
-                                                isShowingSuggestions = false
-                                                addressSuggestions = []
-                                                searchCompleter.cancel()
-                                            } label: {
-                                                HStack {
-                                                    Image(systemName: "mappin.and.ellipse")
-                                                        .font(.caption)
-                                                        .foregroundColor(.secondary)
-                                                    VStack(alignment: .leading, spacing: 1) {
-                                                        Text(suggestion.title)
-                                                            .font(.caption)
-                                                            .foregroundColor(.primary)
-                                                        if !suggestion.subtitle.isEmpty {
-                                                            Text(suggestion.subtitle)
-                                                                .font(.caption2)
-                                                                .foregroundColor(.secondary)
-                                                        }
-                                                    }
-                                                }
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 10)
-                                            }
-                                            .buttonStyle(.plain)
-                                            if idx < addressSuggestions.count - 1 {
-                                                Divider().padding(.leading, 36)
-                                            }
-                                        }
-                                    }
-                                    .padding(.vertical, 4)
-                                }
-                                .frame(maxHeight: 220)
-                                .background(theme.surface)
-                                .cornerRadius(10)
-                                .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
-                                .padding(.top, 4)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
-                                .animation(.easeInOut(duration: 0.15), value: isShowingSuggestions)
-                            }
                         }
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Phone").font(.caption).foregroundColor(.secondary)
@@ -205,6 +172,14 @@ struct NewClientFormView: View {
                 .scrollContentBackground(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
+            .coordinateSpace(name: "clientForm")
+            .overlay(alignment: .topLeading) {
+                if isShowingSuggestions && !addressSuggestions.isEmpty {
+                    addressDropdown
+                        .frame(width: dropdownFrame.width)
+                        .offset(x: dropdownFrame.minX, y: dropdownFrame.maxY + 4)
+                }
+            }
             .onDisappear {
                 searchCompleter.cancel()
                 searchDelegate.onUpdate = { _ in }
@@ -233,6 +208,51 @@ struct NewClientFormView: View {
                 Text(error ?? "Please check the form and try again.")
             }
         }
+    }
+
+    private var addressDropdown: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(addressSuggestions.enumerated()), id: \.offset) { idx, suggestion in
+                    Button {
+                        isSelectingAddress = true
+                        address = suggestion.title + (suggestion.subtitle.isEmpty ? "" : ", \(suggestion.subtitle)")
+                        isShowingSuggestions = false
+                        addressSuggestions = []
+                        searchCompleter.cancel()
+                    } label: {
+                        HStack {
+                            Image(systemName: "mappin.and.ellipse")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(suggestion.title)
+                                    .font(.caption)
+                                    .foregroundColor(.primary)
+                                if !suggestion.subtitle.isEmpty {
+                                    Text(suggestion.subtitle)
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.plain)
+                    if idx < addressSuggestions.count - 1 {
+                        Divider().padding(.leading, 36)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .frame(maxHeight: 220)
+        .background(theme.surface)
+        .cornerRadius(10)
+        .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+        .transition(.opacity.combined(with: .move(edge: .top)))
+        .animation(.easeInOut(duration: 0.15), value: isShowingSuggestions)
     }
 
     private final class SearchDelegate: NSObject, MKLocalSearchCompleterDelegate {
