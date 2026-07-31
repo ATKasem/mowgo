@@ -27,7 +27,6 @@ struct MowGoTheme: Equatable {
     }
 
     init(colorScheme: ColorScheme) {
-        let isDark = colorScheme == .dark
         background = Color(
             light: Color(hex: "f8f9fa"),
             dark: Color(hex: "1a1a2e")

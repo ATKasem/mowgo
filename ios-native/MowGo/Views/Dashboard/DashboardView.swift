@@ -93,28 +93,28 @@ struct DashboardView: View {
                 if isOwner {
                     // Owner — 4 cards
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 12) {
-                        StatCard(
+                        DashboardCard(
                             icon: "dollarsign.circle.fill",
                             color: .green,
                             value: formatCurrency(todayRevenue),
                             label: "Revenue Today",
                             sub: todayJobs.isEmpty ? "No jobs today" : "\(todayDone.count)/\(todayJobs.count) jobs done"
                         )
-                        StatCard(
+                        DashboardCard(
                             icon: "doc.text.fill",
                             color: .orange,
                             value: formatCurrency(outstanding),
                             label: "Outstanding",
                             sub: "Unpaid invoices"
                         )
-                        StatCard(
+                        DashboardCard(
                             icon: "checkmark.circle.fill",
                             color: .purple,
                             value: "\(weeklyJobs.count)",
                             label: "Jobs This Week",
                             sub: "\(formatCurrency(weeklyRevenue)) revenue"
                         )
-                        StatCard(
+                        DashboardCard(
                             icon: "person.2.fill",
                             color: .blue,
                             value: "\(activeClients)",
@@ -125,14 +125,14 @@ struct DashboardView: View {
                 } else {
                     // Crew — 2 cards, no revenue
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 12) {
-                        StatCard(
+                        DashboardCard(
                             icon: "checkmark.circle.fill",
                             color: .green,
                             value: "\(weeklyJobs.count)",
                             label: "Jobs This Week",
                             sub: "\(weeklyDone.count) done"
                         )
-                        StatCard(
+                        DashboardCard(
                             icon: "person.2.fill",
                             color: .blue,
                             value: "\(activeClients)",
@@ -154,9 +154,9 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - Stat Card
+// MARK: - Dashboard Card
 
-private struct StatCard: View {
+private struct DashboardCard: View {
     let icon: String
     let color: Color
     let value: String
