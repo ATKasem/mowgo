@@ -16,6 +16,12 @@ struct DashboardView: View {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0); return f
     }()
 
+    private let currencyFormatter: NumberFormatter = {
+        let f = NumberFormatter(); f.numberStyle = .currency; f.currencySymbol = "$"; return f
+    }()
+
+    private let ownerRole = "owner"
+
     // MARK: - Stats
 
     private var today: String {
@@ -23,7 +29,9 @@ struct DashboardView: View {
     }
 
     private func localDate(_ offsetDays: Int) -> String {
-        let d = Calendar.current.date(byAdding: .day, value: offsetDays, to: Date())!
+        guard let d = Calendar.current.date(byAdding: .day, value: offsetDays, to: Date()) else {
+            return today // fallback to today on overflow
+        }
         return dateFormatter.string(from: d)
     }
 
@@ -74,7 +82,7 @@ struct DashboardView: View {
     }
 
     private var isOwner: Bool {
-        auth.user?.role == "owner"
+        auth.user?.role == ownerRole
     }
 
     // MARK: - Body
@@ -142,10 +150,7 @@ struct DashboardView: View {
     // MARK: - Helpers
 
     private func formatCurrency(_ amount: Decimal) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencySymbol = "$"
-        return formatter.string(from: amount as NSDecimalNumber) ?? "$0"
+        return currencyFormatter.string(from: amount as NSDecimalNumber) ?? "$0"
     }
 }
 
