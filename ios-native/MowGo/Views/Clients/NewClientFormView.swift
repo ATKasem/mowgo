@@ -85,6 +85,7 @@ struct NewClientFormView: View {
                                         isSelectingAddress = false
                                         return
                                     }
+                                    searchDelegate.onUpdate = { addressSuggestions = $0 }
                                     if newValue.count >= 3 {
                                         searchCompleter.queryFragment = newValue
                                         isShowingSuggestions = true
@@ -204,11 +205,6 @@ struct NewClientFormView: View {
                 .scrollContentBackground(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .onAppear {
-                searchDelegate.onUpdate = { results in
-                    addressSuggestions = results
-                }
-            }
             .onDisappear {
                 searchCompleter.cancel()
                 searchDelegate.onUpdate = { _ in }
@@ -272,6 +268,7 @@ struct NewClientFormView: View {
             rate: Decimal(string: rate) ?? 0,
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
+            alarmCode: client?.alarmCode,
             petInstructions: hasPets ? "\(petCount) pet\(petCount == 1 ? "" : "s")\(petInstructions.isEmpty ? "" : ": \(petInstructions)")" : nil,
             createdAt: client?.createdAt
         )
