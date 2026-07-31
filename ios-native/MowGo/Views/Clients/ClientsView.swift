@@ -128,9 +128,6 @@ struct ClientCard: View {
                     if let key = client.keyCode {
                         items.append(("lock", "Gate: \(key)", nil))
                     }
-                    if let alarm = client.alarmCode {
-                        items.append(("bell", "Alarm: \(alarm)", nil))
-                    }
                     if let pets = client.petInstructions {
                         items.append(("pawprint", pets, nil))
                     }

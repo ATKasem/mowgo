@@ -22,7 +22,6 @@ struct NewClientFormView: View {
     @State private var email: String
     @State private var rate: String
     @State private var keyCode: String
-    @State private var alarmCode: String
     @State private var hasPets: Bool
     @State private var petCount: Int
     @State private var petInstructions: String
@@ -32,7 +31,7 @@ struct NewClientFormView: View {
     @State private var addressSuggestions: [MKLocalSearchCompletion] = []
     @State private var isShowingSuggestions = false
 
-    private enum Field { case name, address, phone, email, rate, keyCode, alarmCode, pets, notes }
+    private enum Field { case name, address, phone, email, rate, keyCode, pets, notes }
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private let searchCompleter: MKLocalSearchCompleter
     private let searchDelegate: SearchDelegate
@@ -52,7 +51,6 @@ struct NewClientFormView: View {
         _email = State(initialValue: client?.email ?? "")
         _rate = State(initialValue: client.map { NSDecimalNumber(decimal: $0.rate).stringValue } ?? "")
         _keyCode = State(initialValue: client?.keyCode ?? "")
-        _alarmCode = State(initialValue: client?.alarmCode ?? "")
         let petDetails = Self.parsePetInstructions(client?.petInstructions)
         _hasPets = State(initialValue: petDetails.hasPets)
         _petCount = State(initialValue: petDetails.count)
@@ -154,15 +152,7 @@ struct NewClientFormView: View {
                                 .keyboardType(.numberPad)
                                 .submitLabel(.next)
                                 .focused($focusedField, equals: .keyCode)
-                                .onSubmit { focusedField = .alarmCode }
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Alarm Code").font(.caption).foregroundColor(.secondary)
-                            TextField("", text: $alarmCode)
-                                .keyboardType(.numberPad)
-                                .submitLabel(.next)
-                                .focused($focusedField, equals: .alarmCode)
-                                .onSubmit { focusedField = hasPets ? .pets : .notes }
+                                .onSubmit { focusedField = .pets }
                         }
                         Toggle("Has Pets", isOn: $hasPets)
                         if hasPets {
@@ -259,7 +249,6 @@ struct NewClientFormView: View {
             rate: Decimal(string: rate) ?? 0,
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
-            alarmCode: alarmCode.isEmpty ? nil : alarmCode,
             petInstructions: hasPets ? "\(petCount) pet\(petCount == 1 ? "" : "s")\(petInstructions.isEmpty ? "" : ": \(petInstructions)")" : nil,
             createdAt: client?.createdAt
         )
