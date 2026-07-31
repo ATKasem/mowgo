@@ -2,7 +2,7 @@
 //  DashboardView.swift
 //  MowGo
 //
-//  Owner dashboard with 4 stat cards, quick actions, and today preview.
+//  Owner dashboard with stat cards, quick actions, team progress, and today preview.
 //  Crew see limited view.
 //
 
@@ -101,19 +101,11 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Header
                 headerSection
-
-                // Stat cards
                 statCardsSection
-
-                // Quick actions
-                if isOwner {
-                    quickActionsSection
-                }
-
-                // Today preview
+                if isOwner { quickActionsSection }
                 todayPreviewSection
+                if isOwner && !teamMembers.isEmpty { teamProgressSection }
             }
             .padding(16)
         }
@@ -155,56 +147,38 @@ struct DashboardView: View {
             if isOwner {
                 LazyVGrid(columns: columns, spacing: 12) {
                     DashboardCard(
-                        icon: "dollarsign.circle.fill",
-                        color: .green,
-                        value: formatCurrency(todayRevenue),
-                        label: "Revenue Today",
+                        icon: "dollarsign.circle.fill", color: .green,
+                        value: formatCurrency(todayRevenue), label: "Revenue Today",
                         sub: todayJobs.isEmpty ? "No jobs today" : "\(todayDone.count)/\(todayJobs.count) jobs done"
-                    )
-                    .onTapGesture { selectedTab = 1 }
+                    ).onTapGesture { selectedTab = 1 }
                     DashboardCard(
-                        icon: "doc.text.fill",
-                        color: .orange,
-                        value: formatCurrency(outstanding),
-                        label: "Outstanding",
+                        icon: "doc.text.fill", color: .orange,
+                        value: formatCurrency(outstanding), label: "Outstanding",
                         sub: "Unpaid invoices"
-                    )
-                    .onTapGesture { selectedTab = 3 }
+                    ).onTapGesture { selectedTab = 3 }
                     DashboardCard(
-                        icon: "checkmark.circle.fill",
-                        color: .purple,
-                        value: "\(weeklyJobs.count)",
-                        label: "Jobs This Week",
+                        icon: "checkmark.circle.fill", color: .purple,
+                        value: "\(weeklyJobs.count)", label: "Jobs This Week",
                         sub: "\(formatCurrency(weeklyRevenue)) revenue"
-                    )
-                    .onTapGesture { selectedTab = 1 }
+                    ).onTapGesture { selectedTab = 1 }
                     DashboardCard(
-                        icon: "person.2.fill",
-                        color: .blue,
-                        value: "\(activeClients)",
-                        label: "Active Clients",
+                        icon: "person.2.fill", color: .blue,
+                        value: "\(activeClients)", label: "Active Clients",
                         sub: "\(recurringClients) recurring"
-                    )
-                    .onTapGesture { selectedTab = 2 }
+                    ).onTapGesture { selectedTab = 2 }
                 }
             } else {
                 LazyVGrid(columns: columns, spacing: 12) {
                     DashboardCard(
-                        icon: "checkmark.circle.fill",
-                        color: .green,
-                        value: "\(weeklyJobs.count)",
-                        label: "Jobs This Week",
+                        icon: "checkmark.circle.fill", color: .green,
+                        value: "\(weeklyJobs.count)", label: "Jobs This Week",
                         sub: "\(weeklyDone.count) done"
-                    )
-                    .onTapGesture { selectedTab = 1 }
+                    ).onTapGesture { selectedTab = 1 }
                     DashboardCard(
-                        icon: "person.2.fill",
-                        color: .blue,
-                        value: "\(activeClients)",
-                        label: "Active Clients",
+                        icon: "person.2.fill", color: .blue,
+                        value: "\(activeClients)", label: "Active Clients",
                         sub: nil
-                    )
-                    .onTapGesture { selectedTab = 2 }
+                    ).onTapGesture { selectedTab = 2 }
                 }
             }
         }
@@ -212,9 +186,7 @@ struct DashboardView: View {
 
     private var quickActionsSection: some View {
         HStack(spacing: 12) {
-            Button {
-                showAddJob = true
-            } label: {
+            Button { showAddJob = true } label: {
                 Label("Add Job", systemImage: "plus.circle.fill")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
@@ -223,10 +195,7 @@ struct DashboardView: View {
                     .foregroundColor(MowGoTheme.deepGreen)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-
-            Button {
-                showAddClient = true
-            } label: {
+            Button { showAddClient = true } label: {
                 Label("Add Client", systemImage: "person.badge.plus")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
@@ -246,11 +215,9 @@ struct DashboardView: View {
                     .foregroundColor(theme.textPrimary)
                 Spacer()
                 if !todayJobs.isEmpty {
-                    Button("See all") {
-                        selectedTab = 1
-                    }
-                    .font(.caption)
-                    .foregroundColor(MowGoTheme.deepGreen)
+                    Button("See all") { selectedTab = 1 }
+                        .font(.caption)
+                        .foregroundColor(MowGoTheme.deepGreen)
                 }
             }
 
@@ -273,6 +240,66 @@ struct DashboardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
+    // MARK: - Team Progress
+
+    private var teamMembers: [(member: UserProfile, done: Int, inProgress: Int, total: Int)] {
+        store.teamMembers.compactMap { member in
+            let jobs = todayJobs.filter { $0.assignedTo == member.id }
+            guard !jobs.isEmpty else { return nil }
+            let done = jobs.filter { $0.status == .done }.count
+            let inProgress = jobs.filter { $0.status == .inProgress }.count
+            return (member, done, inProgress, jobs.count)
+        }
+    }
+
+    private var teamProgressSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Team")
+                .font(.headline)
+                .foregroundColor(theme.textPrimary)
+
+            ForEach(teamMembers, id: \.member.id) { item in
+                teamMemberRow(item)
+            }
+        }
+        .padding(16)
+        .background(theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func teamMemberRow(_ item: (member: UserProfile, done: Int, inProgress: Int, total: Int)) -> some View {
+        let completed = item.done + item.inProgress
+        let pct = item.total > 0 ? Double(completed) / Double(item.total) : 0
+
+        return VStack(spacing: 6) {
+            HStack {
+                Circle()
+                    .fill(MowGoTheme.deepGreen)
+                    .frame(width: 8, height: 8)
+                Text(item.member.businessName ?? "Crew")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(theme.textPrimary)
+                Spacer()
+                Text("\(completed)/\(item.total)")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(theme.textSecondary)
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(theme.surfaceElevated)
+                        .frame(height: 6)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(MowGoTheme.deepGreen)
+                        .frame(width: geo.size.width * pct, height: 6)
+                }
+            }
+            .frame(height: 6)
+        }
+    }
+
+    // MARK: - Today Job Row
+
     private func todayJobRow(_ job: Job) -> some View {
         HStack(spacing: 10) {
             Circle()
@@ -280,9 +307,23 @@ struct DashboardView: View {
                 .frame(width: 8, height: 8)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(job.clientName ?? job.title)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundColor(theme.textPrimary)
+                HStack(spacing: 4) {
+                    Text(job.clientName ?? job.title)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(theme.textPrimary)
+                    // Tag badges
+                    if let tags = clientTags(for: job), !tags.isEmpty {
+                        ForEach(tags.prefix(2), id: \.self) { tag in
+                            Text(tagLabel(tag))
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(tagColor(tag))
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 1)
+                                .background(tagColor(tag).opacity(0.12))
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
                 if let time = job.scheduledTime {
                     Text(time)
                         .font(.caption)
@@ -305,6 +346,31 @@ struct DashboardView: View {
                 .clipShape(Capsule())
         }
         .padding(.vertical, 4)
+    }
+
+    private func clientTags(for job: Job) -> [String]? {
+        guard let clientId = job.clientId else { return nil }
+        return store.clients.first(where: { $0.id == clientId })?.tags
+    }
+
+    private func tagLabel(_ tag: String) -> String {
+        switch tag {
+        case "do-not-service": "DNS"
+        case "late-payer": "Late"
+        case "vip": "VIP"
+        case "needs-quote": "Quote"
+        default: tag
+        }
+    }
+
+    private func tagColor(_ tag: String) -> Color {
+        switch tag {
+        case "do-not-service": .red
+        case "late-payer": .orange
+        case "vip": .yellow
+        case "needs-quote": .purple
+        default: .gray
+        }
     }
 
     // MARK: - Helpers

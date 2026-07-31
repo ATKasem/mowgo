@@ -168,6 +168,7 @@ struct Client: Codable, Identifiable, Equatable {
     var keyCode: String?
     var alarmCode: String?
     var petInstructions: String?
+    var tags: [String]?
     var createdAt: String?
 }
 

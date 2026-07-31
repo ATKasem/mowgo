@@ -21,6 +21,7 @@ private struct ClientInsert: Encodable {
     let keyCode: String?
     let alarmCode: String?
     let petInstructions: String?
+    let tags: [String]?
 }
 
 private struct ClientUpdate: Encodable {
@@ -33,6 +34,7 @@ private struct ClientUpdate: Encodable {
     let keyCode: String?
     let alarmCode: String?
     let petInstructions: String?
+    let tags: [String]?
 }
 
 private struct JobInsert: Encodable {
@@ -333,7 +335,8 @@ final class DataStore: ObservableObject {
                 cleaningNotes: client.cleaningNotes,
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
-                petInstructions: client.petInstructions
+                petInstructions: client.petInstructions,
+                tags: client.tags
             ))
 
         case "client:delete":
@@ -400,7 +403,8 @@ final class DataStore: ObservableObject {
                 cleaningNotes: client.cleaningNotes,
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
-                petInstructions: client.petInstructions
+                petInstructions: client.petInstructions,
+                tags: client.tags
             ))
             return client
         }
@@ -473,7 +477,8 @@ final class DataStore: ObservableObject {
             cleaningNotes: client.cleaningNotes,
             keyCode: client.keyCode,
             alarmCode: client.alarmCode,
-            petInstructions: client.petInstructions
+            petInstructions: client.petInstructions,
+            tags: client.tags
         ))
     }
 
@@ -885,7 +890,8 @@ final class DataStore: ObservableObject {
                 cleaningNotes: client.cleaningNotes,
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
-                petInstructions: client.petInstructions
+                petInstructions: client.petInstructions,
+                tags: client.tags
             ))
             clients.append(created)
         } catch {
@@ -921,7 +927,8 @@ final class DataStore: ObservableObject {
                 cleaningNotes: updated.cleaningNotes,
                 keyCode: updated.keyCode,
                 alarmCode: updated.alarmCode,
-                petInstructions: updated.petInstructions
+                petInstructions: updated.petInstructions,
+                tags: updated.tags
             ))
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
