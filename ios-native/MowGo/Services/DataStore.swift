@@ -1185,16 +1185,6 @@ enum PendingMutationError: LocalizedError {
             "Invalid mutation payload: \(detail)"
         }
     }
-    // MARK: - Demo Data Loading
-
-    func loadDemoData() {
-        let demo = DemoData()
-        jobs = demo.jobs
-        clients = demo.clients
-        invoices = demo.invoices
-        teamMembers = demo.teamMembers
-        isLoading = false
-    }
 }
 
 // MARK: - Demo Data
