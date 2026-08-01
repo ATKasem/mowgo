@@ -76,15 +76,22 @@ struct InvoicesView: View {
     }
 
     private var totalBar: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Outstanding").font(.caption).foregroundColor(theme.textMuted)
+        HStack(spacing: 0) {
+            VStack(spacing: 2) {
+                Text("Unpaid").font(.caption).foregroundColor(theme.textMuted)
                 Text(totalUnpaid.formatted(.currency(code: "USD")))
-                    .font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
+                    .font(.title2.weight(.bold)).foregroundColor(MowGoTheme.danger)
             }
-            Spacer()
-            Text("\(unpaid.count) invoice\(unpaid.count == 1 ? "" : "s")")
-                .font(.caption).foregroundColor(theme.textInverse)
+            .frame(maxWidth: .infinity)
+            Divider().frame(height: 40)
+            VStack(spacing: 2) {
+                Text("Paid").font(.caption).foregroundColor(theme.textMuted)
+                Text("\(paid.count)")
+                    .font(.title2.weight(.bold)).foregroundColor(MowGoTheme.success)
+                Text("invoice\(paid.count == 1 ? "" : "s")")
+                    .font(.caption2).foregroundColor(theme.textMuted)
+            }
+            .frame(maxWidth: .infinity)
         }
         .padding().background(theme.surface).cornerRadius(16)
     }
@@ -96,7 +103,7 @@ struct InvoicesView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Image(systemName: "doc.text").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
+            Image(systemName: "doc.text.magnifyingglass").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
             Text("No invoices yet").font(.headline).foregroundColor(theme.textPrimary)
             Text("Complete a job to create one").font(.subheadline).foregroundColor(theme.textInverse)
         }
@@ -123,6 +130,25 @@ struct InvoiceRow: View {
                 }
             }
             Spacer()
+
+            if showPay {
+                Text("Due")
+                    .font(.caption2.weight(.medium))
+                    .foregroundColor(MowGoTheme.warning)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(MowGoTheme.warning.opacity(0.12))
+                    .clipShape(Capsule())
+            } else {
+                Text("Paid")
+                    .font(.caption2.weight(.medium))
+                    .foregroundColor(MowGoTheme.success)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(MowGoTheme.success.opacity(0.12))
+                    .clipShape(Capsule())
+            }
+
             Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
                 .font(.subheadline.weight(.semibold)).foregroundColor(theme.textPrimary)
 
@@ -141,7 +167,7 @@ struct InvoiceRow: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
                     .background(MowGoTheme.deepGreen)
-                    .cornerRadius(8)
+                    .clipShape(Capsule())
                 }
             }
         }

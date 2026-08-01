@@ -25,6 +25,8 @@ actor WebhookService {
     }
 
     func jobCompleted(_ job: Job, userId: UUID) async {
+        let alertsEnabled = UserDefaults.standard.object(forKey: "jobCompletionAlerts") as? Bool ?? true
+        guard alertsEnabled else { return }
         await fire(userId: userId, event: "job.done", payload: [
             "job_id": job.id.uuidString,
             "job_title": job.title,

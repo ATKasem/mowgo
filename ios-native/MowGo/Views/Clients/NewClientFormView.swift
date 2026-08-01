@@ -10,6 +10,7 @@ import MapKit
 
 struct NewClientFormView: View {
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var auth: AuthService
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var focusedField: Field?
@@ -28,6 +29,8 @@ struct NewClientFormView: View {
     @State private var cleaningNotes: String
     @State private var isSaving = false
     @State private var error: String?
+    @State private var showUpgradePrompt = false
+    @State private var showSubscription = false
     @State private var addressSuggestions: [MKLocalSearchCompletion] = []
     @State private var isShowingSuggestions = false
     @State private var isSelectingAddress = false
@@ -207,6 +210,15 @@ struct NewClientFormView: View {
             } message: {
                 Text(error ?? "Please check the form and try again.")
             }
+            .alert("Client Limit Reached", isPresented: $showUpgradePrompt) {
+                Button("View Plans") { showSubscription = true }
+                Button("Not Now", role: .cancel) {}
+            } message: {
+                Text("The Free plan includes up to 5 clients. Upgrade to Solo ($39/mo) for 15 clients, or Crew ($79/mo) for unlimited.")
+            }
+            .sheet(isPresented: $showSubscription) {
+                SubscriptionView(currentTier: auth.user?.tier ?? "free")
+            }
         }
     }
 
@@ -272,6 +284,17 @@ struct NewClientFormView: View {
         guard !trimmedName.isEmpty else {
             error = "Enter a client name."
             return
+        }
+
+        // Check free tier client limit
+        if client == nil {
+            let tier = auth.user?.tier ?? "free"
+            let limits: [String: Int] = ["free": 5, "solo": 15]
+            let maxClients = limits[tier] ?? Int.max
+            if store.clients.count >= maxClients {
+                showUpgradePrompt = true
+                return
+            }
         }
 
         let generator = UIImpactFeedbackGenerator(style: .medium)

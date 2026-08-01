@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ClientsView: View {
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
     @State private var expandedId: UUID?
     @State private var searchText = ""
@@ -31,7 +32,41 @@ struct ClientsView: View {
                     ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 8) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            if !store.clients.isEmpty {
+                                Text("\(store.clients.count) clients")
+                                    .font(.headline)
+                                    .foregroundColor(theme.textPrimary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.bottom, 4)
+                            }
+
+                            if store.clients.isEmpty && searchText.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "person.2.slash")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(theme.surfaceElevated)
+                                    Text("No clients yet")
+                                        .font(.headline)
+                                        .foregroundColor(theme.textPrimary)
+                                    Text("Add your first client to get started")
+                                        .font(.subheadline)
+                                        .foregroundColor(theme.textMuted)
+                                    Button { showNewClient = true } label: {
+                                        Text("Add Client")
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.vertical, 10)
+                                            .background(MowGoTheme.deepGreen)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.top, 40)
+                            }
+
+                            LazyVStack(spacing: 8) {
                             ForEach(filtered) { client in
                                 ClientCard(
                                     client: client,
@@ -46,6 +81,7 @@ struct ClientsView: View {
                                     }
                                 )
                             }
+                        }
                         }
                         .padding(16)
                     }
@@ -71,9 +107,13 @@ struct ClientsView: View {
             }
             .sheet(isPresented: $showNewClient) {
                 NewClientFormView()
+                    .environmentObject(store)
+                    .environmentObject(auth)
             }
             .sheet(item: $editingClient) { client in
                 NewClientFormView(client: client)
+                    .environmentObject(store)
+                    .environmentObject(auth)
             }
         }
     }
@@ -94,7 +134,16 @@ struct ClientCard: View {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onTap()
             }) {
-                HStack {
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(MowGoTheme.deepGreen.opacity(0.12))
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            Text(String(client.name.prefix(1)).uppercased())
+                                .font(.headline.weight(.semibold))
+                                .foregroundColor(MowGoTheme.deepGreen)
+                        )
+
                     VStack(alignment: .leading, spacing: 2) {
                         Text(client.name)
                             .font(.subheadline.weight(.semibold))

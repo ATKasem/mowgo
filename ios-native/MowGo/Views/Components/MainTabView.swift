@@ -33,7 +33,7 @@ struct MainTabView: View {
                 .tag(3)
 
             SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+                .tabItem { Label("More", systemImage: "ellipsis.circle.fill") }
                 .tag(4)
         }
         .tint(MowGoTheme.deepGreen)

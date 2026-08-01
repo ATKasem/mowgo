@@ -21,6 +21,7 @@ struct DashboardView: View {
     @State private var isInviting = false
     @State private var memberToRemove: UserProfile?
     @State private var showRemoveConfirm = false
+    @State private var animateCards = false
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
@@ -125,11 +126,13 @@ struct DashboardView: View {
         .sheet(isPresented: $showAddClient) {
             NewClientFormView()
                 .environmentObject(store)
+                .environmentObject(auth)
         }
         .onAppear {
             if isOwner {
                 Task { await store.loadTeamMembers() }
             }
+            withAnimation(.easeOut(duration: 0.4).delay(0.3)) { animateCards = true }
         }
         .sheet(isPresented: $showInviteCrew) {
             inviteCrewSheet
@@ -197,6 +200,8 @@ struct DashboardView: View {
                         sub: "\(recurringClients) recurring"
                     ).onTapGesture { selectedTab = 2 }
                 }
+                .scaleEffect(animateCards ? 1 : 0.95)
+                .opacity(animateCards ? 1 : 0)
             } else {
                 LazyVGrid(columns: columns, spacing: 12) {
                     DashboardCard(
@@ -217,22 +222,32 @@ struct DashboardView: View {
     private var quickActionsSection: some View {
         HStack(spacing: 12) {
             Button { showAddJob = true } label: {
-                Label("Add Job", systemImage: "plus.circle.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(MowGoTheme.deepGreen.opacity(0.12))
-                    .foregroundColor(MowGoTheme.deepGreen)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                HStack(spacing: 6) {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(MowGoTheme.deepGreen)
+                    Text("Add Job")
+                        .foregroundColor(theme.textPrimary)
+                }
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(theme.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: .black.opacity(0.06), radius: 6, y: 2)
             }
             Button { showAddClient = true } label: {
-                Label("Add Client", systemImage: "person.badge.plus")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(MowGoTheme.info.opacity(0.12))
-                    .foregroundColor(MowGoTheme.info)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                HStack(spacing: 6) {
+                    Image(systemName: "person.badge.plus")
+                        .foregroundColor(MowGoTheme.info)
+                    Text("Add Client")
+                        .foregroundColor(theme.textPrimary)
+                }
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(theme.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: .black.opacity(0.06), radius: 6, y: 2)
             }
         }
     }
@@ -252,11 +267,16 @@ struct DashboardView: View {
             }
 
             if todayJobs.isEmpty {
-                Text("No jobs scheduled for today")
-                    .font(.subheadline)
-                    .foregroundColor(theme.textMuted)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 20)
+                VStack(spacing: 8) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 32))
+                        .foregroundColor(theme.surfaceElevated)
+                    Text("No jobs scheduled for today")
+                        .font(.subheadline)
+                        .foregroundColor(theme.textMuted)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 20)
             } else {
                 ForEach(todayJobs.sorted { a, b in
                     (a.routeOrder ?? Int.max) < (b.routeOrder ?? Int.max)
@@ -321,6 +341,15 @@ struct DashboardView: View {
                 Text("\(completed)/\(row.total)")
                     .font(.caption.weight(.semibold))
                     .foregroundColor(theme.textSecondary)
+                if row.done > 0 {
+                    Text("✓ Done")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundColor(MowGoTheme.success)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(MowGoTheme.success.opacity(0.12))
+                        .clipShape(Capsule())
+                }
             }
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
@@ -478,10 +507,23 @@ struct DashboardView: View {
     // MARK: - Today Job Row
 
     private func todayJobRow(_ job: Job) -> some View {
+        let name = job.clientName ?? job.title
+        let initial = String(name.prefix(1)).uppercased()
+        let statusColor: Color = job.status == .done ? MowGoTheme.success : job.status == .inProgress ? Color.cyan : MowGoTheme.warning
+
         HStack(spacing: 10) {
             Circle()
-                .fill(job.status == .done ? Color.green : job.status == .inProgress ? Color.cyan : Color.orange)
-                .frame(width: 8, height: 8)
+                .fill(theme.surfaceElevated)
+                .frame(width: 36, height: 36)
+                .overlay(
+                    Text(initial.isEmpty ? "?" : initial)
+                        .font(.headline.weight(.semibold))
+                        .foregroundColor(MowGoTheme.deepGreen)
+                )
+                .overlay(
+                    Circle()
+                        .stroke(statusColor, lineWidth: 2)
+                )
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
@@ -596,6 +638,13 @@ private struct DashboardCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .background(theme.surface)
+        .overlay(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(color)
+                .frame(width: 4)
+                .padding(.leading, 1)
+                .padding(.vertical, 10)
+        }
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
     }

@@ -113,4 +113,40 @@ final class AuthService: ObservableObject {
             }
         }
     }
+
+    func updateProfile(businessName: String, phone: String) async throws {
+        let name = businessName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { throw ProfileUpdateError.businessNameRequired }
+
+        if isDemoMode {
+            user?.businessName = name
+            user?.phone = normalizedPhone.isEmpty ? nil : normalizedPhone
+            return
+        }
+
+        guard let id = user?.id else { throw ProfileUpdateError.profileUnavailable }
+        struct ProfilePatch: Encodable {
+            let businessName: String
+            let phone: String?
+        }
+        try await sb.update(
+            "profiles",
+            id: id,
+            ProfilePatch(businessName: name, phone: normalizedPhone.isEmpty ? nil : normalizedPhone)
+        )
+        await loadProfile()
+    }
+}
+
+private enum ProfileUpdateError: LocalizedError {
+    case businessNameRequired
+    case profileUnavailable
+
+    var errorDescription: String? {
+        switch self {
+        case .businessNameRequired: "Business name is required."
+        case .profileUnavailable: "Your profile is unavailable. Refresh and try again."
+        }
+    }
 }

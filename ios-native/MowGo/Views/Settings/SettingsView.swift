@@ -13,10 +13,18 @@ struct SettingsView: View {
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showingSignOut = false
     @State private var showSubscription = false
-    @State private var showManagePortal = false
     @State private var portalError: String?
     @State private var showCancelConfirmation = false
     @State private var cancelError: String?
+    @State private var businessName = ""
+    @State private var phone = ""
+    @State private var profileSaveError: String?
+    @AppStorage("jobCompletionAlerts") private var jobCompletionAlerts = true
+    @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
+
+    private enum SettingsDestination: Hashable {
+        case businessProfile, notifications, appearance, billing
+    }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var appearancePreference: Binding<AppearancePreference> {
@@ -33,16 +41,14 @@ struct SettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 8) {
-                        SectionHeader("Account")
                         profileCard
-                        signOutButton
 
-                        SectionHeader("Preferences")
-                        preferencesCard
+                        SectionHeader("Business")
+                        settingsLinks
+
+                        SectionHeader("About")
                         appInfoCard
-
-                        SectionHeader("Billing")
-                        subscriptionCard
+                        signOutButton
                     }
                     .padding(16)
                 }
@@ -50,8 +56,13 @@ struct SettingsView: View {
                     await auth.loadProfile()
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("More")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: SettingsDestination.self) { destination in
+                destinationView(for: destination)
+            }
+            .onAppear(perform: loadProfileDraft)
+            .onChange(of: auth.user?.businessName) { _, _ in loadProfileDraft() }
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView(currentTier: auth.user?.tier ?? "free")
             }
@@ -70,6 +81,73 @@ struct SettingsView: View {
         }
     }
 
+    @ViewBuilder
+    private func destinationView(for destination: SettingsDestination) -> some View {
+        switch destination {
+        case .businessProfile:
+            BusinessProfileSettingsView(
+                businessName: $businessName,
+                phone: $phone,
+                saveError: $profileSaveError,
+                onSave: saveProfile
+            )
+        case .notifications:
+            NotificationSettingsView(
+                jobCompletionAlerts: $jobCompletionAlerts,
+                rainDelayAlerts: $rainDelayAlerts
+            )
+        case .appearance:
+            AppearanceSettingsView(appearance: appearancePreference)
+        case .billing:
+            BillingSettingsView(
+                tierLabel: auth.user?.tierLabel ?? "Free",
+                tierDescription: tierDescription,
+                tierPrice: tierPrice,
+                isPaidTier: isPaidTier,
+                errorMessage: cancelError ?? portalError,
+                onManageSubscription: openCustomerPortal,
+                onCancelSubscription: { showCancelConfirmation = true },
+                onViewPlans: { showSubscription = true }
+            )
+        }
+    }
+
+    private var settingsLinks: some View {
+        VStack(spacing: 0) {
+            NavigationLink(value: SettingsDestination.businessProfile) {
+                SettingsLinkRow(title: "Business Profile", subtitle: businessName.isEmpty ? "Business name and phone" : businessName, icon: "storefront.fill")
+            }
+            Divider().padding(.leading, 52)
+            NavigationLink(value: SettingsDestination.notifications) {
+                SettingsLinkRow(title: "Notifications", subtitle: "Job completion and rain alerts", icon: "bell.fill")
+            }
+            Divider().padding(.leading, 52)
+            NavigationLink(value: SettingsDestination.appearance) {
+                SettingsLinkRow(title: "Appearance", subtitle: appearancePreference.wrappedValue.label, icon: "circle.lefthalf.filled")
+            }
+            Divider().padding(.leading, 52)
+            NavigationLink(value: SettingsDestination.billing) {
+                SettingsLinkRow(title: "Billing", subtitle: auth.user?.tierLabel ?? "Free", icon: "creditcard.fill")
+            }
+        }
+        .background(theme.surface)
+        .cornerRadius(16)
+    }
+
+    private func loadProfileDraft() {
+        businessName = auth.user?.businessName ?? ""
+        phone = auth.user?.phone ?? ""
+    }
+
+    private func saveProfile() async {
+        profileSaveError = nil
+        do {
+            try await auth.updateProfile(businessName: businessName, phone: phone)
+        } catch {
+            profileSaveError = error.localizedDescription
+        }
+    }
+
     private var profileCard: some View {
         VStack(spacing: 12) {
             Image(systemName: "person.circle.fill")
@@ -83,94 +161,6 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity).padding(20)
         .background(theme.surface).cornerRadius(16)
-    }
-
-    private var subscriptionCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Subscription").font(.headline).foregroundColor(theme.textPrimary)
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(auth.user?.tierLabel ?? "Free Plan")
-                        .font(.subheadline.weight(.medium)).foregroundColor(theme.textPrimary)
-                    Text(tierDescription).font(.caption).foregroundColor(theme.textMuted)
-                }
-                Spacer()
-                Text(tierPrice)
-                    .font(.subheadline.weight(.semibold)).foregroundColor(MowGoTheme.deepGreen)
-            }
-            Divider().background(theme.surfaceElevated)
-
-            // Action buttons
-            if isPaidTier {
-                Button {
-                    Task { openCustomerPortal() }
-                } label: {
-                    HStack {
-                        Image(systemName: "gearshape.2.fill")
-                        Text("Manage Subscription")
-                    }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(MowGoTheme.deepGreen)
-                    .cornerRadius(10)
-                }
-
-                Button {
-                    showCancelConfirmation = true
-                } label: {
-                    HStack {
-                        Image(systemName: "xmark.circle")
-                        Text("Cancel Subscription")
-                    }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundColor(.red)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(.red, lineWidth: 1)
-                    )
-                }
-
-                if let cancelError {
-                    Text(cancelError)
-                        .font(.caption2)
-                        .foregroundColor(.red)
-                }
-            }
-
-            // Show higher-tier plan cards
-            if !higherTiers.isEmpty {
-                Divider().background(theme.surfaceElevated)
-                Text("Upgrade").font(.caption.weight(.semibold))
-                    .foregroundColor(theme.textMuted)
-                ForEach(higherTiers, id: \.self) { tier in
-                    SubscriptionPlanCard(
-                        name: tierLabel(for: tier),
-                        price: priceLabel(for: tier),
-                        features: features(for: tier),
-                        tier: tier,
-                        isCurrent: false,
-                        userTier: auth.user?.tier ?? "free"
-                    )
-                }
-            } else if !isPaidTier {
-                Button { showSubscription = true } label: {
-                    Text("View Plans")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundColor(MowGoTheme.deepGreen)
-                }
-            }
-
-            if let err = portalError {
-                Text(err)
-                    .font(.caption2)
-                    .foregroundColor(.red)
-            }
-        }
-        .padding(16).background(theme.surface).cornerRadius(16)
     }
 
     private var isPaidTier: Bool {
@@ -199,65 +189,6 @@ struct SettingsView: View {
         } catch {
             cancelError = error.localizedDescription
         }
-    }
-
-    private var higherTiers: [String] {
-        let tier = auth.user?.tier ?? "free"
-        switch tier {
-        case "free": return ["solo", "crew"]
-        case "solo": return ["crew"]
-        default: return []
-        }
-    }
-
-    private func tierLabel(for tier: String) -> String {
-        switch tier {
-        case "solo": return "Solo"
-        case "crew": return "Crew"
-        default: return tier.capitalized
-        }
-    }
-
-    private func priceLabel(for tier: String) -> String {
-        switch tier {
-        case "solo": return "$39/mo"
-        case "crew": return "$79/mo"
-        default: return ""
-        }
-    }
-
-    private func features(for tier: String) -> [String] {
-        switch tier {
-        case "solo": return [
-            "15 clients",
-            "AI Autopilot assistant",
-            "Route optimization",
-            "Photo attachments",
-            "Priority support"
-        ]
-        case "crew": return [
-            "Unlimited clients",
-            "Team job assignment",
-            "GPS tracking",
-            "QuickBooks sync",
-            "Everything in Solo"
-        ]
-        default: return []
-        }
-    }
-
-    private var preferencesCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label("Appearance", systemImage: "circle.lefthalf.filled")
-                .foregroundColor(theme.textPrimary)
-            Picker("Appearance", selection: appearancePreference) {
-                ForEach(AppearancePreference.allCases) { preference in
-                    Text(preference.label).tag(preference)
-                }
-            }
-            .pickerStyle(.segmented)
-        }
-        .padding(16).background(theme.surface).cornerRadius(16)
     }
 
     private var appInfoCard: some View {
@@ -296,6 +227,207 @@ struct SettingsView: View {
         case "crew": "$79/mo"
         default: "$0/mo"
         }
+    }
+}
+
+// MARK: - Settings Details
+
+private struct SettingsLinkRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let title: String
+    let subtitle: String
+    let icon: String
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .frame(width: 28, height: 28)
+                .foregroundColor(MowGoTheme.deepGreen)
+                .background(MowGoTheme.deepGreen.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.weight(.medium)).foregroundColor(theme.textPrimary)
+                Text(subtitle).font(.caption).foregroundColor(theme.textMuted).lineLimit(1)
+            }
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundColor(theme.textMuted)
+        }
+        .padding(14)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct BusinessProfileSettingsView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    @Binding var businessName: String
+    @Binding var phone: String
+    @Binding var saveError: String?
+    let onSave: () async -> Void
+    @State private var isSaving = false
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        Form {
+            Section {
+                TextField("Business name", text: $businessName)
+                    .textInputAutocapitalization(.words)
+                TextField("Phone number", text: $phone)
+                    .keyboardType(.phonePad)
+            } footer: {
+                Text("This information appears on customer-facing messages and invoices.")
+            }
+            if let saveError {
+                Section { Text(saveError).foregroundColor(.red) }
+            }
+            Section {
+                Button {
+                    Task {
+                        isSaving = true
+                        await onSave()
+                        isSaving = false
+                    }
+                } label: {
+                    HStack {
+                        Spacer()
+                        if isSaving { ProgressView().tint(.white) }
+                        Text("Save Changes").fontWeight(.semibold)
+                        Spacer()
+                    }
+                }
+                .disabled(isSaving || businessName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .listRowBackground(MowGoTheme.deepGreen)
+                .foregroundColor(.white)
+            }
+        }
+        .scrollContentBackground(.hidden)
+        .background(theme.background)
+        .navigationTitle("Business Profile")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct NotificationSettingsView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    @Binding var jobCompletionAlerts: Bool
+    @Binding var rainDelayAlerts: Bool
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        Form {
+            Section("Job activity") {
+                Toggle(isOn: $jobCompletionAlerts) {
+                    settingsLabel("Job completion alerts", "When a job is marked complete")
+                }
+            }
+            Section("Weather") {
+                Toggle(isOn: $rainDelayAlerts) {
+                    settingsLabel("Rain delay alerts", "When rain may affect tomorrow's jobs")
+                }
+            }
+        }
+        .tint(MowGoTheme.deepGreen)
+        .scrollContentBackground(.hidden)
+        .background(theme.background)
+        .navigationTitle("Notifications")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func settingsLabel(_ title: String, _ subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title).foregroundColor(theme.textPrimary)
+            Text(subtitle).font(.caption).foregroundColor(theme.textMuted)
+        }
+    }
+}
+
+private struct AppearanceSettingsView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    @Binding var appearance: AppearancePreference
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        Form {
+            Section("Theme") {
+                ForEach(AppearancePreference.allCases) { preference in
+                    Button { appearance = preference } label: {
+                        HStack {
+                            Label(preference.label, systemImage: icon(for: preference))
+                                .foregroundColor(theme.textPrimary)
+                            Spacer()
+                            if appearance == preference {
+                                Image(systemName: "checkmark").fontWeight(.semibold).foregroundColor(MowGoTheme.deepGreen)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .scrollContentBackground(.hidden)
+        .background(theme.background)
+        .navigationTitle("Appearance")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func icon(for preference: AppearancePreference) -> String {
+        switch preference {
+        case .system: "circle.lefthalf.filled"
+        case .light: "sun.max.fill"
+        case .dark: "moon.fill"
+        }
+    }
+}
+
+private struct BillingSettingsView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let tierLabel: String
+    let tierDescription: String
+    let tierPrice: String
+    let isPaidTier: Bool
+    let errorMessage: String?
+    let onManageSubscription: () -> Void
+    let onCancelSubscription: () -> Void
+    let onViewPlans: () -> Void
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Current plan").font(.caption.weight(.semibold)).foregroundColor(theme.textMuted)
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(tierLabel).font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
+                        Spacer()
+                        Text(tierPrice).font(.headline).foregroundColor(MowGoTheme.deepGreen)
+                    }
+                    Text(tierDescription).font(.subheadline).foregroundColor(theme.textMuted)
+                }
+                .padding(18).background(theme.surface).cornerRadius(16)
+
+                Button(isPaidTier ? "Manage Subscription" : "View Plans", action: isPaidTier ? onManageSubscription : onViewPlans)
+                    .font(.headline).foregroundColor(.white)
+                    .frame(maxWidth: .infinity).padding()
+                    .background(MowGoTheme.deepGreen).cornerRadius(12)
+
+                if isPaidTier {
+                    Button("Cancel Subscription", role: .destructive, action: onCancelSubscription)
+                        .frame(maxWidth: .infinity).padding()
+                        .background(theme.surface).cornerRadius(12)
+                }
+                if let errorMessage {
+                    Text(errorMessage).font(.caption).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .padding(16)
+        }
+        .background(theme.background)
+        .navigationTitle("Billing")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
