@@ -54,6 +54,9 @@ struct MowGoApp: App {
                     MainTabView()
                         .environmentObject(auth)
                         .environmentObject(store)
+                        .task {
+                            if auth.isDemoMode { store.loadDemoData() }
+                        }
                 } else {
                     LoginView()
                         .environmentObject(auth)
@@ -82,8 +85,6 @@ struct MowGoApp: App {
                     await MainActor.run {
                         PushNotificationService.shared.registerForPushNotifications()
                     }
-                } else if auth.isDemoMode {
-                    store.loadDemoData()
                 } else {
                     // Clear device token when signed out
                     await MainActor.run {
