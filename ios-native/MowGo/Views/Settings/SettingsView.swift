@@ -299,9 +299,11 @@ private struct BusinessProfileSettingsView: View {
                             isSaving = true
                             await onSave()
                             isSaving = false
-                            showSavedBanner = true
-                            try? await Task.sleep(for: .seconds(2))
-                            withAnimation { showSavedBanner = false }
+                            if saveError == nil {
+                                showSavedBanner = true
+                                try? await Task.sleep(for: .seconds(2))
+                                withAnimation { showSavedBanner = false }
+                            }
                         }
                     } label: {
                         HStack {
