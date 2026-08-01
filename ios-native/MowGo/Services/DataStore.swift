@@ -1154,6 +1154,17 @@ final class DataStore: ObservableObject {
         struct Empty: Encodable {}
         enqueue(operation, id: id, payload: Empty())
     }
+
+    // MARK: - Demo Data Loading
+
+    func loadDemoData() {
+        let demo = DemoData()
+        jobs = demo.jobs
+        clients = demo.clients
+        invoices = demo.invoices
+        teamMembers = demo.teamMembers
+        isLoading = false
+    }
 }
 
 enum DataStoreError: LocalizedError {
@@ -1184,16 +1195,6 @@ enum PendingMutationError: LocalizedError {
         case .invalidPayload(let detail):
             "Invalid mutation payload: \(detail)"
         }
-    }
-    // MARK: - Demo Data Loading
-
-    func loadDemoData() {
-        let demo = DemoData()
-        jobs = demo.jobs
-        clients = demo.clients
-        invoices = demo.invoices
-        teamMembers = demo.teamMembers
-        isLoading = false
     }
 }
 
