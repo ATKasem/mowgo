@@ -114,14 +114,16 @@ final class AuthService: ObservableObject {
         }
     }
 
-    func updateProfile(businessName: String, phone: String) async throws {
+    func updateProfile(businessName: String, phone: String, email: String) async throws {
         let name = businessName.trimmingCharacters(in: .whitespacesAndNewlines)
         let normalizedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { throw ProfileUpdateError.businessNameRequired }
 
         if isDemoMode {
             user?.businessName = name
             user?.phone = normalizedPhone.isEmpty ? nil : normalizedPhone
+            user?.email = normalizedEmail.isEmpty ? nil : normalizedEmail
             return
         }
 
@@ -129,11 +131,12 @@ final class AuthService: ObservableObject {
         struct ProfilePatch: Encodable {
             let businessName: String
             let phone: String?
+            let email: String?
         }
         try await sb.update(
             "profiles",
             id: id,
-            ProfilePatch(businessName: name, phone: normalizedPhone.isEmpty ? nil : normalizedPhone)
+            ProfilePatch(businessName: name, phone: normalizedPhone.isEmpty ? nil : normalizedPhone, email: normalizedEmail.isEmpty ? nil : normalizedEmail)
         )
         await loadProfile()
     }

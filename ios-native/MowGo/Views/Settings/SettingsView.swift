@@ -18,6 +18,7 @@ struct SettingsView: View {
     @State private var cancelError: String?
     @State private var businessName = ""
     @State private var phone = ""
+    @State private var email = ""
     @State private var profileSaveError: String?
     @AppStorage("jobCompletionAlerts") private var jobCompletionAlerts = true
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
@@ -88,6 +89,7 @@ struct SettingsView: View {
             BusinessProfileSettingsView(
                 businessName: $businessName,
                 phone: $phone,
+                email: $email,
                 saveError: $profileSaveError,
                 onSave: saveProfile
             )
@@ -137,12 +139,13 @@ struct SettingsView: View {
     private func loadProfileDraft() {
         businessName = auth.user?.businessName ?? ""
         phone = auth.user?.phone ?? ""
+        email = auth.user?.email ?? ""
     }
 
     private func saveProfile() async {
         profileSaveError = nil
         do {
-            try await auth.updateProfile(businessName: businessName, phone: phone)
+            try await auth.updateProfile(businessName: businessName, phone: phone, email: email)
         } catch {
             profileSaveError = error.localizedDescription
         }
@@ -263,47 +266,73 @@ private struct BusinessProfileSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Binding var businessName: String
     @Binding var phone: String
+    @Binding var email: String
     @Binding var saveError: String?
     let onSave: () async -> Void
     @State private var isSaving = false
+    @State private var showSavedBanner = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
-        Form {
-            Section {
-                TextField("Business name", text: $businessName)
-                    .textInputAutocapitalization(.words)
-                TextField("Phone number", text: $phone)
-                    .keyboardType(.phonePad)
-            } footer: {
-                Text("This information appears on customer-facing messages and invoices.")
-            }
-            if let saveError {
-                Section { Text(saveError).foregroundColor(.red) }
-            }
-            Section {
-                Button {
-                    Task {
-                        isSaving = true
-                        await onSave()
-                        isSaving = false
-                    }
-                } label: {
-                    HStack {
-                        Spacer()
-                        if isSaving { ProgressView().tint(.white) }
-                        Text("Save Changes").fontWeight(.semibold)
-                        Spacer()
-                    }
+        ZStack(alignment: .bottom) {
+            Form {
+                Section {
+                    TextField("Business name", text: $businessName)
+                        .textInputAutocapitalization(.words)
+                    TextField("Phone number", text: $phone)
+                        .keyboardType(.phonePad)
+                    TextField("Email address", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                } footer: {
+                    Text("This information appears on customer-facing messages and invoices.")
                 }
-                .disabled(isSaving || businessName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .listRowBackground(MowGoTheme.deepGreen)
-                .foregroundColor(.white)
+                if let saveError {
+                    Section { Text(saveError).foregroundColor(.red) }
+                }
+                Section {
+                    Button {
+                        Task {
+                            isSaving = true
+                            await onSave()
+                            isSaving = false
+                            showSavedBanner = true
+                            try? await Task.sleep(for: .seconds(2))
+                            withAnimation { showSavedBanner = false }
+                        }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            if isSaving { ProgressView().tint(.white) }
+                            Text("Save Changes").fontWeight(.semibold)
+                            Spacer()
+                        }
+                    }
+                    .disabled(isSaving || businessName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .listRowBackground(MowGoTheme.deepGreen)
+                    .foregroundColor(.white)
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(theme.background)
+
+            // Saved banner
+            if showSavedBanner {
+                Text("Changes saved")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(MowGoTheme.deepGreen)
+                    .clipShape(Capsule())
+                    .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                    .padding(.bottom, 24)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(theme.background)
         .navigationTitle("Business Profile")
         .navigationBarTitleDisplayMode(.inline)
     }
