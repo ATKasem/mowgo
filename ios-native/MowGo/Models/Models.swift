@@ -215,6 +215,7 @@ struct UserProfile: Codable, Identifiable {
     var id: UUID?
     var businessName: String?
     var phone: String?
+    var email: String?
     var tier: String?
     var role: String?
     var businessId: UUID?
