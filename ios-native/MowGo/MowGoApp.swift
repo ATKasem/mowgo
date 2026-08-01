@@ -54,6 +54,9 @@ struct MowGoApp: App {
                     MainTabView()
                         .environmentObject(auth)
                         .environmentObject(store)
+                        .task {
+                            if auth.isDemoMode { store.loadDemoData() }
+                        }
                 } else {
                     LoginView()
                         .environmentObject(auth)
