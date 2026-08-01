@@ -511,7 +511,7 @@ struct DashboardView: View {
         let initial = String(name.prefix(1)).uppercased()
         let statusColor: Color = job.status == .done ? MowGoTheme.success : job.status == .inProgress ? Color.cyan : MowGoTheme.warning
 
-        HStack(spacing: 10) {
+        return HStack(spacing: 10) {
             Circle()
                 .fill(theme.surfaceElevated)
                 .frame(width: 36, height: 36)

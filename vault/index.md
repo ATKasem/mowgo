@@ -1,13 +1,17 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-07-31
+> **Last updated:** 2026-08-01
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
-| 2026-07-31 | `2026-07-31_daily-sync.md` | **Main sync note** — decisions, tasks, research, action items, notes |
+| 2026-08-01 | `2026-08-01_daily-sync.md` | **Main sync note** — decisions, tasks, research, action items, notes |
+| 2026-08-01 | `2026-08-01_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 15 new) |
+| 2026-08-01 | `2026-08-01_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (23 messages, 0 new) |
+| 2026-08-01 | `2026-08-01_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages, 0 new) |
+| 2026-07-31 | `2026-07-31_daily-sync.md` | Previous daily sync note |
 | 2026-07-31 | `2026-07-31_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 17 new) |
 | 2026-07-31 | `2026-07-31_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (23 messages, 0 new) |
 | 2026-07-31 | `2026-07-31_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages, 0 new) |
@@ -47,4 +51,4 @@
 
 ---
 
-*Index updated by MowGo nightly vault sync — 2026-07-31 02:00 UTC*
+*Index updated by MowGo nightly vault sync — 2026-08-01 02:00 UTC*
