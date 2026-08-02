@@ -1,6 +1,6 @@
 # MowGo Lead Tracker
-**Last updated:** 2026-07-31 (5 cold emails sent)
-**Total leads:** 9
+**Last updated:** 2026-08-02 (Sunday deep-dive: +8 new FB-discovered leads)
+**Total leads:** 17
 **Contacted:** 5
 **Conversions:** 0
 
@@ -146,6 +146,60 @@
 
 ---
 
+## Sunday Deep-Dive Batch — 2026-08-02 (FB-group discovery, all 🔴 New)
+
+### Chris Young (new OK lawn care starter)
+- **Status:** 🔴 | **Source:** FB group "Start and Grow a Lawn Care Business" post (group 1641584619809265, post 1853734021927656)
+- **City:** Oklahoma (exact city TBD — post says "Starting a lawn care business in Oklahoma")
+- **Contact:** FB group post → DM/comment; no website/phone yet
+- **Why MowGo:** Brand-new business = zero software lock-in, no migration, free-trial stage. Perfect Solo $39 prospect; also a "start right" story for landing page.
+
+### Lawton OK duo (owner + partner Noah)
+- **Status:** 🔴 | **Source:** FB group 396673829451224 ("Quality lawn care services in Lawton, OK", post 897927359325866)
+- **City:** Lawton, OK
+- **Contact:** FB group post → DM/comment (reverse-lookup 08-02: NO public footprint found — no Yelp/YP/website/phone matching a 2-person Lawton op with partner Noah; candidates checked: Lawton Lawn Care 580-919-3040, T&J Lawn Service, KC Lawns of Oklahoma, Quality Lawn Care Lawton, L&C Lawn Care — none match confidently. Best path = reply in the FB group thread.)
+- **Why MowGo:** "Small, locally owned, run by me and my partner" — 2-person crew = Crew $79 candidate. Lawton not yet covered by the 5-emailed leads.
+
+### Spray Masters
+- **Status:** 🔴 | **Source:** FB group 949803220198216 (post 1443163680862165)
+- **City:** Owasso, OK (Tulsa suburb)
+- **Contact (verified 08-02):** **Spray Masters Turf Management** — Owasso, OK 74055 (10108 East 85th Ct N); Facebook page `facebook.com/61574833317425` → Messenger best path (no phone/website/email found in public directories; LLC #3513929613 filed Mar 13 2026 — very new business, explains thin footprint)
+- **Why MowGo:** Weed-control/spray = multi-step recurring treatment programs = recurring billing fit (auto-invoice + reminders). Not in OK_LEADS_100.
+
+### Duncan OK weekly/bi-weekly mowing op
+- **Status:** 🔴 | **Source:** FB group "duncanok" (post 10162946773493014, "Lawn care services for 2026 season available")
+- **City:** Duncan, OK (SW OK — new geography vs 100-lead pool)
+- **Contact:** FB group post → DM; group is small/local
+- **Why MowGo:** Explicitly "starting to book weekly and bi-weekly" services — recurring routes managed manually (Residential & commercial). Route + auto-invoice story.
+
+### TRIMLY TURF Lawn Care
+- **Status:** 🔴 | **Source:** FB group 249288118736317 ("Local Small Business and Services" — advertising "Call now for a free quote ✓ Plus $10 off your first mow")
+- **City:** Verify — group appears local/OK
+- **Contact:** FB group post → DM; phone likely in ad
+- **Why MowGo:** Active advertiser = wants to grow; promo-driven = will respond to value math ($39 flat vs % fees).
+
+### Melgar's Lawn Care
+- **Status:** 🔴 | **Source:** FB group 2122483461230334 (OK contractor group, post 4133661253445868)
+- **City:** Verify (OK)
+- **Contact:** FB group post → DM
+- **Why MowGo:** Active in OK business groups = growth-minded; verify size/location before outreach.
+
+### Native Lawn Care
+- **Status:** 🔴 | **Source:** FB group 2122483461230334 mention ("Oklahoma Small Business Contractors")
+- **City:** Verify (OK)
+- **Contact:** FB group post → DM
+- **Why MowGo:** Verify activity level; likely small crew.
+
+### Grand Lake area couple lawn service
+- **Status:** 🔴 (VERIFY LOCATION) | **Source:** FB group 1115480395465731 ("Lawn care services in Grand Lake area", post 2594270330920056)
+- **City:** Grand Lake, OK — snippet conflict mentions "flint/Genesee County" (MI) in thread; verify before outreach
+- **Contact:** FB group post → DM
+- **Why MowGo:** "My boyfriend and I just started up our own lawn service" — new 2-person op, no software.
+
+**Batch notes:** All contact paths are FB-group DM/comment (Aaron-side; bot can't post). Suggest reverse-lookup phone/email for Lawton duo + Spray Masters before Monday outreach. FB live buying-intent threads this week (lawnmowing101: scheduling-app request · Venmo/Zelle card-on-file pain · apps-for-jobs; bluecollarmillionaire: 170-customer invoicing pain) — engagement queue for Aaron, see intel/2026-08-02_0358.md.
+
+---
+
 ## Outreach Log
 
 | Date | Business | Method | Response | Notes |
@@ -164,3 +218,4 @@
 |------|-----------|-----------|-----------|--------|------|
 | 7/21 | 0 | 0 | 0 | 0 | 0 |
 | 7/26 | 9 | 5 | 0 | 0 | 0 |
+| 8/2 | 8 (FB deep-dive) | 5 (cumulative) | 0 | 0 | 0 |

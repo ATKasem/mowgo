@@ -1,202 +1,172 @@
 {
-  "run_ts": "2026-08-01T13:25:00Z",
-  "run_label": "8am CST Action — Sat Aug 1",
+  "run_ts": "2026-08-02T13:10:00Z",
+  "run_label": "8am CST Action — Sun Aug 2",
   "phase": "2/3",
   "feed": "Part 3 (9am report)",
 
-  "headline": "🔴 STRIPE DAY 16 — RESOLVED. Production checkout is LIVE on mowgo.pages.dev. Old domain mowflow.pages.dev retired (redirect placeholder, no functions). Invoice reminders kicked off and scheduled. Quotes v1 + competitor import scoped.",
+  "headline": "✅ CRITICAL FIX DEPLOYED: verify-session success page bug (Day 1) — Subscribe.jsx now sends Bearer JWT + function relaxed for same-origin; paying customers land on 'You're all set!' instead of a failure page. Landing copy 'Stripe payments are live.' Compare page +SoloOp +TurfHop columns, free-tier count 6, TurfHop reliability note. IBISWorld verified: both $176.7B and $188.8B are real IBISWorld numbers (different products). Monday plate packaged for Aaron.",
 
   "quick_wins": {
     "executed": [
       {
-        "task": "Fix production Stripe on mowgo.pages.dev (Day 16) — REDEPLOYED WITH FUNCTIONS",
-        "status": "✅ DONE — checkout LIVE",
-        "detail": "Root cause found: all 13 env vars + 4 secrets were ALREADY SET on the CF project (set sometime between the 09:07Z health check and this run — likely Aaron in the dashboard), but functions were NOT deployed (POST /api/stripe/checkout-subscription → 405, functions_enabled: None, last deploy 3 days old). Fix: rebuilt client (fresh dist from current source), bundled functions/ into dist, deployed via wrangler to mowgo.pages.dev (deployments a4364570 + 15163128). All 5 functions verified LIVE: checkout 401 (config check PASSED — secrets present at runtime, auth-gated), create-portal-session 401/403, verify-session gated, webhook fail-closed 200, autopilot 200. Signups/payments now possible.",
-        "impact": "CRITICAL — unblocks ALL revenue",
-        "time_min": 25
+        "task": "Subscribe.jsx verify-session auth fix + redeploy (CRITICAL, Day 1)",
+        "status": "✅ DONE — committed 051857c + DEPLOYED (wrangler, deployment cddb397c)",
+        "detail": "Root cause: verify-session.js (commit 5e0e32a) requires Bearer JWT + Origin allowlist; browsers send NO Origin on same-origin GETs and JS cannot set the Origin header (forbidden header) → every real checkout showed 'Could not verify payment' despite successful payment + webhook tier upgrade. Fix: (1) Subscribe.jsx now fetches Supabase session and sends `Authorization: Bearer <access_token>`; (2) verify-session.js rejects only a PRESENT-but-disallowed origin; absence allowed since JWT + metadata.user_id match remains the security gate. Codex CLI pass (codex exec --sandbox workspace-write --skip-git-repo-check) + manual diff verification + lint 0 errors + build OK. ⚠️ DEPLOY LESSON: git push does NOT trigger CF builds (project build_config: null, deployment_triggered_by None). Deploy = `wrangler pages deploy client/dist` from repo root with dist/functions present (npm run build wipes dist/functions — must re-copy functions/ into client/dist/functions before deploy; run from repo root so the functions bundle is detected). Deployed + verified LIVE: no-Origin GET → 401 (was 403), evil Origin → 403, checkout allowed-origin no-auth → 401, uses_functions: True.",
+        "impact": "CRITICAL — success page stops lying to paying customers",
+        "time_min": 45
       },
       {
-        "task": "Re-bind OPENROUTER_API_KEY secret (was empty at runtime)",
-        "status": "✅ DONE",
-        "detail": "Autopilot returned 503 'not_configured' post-deploy despite the secret being listed. Re-put the value from /opt/data/.env via `wrangler pages secret put` + redeploy → autopilot now returns real OpenRouter responses (verified: 'PONG'). The other 3 secrets (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_KEY) verified functional via checkout config probe.",
-        "impact": "Autopilot AI works in production",
+        "task": "Landing copy: 'Coming soon: Stripe payments' → 'Stripe payments are live.'",
+        "status": "✅ DONE (EN + ES)",
+        "detail": "Landing.jsx + en.json + es.json updated: 'Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.' Stripe checkout went live Aug 1; copy now truthful.",
+        "impact": "MEDIUM — conversion copy accuracy",
         "time_min": 5
       },
       {
-        "task": "Kill mowflow.pages.dev (old domain, live-key exposure, Day 2)",
-        "status": "✅ NEUTRALIZED (project deletion pending CF guard)",
-        "detail": "Deleted all 25 deployments via CF API (deployments list now 0). Deployed inert redirect placeholder over the project → mowflow.pages.dev now meta-refreshes to mowgo.pages.dev; POST /api/stripe/checkout-subscription → 405 (no functions, no sessions). LIVE cs_live_ exposure GONE. Project delete blocked by CF error 8000076 ('too many deployments to be deleted' — known CF guard quirk, persists even at 0 deployments); needs dashboard deletion by Aaron or a future retry.",
-        "impact": "HIGH — security + brand hygiene",
+        "task": "Compare page: +SoloOp +TurfHop columns, MowGo Stripe live, LawnPro $0–$39, free-tier count 6",
+        "status": "✅ DONE (EN + ES)",
+        "detail": "Live-verified solo-op.com (08:50Z intel + fresh fetch): $0/mo, AutoPay, Rain Mode, Gravity clustering, 3.5%+$0.50 card fee passed to client. TurfHop: $49/$79/$129 verified (07-31 intel), /pricing/ + /features/ BOTH 500-verified today (reliability ammo). Changes: 10-column matrix (14 rows), MowGo stripe 'soon'→true, LawnPro price $0–$39 + freeTier true, caption 7→9 competitors, 'Updated August 2026', free-tier-note ('Six apps now offer a permanent free tier…Grassly skims 2% of every card payment. MowGo's free plan takes nothing.'), TurfHop 500-error note. All i18n EN+ES.",
+        "impact": "MEDIUM — compare page is the main marketing artifact",
         "time_min": 15
       },
       {
-        "task": "Kick off invoice reminders build (0.5d win)",
-        "status": "✅ KICKED OFF — script built, tested, cron LIVE",
-        "detail": "Wrote server/scripts/invoice_reminders.py: queries Supabase for unpaid invoices >7d, skips cooldown (7d state file), sends Resend reminder with pay link (pattern mirrors existing invoice email, sender invoices@mowgo.app). Tested: connects with service key, 0 unpaid invoices found (pre-launch, expected). Registered hermes cron 'MowGo invoice reminders' — daily 12:30Z, no-agent, delivers to #🌱mowgo, next run Aug 2 12:30Z. NOTE: written directly as an ops script (not product code) — no Codex pass needed.",
-        "impact": "HIGH — direct cash-flow ROI once customers exist",
-        "time_min": 20
+        "task": "IBISWorld market-size verification ($176.7B vs $188.8B)",
+        "status": "✅ VERIFIED — both figures are real IBISWorld",
+        "detail": "$176.7B (2026) / $195B (2031) = IBISWorld MARKET-SIZE DASHBOARD (narrower scope, 3.0% CAGR, ~556K businesses, ibisworld.com/industry/statistics/marketsize.aspx?entid=1497). $188.8B = IBISWorld INDUSTRY ANALYSIS REPORT (broader scope, 6.5% CAGR, ~693K businesses, cited by NALP/LawnStarter/Landscaping.tv, ibisworld.com/united-states/industry/landscaping-services/1497/). NOT a contradiction — different IBISWorld products, different revenue scope for the same NAICS 561730. Rule: if copy cites a figure, name the product ('IBISWorld industry report' vs 'IBISWorld market size').",
+        "impact": "LOW — number hygiene; the 'verify before publishing' flag is RESOLVED",
+        "time_min": 5
       },
       {
-        "task": "Verify 'AI estimates shipped' roadmap claim",
-        "status": "✅ RE-VERIFIED CLEAN (closed Jul 31)",
-        "detail": "Grep of marketing/ + docs/ shows only the Jul 31 changelog correction entry — no stale claims remain. Roadmap truthful.",
-        "impact": "Gates /compare copy accuracy",
-        "time_min": 2
+        "task": "Bilingual claim scrub audit",
+        "status": "✅ VERIFIED CLEAN — nothing to scrub in shipped copy",
+        "detail": "Full grep of client/src (en.json, es.json, all pages) + marketing/: ZERO 'bilingual / Spanish / español' claims in live copy. The 'only bilingual' claim existed ONLY in intel/vault reports, never shipped. Do NOT reintroduce (Jobber ships Spanish team app; MowGo edge = full Spanish parity incl. admin).",
+        "impact": "LOW-MED — removes an indefensible claim risk",
+        "time_min": 10
       },
       {
-        "task": "Supabase keep-alive 'failing daily'",
-        "status": "✅ CLOSED — FALSE ALARM (again)",
-        "detail": "Log shows OK runs incl. Aug 1 06:00:04 (HTTP 401 reachable). Symlink + script intact (/opt/data/scripts/.hermes/scripts/supabase_keepalive.sh → /opt/data/scripts/supabase_keepalive.sh). Scan entry was stale data.",
-        "impact": "Removes recurring failure noise",
-        "time_min": 2
+        "task": "Lawton duo + Spray Masters reverse-lookup (2 of 8 new leads)",
+        "status": "✅ DONE — results in LEAD_TRACKER.md",
+        "detail": "SPRAY MASTERS = STRONG MATCH (95%): Spray Masters Turf Management, Owasso 74055 (10108 East 85th Ct N), FB page facebook.com/61574833317425 (Messenger = best path), LLC #3513929613 filed Mar 13 2026 — new business, no phone/website yet. LAWTON DUO: NO public footprint — checked Yelp/YP/FB/BBB/GreenPal/LawnStarter/Manta; 5 candidates (Lawton Lawn Care 580-919-3040, T&J, KC Lawns, Quality Lawn Care, L&C) none match confidently → best path = reply in FB group thread 396673829451224 post 897927359325866.",
+        "impact": "MEDIUM — unlocks outreach contact paths for 2 leads",
+        "time_min": 10
       },
       {
-        "task": "ALLOWED_ORIGINS dead-domain cleanup",
-        "status": "✅ RE-VERIFIED CLEAN (closed Jul 30)",
-        "detail": "Stripe functions: [mowgo.pages.dev, mowgo.app]; autopilot adds localhost dev ports. No dead domains.",
-        "impact": "Security hygiene",
-        "time_min": 2
-      },
-      {
-        "task": "Stripe price config drift ($49 legacy VITE var on CF)",
-        "status": "⚠️ VERIFIED INERT — dashboard cleanup flagged",
-        "detail": "CF project has STRIPE_PRICE_SOLO=$39 (correct, used by functions) AND VITE_STRIPE_PRICE_SOLO=price_1TwFiDGwXKVLlr2IIyi3NmBi (LEGACY $49). Inert today: static bundle built without price vars, function prefers STRIPE_PRICE_SOLO. Would activate if CF CI builds are ever enabled → cleanup: delete/edit VITE_STRIPE_PRICE_SOLO in CF dashboard (2 min). server/.env + client/.env.example already $39 (Jul 31).",
-        "impact": "Prevents future config drift",
-        "time_min": 3
+        "task": "Monday plate packaged (copy-paste day for Aaron)",
+        "status": "✅ DONE",
+        "detail": "monday_plate_2026-08-03.md: Blasian reply (draft path), 4+1 follow-ups, Jobber promo posts A/B/D, 5 FB buying-intent threads, 5 Reddit posts + new 1unfily candidate, directory submissions, 8 new leads with contact paths, 3 decisions (trial 7v14, CF cleanup, mowflow delete), suggested order (~1.5-2h).",
+        "impact": "MEDIUM — makes Monday a copy-paste day",
+        "time_min": 15
       }
     ],
     "still_blocked": [
       {
-        "task": "mowflow project deletion (domain itself is dead — redirect placeholder)",
-        "status": "🟡 CF API guard 8000076 blocks project delete even at 0 deployments",
-        "detail": "Known CF quirk. Domain already inert (redirect + no functions). Aaron: delete project in CF dashboard (or bot retries next run).",
-        "blocker": "Cloudflare-side guard"
+        "task": "Env var VALUES still unproven end-to-end (Day 17)",
+        "detail": "verify-session fix removes the 403-before-env-guard failure, but only a LOGGED-IN TEST CHECKOUT by Aaron proves STRIPE_SECRET_KEY/SUPABASE keys actually work. 5 min with his account."
+      },
+      {
+        "task": "mowflow project deletion (CF guard 8000076)",
+        "detail": "Unchanged — dashboard task for Aaron."
       }
     ]
   },
 
   "bug_fixes": {
-    "note": "No product-code changes required this run. The 3-day-old deployment missing its functions bundle was the root cause of the Day-16 Stripe outage — fixed via rebuild + redeploy (not code). No Codex CLI pass needed.",
-    "infra_fixed": [
-      "mowgo.pages.dev: fresh client build + functions bundle deployed (was: 3-day-old static-only build, functions_enabled None)",
-      "OPENROUTER_API_KEY secret re-bound (was: empty value at runtime → autopilot 503)",
-      "mowflow.pages.dev: 25 deployments deleted + inert redirect placeholder deployed (was: live old-brand app with working Stripe checkout)"
+    "note": "1 product-code fix this run, executed via Codex CLI per policy (codex exec --sandbox workspace-write --skip-git-repo-check) with manual diff verification + lint + build + push.",
+    "fixed": [
+      "verify-session success page 403 (CRITICAL, Day 1): Subscribe.jsx sends Bearer JWT from Supabase session; function allows same-origin (no-Origin) requests while keeping JWT + metadata.user_id gate — commit 051857c, pushed, CF Pages auto-build in progress"
     ],
     "verified_clean": [
-      "ALLOWED_ORIGINS (4 files)",
-      "server/.env STRIPE_PRICE_SOLO = $39",
-      "Roadmap AI-estimates claim (already corrected Jul 31)",
-      "Supabase keep-alive (Aug 1 06:00 OK)"
+      "Bilingual claim: absent from shipped copy (client + marketing audit)",
+      "IBISWorld figures: both $176.7B (dashboard) and $188.8B (industry report) are genuine IBISWorld — no 'wrong number' to scrub, just attribute correctly",
+      "SoloOp $0/3.5%+$0.50 and TurfHop $49-$129 + 500-errors re-verified live Aug 2"
     ],
     "flagged_not_changed": [
-      "VITE_STRIPE_TRIAL_DAYS=7 on CF but marketing promises '14-day trial' — checkout currently grants 7 days. Revenue-affecting → Aaron decides; fix = set STRIPE_TRIAL_DAYS=14 env or edit VITE_STRIPE_TRIAL_DAYS.",
-      "VITE_STRIPE_PRICE_SOLO legacy $49 value on CF (inert; see quick wins)",
-      "VITE_FORCE_DEMO=true on CF (inert — build-time var; current bundle built without it; demo mode OFF in production)",
-      "STRIPE_PRICE_CREW env not set (falls back to VITE_STRIPE_PRICE_CREW — current Crew price, unchanged)"
+      "Trial days: CF grants 7, copy says 14 — decision pending Aaron (on Monday plate)",
+      "VITE_STRIPE_PRICE_SOLO legacy $49 + VITE_FORCE_DEMO on CF — inert, dashboard cleanup on Monday plate",
+      "STRIPE_PRICE_CREW env not set (falls back to VITE_STRIPE_PRICE_CREW)"
     ]
   },
 
   "research_findings": {
-    "source": "Live fetch Aug 1 13:20Z — SoftwareWorld (softwareworld.co)",
+    "source": "Live fetches + subagent research Aug 2 12:45Z",
     "key_items": [
-      "SoftwareWorld lawn-care category ('cloud-based-lawn-care-software') lists 44 products, last updated AUG 1 2026 — MowGo ABSENT; updates daily/weekly.",
-      "NO self-serve submission form exists (homepage + category page have no 'Add your software' path) — process is curated/vendor-paid via their 'Connect with your next Client' channel. Yesterday's '404 form' finding confirmed.",
-      "Practical path for Aaron (10-15 min): contact SoftwareWorld via their vendor channel (homepage 'Connect with your next Client' section) OR skip and hit self-serve directories instead: Capterra (capterra.com/vendors/signup), G2 (g2.com/products/new), Software Advice (softwareadvice.com/vendors/signup), GetApp (getapp.com/vendors/signup).",
-      "Option noted: Presswave-style $49 bulk-submission middleman (299 directories) — not recommended; quality < targeted submissions.",
-      "Bonus intel from category page: HouseCall Pro listed at $59/mo entry — matches Jul 31 intel; Kickserv $60; GorillaDesk $49 — MowGo $39 flat remains cheapest point of entry in the whole category."
+      "IBISWorld: $176.7B 2026 / $195B 2031 (market-size dashboard, entid=1497, 3.0% CAGR, ~556K businesses) vs $188.8B (industry report, 6.5% CAGR, ~693K businesses; cited by NALP + LawnStarter May 2026 + Landscaping.tv). Both legitimate; attribute the product when citing. Corroboration: Mordor Intelligence ~$186B 2025 → $196B 2026 (broader scope).",
+      "SoloOp (solo-op.com): $0/mo forever, no premium tier; 3.5%+$0.50 card fee ADDED TO CLIENT total; AutoPay card-on-file; Rain Mode (Push Back 24h/Smart redistribute/Bucket + auto branded client emails); Gravity area-clustering; 3-tap invoicing + branded payment links; recurring weekly–6-monthly; offline mode; Collection Mode 'Invoice All'. Gaps: no quotes, no equipment, no portal-with-quotes.",
+      "TurfHop: /pricing/ AND /features/ both return 500 (verified 2× Aug 2 08:50Z + 12:50Z) — .NET stack-trace leak on custom error page; tiers Truck $49 / Office $79 / HQ $129 + 3.9%+$0.30 legacy tx fee; Orbit AI (ChatGPT/Claude/Gemini, credits 25-500/mo by tier).",
+      "Spray Masters reverse-lookup: Spray Masters Turf Management, Owasso OK 74055 — LLC filed Mar 13 2026, active; no phone/website/email in any directory; FB Messenger is the only public contact.",
+      "Lawton duo reverse-lookup: no public web footprint for a 2-person Lawton op with partner Noah — 5 candidates checked, none confident; FB group thread is the only reliable contact path."
     ]
   },
-
-  "builds_kicked_off": [
-    {
-      "id": "invoice_reminders",
-      "status": "LIVE — script + cron",
-      "artifact": "server/scripts/invoice_reminders.py + hermes cron 'MowGo invoice reminders' (30 12 * * *, no-agent, → #🌱mowgo)"
-    },
-    {
-      "id": "quotes_v1",
-      "status": "SCOPED (3-5d build, biggest structural gap)",
-      "artifact": "docs/quotes-v1-scope.md — table, 5 CF endpoints, client routes, edge cases, test plan"
-    },
-    {
-      "id": "competitor_import",
-      "status": "SCOPED (P0, ~1d, Jobber/QuoteIQ switcher wave)",
-      "artifact": "docs/competitor-import-spec.md — CSV mapping, preview/confirm endpoints, guardrails, GTM"
-    }
-  ],
 
   "tasks_needing_aaron": {
     "critical_today": [
       {
         "priority": "🔴 CRITICAL — promo window (ends ~Aug 3)",
         "task": "Jobber promo-expiry posts — drafts A/B/D ready (marketing/jobber-promo-expiration-2026-07-29.md)",
-        "detail": "Promo verified dead Aug 1 07:39Z. Facts fresh. Sat/Sun outside bot window → post today or Mon AM.",
-        "blocked_days": 2
-      },
-      {
-        "priority": "🔴 HIGH",
-        "task": "4 follow-up emails DUE TODAY: Emerge Lawns + Metro Green + Bigfoot + Simply",
-        "detail": "Draft ready for Emerge (marketing/emerge-lawns-followup-2026-07-30.md). Sent Jul 29-31, 0 replies. Warm leads cool fast.",
+        "detail": "New verified ammo: Jobber $29 Core + $29/user on EVERY tier; gates auto-reminders + QuickBooks behind Connect $119. 'MowGo includes them flat.'",
         "blocked_days": 3
       },
       {
         "priority": "🔴 HIGH",
-        "task": "Reply to Blasian in #🌱mowgo-leads (Day 4 unanswered)",
-        "detail": "Ready-to-send draft: leads/blasian-reply-draft-2026-08-01.md. Bot can send verbatim on your word (1 min) — restarts the human loop.",
+        "task": "4 follow-up emails OVERDUE (Emerge Lawns + Metro Green + Bigfoot + Simply) + Campbell & Sons due Aug 3",
+        "detail": "Sent Jul 29-31, 0 replies, now 4-5 days overdue. Draft ready for Emerge. New angle: 'Stripe payments went live — card links on every invoice.'",
         "blocked_days": 4
+      },
+      {
+        "priority": "🔴 HIGH",
+        "task": "Reply to Blasian in #🌱mowgo-leads (Day 6 unanswered Monday)",
+        "detail": "Draft ready: leads/blasian-reply-draft-2026-08-01.md. Bot can send verbatim on your word.",
+        "blocked_days": 5
       }
     ],
     "high": [
       {
-        "task": "SoftwareWorld / comparison-site submission (Day 16)",
-        "detail": "No self-serve form — use their vendor contact channel, or self-serve alternatives: Capterra, G2, Software Advice, GetApp (links in research_findings). 10-15 min.",
-        "blocked_days": 16
+        "task": "SoftwareWorld / comparison-site submission (Day 19)",
+        "detail": "Capterra/G2/SoftwareAdvice/GetApp self-serve (10-15 min each); SoftwareWorld needs vendor-channel contact (guide: marketing/comparison-site-submission-guide.md).",
+        "blocked_days": 18
       },
       {
-        "task": "Reddit manual posting (Day 8) — top targets: r/Entrepreneur 1i3pv4b, r/landscaping 1rm499y (feature-goldmine thread, review Mon), r/CRM 1v6vwcn",
-        "detail": "28 drafts, 0 posted. Bot 403-blocked. 1v6ce6e expired Jul 31.",
-        "blocked_days": 8
+        "task": "Reddit manual posting (Day 11) — 5 targets + new 1unfily",
+        "detail": "r/Entrepreneur 1i3pv4b · r/landscaping 1rm499y (re-check Mon — TurfHop pricing page down = ammo) · r/CRM 1v6vwcn · r/LawnCareBusinessCRM 1l0y40z · Jobber-complaint 1bfw00i · NEW r/WhichCRM 1unfily. 28 drafts ready.",
+        "blocked_days": 10
       },
       {
-        "task": "Delete mowflow project in CF dashboard (domain already inert)",
-        "detail": "API guard 8000076 blocks bot deletion. Dashboard: Workers & Pages → mowflow → Delete (or approve bot retry).",
+        "task": "Delete mowflow project in CF dashboard",
+        "detail": "Stub retired Aug 2; project remains. CF guard 8000076 blocks API deletion.",
         "blocked_days": 2
       }
     ],
     "decisions_needed": [
-      "Trial length: CF env says 7 days, marketing says 14-day trial. Checkout currently grants 7. Set STRIPE_TRIAL_DAYS=14 (1 min) or update copy?",
-      "Cleanup (all inert, 5 min total in CF dashboard): VITE_STRIPE_PRICE_SOLO legacy $49 value, VITE_FORCE_DEMO=true, add STRIPE_PRICE_CREW for symmetry."
+      "Trial length: CF env 7 days vs marketing '14-day trial' — checkout currently grants 7 (1 min to fix either way)",
+      "CF cleanup (5 min): VITE_STRIPE_PRICE_SOLO legacy $49, VITE_FORCE_DEMO=true, add STRIPE_PRICE_CREW for symmetry",
+      "Blasian reply: bot-send verbatim vs Aaron copy-paste"
     ]
   },
 
   "blockers_summary": {
     "resolved_today": [
-      "🔴 Stripe production checkout (Day 16) — LIVE, all 5 functions verified",
-      "🔴 mowflow.pages.dev live-key exposure — domain inert, redirects to mowgo, checkout dead",
-      "Autopilot OPENROUTER_API_KEY empty at runtime — re-bound, verified working",
-      "Supabase keep-alive 'failure' — false alarm (Aug 1 06:00 OK)",
-      "Invoice reminders — no longer just an idea: script + cron live"
+      "🔴 verify-session success-page bug (Day 1) — FIXED + deployed (commit 051857c)",
+      "Landing 'Coming soon: Stripe payments' false copy — now 'Stripe payments are live.'",
+      "IBISWorld number-hygiene flag — verified: both figures legitimate, attribute product",
+      "Bilingual claim risk — verified absent from shipped copy",
+      "Compare page stale (no SoloOp/TurfHop, free-tier count wrong, LawnPro price wrong) — updated Aug 2026"
     ],
     "remaining": [
-      "SoftwareWorld/comparison-site absence (Day 16) — Aaron manual",
-      "Reddit posting (Day 8) — Aaron manual, bot 403-blocked",
-      "Blasian human loop (Day 4) — draft ready, 1 min send",
-      "Cold-outreach follow-up cadence — 4 emails due today",
-      "mowflow project deletion — CF dashboard or retry",
+      "Stripe env var VALUES unproven (Day 17) — needs Aaron's logged-in test checkout (5 min)",
+      "SoftwareWorld/comparison-site absence (Day 19) — Aaron manual",
+      "Reddit posting (Day 11) — Aaron manual, bot 403-blocked",
+      "Blasian human loop (Day 5) — draft ready, 1 min send",
+      "Cold-outreach follow-ups — 4 overdue + Campbell & Sons due Aug 3",
+      "mowflow project deletion — CF dashboard",
       "Trial-length drift (7 vs 14 days) — needs decision"
     ]
   },
 
   "assets_created_today": [
-    "/opt/data/mowgo/server/scripts/invoice_reminders.py (tested, cron LIVE)",
-    "/opt/data/mowgo/docs/quotes-v1-scope.md",
-    "/opt/data/mowgo/docs/competitor-import-spec.md",
-    "/opt/data/mowgo/leads/blasian-reply-draft-2026-08-01.md",
-    "/opt/data/mowgo/scripts/kill_mowflow.py (deployment-cleanup tool, reusable)",
-    "/opt/data/mowgo/.mowflow_placeholder/index.html (retired-domain redirect)",
-    "mowgo.pages.dev production deployment with functions (15163128.mowgo.pages.dev)",
-    "hermes cron: MowGo invoice reminders (30 12 * * *)"
+    "commit 051857c — verify-session fix + landing copy + compare page (pushed, CF auto-build)",
+    "/opt/data/mowgo/monday_plate_2026-08-03.md — Aaron's copy-paste Monday plate",
+    "leads/LEAD_TRACKER.md — Spray Masters (strong match) + Lawton duo (no footprint) lookup results"
   ],
 
-  "summary": "Big day: Stripe production checkout is FIXED (Day 16 → resolved). The 4 secrets + 9 env vars were set on the CF project but functions never shipped — rebuilt, bundled functions/, redeployed, and verified all 5 endpoints live (checkout 401-auth-gated, portal, verify, webhook fail-closed, autopilot returning real OpenRouter responses after re-binding its empty secret). mowflow.pages.dev is neutralized: 25 deployments deleted, redirect placeholder live, checkout dead — project deletion remains blocked by a CF guard (dashboard task). Invoice reminders went from idea to LIVE cron (script tested, scheduled daily 12:30Z). Quotes v1 and competitor-import are scoped and ready for Codex/Dev. Quick wins re-verified: keepalive OK, AI claim clean, ALLOWED_ORIGINS clean, price vars correct. Aaron's plate: 4 follow-up emails due today, Jobber promo posts (window open), Blasian reply (draft ready), SoftwareWorld/comparison submissions (path researched), Reddit manual posts, mowflow dashboard deletion, and one decision (trial days 7 vs 14)."
+  "summary": "The CRITICAL Day-1 bug is fixed and deploying: browsers never send Origin on same-origin GETs, so the JWT+Origin-gated verify-session function 403'd every real checkout — Subscribe.jsx now sends the Supabase Bearer token, and the function only rejects present-but-disallowed origins (JWT + metadata user_id remains the gate). Landing copy now says 'Stripe payments are live' (EN+ES). Compare page went 8→10 columns with SoloOp ($0, verified live) and TurfHop ($49-$129, both pricing+features pages 500 today = reliability note), MowGo Stripe marked live, LawnPro corrected to $0-$39 with free tier, caption 9 competitors, free-tier-count-6 note with the 2% skim line, all bilingual. IBISWorld: both $176.7B and $188.8B are real IBISWorld figures from different products — attribute the product when citing. Bilingual claim: verified absent from shipped copy. Lead lookups: Spray Masters = Spray Masters Turf Management (Owasso, FB Messenger), Lawton duo = no public footprint (reply in group thread). Monday plate packaged (monday_plate_2026-08-03.md) with order: Blasian → follow-ups → FB threads → Jobber posts → Reddit → decisions → directories → new-lead DMs. Aaron's criticals: Jobber promo posts (window ~Aug 3), 4 overdue follow-ups + Campbell & Sons, Blasian reply, logged-in test checkout to prove env vars end-to-end."
 }
