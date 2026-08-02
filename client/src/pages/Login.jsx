@@ -2,7 +2,8 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, isDemoMode } from '../lib/supabase';
-import { Sprout, Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import Logo from '../components/Logo';
 
 export default function Login() {
   const { tr, t, i18n } = useLocalizedText('login');
@@ -115,9 +116,7 @@ export default function Login() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-3">
-            <Sprout className="w-6 h-6 text-white" />
-          </div>
+          <Logo size="lg" className="mx-auto mb-3" />
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
         </div>
