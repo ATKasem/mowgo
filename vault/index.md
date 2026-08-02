@@ -1,12 +1,16 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-08-01
+> **Last updated:** 2026-08-02
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
+| 2026-08-02 | `2026-08-02_daily-sync.md` | **Main sync note** — Stripe Day 16 RESOLVED (checkout live), mowflow domain neutralized, decisions, tasks, research, action items |
+| 2026-08-02 | `2026-08-02_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 14 new) |
+| 2026-08-02 | `2026-08-02_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (23 messages, 0 new) |
+| 2026-08-02 | `2026-08-02_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages, 0 new) |
 | 2026-08-01 | `2026-08-01_daily-sync.md` | **Main sync note** — decisions, tasks, research, action items, notes |
 | 2026-08-01 | `2026-08-01_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 15 new) |
 | 2026-08-01 | `2026-08-01_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (23 messages, 0 new) |
@@ -51,4 +55,4 @@
 
 ---
 
-*Index updated by MowGo nightly vault sync — 2026-08-01 02:00 UTC*
+*Index updated by MowGo nightly vault sync — 2026-08-02 02:00 UTC*
