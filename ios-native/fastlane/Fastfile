@@ -1,0 +1,42 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    # API key for App Store Connect (from env vars)
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_filepath: ENV["APP_STORE_CONNECT_API_KEY_FILEPATH"] || "~/.fastlane/AuthKey_#{ENV['APP_STORE_CONNECT_API_KEY_ID']}.p8",
+      duration: 1200, # 20 min timeout for large uploads
+      in_house: false
+    )
+
+    # Ensure XcodeGen has run (project file is up to date)
+    sh("cd .. && xcodegen generate")
+
+    # Bump build number (auto-increment)
+    increment_build_number(
+      build_number: latest_testflight_build_number(app_identifier: "com.mowgo.app") + 1,
+      xcodeproj: "../MowGo.xcodeproj"
+    )
+
+    # Build and archive
+    build_app(
+      project: "../MowGo.xcodeproj",
+      scheme: "MowGo",
+      export_method: "app-store",
+      output_directory: "build",
+      clean: true
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      # Notify external testers automatically
+      distribute_external: false, # Set true to auto-distribute
+      notify_external_testers: false
+    )
+  end
+end

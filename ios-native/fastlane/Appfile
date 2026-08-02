@@ -1,0 +1,9 @@
+# MowGo iOS Fastlane Appfile
+# App Store Connect credentials come from environment variables
+# See .env.example for what to set
+
+app_identifier("com.mowgo.app")
+apple_id(ENV["APPLE_ID"]) # Your Apple ID email
+
+# Team can be left blank — Fastlane picks the right one from your account
+# team_id(ENV["FASTLANE_TEAM_ID"])
