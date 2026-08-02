@@ -1056,28 +1056,32 @@ final class DataStore: ObservableObject {
             teamMembers.append(newMember)
             return
         }
-        // Real mode: call edge function or insert via API
-        // For now, insert directly into profiles
-        struct ProfileInsert: Encodable {
-            let id: UUID
-            let businessName: String
-            let tier: String
-            let role: String
-            let businessId: UUID?
+        // Real mode: call Cloudflare edge function that handles both flows:
+        //   1. New user → creates auth user + profile
+        //   2. Existing user → updates their profile to join crew
+        let token = sb.token ?? ""
+        let url = URL(string: "https://mowgo.pages.dev/api/invite-crew")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        req.httpBody = try JSONEncoder().encode(["email": normalizedEmail])
+        
+        let (data, res) = try await URLSession.shared.data(for: req)
+        guard let http = res as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            let msg = String(data: data, encoding: .utf8) ?? "Unknown error"
+            throw DataStoreError.serverError("Server error (\((res as? HTTPURLResponse)?.statusCode ?? 0)): \(msg)")
         }
-        guard let currentProfile = try await sb.fetchProfile(),
-              let ownerId = currentProfile.role == "owner" ? currentProfile.id : currentProfile.businessId else {
-            throw DataStoreError.authenticationRequired
-        }
-        let newId = UUID()
-        let member: UserProfile = try await sb.insert("profiles", ProfileInsert(
-            id: newId,
-            businessName: normalizedEmail.split(separator: "@").first.map(String.init) ?? normalizedEmail,
-            tier: "crew",
-            role: "crew",
-            businessId: ownerId
+        
+        let decoded = try JSONDecoder().decode(InviteResponse.self, from: data)
+        teamMembers.append(UserProfile(
+            id: UUID(uuidString: decoded.profile.id) ?? UUID(),
+            businessName: decoded.profile.businessName,
+            phone: nil,
+            tier: decoded.profile.tier,
+            role: decoded.profile.role,
+            businessId: decoded.profile.businessId.map { UUID(uuidString: $0) ?? UUID() }
         ))
-        teamMembers.append(member)
     }
 
     func removeTeamMember(_ member: UserProfile) async throws {
@@ -1160,6 +1164,7 @@ enum DataStoreError: LocalizedError {
     case authenticationRequired
     case clientRequired
     case freeTierLimit(String)
+    case serverError(String)
 
     var errorDescription: String? {
         switch self {
@@ -1168,6 +1173,8 @@ enum DataStoreError: LocalizedError {
         case .clientRequired:
             "Select a client before saving the job."
         case .freeTierLimit(let message):
+            message
+        case .serverError(let message):
             message
         }
     }

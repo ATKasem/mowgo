@@ -404,3 +404,19 @@ final class InvoiceCache {
         return try? JSONDecoder().decode(Invoice.self, from: jsonData)
     }
 }
+
+// MARK: - Invite Response
+
+struct InviteResponse: Codable {
+    let invited: String
+    let flow: String
+    let profile: InviteProfile
+}
+
+struct InviteProfile: Codable {
+    let id: String
+    let businessName: String?
+    let tier: String?
+    let role: String?
+    let businessId: String?
+}
