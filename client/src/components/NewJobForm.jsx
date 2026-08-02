@@ -11,8 +11,8 @@ export default function NewJobForm({ form, setForm, onSubmit, onCancel, saving =
   return (
     <form onSubmit={onSubmit} className="card p-5 mb-4 space-y-3 border-emerald-200 dark:border-emerald-800" style={{ animation: 'slideDown 0.2s ease-out' }}>
       <div className="flex items-center gap-2 mb-1">
-        <Sparkles className="w-4 h-4 text-emerald-500" />
-        <span className="font-semibold text-sm text-gray-700 dark:text-gray-300">{tr("New Job")}</span>
+        <Sparkles className="w-4 h-4 text-brand" />
+        <span className="font-semibold text-sm text-[var(--color-text-primary)] dark:text-gray-300">{tr("New Job")}</span>
       </div>
       <div>
         <label className="label">{tr("Client")}</label>

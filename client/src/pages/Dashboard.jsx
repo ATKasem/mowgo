@@ -93,7 +93,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-brand animate-spin" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function Dashboard() {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <AlertCircle className="w-8 h-8 text-amber-500" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">{error}</p>
+        <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{error}</p>
         <button onClick={() => { setError(''); setLoading(true); setRetryKey(k => k + 1); }} className="btn-secondary text-sm">{tr('Retry')}</button>
       </div>
     );
@@ -120,22 +120,22 @@ export default function Dashboard() {
   if (role !== 'owner') {
     return (
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-5">{tr('Dashboard')}</h2>
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-4">
             <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-2.5">
-              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle className="w-5 h-5 text-brand-hover dark:text-emerald-400" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.weeklyJobs}</p>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-0.5">{tr('Jobs This Week')}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{stats.weeklyJobsDone} {tr('done')}</p>
+            <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">{stats.weeklyJobs}</p>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mt-0.5">{tr('Jobs This Week')}</p>
+            <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">{stats.weeklyJobsDone} {tr('done')}</p>
           </div>
           <div className="card p-4">
             <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center mb-2.5">
               <Users className="w-5 h-5 text-sky-600 dark:text-sky-400" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.activeClients}</p>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-0.5">{tr('Active Clients')}</p>
+            <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">{stats.activeClients}</p>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mt-0.5">{tr('Active Clients')}</p>
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ export default function Dashboard() {
     {
       icon: DollarSign,
       iconBg: 'bg-emerald-100 dark:bg-emerald-900/30',
-      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      iconColor: 'text-brand-hover dark:text-emerald-400',
       value: `$${stats.todayRevenue.toLocaleString()}`,
       label: tr('Revenue Today'),
       sub: stats.todayJobsTotal ? `${stats.todayJobsDone}/${stats.todayJobsTotal} ${tr('jobs done')}` : tr('No jobs today'),
@@ -179,16 +179,16 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-5">{tr('Dashboard')}</h2>
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
       <div className="grid grid-cols-2 gap-3">
         {cards.map((card, i) => (
           <div key={i} className="card p-4">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2.5 ${card.iconBg}`}>
               <card.icon className={`w-5 h-5 ${card.iconColor}`} />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</p>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-0.5">{card.label}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{card.sub}</p>
+            <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">{card.value}</p>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mt-0.5">{card.label}</p>
+            <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">{card.sub}</p>
           </div>
         ))}
       </div>

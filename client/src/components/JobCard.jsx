@@ -44,7 +44,7 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
       >
         {/* Drag handle */}
         {isActive && (
-          <div className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing flex-shrink-0" aria-label={tr("Drag to reorder")}>
+          <div className="text-gray-300 dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-secondary)] dark:hover:text-[var(--color-text-muted)] cursor-grab active:cursor-grabbing flex-shrink-0" aria-label={tr("Drag to reorder")}>
             <GripVertical className="w-4 h-4" />
           </div>
         )}
@@ -53,26 +53,26 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
         <button
           aria-label={tr(isDone ? 'Undo completion' : isInProgress ? 'Mark job complete' : 'Start work')}
           onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-emerald-500 text-white scale-100' : isInProgress ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 hover:scale-105' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60 hover:scale-105'}`}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold flex-shrink-0 transition-all duration-200 shadow-sm ${isDone ? 'bg-brand text-white scale-100' : isInProgress ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 hover:scale-105' : 'bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 hover:bg-sky-200 dark:hover:bg-sky-900/60 hover:scale-105'}`}
         >
           {isDone ? <Check className="w-6 h-6" /> : isInProgress ? <Clock className="w-5 h-5" /> : <span>{index + 1}</span>}
         </button>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className={`font-semibold text-sm truncate ${isDone ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+          <p className={`font-semibold text-sm truncate ${isDone ? 'line-through text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]' : 'text-[var(--color-text-primary)] dark:text-white'}`}>
             {client?.name || tr('Unknown')}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)}</span>
-            <span className="text-gray-300 dark:text-gray-600 text-xs">&middot;</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{job.title}</span>
+            <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{job.scheduled_time?.slice(0, 5)}</span>
+            <span className="text-gray-300 dark:text-[var(--color-text-secondary)] text-xs">&middot;</span>
+            <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] truncate">{job.title}</span>
             {recurrenceLabel && (
-              <><span className="text-gray-300 dark:text-gray-600 text-xs">·</span>
+              <><span className="text-gray-300 dark:text-[var(--color-text-secondary)] text-xs">·</span>
               <span className="text-xs text-violet-500 dark:text-violet-400 inline-flex items-center gap-0.5"><RefreshCw className="w-3 h-3" />{tr(recurrenceLabel)}</span></>
             )}
             {assignedMember && assignedColor && (
-              <><span className="text-gray-300 dark:text-gray-600 text-xs">·</span>
+              <><span className="text-gray-300 dark:text-[var(--color-text-secondary)] text-xs">·</span>
               <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${assignedColor.bg} ${assignedColor.text}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
                 {(assignedMember.business_name || tr('Unnamed')).split(' ')[0]}
@@ -91,13 +91,13 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
           {/* Key info */}
           <div className="flex flex-wrap gap-2">
             {client?.key_code && (
-              <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><Key className="w-3.5 h-3.5" />{tr('Key')}: {client.key_code}</span>
+              <span className="badge bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><Key className="w-3.5 h-3.5" />{tr('Key')}: {client.key_code}</span>
             )}
             {client?.alarm_code && (
               <span className="badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><AlarmCheck className="w-3.5 h-3.5" />{tr('Alarm')}: {client.alarm_code}</span>
             )}
             {client?.pet_instructions && (
-              <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><PawPrint className="w-3.5 h-3.5" />{client.pet_instructions}</span>
+              <span className="badge bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><PawPrint className="w-3.5 h-3.5" />{client.pet_instructions}</span>
             )}
             {recurrenceLabel && (
               <span className="badge bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 text-xs inline-flex items-center gap-1.5 px-3 py-1.5"><RefreshCw className="w-3.5 h-3.5" />{tr(recurrenceLabel)}</span>
@@ -106,14 +106,14 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
 
           {/* Address + notes */}
           {client?.address && (
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">
               <MapPin className="w-4 h-4 flex-shrink-0" />
               <span>{client.address}</span>
             </div>
           )}
           {client?.service_notes && (
-            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <StickyNote className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] bg-[var(--color-surface-bg)] dark:bg-gray-800/50 rounded-lg p-3">
+              <StickyNote className="w-4 h-4 text-[var(--color-text-muted)] mt-0.5 flex-shrink-0" />
               {client.service_notes}
             </div>
           )}
@@ -127,7 +127,7 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
             )}
             <button
               onClick={e => { e.stopPropagation(); onToggleStatus(); }}
-              className={`flex-1 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 min-h-[44px] ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : isInProgress ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'}`}
+              className={`flex-1 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 min-h-[44px] ${isDone ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : isInProgress ? 'bg-brand text-white hover:bg-brand-hover' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'}`}
             >
               {tr(isDone ? 'Undo' : isInProgress ? 'Mark Complete' : 'Start Work')}
             </button>

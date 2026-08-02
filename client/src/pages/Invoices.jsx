@@ -87,12 +87,12 @@ export default function Invoices({ invoices = [], setInvoices }) {
   return (
     <div>
       <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Invoices")}</h2>
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Invoices")}</h2>
         <div className="flex items-center gap-3 mt-0.5">
-          <p className="text-sm text-gray-500 dark:text-gray-400">{tr('{{count}} total', { count: invoices.length })}</p>
-          <span className="text-gray-300 dark:text-gray-600">&middot;</span>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('{{count}} total', { count: invoices.length })}</p>
+          <span className="text-gray-300 dark:text-[var(--color-text-secondary)]">&middot;</span>
           {unpaid.length > 0 && <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">{tr('${{amount}} outstanding', { amount: totalUnpaid })}</p>}
-          {totalPaid > 0 && <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{tr('${{amount}} collected', { amount: totalPaid })}</p>}
+          {totalPaid > 0 && <p className="text-sm text-brand-hover dark:text-emerald-400 font-medium">{tr('${{amount}} collected', { amount: totalPaid })}</p>}
         </div>
       </div>
 
@@ -114,13 +114,13 @@ export default function Invoices({ invoices = [], setInvoices }) {
                  onKeyDown={e => { if (e.key === 'Escape') { setShowFilter(false); } }}
                  onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setShowFilter(false); }}>
               {STATUS_FILTERS.map(f => (
-                <button key={f.value} onClick={() => { setStatusFilter(f.value); setShowFilter(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${statusFilter === f.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>{tr(f.label)}</button>
+                <button key={f.value} onClick={() => { setStatusFilter(f.value); setShowFilter(false); }} className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] ${statusFilter === f.value ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:bg-[var(--color-surface-bg)] dark:hover:bg-gray-800'}`}>{tr(f.label)}</button>
               ))}
             </div>
           )}
         </div>
         {statusFilter !== 'all' && (
-          <button onClick={() => setStatusFilter('all')} className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full">
+          <button onClick={() => setStatusFilter('all')} className="inline-flex items-center gap-1 text-xs font-medium text-brand-hover dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full">
             {tr(STATUS_FILTERS.find(f => f.value === statusFilter)?.label)} <X className="w-3 h-3" />
           </button>
         )}
@@ -128,7 +128,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
 
       <div className="space-y-2">
         {filtered.length === 0 && (
-          <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" /><p className="text-gray-500 dark:text-gray-400 font-semibold">{tr("No invoices")}</p><p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{tr(statusFilter !== 'all' ? 'No matching invoices' : 'Invoices are created when you complete a job')}</p></div>
+          <div className="card p-10 text-center"><Receipt className="w-12 h-12 text-gray-300 dark:text-[var(--color-text-secondary)] mx-auto mb-4" /><p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] font-semibold">{tr("No invoices")}</p><p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] text-sm mt-1">{tr(statusFilter !== 'all' ? 'No matching invoices' : 'Invoices are created when you complete a job')}</p></div>
         )}
         {filtered.map(invoice => {
           const statusInfo = INVOICE_STATUS[invoice.status] || INVOICE_STATUS.unpaid;
@@ -147,8 +147,8 @@ export default function Invoices({ invoices = [], setInvoices }) {
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-white text-sm">{invoice.clients?.name || 'Unknown'}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dateStr} &middot; <span className="font-semibold text-gray-700 dark:text-gray-300">${invoice.amount}</span></p>
+                      <p className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm">{invoice.clients?.name || 'Unknown'}</p>
+                      <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-0.5">{dateStr} &middot; <span className="font-semibold text-[var(--color-text-primary)] dark:text-gray-300">${invoice.amount}</span></p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -156,45 +156,45 @@ export default function Invoices({ invoices = [], setInvoices }) {
                     {!isPaid && (
                       <button
                         onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }}
-                        className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 group"
+                        className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-brand-hover dark:text-emerald-400 hover:text-emerald-700 group"
                       >
                         {copiedIds.has(invoice.id) ? (
                           <><ClipboardCheck className="w-3 h-3" />{tr("Copied!")}
-                            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
+                            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
                               {tr("Paste into a text to the client")}
-                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-[var(--color-surface)] rotate-45" />
                             </span>
                           </>) : (
                           <><Copy className="w-3 h-3" />{tr("Copy")}
-                            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
+                            <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none">
                               {tr("Copy a payment request to send via text")}
-                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-[var(--color-surface)] rotate-45" />
                             </span>
                           </>)}
                       </button>
                     )}
-                    <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
+                    <ChevronRight className={`w-4 h-4 text-[var(--color-text-muted)] transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
                   </div>
                 </div>
                 {isExpanded && (
                   <div className="border-t border-gray-100 dark:border-gray-800 px-4 pb-4 space-y-3" style={{ animation: 'slideDown 0.15s ease-out' }}>
                     <div className="grid grid-cols-2 gap-3 text-sm pt-3">
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Client")}</span><span className="font-medium text-gray-900 dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Amount")}</span><span className="font-bold text-gray-900 dark:text-white">${invoice.amount}</span></div>
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Created")}</span><span className="text-gray-700 dark:text-gray-300">{dateStr}</span></div>
-                      <div><span className="text-xs text-gray-400 dark:text-gray-500 block">{tr("Status")}</span><span className={statusInfo.badge}>{tr(statusInfo.label)}</span></div>
+                      <div><span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] block">{tr("Client")}</span><span className="font-medium text-[var(--color-text-primary)] dark:text-white">{invoice.clients?.name || 'Unknown'}</span></div>
+                      <div><span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] block">{tr("Amount")}</span><span className="font-bold text-[var(--color-text-primary)] dark:text-white">${invoice.amount}</span></div>
+                      <div><span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] block">{tr("Created")}</span><span className="text-[var(--color-text-primary)] dark:text-gray-300">{dateStr}</span></div>
+                      <div><span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] block">{tr("Status")}</span><span className={statusInfo.badge}>{tr(statusInfo.label)}</span></div>
                     </div>
                     <div className="flex gap-2 pt-1">
                       <button onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }} className="relative btn-secondary flex-1 text-xs gap-1 group min-h-[44px] py-2.5">
                         <Copy className="w-3.5 h-3.5" />{tr(copiedIds.has(invoice.id) ? 'Copied!' : 'Copy to Text')}
-                        <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
+                        <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] text-[11px] font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-30">
                           {tr("Copies a payment request — paste in a text")}
-                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-white rotate-45" />
+                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-[var(--color-surface)] rotate-45" />
                         </span>
                       </button>
                     </div>
                     <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
-                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">{tr("Change status")}</p>
+                      <p className="text-xs font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2">{tr("Change status")}</p>
                       <div className="flex gap-1">
                         {['unpaid', 'paid', 'overdue'].map(s => {
                           const si = INVOICE_STATUS[s];
@@ -207,7 +207,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
                               className={`flex-1 text-xs font-semibold py-2.5 rounded-lg transition-all duration-150 min-h-[44px] ${
                                 active
                                   ? `${si.bg} ${si.text} cursor-default`
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                  : 'bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700'
                               }`}
                             >
                               {tr(si.label)}

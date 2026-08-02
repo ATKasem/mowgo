@@ -309,7 +309,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-brand animate-spin" />
       </div>
     );
   }
@@ -321,12 +321,12 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Today")}</h2>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Today")}</h2>
           <div className="flex items-center gap-2 mt-0.5">
-            <p className="text-sm text-gray-500 dark:text-gray-400">{tr('{{count}} job', { count: filtered.length })}</p>
-            {doneCount > 0 && <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{tr('{{count}} completed', { count: doneCount })}</span></>}
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('{{count}} job', { count: filtered.length })}</p>
+            {doneCount > 0 && <><span className="text-gray-300 dark:text-[var(--color-text-secondary)]">&middot;</span><span className="text-sm text-brand-hover dark:text-emerald-400 font-medium">{tr('{{count}} completed', { count: doneCount })}</span></>}
             {filtered.some(j => j.recurrence && j.recurrence !== 'none') && (
-              <><span className="text-gray-300 dark:text-gray-600">&middot;</span><span className="text-sm text-violet-600 dark:text-violet-400 font-medium inline-flex items-center gap-1"><Repeat className="w-3 h-3" />{tr("Recurring")}</span></>
+              <><span className="text-gray-300 dark:text-[var(--color-text-secondary)]">&middot;</span><span className="text-sm text-violet-600 dark:text-violet-400 font-medium inline-flex items-center gap-1"><Repeat className="w-3 h-3" />{tr("Recurring")}</span></>
             )}
           </div>
         </div>
@@ -407,7 +407,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             onClick={() => {
               window.dispatchEvent(new CustomEvent('mowgo:autopilot-send', { detail: { message: prompt.text } }));
             }}
-            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-600 border border-transparent transition-colors"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-600 border border-transparent transition-colors"
           >
             <Sparkles className="w-3 h-3" />
             {prompt.label}
@@ -418,7 +418,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       {/* Date picker + progress */}
       <div className="flex items-center gap-3 mb-5">
         <input type="date" value={date} onChange={e => setDate(e.target.value)} aria-label={tr("Select date")} className="input w-auto" />
-        <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden"
+        <div className="flex-1 bg-[var(--color-surface-secondary)] dark:bg-gray-800 rounded-full h-1.5 overflow-hidden"
              role="progressbar"
              aria-valuenow={doneCount}
              aria-valuemin={0}
@@ -438,8 +438,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             onClick={() => setCrewFilter(null)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               crewFilter === null
-                ? 'bg-emerald-500 text-white shadow-sm'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                ? 'bg-brand text-white shadow-sm'
+                : 'bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700'
             }`}
           >
             {tr("All")}
@@ -453,11 +453,11 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
                 onClick={() => setCrewFilter(isActive ? null : m.id)}
                 className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   isActive
-                    ? 'bg-emerald-500 text-white shadow-sm'
+                    ? 'bg-brand text-white shadow-sm'
                     : `${color.bg} ${color.text} hover:opacity-80`
                 }`}
               >
-                <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white/70' : 'bg-current opacity-50'}`} />
+                <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-[var(--color-surface)]/70' : 'bg-current opacity-50'}`} />
                 {(m.business_name || 'Unnamed').split(' ')[0]}
               </button>
             );
@@ -468,7 +468,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       {/* Team Progress Dashboard — crew owners only */}
       {canManageCrew && teamDashboard.length > 0 && (
         <div className="card p-4 mb-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{tr("Team Progress")}</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-3">{tr("Team Progress")}</h3>
           <div className="space-y-2">
             {teamDashboard.map((member, i) => {
               const color = TEAM_MEMBER_COLORS[i % TEAM_MEMBER_COLORS.length];
@@ -481,10 +481,10 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{member.name}</span>
-                      <span className="text-[11px] text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">{completed}/{member.total} {tr("completed")}</span>
+                      <span className="text-xs font-medium text-[var(--color-text-primary)] dark:text-gray-300 truncate">{member.name}</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-shrink-0 ml-2">{completed}/{member.total} {tr("completed")}</span>
                     </div>
-                    <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-[var(--color-surface-secondary)] dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
@@ -504,9 +504,9 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       <div className="space-y-3">
         {filtered.length === 0 && (
           <div className="card p-10 text-center">
-            <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 font-semibold">{tr(crewFilter ? 'No jobs assigned' : 'No jobs scheduled')}</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">{tr(crewFilter ? 'Choose All or another crew member.' : 'Tap + to add your first job')}</p>
+            <Circle aria-hidden="true" className="w-12 h-12 text-gray-300 dark:text-[var(--color-text-secondary)] mx-auto mb-4" />
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] font-semibold">{tr(crewFilter ? 'No jobs assigned' : 'No jobs scheduled')}</p>
+            <p className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] text-sm mt-1">{tr(crewFilter ? 'Choose All or another crew member.' : 'Tap + to add your first job')}</p>
           </div>
         )}
         {filtered.map((job, i) => (

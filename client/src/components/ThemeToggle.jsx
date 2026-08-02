@@ -5,7 +5,7 @@ import { Sun, Moon, Monitor } from 'lucide-react';
 const THEME_KEY = 'mowgo-theme';
 
 export function getStoredTheme() {
-  return localStorage.getItem(THEME_KEY) || 'system';
+  return localStorage.getItem(THEME_KEY) || 'dark';
 }
 
 export function applyTheme(theme) {
@@ -33,7 +33,7 @@ export default function ThemeToggle() {
   }, [theme]);
 
   function cycle() {
-    setTheme(prev => prev === 'light' ? 'dark' : prev === 'dark' ? 'system' : 'light');
+    setTheme(prev => prev === 'dark' ? 'light' : prev === 'light' ? 'system' : 'dark');
   }
 
   const Icon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;

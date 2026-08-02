@@ -136,17 +136,17 @@ export default function Settings() {
   return (
     <div>
       <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr("Settings")}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{tr("Manage your business profile and preferences")}</p>
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Settings")}</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-0.5">{tr("Manage your business profile and preferences")}</p>
       </div>
 
       <div className="space-y-5">
 
         {/* Business Profile */}
         <form onSubmit={save} className="card p-5 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-emerald-500" />{tr("Business Profile")}</h3>
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-brand" />{tr("Business Profile")}</h3>
           {profileLoading ? (
-            <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-emerald-500 animate-spin" /></div>
+            <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-brand animate-spin" /></div>
           ) : (
             <>
               <div>
@@ -163,26 +163,26 @@ export default function Settings() {
                   {error}
                 </div>
               )}
-              <button type="submit" disabled={isLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-emerald-500 hover:!bg-emerald-600 !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
+              <button type="submit" disabled={isLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-brand hover:!bg-brand-hover !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
                 {saved ? <><CheckCircle className="w-4 h-4" />{tr("Saved")}</> : isLoading ? <><Loader2 className="w-4 h-4 animate-spin" />{tr("Saving...")}</> : <><Save className="w-4 h-4" />{tr("Save Changes")}</>}
               </button>
-              <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{tr("Changes sync across all your devices.")}</p>
+              <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] text-center">{tr("Changes sync across all your devices.")}</p>
             </>
           )}
         </form>
 
         {/* Plan Info */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-violet-500" />{tr("Plan")}</h3>
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-violet-500" />{tr("Plan")}</h3>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-gray-900 dark:text-white capitalize">{tr(profile?.tier === 'solo' ? 'Solo Plan' : profile?.tier === 'crew' ? 'Crew Plan' : 'Free Plan')}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{tr(profile?.tier === 'crew' ? 'Unlimited clients · Full team access' : profile?.tier === 'solo' ? 'Unlimited clients · All features' : 'Up to 5 clients · All core features')}</p>
+              <p className="font-semibold text-[var(--color-text-primary)] dark:text-white capitalize">{tr(profile?.tier === 'solo' ? 'Solo Plan' : profile?.tier === 'crew' ? 'Crew Plan' : 'Free Plan')}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-0.5">{tr(profile?.tier === 'crew' ? 'Unlimited clients · Full team access' : profile?.tier === 'solo' ? 'Unlimited clients · All features' : 'Up to 5 clients · All core features')}</p>
             </div>
             <span className="badge-success text-xs">{tr("Active")}</span>
           </div>
           {(!profile?.tier || profile.tier === 'free') && (
-            <div className="text-xs text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
+            <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] pt-2 border-t border-gray-100 dark:border-gray-800">
               {tr("Upgrade to Solo ($39/mo) or Crew ($79/mo) for unlimited clients, offline mode, and more.")}
             </div>
           )}
@@ -202,44 +202,44 @@ export default function Settings() {
 
         {/* Notifications */}
         <div className="card p-5 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Bell className="w-4 h-4 text-amber-500" />{tr("Notifications")}</h3>
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Bell className="w-4 h-4 text-amber-500" />{tr("Notifications")}</h3>
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{tr("Job completion alerts")}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{tr("Get a notification when a job is marked complete")}</p>
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Job completion alerts")}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Get a notification when a job is marked complete")}</p>
             </div>
             <button
               role="switch"
               aria-checked={notifyOnComplete}
               aria-label={tr("Job completion alerts")}
               onClick={() => toggleNotifyComplete(!notifyOnComplete)}
-              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnComplete ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${notifyOnComplete ? 'translate-x-[18px]' : ''}`} />
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${notifyOnComplete ? 'translate-x-[18px]' : ''}`} />
             </button>
           </label>
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{tr("Rain delay notifications")}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{tr("Alert when rain is forecast for tomorrow's jobs")}</p>
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Rain delay notifications")}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Alert when rain is forecast for tomorrow's jobs")}</p>
             </div>
             <button
               role="switch"
               aria-checked={notifyOnRain}
               aria-label={tr("Rain delay notifications")}
               onClick={() => toggleNotifyRain(!notifyOnRain)}
-              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-700'}`}
+              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${notifyOnRain ? 'translate-x-[18px]' : ''}`} />
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${notifyOnRain ? 'translate-x-[18px]' : ''}`} />
             </button>
           </label>
         </div>
 
         {/* Team */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-emerald-500" />{tr("Team")}</h3>
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-brand" />{tr("Team")}</h3>
           {profile?.tier !== 'crew' && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.")}</p>
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.")}</p>
           )}
           {teamError && (
             <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" role="alert">
@@ -247,39 +247,39 @@ export default function Settings() {
               {teamError}
             </div>
           )}
-          {inviteSuccess && <p className="text-sm text-emerald-600 dark:text-emerald-400" role="status">{inviteSuccess}</p>}
+          {inviteSuccess && <p className="text-sm text-brand-hover dark:text-emerald-400" role="status">{inviteSuccess}</p>}
           {/* Owner row — always shown */}
-          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-[var(--color-surface-bg)] dark:bg-gray-800/50 rounded-xl">
             <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400">
               {(owner?.business_name || profile?.business_name || user?.email || 'YO').slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{owner?.business_name || profile?.business_name || (user?.email?.split('@')?.[0]) || 'You'}</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">{tr("Owner")}</p>
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white truncate">{owner?.business_name || profile?.business_name || (user?.email?.split('@')?.[0]) || 'You'}</p>
+              <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Owner")}</p>
             </div>
           </div>
           {teamLoading && (
             <div className="flex items-center justify-center py-4" aria-label={tr("Loading team members")}>
-              <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
+              <Loader2 className="w-5 h-5 text-brand animate-spin" />
             </div>
           )}
           {/* Crew members — crew tier only */}
           {profile?.tier === 'crew' && !teamLoading && teamMembers.filter(m => m.role !== 'owner').map((m, i) => {
             const color = TEAM_MEMBER_COLORS[(i + 1) % TEAM_MEMBER_COLORS.length];
             return (
-              <div key={m.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+              <div key={m.id} className="flex items-center gap-3 p-3 bg-[var(--color-surface-bg)] dark:bg-gray-800/50 rounded-xl">
                 <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${color.bg} ${color.text}`}>
                   {(m.business_name || '??').slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{m.business_name}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">{tr("Crew Member")}</p>
+                  <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white truncate">{m.business_name}</p>
+                  <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Crew Member")}</p>
                 </div>
                 {isTeamOwner && (
                   <button
                     type="button"
                     onClick={() => handleRemoveMember(m.id)}
-                    className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 min-w-10 min-h-10"
+                    className="text-gray-300 dark:text-[var(--color-text-secondary)] hover:text-red-500 dark:hover:text-red-400 transition-colors p-2 min-w-10 min-h-10"
                     aria-label={tr('Remove {{name}}', { name: m.business_name || tr('team member') })}
                   >
                     ✕
@@ -312,9 +312,9 @@ export default function Settings() {
 
         {/* Help */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-gray-400" />{tr("Help & Support")}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Need help? Email us at")} <a href="mailto:hello@mowgo.app" className="text-emerald-600 dark:text-emerald-400 hover:underline">hello@mowgo.app</a></p>
-          <p className="text-xs text-gray-400 dark:text-gray-500">{tr("MowGo v1.0 · Built for lawn care crews ·")} <a href="https://mowgo.pages.dev" className="hover:text-emerald-500 transition-colors">mowgo.pages.dev</a></p>
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-[var(--color-text-muted)]" />{tr("Help & Support")}</h3>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Need help? Email us at")} <a href="mailto:hello@mowgo.app" className="text-brand-hover dark:text-emerald-400 hover:underline">hello@mowgo.app</a></p>
+          <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("MowGo v1.0 · Built for lawn care crews ·")} <a href="https://mowgo.pages.dev" className="hover:text-brand transition-colors">mowgo.pages.dev</a></p>
         </div>
 
       </div>
