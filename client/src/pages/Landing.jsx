@@ -288,7 +288,7 @@ export default function Landing() {
             ))}
           </div>
           <FadeIn delay={400}>
-            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">{tr("Coming soon: Stripe payments, multi-user crew access, and route optimization. Oklahoma early adopters get these at no price increase.")}</p>
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-8">{tr("Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.")}</p>
           </FadeIn>
         </div>
       </section>

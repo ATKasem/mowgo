@@ -2,6 +2,7 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Subscribe() {
   const { tr, t, i18n } = useLocalizedText('subscribe');
@@ -15,7 +16,10 @@ export default function Subscribe() {
 
     async function verify() {
       try {
-        const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers = {};
+        if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+        const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`, { headers });
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const data = await res.json();
 

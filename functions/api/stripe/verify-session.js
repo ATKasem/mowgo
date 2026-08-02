@@ -9,9 +9,11 @@ const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgo.app'];
 export async function onRequestGet(context) {
   const { request, env } = context;
 
-  // Origin validation
+  // Origin validation — only reject a present-but-disallowed origin.
+  // Same-origin GETs from the deployed app send no Origin header, so absence
+  // is allowed (the Bearer JWT + metadata user_id match below is the real gate).
   const origin = request.headers.get('origin');
-  if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
     return json({ error: 'Forbidden' }, 403);
   }
 

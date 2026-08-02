@@ -7,10 +7,12 @@ const competitors = [
   { name: 'QuoteIQ', price: '$29.99/mo' },
   { name: 'Jobber', price: '$119+/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
-  { name: 'LawnPro', price: '$39/mo' },
+  { name: 'LawnPro', price: '$0–$39' },
   { name: 'Housecall Pro', price: '$79–$189' },
   { name: 'GreenRoute', price: '$29–$59' },
   { name: 'LawnBoss', price: 'New / TBD' },
+  { name: 'SoloOp', price: '$0/mo' },
+  { name: 'TurfHop', price: '$49–$129' },
 ];
 
 const features = [
@@ -32,20 +34,20 @@ const features = [
 
 // ✅ = confirmed, ❌ = not available, 🔜 = coming soon
 const data = {
-  rainDelay:    [ true,  false, false, false, false, false, false, false ],
-  offline:      [ true,  false, true,  false, false, true,  true,  false ],
-  darkMode:     [ true,  false, false, false, false, false, false, false ],
-  freeTier:     [ true,  false, false, true,  false, false, false, false ],
-  txFees:       [ false, true,  false, false, false, false, false, false ],
-  ai:           [ false, true,  false, false, false, 'soon', false, false ],
-  dragDrop:     [ true,  true,  true,  false, false, true,  false, false ],
-  invoicing:    [ true,  true,  true,  true,  true,  true,  false, false ],
-  notes:        [ true,  true,  true,  true,  true,  true,  false, false ],
-  recurring:    [ true,  true,  true,  true,  true,  true,  false, false ],
-  native:       [ 'soon', true,  true,  false, false, true,  false, false ],
-  privacy:      [ true,  true,  false, false, true,  true,  true,  false ],
-  stripe:       [ 'soon', true,  true,  false, true,  true,  false, false ],
-  gps:          [ true,  true,  true,  false, true,  true,  true,  false ],
+  rainDelay:    [ true,  false, false, false, false, false, false, false, true,  false ],
+  offline:      [ true,  false, true,  false, false, true,  true,  false, true,  false ],
+  darkMode:     [ true,  false, false, false, false, false, false, false, false, false ],
+  freeTier:     [ true,  false, false, true,  true,  false, false, false, true,  false ],
+  txFees:       [ false, true,  false, false, false, false, false, false, true,  true  ],
+  ai:           [ false, true,  false, false, false, 'soon', false, false, false, true  ],
+  dragDrop:     [ true,  true,  true,  false, false, true,  false, false, false, false ],
+  invoicing:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
+  notes:        [ true,  true,  true,  true,  true,  true,  false, false, false, false ],
+  recurring:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
+  native:       [ 'soon', true,  true,  false, false, true,  false, false, false, false ],
+  privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
+  stripe:       [ true,  true,  true,  false, true,  true,  false, false, true,  true  ],
+  gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
 };
 
 function Cell({ value, isFirst }) {
@@ -164,11 +166,11 @@ export default function Compare() {
       {/* Comparison table */}
       <section id="comparison" className="max-w-4xl mx-auto px-4 pb-24">
         <h2 className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3">{tr("Feature comparison")}</h2>
-        <p className="text-center text-gray-500 dark:text-gray-400 mb-10">{tr("Updated July 2026. Based on public pricing pages and hands-on testing.")}</p>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-10">{tr("Updated August 2026. Based on public pricing pages and hands-on testing.")}</p>
 
         <div className="overflow-x-auto -mx-4 px-4" role="region" aria-label={tr("Feature comparison table — scroll horizontally on mobile")}>
           <table className="w-full text-sm border-collapse">
-            <caption className="sr-only">{tr("Feature comparison between MowGo and 7 competitors including pricing and availability of 14 key features")}</caption>
+            <caption className="sr-only">{tr("Feature comparison between MowGo and 9 competitors including pricing and availability of 14 key features")}</caption>
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-800">
                 <th scope="col" className="text-left py-3 px-3 font-semibold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-950 z-10">{tr("Feature")}</th>
@@ -197,6 +199,15 @@ export default function Compare() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="mt-6 space-y-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("Six apps now offer a permanent free tier — Grassly, MowStack, Yardbook, ProBase, LawnPro Solo, and SoloOp. Grassly skims 2% of every card payment. MowGo's free plan takes nothing.")}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("TurfHop's own pricing and features pages were down (500 errors) on Aug 2, 2026 — verify current features with them before you buy.")}
+          </p>
         </div>
 
         <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">

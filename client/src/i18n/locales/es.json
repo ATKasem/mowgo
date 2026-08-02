@@ -221,8 +221,8 @@
     "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ cobra un 1 % por cada transacción, además de la comisión de Stripe. Nosotros no tocamos tu dinero: Stripe cobra su comisión y nada más.",
     "your_data_is_yours": "Tus datos son tuyos",
     "feature_comparison": "Comparación de funciones",
-    "updated_july_2026_based_on_public_pricing_pages_and_hands_on_testing": "Actualizado en julio de 2026. Basado en páginas públicas de precios y pruebas prácticas.",
-    "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Comparación de MowGo con 7 competidores, incluidos los precios y la disponibilidad de 14 funciones clave",
+    "updated_july_2026_based_on_public_pricing_pages_and_hands_on_testing": "Actualizado en agosto de 2026. Basado en páginas públicas de precios y pruebas prácticas.",
+    "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Comparación de MowGo con 9 competidores, incluidos los precios y la disponibilidad de 14 funciones clave",
     "feature": "Función",
     "quoteiq_note": "Nota sobre QuoteIQ:",
     "think_something_s_wrong": "¿Crees que hay algún error?",
@@ -243,7 +243,9 @@
     "value_value": "Valor: {{value}}",
     "vs_ruunly": "vs Ruunly",
     "we_built_mowgo_because_the_other_options_are_either_too_expensive_too_co": "Creamos MowGo porque las demás opciones son demasiado caras, demasiado complicadas o venden tus datos.",
-    "quoteiq_is_a_solid_product_4_7_across_4_100_reviews_native_ios_android_a": "QuoteIQ es un buen producto: tiene 4.7 estrellas en más de 4,100 reseñas, apps nativas para iOS y Android y funciones de IA en todos sus planes. Si trabajas en varios oficios o necesitas presupuestos con IA, QuoteIQ puede ser la mejor opción. Para equipos que solo se dedican al césped y buscan reprogramación por lluvia, modo sin conexión y cero recargos de plataforma, MowGo está hecho a la medida."
+    "quoteiq_is_a_solid_product_4_7_across_4_100_reviews_native_ios_android_a": "QuoteIQ es un buen producto: tiene 4.7 estrellas en más de 4,100 reseñas, apps nativas para iOS y Android y funciones de IA en todos sus planes. Si trabajas en varios oficios o necesitas presupuestos con IA, QuoteIQ puede ser la mejor opción. Para equipos que solo se dedican al césped y buscan reprogramación por lluvia, modo sin conexión y cero recargos de plataforma, MowGo está hecho a la medida.",
+    "six_apps_now_offer_a_permanent_free_tier_grassly_mowstack_yardbook_probas": "Seis apps ofrecen ahora un plan gratuito permanente: Grassly, MowStack, Yardbook, ProBase, LawnPro Solo y SoloOp. Grassly se queda con el 2% de cada pago con tarjeta. El plan gratuito de MowGo no cobra nada.",
+    "turfhop_s_own_pricing_and_features_pages_were_down_500_errors_on_aug_2": "Las páginas de precios y funciones de TurfHop estuvieron caídas (errores 500) el 2 de agosto de 2026; verifica las funciones actuales con ellos antes de comprar."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",
@@ -522,7 +524,7 @@
     "start_free_upgrade_when_you_are_ready_cancel_anytime": "Comienza gratis. Mejora tu plan cuando estés listo. Cancela cuando quieras.",
     "14_day_free_trial_on_paid_plans_no_setup_fees_no_contracts": "Prueba gratis de 14 días en los planes de pago. Sin cargos de configuración ni contratos.",
     "most_popular": "Más popular",
-    "coming_soon_stripe_payments_multi_user_crew_access_and_route_optimizatio": "Próximamente: pagos con Stripe, acceso para varios miembros del equipo y optimización de rutas. Quienes adopten MowGo primero en Oklahoma recibirán estas funciones sin aumento de precio.",
+    "coming_soon_stripe_payments_multi_user_crew_access_and_route_optimizatio": "Los pagos con Stripe ya están disponibles. La optimización de rutas llega pronto: los primeros usuarios de Oklahoma reciben las funciones nuevas sin aumento de precio.",
     "built_in_okc_used_by_oklahoma_crews": "Creado en OKC. Usado por equipos de Oklahoma.",
     "free_for_5_clients_no_credit_card_2_minutes": "Gratis para 5 clientes. Sin tarjeta. Listo en 2 minutos.",
     "available_on_iphone_android_and_desktop": "Disponible en iPhone, Android y computadora.",

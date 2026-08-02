@@ -220,8 +220,8 @@
     "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — Stripe takes their cut, that's it.",
     "your_data_is_yours": "Your data is yours",
     "feature_comparison": "Feature comparison",
-    "updated_july_2026_based_on_public_pricing_pages_and_hands_on_testing": "Updated July 2026. Based on public pricing pages and hands-on testing.",
-    "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Feature comparison between MowGo and 7 competitors including pricing and availability of 14 key features",
+    "updated_july_2026_based_on_public_pricing_pages_and_hands_on_testing": "Updated August 2026. Based on public pricing pages and hands-on testing.",
+    "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Feature comparison between MowGo and 9 competitors including pricing and availability of 14 key features",
     "feature": "Feature",
     "quoteiq_note": "QuoteIQ note:",
     "think_something_s_wrong": "Think something's wrong?",
@@ -242,7 +242,9 @@
     "value_value": "Value: {{value}}",
     "vs_ruunly": "vs Ruunly",
     "we_built_mowgo_because_the_other_options_are_either_too_expensive_too_co": "We built MowGo because the other options are either too expensive, too complicated, or sell your data.",
-    "quoteiq_is_a_solid_product_4_7_across_4_100_reviews_native_ios_android_a": "QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you."
+    "quoteiq_is_a_solid_product_4_7_across_4_100_reviews_native_ios_android_a": "QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you.",
+    "six_apps_now_offer_a_permanent_free_tier_grassly_mowstack_yardbook_probas": "Six apps now offer a permanent free tier — Grassly, MowStack, Yardbook, ProBase, LawnPro Solo, and SoloOp. Grassly skims 2% of every card payment. MowGo's free plan takes nothing.",
+    "turfhop_s_own_pricing_and_features_pages_were_down_500_errors_on_aug_2": "TurfHop's own pricing and features pages were down (500 errors) on Aug 2, 2026 — verify current features with them before you buy."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Real cost analysis",
@@ -522,7 +524,7 @@
     "start_free_upgrade_when_you_are_ready_cancel_anytime": "Start free. Upgrade when you are ready. Cancel anytime.",
     "14_day_free_trial_on_paid_plans_no_setup_fees_no_contracts": "14-day free trial on paid plans. No setup fees. No contracts.",
     "most_popular": "Most Popular",
-    "coming_soon_stripe_payments_multi_user_crew_access_and_route_optimizatio": "Coming soon: Stripe payments, multi-user crew access, and route optimization. Oklahoma early adopters get these at no price increase.",
+    "coming_soon_stripe_payments_multi_user_crew_access_and_route_optimizatio": "Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.",
     "built_in_okc_used_by_oklahoma_crews": "Built in OKC. Used by Oklahoma crews.",
     "free_for_5_clients_no_credit_card_2_minutes": "Free for 5 clients. No credit card. 2 minutes.",
     "available_on_iphone_android_and_desktop": "Available on iPhone, Android, and desktop.",
