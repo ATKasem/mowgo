@@ -115,7 +115,7 @@ export default function Landing() {
             </div>
           </FadeIn>
           <FadeIn delay={50}>
-            <Logo type="full" size="lg" className="mx-auto mb-6" />
+            <img src="/mowgo-logo-full.svg" alt="MowGo — Lawn Care Scheduling" className="w-48 h-48 mx-auto mb-6" />
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">

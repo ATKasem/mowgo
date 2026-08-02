@@ -39,10 +39,10 @@ Timing: TODAY is the prime capture day (promo died Jul 31).
 5. **bluecollarmillionaire**: 170-customer invoicing pain → auto-invoicing + reminders (cron live Aug 1).
 Style guide: `marketing/fb-group-drafts-2026-07-29.md` — pain-point-first, no link in OP, respond with the MowGo one-liner only if asked.
 
-## 5. 🐦 Reddit — 5 posts (28 drafts ready; Day 11 of 403-block)
+## 5. 🐦 Reddit — 6 posts (29 drafts ready; Day 11 of 403-block)
 
-Top targets: r/Entrepreneur `1i3pv4b` · r/landscaping `1rm499y` (feature-goldmine — re-check Mon, TurfHop pricing page is down) · r/CRM `1v6vwcn` · r/LawnCareBusinessCRM `1l0y40z` · **r/sweatystartup or r/Jobber-complaint `1bfw00i` ("Not happy with Jobber. Beware.") — fresh pain-point ammo.**
-New candidate spotted Sun: r/WhichCRM `1unfily` "Jobber vs. Yardbook vs. QuoteIQ for Lawn Care in 2026" (month-long demo, OP = multi-op owner).
+Top targets: **NEW r/CRM `1vcr90y`** ("Do you recommend getting a CRM for lawn care if I'm…" — posted Sun ~9am CST, side-hustle solo op, freshest thread on the board; draft in `leads/reddit-threads.md` #30) · r/Entrepreneur `1i3pv4b` · r/landscaping `1rm499y` (feature-goldmine — re-check Mon, TurfHop pricing page STILL down = ammo) · r/CRM `1v6vwcn` · r/LawnCareBusinessCRM `1l0y40z` · **r/sweatystartup or r/Jobber-complaint `1bfw00i` ("Not happy with Jobber. Beware.") — fresh pain-point ammo.**
+Other candidate spotted Sun: r/WhichCRM `1unfily` "Jobber vs. Yardbook vs. QuoteIQ for Lawn Care in 2026" (month-long demo, OP = multi-op owner).
 Drafts: `marketing/reddit-replies-2026-07-27.md` + `leads/reddit-threads.md`. r/sweatystartup may have banned software posts — prefer r/LawnCarePros / r/landscaping.
 
 ## 6. 📇 Directory submissions — 30 min (Day 19)

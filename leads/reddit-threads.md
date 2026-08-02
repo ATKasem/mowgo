@@ -269,6 +269,15 @@
 - **Note:** Facebook post, not Reddit, but highly relevant sentiment.
 - **Priority:** LOW (not a Reddit thread but worth noting sentiment)
 
+### 30. r/CRM — "Do you recommend getting a CRM for lawn care if I'm..." (NEW — Aug 2, ~8h old)
+- **URL:** https://www.reddit.com/r/CRM/comments/1vcr90y/do_you_recommend_getting_a_crm_for_lawn_care_if/
+- **Context:** Construction worker taking a break, thinking of lawn care as a side hustle, asking whether a CRM is worth it. Fresh thread (~8h old at 17:00Z Aug 2) — FIRST verified <48h thread in 11 days.
+- **OP Pain Point:** Brand-new solo op deciding whether software is worth it before starting; price-sensitive by default.
+- **Suggested Reply:**
+  > For a side hustle, skip the full CRM — you'll pay for features you won't touch for months. What actually matters at 5–20 lawns: (1) recurring weekly/biweekly schedules that auto-build your route, (2) invoicing with a card payment link so you stop chasing checks, (3) a notes field per property (gate codes, dogs, mow height). That's it. Jobber/Housecall Pro start around $50–100+/mo and charge per user — overkill until you're way past side-hustle volume. There are newer lawn-care-specific tools at a flat ~$39/mo that do exactly those three things. Honestly, under ~25 clients a spreadsheet + free invoicing app works fine — the software starts paying for itself when missed invoices start costing you real money. How many lawns a week are you aiming for?
+- **Priority:** HIGH (freshest thread on the board; Monday target)
+- **Date:** 2026-08-02
+
 ---
 
 ## Summary

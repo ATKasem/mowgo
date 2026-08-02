@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-08-01T19:51:00Z",
-  "market_intel_lane": 1,
+  "last_run": "2026-08-02T17:00:00Z",
+  "market_intel_lane": 2,
   "lanes_total": 4,
   "lane_names": [
     "competitor_monitoring",
@@ -8,7 +8,7 @@
     "pricing_intelligence",
     "feature_ideas"
   ],
-  "next_lane": "pricing_intelligence",
+  "next_lane": "feature_ideas",
   "seen_reddit_urls": [
     "https://www.reddit.com/r/CRM/comments/1uaa3yg/best_crm_for_lawn_care_business_in_2026/",
     "https://www.reddit.com/r/CRM/comments/1v6vwcn/simple_crm/",
@@ -85,8 +85,25 @@
     "https://www.reddit.com/r/sweatystartup/comments/1r3891a/evaluate_my_6_figure_year_1_landscaping_plan/",
     "https://www.reddit.com/r/sweatystartup/comments/1rpxqif/im_kinda_scared_for_some_reason/",
     "https://www.reddit.com/r/sweatystartup/comments/1sg57o2/update_to_my_last_post_about_my_business/",
-    "https://www.reddit.com/r/sweatystartup/comments/mru6f2/lawncare_crm/"
+    "https://www.reddit.com/r/sweatystartup/comments/mru6f2/lawncare_crm/",
+    "https://www.reddit.com/r/sweatystartup/comments/1bfw00i/not_happy_with_jobber_beware/",
+    "https://www.reddit.com/r/smallbusiness/comments/1qyq9fv/solo_service_business_owners_what_do_you_use_for/",
+    "https://www.reddit.com/r/forestry/comments/1u3uw8l/what_app_do_you_use_for_estimates_and_invoices/",
+    "https://www.reddit.com/r/CRMSoftware/comments/1v68xrf/whats_the_best_crm_with_sms_for_a_growing_service/",
+    "https://www.reddit.com/r/smallbusinessUS/comments/1va7d9s/ai_crm_software_for_small_businesses_is_anything/",
+    "https://www.reddit.com/r/landscaping/comments/1pipbj4/looking_for_honest_feedback_building_a_tool_for/",
+    "https://www.reddit.com/r/lawncare/comments/1iz43ob/what_appssoftware_do_you_recommend/",
+    "https://www.reddit.com/r/lawncare/comments/1ljjbv2/any_softwaretools_you_use_to_run_your_lawn_care/",
+    "https://www.reddit.com/r/WhichCRM/comments/1unfily/jobber_vs_yardbook_vs_quoteiq_for_lawn_care_in/",
+    "https://www.reddit.com/r/websiteservices/comments/1qras6x/whats_the_best_way_to_handle_recurring_bookings/",
+    "https://www.reddit.com/r/landscapedesign/comments/1r90ccv/is_there_any_industrystandard_landscape_design/",
+    "https://www.reddit.com/r/sweatystartup/comments/1rc3sds/my_brother_asked_me_for_help_starting_a_lawn_care/",
+    "https://www.reddit.com/r/smallbusiness/comments/1phd6xf/landscape_biz_owner_crm_advice/",
+    "https://www.reddit.com/r/lawn/comments/1b4dwfx/lawn_care_business_pros_any_route_planning/",
+    "https://www.reddit.com/r/sweatystartup/comments/1cv8tr3/scaling_lawn_care_business/",
+    "https://www.reddit.com/r/CRMSoftware/comments/1v8kyd4/best_crm_for_workflow_automation_top_crms_with/",
+    "https://www.reddit.com/r/CRM/comments/1vcr90y/do_you_recommend_getting_a_crm_for_lawn_care_if/"
   ],
-  "weekly_digest_week": "2026-W31",
-  "version": 9
+  "weekly_digest_week": "2026-W32",
+  "version": 14
 }
