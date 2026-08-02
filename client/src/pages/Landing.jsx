@@ -114,6 +114,9 @@ export default function Landing() {
               {tr("Built in Oklahoma City, for Oklahoma crews")}
             </div>
           </FadeIn>
+          <FadeIn delay={50}>
+            <Logo type="full" size="lg" className="mx-auto mb-6" />
+          </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
               {tr("Lawn care software")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("built in Oklahoma")}</span>

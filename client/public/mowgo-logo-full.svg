@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Dark navy background -->
+  <rect width="200" height="200" rx="24" fill="#1a1a2e"/>
+  
+  <!-- Green leaf with vein cutout -->
+  <path d="M60 120 C50 90 65 65 100 60 C130 55 145 80 140 105 L100 95 Z" 
+        fill="#4ade80"/>
+  <!-- Vein (matching background color = cutout effect) -->
+  <path d="M65 115 C80 100 95 88 105 82" 
+        stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Stem -->
+  <path d="M60 120 C55 130 60 135 70 132" 
+        stroke="#4ade80" stroke-width="3" stroke-linecap="round" fill="none"/>
+  
+  <!-- "MowGo" text -->
+  <text x="100" y="155" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" 
+        font-weight="700" font-size="28" fill="white" letter-spacing="0.5">MowGo</text>
+  
+  <!-- "Lawn Care Scheduling" tagline -->
+  <text x="100" y="178" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" 
+        font-weight="400" font-size="12" fill="#9ca3af" letter-spacing="1">Lawn Care Scheduling</text>
+</svg>
