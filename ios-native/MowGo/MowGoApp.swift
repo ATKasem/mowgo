@@ -134,9 +134,9 @@ struct SplashView: View {
         ZStack {
             theme.background.ignoresSafeArea()
             VStack(spacing: 16) {
-                Image(systemName: "leaf.fill")
-                    .font(.system(size: 48))
-                    .foregroundColor(MowGoTheme.deepGreen)
+                Image("LeafLogo")
+                    .resizable()
+                    .frame(width: 48, height: 48)
                     .scaleEffect(animate ? 1 : 0.5)
                     .opacity(animate ? 1 : 0)
                 Text("MowGo")
