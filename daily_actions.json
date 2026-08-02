@@ -56,6 +56,13 @@
         "detail": "monday_plate_2026-08-03.md: Blasian reply (draft path), 4+1 follow-ups, Jobber promo posts A/B/D, 5 FB buying-intent threads, 5 Reddit posts + new 1unfily candidate, directory submissions, 8 new leads with contact paths, 3 decisions (trial 7v14, CF cleanup, mowflow delete), suggested order (~1.5-2h).",
         "impact": "MEDIUM — makes Monday a copy-paste day",
         "time_min": 15
+      },
+      {
+        "task": "Autopilot public face scoped (0.5d win)",
+        "status": "✅ SCOPED — docs/autopilot-public-face-scope.md",
+        "detail": "Ships the existing Autopilot (14 tools, OpenRouter) as a landing-page chat widget + AI-front-office copy section. No new AI build, no AI-estimates claims. Explicitly excludes what NOT to ship (estimates claim is false). Build steps + test plan included.",
+        "impact": "MEDIUM — supports the 67%-AI-adoption headroom story; surfaces an unmarketed asset",
+        "time_min": 15
       }
     ],
     "still_blocked": [
