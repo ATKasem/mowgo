@@ -31,9 +31,9 @@ struct LoginView: View {
                     Spacer().frame(minHeight: 40)
 
                     // Logo
-                    Image("LeafLogo")
-                        .resizable()
-                        .frame(width: 56, height: 56)
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 56))
+                        .foregroundColor(MowGoTheme.deepGreen)
                         .accessibilityHidden(true)
 
                     Text("MowGo")
