@@ -2,11 +2,10 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import {
-  Calendar, Users, FileText, Settings,
-  Sprout, LogOut, WifiOff, LayoutDashboard, MessageSquare, X
-} from 'lucide-react';
+import i18n from '../i18n';
+import { Calendar, Users, FileText, Settings, LogOut, WifiOff, LayoutDashboard, MessageSquare, X } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 import AutopilotChat from './AutopilotChat';
 import { isCurrentlyOffline } from '../lib/offlineStorage';
 
@@ -113,9 +112,7 @@ export default function Layout() {
       <header className="bg-[var(--color-surface)] dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-sm bg-[var(--color-surface)]/95 dark:bg-gray-900/95" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/app" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              <Sprout className="w-4 h-4 text-white" />
-            </div>
+            <Logo size="md" />
             <h1 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white tracking-tight">{tr("MowGo")}</h1>
           </Link>
           <div className="flex items-center gap-1">

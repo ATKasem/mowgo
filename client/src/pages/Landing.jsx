@@ -1,6 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { Sprout, CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
+import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
+import Logo from '../components/Logo';
 import { Link } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 
@@ -15,7 +16,7 @@ const differentiators = [
   { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural Oklahoma? MowGo keeps working without internet and syncs when you are back in range.' },
   { icon: Moon, title: 'Dark Mode Built In', desc: 'Early Oklahoma mornings are hard enough. Dark mode at 6am keeps the screen easy on your eyes.' },
   { icon: Shield, title: 'Built in OKC, Not Silicon Valley', desc: 'We are not a VC-funded startup in California guessing what Oklahoma crews need. We talk to local operators every week.' },
-  { icon: Sprout, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
+  { icon: Users, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
 ];
 
 const plans = [
@@ -82,9 +83,7 @@ export default function Landing() {
       <nav className="sticky top-0 z-50 bg-[var(--color-surface)]/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 text-[var(--color-text-primary)] dark:text-white font-bold text-lg no-underline">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              <Sprout className="w-4 h-4 text-white" />
-            </div>
+            <Logo size="sm" />
             MowGo
           </Link>
           <div className="flex items-center gap-2">
@@ -314,7 +313,7 @@ export default function Landing() {
       <footer className="bg-[var(--color-surface-bg)] dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] text-sm">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><Sprout className="w-3.5 h-3.5 text-white" /></div>
+            <Logo size="xs" />
             MowGo &copy; 2026
           </div>
           <div className="flex gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
