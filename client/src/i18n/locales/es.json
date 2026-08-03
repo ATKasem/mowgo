@@ -245,7 +245,9 @@
     "we_built_mowgo_because_the_other_options_are_either_too_expensive_too_co": "Creamos MowGo porque las demás opciones son demasiado caras, demasiado complicadas o venden tus datos.",
     "quoteiq_is_a_solid_product_4_7_across_4_100_reviews_native_ios_android_a": "QuoteIQ es un buen producto: tiene 4.7 estrellas en más de 4,100 reseñas, apps nativas para iOS y Android y funciones de IA en todos sus planes. Si trabajas en varios oficios o necesitas presupuestos con IA, QuoteIQ puede ser la mejor opción. Para equipos que solo se dedican al césped y buscan reprogramación por lluvia, modo sin conexión y cero recargos de plataforma, MowGo está hecho a la medida.",
     "six_apps_now_offer_a_permanent_free_tier_grassly_mowstack_yardbook_probas": "Seis apps ofrecen ahora un plan gratuito permanente: Grassly, MowStack, Yardbook, ProBase, LawnPro Solo y SoloOp. Grassly se queda con el 2% de cada pago con tarjeta. El plan gratuito de MowGo no cobra nada.",
-    "turfhop_s_own_pricing_and_features_pages_were_down_500_errors_on_aug_2": "Las páginas de precios y funciones de TurfHop estuvieron caídas (errores 500) el 2 de agosto de 2026; verifica las funciones actuales con ellos antes de comprar."
+    "turfhop_s_own_pricing_and_features_pages_were_down_500_errors_on_aug_2": "Las páginas de precios y funciones de TurfHop estuvieron caídas (errores 500) el 3 de agosto de 2026; verifica las funciones actuales con ellos antes de comprar.",
+    "jobber_s_29_plan_is_the_hook_automated_reminders_and_auto_pay_start_at_c": "El plan de $29 de Jobber es solo el gancho — los recordatorios automáticos y el cobro automático empiezan en Connect $99, y el AI Receptionist cuesta $29/mes (o viene incluido en Plus $199). MowGo los incluye todos por $49–$79 fijos.",
+    "service_autopilot_charges_a_sign_up_fee_and_hides_its_elite_tier_behind_": "Service Autopilot cobra una tarifa de alta y oculta su nivel Elite detrás de una llamada de ventas — MowGo publica $39/$79 y acepta tarjeta."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",
@@ -726,7 +728,11 @@
     "remove_name": "Eliminar a {{name}}",
     "team_member": "miembro del equipo",
     "Review prompts": "Solicitudes de reseña",
-    "Show a review prompt after completing jobs": "Mostrar una solicitud de reseña al completar trabajos"
+    "Show a review prompt after completing jobs": "Mostrar una solicitud de reseña al completar trabajos",
+    "booking_link": "Enlace de Reserva",
+    "share_this_link_with_customers_so_they_can_book_a_service_online_no_login_required": "Comparte este enlace con tus clientes para que puedan reservar un servicio en línea — sin necesidad de iniciar sesión.",
+    "copied": "¡Copiado!",
+    "copy": "Copiar"
   },
   "subscribe": {
     "payment_was_not_completed": "El pago no se completó",
@@ -869,5 +875,26 @@
     "Help us out with a review ⭐": "Ayúdanos con una reseña ⭐",
     "Leave a Review": "Dejar una reseña",
     "Maybe Later": "Quizás después"
+  },
+  "booking": {
+    "book_a_service": "Agenda un servicio de jardinería",
+    "pick_a_date": "Elige una fecha",
+    "pick_a_time": "Elige una hora",
+    "your_info": "Tu Información",
+    "name": "Nombre",
+    "name_placeholder": "Tu nombre",
+    "phone": "Teléfono",
+    "phone_placeholder": "405-555-0100",
+    "address": "Dirección del servicio",
+    "address_placeholder": "123 Main St, OKC, OK",
+    "notes": "Notas",
+    "notes_placeholder": "Alguna solicitud especial...",
+    "optional": "opcional",
+    "summary": "Programado para el {{date}} a las {{time}}",
+    "confirm_booking": "Confirmar Reserva",
+    "booking": "Reservando...",
+    "booked": "¡Reserva Confirmada!",
+    "thanks_for_booking": "Tu servicio con {{name}} ha sido reservado.",
+    "powered_by": "Impulsado por"
   }
 }

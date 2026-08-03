@@ -20,6 +20,7 @@ import SwitchingFromLawnPro from './pages/SwitchingFromLawnPro';
 import JobberPriceIncrease from './pages/JobberPriceIncrease';
 import QuoteIQAlternative from './pages/QuoteIQAlternative';
 import RuunlyComparison from './pages/RuunlyComparison';
+import Booking from './pages/Booking';
 import PortalReturn from './pages/PortalReturn';
 import AutopilotChat from './components/AutopilotChat';
 import { useTranslation } from 'react-i18next';
@@ -190,6 +191,7 @@ export default function App() {
           <Route path="/switch-from-lawnpro" element={<SwitchingFromLawnPro />} />
           <Route path="/quoteiq-alternative" element={<QuoteIQAlternative />} />
           <Route path="/compare/ruunly" element={<RuunlyComparison />} />
+          <Route path="/book/:businessId" element={<Booking />} />
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/portal-return" element={<PortalReturn />} />

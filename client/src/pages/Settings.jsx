@@ -5,7 +5,7 @@ import { TEAM_MEMBER_COLORS } from '../lib/constants';
 import { isDemoMode } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
-import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
+import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 
@@ -28,6 +28,7 @@ export default function Settings() {
   const [inviteSuccess, setInviteSuccess] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteSending, setInviteSending] = useState(false);
+  const [bookingCopied, setBookingCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -330,6 +331,33 @@ export default function Settings() {
 
         {/* Zapier Webhooks */}
         {(profile?.tier === 'solo' || profile?.tier === 'crew') && <WebhookSettings />}
+
+        {/* Booking Link */}
+        <div className="card p-5 space-y-3">
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><LinkIcon className="w-4 h-4 text-brand" />{tr("Booking Link")}</h3>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Share this link with customers so they can book a service online — no login required.")}</p>
+          <div className="flex items-center gap-2">
+            <input
+              readOnly
+              value={`https://mowgo.pages.dev/#/book/${user?.id || 'your-business-id'}`}
+              className="input flex-1 text-xs font-mono bg-[var(--color-surface-bg)] dark:bg-gray-800/50"
+              onClick={e => e.target.select()}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const url = `https://mowgo.pages.dev/#/book/${user?.id || 'your-business-id'}`;
+                navigator.clipboard.writeText(url).then(() => {
+                  setBookingCopied(true);
+                  setTimeout(() => setBookingCopied(false), 2000);
+                });
+              }}
+              className="btn-secondary whitespace-nowrap"
+            >
+              {bookingCopied ? <><CheckCircle className="w-4 h-4" />{tr("Copied!")}</> : <><Copy className="w-4 h-4" />{tr("Copy")}</>}
+            </button>
+          </div>
+        </div>
 
         {/* Help */}
         <div className="card p-5 space-y-3">

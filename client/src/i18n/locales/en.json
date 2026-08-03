@@ -247,7 +247,9 @@
     "we_built_mowgo_because_the_other_options_are_either_too_expensive_too_co": "We built MowGo because the other options are either too expensive, too complicated, or sell your data.",
     "quoteiq_is_a_solid_product_4_7_across_4_100_reviews_native_ios_android_a": "QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you.",
     "six_apps_now_offer_a_permanent_free_tier_grassly_mowstack_yardbook_probas": "Six apps now offer a permanent free tier — Grassly, MowStack, Yardbook, ProBase, LawnPro Solo, and SoloOp. Grassly skims 2% of every card payment. MowGo's free plan takes nothing.",
-    "turfhop_s_own_pricing_and_features_pages_were_down_500_errors_on_aug_2": "TurfHop's own pricing and features pages were down (500 errors) on Aug 2, 2026 — verify current features with them before you buy."
+    "turfhop_s_own_pricing_and_features_pages_were_down_500_errors_on_aug_2": "TurfHop's own pricing and features pages were down (500 errors) on Aug 3, 2026 — verify current features with them before you buy.",
+    "jobber_s_29_plan_is_the_hook_automated_reminders_and_auto_pay_start_at_c": "Jobber's $29 plan is the hook — automated reminders and auto-pay start at Connect $99, and the AI Receptionist is a $29/mo add-on (or bundled in Plus $199). MowGo includes them all at $49–$79 flat.",
+    "service_autopilot_charges_a_sign_up_fee_and_hides_its_elite_tier_behind_": "Service Autopilot charges a sign-up fee and hides its Elite tier behind a sales call — MowGo publishes $39/$79 and takes a card."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Real cost analysis",
@@ -728,7 +730,11 @@
     "remove_name": "Remove {{name}}",
     "team_member": "team member",
     "Review prompts": "Review prompts",
-    "Show a review prompt after completing jobs": "Show a review prompt after completing jobs"
+    "Show a review prompt after completing jobs": "Show a review prompt after completing jobs",
+    "booking_link": "Booking Link",
+    "share_this_link_with_customers_so_they_can_book_a_service_online_no_login_required": "Share this link with customers so they can book a service online — no login required.",
+    "copied": "Copied!",
+    "copy": "Copy"
   },
   "subscribe": {
     "payment_was_not_completed": "Payment was not completed",
@@ -878,5 +884,26 @@
     "Help us out with a review ⭐": "Help us out with a review ⭐",
     "Leave a Review": "Leave a Review",
     "Maybe Later": "Maybe Later"
+  },
+  "booking": {
+    "book_a_service": "Book a lawn care service",
+    "pick_a_date": "Pick a date",
+    "pick_a_time": "Pick a time",
+    "your_info": "Your Information",
+    "name": "Name",
+    "name_placeholder": "Your name",
+    "phone": "Phone",
+    "phone_placeholder": "405-555-0100",
+    "address": "Service Address",
+    "address_placeholder": "123 Main St, OKC, OK",
+    "notes": "Notes",
+    "notes_placeholder": "Any special requests...",
+    "optional": "optional",
+    "summary": "Scheduling for {{date}} at {{time}}",
+    "confirm_booking": "Confirm Booking",
+    "booking": "Booking...",
+    "booked": "Booking Confirmed!",
+    "thanks_for_booking": "Your service with {{name}} has been booked.",
+    "powered_by": "Powered by"
   }
 }
