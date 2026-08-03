@@ -212,6 +212,29 @@ struct Invoice: Codable, Identifiable, Equatable {
     var clientName: String? { clients?.name }
 }
 
+struct Estimate: Codable, Identifiable, Equatable {
+    let id: UUID
+    var userId: UUID?
+    var clientId: UUID?
+    var jobId: UUID?
+    var amount: Decimal
+    var status: EstimateStatus
+    var note: String?
+    var sentAt: String?
+    var approvedAt: String?
+    var declinedAt: String?
+    var createdAt: String?
+    var clients: ClientRef?
+
+    enum EstimateStatus: String, Codable {
+        case draft, sent, approved, declined
+        var label: String { rawValue.capitalized }
+    }
+
+    struct ClientRef: Codable, Equatable { let name: String? }
+    var clientName: String? { clients?.name }
+}
+
 // MARK: - User Profile
 
 struct UserProfile: Codable, Identifiable {

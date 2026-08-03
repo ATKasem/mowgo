@@ -339,7 +339,8 @@
     "amount_collected": "${{amount}} collected",
     "amount_in_unpaid_invoices": "${{amount}} in unpaid invoices",
     "count_invoice_needs_attention_one": "{{count}} invoice needs attention",
-    "count_invoice_needs_attention_other": "{{count}} invoices need attention"
+    "count_invoice_needs_attention_other": "{{count}} invoices need attention",
+    "estimates": "Estimates", "new_estimate": "New Estimate", "no_estimates_yet": "No estimates yet", "create_one_in_10_seconds": "Create one in 10 seconds", "loading_estimates": "Loading estimates…", "unknown_client": "Unknown client", "draft": "Draft", "sent": "Sent", "approved": "Approved", "declined": "Declined", "converted": "Converted ✓", "copy_text": "Copy text", "mark_approved": "Mark Approved", "mark_declined": "Mark Declined", "nudge": "Nudge", "convert_to_job": "Convert to Job", "job_created": "Job created", "select_a_client": "Select a client", "note_optional": "Note (optional)", "save_draft": "Save Draft", "send": "Send"
   },
   "jobberPriceIncrease": {
     "core": "Core",

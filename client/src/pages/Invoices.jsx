@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { updateInvoiceStatus } from '../lib/data';
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
+import EstimatesSection from '../components/EstimatesSection';
 
 const iconMap = { CheckCircle, AlertCircle };
 
@@ -35,6 +36,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
+  const [section, setSection] = useState('invoices');
   const filterRef = useRef(null);
 
   // Close filter dropdown on click outside (handles touch devices)
@@ -86,6 +88,10 @@ export default function Invoices({ invoices = [], setInvoices }) {
 
   return (
     <div>
+      <div className="grid grid-cols-2 gap-1 p-1 mb-5 rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800">
+        {['invoices', 'estimates'].map(value => <button key={value} onClick={() => setSection(value)} className={`min-h-[40px] rounded-lg text-sm font-semibold transition-colors ${section === value ? 'bg-white dark:bg-gray-700 text-brand-hover shadow-sm' : 'text-[var(--color-text-secondary)]'}`}>{tr(value === 'invoices' ? 'Invoices' : 'Estimates')}</button>)}
+      </div>
+      {section === 'estimates' ? <EstimatesSection /> : <>
       <div className="mb-5">
         <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Invoices")}</h2>
         <div className="flex items-center gap-3 mt-0.5">
@@ -222,7 +228,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
             </div>
           );
         })}
-      </div>
+      </div></>}
     </div>
   );
 }

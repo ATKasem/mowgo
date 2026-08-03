@@ -12,6 +12,10 @@ import { demoJobs, demoClients, demoInvoices, demoTeamMembers } from './demoData
 let _jobs = [...demoJobs];
 let _clients = [...demoClients];
 let _invoices = [...demoInvoices];
+let _estimates = [
+  { id: 'demo-est-1', user_id: 'demo-owner-001', client_id: '1', clients: demoClients[0], amount: 50, status: 'sent', note: 'Weekly lawn care', sent_at: new Date(Date.now() - 86400000 * 5).toISOString(), created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
+  { id: 'demo-est-2', user_id: 'demo-owner-001', client_id: '2', clients: demoClients[1], amount: 65, status: 'approved', note: null, approved_at: new Date().toISOString(), created_at: new Date(Date.now() - 86400000).toISOString() },
+];
 let _teamMembers = [...demoTeamMembers];
 
 /** Listeners notified when demo state changes */
@@ -482,6 +486,69 @@ export async function updateInvoiceStatus(id, status) {
     });
   }
   return data;
+}
+
+// ===== Estimates =====
+
+export async function loadEstimates() {
+  if (isDemoMode()) {
+    const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
+    return profile?.role === 'owner' ? [..._estimates] : [];
+  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (profile?.role === 'crew') return [];
+  const { data, error } = await supabase.from('estimates').select('*, clients!left(name)').eq('user_id', user.id).order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createEstimate(estimate) {
+  const amount = Number(estimate.amount);
+  if (!estimate.client_id || !Number.isFinite(amount) || amount <= 0) throw new Error('Client and a positive amount are required');
+  const now = new Date().toISOString();
+  const payload = { ...estimate, amount, sent_at: estimate.status === 'sent' ? now : null };
+  if (isDemoMode()) {
+    const row = { ...payload, id: uid(), user_id: _currentDemoUserId(), clients: _clients.find(c => c.id === estimate.client_id) || null, created_at: now };
+    _estimates = [row, ..._estimates]; notify(); return row;
+  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await supabase.from('estimates').insert({ user_id: user.id, client_id: estimate.client_id, amount, note: estimate.note || null, status: estimate.status, sent_at: payload.sent_at }).select('*, clients!left(name)').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateEstimateStatus(id, status) {
+  const now = new Date().toISOString();
+  const timestamp = status === 'sent' ? 'sent_at' : status === 'approved' ? 'approved_at' : status === 'declined' ? 'declined_at' : null;
+  const updates = { status, ...(timestamp ? { [timestamp]: now } : {}) };
+  if (isDemoMode()) {
+    _estimates = _estimates.map(e => e.id === id ? { ...e, ...updates } : e); notify(); return _estimates.find(e => e.id === id);
+  }
+  const { data, error } = await supabase.from('estimates').update(updates).eq('id', id).select('*, clients!left(name)').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function convertEstimateToJob(estimate) {
+  const job = await createJob({ client_id: estimate.client_id, title: estimate.note || 'Lawn care', scheduled_date: new Date().toISOString().slice(0, 10), scheduled_time: '09:00', duration_minutes: 60, status: 'scheduled' });
+  if (isDemoMode()) {
+    _estimates = _estimates.map(e => e.id === estimate.id ? { ...e, job_id: job.id } : e); notify(); return _estimates.find(e => e.id === estimate.id);
+  }
+  const { data, error } = await supabase.from('estimates').update({ job_id: job.id }).eq('id', estimate.id).select('*, clients!left(name)').single();
+  if (error) throw error;
+  return data;
+}
+
+export function estimateText(estimate) {
+  return `Hi ${estimate.clients?.name || 'there'}, here's your estimate: $${Number(estimate.amount).toFixed(2)} for lawn care. Valid for 30 days. Thanks!`;
+}
+
+export function estimateNudgeText(estimate) {
+  const date = new Date(estimate.created_at).toLocaleDateString();
+  return `Hi ${estimate.clients?.name || 'there'}, just checking in on your estimate for $${Number(estimate.amount).toFixed(2)} from ${date} — still want me to hold the spot? Happy to adjust anything. Thanks!`;
 }
 
 // ===== Profile =====

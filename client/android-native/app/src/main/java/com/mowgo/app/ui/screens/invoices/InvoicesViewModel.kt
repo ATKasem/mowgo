@@ -3,10 +3,12 @@ package com.mowgo.app.ui.screens.invoices
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.InvoiceRepository
+import com.mowgo.app.data.EstimateRepository
 import com.mowgo.app.data.JobRepository
 import com.mowgo.app.data.PaymentRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
+import com.mowgo.app.data.model.Estimate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,8 +23,11 @@ data class InvoicesUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val invoices: List<Invoice> = emptyList(),
+    val estimates: List<Estimate> = emptyList(),
     val clients: List<Client> = emptyList(),
     val showNewInvoiceDialog: Boolean = false,
+    val showNewEstimateDialog: Boolean = false,
+    val selectedEstimate: Estimate? = null,
     val showDeleteConfirmation: Invoice? = null,
     val showMarkPaidConfirmation: Invoice? = null,
     val showSnackbar: String? = null,
@@ -47,7 +52,13 @@ data class InvoicesUiState(
     val unpaidCount: Int get() = invoices.count { it.status == Invoice.STATUS_UNPAID }
     val paidCount: Int get() = invoices.count { it.status == Invoice.STATUS_PAID }
     val totalUnpaid: Double get() = invoices.filter { it.status == Invoice.STATUS_UNPAID }.sumOf { it.amount }
+    val estimatesWithClientName: List<EstimateWithClient> get() {
+        val clientMap = clients.associateBy { it.id }
+        return estimates.map { EstimateWithClient(it, it.clientName ?: clientMap[it.clientId]?.name) }
+    }
 }
+
+data class EstimateWithClient(val estimate: Estimate, val clientName: String?)
 
 data class InvoiceWithClient(
     val invoice: Invoice,
@@ -65,6 +76,8 @@ class InvoicesViewModel : ViewModel() {
     private val invoiceRepository = InvoiceRepository()
     private val jobRepository = JobRepository()
     private val paymentRepository = PaymentRepository()
+    private val estimateRepository = EstimateRepository()
+    private var loadGeneration = 0
 
     private val _uiState = MutableStateFlow(InvoicesUiState())
     val uiState: StateFlow<InvoicesUiState> = _uiState.asStateFlow()
@@ -74,18 +87,21 @@ class InvoicesViewModel : ViewModel() {
     }
 
     fun loadData() {
+        val generation = ++loadGeneration
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            if (generation == loadGeneration) _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val invoices = invoiceRepository.loadInvoices()
                 val clients = jobRepository.loadClients()
-                _uiState.value = _uiState.value.copy(
+                val estimates = estimateRepository.loadEstimates()
+                if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     invoices = invoices,
                     clients = clients,
+                    estimates = estimates,
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+                if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Failed to load invoices",
                 )
@@ -287,5 +303,42 @@ class InvoicesViewModel : ViewModel() {
 
     fun dismissSnackbar() {
         _uiState.value = _uiState.value.copy(showSnackbar = null)
+    }
+
+    fun showNewEstimateDialog() { _uiState.value = _uiState.value.copy(showNewEstimateDialog = true) }
+    fun dismissNewEstimateDialog() { _uiState.value = _uiState.value.copy(showNewEstimateDialog = false) }
+    fun selectEstimate(estimate: Estimate?) { _uiState.value = _uiState.value.copy(selectedEstimate = estimate) }
+
+    fun createEstimate(clientId: String, amount: Double, note: String?, send: Boolean) {
+        val generation = ++loadGeneration
+        viewModelScope.launch {
+            try {
+                estimateRepository.createEstimate(Estimate(clientId = clientId, amount = amount, note = note), send)
+                if (generation == loadGeneration) {
+                    _uiState.value = _uiState.value.copy(showNewEstimateDialog = false, showSnackbar = if (send) "Estimate sent" else "Draft saved")
+                    loadData()
+                }
+            } catch (e: Exception) { if (generation == loadGeneration) _uiState.value = _uiState.value.copy(showSnackbar = "Failed to save: ${e.message}") }
+        }
+    }
+
+    fun updateEstimateStatus(id: String, status: String) {
+        val generation = ++loadGeneration
+        viewModelScope.launch {
+            try {
+                val updated = estimateRepository.updateEstimateStatus(id, status)
+                if (generation == loadGeneration) _uiState.value = _uiState.value.copy(estimates = _uiState.value.estimates.map { if (it.id == id) updated ?: it else it }, selectedEstimate = updated)
+            } catch (e: Exception) { if (generation == loadGeneration) _uiState.value = _uiState.value.copy(showSnackbar = "Failed to update: ${e.message}") }
+        }
+    }
+
+    fun convertEstimate(estimate: Estimate) {
+        val generation = ++loadGeneration
+        viewModelScope.launch {
+            try {
+                val updated = estimateRepository.convertEstimateToJob(estimate)
+                if (generation == loadGeneration) _uiState.value = _uiState.value.copy(estimates = _uiState.value.estimates.map { if (it.id == estimate.id) updated ?: it else it }, selectedEstimate = updated, showSnackbar = "Job created")
+            } catch (e: Exception) { if (generation == loadGeneration) _uiState.value = _uiState.value.copy(showSnackbar = "Failed to convert: ${e.message}") }
+        }
     }
 }

@@ -50,6 +50,13 @@ export const INVOICE_STATUS = {
   },
 };
 
+export const ESTIMATE_STATUS = {
+  draft: { badge: 'badge-ghost', label: 'Draft' },
+  sent: { badge: 'badge-info', label: 'Sent' },
+  approved: { badge: 'badge-success', label: 'Approved' },
+  declined: { badge: 'badge-danger', label: 'Declined' },
+};
+
 /** Recurrence options for jobs */
 export const RECURRENCE_OPTIONS = [
   { value: 'none', label: 'One-time' },

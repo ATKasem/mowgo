@@ -94,11 +94,29 @@ private struct InvoicePaidPatch: Encodable {
     let paidAt: String
 }
 
+private struct EstimateInsert: Encodable {
+    let id: UUID
+    let userId: UUID
+    let clientId: UUID
+    let amount: Decimal
+    let status: Estimate.EstimateStatus
+    let note: String?
+    let sentAt: String?
+}
+
+private struct EstimateOnlyStatusPatch: Encodable { let status: Estimate.EstimateStatus }
+private struct EstimateSentPatch: Encodable { let status: Estimate.EstimateStatus; let sentAt: String }
+private struct EstimateApprovedPatch: Encodable { let status: Estimate.EstimateStatus; let approvedAt: String }
+private struct EstimateDeclinedPatch: Encodable { let status: Estimate.EstimateStatus; let declinedAt: String }
+
+private struct EstimateJobPatch: Encodable { let jobId: UUID? }
+
 @MainActor
 final class DataStore: ObservableObject {
     @Published var jobs: [Job] = []
     @Published var clients: [Client] = []
     @Published var invoices: [Invoice] = []
+    @Published var estimates: [Estimate] = []
     @Published var teamMembers: [UserProfile] = []
     @Published var recurringJobs: [RecurringJob] = []
     @Published var isLoading = false
@@ -154,6 +172,7 @@ final class DataStore: ObservableObject {
             jobs = []
             clients = []
             invoices = []
+            estimates = []
             recurringJobs = []
             currentUserId = nil
             isLoading = false
@@ -169,6 +188,7 @@ final class DataStore: ObservableObject {
             jobs = []
             clients = []
             invoices = []
+            estimates = []
             recurringJobs = []
             isLoading = false
             self.error = "Unable to load your account. Please try again."
@@ -571,6 +591,7 @@ final class DataStore: ObservableObject {
         jobs = []
         clients = []
         invoices = []
+        estimates = []
         teamMembers = []
         recurringJobs = []
         currentUserId = nil
@@ -579,6 +600,78 @@ final class DataStore: ObservableObject {
     }
 
     // MARK: - Jobs
+
+    // MARK: - Estimates
+
+    func loadEstimates() async {
+        guard auth?.user?.role != "crew" else { estimates = []; return }
+        guard await sb.isConfigured else {
+            estimates = DemoData().estimates
+            return
+        }
+        do {
+            var loaded: [Estimate] = try await sb.fetch("estimates", query: ["order": "created_at.desc"])
+            for index in loaded.indices {
+                if let client = clients.first(where: { $0.id == loaded[index].clientId }) {
+                    loaded[index].clients = Estimate.ClientRef(name: client.name)
+                }
+            }
+            estimates = loaded
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func createEstimate(_ estimate: Estimate, send: Bool) async throws {
+        var created = estimate
+        created.status = send ? .sent : .draft
+        created.sentAt = send ? ISO8601DateFormatter().string(from: Date()) : nil
+        if let client = clients.first(where: { $0.id == created.clientId }) {
+            created.clients = Estimate.ClientRef(name: client.name)
+        }
+        guard await canSync() else { estimates.insert(created, at: 0); return }
+        guard let userId = try await sb.getCurrentUserId(), let clientId = created.clientId else {
+            throw DataStoreError.clientRequired
+        }
+        var saved: Estimate = try await sb.insert("estimates", EstimateInsert(
+            id: created.id, userId: userId, clientId: clientId, amount: created.amount,
+            status: created.status, note: created.note, sentAt: created.sentAt
+        ))
+        saved.clients = created.clients
+        estimates.insert(saved, at: 0)
+    }
+
+    func updateEstimateStatus(_ id: UUID, to status: Estimate.EstimateStatus) async throws {
+        let now = ISO8601DateFormatter().string(from: Date())
+        if await canSync() {
+            switch status {
+            case .sent: try await sb.update("estimates", id: id, EstimateSentPatch(status: status, sentAt: now))
+            case .approved: try await sb.update("estimates", id: id, EstimateApprovedPatch(status: status, approvedAt: now))
+            case .declined: try await sb.update("estimates", id: id, EstimateDeclinedPatch(status: status, declinedAt: now))
+            case .draft: try await sb.update("estimates", id: id, EstimateOnlyStatusPatch(status: status))
+            }
+        }
+        guard let index = estimates.firstIndex(where: { $0.id == id }) else { return }
+        estimates[index].status = status
+        if status == .sent { estimates[index].sentAt = now }
+        if status == .approved { estimates[index].approvedAt = now }
+        if status == .declined { estimates[index].declinedAt = now }
+    }
+
+    func convertEstimateToJob(_ estimate: Estimate) async throws {
+        guard let clientId = estimate.clientId else { throw DataStoreError.clientRequired }
+        let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd"
+        let job = Job(id: UUID(), clientId: clientId, title: estimate.note ?? "Lawn care",
+                      scheduledDate: formatter.string(from: Date()), status: .scheduled,
+                      notes: estimate.note)
+        try await createJob(job)
+        if await canSync() {
+            try await sb.update("estimates", id: estimate.id, EstimateJobPatch(jobId: job.id))
+        }
+        if let index = estimates.firstIndex(where: { $0.id == estimate.id }) {
+            estimates[index].jobId = job.id
+        }
+    }
 
     private func attachClientRef(to job: inout Job) {
         guard let client = clients.first(where: { $0.id == job.clientId }) else { return }
@@ -1438,6 +1531,20 @@ struct DemoData {
         Invoice(id: UUID(), amount: 45, status: .unpaid, createdAt: DemoData.today(), clients: Invoice.ClientRef(name: "Smith Residence")),
         Invoice(id: UUID(), amount: 65, status: .paid, paidAt: DemoData.yesterday(), createdAt: DemoData.yesterday(), clients: Invoice.ClientRef(name: "Johnson Home")),
     ]
+
+    var estimates: [Estimate] {
+        let first = clients[0]
+        let second = clients[1]
+        let sentDate = Calendar.current.date(byAdding: .day, value: -5, to: Date()) ?? Date()
+        return [
+            Estimate(id: UUID(), clientId: first.id, amount: first.rate, status: .sent,
+                     note: "Weekly lawn care", sentAt: ISO8601DateFormatter().string(from: sentDate),
+                     createdAt: ISO8601DateFormatter().string(from: sentDate), clients: Estimate.ClientRef(name: first.name)),
+            Estimate(id: UUID(), clientId: second.id, amount: second.rate, status: .approved,
+                     approvedAt: ISO8601DateFormatter().string(from: Date()), createdAt: DemoData.yesterday(),
+                     clients: Estimate.ClientRef(name: second.name))
+        ]
+    }
 
     static func today() -> String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f.string(from: Date())

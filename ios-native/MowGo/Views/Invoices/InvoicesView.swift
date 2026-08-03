@@ -1,187 +1,119 @@
-//
-//  InvoicesView.swift
-//  MowGo
-//
-//  Invoice list with Stripe payment integration.
-//  Tap "Pay" on unpaid invoices to launch Stripe checkout.
-//
-
 import SwiftUI
+import UIKit
 
 struct InvoicesView: View {
+    enum Segment: String, CaseIterable { case invoices = "Invoices", estimates = "Estimates" }
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
+    @State private var segment = Segment.invoices
     @State private var selectedInvoice: Invoice?
-    @State private var selectedInvoiceId: UUID?
+    @State private var selectedEstimate: Estimate?
     @State private var showPayment = false
+    @State private var showNewEstimate = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
-    private var totalUnpaidCents: Int64 {
-        unpaid.reduce(Int64.zero) { total, invoice in
-            let (sum, overflow) = total.addingReportingOverflow(Int64(invoice.amountCents))
-            return overflow ? (invoice.amountCents >= 0 ? Int64.max : Int64.min) : sum
-        }
-    }
-    private var totalUnpaid: Decimal { Decimal(totalUnpaidCents) / 100 }
+    private var totalUnpaid: Decimal { unpaid.reduce(0) { $0 + $1.amount } }
 
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .bottomTrailing) {
                 theme.background.ignoresSafeArea()
-
-                if store.isLoading {
-                    ProgressView().tint(MowGoTheme.deepGreen)
-                } else {
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            if !unpaid.isEmpty { totalBar }
-
-                            if !unpaid.isEmpty {
-                                sectionHeader("Unpaid")
-                                ForEach(unpaid) { inv in
-                                    InvoiceRow(invoice: inv, showPay: true) {
-                                        guard selectedInvoiceId != inv.id else { return }
-                                        selectedInvoiceId = inv.id
-                                        selectedInvoice = inv
-                                        showPayment = true
-                                    }
-                                }
-                            }
-
-                            if !paid.isEmpty {
-                                sectionHeader("Paid")
-                                ForEach(paid) { inv in
-                                    InvoiceRow(invoice: inv, showPay: false) {}
-                                }
-                            }
-
-                            if unpaid.isEmpty && paid.isEmpty { emptyState }
-                        }
-                        .padding(16)
+                VStack(spacing: 0) {
+                    Picker("View", selection: $segment) {
+                        ForEach(Segment.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                     }
+                    .pickerStyle(.segmented).tint(MowGoTheme.deepGreen).padding(.horizontal, 16).padding(.vertical, 10)
+                    if store.isLoading { Spacer(); ProgressView().tint(MowGoTheme.deepGreen); Spacer() }
+                    else if segment == .invoices { invoiceList }
+                    else { estimateList }
+                }
+                if segment == .estimates {
+                    Button { showNewEstimate = true } label: {
+                        Image(systemName: "plus").font(.title2.weight(.semibold)).foregroundColor(MowGoTheme.onAccent)
+                            .frame(width: 56, height: 56).background(MowGoTheme.deepGreen).clipShape(Circle()).shadow(radius: 4)
+                    }.padding(20).accessibilityLabel("New Estimate")
                 }
             }
-            .navigationTitle("Invoices")
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showPayment, onDismiss: {
-                selectedInvoiceId = nil
-                selectedInvoice = nil
-            }) {
-                if let inv = selectedInvoice {
-                    NavigationStack {
-                        PaymentView(invoice: inv)
-                            .navigationTitle("Payment")
-                            .navigationBarTitleDisplayMode(.inline)
-                            .toolbar {
-                                ToolbarItem(placement: .cancellationAction) {
-                                    Button("Close") { showPayment = false }
-                                }
-                            }
-                    }
-                }
-            }
+            .navigationTitle("Invoices").navigationBarTitleDisplayMode(.inline)
+            .task { await store.loadEstimates() }
+            .sheet(isPresented: $showPayment) { paymentSheet }
+            .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
+            .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
         }
+    }
+
+    private var invoiceList: some View {
+        ScrollView { VStack(spacing: 16) {
+            if !unpaid.isEmpty { totalBar; sectionHeader("Unpaid") }
+            ForEach(unpaid) { inv in InvoiceRow(invoice: inv, showPay: true) { selectedInvoice = inv; showPayment = true } }
+            if !paid.isEmpty { sectionHeader("Paid") }
+            ForEach(paid) { inv in InvoiceRow(invoice: inv, showPay: false) {} }
+            if unpaid.isEmpty && paid.isEmpty { invoiceEmpty }
+        }.padding(16) }
+    }
+
+    private var estimateList: some View {
+        ScrollView { VStack(spacing: 10) {
+            ForEach(store.estimates) { estimate in
+                Button { selectedEstimate = estimate } label: { EstimateRow(estimate: estimate) }.buttonStyle(.plain)
+            }
+            if store.estimates.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "doc.text.magnifyingglass").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
+                    Text("No estimates yet").font(.headline).foregroundColor(theme.textPrimary)
+                    Text("Pick a client and send one in 10 seconds").font(.subheadline).foregroundColor(theme.textMuted)
+                }.padding(.top, 60)
+            }
+        }.padding(16).padding(.bottom, 72) }
     }
 
     private var totalBar: some View {
-        HStack(spacing: 0) {
-            VStack(spacing: 2) {
-                Text("Unpaid").font(.caption).foregroundColor(theme.textMuted)
-                Text(totalUnpaid.formatted(.currency(code: "USD")))
-                    .font(.title2.weight(.bold)).foregroundColor(MowGoTheme.danger)
-            }
-            .frame(maxWidth: .infinity)
+        HStack { VStack { Text("Unpaid").font(.caption); Text(totalUnpaid.formatted(.currency(code: "USD"))).font(.title2.bold()).foregroundColor(MowGoTheme.danger) }.frame(maxWidth: .infinity)
             Divider().frame(height: 40)
-            VStack(spacing: 2) {
-                Text("Paid").font(.caption).foregroundColor(theme.textMuted)
-                Text("\(paid.count)")
-                    .font(.title2.weight(.bold)).foregroundColor(MowGoTheme.success)
-                Text("invoice\(paid.count == 1 ? "" : "s")")
-                    .font(.caption2).foregroundColor(theme.textMuted)
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .padding().background(theme.surface).cornerRadius(16)
+            VStack { Text("Paid").font(.caption); Text("\(paid.count)").font(.title2.bold()).foregroundColor(MowGoTheme.success) }.frame(maxWidth: .infinity)
+        }.foregroundColor(theme.textMuted).padding().background(theme.surface).cornerRadius(16)
     }
-
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title).font(.headline).foregroundColor(theme.textPrimary)
-            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "doc.text.magnifyingglass").font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
-            Text("No invoices yet").font(.headline).foregroundColor(theme.textPrimary)
-            Text("Complete a job to create one").font(.subheadline).foregroundColor(theme.textInverse)
-        }
-        .padding(.top, 60)
-    }
+    private func sectionHeader(_ title: String) -> some View { Text(title).font(.headline).foregroundColor(theme.textPrimary).frame(maxWidth: .infinity, alignment: .leading) }
+    private var invoiceEmpty: some View { VStack(spacing: 12) { Text("No invoices yet").font(.headline); Text("Complete a job to create one").font(.subheadline).foregroundColor(theme.textMuted) }.foregroundColor(theme.textPrimary).padding(.top, 60) }
+    @ViewBuilder private var paymentSheet: some View { if let inv = selectedInvoice { NavigationStack { PaymentView(invoice: inv).navigationTitle("Payment").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { showPayment = false } } } } } }
 }
 
 struct InvoiceRow: View {
     @Environment(\.colorScheme) private var colorScheme
-    let invoice: Invoice
-    var showPay: Bool
-    var onPay: () -> Void
-
+    let invoice: Invoice; var showPay: Bool; var onPay: () -> Void
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-
-    var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(invoice.clientName ?? "Invoice")
-                    .font(.subheadline.weight(.medium)).foregroundColor(theme.textPrimary)
-                if let date = invoice.createdAt {
-                    Text(date.prefix(10).description)
-                        .font(.caption).foregroundColor(theme.textMuted)
-                }
-            }
-            Spacer()
-
-            if showPay {
-                Text("Due")
-                    .font(.caption2.weight(.medium))
-                    .foregroundColor(MowGoTheme.warning)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(MowGoTheme.warning.opacity(0.12))
-                    .clipShape(Capsule())
-            } else {
-                Text("Paid")
-                    .font(.caption2.weight(.medium))
-                    .foregroundColor(MowGoTheme.success)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(MowGoTheme.success.opacity(0.12))
-                    .clipShape(Capsule())
-            }
-
-            Text(invoice.currencyAmount.formatted(.currency(code: "USD")))
-                .font(.subheadline.weight(.semibold)).foregroundColor(theme.textPrimary)
-
-            if showPay {
-                Button(action: {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    onPay()
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "creditcard")
-                            .font(.system(size: 10))
-                        Text("Pay")
-                            .font(.caption.weight(.medium))
-                    }
-                    .foregroundColor(MowGoTheme.onAccent)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(MowGoTheme.deepGreen)
-                    .clipShape(Capsule())
-                }
-            }
-        }
-        .padding(12).background(theme.surface).cornerRadius(12)
-    }
+    var body: some View { HStack(spacing: 12) { VStack(alignment: .leading) { Text(invoice.clientName ?? "Invoice").font(.subheadline.weight(.medium)); if let date = invoice.createdAt { Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted) } }; Spacer(); status; Text(invoice.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold)); if showPay { Button("Pay") { UIImpactFeedbackGenerator(style: .medium).impactOccurred(); onPay() }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small) } }.foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12) }
+    private var status: some View { Text(showPay ? "Due" : "Paid").font(.caption2.weight(.medium)).foregroundColor(showPay ? MowGoTheme.warning : MowGoTheme.success).padding(.horizontal, 8).padding(.vertical, 3).background((showPay ? MowGoTheme.warning : MowGoTheme.success).opacity(0.12)).clipShape(Capsule()) }
 }
+
+struct EstimateRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let estimate: Estimate
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    private var color: Color { switch estimate.status { case .draft: theme.textMuted; case .sent: MowGoTheme.info; case .approved: MowGoTheme.success; case .declined: MowGoTheme.danger } }
+    var body: some View { HStack(spacing: 12) { VStack(alignment: .leading, spacing: 3) { Text(estimate.clientName ?? "Estimate").font(.subheadline.weight(.medium)); if let date = estimate.createdAt { Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted) }; if let note = estimate.note, !note.isEmpty { Text(note).font(.caption2).foregroundColor(theme.textMuted).lineLimit(1) }; if estimate.jobId != nil { Text("Converted ✓").font(.caption2.weight(.medium)).foregroundColor(MowGoTheme.success) } }; Spacer(); Text(estimate.status.label).font(.caption2.weight(.medium)).foregroundColor(color).padding(.horizontal, 8).padding(.vertical, 3).background(color.opacity(0.12)).clipShape(Capsule()); Text(estimate.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold)) }.foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12) }
+}
+
+private struct NewEstimateView: View {
+    @EnvironmentObject var store: DataStore; @Environment(\.dismiss) private var dismiss; @Environment(\.colorScheme) private var colorScheme
+    @State private var client: Client?; @State private var amount = ""; @State private var note = ""; @State private var showClients = false; @State private var saving = false
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    var body: some View { NavigationStack { Form { Button(client?.name ?? "Select Client") { showClients = true }; TextField("Amount", text: $amount).keyboardType(.decimalPad); TextField("Note (optional)", text: $note); HStack { Button("Save Draft") { save(send: false) }.buttonStyle(.bordered).frame(maxWidth: .infinity); Button("Send") { save(send: true) }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).frame(maxWidth: .infinity) }.disabled(client == nil || Decimal(string: amount) == nil || saving) }.scrollContentBackground(.hidden).background(theme.background).navigationTitle("New Estimate").navigationBarTitleDisplayMode(.inline).toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }.sheet(isPresented: $showClients) { NavigationStack { List(store.clients) { item in Button(item.name) { client = item; amount = NSDecimalNumber(decimal: item.rate).stringValue; showClients = false } }.navigationTitle("Select Client").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showClients = false } } } }.presentationDetents([.medium, .large]) } }.presentationDetents([.medium, .large]) }
+    private func save(send: Bool) { guard let client, let value = Decimal(string: amount) else { return }; saving = true; let estimate = Estimate(id: UUID(), clientId: client.id, amount: value, status: send ? .sent : .draft, note: note.isEmpty ? nil : note, createdAt: ISO8601DateFormatter().string(from: Date()), clients: Estimate.ClientRef(name: client.name)); let task: Task<Void, Never> = Task { do { try await store.createEstimate(estimate, send: send); if send { UIPasteboard.general.string = estimateText(estimate) }; dismiss() } catch { saving = false } }; _ = task }
+}
+
+private struct EstimateDetailView: View {
+    @EnvironmentObject var store: DataStore; @Environment(\.dismiss) private var dismiss; @State private var showJobCreated = false
+    let estimate: Estimate
+    private var current: Estimate { store.estimates.first(where: { $0.id == estimate.id }) ?? estimate }
+    var body: some View { NavigationStack { Form { Section { EstimateRow(estimate: current) }; Section { Button("Copy estimate text") { copy(estimateText(current)) }; if canNudge { Button("Nudge") { copy(nudgeText(current)) }.tint(.orange) }; if current.status == .draft || current.status == .sent { Button("Mark Approved") { update(.approved) }; Button("Mark Declined", role: .destructive) { update(.declined) } }; if current.status == .approved && current.jobId == nil { Button("Convert to Job") { convert() } }; if current.jobId != nil { Text("Converted ✓").foregroundColor(MowGoTheme.success) } } }.navigationTitle("Estimate").navigationBarTitleDisplayMode(.inline).toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }.alert("Job created", isPresented: $showJobCreated) { Button("OK") {} } }.presentationDetents([.medium, .large]) }
+    private var canNudge: Bool { guard current.status == .sent, let value = current.sentAt, let date = ISO8601DateFormatter().date(from: value) else { return false }; return date < Calendar.current.date(byAdding: .day, value: -3, to: Date())! }
+    private func copy(_ text: String) { UIPasteboard.general.string = text; UINotificationFeedbackGenerator().notificationOccurred(.success) }
+    private func update(_ status: Estimate.EstimateStatus) { let task: Task<Void, Never> = Task { try? await store.updateEstimateStatus(current.id, to: status) }; _ = task }
+    private func convert() { let task: Task<Void, Never> = Task { do { try await store.convertEstimateToJob(current); showJobCreated = true } catch {} }; _ = task }
+}
+
+private func estimateText(_ estimate: Estimate) -> String { "Hi \(estimate.clientName ?? "there"), here's your estimate: \(estimate.amount.formatted(.currency(code: "USD"))) for lawn care. Valid for 30 days. Thanks!" }
+private func nudgeText(_ estimate: Estimate) -> String { "Hi \(estimate.clientName ?? "there"), just checking in on your estimate for \(estimate.amount.formatted(.currency(code: "USD"))) from \(String((estimate.sentAt ?? estimate.createdAt ?? "").prefix(10))) — still want me to hold the spot? Happy to adjust anything. Thanks!" }

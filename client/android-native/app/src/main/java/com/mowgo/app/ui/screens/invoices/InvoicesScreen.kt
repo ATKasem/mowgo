@@ -2,6 +2,9 @@ package com.mowgo.app.ui.screens.invoices
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
+import com.mowgo.app.data.model.Estimate
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
 import com.mowgo.app.ui.theme.MowGoColors
 import com.stripe.android.paymentsheet.PaymentSheet
@@ -37,6 +42,7 @@ fun InvoicesScreen(
     viewModel: InvoicesViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var showingEstimates by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
@@ -181,6 +187,24 @@ fun InvoicesScreen(
         )
     }
 
+    if (state.showNewEstimateDialog) {
+        NewEstimateDialog(
+            clients = state.clients,
+            onDismiss = { viewModel.dismissNewEstimateDialog() },
+            onSave = { clientId, amount, note, send -> viewModel.createEstimate(clientId, amount, note, send) },
+        )
+    }
+
+    state.selectedEstimate?.let { estimate ->
+        EstimateDetailDialog(
+            estimate = estimate,
+            clientName = state.estimatesWithClientName.firstOrNull { it.estimate.id == estimate.id }?.clientName,
+            onDismiss = { viewModel.selectEstimate(null) },
+            onStatus = { status -> viewModel.updateEstimateStatus(estimate.id, status) },
+            onConvert = { viewModel.convertEstimate(estimate) },
+        )
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(snackbarHostState) { data ->
@@ -193,34 +217,45 @@ fun InvoicesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.showNewInvoiceDialog() },
+                onClick = { if (showingEstimates) viewModel.showNewEstimateDialog() else viewModel.showNewInvoiceDialog() },
                 containerColor = MowGoColors.DeepGreenDark,
                 contentColor = MowGoColors.OnAccent,
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "New Invoice")
+                Icon(Icons.Filled.Add, contentDescription = if (showingEstimates) "New Estimate" else "New Invoice")
             }
         },
         containerColor = MowGoColors.BackgroundDark,
     ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(selected = !showingEstimates, onClick = { showingEstimates = false }, label = { Text("Invoices") }, modifier = Modifier.weight(1f))
+                FilterChip(selected = showingEstimates, onClick = { showingEstimates = true }, label = { Text("Estimates") }, modifier = Modifier.weight(1f))
+            }
         PullToRefreshBox(
             isRefreshing = state.isLoading,
             onRefresh = { viewModel.refresh() },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .weight(1f),
         ) {
-            if (state.isLoading && state.invoices.isEmpty()) {
+            if (state.isLoading && state.invoices.isEmpty() && state.estimates.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(color = MowGoColors.DeepGreenDark)
                 }
-            } else if (state.error != null && state.invoices.isEmpty()) {
+            } else if (state.error != null && state.invoices.isEmpty() && state.estimates.isEmpty()) {
                 ErrorContent(
                     error = state.error!!,
                     onRetry = { viewModel.refresh() },
                 )
+            } else if (showingEstimates) {
+                if (state.estimates.isEmpty()) EstimateEmptyContent() else LazyColumn(contentPadding = PaddingValues(bottom = 80.dp)) {
+                    items(items = state.estimatesWithClientName, key = { it.estimate.id }) { item ->
+                        EstimateCard(estimate = item.estimate, clientName = item.clientName, onClick = { viewModel.selectEstimate(item.estimate) })
+                    }
+                }
             } else if (state.invoices.isEmpty()) {
                 EmptyContent()
             } else {
@@ -254,8 +289,69 @@ fun InvoicesScreen(
                 }
             }
         }
+        }
     }
 }
+
+@Composable
+private fun EstimateCard(estimate: Estimate, clientName: String?, onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clickable(onClick = onClick), colors = CardDefaults.cardColors(containerColor = MowGoColors.SurfaceDark), shape = RoundedCornerShape(12.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(clientName ?: "Unknown Client", color = MowGoColors.TextPrimaryDark, fontWeight = FontWeight.SemiBold)
+                estimate.createdAt?.let { Text(it.take(10), style = MaterialTheme.typography.bodySmall, color = MowGoColors.TextSecondaryDark) }
+                estimate.note?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MowGoColors.TextSecondaryDark, maxLines = 1) }
+                if (estimate.jobId != null) Text("Converted ✓", style = MaterialTheme.typography.labelSmall, color = MowGoColors.SuccessDark)
+            }
+            EstimateStatusChip(estimate.status)
+            Spacer(Modifier.width(10.dp))
+            Text("$${String.format("%.2f", estimate.amount)}", color = MowGoColors.TextPrimaryDark, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun EstimateStatusChip(status: String) {
+    val color = when (status) { Estimate.STATUS_SENT -> MowGoColors.InfoDark; Estimate.STATUS_APPROVED -> MowGoColors.SuccessDark; Estimate.STATUS_DECLINED -> MowGoColors.DangerDark; else -> MowGoColors.TextSecondaryDark }
+    Surface(shape = RoundedCornerShape(8.dp), color = color.copy(alpha = .15f)) { Text(status.replaceFirstChar { it.uppercase() }, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = color) }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NewEstimateDialog(clients: List<Client>, onDismiss: () -> Unit, onSave: (String, Double, String?, Boolean) -> Unit) {
+    val context = LocalContext.current
+    var selected by remember { mutableStateOf<Client?>(null) }; var amount by remember { mutableStateOf("") }; var note by remember { mutableStateOf("") }; var picker by remember { mutableStateOf(false) }
+    if (picker) ClientPickerDialog(clients = clients, onSelect = { selected = it; amount = it.rate.toString(); picker = false }, onDismiss = { picker = false })
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("New Estimate", color = MowGoColors.TextPrimaryDark) }, containerColor = MowGoColors.SurfaceDark,
+        text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            OutlinedTextField(value = selected?.name ?: "", onValueChange = {}, label = { Text("Client *") }, readOnly = true, enabled = false, modifier = Modifier.fillMaxWidth().clickable { picker = true }, colors = OutlinedTextFieldDefaults.colors(disabledTextColor = MowGoColors.TextPrimaryDark, disabledBorderColor = MowGoColors.TextSecondaryDark))
+            OutlinedTextField(value = amount, onValueChange = { amount = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text("Amount ($) *") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = note, onValueChange = { note = it }, label = { Text("Note (optional)") }, modifier = Modifier.fillMaxWidth())
+        } },
+        confirmButton = { Button(onClick = { val client = selected; val value = amount.toDoubleOrNull(); if (client != null && value != null) { val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("Estimate", "Hi ${client.name}, here's your estimate: $${String.format("%.2f", value)} for lawn care. Valid for 30 days. Thanks!")); onSave(client.id, value, note.ifBlank { null }, true) } }, enabled = selected != null && amount.toDoubleOrNull() != null) { Text("Send") } },
+        dismissButton = { Row { TextButton(onClick = onDismiss) { Text("Cancel") }; TextButton(onClick = { val client = selected; val value = amount.toDoubleOrNull(); if (client != null && value != null) onSave(client.id, value, note.ifBlank { null }, false) }, enabled = selected != null && amount.toDoubleOrNull() != null) { Text("Save Draft") } } })
+}
+
+@Composable
+private fun EstimateDetailDialog(estimate: Estimate, clientName: String?, onDismiss: () -> Unit, onStatus: (String) -> Unit, onConvert: () -> Unit) {
+    val context = LocalContext.current
+    val copy: (String) -> Unit = { value -> val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("Estimate", value)); Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show() }
+    val name = clientName ?: "there"; val amount = "$${String.format("%.2f", estimate.amount)}"
+    val estimateMessage = "Hi $name, here's your estimate: $amount for lawn care. Valid for 30 days. Thanks!"
+    val canNudge = estimate.status == Estimate.STATUS_SENT && estimate.sentAt?.let { runCatching { Instant.parse(it).isBefore(Instant.now().minusSeconds(3 * 86400)) }.getOrDefault(false) } == true
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Estimate", color = MowGoColors.TextPrimaryDark) }, containerColor = MowGoColors.SurfaceDark,
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            EstimateCard(estimate, clientName, onClick = {})
+            TextButton(onClick = { copy(estimateMessage) }) { Text("Copy estimate text") }
+            if (canNudge) TextButton(onClick = { copy("Hi $name, just checking in on your estimate for $amount from ${estimate.sentAt?.take(10)} — still want me to hold the spot? Happy to adjust anything. Thanks!") }) { Text("Nudge", color = MowGoColors.WarningDark) }
+            if (estimate.status == Estimate.STATUS_DRAFT || estimate.status == Estimate.STATUS_SENT) { TextButton(onClick = { onStatus(Estimate.STATUS_APPROVED) }) { Text("Mark Approved") }; TextButton(onClick = { onStatus(Estimate.STATUS_DECLINED) }) { Text("Mark Declined", color = MowGoColors.DangerDark) } }
+            if (estimate.status == Estimate.STATUS_APPROVED && estimate.jobId == null) Button(onClick = onConvert) { Text("Convert to Job") }
+            if (estimate.jobId != null) Text("Converted ✓", color = MowGoColors.SuccessDark)
+        } }, confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } })
+}
+
+@Composable
+private fun EstimateEmptyContent() { Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) { Icon(Icons.Filled.Description, null, modifier = Modifier.size(64.dp), tint = MowGoColors.DeepGreenDark.copy(alpha = .3f)); Text("No estimates yet", color = MowGoColors.TextPrimaryDark, style = MaterialTheme.typography.titleMedium); Text("Pick a client and send one in 10 seconds", color = MowGoColors.TextSecondaryDark) } }
 
 // ── Summary Header ──────────────────────────────────────────────────────
 

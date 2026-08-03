@@ -339,7 +339,8 @@
     "amount_collected": "${{amount}} cobrados",
     "amount_in_unpaid_invoices": "${{amount}} en facturas pendientes",
     "count_invoice_needs_attention_one": "{{count}} factura requiere atención",
-    "count_invoice_needs_attention_other": "{{count}} facturas requieren atención"
+    "count_invoice_needs_attention_other": "{{count}} facturas requieren atención",
+    "estimates": "Presupuestos", "new_estimate": "Nuevo presupuesto", "no_estimates_yet": "Aún no hay presupuestos", "create_one_in_10_seconds": "Crea uno en 10 segundos", "loading_estimates": "Cargando presupuestos…", "unknown_client": "Cliente desconocido", "draft": "Borrador", "sent": "Enviado", "approved": "Aprobado", "declined": "Rechazado", "converted": "Convertido ✓", "copy_text": "Copiar texto", "mark_approved": "Marcar como aprobado", "mark_declined": "Marcar como rechazado", "nudge": "Recordar", "convert_to_job": "Convertir en trabajo", "job_created": "Trabajo creado", "select_a_client": "Selecciona un cliente", "note_optional": "Nota (opcional)", "save_draft": "Guardar borrador", "send": "Enviar"
   },
   "jobberPriceIncrease": {
     "core": "Core",
