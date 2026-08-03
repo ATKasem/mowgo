@@ -6,6 +6,7 @@ import { isDemoMode } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
 import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle } from 'lucide-react';
+import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 
 export default function Settings() {
@@ -20,6 +21,7 @@ export default function Settings() {
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
   const [notifyOnRain, setNotifyOnRain] = useState(() => localStorage.getItem('mf_notify_rain') !== 'false');
+  const [reviewPrompts, setReviewPrompts] = useState(() => localStorage.getItem('mf_review_prompts') !== 'false');
   const [teamMembers, setTeamMembers] = useState([]);
   const [teamLoading, setTeamLoading] = useState(false);
   const [teamError, setTeamError] = useState('');
@@ -84,6 +86,10 @@ export default function Settings() {
   function toggleNotifyRain(val) {
     setNotifyOnRain(val);
     localStorage.setItem('mf_notify_rain', val);
+  }
+  function toggleReviewPrompts(val) {
+    setReviewPrompts(val);
+    localStorage.setItem('mf_review_prompts', val);
   }
 
   async function handleInvite(e) {
@@ -231,6 +237,21 @@ export default function Settings() {
               className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${notifyOnRain ? 'translate-x-[18px]' : ''}`} />
+            </button>
+          </label>
+          <label className="flex items-center justify-between cursor-pointer">
+            <div>
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Review prompts")}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Show a review prompt after completing jobs")}</p>
+            </div>
+            <button
+              role="switch"
+              aria-checked={reviewPrompts}
+              aria-label={tr("Review prompts")}
+              onClick={() => toggleReviewPrompts(!reviewPrompts)}
+              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${reviewPrompts ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${reviewPrompts ? 'translate-x-[18px]' : ''}`} />
             </button>
           </label>
         </div>

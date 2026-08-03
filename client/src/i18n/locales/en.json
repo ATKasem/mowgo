@@ -277,7 +277,6 @@
     "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter": "You must upgrade to the Pro plan ($59/mo) just to get rain delay. Starter plan doesn't include it.",
     "platform_fee_exposé": "Platform Fee Exposé",
     "ruunly_s_sticker_price_is_a_lie_here_s_what_you_actually_pay": "Ruunly's sticker price is a lie. Here's what you actually pay.",
-    "monthly_revenue": "Monthly Revenue",
     "you_save": "You Save",
     "per_mo": "/mo",
     "_based_on_ruunly_s_published_platform_fee_percentages_applied_to_monthly": "* Based on Ruunly's published platform fee percentages applied to monthly revenue. MowGo Solo is $39 flat — no percentage fees.",
@@ -727,7 +726,9 @@
     "unable_to_open_subscription_management": "Unable to open subscription management",
     "send_invite": "Send Invite",
     "remove_name": "Remove {{name}}",
-    "team_member": "team member"
+    "team_member": "team member",
+    "Review prompts": "Review prompts",
+    "Show a review prompt after completing jobs": "Show a review prompt after completing jobs"
   },
   "subscribe": {
     "payment_was_not_completed": "Payment was not completed",
@@ -871,5 +872,11 @@
     "done": "done",
     "no_jobs_today": "No jobs today",
     "retry": "Retry"
+  },
+  "reviewPrompt": {
+    "Loving MowGo?": "Loving MowGo?",
+    "Help us out with a review ⭐": "Help us out with a review ⭐",
+    "Leave a Review": "Leave a Review",
+    "Maybe Later": "Maybe Later"
   }
 }

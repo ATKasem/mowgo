@@ -724,7 +724,9 @@
     "unable_to_open_subscription_management": "No se pudo abrir la administración de la suscripción",
     "send_invite": "Enviar invitación",
     "remove_name": "Eliminar a {{name}}",
-    "team_member": "miembro del equipo"
+    "team_member": "miembro del equipo",
+    "Review prompts": "Solicitudes de reseña",
+    "Show a review prompt after completing jobs": "Mostrar una solicitud de reseña al completar trabajos"
   },
   "subscribe": {
     "payment_was_not_completed": "El pago no se completó",
@@ -861,5 +863,11 @@
     "done": "hecho",
     "no_jobs_today": "Sin trabajos hoy",
     "retry": "Reintentar"
+  },
+  "reviewPrompt": {
+    "Loving MowGo?": "¿Te gusta MowGo?",
+    "Help us out with a review ⭐": "Ayúdanos con una reseña ⭐",
+    "Leave a Review": "Dejar una reseña",
+    "Maybe Later": "Quizás después"
   }
 }
