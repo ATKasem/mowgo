@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'client/android-native/**'
+      - '.github/workflows/android-native-ci.yml'
   workflow_dispatch:
 
 jobs:
