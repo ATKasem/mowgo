@@ -76,7 +76,7 @@ fun MoreScreen(
             billingUrlHandled = viewModel::billingUrlHandled,
             billingUrlFailed = viewModel::billingUrlFailed,
         )
-        MoreDestination.INTEGRATIONS -> IntegrationsScreen { destination = MoreDestination.ROOT }
+        MoreDestination.INTEGRATIONS -> IntegrationsScreen(back = { destination = MoreDestination.ROOT })
     }
 }
 
