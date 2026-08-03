@@ -78,7 +78,10 @@
     "scheduled": "Scheduled",
     "in_progress": "In Progress",
     "done": "Done",
-    "skipped": "Skipped"
+    "skipped": "Skipped",
+    "before_photo": "Before",
+    "after_photo": "After",
+    "no_photo": "No photo"
   },
   "layout": {
     "home": "Home",
@@ -846,7 +849,14 @@
     "remaining_to_tomorrow": "remaining to tomorrow",
     "completed": "completed",
     "count_completed": "{{count}} completed",
-    "job_already_scheduled": "job already scheduled"
+    "job_already_scheduled": "job already scheduled",
+    "add_photo": "Add Photo",
+    "take_photo": "Take Photo",
+    "upload_photo": "Upload Photo",
+    "photo_added": "Photo added",
+    "before": "Before",
+    "after": "After",
+    "no_photo": "No photo"
   },
   "dashboard": {
     "revenue_today": "Revenue Today",

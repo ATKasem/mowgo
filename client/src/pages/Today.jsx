@@ -8,6 +8,8 @@ import { Plus, Circle, CloudRain, Repeat, Loader2, Sparkles } from 'lucide-react
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
+import PhotoUpload from '../components/PhotoUpload';
+import ReviewPrompt from '../components/ReviewPrompt';
 
 /** Calculate the next occurrence date based on recurrence rule */
 function getNextDate(currentDate, recurrence) {
@@ -44,12 +46,14 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [saving, setSaving] = useState(false);
   const [clients, setClients] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const [canManageCrew, setCanManageCrew] = useState(false);
   const [isCrewMember, setIsCrewMember] = useState(false);
   const [teamLoading, setTeamLoading] = useState(false);
   const [teamError, setTeamError] = useState('');
   const [crewFilter, setCrewFilter] = useState(null); // null = show all
   const [teamDashboard, setTeamDashboard] = useState([]);
+  const [photoModalJob, setPhotoModalJob] = useState(null); // job being photographed
   const toggleTimeoutRef = useRef(null);
   const statusToggleTimeoutsRef = useRef(new Map());
   const pendingRecurringRef = useRef(new Set());
@@ -126,6 +130,24 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     return () => { active = false; };
   }, [date]);
 
+  // Review prompt logic — show once after 10 completed jobs
+  useEffect(() => {
+    // Skip if user has disabled review prompts
+    if (localStorage.getItem('mf_review_prompts') === 'false') return;
+    // Skip if already shown
+    if (localStorage.getItem('mf_review_prompt_shown') === 'true') return;
+
+    const completedCount = parseInt(localStorage.getItem('mf_completed_jobs') || '0', 10);
+    if (completedCount >= 10) {
+      setShowReviewPrompt(true);
+    }
+  }, []);
+
+  function handleReviewPromptClose() {
+    setShowReviewPrompt(false);
+    localStorage.setItem('mf_review_prompt_shown', 'true');
+  }
+
   const createJobHandler = useCallback(async (e) => {
     e.preventDefault();
     const currentForm = formRef.current;
@@ -156,9 +178,23 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       try {
         const newStatus = job.status === 'scheduled' ? 'in_progress' : job.status === 'in_progress' ? 'done' : 'scheduled';
         await updateJobStatus(job.id, newStatus);
+        // Track completed jobs for review prompt
+        if (newStatus === 'done' && localStorage.getItem('mf_review_prompts') !== 'false' && localStorage.getItem('mf_review_prompt_shown') !== 'true') {
+          const prev = parseInt(localStorage.getItem('mf_completed_jobs') || '0', 10);
+          const next = prev + 1;
+          localStorage.setItem('mf_completed_jobs', String(next));
+          if (next >= 10) {
+            setTimeout(() => setShowReviewPrompt(true), 500);
+          }
+        }
 
         // Update state outside the callback to avoid race condition
         setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: newStatus } : j));
+
+        // Show photo upload modal when completing a job
+        if (newStatus === 'done') {
+          setPhotoModalJob(job);
+        }
 
         // Auto-regenerate recurring jobs (outside setJobs to avoid race)
         // Only generate next occurrence when job is newly completed
@@ -317,7 +353,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   return (
     <div>
       <InvoiceToast toast={completedToast} />
-
+      <ReviewPrompt show={showReviewPrompt} onClose={handleReviewPromptClose} />
+      {/* Header */}
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
@@ -530,6 +567,29 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           />
         ))}
       </div>
+
+      {/* Photo upload modal — shown after marking a job complete */}
+      {photoModalJob && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setPhotoModalJob(null)} />
+          <div className="relative w-full sm:max-w-sm bg-[var(--color-surface)] dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl border border-[var(--color-border)] dark:border-gray-700" style={{ animation: 'slideUp 0.2s ease-out' }}>
+            <h3 className="text-base font-bold text-[var(--color-text-primary)] dark:text-white mb-1">{tr('Add Photo')}</h3>
+            <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-4">
+              {photoModalJob.clients?.name || tr('Job')}
+            </p>
+            <div className="grid grid-cols-2 gap-4 mb-5">
+              <PhotoUpload jobId={photoModalJob.id} type="after" onUploaded={() => {}} />
+              <PhotoUpload jobId={photoModalJob.id} type="before" onUploaded={() => {}} />
+            </div>
+            <button
+              onClick={() => setPhotoModalJob(null)}
+              className="w-full btn-primary"
+            >
+              {tr('Done')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

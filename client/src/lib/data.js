@@ -763,3 +763,87 @@ export async function loadTeamDashboard(date) {
     };
   });
 }
+
+// ===== Job Photos =====
+
+// In-memory demo photo store
+const _demoPhotos = new Map();
+
+/**
+ * Upload a job photo (before/after) to Supabase storage.
+ * @param {string} jobId
+ * @param {File} file - image file from input/camera
+ * @param {'before'|'after'} type
+ * @returns {Promise<string>} public URL of the uploaded photo
+ */
+export async function uploadJobPhoto(jobId, file, type) {
+  const timestamp = Date.now();
+  const ext = file.name?.split('.').pop() || 'jpg';
+  const path = `${jobId}/${type}-${timestamp}.${ext}`;
+
+  if (isDemoMode()) {
+    const url = URL.createObjectURL(file);
+    const existing = _demoPhotos.get(jobId) || {};
+    _demoPhotos.set(jobId, { ...existing, [type]: url });
+    return url;
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const storagePath = `${user.id}/${path}`;
+  const { error: uploadError } = await supabase.storage
+    .from('job-photo')
+    .upload(storagePath, file, { contentType: file.type || 'image/jpeg', upsert: true });
+
+  if (uploadError) throw uploadError;
+
+  const { data: urlData } = supabase.storage
+    .from('job-photo')
+    .getPublicUrl(storagePath);
+
+  // Store URL on the job record if photo_before/photo_after columns exist
+  const colName = type === 'before' ? 'photo_before' : 'photo_after';
+  try {
+    await supabase.from('jobs').update({ [colName]: urlData.publicUrl }).eq('id', jobId);
+  } catch {
+    // Column may not exist yet — storage is the source of truth
+  }
+
+  return urlData.publicUrl;
+}
+
+/**
+ * Get before/after photo URLs for a job.
+ * @param {string} jobId
+ * @returns {Promise<{before: string|null, after: string|null}>}
+ */
+export async function getJobPhotos(jobId) {
+  if (isDemoMode()) {
+    const photos = _demoPhotos.get(jobId) || {};
+    return { before: photos.before || null, after: photos.after || null };
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { before: null, after: null };
+
+  const folderPath = `${user.id}/${jobId}`;
+  const { data: files, error } = await supabase.storage
+    .from('job-photo')
+    .list(folderPath);
+
+  if (error || !files || files.length === 0) {
+    return { before: null, after: null };
+  }
+
+  const result = { before: null, after: null };
+  for (const f of files) {
+    const filePath = `${folderPath}/${f.name}`;
+    const { data: urlData } = supabase.storage
+      .from('job-photo')
+      .getPublicUrl(filePath);
+    if (f.name.startsWith('before-')) result.before = urlData.publicUrl;
+    if (f.name.startsWith('after-')) result.after = urlData.publicUrl;
+  }
+  return result;
+}

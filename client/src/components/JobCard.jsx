@@ -1,11 +1,13 @@
 import useLocalizedText from '../i18n/useLocalizedText';
-import { memo } from 'react';
-import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical, Clock } from 'lucide-react';
+import { memo, useState, useEffect } from 'react';
+import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical, Clock, Camera } from 'lucide-react';
 import { STATUS_CONFIG, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
+import { getJobPhotos } from '../lib/data';
 import { getMapsUrl } from '../lib/maps';
 
 function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown, teamMembers }) {
   const { tr } = useLocalizedText('jobCard');
+  const [photos, setPhotos] = useState({ before: null, after: null });
   const client = job.clients;
   const isDone = job.status === 'done';
   const isInProgress = job.status === 'in_progress';
@@ -23,6 +25,14 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
   const assignedColor = assignedMemberIdx >= 0
     ? TEAM_MEMBER_COLORS[assignedMemberIdx % TEAM_MEMBER_COLORS.length]
     : null;
+
+  // Load photos when expanded
+  useEffect(() => {
+    if (!isExpanded) return;
+    let active = true;
+    getJobPhotos(job.id).then(p => { if (active) setPhotos(p); }).catch(() => {});
+    return () => { active = false; };
+  }, [isExpanded, job.id]);
 
   return (
     <div
@@ -115,6 +125,30 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
             <div className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] bg-[var(--color-surface-bg)] dark:bg-gray-800/50 rounded-lg p-3">
               <StickyNote className="w-4 h-4 text-[var(--color-text-muted)] mt-0.5 flex-shrink-0" />
               {client.service_notes}
+            </div>
+          )}
+
+          {/* Before/After photos */}
+          {(photos.before || photos.after) && (
+            <div className="flex gap-2">
+              {photos.before && (
+                <div className="flex-1">
+                  <p className="text-[10px] font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] uppercase tracking-wide mb-1">{tr('Before')}</p>
+                  <img src={photos.before} alt={tr('Before')} className="w-full h-24 object-cover rounded-lg border border-[var(--color-border)] dark:border-gray-700" />
+                </div>
+              )}
+              {photos.after && (
+                <div className="flex-1">
+                  <p className="text-[10px] font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] uppercase tracking-wide mb-1">{tr('After')}</p>
+                  <img src={photos.after} alt={tr('After')} className="w-full h-24 object-cover rounded-lg border border-[var(--color-border)] dark:border-gray-700" />
+                </div>
+              )}
+            </div>
+          )}
+          {!photos.before && !photos.after && isDone && (
+            <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+              <Camera className="w-3.5 h-3.5" />
+              <span>{tr('No photo')}</span>
             </div>
           )}
 
