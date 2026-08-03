@@ -292,14 +292,14 @@ final class DataStore: ObservableObject {
                 guard !Task.isCancelled,
                       generation == loadGeneration,
                       self.currentUserId == currentUserId else { return }
-                let (j, c, i, r) = refreshed
-                jobs = j
-                clients = c
-                invoices = i
-                recurringJobs = r
-                persistence.saveJobs(j, currentUserId: currentUserId)
-                persistence.saveClients(c, currentUserId: currentUserId)
-                persistence.saveInvoices(i, currentUserId: currentUserId)
+                let (freshJobs, freshClients, freshInvoices, freshTemplates) = refreshed
+                jobs = freshJobs
+                clients = freshClients
+                invoices = freshInvoices
+                recurringJobs = freshTemplates
+                persistence.saveJobs(freshJobs, currentUserId: currentUserId)
+                persistence.saveClients(freshClients, currentUserId: currentUserId)
+                persistence.saveInvoices(freshInvoices, currentUserId: currentUserId)
             } catch {
                 print("[DataStore] post-replay refresh failed: \(error)")
             }
@@ -1189,7 +1189,7 @@ final class DataStore: ObservableObject {
         // Real mode: call Cloudflare edge function that handles both flows:
         //   1. New user → creates auth user + profile
         //   2. Existing user → updates their profile to join crew
-        let token = sb.token ?? ""
+        let token = await sb.token ?? ""
         let url = URL(string: "https://mowgo.pages.dev/api/invite-crew")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
