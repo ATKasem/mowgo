@@ -48,14 +48,16 @@ struct RecurringJob: Codable, Identifiable, Equatable {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0); return f
     }()
 
+    // Local calendar formatter — treats the date string as a calendar date
+    // in the user's locale, matching Calendar.current math below.
+    private static let localDateFmt: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
+    }()
+
     /// Returns true if `targetDate` should receive a job from this template.
     func matchesDate(_ targetDate: Date) -> Bool {
-        guard let utcStart = Self.dateFmt.date(from: startDate) else { return false }
+        guard let startDate = Self.localDateFmt.date(from: startDate) else { return false }
         let cal = Calendar.current
-        // Normalize the UTC-parsed start date into the local calendar so weekday
-        // and interval math agree with targetDate's calendar.
-        let startComponents = cal.dateComponents([.year, .month, .day], from: utcStart)
-        guard let startDate = cal.date(from: startComponents) else { return false }
         guard targetDate >= startDate else { return false }
 
         let calendarWeekday = cal.component(.weekday, from: targetDate) // 1=Sun, 2=Mon…7=Sat

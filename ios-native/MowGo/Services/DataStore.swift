@@ -197,6 +197,7 @@ final class DataStore: ObservableObject {
                 persistence?.saveInvoices(loaded.2, currentUserId: currentUserId)
                 // Replay any offline mutations queued while disconnected
                 await syncPendingMutations()
+                guard !Task.isCancelled, generation == loadGeneration else { return }
                 // Recurring templates must be loaded before today's jobs are generated.
                 await generateJobsFromRecurring()
                 // Start real-time polling after successful load
@@ -317,6 +318,18 @@ final class DataStore: ObservableObject {
                 throw PendingMutationError.invalidPayload("Unknown job status: \(p.status)")
             }
             try await sb.update("jobs", id: mutation.entityId, JobStatusPatch(status: status))
+            // Fire notifications for replayed status changes (client should still be notified)
+            if let job = jobs.first(where: { $0.id == mutation.entityId }) {
+                switch job.status {
+                case .done:
+                    await fireWebhookJobCompleted(job)
+                    await firePushJobCompleted(job)
+                case .skipped:
+                    await fireWebhookJobSkipped(job)
+                default:
+                    break
+                }
+            }
 
         case "job:delete":
             try await sb.delete("jobs", id: mutation.entityId)
@@ -1198,9 +1211,6 @@ final class DataStore: ObservableObject {
     }
 
     func removeTeamMember(_ member: UserProfile) async throws {
-        guard auth?.user?.role == "owner" else {
-            throw DataStoreError.permissionDenied
-        }
         guard let memberId = member.id else { return }
         guard await sb.isConfigured else {
             teamMembers.removeAll { $0.id == memberId }
@@ -1209,6 +1219,9 @@ final class DataStore: ObservableObject {
                 jobs[idx].assignedTo = nil
             }
             return
+        }
+        guard auth?.user?.role == "owner" else {
+            throw DataStoreError.permissionDenied
         }
         try await sb.delete("profiles", id: memberId)
         teamMembers.removeAll { $0.id == memberId }

@@ -272,6 +272,57 @@ class IOSReviewFixTests(unittest.TestCase):
         self.assertIn("INFOPLIST_KEY_NSCameraUsageDescription", config)
         self.assertIn("INFOPLIST_KEY_NSCameraUsageDescription", project)
 
+    def test_recurring_start_date_is_parsed_in_the_local_calendar(self) -> None:
+        models = source("Models/Models.swift")
+        matching = models.split("func matchesDate", 1)[1].split(
+            "private static func nthWeekday", 1
+        )[0]
+
+        self.assertIn("private static let localDateFmt: DateFormatter", models)
+        self.assertIn("Self.localDateFmt.date(from: startDate)", matching)
+        self.assertNotIn("utcStart", matching)
+        self.assertNotIn("startComponents", matching)
+
+    def test_successful_load_rechecks_generation_after_offline_sync(self) -> None:
+        data_store = source("Services/DataStore.swift")
+        successful_load = data_store.split("await syncPendingMutations()", 1)[1]
+        successful_load = successful_load.split("await generateJobsFromRecurring()", 1)[0]
+
+        self.assertIn(
+            "guard !Task.isCancelled, generation == loadGeneration else { return }",
+            successful_load,
+        )
+
+    def test_demo_member_removal_and_replayed_status_notifications(self) -> None:
+        data_store = source("Services/DataStore.swift")
+        removal = data_store.split("func removeTeamMember", 1)[1].split(
+            "// MARK: - Helpers", 1
+        )[0]
+        self.assertLess(removal.index("guard await sb.isConfigured else"), removal.index(
+            'guard auth?.user?.role == "owner" else'
+        ))
+
+        replay = data_store.split('case "job:status":', 1)[1].split(
+            'case "job:delete":', 1
+        )[0]
+        self.assertIn("await fireWebhookJobCompleted(job)", replay)
+        self.assertIn("await firePushJobCompleted(job)", replay)
+        self.assertIn("await fireWebhookJobSkipped(job)", replay)
+
+    def test_sign_out_waits_for_device_token_clear(self) -> None:
+        push = source("Services/PushNotificationService.swift")
+        auth = source("Services/AuthService.swift")
+
+        self.assertIn(
+            "func clearDeviceToken() -> Task<Void, Never>?",
+            push,
+        )
+        self.assertIn("return task", push)
+        self.assertIn(
+            "await PushNotificationService.shared.clearDeviceToken()?.value",
+            auth,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

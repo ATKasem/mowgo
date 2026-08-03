@@ -84,20 +84,23 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     /// Clear the device token on sign-out.
     private var clearTokenTask: Task<Void, Never>?
 
-    func clearDeviceToken() {
+    @discardableResult
+    func clearDeviceToken() -> Task<Void, Never>? {
         clearTokenTask?.cancel()
         guard let userId = currentUserId else {
             deviceToken = nil
             isRegistered = false
             currentUserId = nil
-            return
+            return nil
         }
-        clearTokenTask = Task {
+        let task = Task {
             try? await sb.updateDeviceToken(userId: userId, token: nil)
         }
+        clearTokenTask = task
         deviceToken = nil
         isRegistered = false
         currentUserId = nil
+        return task
     }
 
     // MARK: - Sending Push Notifications
