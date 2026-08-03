@@ -215,6 +215,9 @@ final class DataStore: ObservableObject {
                 } else {
                     self.error = error.localizedDescription
                 }
+                // Templates may still be in memory from a prior online load —
+                // generate today's recurring jobs even while offline.
+                await generateJobsFromRecurring()
             }
             if generation == loadGeneration {
                 isLoading = false
@@ -1271,7 +1274,7 @@ final class DataStore: ObservableObject {
     /// Best-effort enqueue that never throws — sets self.error on failure.
     private func safeEnqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) {
         do { try enqueue(operation, id: id, payload: payload) } catch {
-            self.error = "Saved locally — sync unavailable"
+            self.error = "Could not save locally — offline sync unavailable"
         }
     }
 
@@ -1279,7 +1282,7 @@ final class DataStore: ObservableObject {
     private func safeEnqueueEmpty(_ operation: String, id: UUID) {
         struct Empty: Encodable {}
         do { try enqueue(operation, id: id, payload: Empty()) } catch {
-            self.error = "Saved locally — sync unavailable"
+            self.error = "Could not save locally — offline sync unavailable"
         }
     }
 
