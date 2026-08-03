@@ -9,7 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Leaf
+
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -62,7 +62,7 @@ fun LoginScreen(
 
             // Logo - green leaf icon
             Icon(
-                imageVector = Icons.Filled.Leaf,
+                painter = androidx.compose.ui.res.painterResource(com.mowgo.app.R.drawable.ic_leaf),
                 contentDescription = "MowGo Logo",
                 modifier = Modifier.size(56.dp),
                 tint = MowGoColors.DeepGreenDark,

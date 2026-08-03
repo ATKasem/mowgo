@@ -1,7 +1,10 @@
 package com.mowgo.app.data.auth
 
 import com.mowgo.app.data.SupabaseClientProvider
-import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.auth.Session
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.sessionManager
+import io.github.jan.supabase.auth.status.AuthStatus
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -13,11 +16,11 @@ class AuthRepository {
     private val auth = SupabaseClientProvider.auth
 
     /** Observe whether a user is currently signed in. */
-    val sessionState: StateFlow<io.github.jan.supabase.gotrue.status.AuthStatus>
+    val sessionState: StateFlow<AuthStatus>
         get() = auth.sessionManager.status
 
     /** Current session (null if not authenticated). */
-    val currentSession: io.github.jan.supabase.gotrue.Session?
+    val currentSession: Session?
         get() = auth.currentSessionOrNull()
 
     /**

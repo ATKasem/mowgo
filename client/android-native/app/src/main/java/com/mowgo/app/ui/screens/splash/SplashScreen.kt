@@ -4,7 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Leaf
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,7 +43,7 @@ fun SplashScreen(
             modifier = Modifier.alpha(alpha.value),
         ) {
             Icon(
-                imageVector = Icons.Filled.Leaf,
+                painter = androidx.compose.ui.res.painterResource(com.mowgo.app.R.drawable.ic_leaf),
                 contentDescription = null,
                 modifier = Modifier.size(80.dp),
                 tint = MowGoColors.DeepGreenDark,

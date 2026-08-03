@@ -2,7 +2,7 @@ package com.mowgo.app.ui.screens.today
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Leaf
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,7 +39,7 @@ fun TodayScreen() {
             verticalArrangement = Arrangement.Center,
         ) {
             Icon(
-                imageVector = Icons.Filled.Leaf,
+                painter = androidx.compose.ui.res.painterResource(com.mowgo.app.R.drawable.ic_leaf),
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
                 tint = MowGoColors.DeepGreenDark.copy(alpha = 0.3f),
