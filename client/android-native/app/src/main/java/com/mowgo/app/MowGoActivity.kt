@@ -17,10 +17,12 @@ import com.mowgo.app.ui.screens.auth.LoginScreen
 import com.mowgo.app.ui.screens.splash.SplashScreen
 import com.mowgo.app.ui.theme.MowGoTheme
 import com.mowgo.app.data.SettingsRepository
+import com.stripe.android.PaymentConfiguration
 
 class MowGoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PaymentConfiguration.init(applicationContext, BuildConfig.STRIPE_PUBLISHABLE_KEY)
         enableEdgeToEdge()
         setContent {
             val settingsRepository = remember { SettingsRepository(applicationContext) }

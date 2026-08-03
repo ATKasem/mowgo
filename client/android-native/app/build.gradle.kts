@@ -21,6 +21,7 @@ android {
         // Supabase config — injected at build time
         buildConfigField("String", "SUPABASE_URL", "\"https://vqgiynfrpsqddjrayczc.supabase.co\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz\"")
+        buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj\"")
     }
 
     buildTypes {
@@ -96,6 +97,9 @@ dependencies {
 
     // Image loading
     implementation(libs.coil.compose)
+
+    // Payments
+    implementation(libs.stripe.android)
 
     // Testing
     testImplementation(libs.junit)

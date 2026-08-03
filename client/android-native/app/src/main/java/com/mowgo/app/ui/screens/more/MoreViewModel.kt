@@ -3,6 +3,7 @@ package com.mowgo.app.ui.screens.more
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.ProfileRepository
+import com.mowgo.app.data.PaymentRepository
 import com.mowgo.app.data.SettingsRepository
 import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.model.Profile
@@ -18,12 +19,17 @@ data class MoreUiState(
     val isSaving: Boolean = false,
     val isSigningOut: Boolean = false,
     val saveMessage: String? = null,
+    val billingLoadingAction: String? = null,
+    val billingError: String? = null,
+    val billingMessage: String? = null,
+    val pendingBillingUrl: String? = null,
 )
 
 class MoreViewModel(
     private val settingsRepository: SettingsRepository,
     private val profileRepository: ProfileRepository = ProfileRepository(),
     private val authRepository: AuthRepository = AuthRepository(),
+    private val paymentRepository: PaymentRepository = PaymentRepository(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MoreUiState())
     val uiState: StateFlow<MoreUiState> = _uiState.asStateFlow()
@@ -74,6 +80,87 @@ class MoreViewModel(
     fun setAppearance(value: String) { viewModelScope.launch { settingsRepository.setAppearanceMode(value) } }
     fun setCompletionAlerts(value: Boolean) { viewModelScope.launch { settingsRepository.setJobCompletionAlerts(value) } }
     fun setRainAlerts(value: Boolean) { viewModelScope.launch { settingsRepository.setRainDelayAlerts(value) } }
+
+    fun startCheckout(tier: String) {
+        if (_uiState.value.billingLoadingAction != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                billingLoadingAction = "checkout:$tier",
+                billingError = null,
+                billingMessage = null,
+            )
+            try {
+                val url = paymentRepository.createCheckoutSession(tier)
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    pendingBillingUrl = url,
+                )
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    billingError = error.message ?: "Could not create checkout session.",
+                )
+            }
+        }
+    }
+
+    fun openCustomerPortal() {
+        if (_uiState.value.billingLoadingAction != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                billingLoadingAction = "portal",
+                billingError = null,
+                billingMessage = null,
+            )
+            try {
+                val url = paymentRepository.createCustomerPortal()
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    pendingBillingUrl = url,
+                )
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    billingError = error.message ?: "Could not open subscription management.",
+                )
+            }
+        }
+    }
+
+    fun cancelSubscription() {
+        if (_uiState.value.billingLoadingAction != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                billingLoadingAction = "cancel",
+                billingError = null,
+                billingMessage = null,
+            )
+            try {
+                paymentRepository.cancelSubscription()
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    billingMessage = "Subscription canceled",
+                )
+                loadProfile()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    billingError = error.message ?: "Could not cancel subscription.",
+                )
+            }
+        }
+    }
+
+    fun billingUrlHandled() {
+        _uiState.value = _uiState.value.copy(pendingBillingUrl = null)
+    }
+
+    fun billingUrlFailed() {
+        _uiState.value = _uiState.value.copy(
+            pendingBillingUrl = null,
+            billingError = "Could not open billing page.",
+        )
+    }
 
     fun signOut(onComplete: () -> Unit) {
         viewModelScope.launch {

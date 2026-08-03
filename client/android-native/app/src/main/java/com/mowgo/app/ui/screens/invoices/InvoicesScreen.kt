@@ -1,5 +1,8 @@
 package com.mowgo.app.ui.screens.invoices
 
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -22,6 +26,8 @@ import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
 import com.mowgo.app.ui.theme.MowGoColors
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,11 +37,54 @@ fun InvoicesScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val activity = remember(context) { context.findActivity() }
+    var presentedPayment by remember { mutableStateOf<PendingInvoicePayment?>(null) }
+    val paymentSheet = activity?.let { hostActivity ->
+        remember(hostActivity) {
+            PaymentSheet.Builder { result ->
+                val payment = presentedPayment
+                when (result) {
+                    is PaymentSheetResult.Completed -> {
+                        if (payment != null) viewModel.paymentCompleted(payment)
+                    }
+                    is PaymentSheetResult.Canceled -> viewModel.paymentCanceled()
+                    is PaymentSheetResult.Failed -> viewModel.paymentFailed(
+                        result.error.localizedMessage ?: "Payment failed.",
+                    )
+                }
+                presentedPayment = null
+            }.build(hostActivity)
+        }
+    }
 
     LaunchedEffect(state.showSnackbar) {
         state.showSnackbar?.let { message ->
             snackbarHostState.showSnackbar(message)
             viewModel.dismissSnackbar()
+        }
+    }
+
+    LaunchedEffect(state.paymentError) {
+        state.paymentError?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.dismissPaymentError()
+        }
+    }
+
+    LaunchedEffect(state.pendingPayment) {
+        val payment = state.pendingPayment
+        if (payment != null) {
+            if (paymentSheet == null) {
+                viewModel.paymentFailed("Could not present payment sheet.")
+            } else {
+                presentedPayment = payment
+                viewModel.paymentSheetPresented()
+                paymentSheet.presentWithPaymentIntent(
+                    payment.clientSecret,
+                    PaymentSheet.Configuration.Builder(merchantDisplayName = "MowGo").build(),
+                )
+            }
         }
     }
 
@@ -172,6 +221,8 @@ fun InvoicesScreen(
                         InvoiceCard(
                             invoice = item.invoice,
                             clientName = item.clientName,
+                            isPaying = state.payingInvoiceId == item.invoice.id,
+                            onPay = { viewModel.payInvoice(item) },
                             onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
                             onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
                         )
@@ -241,6 +292,8 @@ private fun InvoiceSummaryHeader(
 private fun InvoiceCard(
     invoice: Invoice,
     clientName: String?,
+    isPaying: Boolean,
+    onPay: () -> Unit,
     onMarkPaid: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -336,6 +389,29 @@ private fun InvoiceCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (!isPaid) {
+                        Button(
+                            onClick = onPay,
+                            enabled = !isPaying,
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MowGoColors.DeepGreenDark,
+                                contentColor = MowGoColors.OnAccent,
+                            ),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp),
+                        ) {
+                            if (isPaying) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MowGoColors.OnAccent,
+                                )
+                            } else {
+                                Icon(Icons.Filled.CreditCard, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Pay", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                         OutlinedButton(
                             onClick = onMarkPaid,
                             modifier = Modifier.weight(1f),
@@ -377,6 +453,12 @@ private fun InvoiceCard(
             }
         }
     }
+}
+
+private tailrec fun Context.findActivity(): ComponentActivity? = when (this) {
+    is ComponentActivity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
 
 // ── Invoice Status Chip ─────────────────────────────────────────────────

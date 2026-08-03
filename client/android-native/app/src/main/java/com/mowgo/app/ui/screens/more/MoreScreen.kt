@@ -1,5 +1,6 @@
 package com.mowgo.app.ui.screens.more
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -57,7 +58,15 @@ fun MoreScreen(
         MoreDestination.PROFILE -> BusinessProfileScreen(state, { destination = MoreDestination.ROOT }, viewModel::updateProfile, viewModel::dismissSaveMessage)
         MoreDestination.NOTIFICATIONS -> NotificationSettingsScreen(completionAlerts, rainAlerts, { destination = MoreDestination.ROOT }, viewModel::setCompletionAlerts, viewModel::setRainAlerts)
         MoreDestination.APPEARANCE -> AppearanceSettingsScreen(appearance, { destination = MoreDestination.ROOT }, viewModel::setAppearance)
-        MoreDestination.BILLING -> BillingSettingsScreen(state.profile, { destination = MoreDestination.ROOT })
+        MoreDestination.BILLING -> BillingSettingsScreen(
+            state = state,
+            back = { destination = MoreDestination.ROOT },
+            startCheckout = viewModel::startCheckout,
+            openCustomerPortal = viewModel::openCustomerPortal,
+            cancelSubscription = viewModel::cancelSubscription,
+            billingUrlHandled = viewModel::billingUrlHandled,
+            billingUrlFailed = viewModel::billingUrlFailed,
+        )
     }
 }
 
@@ -208,19 +217,192 @@ private fun AppearanceSettingsScreen(mode: String, back: () -> Unit, select: (St
 }
 
 @Composable
-private fun BillingSettingsScreen(profile: Profile?, back: () -> Unit) {
+private fun BillingSettingsScreen(
+    state: MoreUiState,
+    back: () -> Unit,
+    startCheckout: (String) -> Unit,
+    openCustomerPortal: () -> Unit,
+    cancelSubscription: () -> Unit,
+    billingUrlHandled: () -> Unit,
+    billingUrlFailed: () -> Unit,
+) {
     val context = LocalContext.current
-    val tier = profile?.tier ?: "free"
+    val tier = state.profile?.tier?.lowercase() ?: "free"
     val price = when (tier) { "solo" -> "$39/mo"; "crew" -> "$79/mo"; else -> "$0/mo" }
     val description = when (tier) { "solo" -> "15 clients · AI assistant"; "crew" -> "Unlimited · Team · Priority"; else -> "5 clients · Basic features" }
+    val isPaid = tier == "solo" || tier == "crew"
+    var showCancelConfirmation by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.pendingBillingUrl) {
+        val url = state.pendingBillingUrl
+        if (url != null) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val opened = runCatching { context.startActivity(intent) }.isSuccess
+            if (opened) billingUrlHandled() else billingUrlFailed()
+        }
+    }
+
+    if (showCancelConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showCancelConfirmation = false },
+            title = { Text("Cancel Subscription") },
+            text = { Text("Cancel your current subscription? Your plan access may change at the end of the billing period.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showCancelConfirmation = false
+                        cancelSubscription()
+                    },
+                    enabled = state.billingLoadingAction == null,
+                ) { Text("Cancel Subscription", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCancelConfirmation = false }) { Text("Keep Plan") }
+            },
+        )
+    }
+
     DetailScaffold("Billing", back) {
         Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Current Plan", color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(tierLabel(tier), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(price, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
             Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (isPaid) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { showCancelConfirmation = true },
+                    enabled = state.billingLoadingAction == null,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    if (state.billingLoadingAction == "cancel") {
+                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text("Cancel Subscription")
+                    }
+                }
+            }
         } }
-        Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://mowgo.pages.dev/subscribe"))) }, modifier = Modifier.fillMaxWidth()) { Text("View Plans") }
+
+        SectionLabel("Plans")
+        BillingPlanCard(
+            name = "Free",
+            price = "$0/mo",
+            feature = "5 clients · Basic features",
+            tier = "free",
+            currentTier = tier,
+            loadingAction = state.billingLoadingAction,
+            subscribe = startCheckout,
+        )
+        BillingPlanCard(
+            name = "Solo",
+            price = "$39/mo",
+            feature = "15 clients · AI assistant",
+            tier = "solo",
+            currentTier = tier,
+            loadingAction = state.billingLoadingAction,
+            subscribe = startCheckout,
+        )
+        BillingPlanCard(
+            name = "Crew",
+            price = "$79/mo",
+            feature = "Unlimited · Team · Priority",
+            tier = "crew",
+            currentTier = tier,
+            loadingAction = state.billingLoadingAction,
+            subscribe = startCheckout,
+        )
+
+        if (isPaid) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = state.billingLoadingAction == null) { openCustomerPortal() },
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Default.CreditCard, null, tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Manage Billing", fontWeight = FontWeight.Medium)
+                        Text("Payment methods and invoices", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (state.billingLoadingAction == "portal") {
+                        CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Icon(Icons.Default.ChevronRight, null)
+                    }
+                }
+            }
+        }
+
+        state.billingError?.let {
+            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        }
+        state.billingMessage?.let {
+            Text(it, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun BillingPlanCard(
+    name: String,
+    price: String,
+    feature: String,
+    tier: String,
+    currentTier: String,
+    loadingAction: String?,
+    subscribe: (String) -> Unit,
+) {
+    val order = mapOf("free" to 0, "solo" to 1, "crew" to 2)
+    val isCurrent = tier == currentTier
+    val canUpgrade = (order[tier] ?: 0) > (order[currentTier] ?: 0)
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(price, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                }
+                if (isCurrent) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        shape = MaterialTheme.shapes.small,
+                    ) {
+                        Text(
+                            "Current",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        )
+                    }
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CheckCircle, null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                Spacer(Modifier.width(8.dp))
+                Text(feature, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (canUpgrade) {
+                val action = "checkout:$tier"
+                Button(
+                    onClick = { subscribe(tier) },
+                    enabled = loadingAction == null,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (loadingAction == action) {
+                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(if (currentTier == "free") "Subscribe" else "Upgrade")
+                    }
+                }
+            }
+        }
     }
 }
 

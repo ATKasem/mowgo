@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobRepository
+import com.mowgo.app.data.PaymentRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
+import kotlin.math.roundToInt
 
 /**
  * UI state for the Invoices screen.
@@ -24,6 +26,9 @@ data class InvoicesUiState(
     val showDeleteConfirmation: Invoice? = null,
     val showMarkPaidConfirmation: Invoice? = null,
     val showSnackbar: String? = null,
+    val payingInvoiceId: String? = null,
+    val pendingPayment: PendingInvoicePayment? = null,
+    val paymentError: String? = null,
 ) {
     /** Invoices enriched with client names for display. */
     val invoicesWithClientName: List<InvoiceWithClient>
@@ -47,10 +52,17 @@ data class InvoiceWithClient(
     val clientName: String?,
 )
 
+data class PendingInvoicePayment(
+    val invoiceId: String,
+    val clientSecret: String,
+    val paymentIntentId: String,
+)
+
 class InvoicesViewModel : ViewModel() {
 
     private val invoiceRepository = InvoiceRepository()
     private val jobRepository = JobRepository()
+    private val paymentRepository = PaymentRepository()
 
     private val _uiState = MutableStateFlow(InvoicesUiState())
     val uiState: StateFlow<InvoicesUiState> = _uiState.asStateFlow()
@@ -80,6 +92,72 @@ class InvoicesViewModel : ViewModel() {
     }
 
     fun refresh() = loadData()
+
+    fun payInvoice(invoice: InvoiceWithClient) {
+        if (_uiState.value.payingInvoiceId != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                payingInvoiceId = invoice.invoice.id,
+                paymentError = null,
+            )
+            try {
+                val intent = paymentRepository.createPaymentIntent(
+                    amountCents = (invoice.invoice.amount * 100).roundToInt(),
+                    invoiceId = invoice.invoice.id,
+                )
+                _uiState.value = _uiState.value.copy(
+                    pendingPayment = PendingInvoicePayment(
+                        invoiceId = invoice.invoice.id,
+                        clientSecret = intent.clientSecret,
+                        paymentIntentId = intent.paymentIntentId,
+                    ),
+                )
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    payingInvoiceId = null,
+                    paymentError = error.message ?: "Could not initialize payment.",
+                )
+            }
+        }
+    }
+
+    fun paymentSheetPresented() {
+        _uiState.value = _uiState.value.copy(pendingPayment = null)
+    }
+
+    fun paymentCompleted(payment: PendingInvoicePayment) {
+        viewModelScope.launch {
+            try {
+                paymentRepository.confirmPayment(payment.invoiceId, payment.paymentIntentId)
+                _uiState.value = _uiState.value.copy(
+                    payingInvoiceId = null,
+                    showSnackbar = "Payment confirmed",
+                )
+                loadData()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    payingInvoiceId = null,
+                    paymentError = "Payment succeeded, but verification failed: ${error.message ?: "Unknown error"}. Refresh before trying again.",
+                )
+            }
+        }
+    }
+
+    fun paymentCanceled() {
+        _uiState.value = _uiState.value.copy(payingInvoiceId = null, pendingPayment = null)
+    }
+
+    fun paymentFailed(message: String) {
+        _uiState.value = _uiState.value.copy(
+            payingInvoiceId = null,
+            pendingPayment = null,
+            paymentError = message,
+        )
+    }
+
+    fun dismissPaymentError() {
+        _uiState.value = _uiState.value.copy(paymentError = null)
+    }
 
     fun showNewInvoiceDialog() {
         _uiState.value = _uiState.value.copy(showNewInvoiceDialog = true)
