@@ -16,8 +16,11 @@ actor WebhookService {
 
     /// Fire a webhook event via the /api/webhook-dispatch Pages Function.
     /// Requires a Supabase access token on SupabaseService.shared.token.
+    /// `userId` is retained for caller clarity/logging — the server derives
+    /// the user from the Bearer token, not from this value.
     func fire(userId: UUID, event: String, payload: [String: Any]) async {
-        guard let token = SupabaseService.shared.token, !token.isEmpty else {
+        // await required — SupabaseService is an actor; token is actor-isolated
+        guard let token = await SupabaseService.shared.token, !token.isEmpty else {
             print("[WebhookService] Skipping \(event) — no auth token (demo mode?)")
             return
         }
