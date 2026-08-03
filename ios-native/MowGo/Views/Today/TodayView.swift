@@ -615,7 +615,8 @@ struct TodayView: View {
     /// This is a simple proxy for proximity — crew members pick the order,
     /// and alphabetizing by street gives a reasonable geographic grouping.
     private func reorderJobsByRoute() {
-        let jobsToOrder = store.jobs.filter { $0.scheduledDate == dateString }
+        guard !isOperating else { return }
+        let jobsToOrder = todayJobs.filter { $0.scheduledDate == dateString }
         guard !jobsToOrder.isEmpty else { return }
 
         // Sort by client address alphabetically (street-first grouping)
@@ -624,6 +625,7 @@ struct TodayView: View {
         }
 
         // Persist route orders sequentially so indices stay unique and writes stay ordered.
+        isOperating = true
         Task {
             do {
                 operationError = nil
@@ -633,6 +635,7 @@ struct TodayView: View {
             } catch {
                 operationError = error.localizedDescription
             }
+            isOperating = false
         }
     }
 }
