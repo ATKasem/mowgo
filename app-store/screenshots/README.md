@@ -10,7 +10,7 @@ Generated via AI (FLUX 2 Klein 9B).
 | 2 | `02-today-dark.png` ✅ | Today schedule — job cards with rain delay button |
 | 3 | `03-client-light.png` ✅ | Client detail — address, gate codes, pet instructions |
 | 4 | `04-invoices-dark.png` ✅ | Invoices — unpaid list with mark-as-paid |
-| 5 | `05-autopilot-dark.png` ✅ | AI Autopilot — chat drawer with schedule response |
+| 5 | `05-jobs-dark.png` ✅ | Jobs — date-grouped job list with filters |
 | 6 | `06-dark-showcase.png` ✅ | Dark mode showcase — Today tab in dark theme |
 | 7 | `07-pricing-dark.png` ✅ | Landing page — Free, Solo $39, Crew $79 pricing |
 | 8 | `08-compare-dark.png` ✅ | Comparison page — MowGo vs competitors table |
