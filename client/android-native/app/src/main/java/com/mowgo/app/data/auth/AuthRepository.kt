@@ -1,9 +1,9 @@
 package com.mowgo.app.data.auth
 
 import com.mowgo.app.data.SupabaseClientProvider
+import io.github.jan.supabase.auth.UserSession
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
-import io.github.jan.supabase.auth.status.UserSession
 import kotlinx.coroutines.flow.StateFlow
 
 /**
