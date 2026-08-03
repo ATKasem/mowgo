@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -15,13 +16,22 @@ import com.mowgo.app.ui.screens.MainScreen
 import com.mowgo.app.ui.screens.auth.LoginScreen
 import com.mowgo.app.ui.screens.splash.SplashScreen
 import com.mowgo.app.ui.theme.MowGoTheme
+import com.mowgo.app.data.SettingsRepository
 
 class MowGoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MowGoTheme(darkTheme = true) {
+            val settingsRepository = remember { SettingsRepository(applicationContext) }
+            val appearanceMode by settingsRepository.appearanceMode.collectAsState(initial = "system")
+            val systemDark = isSystemInDarkTheme()
+            val darkTheme = when (appearanceMode) {
+                "light" -> false
+                "dark" -> true
+                else -> systemDark
+            }
+            MowGoTheme(darkTheme = darkTheme) {
                 MowGoNavHost()
             }
         }
@@ -63,7 +73,13 @@ fun MowGoNavHost() {
         }
 
         composable("main") {
-            MainScreen()
+            MainScreen(
+                onSignedOut = {
+                    navController.navigate(NavRoutes.LOGIN) {
+                        popUpTo("main") { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }

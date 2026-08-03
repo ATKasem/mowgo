@@ -19,7 +19,7 @@ import com.mowgo.app.ui.screens.more.MoreScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(onSignedOut: () -> Unit = {}) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -77,7 +77,7 @@ fun MainScreen() {
             composable(NavRoutes.JOBS) { JobsScreen() }
             composable(NavRoutes.CLIENTS) { ClientsScreen() }
             composable(NavRoutes.INVOICES) { InvoicesScreen() }
-            composable(NavRoutes.MORE) { MoreScreen() }
+            composable(NavRoutes.MORE) { MoreScreen(onSignedOut = onSignedOut) }
         }
     }
 }
