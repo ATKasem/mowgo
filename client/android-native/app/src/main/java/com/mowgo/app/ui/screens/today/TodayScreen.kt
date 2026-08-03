@@ -194,7 +194,7 @@ fun TodayScreen(
                             onSkip = { viewModel.skipJob(jobWithClient.id) },
                             onEdit = { viewModel.showEditJobDialog(jobWithClient) },
                             onDelete = { viewModel.deleteJob(jobWithClient.id) },
-                            isUploadingPhoto = state.uploadingPhotoJobId == jobWithClient.id,
+                            isUploadingPhoto = jobWithClient.id in state.uploadingPhotoJobIds,
                             onPhotoReady = { bytes -> viewModel.uploadJobPhoto(jobWithClient.id, bytes) },
                             onPhotoError = viewModel::showPhotoError,
                         )

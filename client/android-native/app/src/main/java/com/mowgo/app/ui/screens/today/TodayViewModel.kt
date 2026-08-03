@@ -29,7 +29,7 @@ data class TodayUiState(
     val showSnackbar: String? = null,
     val showNewJobDialog: Boolean = false,
     val editingJob: JobWithClient? = null,
-    val uploadingPhotoJobId: String? = null,
+    val uploadingPhotoJobIds: Set<String> = emptySet(),
 ) {
     val todayJobs: List<JobWithClient>
         get() {
@@ -241,7 +241,9 @@ class TodayViewModel : ViewModel() {
     }
 
     fun uploadJobPhoto(jobId: String, imageData: ByteArray) {
-        _uiState.value = _uiState.value.copy(uploadingPhotoJobId = jobId)
+        _uiState.value = _uiState.value.copy(
+            uploadingPhotoJobIds = _uiState.value.uploadingPhotoJobIds + jobId,
+        )
         viewModelScope.launch {
             try {
                 val url = photoRepository.uploadJobPhoto(jobId, imageData)
@@ -249,12 +251,12 @@ class TodayViewModel : ViewModel() {
                     jobs = _uiState.value.jobs.map { item ->
                         if (item.id == jobId) item.copy(job = item.job.copy(photoUrl = url)) else item
                     },
-                    uploadingPhotoJobId = null,
+                    uploadingPhotoJobIds = _uiState.value.uploadingPhotoJobIds - jobId,
                     showSnackbar = "Photo uploaded",
                 )
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    uploadingPhotoJobId = null,
+                    uploadingPhotoJobIds = _uiState.value.uploadingPhotoJobIds - jobId,
                     showSnackbar = "Photo upload failed: ${error.message}",
                 )
             }

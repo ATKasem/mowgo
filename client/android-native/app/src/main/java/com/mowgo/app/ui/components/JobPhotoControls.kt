@@ -1,5 +1,6 @@
 package com.mowgo.app.ui.components
 
+import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -56,9 +57,7 @@ fun JobPhotoButton(
         scope.launch {
             try {
                 val bytes = withContext(Dispatchers.IO) {
-                    val source = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                        ?: throw IllegalStateException("The selected photo could not be opened")
-                    compressJpeg(source)
+                    compressJpeg(context.contentResolver, uri)
                 }
                 onImageReady(bytes)
             } catch (error: Exception) {
@@ -145,9 +144,13 @@ fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
     )
 }
 
-private fun compressJpeg(source: ByteArray): ByteArray {
+private fun compressJpeg(contentResolver: ContentResolver, uri: Uri): ByteArray {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeByteArray(source, 0, source.size, bounds)
+    val boundsStream = contentResolver.openInputStream(uri)
+        ?: throw IllegalStateException("The selected photo could not be opened")
+    boundsStream.use { stream ->
+        BitmapFactory.decodeStream(stream, null, bounds)
+    }
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
         throw IllegalArgumentException("The selected file is not a valid image")
     }
@@ -156,12 +159,13 @@ private fun compressJpeg(source: ByteArray): ByteArray {
     while (bounds.outWidth / sampleSize > 1600 || bounds.outHeight / sampleSize > 1600) {
         sampleSize *= 2
     }
-    val bitmap = BitmapFactory.decodeByteArray(
-        source,
-        0,
-        source.size,
-        BitmapFactory.Options().apply { inSampleSize = sampleSize },
-    ) ?: throw IllegalArgumentException("The selected image could not be decoded")
+    val bitmap = contentResolver.openInputStream(uri)?.use { stream ->
+        BitmapFactory.decodeStream(
+            stream,
+            null,
+            BitmapFactory.Options().apply { inSampleSize = sampleSize },
+        )
+    } ?: throw IllegalArgumentException("The selected image could not be decoded")
 
     val scale = minOf(1f, 1600f / maxOf(bitmap.width, bitmap.height).toFloat())
     val resized = if (scale < 1f) {

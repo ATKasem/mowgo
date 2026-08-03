@@ -53,8 +53,6 @@ actor WebhookService {
     }
 
     func jobCompleted(_ job: Job, userId: UUID) async {
-        let alertsEnabled = UserDefaults.standard.object(forKey: "jobCompletionAlerts") as? Bool ?? true
-        guard alertsEnabled else { return }
         await fire(userId: userId, event: "job.completed", payload: [
             "job_id": job.id.uuidString,
             "title": job.title,
@@ -67,6 +65,45 @@ actor WebhookService {
             "status": "done",
             "completed_at": ISO8601DateFormatter().string(from: Date())
         ])
+    }
+
+    func jobCreated(_ job: Job, userId: UUID) async {
+        await fire(userId: userId, event: "job.created", payload: jobPayload(job))
+    }
+
+    func jobUpdated(_ job: Job, userId: UUID) async {
+        await fire(userId: userId, event: "job.updated", payload: jobPayload(job))
+    }
+
+    func customerCreated(_ client: Client, userId: UUID) async {
+        await fire(userId: userId, event: "customer.created", payload: [
+            "client_id": client.id.uuidString,
+            "name": client.name,
+            "address": client.address ?? "",
+            "phone": client.phone ?? "",
+            "email": client.email ?? "",
+            "rate": NSDecimalNumber(decimal: client.rate).doubleValue
+        ])
+    }
+
+    func invoicePaid(_ invoice: Invoice, userId: UUID) async {
+        await fire(userId: userId, event: "invoice.paid", payload: [
+            "invoice_id": invoice.id.uuidString,
+            "client_id": invoice.clientId?.uuidString ?? "",
+            "client_name": invoice.clientName ?? "",
+            "amount": NSDecimalNumber(decimal: invoice.amount).doubleValue,
+            "paid_at": invoice.paidAt ?? ISO8601DateFormatter().string(from: Date())
+        ])
+    }
+
+    private func jobPayload(_ job: Job) -> [String: Any] {
+        [
+            "job_id": job.id.uuidString,
+            "title": job.title,
+            "client_id": job.clientId?.uuidString ?? "",
+            "scheduled_date": job.scheduledDate,
+            "status": job.status.rawValue
+        ]
     }
 
     func jobSkipped(_ job: Job, userId: UUID) async {

@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 data class IntegrationsUiState(
     val isLoading: Boolean = true,
@@ -22,6 +24,7 @@ class IntegrationsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntegrationsUiState())
     val uiState: StateFlow<IntegrationsUiState> = _uiState.asStateFlow()
+    private val mutationMutex = Mutex()
 
     init { load() }
 
@@ -33,14 +36,16 @@ class IntegrationsViewModel(
     }
 
     fun save(config: WebhookConfig, done: () -> Unit) = viewModelScope.launch {
-        _uiState.value = _uiState.value.copy(isSaving = true, error = null)
-        runCatching { repository.saveConfig(config) }
-            .onSuccess { saved ->
-                val configs = _uiState.value.configs.filterNot { it.id == saved.id } + saved
-                _uiState.value = _uiState.value.copy(isSaving = false, configs = configs, message = "Endpoint saved")
-                done()
-            }
-            .onFailure { _uiState.value = _uiState.value.copy(isSaving = false, error = it.message ?: "Failed to save endpoint") }
+        mutationMutex.withLock {
+            _uiState.value = _uiState.value.copy(isSaving = true, error = null)
+            runCatching { repository.saveConfig(config) }
+                .onSuccess { saved ->
+                    val configs = _uiState.value.configs.filterNot { it.id == saved.id } + saved
+                    _uiState.value = _uiState.value.copy(isSaving = false, configs = configs, message = "Endpoint saved")
+                    done()
+                }
+                .onFailure { _uiState.value = _uiState.value.copy(isSaving = false, error = it.message ?: "Failed to save endpoint") }
+        }
     }
 
     fun delete(id: String) = viewModelScope.launch {
@@ -55,13 +60,18 @@ class IntegrationsViewModel(
         if (config.id.isBlank()) {
             updated(config.copy(secret = WebhookRepository.generateSecret()))
         } else {
-            runCatching { repository.regenerateSecret(config.id) }
-                .onSuccess { secret ->
-                    val changed = config.copy(secret = secret)
-                    _uiState.value = _uiState.value.copy(configs = _uiState.value.configs.map { if (it.id == config.id) changed else it })
-                    updated(changed)
-                }
-                .onFailure { _uiState.value = _uiState.value.copy(error = it.message ?: "Failed to regenerate secret") }
+            mutationMutex.withLock {
+                runCatching { repository.regenerateSecret(config.id) }
+                    .onSuccess { secret ->
+                        _uiState.value = _uiState.value.copy(
+                            configs = _uiState.value.configs.map {
+                                if (it.id == config.id) it.copy(secret = secret) else it
+                            },
+                        )
+                        updated(config.copy(secret = secret))
+                    }
+                    .onFailure { _uiState.value = _uiState.value.copy(error = it.message ?: "Failed to regenerate secret") }
+            }
         }
     }
 

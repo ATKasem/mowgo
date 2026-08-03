@@ -13,8 +13,6 @@ private let webhookEventOptions = [
     WebhookEventOption(id: "job.completed", title: "Job Completed", detail: "Status changes to done"),
     WebhookEventOption(id: "invoice.paid", title: "Invoice Paid", detail: "Invoice is marked paid"),
     WebhookEventOption(id: "customer.created", title: "Customer Created", detail: "New client added"),
-    WebhookEventOption(id: "payment.failed", title: "Payment Failed", detail: "Stripe payment fails"),
-    WebhookEventOption(id: "rain.delay.applied", title: "Rain Delay Applied", detail: "Jobs rescheduled due to rain"),
     WebhookEventOption(id: "job.skipped", title: "Job Skipped", detail: "Job is skipped")
 ]
 

@@ -139,6 +139,10 @@ class JobRepository {
             .update(job) {
                 filter { eq("id", job.id) }
             }
+        WebhookService.fire("job.updated", mapOf(
+            "job_id" to job.id, "title" to job.title, "client_id" to job.clientId,
+            "scheduled_date" to job.scheduledDate, "status" to job.status,
+        ))
     }
 
     /** Persist a job photo URL after the image has been uploaded. */

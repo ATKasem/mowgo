@@ -2,7 +2,6 @@ package com.mowgo.app.data
 
 import com.mowgo.app.BuildConfig
 import io.github.jan.supabase.auth.auth
-import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,7 +28,7 @@ class JobPhotoRepository(
         val session = SupabaseClientProvider.client.auth.currentSessionOrNull()
             ?: throw IllegalStateException("Not authenticated")
         val userId = session.user?.id ?: throw IllegalStateException("Missing user ID")
-        val path = "$userId/$jobId/${UUID.randomUUID()}.jpg"
+        val path = "$userId/$jobId/photo.jpg"
         val objectUrl = "${BuildConfig.SUPABASE_URL}/storage/v1/object/job-photo/$path"
         val request = Request.Builder()
             .url(objectUrl)

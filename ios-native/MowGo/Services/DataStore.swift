@@ -310,7 +310,8 @@ final class DataStore: ObservableObject {
         switch mutation.operation {
         case "job:create":
             let job = try JSONDecoder().decode(Job.self, from: mutation.payload)
-            _ = try await upsertJob(job)
+            let created = try await upsertJob(job)
+            await fireWebhookJobCreated(created)
 
         case "job:status":
             struct P: Decodable { let status: String }
@@ -322,12 +323,15 @@ final class DataStore: ObservableObject {
             // Fire notifications for replayed status changes (client should still be notified).
             // Use the decoded `status` — the local job may be stale.
             if let job = jobs.first(where: { $0.id == mutation.entityId }) {
+                var updated = job
+                updated.status = status
+                await fireWebhookJobUpdated(updated)
                 switch status {
                 case .done:
-                    await fireWebhookJobCompleted(job)
-                    await firePushJobCompleted(job)
+                    await fireWebhookJobCompleted(updated)
+                    await firePushJobCompleted(updated)
                 case .skipped:
-                    await fireWebhookJobSkipped(job)
+                    await fireWebhookJobSkipped(updated)
                 default:
                     break
                 }
@@ -340,6 +344,11 @@ final class DataStore: ObservableObject {
             struct P: Decodable { let scheduledDate: String }
             let p = try JSONDecoder().decode(P.self, from: mutation.payload)
             try await sb.update("jobs", id: mutation.entityId, JobSchedulePatch(scheduledDate: p.scheduledDate))
+            if let job = jobs.first(where: { $0.id == mutation.entityId }) {
+                var updated = job
+                updated.scheduledDate = p.scheduledDate
+                await fireWebhookJobUpdated(updated)
+            }
 
         case "job:route":
             struct P: Decodable { let routeOrder: Int }
@@ -353,7 +362,8 @@ final class DataStore: ObservableObject {
 
         case "client:create":
             let client = try JSONDecoder().decode(Client.self, from: mutation.payload)
-            _ = try await upsertClient(client)
+            let created = try await upsertClient(client)
+            await fireWebhookCustomerCreated(created)
 
         case "client:update":
             let client = try JSONDecoder().decode(Client.self, from: mutation.payload)
@@ -380,6 +390,12 @@ final class DataStore: ObservableObject {
                 status: .paid,
                 paidAt: p.paidAt
             ))
+            if let invoice = invoices.first(where: { $0.id == mutation.entityId }) {
+                var updated = invoice
+                updated.status = .paid
+                updated.paidAt = p.paidAt
+                await fireWebhookInvoicePaid(updated)
+            }
 
         case "recurring:create":
             let template = try JSONDecoder().decode(RecurringJob.self, from: mutation.payload)
@@ -619,6 +635,7 @@ final class DataStore: ObservableObject {
             ))
             attachClientRef(to: &created)
             jobs.append(created)
+            await fireWebhookJobCreated(created)
         } catch {
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription
@@ -647,6 +664,7 @@ final class DataStore: ObservableObject {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
+            await fireWebhookJobUpdated(updated)
             switch status {
             case .done:
                 await fireWebhookJobCompleted(updated)
@@ -686,6 +704,7 @@ final class DataStore: ObservableObject {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
+            await fireWebhookJobUpdated(updated)
         } catch {
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription
@@ -799,6 +818,26 @@ final class DataStore: ObservableObject {
     private func fireWebhookJobCompleted(_ job: Job) async {
         guard let userId = self.currentUserId else { return }
         await WebhookService.shared.jobCompleted(job, userId: userId)
+    }
+
+    private func fireWebhookJobCreated(_ job: Job) async {
+        guard let userId = self.currentUserId else { return }
+        await WebhookService.shared.jobCreated(job, userId: userId)
+    }
+
+    private func fireWebhookJobUpdated(_ job: Job) async {
+        guard let userId = self.currentUserId else { return }
+        await WebhookService.shared.jobUpdated(job, userId: userId)
+    }
+
+    private func fireWebhookCustomerCreated(_ client: Client) async {
+        guard let userId = self.currentUserId else { return }
+        await WebhookService.shared.customerCreated(client, userId: userId)
+    }
+
+    private func fireWebhookInvoicePaid(_ invoice: Invoice) async {
+        guard let userId = self.currentUserId else { return }
+        await WebhookService.shared.invoicePaid(invoice, userId: userId)
     }
 
     private func fireWebhookJobSkipped(_ job: Job) async {
@@ -1008,6 +1047,7 @@ final class DataStore: ObservableObject {
                 tags: client.tags
             ))
             clients.append(created)
+            await fireWebhookCustomerCreated(created)
         } catch {
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription
@@ -1109,6 +1149,7 @@ final class DataStore: ObservableObject {
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
+            await fireWebhookInvoicePaid(updated)
         } catch {
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription

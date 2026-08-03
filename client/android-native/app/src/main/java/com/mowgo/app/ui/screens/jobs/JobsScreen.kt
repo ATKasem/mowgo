@@ -100,7 +100,7 @@ fun JobsScreen(viewModel: JobsViewModel = viewModel()) {
                             items(jobs, key = { it.id }) { job ->
                                 JobsCard(
                                     job = job,
-                                    isUploadingPhoto = state.uploadingPhotoJobId == job.id,
+                                    isUploadingPhoto = job.id in state.uploadingPhotoJobIds,
                                     onToggle = { viewModel.toggleDone(job.id) },
                                     onEdit = { viewModel.edit(job) },
                                     onDelete = { pendingDelete = job },
