@@ -22,6 +22,7 @@ import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
 import com.mowgo.app.ui.theme.MowGoColors
+import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -478,8 +479,8 @@ private fun NewInvoiceDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val clientId = selectedClient?.id ?: return@AlertDialog
-                    val amount = amountText.toDoubleOrNull() ?: return@AlertDialog
+                    val clientId = selectedClient?.id ?: return@onClick
+                    val amount = amountText.toDoubleOrNull() ?: return@onClick
                     onCreate(clientId, amount)
                 },
                 enabled = selectedClient != null && amountText.toDoubleOrNull() != null,

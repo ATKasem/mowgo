@@ -90,7 +90,7 @@ class InvoiceRepository {
     suspend fun createClient(client: Client) {
         if (!SupabaseClientProvider.isConfigured) {
             val newClient = client.copy(id = "demo-client-${System.currentTimeMillis()}")
-            demoClientsMutable = listOf(newClient) + demoClientsMutable
+            demoClientsMutable = listOf(newClient) + (demoClientsMutable ?: emptyList())
             return
         }
 
@@ -104,7 +104,7 @@ class InvoiceRepository {
     /** Update an existing client. */
     suspend fun updateClient(client: Client) {
         if (!SupabaseClientProvider.isConfigured) {
-            demoClientsMutable = demoClientsMutable.map {
+            demoClientsMutable = (demoClientsMutable ?: emptyList()).map {
                 if (it.id == client.id) client else it
             }
             return
@@ -119,7 +119,7 @@ class InvoiceRepository {
     /** Delete a client. */
     suspend fun deleteClient(clientId: String) {
         if (!SupabaseClientProvider.isConfigured) {
-            demoClientsMutable = demoClientsMutable.filter { it.id != clientId }
+            demoClientsMutable = (demoClientsMutable ?: emptyList()).filter { it.id != clientId }
             return
         }
 
