@@ -716,24 +716,34 @@ final class DataStore: ObservableObject {
         }
     }
 
+    private var inFlightPhotoUploads: [UUID: Task<Void, Never>] = [:]
+
     func updateJobPhoto(jobId: UUID, url: String) async {
+        // Cancel any in-flight upload for this job — only the latest photo wins.
+        inFlightPhotoUploads[jobId]?.cancel()
         guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
         jobs[idx].photoUrl = url
 
-        guard await canSync() else {
-            safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
-            return
-        }
-
-        do {
-            try await sb.update("jobs", id: jobId, JobPhotoPatch(photoUrl: url))
-        } catch {
-            if isNetworkError(error) {
+        let task = Task {
+            guard await canSync() else {
                 safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
-            } else {
-                self.error = error.localizedDescription
+                return
+            }
+
+            do {
+                try await sb.update("jobs", id: jobId, JobPhotoPatch(photoUrl: url))
+            } catch {
+                guard !Task.isCancelled else { return }
+                if isNetworkError(error) {
+                    safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
+                } else {
+                    self.error = error.localizedDescription
+                }
             }
         }
+        inFlightPhotoUploads[jobId] = task
+        await task.value
+        inFlightPhotoUploads[jobId] = nil
     }
 
     func toggleJobStatus(_ job: Job) async throws {
