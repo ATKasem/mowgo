@@ -1,0 +1,38 @@
+name: Android Native Build
+on:
+  push:
+    paths:
+      - 'client/android-native/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+          cache-dependency-path: client/android-native/**/*.gradle*
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Validate Gradle wrapper
+        working-directory: client/android-native
+        run: ./gradlew --version
+
+      - name: Build debug APK
+        working-directory: client/android-native
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mowgo-native-debug-apk
+          path: client/android-native/app/build/outputs/apk/debug/*.apk
