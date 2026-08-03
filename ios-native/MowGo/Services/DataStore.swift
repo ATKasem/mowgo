@@ -256,6 +256,7 @@ final class DataStore: ObservableObject {
 
         var replayedCount = 0
         for mutation in mutations {
+            guard !Task.isCancelled else { return }
             do {
                 try await replayMutation(mutation)
                 persistence.removeMutation(mutation)
@@ -523,9 +524,9 @@ final class DataStore: ObservableObject {
         loadTask?.cancel()
         pollingTask?.cancel()
         syncTask?.cancel()
-        for (_, task) in inFlightPhotoUploads { task.cancel() }
-        inFlightPhotoUploads.removeAll()
-        inFlightPhotoIds.removeAll()
+        for (_, task) in photoUploadQueue { task.cancel() }
+        photoUploadQueue.removeAll()
+        photoUploadIds.removeAll()
         _ = await syncTask?.value
         _ = await loadTask?.value
         _ = await pollingTask?.value
@@ -734,17 +735,18 @@ final class DataStore: ObservableObject {
         }
     }
 
-    private var inFlightPhotoUploads: [UUID: Task<Void, Never>] = [:]
-    private var inFlightPhotoIds: [UUID: UUID] = [:]
+    private var photoUploadQueue: [UUID: Task<Void, Never>] = [:]
+    private var photoUploadIds: [UUID: UUID] = [:]
 
     func updateJobPhoto(jobId: UUID, url: String) async {
-        // Cancel any in-flight upload for this job — only the latest photo wins.
-        inFlightPhotoUploads[jobId]?.cancel()
         guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
         jobs[idx].photoUrl = url
-
         let uploadId = UUID()
+        let previous = photoUploadQueue[jobId]
+        photoUploadIds[jobId] = uploadId
         let task = Task {
+            await previous?.value
+            guard !Task.isCancelled else { return }
             guard await canSync() else {
                 safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
                 return
@@ -761,12 +763,11 @@ final class DataStore: ObservableObject {
                 }
             }
         }
-        inFlightPhotoUploads[jobId] = task
-        inFlightPhotoIds[jobId] = uploadId
+        photoUploadQueue[jobId] = task
         await task.value
-        if inFlightPhotoIds[jobId] == uploadId {
-            inFlightPhotoUploads[jobId] = nil
-            inFlightPhotoIds[jobId] = nil
+        if photoUploadIds[jobId] == uploadId {
+            photoUploadQueue[jobId] = nil
+            photoUploadIds[jobId] = nil
         }
     }
 
@@ -1197,6 +1198,9 @@ final class DataStore: ObservableObject {
     }
 
     func removeTeamMember(_ member: UserProfile) async throws {
+        guard auth?.user?.role == "owner" else {
+            throw DataStoreError.permissionDenied
+        }
         guard let memberId = member.id else { return }
         guard await sb.isConfigured else {
             teamMembers.removeAll { $0.id == memberId }
@@ -1310,6 +1314,7 @@ enum DataStoreError: LocalizedError {
     case authenticationRequired
     case clientRequired
     case freeTierLimit(String)
+    case permissionDenied
     case persistenceUnavailable
     case serverError(String)
 
@@ -1321,6 +1326,8 @@ enum DataStoreError: LocalizedError {
             "Select a client before saving the job."
         case .freeTierLimit(let message):
             message
+        case .permissionDenied:
+            "Only the business owner can manage team members."
         case .persistenceUnavailable:
             "Offline changes could not be saved on this device."
         case .serverError(let message):

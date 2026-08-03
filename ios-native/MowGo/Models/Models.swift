@@ -50,12 +50,14 @@ struct RecurringJob: Codable, Identifiable, Equatable {
 
     /// Returns true if `targetDate` should receive a job from this template.
     func matchesDate(_ targetDate: Date) -> Bool {
-        guard let startDate = Self.dateFmt.date(from: startDate) else { return false }
+        guard let utcStart = Self.dateFmt.date(from: startDate) else { return false }
+        let cal = Calendar.current
+        // Normalize the UTC-parsed start date into the local calendar so weekday
+        // and interval math agree with targetDate's calendar.
+        let startComponents = cal.dateComponents([.year, .month, .day], from: utcStart)
+        guard let startDate = cal.date(from: startComponents) else { return false }
         guard targetDate >= startDate else { return false }
 
-        // startDate is parsed under the persisted UTC date contract; Calendar.current
-        // is intentionally used below to match recurrence days in the user's locale.
-        let cal = Calendar.current
         let calendarWeekday = cal.component(.weekday, from: targetDate) // 1=Sun, 2=Mon…7=Sat
         let dayOfWeek = calendarWeekday - 1 // → 0=Sun(excl), 1=Mon, …, 6=Sat
 

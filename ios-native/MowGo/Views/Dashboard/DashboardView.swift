@@ -141,6 +141,7 @@ struct DashboardView: View {
         .alert("Remove Crew Member", isPresented: $showRemoveConfirm) {
             Button("Remove", role: .destructive) {
                 guard let member = memberToRemove else { return }
+                // Trust boundary: RLS must also enforce owner-only deletion server-side.
                 Task {
                     do {
                         try await store.removeTeamMember(member)

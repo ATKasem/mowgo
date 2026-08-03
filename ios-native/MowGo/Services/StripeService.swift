@@ -48,6 +48,9 @@ final class StripeService: ObservableObject {
     }
 
     func createPaymentIntent(amount: Int, currency: String = "usd", invoiceId: UUID) async throws -> PaymentIntentResult {
+        guard amount > 0 && amount <= 10_000_000 else {
+            throw StripeError.invalidAmount
+        }
         guard !isLoading else { throw StripeError.operationInProgress }
         isLoading = true
         defer { isLoading = false }
@@ -144,6 +147,7 @@ final class StripeService: ObservableObject {
 // MARK: - Stripe Errors
 
 enum StripeError: LocalizedError {
+    case invalidAmount
     case noClientSecret
     case noCheckoutURL
     case noPortalURL
@@ -152,6 +156,7 @@ enum StripeError: LocalizedError {
     case cancelFailed(String)
     var errorDescription: String? {
         switch self {
+        case .invalidAmount: "Invalid payment amount."
         case .noClientSecret: "Could not initialize payment."
         case .noCheckoutURL: "Could not create checkout session."
         case .noPortalURL: "Could not open subscription management."

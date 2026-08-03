@@ -139,11 +139,7 @@ final class Persistence {
             userId: userId
         )
         context.insert(mutation)
-        do {
-            try context.save()
-        } catch {
-            throw error
-        }
+        try context.save()
     }
 
     /// Load all pending mutations in FIFO order (oldest first), scoped to current user.
