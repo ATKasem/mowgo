@@ -24,6 +24,8 @@ struct TodayView: View {
     @State private var notificationMessage: String?
     @State private var showNotificationBanner = false
     @State private var calendarMode: CalendarMode = .week
+    @State private var isOperating = false
+    @State private var bannerDismissTask: Task<Void, Never>?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -109,28 +111,30 @@ struct TodayView: View {
                                     ForEach(todayJobs) { job in
                                         JobCardView(job: job, teamMembers: store.teamMembers,
                                             onToggle: {
-                                                Task {
-                                                    do {
-                                                        operationError = nil
-                                                        let wasDone = job.status == .inProgress
-                                                        try await store.toggleJobStatus(job)
-                                                        if wasDone {
-                                                            showBanner("Job marked done — client notified ✅")
-                                                        }
-                                                    } catch {
-                                                        operationError = error.localizedDescription
+                                                guard !isOperating else { return }
+                                                isOperating = true
+                                                defer { isOperating = false }
+                                                do {
+                                                    operationError = nil
+                                                    let wasDone = job.status == .inProgress
+                                                    try await store.toggleJobStatus(job)
+                                                    if wasDone {
+                                                        showBanner("Job marked done — client notified ✅")
                                                     }
+                                                } catch {
+                                                    operationError = error.localizedDescription
                                                 }
                                             },
                                             onSkip: {
-                                                Task {
-                                                    do {
-                                                        operationError = nil
-                                                        try await store.skipJob(job)
-                                                        showBanner("Job skipped — client notified ✅")
-                                                    } catch {
-                                                        operationError = error.localizedDescription
-                                                    }
+                                                guard !isOperating else { return }
+                                                isOperating = true
+                                                defer { isOperating = false }
+                                                do {
+                                                    operationError = nil
+                                                    try await store.skipJob(job)
+                                                    showBanner("Job skipped — client notified ✅")
+                                                } catch {
+                                                    operationError = error.localizedDescription
                                                 }
                                             },
                                             showDate: !isToday
@@ -597,10 +601,12 @@ struct TodayView: View {
     }
 
     private func showBanner(_ message: String) {
+        bannerDismissTask?.cancel()
         notificationMessage = message
         withAnimation { showNotificationBanner = true }
-        Task { @MainActor in
+        bannerDismissTask = Task { @MainActor in
             try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
             withAnimation { showNotificationBanner = false }
         }
     }
@@ -609,7 +615,7 @@ struct TodayView: View {
     /// This is a simple proxy for proximity — crew members pick the order,
     /// and alphabetizing by street gives a reasonable geographic grouping.
     private func reorderJobsByRoute() {
-        let jobsToOrder = todayJobs.filter { $0.scheduledDate == dateString }
+        let jobsToOrder = store.jobs.filter { $0.scheduledDate == dateString }
         guard !jobsToOrder.isEmpty else { return }
 
         // Sort by client address alphabetically (street-first grouping)
@@ -617,10 +623,15 @@ struct TodayView: View {
             (a.address ?? "") < (b.address ?? "")
         }
 
-        // Persist route orders to the store
-        for (index, job) in sorted.enumerated() {
-            Task {
-                try? await store.updateRouteOrder(job, order: index)
+        // Persist route orders sequentially so indices stay unique and writes stay ordered.
+        Task {
+            do {
+                operationError = nil
+                for (index, job) in sorted.enumerated() {
+                    try await store.updateRouteOrder(job, order: index)
+                }
+            } catch {
+                operationError = error.localizedDescription
             }
         }
     }

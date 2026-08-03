@@ -161,7 +161,10 @@ struct NewJobFormView: View {
             durationMinutes: duration,
             status: .scheduled,
             notes: notes.isEmpty ? nil : notes,
-            routeOrder: store.jobs.filter { $0.scheduledDate == date }.count,
+            routeOrder: (store.jobs
+                .filter { $0.scheduledDate == date }
+                .map { $0.routeOrder ?? -1 }
+                .max() ?? -1) + 1,
             isRecurring: repeatFrequency != nil ? true : nil,
             recurrenceRule: repeatFrequency?.rawValue
         )
@@ -186,7 +189,7 @@ struct NewJobFormView: View {
                         isActive: true,
                         startDate: date
                     )
-                    try? await store.createRecurringJob(template)
+                    try await store.createRecurringJob(template)
                 }
 
                 dismiss()

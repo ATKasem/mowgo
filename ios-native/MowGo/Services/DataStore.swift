@@ -70,6 +70,10 @@ private struct JobRoutePatch: Encodable {
     let routeOrder: Int?
 }
 
+private struct JobPhotoPatch: Encodable {
+    let photoUrl: String
+}
+
 private struct RecurringJobInsert: Encodable {
     let id: UUID
     let userId: UUID
@@ -319,6 +323,11 @@ final class DataStore: ObservableObject {
             struct P: Decodable { let routeOrder: Int }
             let p = try JSONDecoder().decode(P.self, from: mutation.payload)
             try await sb.update("jobs", id: mutation.entityId, JobRoutePatch(routeOrder: p.routeOrder))
+
+        case "job:photo":
+            struct P: Decodable { let photoUrl: String }
+            let p = try JSONDecoder().decode(P.self, from: mutation.payload)
+            try await sb.update("jobs", id: mutation.entityId, JobPhotoPatch(photoUrl: p.photoUrl))
 
         case "client:create":
             let client = try JSONDecoder().decode(Client.self, from: mutation.payload)
@@ -704,6 +713,26 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             throw error
+        }
+    }
+
+    func updateJobPhoto(jobId: UUID, url: String) async {
+        guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
+        jobs[idx].photoUrl = url
+
+        guard await canSync() else {
+            safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
+            return
+        }
+
+        do {
+            try await sb.update("jobs", id: jobId, JobPhotoPatch(photoUrl: url))
+        } catch {
+            if isNetworkError(error) {
+                safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
+            } else {
+                self.error = error.localizedDescription
+            }
         }
     }
 

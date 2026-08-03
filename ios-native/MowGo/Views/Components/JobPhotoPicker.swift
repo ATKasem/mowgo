@@ -24,6 +24,7 @@ struct JobPhotoPicker: View {
     @State private var showSourcePicker = false
     @State private var showLibraryPicker = false
     @State private var showCamera = false
+    @State private var delayedPresentationTask: Task<Void, Never>?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -106,9 +107,16 @@ struct JobPhotoPicker: View {
             }
             .onChange(of: selectedItem) { _, newItem in
                 Task {
-                    if let data = try? await newItem?.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
+                    do {
+                        guard let data = try await newItem?.loadTransferable(type: Data.self),
+                              let uiImage = UIImage(data: data) else {
+                            uploadError = "The selected image could not be loaded."
+                            return
+                        }
                         selectedImage = uiImage
+                        uploadError = nil
+                    } catch {
+                        uploadError = "Photo selection failed: \(error.localizedDescription)"
                     }
                 }
             }
@@ -116,7 +124,10 @@ struct JobPhotoPicker: View {
                 VStack(spacing: 0) {
                     Button {
                         showSourcePicker = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        delayedPresentationTask?.cancel()
+                        delayedPresentationTask = Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(350))
+                            guard !Task.isCancelled else { return }
                             showCamera = true
                         }
                     } label: {
@@ -130,7 +141,10 @@ struct JobPhotoPicker: View {
 
                     Button {
                         showSourcePicker = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        delayedPresentationTask?.cancel()
+                        delayedPresentationTask = Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(350))
+                            guard !Task.isCancelled else { return }
                             showLibraryPicker = true
                         }
                     } label: {
@@ -160,11 +174,18 @@ struct JobPhotoPicker: View {
                     dismiss()
                 }
             }
+            .onDisappear {
+                delayedPresentationTask?.cancel()
+            }
         }
     }
 
     private func upload() async {
-        guard let image = selectedImage, let jpegData = image.jpegData(compressionQuality: 0.8) else { return }
+        guard let image = selectedImage,
+              let jpegData = image.jpegData(compressionQuality: 0.8) else {
+            uploadError = "The image could not be prepared for upload."
+            return
+        }
         isUploading = true
         uploadError = nil
         do {

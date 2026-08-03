@@ -17,6 +17,7 @@ struct CameraView: View {
     @State private var isUploading = false
     @State private var uploadError: String?
     @State private var capturedImage: UIImage?
+    @State private var uploadTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -52,6 +53,9 @@ struct CameraView: View {
         } message: {
             Text(uploadError ?? "Please try again.")
         }
+        .onDisappear {
+            uploadTask?.cancel()
+        }
     }
 
     private func upload(_ image: UIImage) {
@@ -65,15 +69,18 @@ struct CameraView: View {
         isUploading = true
         uploadError = nil
 
-        Task {
+        uploadTask?.cancel()
+        uploadTask = Task {
             do {
                 let url = try await SupabaseService.shared.uploadJobPhoto(
                     jobId: jobId,
                     imageData: jpegData
                 )
+                guard !Task.isCancelled else { return }
                 onPhotoUploaded?(url)
                 dismiss()
             } catch {
+                guard !Task.isCancelled else { return }
                 uploadError = "Upload failed: \(error.localizedDescription)"
                 isUploading = false
             }
@@ -91,6 +98,11 @@ private struct CameraPicker: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+            picker.sourceType = .photoLibrary
+            picker.delegate = context.coordinator
+            return picker
+        }
         picker.sourceType = .camera
         picker.cameraCaptureMode = .photo
         picker.delegate = context.coordinator

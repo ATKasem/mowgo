@@ -13,8 +13,8 @@ struct JobCardView: View {
     @Environment(\.colorScheme) private var colorScheme
     let job: Job
     var teamMembers: [UserProfile] = []
-    var onToggle: (() -> Void)?
-    var onSkip: (() -> Void)?
+    var onToggle: (() async -> Void)?
+    var onSkip: (() async -> Void)?
     var showDate: Bool = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -22,6 +22,7 @@ struct JobCardView: View {
     @State private var showPhotoPicker = false
     @State private var showSkipConfirm = false
     @State private var showMapPicker = false
+    @State private var isToggling = false
 
     private var assignedMember: UserProfile? {
         guard let assignedTo = job.assignedTo else { return nil }
@@ -69,8 +70,13 @@ struct JobCardView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Button {
+                guard !isToggling else { return }
+                isToggling = true
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                onToggle?()
+                Task {
+                    await onToggle?()
+                    isToggling = false
+                }
             } label: {
                 VStack(spacing: 1) {
                     Image(systemName: statusIconName)
@@ -191,7 +197,9 @@ struct JobCardView: View {
                             .replacingOccurrences(of: "-", with: "")
                             .replacingOccurrences(of: "(", with: "")
                             .replacingOccurrences(of: ")", with: "")
-                        UIApplication.shared.open(URL(string: "tel:\(cleaned)")!)
+                        if let url = URL(string: "tel:\(cleaned)") {
+                            UIApplication.shared.open(url)
+                        }
                     } label: {
                         Image(systemName: "phone.fill")
                             .font(.caption)
@@ -219,9 +227,15 @@ struct JobCardView: View {
                     .buttonStyle(.plain)
                     .confirmationDialog("Navigate", isPresented: $showMapPicker) {
                         if let enc = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                            Button("Apple Maps") { UIApplication.shared.open(URL(string: "https://maps.apple.com/?q=\(enc)")!) }
-                            Button("Google Maps") { UIApplication.shared.open(URL(string: "comgooglemaps://?q=\(enc)")!) }
-                            Button("Waze") { UIApplication.shared.open(URL(string: "waze://?q=\(enc)")!) }
+                            if let url = URL(string: "https://maps.apple.com/?q=\(enc)") {
+                                Button("Apple Maps") { UIApplication.shared.open(url) }
+                            }
+                            if let url = URL(string: "comgooglemaps://?q=\(enc)"), UIApplication.shared.canOpenURL(url) {
+                                Button("Google Maps") { UIApplication.shared.open(url) }
+                            }
+                            if let url = URL(string: "waze://?q=\(enc)"), UIApplication.shared.canOpenURL(url) {
+                                Button("Waze") { UIApplication.shared.open(url) }
+                            }
                         }
                         Button("Cancel", role: .cancel) { }
                     }
@@ -253,7 +267,14 @@ struct JobCardView: View {
                 }
             }
             if job.status == .skipped {
-                Button { onToggle?() } label: {
+                Button {
+                    guard !isToggling else { return }
+                    isToggling = true
+                    Task {
+                        await onToggle?()
+                        isToggling = false
+                    }
+                } label: {
                     Label("Unskip Job", systemImage: "arrow.counterclockwise")
                 }
             }
@@ -263,16 +284,21 @@ struct JobCardView: View {
             isPresented: $showSkipConfirm,
             titleVisibility: .visible
         ) {
-            Button("Skip Job", role: .destructive) { onSkip?() }
+            Button("Skip Job", role: .destructive) {
+                guard !isToggling else { return }
+                isToggling = true
+                Task {
+                    await onSkip?()
+                    isToggling = false
+                }
+            }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This job will be marked as skipped and won't appear in your active route.")
         }
         .sheet(isPresented: $showPhotoPicker) {
             JobPhotoPicker(jobId: job.id, onPhotoUploaded: { url in
-                if let idx = store.jobs.firstIndex(where: { $0.id == job.id }) {
-                    store.jobs[idx].photoUrl = url
-                }
+                Task { await store.updateJobPhoto(jobId: job.id, url: url) }
             })
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
