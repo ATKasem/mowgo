@@ -3,12 +3,8 @@
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="?attr/colorControlNormal">
-    <group
-        android:tint="#4ade80">
-        <path
-            android:fillColor="@android:color/white"
-            android:pathData="M17,8C8,10 5.9,16.17 3.82,21.34l1.89,0.66c0.95,-2.3 2.29,-4.64 4.54,-6.68C11.2,14.39 14,13 17,13V17L23,10L17,3V8ZM6.17,22l0.49,-1.82C6.68,18.6 6.54,17.86 6.38,17.11C7.53,16.56 8.76,16.24 10,16.13L6.17,22Z"/>
-    </group>
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#4ade80"
+        android:pathData="M17,8C8,10 5.9,16.17 3.82,21.34l1.89,0.66c0.95,-2.3 2.29,-4.64 4.54,-6.68C11.2,14.39 14,13 17,13V17L23,10L17,3V8ZM6.17,22l0.49,-1.82C6.68,18.6 6.54,17.86 6.38,17.11C7.53,16.56 8.76,16.24 10,16.13L6.17,22Z"/>
 </vector>
