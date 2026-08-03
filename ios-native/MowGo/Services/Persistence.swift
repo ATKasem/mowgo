@@ -146,9 +146,10 @@ final class Persistence {
         }
     }
 
-    /// Load all pending mutations in FIFO order (oldest first).
-    func loadPendingMutations() -> [PendingMutation] {
+    /// Load all pending mutations in FIFO order (oldest first), scoped to current user.
+    func loadPendingMutations(currentUserId: UUID) -> [PendingMutation] {
         let descriptor = FetchDescriptor<PendingMutation>(
+            predicate: #Predicate { $0.userId == currentUserId },
             sortBy: [SortDescriptor(\.sequence)]
         )
         do {
