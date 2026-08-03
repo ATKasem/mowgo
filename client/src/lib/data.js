@@ -24,17 +24,26 @@ function uid() { return crypto.randomUUID ? crypto.randomUUID() : String(Date.no
 // ===== Webhook helper =====
 
 /**
- * Fire a webhook event to the send-webhook Edge Function.
+ * Fire a webhook event via the /api/webhook-dispatch Cloudflare Pages Function.
  * Non-blocking — errors are logged but never thrown so they
  * don't break the calling flow.
  */
 export async function fireWebhook(event, payload = {}) {
   if (isDemoMode()) return;
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.functions.invoke('send-webhook', {
-      body: { user_id: user.id, event, payload },
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) return;
+    // Best-effort POST — the Pages Function handles auth + delivery
+    fetch('/api/webhook-dispatch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ event, payload }),
+    }).catch((err) => {
+      console.warn('fireWebhook:', event, err?.message || err);
     });
   } catch (err) {
     // Webhook failures must never break the main flow
