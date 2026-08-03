@@ -3,6 +3,7 @@ package com.mowgo.app.ui.screens.today
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
+import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
@@ -28,6 +29,7 @@ data class TodayUiState(
     val showSnackbar: String? = null,
     val showNewJobDialog: Boolean = false,
     val editingJob: JobWithClient? = null,
+    val uploadingPhotoJobId: String? = null,
 ) {
     val todayJobs: List<JobWithClient>
         get() {
@@ -66,6 +68,7 @@ data class TodayUiState(
 class TodayViewModel : ViewModel() {
 
     private val repository = JobRepository()
+    private val photoRepository = JobPhotoRepository(repository)
 
     private val _uiState = MutableStateFlow(TodayUiState())
     val uiState: StateFlow<TodayUiState> = _uiState.asStateFlow()
@@ -235,6 +238,31 @@ class TodayViewModel : ViewModel() {
                 )
             }
         }
+    }
+
+    fun uploadJobPhoto(jobId: String, imageData: ByteArray) {
+        _uiState.value = _uiState.value.copy(uploadingPhotoJobId = jobId)
+        viewModelScope.launch {
+            try {
+                val url = photoRepository.uploadJobPhoto(jobId, imageData)
+                _uiState.value = _uiState.value.copy(
+                    jobs = _uiState.value.jobs.map { item ->
+                        if (item.id == jobId) item.copy(job = item.job.copy(photoUrl = url)) else item
+                    },
+                    uploadingPhotoJobId = null,
+                    showSnackbar = "Photo uploaded",
+                )
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    uploadingPhotoJobId = null,
+                    showSnackbar = "Photo upload failed: ${error.message}",
+                )
+            }
+        }
+    }
+
+    fun showPhotoError(message: String) {
+        _uiState.value = _uiState.value.copy(showSnackbar = message)
     }
 
     // ── Snackbar ─────────────────────────────────────────────────────────

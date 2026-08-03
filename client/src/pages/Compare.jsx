@@ -4,8 +4,8 @@ import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from
 
 const competitors = [
   { name: 'MowGo', price: 'Free – $79', highlight: true },
-  { name: 'QuoteIQ', price: '$29.99/mo' },
-  { name: 'Jobber', price: '$119+/mo' },
+  { name: 'QuoteIQ', price: '$29.99–$699/mo' },
+  { name: 'Jobber', price: '$29–$199/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
   { name: 'LawnPro', price: '$0–$39' },
   { name: 'Housecall Pro', price: '$79–$189' },
@@ -206,7 +206,13 @@ export default function Compare() {
             {tr("Six apps now offer a permanent free tier — Grassly, MowStack, Yardbook, ProBase, LawnPro Solo, and SoloOp. Grassly skims 2% of every card payment. MowGo's free plan takes nothing.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("TurfHop's own pricing and features pages were down (500 errors) on Aug 2, 2026 — verify current features with them before you buy.")}
+            {tr("TurfHop's own pricing and features pages were down (500 errors) on Aug 3, 2026 — verify current features with them before you buy.")}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("Jobber's $29 plan is the hook — automated reminders and auto-pay start at Connect $99, and the AI Receptionist is a $29/mo add-on (or bundled in Plus $199). MowGo includes them all at $49–$79 flat.")}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("Some competitors charge a sign-up fee and hide their top tier behind a sales call — MowGo publishes $39/$79 and takes a card.")}
           </p>
         </div>
 

@@ -24,6 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
+import com.mowgo.app.ui.components.JobPhotoButton
+import com.mowgo.app.ui.components.JobPhotoThumbnail
 import com.mowgo.app.ui.theme.MowGoColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -192,6 +194,9 @@ fun TodayScreen(
                             onSkip = { viewModel.skipJob(jobWithClient.id) },
                             onEdit = { viewModel.showEditJobDialog(jobWithClient) },
                             onDelete = { viewModel.deleteJob(jobWithClient.id) },
+                            isUploadingPhoto = state.uploadingPhotoJobId == jobWithClient.id,
+                            onPhotoReady = { bytes -> viewModel.uploadJobPhoto(jobWithClient.id, bytes) },
+                            onPhotoError = viewModel::showPhotoError,
                         )
                     }
                 }
@@ -358,6 +363,9 @@ private fun JobCard(
     onSkip: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    isUploadingPhoto: Boolean,
+    onPhotoReady: (ByteArray) -> Unit,
+    onPhotoError: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -408,6 +416,18 @@ private fun JobCard(
                         color = MowGoColors.TextSecondaryDark,
                     )
                 }
+
+                JobPhotoThumbnail(
+                    photoUrl = jobWithClient.photoUrl,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+
+                JobPhotoButton(
+                    jobId = jobWithClient.id,
+                    isUploading = isUploadingPhoto,
+                    onImageReady = onPhotoReady,
+                    onError = onPhotoError,
+                )
 
                 // Time + status chip
                 Column(horizontalAlignment = Alignment.End) {

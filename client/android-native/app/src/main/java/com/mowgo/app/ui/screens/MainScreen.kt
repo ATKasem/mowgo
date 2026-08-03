@@ -17,7 +17,6 @@ import com.mowgo.app.ui.screens.clients.ClientsScreen
 import com.mowgo.app.ui.screens.invoices.InvoicesScreen
 import com.mowgo.app.ui.screens.more.MoreScreen
 import com.mowgo.app.ui.screens.dashboard.DashboardScreen
-import com.mowgo.app.ui.screens.chat.ChatScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +98,6 @@ fun MainScreen(
                             restoreState = true
                         }
                     },
-                    onOpenChat = { navController.navigate(NavRoutes.CHAT) },
                 )
             }
             composable(NavRoutes.TODAY) { TodayScreen() }
@@ -110,11 +108,7 @@ fun MainScreen(
                 MoreScreen(
                     openBillingEvent = settingsDeepLinkEvent,
                     onSignedOut = onSignedOut,
-                    onOpenChat = { navController.navigate(NavRoutes.CHAT) },
                 )
-            }
-            composable(NavRoutes.CHAT) {
-                ChatScreen(onBack = { navController.popBackStack() })
             }
         }
     }

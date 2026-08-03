@@ -103,7 +103,6 @@ struct MowGoApp: App {
                         PushNotificationService.shared.clearDeviceToken()
                     }
                     await store.clear()
-                    ChatService.shared.clearOnSignOut()
                 }
             }
             .modelContainer(Self.modelContainer)

@@ -20,6 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.ui.screens.today.EditJobDialog
+import com.mowgo.app.ui.components.JobPhotoButton
+import com.mowgo.app.ui.components.JobPhotoThumbnail
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -96,7 +98,15 @@ fun JobsScreen(viewModel: JobsViewModel = viewModel()) {
                         filtered.groupBy { it.scheduledDate }.forEach { (date, jobs) ->
                             item(key = "header-$date") { DateHeader(date) }
                             items(jobs, key = { it.id }) { job ->
-                                JobsCard(job, { viewModel.toggleDone(job.id) }, { viewModel.edit(job) }, { pendingDelete = job })
+                                JobsCard(
+                                    job = job,
+                                    isUploadingPhoto = state.uploadingPhotoJobId == job.id,
+                                    onToggle = { viewModel.toggleDone(job.id) },
+                                    onEdit = { viewModel.edit(job) },
+                                    onDelete = { pendingDelete = job },
+                                    onPhotoReady = { bytes -> viewModel.uploadJobPhoto(job.id, bytes) },
+                                    onPhotoError = viewModel::showPhotoError,
+                                )
                             }
                         }
                     }
@@ -119,7 +129,15 @@ private fun DateHeader(value: String) {
 }
 
 @Composable
-private fun JobsCard(job: JobWithClient, onToggle: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
+private fun JobsCard(
+    job: JobWithClient,
+    isUploadingPhoto: Boolean,
+    onToggle: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onPhotoReady: (ByteArray) -> Unit,
+    onPhotoError: (String) -> Unit,
+) {
     var menu by remember { mutableStateOf(false) }
     val done = job.status == Job.STATUS_DONE
     Card(
@@ -132,6 +150,13 @@ private fun JobsCard(job: JobWithClient, onToggle: () -> Unit, onEdit: () -> Uni
                     Text(job.clientName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, textDecoration = if (done) TextDecoration.LineThrough else null)
                     Text(job.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                JobPhotoThumbnail(job.photoUrl, Modifier.padding(horizontal = 6.dp))
+                JobPhotoButton(
+                    jobId = job.id,
+                    isUploading = isUploadingPhoto,
+                    onImageReady = onPhotoReady,
+                    onError = onPhotoError,
+                )
                 JobStatusChip(job.status)
                 Box {
                     IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "Job options") }

@@ -1,12 +1,11 @@
 import useLocalizedText from '../i18n/useLocalizedText';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import i18n from '../i18n';
-import { Calendar, Users, FileText, Settings, LogOut, WifiOff, LayoutDashboard, MessageSquare, X } from 'lucide-react';
+import { Calendar, Users, FileText, Settings, LogOut, WifiOff, LayoutDashboard } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import Logo from './Logo';
-import AutopilotChat from './AutopilotChat';
 import { isCurrentlyOffline } from '../lib/offlineStorage';
 
 const navItems = [
@@ -20,23 +19,7 @@ const navItems = [
 export default function Layout() {
   const { tr, t, i18n } = useLocalizedText('layout');
   const navigate = useNavigate();
-  const location = useLocation();
   const [isOffline, setIsOffline] = useState(isCurrentlyOffline());
-  const [chatOpen, setChatOpen] = useState(false);
-  const [pendingMessage, setPendingMessage] = useState(null);
-  const [hasBadge, setHasBadge] = useState(false);
-
-  // Derive page context from current route
-  const pageContext = (() => {
-    const path = location.pathname;
-    if (path === '/app' || path === '/app/') return { page: 'Dashboard', description: 'You are viewing the business dashboard.' };
-    if (path === '/app/home' || path === '/app/home/') return { page: 'Home', description: 'You are viewing the home calendar and schedule.' };
-    if (path.startsWith('/app/today')) return { page: 'Today', description: 'You are viewing today\'s schedule.' };
-    if (path.startsWith('/app/clients')) return { page: 'Clients', description: 'You are viewing the client list.' };
-    if (path.startsWith('/app/invoices')) return { page: 'Invoices', description: 'You are viewing invoices.' };
-    if (path.startsWith('/app/settings')) return { page: 'Settings', description: 'You are on the settings page.' };
-    return { page: 'App', description: 'You are in the MowGo app.' };
-  })();
 
   useEffect(() => {
     const goOnline = () => setIsOffline(false);
@@ -49,44 +32,6 @@ export default function Layout() {
     };
   }, []);
 
-  // Listen for quick-prompt events from child pages (e.g. Today.jsx)
-  useEffect(() => {
-    function handleSend(e) {
-      setPendingMessage(e.detail?.message || null);
-      setChatOpen(true);
-    }
-    function handleBadge(e) {
-      setHasBadge(e.detail?.show ?? false);
-    }
-    window.addEventListener('mowgo:autopilot-send', handleSend);
-    window.addEventListener('mowgo:autopilot-badge', handleBadge);
-    return () => {
-      window.removeEventListener('mowgo:autopilot-send', handleSend);
-      window.removeEventListener('mowgo:autopilot-badge', handleBadge);
-    };
-  }, []);
-
-  // Chat drawer focus trap (WCAG 2.4.3)
-  useEffect(() => {
-    if (!chatOpen) return;
-    const drawer = document.querySelector('[role="dialog"]');
-    if (!drawer) return;
-    const focusable = drawer.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
-    focusable?.[0]?.focus();
-
-    function handleTab(e) {
-      if (e.key !== 'Tab') return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
-      }
-    }
-    drawer.addEventListener('keydown', handleTab);
-    return () => drawer.removeEventListener('keydown', handleTab);
-  }, [chatOpen]);
 
   async function logout() {
     try {
@@ -175,56 +120,6 @@ export default function Layout() {
         </div>
       </nav>
 
-      {/* Floating chat button */}
-      {!chatOpen && (
-        <button
-          onClick={() => setChatOpen(true)}
-          className="fixed bottom-20 right-4 z-30 w-12 h-12 rounded-full bg-brand-hover hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
-          aria-label={tr("Open assistant")}
-        >
-          <MessageSquare className="w-5 h-5" />
-          {hasBadge && (
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-400 border-2 border-white dark:border-gray-950 animate-pulse" />
-          )}
-        </button>
-      )}
-
-      {/* Chat drawer */}
-      {chatOpen && (
-        <div className="fixed inset-0 z-40">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => { setChatOpen(false); setPendingMessage(null); }}
-          />
-          {/* Panel — centered compact sheet */}
-          <div role="dialog" aria-modal="true" aria-label={tr("AI assistant")} className="absolute bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md bg-[var(--color-surface)] dark:bg-gray-900 rounded-2xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden"
-               style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-            {/* Handle bar + close + reset */}
-            <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                  <MessageSquare className="w-3.5 h-3.5 text-brand-hover dark:text-emerald-400" />
-                </div>
-                <span className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr("Ask anything")}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => { setChatOpen(false); setPendingMessage(null); }}
-                  className="p-1.5 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 transition-colors"
-                  aria-label={tr("Close")}
-                >
-                  <X className="w-4 h-4 text-[var(--color-text-muted)]" />
-                </button>
-              </div>
-            </div>
-            {/* Chat content */}
-            <div className="flex-1 overflow-hidden px-4 pt-2 pb-4">
-              <AutopilotChat compact pageContext={pageContext} initialMessage={pendingMessage} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

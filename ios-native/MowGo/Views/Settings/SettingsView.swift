@@ -518,7 +518,6 @@ struct SubscriptionView: View {
                             price: "$39/mo",
                             features: [
                                 "15 clients",
-                                "AI Autopilot assistant",
                                 "Route optimization",
                                 "Photo attachments",
                                 "Priority support"

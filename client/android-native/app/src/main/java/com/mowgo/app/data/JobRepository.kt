@@ -123,6 +123,21 @@ class JobRepository {
             }
     }
 
+    /** Persist a job photo URL after the image has been uploaded. */
+    suspend fun updateJobPhoto(jobId: String, photoUrl: String) {
+        if (!SupabaseClientProvider.isConfigured) {
+            demoJobsMutable = demoJobsMutable.map {
+                if (it.job.id == jobId) it.copy(job = it.job.copy(photoUrl = photoUrl)) else it
+            }
+            return
+        }
+
+        SupabaseClientProvider.client.from("jobs")
+            .update(mapOf("photo_url" to photoUrl)) {
+                filter { eq("id", jobId) }
+            }
+    }
+
     /** Delete a job. */
     suspend fun deleteJob(jobId: String) {
         if (!SupabaseClientProvider.isConfigured) {

@@ -16,5 +16,4 @@ object NavRoutes {
     const val MORE = "more"
 
     // Routes outside the bottom navigation tabs
-    const val CHAT = "chat"
 }

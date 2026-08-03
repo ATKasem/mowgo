@@ -3,6 +3,7 @@ package com.mowgo.app.ui.screens.jobs
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
+import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
@@ -18,10 +19,12 @@ data class JobsUiState(
     val clients: List<Client> = emptyList(),
     val editingJob: JobWithClient? = null,
     val message: String? = null,
+    val uploadingPhotoJobId: String? = null,
 )
 
 class JobsViewModel : ViewModel() {
     private val repository = JobRepository()
+    private val photoRepository = JobPhotoRepository(repository)
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState: StateFlow<JobsUiState> = _uiState.asStateFlow()
 
@@ -90,6 +93,31 @@ class JobsViewModel : ViewModel() {
                 _uiState.value = _uiState.value.copy(message = error.message ?: "Failed to update job")
             }
         }
+    }
+
+    fun uploadJobPhoto(jobId: String, imageData: ByteArray) {
+        _uiState.value = _uiState.value.copy(uploadingPhotoJobId = jobId)
+        viewModelScope.launch {
+            try {
+                val url = photoRepository.uploadJobPhoto(jobId, imageData)
+                _uiState.value = _uiState.value.copy(
+                    jobs = _uiState.value.jobs.map { item ->
+                        if (item.id == jobId) item.copy(job = item.job.copy(photoUrl = url)) else item
+                    },
+                    uploadingPhotoJobId = null,
+                    message = "Photo uploaded",
+                )
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    uploadingPhotoJobId = null,
+                    message = "Photo upload failed: ${error.message}",
+                )
+            }
+        }
+    }
+
+    fun showPhotoError(message: String) {
+        _uiState.value = _uiState.value.copy(message = message)
     }
 
     fun dismissMessage() { _uiState.value = _uiState.value.copy(message = null) }

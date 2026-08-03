@@ -31,8 +31,15 @@ export default function Settings() {
   const [bookingCopied, setBookingCopied] = useState(false);
   const bookingCopyTimer = useRef(null);
 
-  // Booking link derived from current origin — survives domain changes
-  const bookingUrl = `${window.location.origin}/#/book/${user?.id || 'your-business-id'}`;
+  // Booking link — use the live domain. Inside Capacitor (Android/iOS shell),
+  // window.location.origin is a local scheme (https://localhost) that customers
+  // can't reach, so fall back to the public domain.
+  const isNativeShell = ['localhost', '127.0.0.1'].includes(window.location.hostname) &&
+    window.location.port === '';
+  const bookingBase = isNativeShell
+    ? 'https://mowgo.pages.dev'
+    : window.location.origin;
+  const bookingUrl = `${bookingBase}/#/book/${user?.id || 'your-business-id'}`;
 
   useEffect(() => {
     return () => {

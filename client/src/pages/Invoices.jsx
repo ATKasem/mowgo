@@ -63,15 +63,15 @@ export default function Invoices({ invoices = [], setInvoices }) {
 
   const markAsPaid = useCallback(async (id) => {
     try {
-      await updateInvoiceStatus(id, 'paid');
-      setInvoices(prev => prev.map(i => i.id === id ? { ...i, status: 'paid', paid_at: new Date().toISOString() } : i));
+      const updated = await updateInvoiceStatus(id, 'paid');
+      setInvoices(prev => prev.map(i => i.id === id ? { ...i, ...updated } : i));
     } catch (err) { console.error('markAsPaid:', err); }
   }, [setInvoices]);
 
   const changeStatus = useCallback(async (id, newStatus) => {
     try {
-      await updateInvoiceStatus(id, newStatus);
-      setInvoices(prev => prev.map(i => i.id === id ? { ...i, status: newStatus, ...(newStatus === 'paid' ? { paid_at: new Date().toISOString() } : {}) } : i));
+      const updated = await updateInvoiceStatus(id, newStatus);
+      setInvoices(prev => prev.map(i => i.id === id ? { ...i, ...updated } : i));
     } catch (err) { console.error('changeStatus:', err); }
   }, [setInvoices]);
 

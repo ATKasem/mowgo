@@ -4,7 +4,7 @@ import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 import { createJob, updateJobStatus, updateJob, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard } from '../lib/data';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Circle, CloudRain, Repeat, Loader2, Sparkles } from 'lucide-react';
+import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
@@ -71,14 +71,6 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     ? dateFiltered.filter(j => j.assigned_to === crewFilter)
     : dateFiltered, [dateFiltered, crewFilter]);
   const doneCount = useMemo(() => filtered.filter(j => j.status === 'done' || j.status === 'in_progress').length, [filtered]);
-
-  // Signal badge on FAB when there's something the AI can help with
-  useEffect(() => {
-    const incompleteJobs = filtered.some(j => j.status !== 'done');
-    const completedJobs = doneCount > 0;
-    const shouldShowBadge = (incompleteJobs && rainLikely()) || completedJobs;
-    window.dispatchEvent(new CustomEvent('mowgo:autopilot-badge', { detail: { show: shouldShowBadge } }));
-  }, [filtered, doneCount, rainLikely]);
 
   // Load clients for the NewJobForm dropdown
   useEffect(() => {
@@ -426,31 +418,6 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           </button>
         </div>
       )}
-
-      {/* Contextual AI quick-prompts */}
-      <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
-        {[
-          { text: "What's next on my schedule?", label: "What's next?" },
-          ...(filtered.some(j => j.status !== 'done')
-            ? [{ text: "Move today's jobs to tomorrow", label: "Rain delay?" }]
-            : []),
-          ...(doneCount > 0
-            ? [{ text: "Invoice completed jobs", label: "Invoice done jobs" }]
-            : []),
-          { text: "Show unpaid invoices", label: "Unpaid invoices" },
-        ].slice(0, 4).map((prompt, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              window.dispatchEvent(new CustomEvent('mowgo:autopilot-send', { detail: { message: prompt.text } }));
-            }}
-            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-600 border border-transparent transition-colors"
-          >
-            <Sparkles className="w-3 h-3" />
-            {prompt.label}
-          </button>
-        ))}
-      </div>
 
       {/* Date picker + progress */}
       <div className="flex items-center gap-3 mb-5">

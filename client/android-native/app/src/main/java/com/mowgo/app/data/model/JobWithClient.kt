@@ -21,4 +21,5 @@ data class JobWithClient(
     val recurrenceRule: String? get() = job.recurrenceRule
     val clientId: String get() = job.clientId
     val userId: String get() = job.userId
+    val photoUrl: String? get() = job.photoUrl
 }

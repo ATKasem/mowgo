@@ -22,7 +22,6 @@ import QuoteIQAlternative from './pages/QuoteIQAlternative';
 import RuunlyComparison from './pages/RuunlyComparison';
 import Booking from './pages/Booking';
 import PortalReturn from './pages/PortalReturn';
-import AutopilotChat from './components/AutopilotChat';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
 
@@ -208,7 +207,6 @@ export default function App() {
             <Route path="/app/clients" element={<Clients jobs={jobs} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
-            <Route path="/app/autopilot" element={<AutopilotChat />} />
             <Route path="*" element={<Navigate to="/app" />} />
           </Route>
         </Routes>

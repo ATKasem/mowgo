@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import useLocalizedText from '../i18n/useLocalizedText';
-import { Sprout, Check, X, ArrowRight, AlertTriangle, DollarSign, CloudRain, Zap, Calculator, TrendingDown } from 'lucide-react';
+import { Sprout, Check, X, ArrowRight, AlertTriangle, DollarSign, CloudRain, Calculator, TrendingDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Ruunly platform fee rates (percentage of monthly revenue)
@@ -367,42 +367,6 @@ export default function RuunlyComparison() {
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 text-center">{tr("* Based on Ruunly's published platform fee percentages applied to monthly revenue. MowGo Solo is $39 flat — no percentage fees.")}</p>
           </FadeIn>
         </div>
-      </section>
-
-      {/* AI Section */}
-      <section className="max-w-4xl mx-auto px-4 py-16 md:py-24">
-        <FadeIn>
-          <div className="grid md:grid-cols-2 gap-5">
-            <div className="card p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                  <Zap className="w-5 h-5 text-white" aria-hidden="true" />
-                </div>
-                <h3 className="font-bold text-gray-900 dark:text-white text-lg">{tr("MowGo AI")}</h3>
-              </div>
-              <p className="text-2xl md:text-3xl font-extrabold text-emerald-500 mb-2">
-                {tr("Unlimited & Conversational")}
-              </p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                {tr("Ask MowGo AI anything about your business — scheduling, invoicing, client lookup, revenue reports. No caps, no limits. Chat naturally.")}
-              </p>
-            </div>
-            <div className="card p-6 md:p-8 border-red-200 dark:border-red-800/50">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-red-400 to-orange-500 flex items-center justify-center shadow-lg shadow-red-500/20">
-                  <AlertTriangle className="w-5 h-5 text-white" aria-hidden="true" />
-                </div>
-                <h3 className="font-bold text-gray-900 dark:text-white text-lg">Ruunly AI</h3>
-              </div>
-              <p className="text-2xl md:text-3xl font-extrabold text-red-500 mb-2">
-                {tr("Capped at 13–26 quotes")}
-              </p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                {tr("Ruunly Starter limits you to 13 AI-generated quotes per month. Pro gets 26. Hit the cap? You're generating quotes by hand.")}
-              </p>
-            </div>
-          </div>
-        </FadeIn>
       </section>
 
       {/* CTA */}
