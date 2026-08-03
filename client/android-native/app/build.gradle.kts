@@ -88,8 +88,8 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // Supabase
-    implementation(platform(libs.supabase.bom))
+    // Supabase (no BOM — versions pinned in catalog)
+    implementation(libs.supabase.core)
     implementation(libs.supabase.auth)
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.realtime)
