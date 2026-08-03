@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "189790164114",
+    "project_id": "mowgo-e3ce3",
+    "storage_bucket": "mowgo-e3ce3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189790164114:android:80d5d9c2e26444b5a8c24b",
+        "android_client_info": {
+          "package_name": "com.mowgo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2huOUP1n8ZeEVWN4M3li6Id2GWDjFMs4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
