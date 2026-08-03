@@ -305,7 +305,7 @@ fun NewJobDialog(
 }
 
 @Composable
-private fun ClientPickerDialog(
+fun ClientPickerDialog(
     clients: List<Client>,
     onSelect: (Client) -> Unit,
     onDismiss: () -> Unit,
