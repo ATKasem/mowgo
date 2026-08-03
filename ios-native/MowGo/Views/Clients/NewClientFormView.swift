@@ -308,11 +308,12 @@ struct NewClientFormView: View {
             address: address.isEmpty ? nil : address,
             phone: phone.isEmpty ? nil : phone,
             email: email.isEmpty ? nil : email,
-            rate: Decimal(string: rate) ?? 0,
+            rate: Decimal(string: rate) ?? (client?.rate ?? 0),
             cleaningNotes: cleaningNotes.isEmpty ? nil : cleaningNotes,
             keyCode: keyCode.isEmpty ? nil : keyCode,
             alarmCode: client?.alarmCode,
             petInstructions: hasPets ? "\(petCount) pet\(petCount == 1 ? "" : "s")\(petInstructions.isEmpty ? "" : ": \(petInstructions)")" : nil,
+            tags: client?.tags,
             createdAt: client?.createdAt
         )
         Task {

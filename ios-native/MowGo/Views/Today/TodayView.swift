@@ -222,8 +222,6 @@ struct TodayView: View {
                 if auth.user?.tier == "crew" {
                     Task { await store.loadTeamMembers() }
                 }
-                // Auto-generate jobs from recurring templates for today
-                Task { await store.generateJobsFromRecurring() }
             }
         }
     }
@@ -549,28 +547,6 @@ struct TodayView: View {
             }
         }
         .padding(.vertical, 4)
-    }
-
-    private var controlBar_OLD: some View {
-        Group {
-            if isToday {
-                Button { showingRainConfirm = true } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "cloud.rain.fill")
-                            .font(.caption)
-                        Text("Rain Delay")
-                            .font(.caption.weight(.medium))
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(MowGoTheme.rainBlue)
-                    .foregroundColor(MowGoTheme.onAccent)
-                    .cornerRadius(20)
-                }
-                .disabled(scheduledCount == 0)
-                .opacity(scheduledCount == 0 ? 0.5 : 1)
-            }
-        }
     }
 
     // MARK: - Empty State

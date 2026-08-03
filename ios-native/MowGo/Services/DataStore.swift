@@ -105,6 +105,7 @@ final class DataStore: ObservableObject {
     @Published var error: String?
 
     private let sb = SupabaseService.shared
+    weak var auth: AuthService?
     let persistence: Persistence?
     private(set) var currentUserId: UUID?
 
@@ -196,6 +197,8 @@ final class DataStore: ObservableObject {
                 persistence?.saveInvoices(loaded.2, currentUserId: currentUserId)
                 // Replay any offline mutations queued while disconnected
                 await syncPendingMutations()
+                // Recurring templates must be loaded before today's jobs are generated.
+                await generateJobsFromRecurring()
                 // Start real-time polling after successful load
                 startPollingIfNeeded(generation: generation)
             } catch is CancellationError {
@@ -517,6 +520,9 @@ final class DataStore: ObservableObject {
         loadTask?.cancel()
         pollingTask?.cancel()
         syncTask?.cancel()
+        for (_, task) in inFlightPhotoUploads { task.cancel() }
+        inFlightPhotoUploads.removeAll()
+        inFlightPhotoIds.removeAll()
         _ = await syncTask?.value
         _ = await loadTask?.value
         _ = await pollingTask?.value
@@ -602,7 +608,7 @@ final class DataStore: ObservableObject {
             jobs.append(job)
             safeEnqueue("job:create", id: job.id, payload: job)
             self.error = "Saved offline — will sync when connected"
-            throw error
+            return
         }
     }
 
@@ -621,6 +627,15 @@ final class DataStore: ObservableObject {
             try await sb.update("jobs", id: job.id, JobStatusPatch(status: status))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
+            }
+            switch status {
+            case .done:
+                await fireWebhookJobCompleted(updated)
+                await firePushJobCompleted(updated)
+            case .skipped:
+                await fireWebhookJobSkipped(updated)
+            default:
+                break
             }
         } catch {
             guard isNetworkError(error) else {
@@ -717,6 +732,7 @@ final class DataStore: ObservableObject {
     }
 
     private var inFlightPhotoUploads: [UUID: Task<Void, Never>] = [:]
+    private var inFlightPhotoIds: [UUID: UUID] = [:]
 
     func updateJobPhoto(jobId: UUID, url: String) async {
         // Cancel any in-flight upload for this job — only the latest photo wins.
@@ -724,6 +740,7 @@ final class DataStore: ObservableObject {
         guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
         jobs[idx].photoUrl = url
 
+        let uploadId = UUID()
         let task = Task {
             guard await canSync() else {
                 safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
@@ -742,8 +759,12 @@ final class DataStore: ObservableObject {
             }
         }
         inFlightPhotoUploads[jobId] = task
+        inFlightPhotoIds[jobId] = uploadId
         await task.value
-        inFlightPhotoUploads[jobId] = nil
+        if inFlightPhotoIds[jobId] == uploadId {
+            inFlightPhotoUploads[jobId] = nil
+            inFlightPhotoIds[jobId] = nil
+        }
     }
 
     func toggleJobStatus(_ job: Job) async throws {
@@ -779,6 +800,7 @@ final class DataStore: ObservableObject {
     }
 
     private func firePushRainDelay(_ jobs: [Job], date: String) async {
+        guard UserDefaults.standard.object(forKey: "rainDelayAlerts") as? Bool ?? true else { return }
         guard let userId = self.currentUserId else { return }
         let count = jobs.count
         let f = DateFormatter()
@@ -866,7 +888,7 @@ final class DataStore: ObservableObject {
             recurringJobs.append(template)
             safeEnqueue("recurring:create", id: template.id, payload: template)
             self.error = "Saved offline — will sync when connected"
-            throw error
+            return
         }
     }
 
@@ -936,7 +958,7 @@ final class DataStore: ObservableObject {
         // allowing — the limit applies on next load when tier is confirmed.
         let freeClientLimit = 5
         let freeTiers: [String?] = ["", "free"]
-        let ownerTier = teamMembers.first(where: { $0.role == "owner" })?.tier
+        let ownerTier = teamMembers.first(where: { $0.role == "owner" })?.tier ?? auth?.user?.tier
         if freeTiers.contains(ownerTier) && clients.count >= freeClientLimit {
             throw DataStoreError.freeTierLimit("Free plan is limited to \(freeClientLimit) clients. Upgrade to Solo or Crew for unlimited.")
         }
@@ -973,7 +995,7 @@ final class DataStore: ObservableObject {
             clients.append(client)
             safeEnqueue("client:create", id: client.id, payload: client)
             self.error = "Saved offline — will sync when connected"
-            throw error
+            return
         }
     }
 
@@ -1203,10 +1225,19 @@ final class DataStore: ObservableObject {
                 try? await Task.sleep(for: .seconds(15))
                 guard !Task.isCancelled, await sb.isAuthenticated else { continue }
                 do {
-                    let latest = try await sb.fetchJobs()
+                    async let latestJobs = sb.fetchJobs()
+                    async let latestClients: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
+                    async let latestInvoices = sb.fetchInvoices()
+                    let (latest, clients, invoices) = try await (latestJobs, latestClients, latestInvoices)
                     guard !Task.isCancelled, self.loadGeneration == generation else { return }
                     if latest.map(\.id) != self.jobs.map(\.id) || latest != self.jobs {
                         self.jobs = latest
+                    }
+                    if clients != self.clients {
+                        self.clients = clients
+                    }
+                    if invoices != self.invoices {
+                        self.invoices = invoices
                     }
                 } catch {
                     // Silently skip — next tick will retry

@@ -142,7 +142,6 @@ struct LoginView: View {
                     Spacer().frame(minHeight: 40)
                 }
                 .padding(.horizontal, 24)
-                .frame(minHeight: UIScreen.main.bounds.height * 0.85)
             }
             .scrollDismissesKeyboard(.interactively)
             .sheet(isPresented: $showResetPassword) {

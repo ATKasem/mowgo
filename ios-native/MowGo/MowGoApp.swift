@@ -88,6 +88,7 @@ struct MowGoApp: App {
             }
             .task(id: authLoadState) {
                 guard !auth.isLoading else { return }
+                store.auth = auth
                 if auth.isAuthenticated {
                     await store.loadAll()
                     // Register for push notifications after authentication

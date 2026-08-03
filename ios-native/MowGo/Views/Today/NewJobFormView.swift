@@ -120,7 +120,8 @@ struct NewJobFormView: View {
                     Button("Save") { save() }
                         .disabled(
                             clientId == nil ||
-                            isSaving
+                            isSaving ||
+                            (repeatFrequency != nil && selectedDays.isEmpty)
                         )
                 }
             }
@@ -189,7 +190,13 @@ struct NewJobFormView: View {
                         isActive: true,
                         startDate: date
                     )
-                    try await store.createRecurringJob(template)
+                    do {
+                        try await store.createRecurringJob(template)
+                    } catch {
+                        // Keep job/template creation atomic from the form's perspective.
+                        try? await store.deleteJob(job)
+                        throw error
+                    }
                 }
 
                 dismiss()

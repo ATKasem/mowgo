@@ -47,7 +47,9 @@ actor SupabaseService {
             try await refreshAccessToken()
             return isAuthenticated
         } catch {
-            await signOut()
+            if isPermanentRefreshFailure(error) {
+                await signOut()
+            }
             return false
         }
     }
@@ -137,6 +139,8 @@ actor SupabaseService {
     }
 
     func signOut() async {
+        refreshTask?.cancel()
+        refreshTask = nil
         _cachedUserId = nil
         token = nil
         refreshToken = nil
@@ -265,7 +269,9 @@ actor SupabaseService {
             try await refreshAccessToken()
             return isAuthenticated
         } catch {
-            await signOut()
+            if isPermanentRefreshFailure(error) {
+                await signOut()
+            }
             return false
         }
     }
@@ -287,7 +293,9 @@ actor SupabaseService {
             do {
                 try await existing.value
             } catch {
-                await signOut()
+                if isPermanentRefreshFailure(error) {
+                    await signOut()
+                }
                 throw error
             }
             // After the in-flight refresh, check if we now have a valid token
@@ -304,6 +312,7 @@ actor SupabaseService {
             )
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             if let accessToken = json?["access_token"] as? String {
+                try Task.checkCancellation()
                 token = accessToken
                 refreshToken = json?["refresh_token"] as? String
                 if let expiresIn = json?["expires_in"] as? Double {
@@ -318,9 +327,19 @@ actor SupabaseService {
         do {
             try await refreshTask?.value
         } catch {
-            await signOut()
+            if isPermanentRefreshFailure(error) {
+                await signOut()
+            }
             throw error
         }
+    }
+
+    private func isPermanentRefreshFailure(_ error: Error) -> Bool {
+        if let supabaseError = error as? SupabaseError,
+           case .httpStatus(let statusCode, _) = supabaseError {
+            return statusCode == 401 || statusCode == 403
+        }
+        return error is AuthError
     }
 
     // MARK: - Photo Upload

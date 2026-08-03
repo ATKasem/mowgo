@@ -83,8 +83,9 @@ final class AuthService: ObservableObject {
     func signOut() async {
         isAuthenticated = false
         user = nil
-        await sb.signOut()
         ChatService.shared.clearOnSignOut()
+        PushNotificationService.shared.clearDeviceToken()
+        await sb.signOut()
     }
 
     func resetPassword(email: String) async {
