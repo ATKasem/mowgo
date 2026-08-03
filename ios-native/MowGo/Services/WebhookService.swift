@@ -55,13 +55,16 @@ actor WebhookService {
     func jobCompleted(_ job: Job, userId: UUID) async {
         let alertsEnabled = UserDefaults.standard.object(forKey: "jobCompletionAlerts") as? Bool ?? true
         guard alertsEnabled else { return }
-        await fire(userId: userId, event: "job.done", payload: [
+        await fire(userId: userId, event: "job.completed", payload: [
             "job_id": job.id.uuidString,
+            "title": job.title,
             "job_title": job.title,
+            "client_id": job.clientId?.uuidString ?? "",
             "client_name": job.clientName ?? "",
             "client_email": job.clients?.email ?? "",
             "client_phone": job.clients?.phone ?? "",
             "scheduled_date": job.scheduledDate,
+            "status": "done",
             "completed_at": ISO8601DateFormatter().string(from: Date())
         ])
     }

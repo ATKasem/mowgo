@@ -30,7 +30,7 @@ import com.mowgo.app.BuildConfig
 import com.mowgo.app.data.SettingsRepository
 import com.mowgo.app.data.model.Profile
 
-private enum class MoreDestination { ROOT, PROFILE, NOTIFICATIONS, APPEARANCE, BILLING }
+private enum class MoreDestination { ROOT, PROFILE, NOTIFICATIONS, APPEARANCE, BILLING, INTEGRATIONS }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +76,7 @@ fun MoreScreen(
             billingUrlHandled = viewModel::billingUrlHandled,
             billingUrlFailed = viewModel::billingUrlFailed,
         )
+        MoreDestination.INTEGRATIONS -> IntegrationsScreen { destination = MoreDestination.ROOT }
     }
 }
 
@@ -119,6 +120,10 @@ private fun MoreRootScreen(
                     SettingsRow(Icons.Default.Contrast, "Appearance", appearance.replaceFirstChar { it.titlecase() }) { navigate(MoreDestination.APPEARANCE) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
                     SettingsRow(Icons.Default.CreditCard, "Billing", tierLabel(state.profile?.tier)) { navigate(MoreDestination.BILLING) }
+                    if (state.profile?.tier == "solo" || state.profile?.tier == "crew") {
+                        HorizontalDivider(Modifier.padding(start = 56.dp))
+                        SettingsRow(Icons.Default.Link, "Integrations", "Zapier, Make, n8n webhooks") { navigate(MoreDestination.INTEGRATIONS) }
+                    }
                 }
                 SectionLabel("About")
                 Card { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

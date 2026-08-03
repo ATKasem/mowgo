@@ -6,6 +6,7 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 /**
  * Repository for Invoice and extended Client operations.
@@ -61,15 +62,31 @@ class InvoiceRepository {
             return
         }
 
+        val invoice = SupabaseClientProvider.client.from("invoices").select {
+            filter { eq("id", invoiceId) }
+        }.decodeSingle<Invoice>()
+        val paidAt = Instant.now().toString()
+        val client = invoice.clientId?.let { clientId ->
+            SupabaseClientProvider.client.from("clients").select {
+                filter { eq("id", clientId) }
+            }.decodeList<Client>().firstOrNull()
+        }
         SupabaseClientProvider.client.from("invoices")
             .update(
                 mapOf(
                     "status" to Invoice.STATUS_PAID,
-                    "paid_at" to Instant.now().toString(),
+                    "paid_at" to paidAt,
                 )
             ) {
                 filter { eq("id", invoiceId) }
             }
+        WebhookService.fire("invoice.paid", mapOf(
+            "invoice_id" to invoice.id,
+            "client_id" to (invoice.clientId ?: ""),
+            "client_name" to (client?.name ?: ""),
+            "amount" to invoice.amount.toString(),
+            "paid_at" to paidAt,
+        ))
     }
 
     /** Delete an invoice. */
@@ -96,10 +113,18 @@ class InvoiceRepository {
         }
 
         val userId = getCurrentUserId() ?: throw IllegalStateException("Not authenticated")
-        val clientWithUser = client.copy(userId = userId)
+        val clientWithUser = client.copy(
+            id = client.id.ifBlank { UUID.randomUUID().toString() },
+            userId = userId,
+        )
 
         SupabaseClientProvider.client.from("clients")
             .insert(clientWithUser)
+        WebhookService.fire("customer.created", mapOf(
+            "client_id" to clientWithUser.id, "name" to clientWithUser.name,
+            "address" to (clientWithUser.address ?: ""), "phone" to (clientWithUser.phone ?: ""),
+            "email" to (clientWithUser.email ?: ""), "rate" to clientWithUser.rate.toString(),
+        ))
     }
 
     /** Update an existing client. */

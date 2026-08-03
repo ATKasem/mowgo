@@ -24,7 +24,7 @@ struct SettingsView: View {
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
 
     private enum SettingsDestination: Hashable {
-        case businessProfile, notifications, appearance, billing
+        case businessProfile, notifications, appearance, billing, integrations
     }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -116,6 +116,8 @@ struct SettingsView: View {
                 onCancelSubscription: { showCancelConfirmation = true },
                 onViewPlans: { showSubscription = true }
             )
+        case .integrations:
+            IntegrationsView()
         }
     }
 
@@ -135,6 +137,12 @@ struct SettingsView: View {
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.billing) {
                 SettingsLinkRow(title: "Billing", subtitle: auth.user?.tierLabel ?? "Free", icon: "creditcard.fill")
+            }
+            if isPaidTier {
+                Divider().padding(.leading, 52)
+                NavigationLink(value: SettingsDestination.integrations) {
+                    SettingsLinkRow(title: "Integrations", subtitle: "Zapier, Make, n8n webhooks", icon: "link.circle.fill")
+                }
             }
         }
         .background(theme.surface)

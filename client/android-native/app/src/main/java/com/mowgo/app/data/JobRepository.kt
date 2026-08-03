@@ -7,6 +7,7 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -80,12 +81,21 @@ class JobRepository {
             return
         }
 
+        val job = SupabaseClientProvider.client.from("jobs").select {
+            filter { eq("id", jobId) }
+        }.decodeSingle<Job>()
         SupabaseClientProvider.client.from("jobs")
             .update(
                 mapOf("status" to newStatus)
             ) {
                 filter { eq("id", jobId) }
             }
+        val payload = mapOf(
+            "job_id" to job.id, "title" to job.title, "client_id" to job.clientId,
+            "scheduled_date" to job.scheduledDate, "status" to newStatus,
+        )
+        WebhookService.fire("job.updated", payload)
+        if (newStatus == Job.STATUS_DONE) WebhookService.fire("job.completed", payload)
     }
 
     /** Create a new job. */
@@ -102,10 +112,18 @@ class JobRepository {
         }
 
         val userId = getCurrentUserId() ?: throw IllegalStateException("Not authenticated")
-        val jobWithUser = job.copy(userId = userId)
+        val jobWithUser = job.copy(
+            id = job.id.ifBlank { UUID.randomUUID().toString() },
+            userId = userId,
+        )
 
         SupabaseClientProvider.client.from("jobs")
             .insert(jobWithUser)
+        WebhookService.fire("job.created", mapOf(
+            "job_id" to jobWithUser.id, "title" to jobWithUser.title,
+            "client_id" to jobWithUser.clientId, "scheduled_date" to jobWithUser.scheduledDate,
+            "status" to jobWithUser.status,
+        ))
     }
 
     /** Update an existing job. */
@@ -220,6 +238,11 @@ class JobRepository {
                     filter { eq("id", job.id) }
                 }
         }
+
+        WebhookService.fire("rain.delay.applied", mapOf(
+            "status" to "applied", "from_date" to today, "to_date" to tomorrow,
+            "jobs_moved" to jobsToMove.size.toString(),
+        ))
 
         return jobsToMove.size
     }
