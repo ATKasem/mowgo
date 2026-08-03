@@ -23,6 +23,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Make gradlew executable
+        working-directory: client/android-native
+        run: chmod +x gradlew
+
       - name: Validate Gradle wrapper
         working-directory: client/android-native
         run: ./gradlew --version
