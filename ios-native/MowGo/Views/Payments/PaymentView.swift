@@ -240,9 +240,6 @@ struct SubscriptionPlanCard: View {
         .padding(16)
         .background(theme.surface)
         .cornerRadius(16)
-        .onDisappear {
-            isPurchasing = false
-        }
     }
 
     private func subscribe() async {
@@ -258,8 +255,8 @@ struct SubscriptionPlanCard: View {
             let didOpen = await UIApplication.shared.open(url)
             if !didOpen {
                 self.error = "Could not open checkout."
-                isPurchasing = false
             }
+            isPurchasing = false
         } catch {
             self.error = error.localizedDescription
             isPurchasing = false
