@@ -21,7 +21,12 @@ actor WebhookService {
         ]
 
         // Fire and forget — don't block the UI if webhook fails
-        _ = try? await SupabaseService.shared.requestFunction("send-webhook", body: body)
+        print("[WebhookService] Firing event: \(event)")
+        do {
+            _ = try await SupabaseService.shared.requestFunction("send-webhook", body: body)
+        } catch {
+            print("[WebhookService] Failed to fire event \(event): \(error.localizedDescription)")
+        }
     }
 
     func jobCompleted(_ job: Job, userId: UUID) async {

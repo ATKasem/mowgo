@@ -20,6 +20,7 @@ final class ChatService: ObservableObject {
 
     /// The in-flight send Task — cancelled on sheet dismiss or new send.
     private var currentSendTask: Task<Void, Never>?
+    private var currentSendId: UUID?
 
     struct ChatMessage: Identifiable, Equatable {
         let id: UUID
@@ -93,12 +94,16 @@ final class ChatService: ObservableObject {
         let body: [String: Any] = ["messages": history]
 
         // Store the task so it can be cancelled on sheet dismiss.
+        let sendId = UUID()
         let sendTask = Task { @MainActor in
             do {
                 let data = try await sb.requestFunction("ai-chat", body: body)
                 // Check if cancelled after the await.
                 guard !Task.isCancelled else { return }
                 let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                if json?["reply"] as? String == nil {
+                    print("[ChatService] malformed response body")
+                }
                 let reply = json?["reply"] as? String ?? "Sorry, I couldn't process that."
                 let assistantMsg = ChatMessage(role: .assistant, content: reply)
                 messages.append(assistantMsg)
@@ -110,23 +115,38 @@ final class ChatService: ObservableObject {
                 let errorMsg = ChatMessage(role: .assistant, content: "⚠️ Connection error. Please try again.")
                 messages.append(errorMsg)
             }
-            isLoading = false
-            currentSendTask = nil
+            if currentSendId == sendId {
+                isLoading = false
+                currentSendTask = nil
+                currentSendId = nil
+            }
         }
+        currentSendId = sendId
         currentSendTask = sendTask
         await sendTask.value
     }
 
     /// Cancel any in-flight API call (e.g. when the chat sheet is dismissed).
     func cancelCurrentRequest() {
-        currentSendTask?.cancel()
-        currentSendTask = nil
-        isLoading = false
+        guard let task = currentSendTask, let sendId = currentSendId else { return }
+        task.cancel()
+        if currentSendId == sendId {
+            currentSendTask = nil
+            currentSendId = nil
+            isLoading = false
+        }
     }
 
     func clearChat() {
         cancelCurrentRequest()
         messages.removeAll()
         error = nil
+    }
+
+    func clearOnSignOut() {
+        clearChat()
+        currentSendTask = nil
+        currentSendId = nil
+        isLoading = false
     }
 }

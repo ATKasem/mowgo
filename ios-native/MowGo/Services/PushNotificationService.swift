@@ -16,8 +16,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     @Published var isRegistered = false
     @Published var permissionGranted = false
 
-    // TODO: Set from MowGoApp when auth state changes
-    var currentUserId: UUID?
+    private var currentUserId: UUID?
 
     private let sb = SupabaseService.shared
     private var deviceToken: Data?
@@ -28,6 +27,10 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     }
 
     // MARK: - Registration
+
+    func setCurrentUserId(_ userId: UUID?) {
+        currentUserId = userId
+    }
 
     /// Request notification permission and register for remote notifications.
     /// Call this once after the user is authenticated.
@@ -52,6 +55,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
         self.deviceToken = data
         let tokenString = data.map { String(format: "%02x", $0) }.joined()
         isRegistered = true
+        setCurrentUserId(currentUserId)
         saveDeviceToken(tokenString)
     }
 
@@ -64,7 +68,10 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     // MARK: - Token Storage
 
     private func saveDeviceToken(_ token: String) {
-        guard let userId = currentUserId else { return }
+        guard let userId = currentUserId else {
+            print("[PushNotificationService] Cannot save device token: current user ID is unavailable")
+            return
+        }
         Task {
             do {
                 // Upsert device_token on the user's profile
@@ -77,7 +84,11 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
 
     /// Clear the device token on sign-out.
     func clearDeviceToken() {
-        guard let userId = currentUserId else { return }
+        guard let userId = currentUserId else {
+            deviceToken = nil
+            isRegistered = false
+            return
+        }
         Task {
             try? await sb.updateDeviceToken(userId: userId, token: nil)
         }
@@ -93,6 +104,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     ///   - title: Notification title.
     ///   - body: Notification body text.
     func sendPush(userId: UUID, title: String, body: String) async {
+        // Trust boundary: callers must ensure userId is authorized for the authenticated session.
         do {
             _ = try await sb.requestFunction("send-push", body: [
                 "userId": userId.uuidString,

@@ -92,14 +92,17 @@ struct MowGoApp: App {
                     await store.loadAll()
                     // Register for push notifications after authentication
                     await MainActor.run {
+                        PushNotificationService.shared.setCurrentUserId(store.currentUserId)
                         PushNotificationService.shared.registerForPushNotifications()
                     }
                 } else {
                     // Clear device token when signed out
                     await MainActor.run {
+                        PushNotificationService.shared.setCurrentUserId(store.currentUserId)
                         PushNotificationService.shared.clearDeviceToken()
                     }
                     await store.clear()
+                    ChatService.shared.clearOnSignOut()
                 }
             }
             .modelContainer(Self.modelContainer)
