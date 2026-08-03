@@ -41,6 +41,9 @@ data class Job(
 
     @SerialName("notes")
     val notes: String? = null,
+
+    @SerialName("recurrence_rule")
+    val recurrenceRule: String? = null,
 ) {
     companion object {
         const val STATUS_SCHEDULED = "scheduled"

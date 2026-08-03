@@ -18,6 +18,7 @@ data class JobWithClient(
     val routeOrder: Int? get() = job.routeOrder
     val notes: String? get() = job.notes
     val assignedTo: String? get() = job.assignedTo
+    val recurrenceRule: String? get() = job.recurrenceRule
     val clientId: String get() = job.clientId
     val userId: String get() = job.userId
 }

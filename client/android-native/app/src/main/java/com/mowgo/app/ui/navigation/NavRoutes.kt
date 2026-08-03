@@ -8,6 +8,7 @@ object NavRoutes {
     const val LOGIN = "login"
 
     // Bottom nav tabs
+    const val DASHBOARD = "dashboard"
     const val TODAY = "today"
     const val JOBS = "jobs"
     const val CLIENTS = "clients"

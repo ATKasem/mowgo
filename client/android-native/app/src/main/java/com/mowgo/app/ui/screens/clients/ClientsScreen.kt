@@ -355,7 +355,7 @@ private fun DetailRow(
 // ── Client Form Dialog ──────────────────────────────────────────────────
 
 @Composable
-private fun ClientFormDialog(
+fun ClientFormDialog(
     title: String,
     initialClient: Client? = null,
     onDismiss: () -> Unit,

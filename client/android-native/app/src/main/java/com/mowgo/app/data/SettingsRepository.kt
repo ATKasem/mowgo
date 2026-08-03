@@ -24,4 +24,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun setAppearanceMode(value: String) { context.dataStore.edit { it[appearanceKey] = value } }
     suspend fun setJobCompletionAlerts(value: Boolean) { context.dataStore.edit { it[completionKey] = value } }
     suspend fun setRainDelayAlerts(value: Boolean) { context.dataStore.edit { it[rainKey] = value } }
+
+    /** Clear account-specific notification prefs so a signed-out user's settings don't leak to the next account. */
+    suspend fun clearNotificationPrefs() {
+        context.dataStore.edit {
+            it.remove(completionKey)
+            it.remove(rainKey)
+        }
+    }
 }

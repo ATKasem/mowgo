@@ -16,6 +16,7 @@ import com.mowgo.app.ui.screens.jobs.JobsScreen
 import com.mowgo.app.ui.screens.clients.ClientsScreen
 import com.mowgo.app.ui.screens.invoices.InvoicesScreen
 import com.mowgo.app.ui.screens.more.MoreScreen
+import com.mowgo.app.ui.screens.dashboard.DashboardScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,9 +71,22 @@ fun MainScreen(onSignedOut: () -> Unit = {}) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = NavRoutes.TODAY,
+            startDestination = NavRoutes.DASHBOARD,
             modifier = Modifier.padding(innerPadding),
         ) {
+            composable(NavRoutes.DASHBOARD) {
+                DashboardScreen(
+                    onNavigateToTab = { route ->
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
             composable(NavRoutes.TODAY) { TodayScreen() }
             composable(NavRoutes.JOBS) { JobsScreen() }
             composable(NavRoutes.CLIENTS) { ClientsScreen() }

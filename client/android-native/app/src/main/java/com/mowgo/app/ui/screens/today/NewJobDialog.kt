@@ -286,9 +286,11 @@ fun NewJobDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
                             onClick = {
-                                val clientId = selectedClient?.id ?: return@Button
-                                val routeOrder = routeOrderText.toIntOrNull()
-                                onCreate(title, clientId, selectedDate, selectedTime, notes.ifBlank { null }, routeOrder)
+                                val clientId = selectedClient?.id
+                                if (clientId != null) {
+                                    val routeOrder = routeOrderText.toIntOrNull()
+                                    onCreate(title, clientId, selectedDate, selectedTime, notes.ifBlank { null }, routeOrder)
+                                }
                             },
                             enabled = title.isNotBlank() && selectedClient != null,
                             colors = ButtonDefaults.buttonColors(

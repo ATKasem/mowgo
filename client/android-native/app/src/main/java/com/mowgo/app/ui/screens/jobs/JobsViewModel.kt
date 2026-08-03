@@ -25,20 +25,29 @@ class JobsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState: StateFlow<JobsUiState> = _uiState.asStateFlow()
 
+    // Generation counter: only the latest load() may write results, so a slow
+    // refresh can't overwrite newer state from a post-mutation reload.
+    private var loadGeneration = 0
+
     init { load() }
 
     fun load() {
+        val generation = ++loadGeneration
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val jobs = repository.loadJobs()
                 val clients = repository.loadClients()
-                _uiState.value = _uiState.value.copy(isLoading = false, jobs = jobs, clients = clients)
+                if (generation == loadGeneration) {
+                    _uiState.value = _uiState.value.copy(isLoading = false, jobs = jobs, clients = clients)
+                }
             } catch (error: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = error.message ?: "Failed to load jobs",
-                )
+                if (generation == loadGeneration) {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to load jobs",
+                    )
+                }
             }
         }
     }

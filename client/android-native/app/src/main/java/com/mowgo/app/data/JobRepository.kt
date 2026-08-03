@@ -7,6 +7,8 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Repository for Job and Client data.
@@ -127,6 +129,28 @@ class JobRepository {
             }
     }
 
+    /** Unassign every job currently allocated to a removed crew member. */
+    suspend fun unassignJobsFromMember(memberId: String) {
+        if (!SupabaseClientProvider.isConfigured) {
+            demoJobsMutable = demoJobsMutable.map { jobWithClient ->
+                if (jobWithClient.assignedTo == memberId) {
+                    jobWithClient.copy(job = jobWithClient.job.copy(assignedTo = null))
+                } else {
+                    jobWithClient
+                }
+            }
+            return
+        }
+
+        val jobs = loadJobs().filter { it.assignedTo == memberId }
+        for (job in jobs) {
+            SupabaseClientProvider.client.from("jobs")
+                .update(JobAssignedPatch(assignedTo = null)) {
+                    filter { eq("id", job.id) }
+                }
+        }
+    }
+
     /**
      * Move all today's scheduled/in_progress jobs to tomorrow (rain delay).
      * Returns the count of jobs moved.
@@ -236,6 +260,7 @@ class JobRepository {
                         scheduledTime = "08:00",
                         status = Job.STATUS_DONE,
                         routeOrder = 0,
+                        recurrenceRule = "weekly",
                     ),
                     clientName = "Smith Residence",
                     clientRate = 45.0,
@@ -283,6 +308,7 @@ class JobRepository {
                         scheduledTime = "13:00",
                         status = Job.STATUS_SCHEDULED,
                         routeOrder = 3,
+                        recurrenceRule = "biweekly",
                     ),
                     clientName = "Smith Residence",
                     clientRate = 45.0,
@@ -293,3 +319,8 @@ class JobRepository {
         return demoJobsMutable
     }
 }
+
+@Serializable
+private data class JobAssignedPatch(
+    @SerialName("assigned_to") val assignedTo: String?,
+)
