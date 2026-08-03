@@ -1,7 +1,10 @@
 package com.mowgo.app
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,11 +21,15 @@ import com.mowgo.app.ui.screens.auth.LoginScreen
 import com.mowgo.app.ui.screens.splash.SplashScreen
 import com.mowgo.app.ui.theme.MowGoTheme
 import com.mowgo.app.data.SettingsRepository
+import com.mowgo.app.push.FcmService
 import com.stripe.android.PaymentConfiguration
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class MowGoActivity : ComponentActivity() {
     private val settingsDeepLinkEvent = MutableStateFlow(0L)
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +47,10 @@ class MowGoActivity : ComponentActivity() {
             }
             MowGoTheme(darkTheme = darkTheme) {
                 val deepLinkEvent by settingsDeepLinkEvent.collectAsState()
-                MowGoNavHost(settingsDeepLinkEvent = deepLinkEvent)
+                MowGoNavHost(
+                    settingsDeepLinkEvent = deepLinkEvent,
+                    onAuthenticated = ::registerForPushNotifications,
+                )
             }
         }
     }
@@ -57,10 +67,20 @@ class MowGoActivity : ComponentActivity() {
             settingsDeepLinkEvent.value = settingsDeepLinkEvent.value + 1
         }
     }
+
+    private fun registerForPushNotifications() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        FcmService.registerCurrentToken()
+    }
 }
 
 @Composable
-fun MowGoNavHost(settingsDeepLinkEvent: Long = 0L) {
+fun MowGoNavHost(
+    settingsDeepLinkEvent: Long = 0L,
+    onAuthenticated: () -> Unit = {},
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -94,6 +114,9 @@ fun MowGoNavHost(settingsDeepLinkEvent: Long = 0L) {
         }
 
         composable("main") {
+            LaunchedEffect(Unit) {
+                onAuthenticated()
+            }
             MainScreen(
                 settingsDeepLinkEvent = settingsDeepLinkEvent,
                 onSignedOut = {
