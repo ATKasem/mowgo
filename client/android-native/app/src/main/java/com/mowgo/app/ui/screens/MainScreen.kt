@@ -17,6 +17,7 @@ import com.mowgo.app.ui.screens.clients.ClientsScreen
 import com.mowgo.app.ui.screens.invoices.InvoicesScreen
 import com.mowgo.app.ui.screens.more.MoreScreen
 import com.mowgo.app.ui.screens.dashboard.DashboardScreen
+import com.mowgo.app.ui.screens.chat.ChatScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,14 +85,23 @@ fun MainScreen(onSignedOut: () -> Unit = {}) {
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    onOpenChat = { navController.navigate(NavRoutes.CHAT) },
                 )
             }
             composable(NavRoutes.TODAY) { TodayScreen() }
             composable(NavRoutes.JOBS) { JobsScreen() }
             composable(NavRoutes.CLIENTS) { ClientsScreen() }
             composable(NavRoutes.INVOICES) { InvoicesScreen() }
-            composable(NavRoutes.MORE) { MoreScreen(onSignedOut = onSignedOut) }
+            composable(NavRoutes.MORE) {
+                MoreScreen(
+                    onSignedOut = onSignedOut,
+                    onOpenChat = { navController.navigate(NavRoutes.CHAT) },
+                )
+            }
+            composable(NavRoutes.CHAT) {
+                ChatScreen(onBack = { navController.popBackStack() })
+            }
         }
     }
 }

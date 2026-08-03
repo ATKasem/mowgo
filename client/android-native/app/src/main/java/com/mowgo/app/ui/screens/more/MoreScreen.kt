@@ -32,7 +32,10 @@ private enum class MoreDestination { ROOT, PROFILE, NOTIFICATIONS, APPEARANCE, B
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoreScreen(onSignedOut: () -> Unit = {}) {
+fun MoreScreen(
+    onSignedOut: () -> Unit = {},
+    onOpenChat: () -> Unit = {},
+) {
     val context = LocalContext.current
     val factory = remember(context) {
         object : ViewModelProvider.Factory {
@@ -50,7 +53,7 @@ fun MoreScreen(onSignedOut: () -> Unit = {}) {
 
     BackHandler(enabled = destination != MoreDestination.ROOT) { destination = MoreDestination.ROOT }
     when (destination) {
-        MoreDestination.ROOT -> MoreRootScreen(state, appearance, viewModel::loadProfile, { destination = it }, viewModel, onSignedOut)
+        MoreDestination.ROOT -> MoreRootScreen(state, appearance, viewModel::loadProfile, { destination = it }, viewModel, onSignedOut, onOpenChat)
         MoreDestination.PROFILE -> BusinessProfileScreen(state, { destination = MoreDestination.ROOT }, viewModel::updateProfile, viewModel::dismissSaveMessage)
         MoreDestination.NOTIFICATIONS -> NotificationSettingsScreen(completionAlerts, rainAlerts, { destination = MoreDestination.ROOT }, viewModel::setCompletionAlerts, viewModel::setRainAlerts)
         MoreDestination.APPEARANCE -> AppearanceSettingsScreen(appearance, { destination = MoreDestination.ROOT }, viewModel::setAppearance)
@@ -67,6 +70,7 @@ private fun MoreRootScreen(
     navigate: (MoreDestination) -> Unit,
     viewModel: MoreViewModel,
     onSignedOut: () -> Unit,
+    onOpenChat: () -> Unit,
 ) {
     var confirmSignOut by remember { mutableStateOf(false) }
     if (confirmSignOut) {
@@ -91,6 +95,8 @@ private fun MoreRootScreen(
                 ProfileCard(state.profile)
                 SectionLabel("Business")
                 Card {
+                    SettingsRow(Icons.Default.Chat, "MowGo AI", "Your lawn care business assistant", onOpenChat)
+                    HorizontalDivider(Modifier.padding(start = 56.dp))
                     SettingsRow(Icons.Default.Storefront, "Business Profile", state.profile?.businessName?.takeIf { it.isNotBlank() } ?: "Business name and phone") { navigate(MoreDestination.PROFILE) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
                     SettingsRow(Icons.Default.Notifications, "Notifications", "Job completion and rain alerts") { navigate(MoreDestination.NOTIFICATIONS) }

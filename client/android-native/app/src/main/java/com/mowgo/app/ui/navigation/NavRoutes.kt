@@ -14,4 +14,7 @@ object NavRoutes {
     const val CLIENTS = "clients"
     const val INVOICES = "invoices"
     const val MORE = "more"
+
+    // Routes outside the bottom navigation tabs
+    const val CHAT = "chat"
 }
