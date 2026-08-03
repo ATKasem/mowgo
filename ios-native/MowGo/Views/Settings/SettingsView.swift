@@ -47,6 +47,11 @@ struct SettingsView: View {
                         SectionHeader("Business")
                         settingsLinks
 
+                        if let bookingURL = bookingLink {
+                            SectionHeader("Booking")
+                            BookingLinkRow(url: bookingURL)
+                        }
+
                         SectionHeader("About")
                         appInfoCard
                         signOutButton
@@ -212,6 +217,18 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity).padding()
                 .background(theme.surface).cornerRadius(12)
         }
+    }
+
+    private var bookingLink: URL? {
+        guard let user = auth.user else { return nil }
+        let bid: String
+        if user.role == "owner" {
+            bid = user.id?.uuidString.lowercased() ?? ""
+        } else {
+            bid = user.businessId?.uuidString.lowercased() ?? ""
+        }
+        guard !bid.isEmpty else { return nil }
+        return URL(string: "https://mowgo.pages.dev/#/book/\(bid)")
     }
 
     // MARK: - Helpers
@@ -549,5 +566,65 @@ private struct SectionHeader: View {
             .foregroundColor(.gray)
             .padding(.top, 12)
             .padding(.leading, 4)
+    }
+}
+
+private struct BookingLinkRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let url: URL
+    @State private var showCopied = false
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "link")
+                    .font(.system(size: 16))
+                    .foregroundColor(MowGoTheme.deepGreen)
+                    .frame(width: 28, height: 28)
+                    .background(MowGoTheme.deepGreen.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                Text(url.absoluteString)
+                    .font(.caption)
+                    .foregroundColor(theme.textMuted)
+                    .lineLimit(2)
+                    .textSelection(.enabled)
+
+                Spacer()
+            }
+
+            HStack(spacing: 12) {
+                ShareLink(item: url) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(MowGoTheme.deepGreen)
+                        .cornerRadius(10)
+                }
+
+                Button {
+                    UIPasteboard.general.string = url.absoluteString
+                    showCopied = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        showCopied = false
+                    }
+                } label: {
+                    Label(showCopied ? "Copied!" : "Copy", systemImage: showCopied ? "checkmark" : "doc.on.doc")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(showCopied ? .green : theme.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(theme.surface)
+                        .cornerRadius(10)
+                }
+            }
+        }
+        .padding(14)
+        .background(theme.surface)
+        .cornerRadius(16)
     }
 }
