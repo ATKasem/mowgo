@@ -479,9 +479,11 @@ private fun NewInvoiceDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val clientId = selectedClient?.id ?: return@onClick
-                    val amount = amountText.toDoubleOrNull() ?: return@onClick
-                    onCreate(clientId, amount)
+                    val clientId = selectedClient?.id
+                    val amount = amountText.toDoubleOrNull()
+                    if (clientId != null && amount != null) {
+                        onCreate(clientId, amount)
+                    }
                 },
                 enabled = selectedClient != null && amountText.toDoubleOrNull() != null,
                 colors = ButtonDefaults.buttonColors(
