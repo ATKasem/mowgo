@@ -2,8 +2,9 @@
 //  WebhookService.swift
 //  MowGo
 //
-//  Fires webhook events to the send-webhook Edge Function.
-//  Zapier catches these and handles email/SMS delivery to clients.
+//  Fires webhook events via /api/webhook-dispatch.
+//  The Cloudflare Pages Function looks up webhook_configs for the
+//  authenticated user and delivers to configured URLs (including Zapier).
 //
 
 import Foundation
@@ -11,19 +12,38 @@ import Foundation
 actor WebhookService {
     static let shared = WebhookService()
 
-    /// Fire a webhook event via the send-webhook Edge Function.
-    /// Requires the caller's Supabase auth token to be set on SupabaseService.
+    private static let dispatchURL = URL(string: "https://mowgo.pages.dev/api/webhook-dispatch")!
+
+    /// Fire a webhook event via the /api/webhook-dispatch Pages Function.
+    /// Requires a Supabase access token on SupabaseService.shared.token.
     func fire(userId: UUID, event: String, payload: [String: Any]) async {
+        guard let token = SupabaseService.shared.token, !token.isEmpty else {
+            print("[WebhookService] Skipping \(event) — no auth token (demo mode?)")
+            return
+        }
+
         let body: [String: Any] = [
-            "user_id": userId.uuidString,
             "event": event,
             "payload": payload
         ]
 
-        // Fire and forget — don't block the UI if webhook fails
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else {
+            print("[WebhookService] Failed to serialise body for \(event)")
+            return
+        }
+
+        var request = URLRequest(url: Self.dispatchURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = bodyData
+
         print("[WebhookService] Firing event: \(event)")
         do {
-            _ = try await SupabaseService.shared.requestFunction("send-webhook", body: body)
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse, http.statusCode >= 300 {
+                print("[WebhookService] Event \(event) returned HTTP \(http.statusCode)")
+            }
         } catch {
             print("[WebhookService] Failed to fire event \(event): \(error.localizedDescription)")
         }
