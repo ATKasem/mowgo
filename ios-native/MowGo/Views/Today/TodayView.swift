@@ -580,7 +580,7 @@ struct TodayView: View {
         bannerDismissTask?.cancel()
         notificationMessage = message
         withAnimation { showNotificationBanner = true }
-        bannerDismissTask = Task { @MainActor in
+        bannerDismissTask = Task<Void, Never> { @MainActor in
             try? await Task.sleep(for: .seconds(3))
             guard !Task.isCancelled else { return }
             withAnimation { showNotificationBanner = false }

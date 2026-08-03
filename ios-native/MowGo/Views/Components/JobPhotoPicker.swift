@@ -125,7 +125,7 @@ struct JobPhotoPicker: View {
                     Button {
                         showSourcePicker = false
                         delayedPresentationTask?.cancel()
-                        delayedPresentationTask = Task { @MainActor in
+                        delayedPresentationTask = Task<Void, Never> { @MainActor in
                             try? await Task.sleep(for: .milliseconds(350))
                             guard !Task.isCancelled else { return }
                             showCamera = true
@@ -142,7 +142,7 @@ struct JobPhotoPicker: View {
                     Button {
                         showSourcePicker = false
                         delayedPresentationTask?.cancel()
-                        delayedPresentationTask = Task { @MainActor in
+                        delayedPresentationTask = Task<Void, Never> { @MainActor in
                             try? await Task.sleep(for: .milliseconds(350))
                             guard !Task.isCancelled else { return }
                             showLibraryPicker = true

@@ -301,7 +301,7 @@ actor SupabaseService {
             // After the in-flight refresh, check if we now have a valid token
             guard !isAuthenticated else { return }
         }
-        refreshTask = Task {
+        refreshTask = Task<Void, Error> {
             defer { refreshTask = nil }
             let body: [String: Any] = ["refresh_token": rt]
             let data = try await request(

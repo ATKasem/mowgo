@@ -182,7 +182,7 @@ final class DataStore: ObservableObject {
             invoices = persistence.loadInvoices(currentUserId: currentUserId)
         }
 
-        loadTask = Task {
+        loadTask = Task<Void, Never> {
             do {
                 async let j = sb.fetchJobs()
                 async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
@@ -241,7 +241,7 @@ final class DataStore: ObservableObject {
         defer { isSyncing = false; syncTask = nil }
 
         // Track this sync so clear() can cancel it
-        syncTask = Task { [weak self] in
+        syncTask = Task<Void, Never> { [weak self] in
             await self?.runSync(persistence: persistence)
         }
         await syncTask?.value
@@ -759,7 +759,7 @@ final class DataStore: ObservableObject {
         let uploadId = UUID()
         let previous = photoUploadQueue[jobId]
         photoUploadIds[jobId] = uploadId
-        let task = Task {
+        let task: Task<Void, Never> = Task {
             await previous?.value
             guard !Task.isCancelled else { return }
             guard await canSync() else {
@@ -1243,7 +1243,7 @@ final class DataStore: ObservableObject {
     private func startPollingIfNeeded(generation: Int) {
         guard generation == loadGeneration else { return }
         pollingTask?.cancel()
-        pollingTask = Task { [weak self] in
+        pollingTask = Task<Void, Never> { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(15))

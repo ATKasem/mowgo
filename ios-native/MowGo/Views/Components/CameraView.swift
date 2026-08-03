@@ -70,7 +70,7 @@ struct CameraView: View {
         uploadError = nil
 
         uploadTask?.cancel()
-        uploadTask = Task {
+        uploadTask = Task<Void, Never> {
             do {
                 let url = try await SupabaseService.shared.uploadJobPhoto(
                     jobId: jobId,

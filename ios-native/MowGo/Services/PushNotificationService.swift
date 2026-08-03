@@ -93,7 +93,7 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
             currentUserId = nil
             return nil
         }
-        let task = Task {
+        let task: Task<Void, Never> = Task {
             try? await sb.updateDeviceToken(userId: userId, token: nil)
         }
         clearTokenTask = task
