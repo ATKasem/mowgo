@@ -201,6 +201,8 @@ class JobRepository {
             address = "123 Main St, Edmond, OK",
             phone = "405-555-0101",
             rate = 45.0,
+            keyCode = "1234",
+            petInstructions = "Dog is friendly, keep gate closed",
         ),
         Client(
             id = "demo-client-2",
@@ -216,6 +218,7 @@ class JobRepository {
             name = "Williams Estate",
             address = "789 Pine Rd, Edmond, OK",
             rate = 80.0,
+            keyCode = "5678",
         ),
     )
 
