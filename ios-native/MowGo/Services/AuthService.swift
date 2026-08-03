@@ -18,6 +18,7 @@ final class AuthService: ObservableObject {
     @Published var isLoading = true
     @Published var user: UserProfile?
     @Published var error: String?
+    @Published var authMessage: String?
     @Published var resetLoading = false
     @Published var resetMessage: String?
 
@@ -55,6 +56,7 @@ final class AuthService: ObservableObject {
     func signIn(email: String, password: String) async {
         isLoading = true
         error = nil
+        authMessage = nil
         do {
             _ = try await sb.signIn(email: email, password: password)
             isAuthenticated = true
@@ -68,9 +70,10 @@ final class AuthService: ObservableObject {
     func signUp(email: String, password: String) async {
         isLoading = true
         error = nil
+        authMessage = nil
         do {
             try await sb.signUp(email: email, password: password)
-            error = "Check your email to confirm your account."
+            authMessage = "Check your email to confirm your account."
         } catch {
             self.error = error.localizedDescription
         }

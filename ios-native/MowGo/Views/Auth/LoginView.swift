@@ -80,6 +80,13 @@ struct LoginView: View {
                             .multilineTextAlignment(.center)
                             .accessibilityLabel(err)
                     }
+                    if let message = auth.authMessage {
+                        Text(message)
+                            .font(.caption)
+                            .foregroundColor(MowGoTheme.deepGreen)
+                            .multilineTextAlignment(.center)
+                            .accessibilityLabel(message)
+                    }
 
                     // Button
                     Button(action: submit) {

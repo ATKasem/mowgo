@@ -5,6 +5,7 @@
 
 import SwiftUI
 import SwiftData
+import OSLog
 
 @main
 struct MowGoApp: App {
@@ -17,20 +18,31 @@ struct MowGoApp: App {
     @State private var showUpgradeSuccessToast = false
 
     /// SwiftData container for offline cache persistence.
-    /// Falls back to in-memory if the on-disk schema is corrupt.
+    /// Falls back to in-memory if the on-disk schema is corrupt. This loses
+    /// offline durability, so both failures are logged as launch-critical.
     private static let modelContainer: ModelContainer = {
+        let logger = Logger(subsystem: "com.mowgo.app", category: "Persistence")
         let diskConfig = ModelConfiguration(isStoredInMemoryOnly: false)
-        if let container = try? ModelContainer(
-            for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
-            configurations: diskConfig
-        ) {
-            return container
+        do {
+            return try ModelContainer(
+                for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
+                configurations: diskConfig
+            )
+        } catch {
+            logger.fault("Persistent ModelContainer creation failed: \(String(describing: error), privacy: .public)")
         }
+
         let memConfig = ModelConfiguration(isStoredInMemoryOnly: true)
-        return try! ModelContainer(
-            for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
-            configurations: memConfig
-        )
+        do {
+            logger.warning("Proceeding with volatile in-memory storage; offline changes will not survive relaunch.")
+            return try ModelContainer(
+                for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
+                configurations: memConfig
+            )
+        } catch {
+            logger.critical("In-memory ModelContainer creation failed: \(String(describing: error), privacy: .public)")
+            fatalError("MowGo cannot initialize its data store: \(error)")
+        }
     }()
 
     init() {
@@ -87,7 +99,7 @@ struct MowGoApp: App {
                     await MainActor.run {
                         PushNotificationService.shared.clearDeviceToken()
                     }
-                    store.clear()
+                    await store.clear()
                 }
             }
             .modelContainer(Self.modelContainer)

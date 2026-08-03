@@ -26,49 +26,52 @@ final class Persistence {
     // MARK: - Save
 
     /// Replace all cached jobs with the provided list.
-    func saveJobs(_ jobs: [Job]) {
+    func saveJobs(_ jobs: [Job], currentUserId: UUID) {
         do {
-            let existing = try context.fetch(FetchDescriptor<JobCache>())
+            let descriptor = FetchDescriptor<JobCache>(
+                predicate: #Predicate { $0.userId == currentUserId }
+            )
+            let existing = try context.fetch(descriptor)
             for item in existing { context.delete(item) }
+            for job in jobs {
+                context.insert(JobCache(job: job, userId: currentUserId))
+            }
+            try context.save()
         } catch {
-            print("[Persistence] failed to clear cached jobs: \(error)")
-        }
-        for job in jobs {
-            context.insert(JobCache(job: job))
-        }
-        do { try context.save() } catch {
             print("[Persistence] failed to save jobs: \(error)")
         }
     }
 
     /// Replace all cached clients with the provided list.
-    func saveClients(_ clients: [Client]) {
+    func saveClients(_ clients: [Client], currentUserId: UUID) {
         do {
-            let existing = try context.fetch(FetchDescriptor<ClientCache>())
+            let descriptor = FetchDescriptor<ClientCache>(
+                predicate: #Predicate { $0.userId == currentUserId }
+            )
+            let existing = try context.fetch(descriptor)
             for item in existing { context.delete(item) }
+            for client in clients {
+                context.insert(ClientCache(client: client, userId: currentUserId))
+            }
+            try context.save()
         } catch {
-            print("[Persistence] failed to clear cached clients: \(error)")
-        }
-        for client in clients {
-            context.insert(ClientCache(client: client))
-        }
-        do { try context.save() } catch {
             print("[Persistence] failed to save clients: \(error)")
         }
     }
 
     /// Replace all cached invoices with the provided list.
-    func saveInvoices(_ invoices: [Invoice]) {
+    func saveInvoices(_ invoices: [Invoice], currentUserId: UUID) {
         do {
-            let existing = try context.fetch(FetchDescriptor<InvoiceCache>())
+            let descriptor = FetchDescriptor<InvoiceCache>(
+                predicate: #Predicate { $0.userId == currentUserId }
+            )
+            let existing = try context.fetch(descriptor)
             for item in existing { context.delete(item) }
+            for invoice in invoices {
+                context.insert(InvoiceCache(invoice: invoice, userId: currentUserId))
+            }
+            try context.save()
         } catch {
-            print("[Persistence] failed to clear cached invoices: \(error)")
-        }
-        for invoice in invoices {
-            context.insert(InvoiceCache(invoice: invoice))
-        }
-        do { try context.save() } catch {
             print("[Persistence] failed to save invoices: \(error)")
         }
     }
@@ -76,8 +79,11 @@ final class Persistence {
     // MARK: - Load
 
     /// Read cached jobs from SwiftData, reconstructing via stored JSON.
-    func loadJobs() -> [Job] {
-        let descriptor = FetchDescriptor<JobCache>(sortBy: [SortDescriptor(\.routeOrder)])
+    func loadJobs(currentUserId: UUID) -> [Job] {
+        let descriptor = FetchDescriptor<JobCache>(
+            predicate: #Predicate { $0.userId == currentUserId },
+            sortBy: [SortDescriptor(\.routeOrder)]
+        )
         let cached: [JobCache]
         do { cached = try context.fetch(descriptor) } catch {
             print("[Persistence] failed to load jobs: \(error)"); return []
@@ -86,8 +92,11 @@ final class Persistence {
     }
 
     /// Read cached clients from SwiftData.
-    func loadClients() -> [Client] {
-        let descriptor = FetchDescriptor<ClientCache>(sortBy: [SortDescriptor(\.name)])
+    func loadClients(currentUserId: UUID) -> [Client] {
+        let descriptor = FetchDescriptor<ClientCache>(
+            predicate: #Predicate { $0.userId == currentUserId },
+            sortBy: [SortDescriptor(\.name)]
+        )
         let cached: [ClientCache]
         do { cached = try context.fetch(descriptor) } catch {
             print("[Persistence] failed to load clients: \(error)"); return []
@@ -96,8 +105,11 @@ final class Persistence {
     }
 
     /// Read cached invoices from SwiftData.
-    func loadInvoices() -> [Invoice] {
-        let descriptor = FetchDescriptor<InvoiceCache>(sortBy: [SortDescriptor(\.createdAt)])
+    func loadInvoices(currentUserId: UUID) -> [Invoice] {
+        let descriptor = FetchDescriptor<InvoiceCache>(
+            predicate: #Predicate { $0.userId == currentUserId },
+            sortBy: [SortDescriptor(\.createdAt)]
+        )
         let cached: [InvoiceCache]
         do { cached = try context.fetch(descriptor) } catch {
             print("[Persistence] failed to load invoices: \(error)"); return []
@@ -116,7 +128,7 @@ final class Persistence {
     }
 
     /// Enqueue a mutation made while offline for later replay.
-    func enqueueMutation(operation: String, entityId: UUID, payload: Data, userId: UUID?) {
+    func enqueueMutation(operation: String, entityId: UUID, payload: Data, userId: UUID) throws {
         let seq = nextSequence
         nextSequence += 1
         let mutation = PendingMutation(
@@ -127,8 +139,10 @@ final class Persistence {
             userId: userId
         )
         context.insert(mutation)
-        do { try context.save() } catch {
-            print("[Persistence] failed to enqueue mutation: \(error)")
+        do {
+            try context.save()
+        } catch {
+            throw error
         }
     }
 
@@ -154,9 +168,12 @@ final class Persistence {
     }
 
     /// Clear all pending mutations (e.g. on sign-out).
-    func clearAllMutations() {
+    func clearAllMutations(currentUserId: UUID) {
         do {
-            let mutations = try context.fetch(FetchDescriptor<PendingMutation>())
+            let descriptor = FetchDescriptor<PendingMutation>(
+                predicate: #Predicate { $0.userId == currentUserId }
+            )
+            let mutations = try context.fetch(descriptor)
             for item in mutations { context.delete(item) }
             try context.save()
         } catch {
@@ -168,29 +185,35 @@ final class Persistence {
 
     /// Returns true if any cached data exists (used to decide whether to
     /// show cached data immediately before a network round-trip).
-    func hasCachedData() -> Bool {
-        let jobCount = (try? context.fetch(FetchDescriptor<JobCache>()).count) ?? 0
-        let clientCount = (try? context.fetch(FetchDescriptor<ClientCache>()).count) ?? 0
-        let invoiceCount = (try? context.fetch(FetchDescriptor<InvoiceCache>()).count) ?? 0
+    func hasCachedData(currentUserId: UUID) -> Bool {
+        let jobs = FetchDescriptor<JobCache>(predicate: #Predicate { $0.userId == currentUserId })
+        let clients = FetchDescriptor<ClientCache>(predicate: #Predicate { $0.userId == currentUserId })
+        let invoices = FetchDescriptor<InvoiceCache>(predicate: #Predicate { $0.userId == currentUserId })
+        let jobCount = (try? context.fetch(jobs).count) ?? 0
+        let clientCount = (try? context.fetch(clients).count) ?? 0
+        let invoiceCount = (try? context.fetch(invoices).count) ?? 0
         return jobCount > 0 || clientCount > 0 || invoiceCount > 0
     }
 
     /// Clear all cached data (e.g. on sign-out).
-    func clearAll() {
+    func clearAll(currentUserId: UUID) {
         do {
-            let jobs = try context.fetch(FetchDescriptor<JobCache>())
+            let descriptor = FetchDescriptor<JobCache>(predicate: #Predicate { $0.userId == currentUserId })
+            let jobs = try context.fetch(descriptor)
             for item in jobs { context.delete(item) }
         } catch {
             print("[Persistence] failed to clear jobs: \(error)")
         }
         do {
-            let clients = try context.fetch(FetchDescriptor<ClientCache>())
+            let descriptor = FetchDescriptor<ClientCache>(predicate: #Predicate { $0.userId == currentUserId })
+            let clients = try context.fetch(descriptor)
             for item in clients { context.delete(item) }
         } catch {
             print("[Persistence] failed to clear clients: \(error)")
         }
         do {
-            let invoices = try context.fetch(FetchDescriptor<InvoiceCache>())
+            let descriptor = FetchDescriptor<InvoiceCache>(predicate: #Predicate { $0.userId == currentUserId })
+            let invoices = try context.fetch(descriptor)
             for item in invoices { context.delete(item) }
         } catch {
             print("[Persistence] failed to clear invoices: \(error)")
@@ -198,6 +221,6 @@ final class Persistence {
         do { try context.save() } catch {
             print("[Persistence] failed to save after clear: \(error)")
         }
-        clearAllMutations()
+        clearAllMutations(currentUserId: currentUserId)
     }
 }

@@ -248,7 +248,7 @@ struct TeamDashboardRow: Identifiable {
 @Model
 final class JobCache {
     @Attribute(.unique) var id: UUID
-    var userId: UUID?
+    var userId: UUID
     var clientId: UUID?
     var title: String
     var scheduledDate: String
@@ -263,9 +263,9 @@ final class JobCache {
     var jsonData: Data          // full JSON backup for faithful reconstruction
     var cachedAt: Date
 
-    init(job: Job) {
+    init(job: Job, userId: UUID) {
         self.id = job.id
-        self.userId = job.userId
+        self.userId = userId
         self.clientId = job.clientId
         self.title = job.title
         self.scheduledDate = job.scheduledDate
@@ -297,7 +297,7 @@ final class JobCache {
 @Model
 final class ClientCache {
     @Attribute(.unique) var id: UUID
-    var userId: UUID?
+    var userId: UUID
     var name: String
     var address: String?
     var phone: String?
@@ -310,9 +310,9 @@ final class ClientCache {
     var jsonData: Data
     var cachedAt: Date
 
-    init(client: Client) {
+    init(client: Client, userId: UUID) {
         self.id = client.id
-        self.userId = client.userId
+        self.userId = userId
         self.name = client.name
         self.address = client.address
         self.phone = client.phone
@@ -347,11 +347,13 @@ final class PendingMutation {
     var operation: String       // "job:create", "job:status", "job:delete", etc.
     var entityId: UUID          // id of the affected entity
     var payload: Data           // JSON-encoded mutation payload
-    var sequence: Int           // monotonically increasing for deterministic FIFO
-    var userId: UUID?           // the authenticated user who created this mutation
+    // UserDefaults provides local FIFO ordering only; values are not globally unique
+    // across devices or independent app installations.
+    var sequence: Int
+    var userId: UUID            // the authenticated user who created this mutation
     var createdAt: Date
 
-    init(id: UUID = UUID(), operation: String, entityId: UUID, payload: Data, sequence: Int, userId: UUID?, createdAt: Date = Date()) {
+    init(id: UUID = UUID(), operation: String, entityId: UUID, payload: Data, sequence: Int, userId: UUID, createdAt: Date = Date()) {
         self.id = id
         self.operation = operation
         self.entityId = entityId
@@ -365,7 +367,7 @@ final class PendingMutation {
 @Model
 final class InvoiceCache {
     @Attribute(.unique) var id: UUID
-    var userId: UUID?
+    var userId: UUID
     var clientId: UUID?
     var jobId: UUID?
     var amount: Double
@@ -378,9 +380,9 @@ final class InvoiceCache {
     var jsonData: Data
     var cachedAt: Date
 
-    init(invoice: Invoice) {
+    init(invoice: Invoice, userId: UUID) {
         self.id = invoice.id
-        self.userId = invoice.userId
+        self.userId = userId
         self.clientId = invoice.clientId
         self.jobId = invoice.jobId
         self.amount = NSDecimalNumber(decimal: invoice.amount).doubleValue

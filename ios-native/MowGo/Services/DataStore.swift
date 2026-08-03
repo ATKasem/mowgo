@@ -126,21 +126,12 @@ final class DataStore: ObservableObject {
         isLoading = true
         error = nil
 
-        // ---- Cache-first: show cached data instantly ----
-        if let persistence, persistence.hasCachedData() {
-            self.jobs = persistence.loadJobs()
-            self.clients = persistence.loadClients()
-            self.invoices = persistence.loadInvoices()
-        }
-
         let isConfigured = await sb.isConfigured
         guard !Task.isCancelled, generation == loadGeneration else { return }
         guard isConfigured else {
             // Supabase not configured — if we have cached data, show it;
             // otherwise surface the error.
-            if persistence?.hasCachedData() != true {
-                self.error = "Supabase not configured. Please check your settings."
-            }
+            self.error = "Supabase not configured. Please check your settings."
             isLoading = false
             return
         }
@@ -169,7 +160,7 @@ final class DataStore: ObservableObject {
         } catch {
             self.currentUserId = nil
         }
-        guard self.currentUserId != nil else {
+        guard let currentUserId = self.currentUserId else {
             jobs = []
             clients = []
             invoices = []
@@ -177,6 +168,13 @@ final class DataStore: ObservableObject {
             isLoading = false
             self.error = "Unable to load your account. Please try again."
             return
+        }
+
+        // Cache reads are safe only after the authenticated owner is known.
+        if let persistence, persistence.hasCachedData(currentUserId: currentUserId) {
+            jobs = persistence.loadJobs(currentUserId: currentUserId)
+            clients = persistence.loadClients(currentUserId: currentUserId)
+            invoices = persistence.loadInvoices(currentUserId: currentUserId)
         }
 
         loadTask = Task {
@@ -189,9 +187,9 @@ final class DataStore: ObservableObject {
                 guard !Task.isCancelled, generation == loadGeneration else { return }
                 (jobs, clients, invoices, recurringJobs) = loaded
                 // Persist to local cache for offline fallback
-                persistence?.saveJobs(loaded.0)
-                persistence?.saveClients(loaded.1)
-                persistence?.saveInvoices(loaded.2)
+                persistence?.saveJobs(loaded.0, currentUserId: currentUserId)
+                persistence?.saveClients(loaded.1, currentUserId: currentUserId)
+                persistence?.saveInvoices(loaded.2, currentUserId: currentUserId)
                 // Replay any offline mutations queued while disconnected
                 await syncPendingMutations()
                 // Start real-time polling after successful load
@@ -202,10 +200,10 @@ final class DataStore: ObservableObject {
                 guard !Task.isCancelled, generation == loadGeneration else { return }
                 // Offline fallback: if we have cached data, show it with a
                 // non-blocking informational message instead of a hard error.
-                if let persistence, persistence.hasCachedData() {
-                    self.jobs = persistence.loadJobs()
-                    self.clients = persistence.loadClients()
-                    self.invoices = persistence.loadInvoices()
+                if let persistence, persistence.hasCachedData(currentUserId: currentUserId) {
+                    self.jobs = persistence.loadJobs(currentUserId: currentUserId)
+                    self.clients = persistence.loadClients(currentUserId: currentUserId)
+                    self.invoices = persistence.loadInvoices(currentUserId: currentUserId)
                     self.error = "Showing cached data — pull to refresh when online"
                 } else {
                     self.error = error.localizedDescription
@@ -238,6 +236,7 @@ final class DataStore: ObservableObject {
     }
 
     private func runSync(persistence: Persistence) async {
+        let generation = loadGeneration
         let mutations = persistence.loadPendingMutations()
         guard !mutations.isEmpty else { return }
 
@@ -246,9 +245,9 @@ final class DataStore: ObservableObject {
         // Only replay mutations belonging to the current user
         guard let currentUserId = self.currentUserId else { return }
         let mine = mutations.filter { $0.userId == currentUserId }
-        // Remove mutations from other users (orphaned from a previous session)
+        // Never mutate another user's queue. It may be valid for a later session.
         for stale in mutations where stale.userId != currentUserId {
-            persistence.removeMutation(stale)
+            print("[DataStore] skipping mutation owned by another user: \(stale.id)")
         }
         guard !mine.isEmpty else { return }
 
@@ -275,18 +274,26 @@ final class DataStore: ObservableObject {
 
         // Refresh local state directly (no recursive loadAll) to reflect replayed changes
         if replayedCount > 0 {
+            guard !Task.isCancelled,
+                  generation == loadGeneration,
+                  self.currentUserId == currentUserId else { return }
             do {
-                let j = try await sb.fetchJobs()
-                let c: [Client] = try await sb.fetch("clients", query: ["order": "name.asc"])
-                let i = try await sb.fetchInvoices()
-                let r: [RecurringJob] = try await sb.fetch("recurring_jobs")
+                async let j = sb.fetchJobs()
+                async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
+                async let i = sb.fetchInvoices()
+                async let r: [RecurringJob] = sb.fetch("recurring_jobs")
+                let refreshed = try await (j, c, i, r)
+                guard !Task.isCancelled,
+                      generation == loadGeneration,
+                      self.currentUserId == currentUserId else { return }
+                let (j, c, i, r) = refreshed
                 jobs = j
                 clients = c
                 invoices = i
                 recurringJobs = r
-                persistence.saveJobs(j)
-                persistence.saveClients(c)
-                persistence.saveInvoices(i)
+                persistence.saveJobs(j, currentUserId: currentUserId)
+                persistence.saveClients(c, currentUserId: currentUserId)
+                persistence.saveInvoices(i, currentUserId: currentUserId)
             } catch {
                 print("[DataStore] post-replay refresh failed: \(error)")
             }
@@ -503,15 +510,21 @@ final class DataStore: ObservableObject {
         ))
     }
 
-    func clear() {
+    func clear() async {
         loadGeneration += 1
         loadTask?.cancel()
-        loadTask = nil
         pollingTask?.cancel()
-        pollingTask = nil
         syncTask?.cancel()
-        isSyncing = false
-        persistence?.clearAll()  // clears caches + pending mutations
+        _ = await syncTask?.value
+        _ = await loadTask?.value
+        _ = await pollingTask?.value
+        syncTask = nil
+        loadTask = nil
+        pollingTask = nil
+        let signedOutUserId = currentUserId
+        if let signedOutUserId {
+            persistence?.clearAll(currentUserId: signedOutUserId)
+        }
         jobs = []
         clients = []
         invoices = []
@@ -550,8 +563,8 @@ final class DataStore: ObservableObject {
         var job = job
         attachClientRef(to: &job)
         guard await canSync() else {
+            try enqueue("job:create", id: job.id, payload: job)
             jobs.append(job)
-            enqueue("job:create", id: job.id, payload: job)
             return
         }
         do {
@@ -580,9 +593,12 @@ final class DataStore: ObservableObject {
             attachClientRef(to: &created)
             jobs.append(created)
         } catch {
-            // Network failed — save locally and queue for sync
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueue("job:create", id: job.id, payload: job)
             jobs.append(job)
-            enqueue("job:create", id: job.id, payload: job)
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -592,11 +608,11 @@ final class DataStore: ObservableObject {
         var updated = job
         updated.status = status
         guard await canSync() else {
+            struct P: Encodable { let status: String }
+            try enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            struct P: Encodable { let status: String }
-            enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             return
         }
         do {
@@ -605,12 +621,15 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
         } catch {
-            // Network failed — apply local update and queue
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            struct P: Encodable { let status: String }
+            try enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            struct P: Encodable { let status: String }
-            enqueue("job:status", id: job.id, payload: P(status: status.rawValue))
             throw error
         }
     }
@@ -619,11 +638,11 @@ final class DataStore: ObservableObject {
         var updated = job
         updated.scheduledDate = scheduledDate
         guard await canSync() else {
+            struct P: Encodable { let scheduledDate: String }
+            try enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            struct P: Encodable { let scheduledDate: String }
-            enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             return
         }
         do {
@@ -632,27 +651,35 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            struct P: Encodable { let scheduledDate: String }
+            try enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            struct P: Encodable { let scheduledDate: String }
-            enqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
             throw error
         }
     }
 
     func deleteJob(_ job: Job) async throws {
         guard await canSync() else {
+            try enqueueEmpty("job:delete", id: job.id)
             jobs.removeAll { $0.id == job.id }
-            enqueueEmpty("job:delete", id: job.id)
             return
         }
         do {
             try await sb.delete("jobs", id: job.id)
             jobs.removeAll { $0.id == job.id }
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueueEmpty("job:delete", id: job.id)
             jobs.removeAll { $0.id == job.id }
-            enqueueEmpty("job:delete", id: job.id)
             throw error
         }
     }
@@ -661,11 +688,11 @@ final class DataStore: ObservableObject {
         var updated = job
         updated.routeOrder = order
         guard await canSync() else {
+            struct P: Encodable { let routeOrder: Int }
+            try enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            struct P: Encodable { let routeOrder: Int }
-            enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             return
         }
         do {
@@ -674,11 +701,15 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            struct P: Encodable { let routeOrder: Int }
+            try enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            struct P: Encodable { let routeOrder: Int }
-            enqueue("job:route", id: job.id, payload: P(routeOrder: order))
             throw error
         }
     }
@@ -772,8 +803,8 @@ final class DataStore: ObservableObject {
 
     func createRecurringJob(_ template: RecurringJob) async throws {
         guard await canSync() else {
+            try enqueue("recurring:create", id: template.id, payload: template)
             recurringJobs.append(template)
-            enqueue("recurring:create", id: template.id, payload: template)
             return
         }
         do {
@@ -796,8 +827,12 @@ final class DataStore: ObservableObject {
             ))
             recurringJobs.append(created)
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueue("recurring:create", id: template.id, payload: template)
             recurringJobs.append(template)
-            enqueue("recurring:create", id: template.id, payload: template)
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -805,16 +840,20 @@ final class DataStore: ObservableObject {
 
     func deleteRecurringJob(_ template: RecurringJob) async throws {
         guard await canSync() else {
+            try enqueueEmpty("recurring:delete", id: template.id)
             recurringJobs.removeAll { $0.id == template.id }
-            enqueueEmpty("recurring:delete", id: template.id)
             return
         }
         do {
             try await sb.delete("recurring_jobs", id: template.id)
             recurringJobs.removeAll { $0.id == template.id }
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueueEmpty("recurring:delete", id: template.id)
             recurringJobs.removeAll { $0.id == template.id }
-            enqueueEmpty("recurring:delete", id: template.id)
             throw error
         }
     }
@@ -871,8 +910,8 @@ final class DataStore: ObservableObject {
         }
 
         guard await canSync() else {
+            try enqueue("client:create", id: client.id, payload: client)
             clients.append(client)
-            enqueue("client:create", id: client.id, payload: client)
             return
         }
         do {
@@ -895,8 +934,12 @@ final class DataStore: ObservableObject {
             ))
             clients.append(created)
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueue("client:create", id: client.id, payload: client)
             clients.append(client)
-            enqueue("client:create", id: client.id, payload: client)
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -910,11 +953,11 @@ final class DataStore: ObservableObject {
         }
 
         guard await canSync() else {
+            try enqueue("client:update", id: client.id, payload: updated)
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
             refreshJobClientRefs(for: updated.id)
-            enqueue("client:update", id: client.id, payload: updated)
             return
         }
         do {
@@ -935,27 +978,35 @@ final class DataStore: ObservableObject {
             }
             refreshJobClientRefs(for: updated.id)
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueue("client:update", id: client.id, payload: updated)
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
             refreshJobClientRefs(for: updated.id)
-            enqueue("client:update", id: client.id, payload: updated)
             throw error
         }
     }
 
     func deleteClient(_ client: Client) async throws {
         guard await canSync() else {
+            try enqueueEmpty("client:delete", id: client.id)
             clients.removeAll { $0.id == client.id }
-            enqueueEmpty("client:delete", id: client.id)
             return
         }
         do {
             try await sb.delete("clients", id: client.id)
             clients.removeAll { $0.id == client.id }
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            try enqueueEmpty("client:delete", id: client.id)
             clients.removeAll { $0.id == client.id }
-            enqueueEmpty("client:delete", id: client.id)
             throw error
         }
     }
@@ -968,11 +1019,11 @@ final class DataStore: ObservableObject {
         updated.status = .paid
         updated.paidAt = paidAt
         guard await canSync() else {
+            struct P: Encodable { let paidAt: String }
+            try enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
-            struct P: Encodable { let paidAt: String }
-            enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             return
         }
         do {
@@ -984,11 +1035,15 @@ final class DataStore: ObservableObject {
                 invoices[idx] = updated
             }
         } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            struct P: Encodable { let paidAt: String }
+            try enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
-            struct P: Encodable { let paidAt: String }
-            enqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -1144,19 +1199,29 @@ final class DataStore: ObservableObject {
         return await sb.isOnline
     }
 
+    private func isNetworkError(_ error: Error) -> Bool {
+        if error is URLError { return true }
+        if case SupabaseError.network = error { return true }
+        return false
+    }
+
     /// Enqueue an offline mutation for later replay.
-    private func enqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) {
-        guard let data = try? JSONEncoder().encode(payload) else {
-            print("[DataStore] failed to encode mutation payload for \(operation)")
-            return
-        }
-        persistence?.enqueueMutation(operation: operation, entityId: id, payload: data, userId: currentUserId)
+    private func enqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) throws {
+        guard let persistence else { throw DataStoreError.persistenceUnavailable }
+        guard let currentUserId else { throw DataStoreError.authenticationRequired }
+        let data = try JSONEncoder().encode(payload)
+        try persistence.enqueueMutation(
+            operation: operation,
+            entityId: id,
+            payload: data,
+            userId: currentUserId
+        )
     }
 
     /// Enqueue an empty-payload mutation (delete operations).
-    private func enqueueEmpty(_ operation: String, id: UUID) {
+    private func enqueueEmpty(_ operation: String, id: UUID) throws {
         struct Empty: Encodable {}
-        enqueue(operation, id: id, payload: Empty())
+        try enqueue(operation, id: id, payload: Empty())
     }
 }
 
@@ -1164,6 +1229,7 @@ enum DataStoreError: LocalizedError {
     case authenticationRequired
     case clientRequired
     case freeTierLimit(String)
+    case persistenceUnavailable
     case serverError(String)
 
     var errorDescription: String? {
@@ -1174,6 +1240,8 @@ enum DataStoreError: LocalizedError {
             "Select a client before saving the job."
         case .freeTierLimit(let message):
             message
+        case .persistenceUnavailable:
+            "Offline changes could not be saved on this device."
         case .serverError(let message):
             message
         }

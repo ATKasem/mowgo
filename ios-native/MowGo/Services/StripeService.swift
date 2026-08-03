@@ -106,7 +106,10 @@ final class StripeService: ObservableObject {
         let body: [String: Any] = ["tier": tier]
         let data = try await sb.requestFunction("create-checkout-session", body: body)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let urlString = json?["url"] as? String, let url = URL(string: urlString) else {
+        guard let urlString = json?["url"] as? String,
+              let url = URL(string: urlString),
+              url.scheme == "https",
+              url.host == "checkout.stripe.com" else {
             throw StripeError.noCheckoutURL
         }
         return url
@@ -117,7 +120,10 @@ final class StripeService: ObservableObject {
     func createCustomerPortal() async throws -> URL {
         let data = try await sb.requestFunction("create-customer-portal", body: [:])
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        guard let urlString = json?["url"] as? String, let url = URL(string: urlString) else {
+        guard let urlString = json?["url"] as? String,
+              let url = URL(string: urlString),
+              url.scheme == "https",
+              url.host == "billing.stripe.com" else {
             throw StripeError.noPortalURL
         }
         return url
