@@ -199,8 +199,9 @@ final class DataStore: ObservableObject {
                 await syncPendingMutations()
                 guard !Task.isCancelled, generation == loadGeneration else { return }
                 // Recurring templates must be loaded before today's jobs are generated.
-                await generateJobsFromRecurring()
+                await generateJobsFromRecurring(generation: generation)
                 // Start real-time polling after successful load
+                guard !Task.isCancelled, generation == loadGeneration else { return }
                 startPollingIfNeeded(generation: generation)
             } catch is CancellationError {
                 return // Silently cancelled — the new loadTask will replace us
@@ -218,7 +219,7 @@ final class DataStore: ObservableObject {
                 }
                 // Templates may still be in memory from a prior online load —
                 // generate today's recurring jobs even while offline.
-                await generateJobsFromRecurring()
+                await generateJobsFromRecurring(generation: generation)
             }
             if generation == loadGeneration {
                 isLoading = false
@@ -318,9 +319,10 @@ final class DataStore: ObservableObject {
                 throw PendingMutationError.invalidPayload("Unknown job status: \(p.status)")
             }
             try await sb.update("jobs", id: mutation.entityId, JobStatusPatch(status: status))
-            // Fire notifications for replayed status changes (client should still be notified)
+            // Fire notifications for replayed status changes (client should still be notified).
+            // Use the decoded `status` — the local job may be stale.
             if let job = jobs.first(where: { $0.id == mutation.entityId }) {
-                switch job.status {
+                switch status {
                 case .done:
                     await fireWebhookJobCompleted(job)
                     await firePushJobCompleted(job)
@@ -931,9 +933,11 @@ final class DataStore: ObservableObject {
 
     /// Check all active recurring job templates and create Job instances for today
     /// if they match the pattern and no job already exists for that client today.
-    func generateJobsFromRecurring() async {
+    func generateJobsFromRecurring(generation: Int? = nil) async {
         let todayStr = Self.dateString(from: Date())
         for template in recurringJobs where template.isActive {
+            // Bail if a newer load superseded this pass.
+            if let generation, generation != loadGeneration { return }
             // Skip if a job already exists for this client today
             let alreadyExists = jobs.contains { job in
                 job.clientId == template.clientId && job.scheduledDate == todayStr
