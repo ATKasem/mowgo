@@ -11,8 +11,35 @@
  *
  * Env vars (set in Cloudflare dashboard):
  *   SUPABASE_URL           — https://xxx.supabase.co
- *   SUPABASE_ANON_KEY      — anon key (for token verification)
+ *   SUPABASE_SERVICE_ROLE_KEY — service role key (config lookup)
  */
+
+/** Block SSRF: only https, no private/link-local hosts */
+async function isSafeWebhookUrl(rawUrl) {
+  let u;
+  try {
+    u = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  if (u.protocol !== 'https:') return false;
+  const host = u.hostname.toLowerCase();
+  // Direct IP or hostname resolves — block obvious internal targets
+  if (host === 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) return false;
+  // IPv4 private / link-local / loopback ranges
+  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4) {
+    const [a, b, c] = ipv4.slice(1).map(Number);
+    if (a === 10 || a === 127) return false;
+    if (a === 169 && b === 254) return false; // metadata
+    if (a === 172 && b >= 16 && b <= 31) return false;
+    if (a === 192 && b === 168) return false;
+    if (a === 0 || a === 100 || a === 198) return false;
+    if (a >= 224) return false; // multicast/reserved
+  }
+  if (host.startsWith('[')) return false; // IPv6 literal — block to be safe
+  return true;
+}
 
 function corsHeaders(origin) {
   return {
@@ -43,7 +70,7 @@ async function verifyToken(token, env) {
   const res = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      apikey: env.SUPABASE_ANON_KEY,
+      apikey: env.SUPABASE_ANON_KEY || env.SUPABASE_SERVICE_ROLE_KEY,
     },
   });
   if (!res.ok) return null;
@@ -82,10 +109,16 @@ export async function onRequestPost({ request, env }) {
 
   // --- Look up webhook configs ---
   const supabaseUrl = env.SUPABASE_URL;
-  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY;
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    return Response.json({ error: 'Server misconfigured' }, { status: 500, headers });
+  }
   const configsRes = await fetch(
     `${supabaseUrl}/rest/v1/webhook_configs?user_id=eq.${userId}&is_active=eq.true&select=id,url,secret,events,label`,
-    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
+    {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      signal: AbortSignal.timeout(5_000),
+    },
   );
 
   if (!configsRes.ok) {
@@ -98,9 +131,10 @@ export async function onRequestPost({ request, env }) {
   const configs = await configsRes.json();
 
   // Filter to configs that subscribed to this event
+  // Empty events array = subscribed to nothing (must pick events explicitly)
   const matching = configs.filter((c) => {
     const events = c.events || [];
-    return events.length === 0 || events.includes(event);
+    return events.length > 0 && events.includes(event);
   });
 
   if (matching.length === 0) {
@@ -117,6 +151,11 @@ export async function onRequestPost({ request, env }) {
   await Promise.all(
     matching.map(async (config) => {
       try {
+        if (!(await isSafeWebhookUrl(config.url))) {
+          console.warn(`webhook dispatch: blocked unsafe URL for ${config.id}`);
+          failures++;
+          return;
+        }
         const signature = await hmacSha256(config.secret, bodyStr);
         const res = await fetch(config.url, {
           method: 'POST',
@@ -151,7 +190,7 @@ export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Origin': 'https://mowgo.pages.dev',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',

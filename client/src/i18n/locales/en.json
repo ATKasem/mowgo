@@ -946,6 +946,11 @@
     "booking": "Booking...",
     "booked": "Booking Confirmed!",
     "thanks_for_booking": "Your service with {{name}} has been booked.",
-    "powered_by": "Powered by"
+    "powered_by": "Powered by",
+    "select_date_time": "Please select a date and time.",
+    "fill_fields": "Please fill in your name, phone, and address.",
+    "business_not_found": "Business not found.",
+    "could_not_load_business": "Could not load business.",
+    "booking_link_invalid": "This booking link may be invalid."
   }
 }

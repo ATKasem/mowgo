@@ -9,12 +9,15 @@
  *
  * Env vars (set in Cloudflare dashboard):
  *   SUPABASE_URL          — Supabase project URL
- *   SUPABASE_SERVICE_KEY  — Supabase service role key (for bypassing RLS)
+ *   SUPABASE_SERVICE_ROLE_KEY — Supabase service role key (for bypassing RLS)
  */
 
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+// NOTE: In-memory rate limiting is best-effort on Cloudflare (per-isolate).
+// For production, enable Cloudflare Rate Limiting rules in the dashboard
+// (5 req / 15 min per IP on /api/booking) — that is the real defense.
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
-const rateLimitMap = new Map(); // IP -> { count, resetTime }
+const rateLimitMap = new Map();
 
 function checkRateLimit(ip) {
   const now = Date.now();
@@ -28,19 +31,30 @@ function checkRateLimit(ip) {
   return true;
 }
 
-// Clean up old entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap) {
-    if (now > entry.resetTime) rateLimitMap.delete(ip);
-  }
-}, 60_000);
+const ALLOWED_TIME_SLOTS = new Set([
+  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00',
+]);
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidBookingDate(dateStr) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const max = new Date(today);
+  max.setDate(max.getDate() + 14); // allow up to 14 days out
+  return d >= today && d <= max;
+}
 
 export async function onRequestOptions(context) {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'https://mowgo.pages.dev',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Max-Age': '86400',
@@ -58,8 +72,8 @@ export async function onRequestPost(context) {
   }
 
   // Validate env
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
-    console.warn('Booking function: SUPABASE_URL or SUPABASE_SERVICE_KEY not set');
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn('Booking function: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set');
     return json({ error: 'Booking is not configured. Please contact the business.' }, 503);
   }
 
@@ -72,14 +86,19 @@ export async function onRequestPost(context) {
       return json({ error: 'Missing required fields: name, phone, address, date, and time are required.' }, 400);
     }
 
+    // Validate business_id is a real UUID (prevents query injection)
+    if (!UUID_RE.test(business_id)) {
+      return json({ error: 'Invalid booking link.' }, 400);
+    }
+
     // Validate date format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(scheduled_date)) {
-      return json({ error: 'Invalid date format.' }, 400);
+    if (!isValidBookingDate(scheduled_date)) {
+      return json({ error: 'Invalid date. Bookings must be within the next 14 days.' }, 400);
     }
 
     // Validate time format
-    if (!/^\d{2}:\d{2}$/.test(scheduled_time)) {
-      return json({ error: 'Invalid time format.' }, 400);
+    if (!ALLOWED_TIME_SLOTS.has(scheduled_time)) {
+      return json({ error: 'Invalid time slot.' }, 400);
     }
 
     // Validate name length
@@ -91,9 +110,20 @@ export async function onRequestPost(context) {
     if (customer_phone.trim().length < 5 || customer_phone.trim().length > 20) {
       return json({ error: 'Phone number must be 5-20 characters.' }, 400);
     }
+    if (!/^[+\d\s\-().]{5,20}$/.test(customer_phone.trim())) {
+      return json({ error: 'Phone number contains invalid characters.' }, 400);
+    }
+
+    // Validate address/notes length
+    if (customer_address.trim().length > 200) {
+      return json({ error: 'Address is too long.' }, 400);
+    }
+    if ((notes || '').trim().length > 500) {
+      return json({ error: 'Notes are too long.' }, 400);
+    }
 
     const supabaseUrl = env.SUPABASE_URL;
-    const serviceKey = env.SUPABASE_SERVICE_KEY;
+    const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
     const headers = {
       'apikey': serviceKey,
       'Authorization': `Bearer ${serviceKey}`,
@@ -186,7 +216,7 @@ function json(data, status = 200) {
     status,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'https://mowgo.pages.dev',
     },
   });
 }

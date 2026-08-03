@@ -1,5 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { loadProfile, saveProfile, loadTeamMembers, inviteTeamMember, removeTeamMember } from '../lib/data';
 import { TEAM_MEMBER_COLORS } from '../lib/constants';
 import { isDemoMode } from '../lib/supabase';
@@ -29,6 +29,16 @@ export default function Settings() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteSending, setInviteSending] = useState(false);
   const [bookingCopied, setBookingCopied] = useState(false);
+  const bookingCopyTimer = useRef(null);
+
+  // Booking link derived from current origin — survives domain changes
+  const bookingUrl = `${window.location.origin}/#/book/${user?.id || 'your-business-id'}`;
+
+  useEffect(() => {
+    return () => {
+      if (bookingCopyTimer.current) clearTimeout(bookingCopyTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -339,17 +349,17 @@ export default function Settings() {
           <div className="flex items-center gap-2">
             <input
               readOnly
-              value={`https://mowgo.pages.dev/#/book/${user?.id || 'your-business-id'}`}
+              value={bookingUrl}
               className="input flex-1 text-xs font-mono bg-[var(--color-surface-bg)] dark:bg-gray-800/50"
               onClick={e => e.target.select()}
             />
             <button
               type="button"
               onClick={() => {
-                const url = `https://mowgo.pages.dev/#/book/${user?.id || 'your-business-id'}`;
-                navigator.clipboard.writeText(url).then(() => {
+                navigator.clipboard.writeText(bookingUrl).then(() => {
                   setBookingCopied(true);
-                  setTimeout(() => setBookingCopied(false), 2000);
+                  if (bookingCopyTimer.current) clearTimeout(bookingCopyTimer.current);
+                  bookingCopyTimer.current = setTimeout(() => setBookingCopied(false), 2000);
                 });
               }}
               className="btn-secondary whitespace-nowrap"

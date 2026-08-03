@@ -36,7 +36,7 @@ function SecretDisplay({ secret }) {
     } catch { /* clipboard may not be available */ }
   }
 
-  const masked = revealed ? secret : '•'.repeat(32);
+  const masked = revealed ? secret : '•'.repeat(Math.min(64, Math.max(16, (secret || '').length)));
 
   return (
     <div className="flex items-center gap-1.5 mt-1">

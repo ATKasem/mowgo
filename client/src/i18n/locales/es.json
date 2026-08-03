@@ -937,6 +937,11 @@
     "booking": "Reservando...",
     "booked": "¡Reserva Confirmada!",
     "thanks_for_booking": "Tu servicio con {{name}} ha sido reservado.",
-    "powered_by": "Impulsado por"
+    "powered_by": "Impulsado por",
+    "select_date_time": "Por favor selecciona una fecha y hora.",
+    "fill_fields": "Por favor completa tu nombre, teléfono y dirección.",
+    "business_not_found": "Negocio no encontrado.",
+    "could_not_load_business": "No se pudo cargar el negocio.",
+    "booking_link_invalid": "Este enlace de reserva puede ser inválido."
   }
 }

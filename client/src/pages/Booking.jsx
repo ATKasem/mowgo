@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase, isDemoMode } from '../lib/supabase';
@@ -14,16 +14,19 @@ const TIME_SLOTS = [
 function getNext7Days() {
   const days = [];
   const today = new Date();
-  for (let i = 1; i <= 7; i++) {
+  let i = 1;
+  while (days.length < 7) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    if (d.getDay() !== 0) { // skip Sundays
+    if (d.getDay() !== 0) { // skip Sundays until we have 7 usable days
       days.push({
-        date: d.toISOString().slice(0, 10),
+        // Local-time date (not UTC) — prevents off-by-one across timezones
+        date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
         label: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
         dayOfWeek: d.getDay(),
       });
     }
+    i++;
   }
   return days;
 }
@@ -31,13 +34,14 @@ function getNext7Days() {
 function formatTime(t) {
   const [h, m] = t.split(':');
   const hr = parseInt(h, 10);
-  return `${hr > 12 ? hr - 12 : hr}:${m} ${hr >= 12 ? 'PM' : 'AM'}`;
+  const displayHr = hr === 0 ? 12 : hr > 12 ? hr - 12 : hr;
+  return `${displayHr}:${m} ${hr >= 12 ? 'PM' : 'AM'}`;
 }
 
 export default function Booking() {
   const { businessId } = useParams();
   const { t } = useTranslation();
-  const days = getNext7Days();
+  const days = useMemo(() => getNext7Days(), []);
 
   const [businessName, setBusinessName] = useState('');
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -54,6 +58,7 @@ export default function Booking() {
   const [notes, setNotes] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
@@ -74,12 +79,12 @@ export default function Booking() {
           .single();
         if (!active) return;
         if (error || !data) {
-          setProfileError('Business not found.');
+          setProfileError(t('booking.business_not_found'));
         } else {
           setBusinessName(data.business_name || 'Lawn Care');
         }
       } catch {
-        if (active) setProfileError('Could not load business.');
+        if (active) setProfileError(t('booking.could_not_load_business'));
       } finally {
         if (active) setLoadingProfile(false);
       }
@@ -123,17 +128,19 @@ export default function Booking() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (submittingRef.current) return; // synchronous double-submit guard
     setError('');
     if (!selectedDate || !selectedTime) {
-      setError('Please select a date and time.');
+      setError(t('booking.select_date_time'));
       return;
     }
     if (!name.trim() || !phone.trim() || !address.trim()) {
-      setError('Please fill in your name, phone, and address.');
+      setError(t('booking.fill_fields'));
       return;
     }
 
     setSubmitting(true);
+    submittingRef.current = true;
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '';
       const res = await fetch(`${apiUrl}/api/booking`, {
@@ -158,6 +165,7 @@ export default function Booking() {
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
@@ -175,7 +183,7 @@ export default function Booking() {
         <div className="text-center max-w-sm">
           <Leaf className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{profileError}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">This booking link may be invalid.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('booking.booking_link_invalid')}</p>
         </div>
       </div>
     );
