@@ -491,7 +491,8 @@ struct SubscriptionView: View {
                             price: "$0/mo",
                             features: ["5 clients", "Basic scheduling", "Invoice tracking"],
                             tier: "free",
-                            isCurrent: normalizedCurrentTier == "free"
+                            isCurrent: normalizedCurrentTier == "free",
+                            userTier: normalizedCurrentTier
                         )
                         }
 
@@ -506,7 +507,8 @@ struct SubscriptionView: View {
                                 "Priority support"
                             ],
                             tier: "solo",
-                            isCurrent: normalizedCurrentTier == "solo"
+                            isCurrent: normalizedCurrentTier == "solo",
+                            userTier: normalizedCurrentTier
                         )
 
                         SubscriptionPlanCard(
@@ -520,7 +522,8 @@ struct SubscriptionView: View {
                                 "Team progress dashboard"
                             ],
                             tier: "crew",
-                            isCurrent: normalizedCurrentTier == "crew"
+                            isCurrent: normalizedCurrentTier == "crew",
+                            userTier: normalizedCurrentTier
                         )
                     }
                     .padding(16)

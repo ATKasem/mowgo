@@ -12,13 +12,19 @@ struct InvoicesView: View {
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedInvoice: Invoice?
+    @State private var selectedInvoiceId: UUID?
     @State private var showPayment = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
-    private var totalUnpaidCents: Int { unpaid.reduce(0) { $0 + $1.amountCents } }
+    private var totalUnpaidCents: Int64 {
+        unpaid.reduce(Int64.zero) { total, invoice in
+            let (sum, overflow) = total.addingReportingOverflow(Int64(invoice.amountCents))
+            return overflow ? (invoice.amountCents >= 0 ? Int64.max : Int64.min) : sum
+        }
+    }
     private var totalUnpaid: Decimal { Decimal(totalUnpaidCents) / 100 }
 
     var body: some View {
@@ -37,6 +43,8 @@ struct InvoicesView: View {
                                 sectionHeader("Unpaid")
                                 ForEach(unpaid) { inv in
                                     InvoiceRow(invoice: inv, showPay: true) {
+                                        guard selectedInvoiceId != inv.id else { return }
+                                        selectedInvoiceId = inv.id
                                         selectedInvoice = inv
                                         showPayment = true
                                     }
@@ -58,7 +66,10 @@ struct InvoicesView: View {
             }
             .navigationTitle("Invoices")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showPayment) {
+            .sheet(isPresented: $showPayment, onDismiss: {
+                selectedInvoiceId = nil
+                selectedInvoice = nil
+            }) {
                 if let inv = selectedInvoice {
                     NavigationStack {
                         PaymentView(invoice: inv)

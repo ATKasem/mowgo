@@ -19,6 +19,7 @@ struct DashboardView: View {
     @State private var inviteEmail = ""
     @State private var inviteError: String?
     @State private var isInviting = false
+    @State private var crewRemovalError: String?
     @State private var memberToRemove: UserProfile?
     @State private var showRemoveConfirm = false
     @State private var animateCards = false
@@ -144,13 +145,21 @@ struct DashboardView: View {
                     do {
                         try await store.removeTeamMember(member)
                     } catch {
-                        inviteError = error.localizedDescription
+                        crewRemovalError = error.localizedDescription
                     }
                 }
             }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("\(memberToRemove?.businessName ?? "This member") will be removed from your team. Their jobs will be unassigned.")
+        }
+        .alert("Could Not Remove Crew Member", isPresented: Binding(
+            get: { crewRemovalError != nil },
+            set: { if !$0 { crewRemovalError = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(crewRemovalError ?? "An unknown error occurred.")
         }
     }
 
@@ -459,6 +468,7 @@ struct DashboardView: View {
 
                 Button {
                     Task {
+                        guard !isInviting else { return }
                         isInviting = true
                         inviteError = nil
                         do {

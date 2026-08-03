@@ -94,17 +94,20 @@ struct PaymentView: View {
                 intentConfiguration: intentConfig,
                 configuration: config
             )
-            // Present from the key window's root view controller
+            // Present from the topmost controller because PaymentView may itself be in a sheet.
             guard let windowScene = UIApplication.shared.connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
                 .first(where: { $0.activationState == .foregroundActive }),
-                  let rootVC = windowScene.keyWindow?.rootViewController else {
+                  let rootVC = windowScene.keyWindow?.rootViewController,
+                  let presentingVC = topmostViewController(from: rootVC) else {
                 paymentError = "Could not present payment sheet."
                 return
             }
-            paymentSheet.present(from: rootVC) { result in
+            paymentSheet.present(from: presentingVC) { result in
                 switch result {
                 case .completed:
+                    // Trust boundary: this client callback is not authoritative settlement.
+                    // The edge function must independently verify the PaymentIntent with Stripe.
                     Task {
                         do {
                             try await self.stripe.confirmPayment(
@@ -128,6 +131,19 @@ struct PaymentView: View {
         } catch {
             paymentError = error.localizedDescription
         }
+    }
+
+    private func topmostViewController(from viewController: UIViewController?) -> UIViewController? {
+        if let presented = viewController?.presentedViewController {
+            return topmostViewController(from: presented)
+        }
+        if let navigationController = viewController as? UINavigationController {
+            return topmostViewController(from: navigationController.visibleViewController)
+        }
+        if let tabBarController = viewController as? UITabBarController {
+            return topmostViewController(from: tabBarController.selectedViewController)
+        }
+        return viewController
     }
 }
 
@@ -224,6 +240,9 @@ struct SubscriptionPlanCard: View {
         .padding(16)
         .background(theme.surface)
         .cornerRadius(16)
+        .onDisappear {
+            isPurchasing = false
+        }
     }
 
     private func subscribe() async {
@@ -236,10 +255,14 @@ struct SubscriptionPlanCard: View {
         do {
             let url = try await stripe.createCheckoutSession(tier: tier)
             // Open in Safari
-            await UIApplication.shared.open(url)
+            let didOpen = await UIApplication.shared.open(url)
+            if !didOpen {
+                self.error = "Could not open checkout."
+                isPurchasing = false
+            }
         } catch {
             self.error = error.localizedDescription
+            isPurchasing = false
         }
-        isPurchasing = false
     }
 }
