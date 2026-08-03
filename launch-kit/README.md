@@ -18,14 +18,14 @@ Prepared August 2, 2026. Ready to copy-paste into each platform's submission for
 
 ### Description (500 chars)
 ```
-MowGo is lawn care scheduling software built for 1-5 person crews. Drag-and-drop scheduling, route optimization, invoicing, and the only free-tier rain delay auto-reschedule — one button moves all today's jobs to tomorrow when it rains. Free for 5 clients. Solo plan $39/mo includes AI Autopilot (chat to your CRM), unlimited clients, and offline mode.
+MowGo is lawn care scheduling software built for 1-5 person crews. Drag-and-drop scheduling, route optimization, invoicing, and the only free-tier rain delay auto-reschedule — one button moves all today's jobs to tomorrow when it rains. Free for 5 clients. Solo plan $39/mo includes unlimited clients, route optimization, and offline mode.
 ```
 
 ### List as Alternative To (submit separately for each):
 1. **ProBase** — "Like ProBase but with rain delay auto-reschedule, native iOS app, and lawn-specific fields (gate codes, mow notes, chemical tracking)."
 2. **Jobber** — "Affordable Jobber alternative for small crews. No per-user fees, rain delay included, $39/mo vs Jobber's $49+."
 3. **Yardbook** — "Modern Yardbook alternative. Same free tier but with rain delay, better invoicing, and no ads."
-4. **LawnPro** — "LawnPro alternative with one-button rain delay vs LawnPro's manual rebuild, plus AI Autopilot at $39."
+4. **LawnPro** — "LawnPro alternative with one-button rain delay vs LawnPro's manual rebuild, plus native apps and offline mode at $39."
 5. **GreenRoute** — "GreenRoute alternative. MowGo gives you rain delay auto-reschedule, not just weather forecasts."
 
 ---
@@ -48,7 +48,7 @@ Core features:
 • One-button rain delay — move all today's jobs to tomorrow instantly
 • Drag-and-drop scheduling with route optimization
 • Automated invoicing + Stripe payments
-• AI Autopilot — chat to your CRM ($39/mo Solo plan)
+• Route optimization + offline mode ($39/mo Solo plan)
 • Native iOS app with offline mode
 • Gate codes, pet instructions, mow notes, chemical tracking
 
@@ -84,7 +84,7 @@ MowGo is the only lawn care scheduling app with rain delay on the free tier. One
 
 Your audience of lawn care operators, landscapers, and field service pros will love:
 • Free tier with 5 clients + rain delay (no credit card)
-• Solo $39/mo — AI Autopilot, unlimited clients, routes, offline mode
+• Solo $39/mo — unlimited clients, routes, offline mode
 • Crew $79/mo — multi-user team features
 • No platform fees, no per-user pricing, transparent
 
@@ -107,12 +107,12 @@ Your audience of lawn care operators, landscapers, and field service pros will l
 ```
 MowGo is lawn care scheduling software built specifically for 1-5 person crews. It replaces the patchwork of spreadsheets, texting, and manual invoicing with one app.
 
-Core features include drag-and-drop scheduling, route optimization, automated invoicing with Stripe payments, client CRM with property notes (gate codes, pet instructions, mow notes), chemical tracking, and team management. The AI Autopilot lets operators talk to their CRM — ask questions, log jobs, and check schedules by voice or text.
+Core features include drag-and-drop scheduling, route optimization, automated invoicing with Stripe payments, client CRM with property notes (gate codes, pet instructions, mow notes), chemical tracking, and team management.
 
 MowGo's standout feature is rain delay auto-reschedule: one button moves all today's unfinished jobs to tomorrow. It's the only lawn care software with rain delay on a free tier.
 
 - Free: 5 clients, rain delay, scheduling, invoicing
-- Solo ($39/mo): Unlimited clients, AI Autopilot, routes, reminders, offline mode
+- Solo ($39/mo): Unlimited clients, routes, reminders, offline mode
 - Crew ($79/mo): Everything in Solo plus multi-user crew, team dashboard, job assignment
 
 No per-user fees. No hidden platform fees. Native iOS app with offline mode. Web app works on any device.
@@ -178,7 +178,7 @@ MowGo handles what no other lawn care software does: rain.
 
 One button moves all today's jobs to tomorrow. Free tier includes it. Nobody else does.
 
-Built for 1-5 person crews: scheduling, routes, invoicing, AI Autopilot, native iOS with offline mode. Gate codes, mow notes, chemical tracking — lawn-specific fields that generalist apps don't have.
+Built for 1-5 person crews: scheduling, routes, invoicing, native iOS with offline mode. Gate codes, mow notes, chemical tracking — lawn-specific fields that generalist apps don't have.
 
 Launching soon. Get notified.
 ```
@@ -190,7 +190,7 @@ Launching soon. Get notified.
   2. Today view with job cards
   3. Route optimization map view
   4. Invoice/payment flow
-  5. AI Autopilot conversation
+  5. Client CRM / property notes view
 - **First comment:** Founder story (see below)
 
 ### First Comment Draft
@@ -201,7 +201,7 @@ Here's the problem: most lawn care software is either free but useless when it r
 
 So I built it. MowGo has rain delay on the free tier. Five clients. No credit card. One button. All jobs move to tomorrow, route rebuilds, customers get notified.
 
-It also does everything else you'd expect from lawn care software — scheduling, routing, invoicing, a client CRM with gate codes and mow notes — plus an AI Autopilot that lets you talk to your CRM while you're driving between jobs.
+It also does everything else you'd expect from lawn care software — scheduling, routing, invoicing, a client CRM with gate codes and mow notes — plus route optimization and native iOS with offline mode.
 
 Pricing:
 • Free: 5 clients, rain delay, scheduling, invoicing

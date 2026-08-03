@@ -65,7 +65,7 @@ Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts 
 - ✅ **One-button rain delay** — Storm at 7am? Tap. Every job moves. Clients notified.
 - ✅ **Flat pricing** — No per-user fees. One price, everything included.
 - ✅ **2-minute setup** — No onboarding call. No demo. Just use it.
-- ✅ **Free tier** — 10 clients, scheduling, invoicing, rain delay. No credit card.
+- ✅ **Free tier** — 5 clients, scheduling, invoicing, rain delay. No credit card.
 
 ---
 
@@ -115,7 +115,7 @@ Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts 
 | SMS notifications | ❌ | ✅ | ✅ |
 | Client portal | ❌ ($49 add-on?) | ✅ | ✅ |
 | One-button rain delay | ❌ | ❌ | ✅ |
-| Free tier | ❌ (14-day trial) | ❌ | ✅ (10 clients, no CC) |
+| Free tier | ❌ (14-day trial) | ❌ | ✅ (5 clients, no CC) |
 | Per-user fee | $49/user | $139/user | $0 (flat) |
 | Setup time | Demo call required | Demo call required | 2 minutes, no call |
 | Credit card for trial | ✅ Required | ✅ Required | ❌ Not needed |

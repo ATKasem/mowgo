@@ -22,7 +22,7 @@ You should not need a training session to use a scheduling app. Sign up. Add a c
 Nobody else makes this so simple. Storm at 7am? Tap once. Every job moves to tomorrow. Clients get notified. You go back to bed. Your route is fine. *(Note: Servinix is automating rain-delay texts pre-launch (Sept 14) — our edge is one-button simplicity + no onboarding, not feature uniqueness — see intel/2026-07-31_2328.md)*
 
 **Free tier that is actually useful.**
-10 clients. Full scheduling. Rain delay. Auto invoicing. No credit card. Not a "14 day trial." Just free.
+5 clients. Full scheduling. Rain delay. Auto invoicing. No credit card. Not a "14 day trial." Just free.
 
 **$39. Flat.**
 Not $29 that becomes $169 when you want the features you actually need. $39 is $39. Unlimited clients. Everything included.

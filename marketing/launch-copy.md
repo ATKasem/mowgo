@@ -8,7 +8,7 @@ I built a lawn care app because the existing ones made me want to throw my phone
 
 MowGo. Scheduling, routes, invoicing. No demo calls. No bloat. Rain delay with one button — nobody else has that.
 
-Free for 10 clients. No credit card. 2 minutes.
+Free for 5 clients. No credit card. 2 minutes.
 
 → mowgo.pages.dev
 
@@ -20,7 +20,7 @@ MowGo is the lawn care app that just works.
 - Rain hits → one button shifts everything
 - Job done → invoice sends automatically
 
-Free for 10 clients. No credit card. $39/mo for unlimited.
+Free for 5 clients. No credit card. $39/mo for unlimited.
 
 Link in bio → mowgo.pages.dev
 
@@ -33,7 +33,7 @@ The existing scheduling software makes you book a demo before you can even see i
 
 So I built MowGo.
 
-It does less than the other apps. That is the point. Scheduling, routes, invoicing. And a rain delay button that shifts your whole route to tomorrow — nobody else has that. It just works. No demos. No setup calls. Free for 10 clients.
+It does less than the other apps. That is the point. Scheduling, routes, invoicing. And a rain delay button that shifts your whole route to tomorrow — nobody else has that. It just works. No demos. No setup calls. Free for 5 clients.
 
 If you know a landscaper who is still running on texts and a notebook, send them the link.
 
@@ -46,7 +46,7 @@ The apps out there are either too expensive, too complicated, or both. Most of y
 
 So I built MowGo. It does three things: scheduling, routes, invoicing. That is it. No CRM. No marketing dashboards. No "book a demo." It just works.
 
-Free for 10 clients. $39/mo solo. $79/mo crew. 2 minute setup.
+Free for 5 clients. $39/mo solo. $79/mo crew. 2 minute setup.
 
 Not here to pitch. Genuinely want feedback from actual lawn guys. If you try it, tell me what is broken.
 

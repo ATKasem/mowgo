@@ -4,7 +4,7 @@
 MowGo — Lawn Care Scheduling That Just Works | Free
 
 ## Meta Description (155 chars max)
-The lawn care app that just works. Scheduling, routes, and invoicing from your phone. Free for 10 clients. No credit card. Takes 2 minutes.
+The lawn care app that just works. Scheduling, routes, and invoicing from your phone. Free for 5 clients. No credit card. Takes 2 minutes.
 
 ## H1 Headline
 The lawn care app that just works.
@@ -22,7 +22,7 @@ Storm hits at 7am. Tap once. Every job shifts to tomorrow. Clients get notified.
 **Invoicing that just works.**
 Mark a job complete. Invoice sends automatically. Client pays with one tap. No Sunday night admin session.
 
-**Free for 10 clients. No credit card.**
+**Free for 5 clients. No credit card.**
 Not a trial. Not a demo. Just free. Upgrade when you need more.
 
 ## Social Proof
@@ -32,7 +32,7 @@ Not a trial. Not a demo. Just free. Upgrade when you need more.
 ## FAQ Section
 
 **Q: Is it actually free?**
-Yes. 10 clients, scheduling, routes, invoicing, rain delay. No credit card. No time limit. Free.
+Yes. 5 clients, scheduling, routes, invoicing, rain delay. No credit card. No time limit. Free.
 
 **Q: What makes it different?**
 Rain delay. Nobody else has it under $100 a month. Also: no demos, no setup calls, no features you will never touch. It does less than the other apps and that is the point.
