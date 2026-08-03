@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.BuildConfig
 import com.mowgo.app.data.SettingsRepository
@@ -34,6 +35,7 @@ private enum class MoreDestination { ROOT, PROFILE, NOTIFICATIONS, APPEARANCE, B
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
+    openBillingEvent: Long = 0L,
     onSignedOut: () -> Unit = {},
     onOpenChat: () -> Unit = {},
 ) {
@@ -51,6 +53,14 @@ fun MoreScreen(
     val completionAlerts by viewModel.jobCompletionAlerts.collectAsStateWithLifecycle(initialValue = true)
     val rainAlerts by viewModel.rainDelayAlerts.collectAsStateWithLifecycle(initialValue = true)
     var destination by rememberSaveable { mutableStateOf(MoreDestination.ROOT) }
+
+    LaunchedEffect(openBillingEvent) {
+        if (openBillingEvent > 0L) destination = MoreDestination.BILLING
+    }
+    LifecycleResumeEffect(Unit) {
+        viewModel.onResume()
+        onPauseOrDispose { }
+    }
 
     BackHandler(enabled = destination != MoreDestination.ROOT) { destination = MoreDestination.ROOT }
     when (destination) {

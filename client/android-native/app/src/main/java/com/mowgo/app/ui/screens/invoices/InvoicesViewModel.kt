@@ -28,6 +28,8 @@ data class InvoicesUiState(
     val showSnackbar: String? = null,
     val payingInvoiceId: String? = null,
     val pendingPayment: PendingInvoicePayment? = null,
+    val isPaymentSheetPresenting: Boolean = false,
+    val isPaymentConfirmationPending: Boolean = false,
     val paymentError: String? = null,
 ) {
     /** Invoices enriched with client names for display. */
@@ -122,36 +124,77 @@ class InvoicesViewModel : ViewModel() {
     }
 
     fun paymentSheetPresented() {
-        _uiState.value = _uiState.value.copy(pendingPayment = null)
+        if (_uiState.value.pendingPayment != null) {
+            _uiState.value = _uiState.value.copy(isPaymentSheetPresenting = true)
+        }
     }
 
     fun paymentCompleted(payment: PendingInvoicePayment) {
+        val pending = _uiState.value.pendingPayment
+        if (pending?.paymentIntentId != payment.paymentIntentId) return
+        _uiState.value = _uiState.value.copy(
+            isPaymentSheetPresenting = false,
+            isPaymentConfirmationPending = true,
+            paymentError = null,
+        )
+        confirmPendingPayment(payment)
+    }
+
+    fun retryConfirmPayment() {
+        val payment = _uiState.value.pendingPayment ?: return
+        if (!_uiState.value.isPaymentConfirmationPending) return
+        _uiState.value = _uiState.value.copy(paymentError = null)
+        confirmPendingPayment(payment)
+    }
+
+    private fun confirmPendingPayment(payment: PendingInvoicePayment) {
         viewModelScope.launch {
             try {
                 paymentRepository.confirmPayment(payment.invoiceId, payment.paymentIntentId)
                 _uiState.value = _uiState.value.copy(
                     payingInvoiceId = null,
+                    pendingPayment = null,
+                    isPaymentSheetPresenting = false,
+                    isPaymentConfirmationPending = false,
                     showSnackbar = "Payment confirmed",
                 )
                 loadData()
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    payingInvoiceId = null,
-                    paymentError = "Payment succeeded, but verification failed: ${error.message ?: "Unknown error"}. Refresh before trying again.",
+                    isPaymentSheetPresenting = false,
+                    isPaymentConfirmationPending = true,
+                    paymentError = "Payment was successful but confirmation failed. Retry confirmation.",
                 )
             }
         }
     }
 
     fun paymentCanceled() {
-        _uiState.value = _uiState.value.copy(payingInvoiceId = null, pendingPayment = null)
+        _uiState.value = _uiState.value.copy(
+            payingInvoiceId = null,
+            pendingPayment = null,
+            isPaymentSheetPresenting = false,
+            isPaymentConfirmationPending = false,
+        )
     }
 
     fun paymentFailed(message: String) {
         _uiState.value = _uiState.value.copy(
             payingInvoiceId = null,
             pendingPayment = null,
+            isPaymentSheetPresenting = false,
+            isPaymentConfirmationPending = false,
             paymentError = message,
+        )
+    }
+
+    fun dismissPendingPayment() {
+        _uiState.value = _uiState.value.copy(
+            payingInvoiceId = null,
+            pendingPayment = null,
+            isPaymentSheetPresenting = false,
+            isPaymentConfirmationPending = false,
+            paymentError = null,
         )
     }
 

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
@@ -39,21 +40,23 @@ fun InvoicesScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
-    var presentedPayment by remember { mutableStateOf<PendingInvoicePayment?>(null) }
     val paymentSheet = activity?.let { hostActivity ->
         remember(hostActivity) {
             PaymentSheet.Builder { result ->
-                val payment = presentedPayment
+                val payment = viewModel.uiState.value.pendingPayment
                 when (result) {
                     is PaymentSheetResult.Completed -> {
-                        if (payment != null) viewModel.paymentCompleted(payment)
+                        if (payment != null) {
+                            viewModel.paymentCompleted(payment)
+                        } else {
+                            viewModel.paymentFailed("Could not recover payment confirmation details.")
+                        }
                     }
                     is PaymentSheetResult.Canceled -> viewModel.paymentCanceled()
                     is PaymentSheetResult.Failed -> viewModel.paymentFailed(
                         result.error.localizedMessage ?: "Payment failed.",
                     )
                 }
-                presentedPayment = null
             }.build(hostActivity)
         }
     }
@@ -65,20 +68,21 @@ fun InvoicesScreen(
         }
     }
 
-    LaunchedEffect(state.paymentError) {
-        state.paymentError?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            viewModel.dismissPaymentError()
+    LaunchedEffect(state.paymentError, state.isPaymentConfirmationPending) {
+        if (!state.isPaymentConfirmationPending) {
+            state.paymentError?.let { message ->
+                snackbarHostState.showSnackbar(message)
+                viewModel.dismissPaymentError()
+            }
         }
     }
 
     LaunchedEffect(state.pendingPayment) {
         val payment = state.pendingPayment
-        if (payment != null) {
+        if (payment != null && !state.isPaymentSheetPresenting && !state.isPaymentConfirmationPending) {
             if (paymentSheet == null) {
                 viewModel.paymentFailed("Could not present payment sheet.")
             } else {
-                presentedPayment = payment
                 viewModel.paymentSheetPresented()
                 paymentSheet.presentWithPaymentIntent(
                     payment.clientSecret,
@@ -86,6 +90,24 @@ fun InvoicesScreen(
                 )
             }
         }
+    }
+
+    if (state.isPaymentConfirmationPending && state.paymentError != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissPendingPayment() },
+            title = { Text("Confirm Payment") },
+            text = { Text(state.paymentError!!) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.retryConfirmPayment() }) {
+                    Text("Retry")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.dismissPendingPayment() }) {
+                    Text("Dismiss")
+                }
+            },
+        )
     }
 
     // Delete confirmation dialog
@@ -222,6 +244,8 @@ fun InvoicesScreen(
                             invoice = item.invoice,
                             clientName = item.clientName,
                             isPaying = state.payingInvoiceId == item.invoice.id,
+                            payEnabled = state.payingInvoiceId == null,
+                            showPay = SupabaseClientProvider.isConfigured,
                             onPay = { viewModel.payInvoice(item) },
                             onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
                             onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
@@ -293,6 +317,8 @@ private fun InvoiceCard(
     invoice: Invoice,
     clientName: String?,
     isPaying: Boolean,
+    payEnabled: Boolean,
+    showPay: Boolean,
     onPay: () -> Unit,
     onMarkPaid: () -> Unit,
     onDelete: () -> Unit,
@@ -389,27 +415,29 @@ private fun InvoiceCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (!isPaid) {
-                        Button(
-                            onClick = onPay,
-                            enabled = !isPaying,
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MowGoColors.DeepGreenDark,
-                                contentColor = MowGoColors.OnAccent,
-                            ),
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp),
-                        ) {
-                            if (isPaying) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MowGoColors.OnAccent,
-                                )
-                            } else {
-                                Icon(Icons.Filled.CreditCard, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Pay", style = MaterialTheme.typography.labelSmall)
+                        if (showPay) {
+                            Button(
+                                onClick = onPay,
+                                enabled = payEnabled,
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MowGoColors.DeepGreenDark,
+                                    contentColor = MowGoColors.OnAccent,
+                                ),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp),
+                            ) {
+                                if (isPaying) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MowGoColors.OnAccent,
+                                    )
+                                } else {
+                                    Icon(Icons.Filled.CreditCard, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Pay", style = MaterialTheme.typography.labelSmall)
+                                }
                             }
                         }
                         OutlinedButton(

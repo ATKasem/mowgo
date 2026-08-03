@@ -26,10 +26,14 @@ class JobRepository {
 
         val client = SupabaseClientProvider.client
         val userId = getCurrentUserId() ?: return emptyList()
+        val profile = ProfileRepository().loadProfile()
 
         val jobs = client.from("jobs")
             .select {
-                filter { eq("user_id", userId) }
+                filter {
+                    if (profile?.role == "crew") eq("assigned_to", userId)
+                    else eq("user_id", userId)
+                }
                 order("route_order", Order.ASCENDING)
                 order("scheduled_time", Order.ASCENDING)
             }
@@ -55,10 +59,13 @@ class JobRepository {
 
         val client = SupabaseClientProvider.client
         val userId = getCurrentUserId() ?: return emptyList()
+        val profile = ProfileRepository().loadProfile()
+        val ownerId = if (profile?.role == "crew") profile.businessId else userId
+        if (ownerId == null) return emptyList()
 
         return client.from("clients")
             .select {
-                filter { eq("user_id", userId) }
+                filter { eq("user_id", ownerId) }
                 order("name", Order.ASCENDING)
             }
             .decodeList<Client>()

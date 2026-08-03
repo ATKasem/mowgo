@@ -33,12 +33,14 @@ class ChatViewModel(
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
     private var currentSendJob: Job? = null
+    private var sendGeneration = 0
 
     fun send(text: String) {
         val trimmedText = text.trim()
         if (trimmedText.isEmpty() || _uiState.value.isLoading) return
 
         currentSendJob?.cancel()
+        val generation = ++sendGeneration
         val userMessage = ChatMessage(role = ROLE_USER, content = trimmedText)
         _uiState.update { state ->
             state.copy(
@@ -54,22 +56,26 @@ class ChatViewModel(
         currentSendJob = viewModelScope.launch {
             try {
                 val reply = repository.send(history)
-                appendAssistant(reply)
+                if (generation == sendGeneration) appendAssistant(reply)
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
-                _uiState.update { state ->
-                    state.copy(
-                        messages = (state.messages + ChatMessage(
-                            role = ROLE_ASSISTANT,
-                            content = CONNECTION_ERROR_MESSAGE,
-                        )).takeLast(MAX_MESSAGES),
-                        error = error.message ?: "Connection error",
-                    )
+                if (generation == sendGeneration) {
+                    _uiState.update { state ->
+                        state.copy(
+                            messages = (state.messages + ChatMessage(
+                                role = ROLE_ASSISTANT,
+                                content = CONNECTION_ERROR_MESSAGE,
+                            )).takeLast(MAX_MESSAGES),
+                            error = error.message ?: "Connection error",
+                        )
+                    }
                 }
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
-                currentSendJob = null
+                if (generation == sendGeneration) {
+                    _uiState.update { it.copy(isLoading = false) }
+                    currentSendJob = null
+                }
             }
         }
     }
@@ -91,6 +97,7 @@ class ChatViewModel(
     }
 
     fun clearChat() {
+        sendGeneration++
         currentSendJob?.cancel()
         currentSendJob = null
         _uiState.value = ChatUiState()

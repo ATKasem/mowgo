@@ -11,6 +11,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.net.URI
 
 data class PaymentIntentResult(
     val clientSecret: String,
@@ -60,20 +61,14 @@ class PaymentRepository(
             body = json.encodeToString(CheckoutRequest.serializer(), CheckoutRequest(tier)),
         )
         val url = decode<UrlResponse>(response).url
-        if (!url.startsWith(CHECKOUT_URL_PREFIX)) {
-            throw IllegalStateException(errorFrom(response) ?: "Could not create checkout session.")
-        }
-        return url
+        return validateStripeUrl(url, CHECKOUT_HOST)
     }
 
     suspend fun createCustomerPortal(): String {
         ensureConfigured()
         val response = post("create-customer-portal", EMPTY_JSON)
         val url = decode<UrlResponse>(response).url
-        if (!url.startsWith(PORTAL_URL_PREFIX)) {
-            throw IllegalStateException(errorFrom(response) ?: "Could not open subscription management.")
-        }
-        return url
+        return validateStripeUrl(url, PORTAL_HOST)
     }
 
     suspend fun cancelSubscription() {
@@ -125,6 +120,15 @@ class PaymentRepository(
         json.decodeFromString(ErrorResponse.serializer(), body).error
     }.getOrNull()?.takeIf { it.isNotBlank() }
 
+    private fun validateStripeUrl(url: String, allowedHost: String): String {
+        val uri = runCatching { URI(url) }
+            .getOrElse { throw IllegalStateException("Invalid payment URL.") }
+        if (uri.scheme != "https" || uri.host != allowedHost) {
+            throw IllegalStateException("Invalid payment URL.")
+        }
+        return url
+    }
+
     @Serializable
     private data class CreatePaymentIntentRequest(
         val amount: Int,
@@ -152,8 +156,8 @@ class PaymentRepository(
     companion object {
         private const val FUNCTION_BASE_URL =
             "https://vqgiynfrpsqddjrayczc.supabase.co/functions/v1/"
-        private const val CHECKOUT_URL_PREFIX = "https://checkout.stripe.com"
-        private const val PORTAL_URL_PREFIX = "https://billing.stripe.com"
+        private const val CHECKOUT_HOST = "checkout.stripe.com"
+        private const val PORTAL_HOST = "billing.stripe.com"
         private const val EMPTY_JSON = "{}"
         private val JSON_MEDIA_TYPE = "application/json".toMediaType()
     }

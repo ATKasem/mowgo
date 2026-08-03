@@ -65,6 +65,7 @@ class DashboardViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Loading)
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+    private var loadGeneration = 0
 
     init {
         loadData()
@@ -189,6 +190,7 @@ class DashboardViewModel : ViewModel() {
     fun dismissActionMessage() = updateLoaded { it.copy(actionMessage = null) }
 
     private fun loadData(isRefresh: Boolean = false) {
+        val generation = ++loadGeneration
         if (isRefresh) updateLoaded { it.copy(isRefreshing = true) }
         else _uiState.value = DashboardUiState.Loading
 
@@ -199,16 +201,20 @@ class DashboardViewModel : ViewModel() {
                 val invoices = invoiceRepository.loadInvoices()
                 val profile = profileRepository.loadProfile()
                 val teamMembers = teamRepository.loadTeamMembers()
-                _uiState.value = buildLoadedState(jobs, clients, invoices, profile, teamMembers)
+                if (generation == loadGeneration) {
+                    _uiState.value = buildLoadedState(jobs, clients, invoices, profile, teamMembers)
+                }
             } catch (e: Exception) {
-                val current = _uiState.value as? DashboardUiState.Loaded
-                _uiState.value = if (current != null) {
-                    current.copy(
-                        isRefreshing = false,
-                        actionMessage = e.message ?: "Failed to load dashboard",
-                    )
-                } else {
-                    DashboardUiState.Error(e.message ?: "Failed to load dashboard")
+                if (generation == loadGeneration) {
+                    val current = _uiState.value as? DashboardUiState.Loaded
+                    _uiState.value = if (current != null) {
+                        current.copy(
+                            isRefreshing = false,
+                            actionMessage = e.message ?: "Failed to load dashboard",
+                        )
+                    } else {
+                        DashboardUiState.Error(e.message ?: "Failed to load dashboard")
+                    }
                 }
             }
         }

@@ -1,6 +1,8 @@
 package com.mowgo.app.data.auth
 
 import com.mowgo.app.data.SupabaseClientProvider
+import com.mowgo.app.data.ProfileRepository
+import com.mowgo.app.data.TeamRepository
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
@@ -57,5 +59,7 @@ class AuthRepository {
      */
     suspend fun signOut() {
         auth.signOut()
+        runCatching { ProfileRepository.resetDemoState() }
+        runCatching { TeamRepository.resetDemoTeam() }
     }
 }

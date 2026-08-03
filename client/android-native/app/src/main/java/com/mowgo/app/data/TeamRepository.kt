@@ -3,8 +3,8 @@ package com.mowgo.app.data
 import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.model.Profile
 import com.mowgo.app.data.model.UserProfile
-import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -106,9 +106,33 @@ class TeamRepository(
             throw IllegalStateException("Only an owner can remove crew members")
         }
 
-        val client = SupabaseClientProvider.client
-        client.from("profiles").delete { filter { eq("id", member.id) } }
-        JobRepository().unassignJobsFromMember(member.id)
+        val token = authRepository.currentSession?.accessToken
+            ?: throw IllegalStateException("Not authenticated")
+        val request = Request.Builder()
+            .url("https://mowgo.pages.dev/api/team/${member.id}")
+            .header("Authorization", "Bearer $token")
+            .header("Content-Type", "application/json")
+            .delete()
+            .build()
+
+        val responseText = withContext(Dispatchers.IO) {
+            httpClient.newCall(request).execute().use { response ->
+                val body = response.body?.string().orEmpty()
+                val result = runCatching {
+                    json.decodeFromString(RemoveResponse.serializer(), body)
+                }.getOrNull()
+                if (!response.isSuccessful || result?.success != true) {
+                    throw IllegalStateException(
+                        result?.error?.takeIf { it.isNotBlank() }
+                            ?: body.takeIf { it.isNotBlank() }
+                            ?: "Server error (${response.code})",
+                    )
+                }
+                body
+            }
+        }
+        val result = json.decodeFromString(RemoveResponse.serializer(), responseText)
+        if (!result.success) throw IllegalStateException(result.error ?: "Could not remove crew member")
     }
 
     @Serializable
@@ -126,12 +150,20 @@ class TeamRepository(
         val businessId: String? = null,
     )
 
+    @Serializable
+    private data class RemoveResponse(
+        val success: Boolean = false,
+        val error: String? = null,
+    )
+
     companion object {
         private const val OWNER_ROLE = "owner"
         private const val DEMO_OWNER_ID = "demo-owner"
 
         @Volatile
-        private var demoTeamMembers: List<UserProfile> = listOf(
+        private var demoTeamMembers: List<UserProfile> = seedTeamMembers()
+
+        private fun seedTeamMembers(): List<UserProfile> = listOf(
             UserProfile(
                 id = DEMO_OWNER_ID,
                 businessName = "Green Thumb Lawn Care",
@@ -154,5 +186,9 @@ class TeamRepository(
                 businessId = DEMO_OWNER_ID,
             ),
         )
+
+        fun resetDemoTeam() {
+            demoTeamMembers = seedTeamMembers()
+        }
     }
 }

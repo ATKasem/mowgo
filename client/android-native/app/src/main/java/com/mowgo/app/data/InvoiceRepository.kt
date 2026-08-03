@@ -21,6 +21,7 @@ class InvoiceRepository {
 
         val client = SupabaseClientProvider.client
         val userId = getCurrentUserId() ?: return emptyList()
+        if (ProfileRepository().loadProfile()?.role == "crew") return emptyList()
 
         return client.from("invoices")
             .select {

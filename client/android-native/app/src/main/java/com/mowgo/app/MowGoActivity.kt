@@ -1,5 +1,6 @@
 package com.mowgo.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,10 +19,14 @@ import com.mowgo.app.ui.screens.splash.SplashScreen
 import com.mowgo.app.ui.theme.MowGoTheme
 import com.mowgo.app.data.SettingsRepository
 import com.stripe.android.PaymentConfiguration
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MowGoActivity : ComponentActivity() {
+    private val settingsDeepLinkEvent = MutableStateFlow(0L)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handleDeepLink(intent)
         PaymentConfiguration.init(applicationContext, BuildConfig.STRIPE_PUBLISHABLE_KEY)
         enableEdgeToEdge()
         setContent {
@@ -34,14 +39,28 @@ class MowGoActivity : ComponentActivity() {
                 else -> systemDark
             }
             MowGoTheme(darkTheme = darkTheme) {
-                MowGoNavHost()
+                val deepLinkEvent by settingsDeepLinkEvent.collectAsState()
+                MowGoNavHost(settingsDeepLinkEvent = deepLinkEvent)
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleDeepLink(intent)
+    }
+
+    private fun handleDeepLink(intent: Intent?) {
+        val data = intent?.data
+        if (data?.scheme == "mowgo" && data.host == "settings") {
+            settingsDeepLinkEvent.value = settingsDeepLinkEvent.value + 1
         }
     }
 }
 
 @Composable
-fun MowGoNavHost() {
+fun MowGoNavHost(settingsDeepLinkEvent: Long = 0L) {
     val navController = rememberNavController()
 
     NavHost(
@@ -76,6 +95,7 @@ fun MowGoNavHost() {
 
         composable("main") {
             MainScreen(
+                settingsDeepLinkEvent = settingsDeepLinkEvent,
                 onSignedOut = {
                     navController.navigate(NavRoutes.LOGIN) {
                         popUpTo("main") { inclusive = true }

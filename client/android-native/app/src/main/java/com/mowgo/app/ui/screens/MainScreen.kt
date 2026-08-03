@@ -21,10 +21,23 @@ import com.mowgo.app.ui.screens.chat.ChatScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(onSignedOut: () -> Unit = {}) {
+fun MainScreen(
+    settingsDeepLinkEvent: Long = 0L,
+    onSignedOut: () -> Unit = {},
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(settingsDeepLinkEvent) {
+        if (settingsDeepLinkEvent > 0L) {
+            navController.navigate(NavRoutes.MORE) {
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -95,6 +108,7 @@ fun MainScreen(onSignedOut: () -> Unit = {}) {
             composable(NavRoutes.INVOICES) { InvoicesScreen() }
             composable(NavRoutes.MORE) {
                 MoreScreen(
+                    openBillingEvent = settingsDeepLinkEvent,
                     onSignedOut = onSignedOut,
                     onOpenChat = { navController.navigate(NavRoutes.CHAT) },
                 )

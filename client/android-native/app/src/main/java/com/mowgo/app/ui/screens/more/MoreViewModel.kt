@@ -59,6 +59,10 @@ class MoreViewModel(
         }
     }
 
+    fun onResume() {
+        loadProfile()
+    }
+
     fun updateProfile(name: String, phone: String, email: String) {
         // Invalidate any in-flight load so it can't clobber the saved profile.
         profileLoadGeneration++
