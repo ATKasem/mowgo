@@ -44,10 +44,6 @@ struct RecurringJob: Codable, Identifiable, Equatable {
 
     // MARK: - Pattern Matching
 
-    private static let dateFmt: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.timeZone = TimeZone(secondsFromGMT: 0); return f
-    }()
-
     // Local calendar formatter — treats the date string as a calendar date
     // in the user's locale, matching Calendar.current math below.
     private static let localDateFmt: DateFormatter = {

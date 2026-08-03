@@ -83,7 +83,16 @@ final class AuthService: ObservableObject {
     func signOut() async {
         isAuthenticated = false
         user = nil
-        await PushNotificationService.shared.clearDeviceToken()?.value
+        // Wait for the device-token clear, but cap it at 5s so sign-out
+        // never hangs on a slow network (network timeout is 30s).
+        if let clearTask = PushNotificationService.shared.clearDeviceToken() {
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask { await clearTask.value }
+                group.addTask { try? await Task.sleep(for: .seconds(5)) }
+                await group.next()
+                group.cancelAll()
+            }
+        }
         await sb.signOut()
     }
 
