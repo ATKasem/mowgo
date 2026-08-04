@@ -293,7 +293,7 @@ private fun RainDelayDialog(count: Int, applying: Boolean, dismiss: () -> Unit, 
                 listOf("Tomorrow", "Pick a date").forEachIndexed { index, label -> SegmentedButton(selected = custom == (index == 1), onClick = { custom = index == 1; if (!custom) target = tomorrow }, shape = SegmentedButtonDefaults.itemShape(index, 2), label = { Text(label) }) }
             }
             if (custom) OutlinedButton({ showPicker = true }, Modifier.fillMaxWidth()) { Icon(Icons.Filled.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(target.toString()) }
-            Text("Only today's scheduled and in-progress jobs move.", color = MowGoColors.TextSecondaryDark)
+            Text("Only today's scheduled jobs move.", color = MowGoColors.TextSecondaryDark)
         } },
         confirmButton = { Button({ confirm(target.toString()) }, enabled = !applying && count > 0, colors = ButtonDefaults.buttonColors(containerColor = MowGoColors.RainBlue)) { if (applying) CircularProgressIndicator(Modifier.size(18.dp)) else Text("Confirm Rain Delay") } },
         dismissButton = { TextButton(dismiss, enabled = !applying) { Text("Cancel") } },

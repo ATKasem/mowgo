@@ -141,7 +141,7 @@ private fun ClientCard(client: Client, onEdit: () -> Unit, onDelete: () -> Unit)
 @Composable
 private fun NewLeadDialog(saving: Boolean, dismiss: () -> Unit, save: (String, String?, String?, String?, String, String?) -> Unit) {
     var name by remember { mutableStateOf("") }; var phone by remember { mutableStateOf("") }; var email by remember { mutableStateOf("") }; var address by remember { mutableStateOf("") }; var notes by remember { mutableStateOf("") }; var source by remember { mutableStateOf("other") }; var sourceMenu by remember { mutableStateOf(false) }
-    val sources = listOf("referral", "website", "google", "facebook", "yard_sign", "booking_link", "other")
+    val sources = listOf("booking_link", "phone", "facebook", "referral", "walk_in", "other")
     AlertDialog(dismiss, title = { Text("New Lead") }, containerColor = MowGoColors.SurfaceDark, text = {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             LeadField(name, { name = it }, "Name *"); LeadField(phone, { phone = it }, "Phone"); LeadField(email, { email = it }, "Email"); LeadField(address, { address = it }, "Address")

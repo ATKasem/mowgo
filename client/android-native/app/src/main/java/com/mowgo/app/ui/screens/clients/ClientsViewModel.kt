@@ -108,14 +108,17 @@ class ClientsViewModel : ViewModel() {
     }
 
     private fun mutate(success: String, action: suspend () -> Unit) {
+        if (_uiState.value.isMutating) return
+        _uiState.value = _uiState.value.copy(isMutating = true)
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isMutating = true)
             try {
                 action()
-                _uiState.value = _uiState.value.copy(isMutating = false, showSnackbar = success)
+                _uiState.value = _uiState.value.copy(showSnackbar = success)
                 loadData()
             } catch (error: Exception) {
-                _uiState.value = _uiState.value.copy(isMutating = false, showSnackbar = "Failed: ${error.message}")
+                _uiState.value = _uiState.value.copy(showSnackbar = "Failed: ${error.message}")
+            } finally {
+                _uiState.value = _uiState.value.copy(isMutating = false)
             }
         }
     }

@@ -199,20 +199,19 @@ class JobRepository {
     }
 
     /**
-     * Move all today's scheduled/in_progress jobs to tomorrow (rain delay).
+     * Move all today's scheduled jobs to the requested date (rain delay).
      * Returns the count of jobs moved.
      */
     suspend fun rainDelay(date: String, targetDate: String): RainDelayEntry? {
+        require(date.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) { "Rain delay source date must use YYYY-MM-DD" }
+        require(targetDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) { "Rain delay target date must use YYYY-MM-DD" }
 
         if (!SupabaseClientProvider.isConfigured) {
             val affected = demoJobsMutable.filter {
-                it.scheduledDate == date &&
-                    (it.status == Job.STATUS_SCHEDULED || it.status == Job.STATUS_IN_PROGRESS)
+                it.scheduledDate == date && it.status == Job.STATUS_SCHEDULED
             }
             demoJobsMutable = demoJobsMutable.map { jwc ->
-                if (jwc.scheduledDate == date &&
-                    (jwc.status == Job.STATUS_SCHEDULED || jwc.status == Job.STATUS_IN_PROGRESS)
-                ) {
+                if (jwc.scheduledDate == date && jwc.status == Job.STATUS_SCHEDULED) {
                     jwc.copy(job = jwc.job.copy(scheduledDate = targetDate))
                 } else {
                     jwc
@@ -233,8 +232,7 @@ class JobRepository {
             .decodeList<Job>()
 
         val jobsToMove = allJobs.filter {
-            it.scheduledDate == date &&
-                (it.status == Job.STATUS_SCHEDULED || it.status == Job.STATUS_IN_PROGRESS)
+            it.scheduledDate == date && it.status == Job.STATUS_SCHEDULED
         }
 
         val moved = mutableListOf<Job>()
@@ -244,9 +242,14 @@ class JobRepository {
                 moved += job
             }
         } catch (error: Exception) {
+            var rollbackFailed = false
             for (job in moved) {
-                try { updateJobDate(job.id, job.scheduledDate) } catch (_: Exception) { }
+                try { updateJobDate(job.id, job.scheduledDate) } catch (_: Exception) { rollbackFailed = true }
             }
+            if (rollbackFailed) throw RuntimeException(
+                "Rain delay rollback incomplete — verify your schedule (original: ${error.message})",
+                error,
+            )
             throw error
         }
         if (moved.isEmpty()) return null

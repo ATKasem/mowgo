@@ -59,7 +59,18 @@ class LeadRepository(private val clientRepository: InvoiceRepository = InvoiceRe
             }
             return updated ?: throw IllegalArgumentException("Lead not found")
         }
-        SupabaseClientProvider.client.from("leads").update(stamped) { filter { eq("id", id) } }
+        val fields = buildMap<String, Any> {
+            stamped.name?.let { put("name", it) }
+            stamped.phone?.let { put("phone", it) }
+            stamped.email?.let { put("email", it) }
+            stamped.address?.let { put("address", it) }
+            stamped.source?.let { put("source", it) }
+            stamped.notes?.let { put("notes", it) }
+            stamped.status?.let { put("status", it) }
+            stamped.clientId?.let { put("client_id", it) }
+            put("updated_at", stamped.updatedAt!!)
+        }
+        SupabaseClientProvider.client.from("leads").update(fields) { filter { eq("id", id) } }
         return SupabaseClientProvider.client.from("leads").select {
             filter { eq("id", id) }
         }.decodeList<Lead>().firstOrNull() ?: throw IllegalStateException("Lead not found after update")
@@ -67,10 +78,12 @@ class LeadRepository(private val clientRepository: InvoiceRepository = InvoiceRe
 
     suspend fun updateLeadStatus(id: String, status: LeadStatus): Lead {
         val updated = updateLead(id, LeadPatch(status = status.value))
-        WebhookService.fire("lead.status.updated", mapOf(
-            "lead_id" to updated.id, "name" to updated.name, "status" to status.value,
-            "client_id" to (updated.clientId ?: ""),
-        ))
+        WebhookService.fire("lead.status.updated", buildMap {
+            put("lead_id", updated.id)
+            put("name", updated.name)
+            put("status", updated.status)
+            updated.clientId?.let { put("client_id", it) }
+        })
         return updated
     }
 
@@ -103,8 +116,17 @@ class LeadRepository(private val clientRepository: InvoiceRepository = InvoiceRe
                 "client_id" to client.id,
             ))
         } catch (error: Exception) {
-            try { clientRepository.deleteClient(client.id) } catch (_: Exception) { }
-            throw error
+            val cleanupError = try {
+                clientRepository.deleteClient(client.id)
+                null
+            } catch (cleanupError: Exception) {
+                cleanupError
+            }
+            throw RuntimeException(
+                "Conversion failed: ${error.message}" +
+                    (cleanupError?.let { "; cleanup failed: ${it.message}" } ?: ""),
+                error,
+            )
         }
         return client
     }

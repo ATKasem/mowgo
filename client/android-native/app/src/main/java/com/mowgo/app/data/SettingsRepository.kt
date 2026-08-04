@@ -16,8 +16,6 @@ class SettingsRepository(private val context: Context) {
     private val appearanceKey = stringPreferencesKey("appearance_mode")
     private val completionKey = booleanPreferencesKey("job_completion_alerts")
     private val rainKey = booleanPreferencesKey("rain_delay_alerts")
-    val rainDelayHistoryKey = stringPreferencesKey("rain_delay_history")
-
     val appearanceMode: Flow<String> = context.dataStore.data.map { it[appearanceKey] ?: "system" }
     val jobCompletionAlerts: Flow<Boolean> = context.dataStore.data.map { it[completionKey] ?: true }
     val rainDelayAlerts: Flow<Boolean> = context.dataStore.data.map { it[rainKey] ?: true }
@@ -31,6 +29,9 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit {
             it.remove(completionKey)
             it.remove(rainKey)
+            it.asMap().keys
+                .filter { key -> key.name.startsWith("rain_delay_history") }
+                .forEach { key -> it.remove(key) }
         }
     }
 }

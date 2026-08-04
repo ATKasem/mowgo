@@ -71,9 +71,7 @@ data class TodayUiState(
         get() = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE", Locale.US))
 
     val movableJobCount: Int
-        get() = todayJobs.count {
-            it.status == Job.STATUS_SCHEDULED || it.status == Job.STATUS_IN_PROGRESS
-        }
+        get() = todayJobs.count { it.status == Job.STATUS_SCHEDULED }
 }
 
 class TodayViewModel(application: Application) : AndroidViewModel(application) {
@@ -173,7 +171,16 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun confirmRainDelay(targetDate: String) {
-        val sourceDate = LocalDate.now().toString()
+        val today = LocalDate.now()
+        val parsedTarget = try { LocalDate.parse(targetDate) } catch (_: Exception) { null }
+        if (parsedTarget == null || parsedTarget <= today) {
+            _uiState.value = _uiState.value.copy(
+                error = "Rain delay target must be in the future",
+                showSnackbar = "Rain delay target must be in the future",
+            )
+            return
+        }
+        val sourceDate = today.toString()
         _uiState.value = _uiState.value.copy(isApplyingRainDelay = true, rainDelayTargetDate = targetDate)
         viewModelScope.launch {
             try {

@@ -17,8 +17,11 @@ class InvoiceRepository {
     suspend fun loadClients(): List<Client> {
         if (!SupabaseClientProvider.isConfigured) return demoClients()
         val userId = getCurrentUserId() ?: return emptyList()
+        val profile = ProfileRepository().loadProfile()
+        val ownerId = if (profile?.role == "crew") profile.businessId else userId
+        if (ownerId == null) return emptyList()
         return SupabaseClientProvider.client.from("clients").select {
-            filter { eq("user_id", userId) }
+            filter { eq("user_id", ownerId) }
             order("name", Order.ASCENDING)
         }.decodeList<Client>()
     }
