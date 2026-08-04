@@ -48,6 +48,8 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
         [process.env.STRIPE_PRICE_CREW]: 'crew',
         [process.env.STRIPE_PRICE_SOLO_ANNUAL]: 'solo',
         [process.env.STRIPE_PRICE_CREW_ANNUAL]: 'crew',
+        [process.env.STRIPE_PRICE_PREMIUM]: 'premium',
+        [process.env.STRIPE_PRICE_PREMIUM_ANNUAL]: 'premium',
       },
     });
   } catch (err) {
