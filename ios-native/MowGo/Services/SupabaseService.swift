@@ -394,7 +394,11 @@ actor SupabaseService {
 
     func fetchJobs() async throws -> [Job] {
         guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
-        let path = "/rest/v1/jobs?select=*,clients!left(*)&user_id=eq.\(uid.uuidString)&order=scheduled_date.asc"
+        let profile = try? await fetchProfile()
+        let filter = profile?.role == "crew"
+            ? "assigned_to=eq.\(uid.uuidString)"
+            : "user_id=eq.\(uid.uuidString)"
+        let path = "/rest/v1/jobs?select=*,clients!left(*)&\(filter)&order=scheduled_date.asc"
         let data = try await request("GET", path)
         return try decoder.decode([Job].self, from: data)
     }
