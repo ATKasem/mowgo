@@ -29,6 +29,16 @@ export async function onRequestPost({ request, env }) {
     if (!userResponse.ok) return Response.json({ error: 'Invalid token' }, { status: 401, headers });
     const user = await userResponse.json();
     const serviceHeaders = { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };
+    let profileResponse;
+    try {
+      profileResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?select=tier&id=eq.${user.id}`, { headers: serviceHeaders });
+    } catch {
+      return Response.json({ error: 'Could not verify your plan. Please try again.' }, { status: 500, headers });
+    }
+    if (!profileResponse.ok) return Response.json({ error: 'Could not verify your plan. Please try again.' }, { status: 500, headers });
+    const profile = await profileResponse.json().catch(() => null);
+    if (!Array.isArray(profile)) return Response.json({ error: 'Could not verify your plan. Please try again.' }, { status: 500, headers });
+    if (!['solo', 'crew'].includes(profile[0]?.tier)) return Response.json({ error: 'Concierge setup is a Solo/Crew perk. Upgrade to claim it.' }, { status: 403, headers });
     const insertResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/concierge_requests`, { method: 'POST', headers: serviceHeaders, body: JSON.stringify({ user_id: user.id, business_name: businessName, client_count: body.client_count ?? null, csv_content: csvContent, status: 'pending' }) });
     const inserted = await insertResponse.json().catch(() => null);
     if (!insertResponse.ok) {
