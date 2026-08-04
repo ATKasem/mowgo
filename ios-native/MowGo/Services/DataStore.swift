@@ -1095,7 +1095,6 @@ final class DataStore: ObservableObject {
                         }
                         if !removed {
                             failedToRemoveQueuedChanges = true
-                            self.error = "Could not remove queued rain delay changes — verify your schedule"
                         }
                     } else if let original = originalDates[jobId],
                               let realJob = self.jobs.first(where: { $0.id == jobId }) {
@@ -1114,7 +1113,11 @@ final class DataStore: ObservableObject {
                     self.error = "Could not remove queued rain delay changes — verify your schedule"
                 }
                 if serverRollbackFailed {
-                    self.error = "Rain delay rollback incomplete — verify your schedule"
+                    if let existing = self.error {
+                        self.error = existing + " Rain delay rollback incomplete — verify your schedule"
+                    } else {
+                        self.error = "Rain delay rollback incomplete — verify your schedule"
+                    }
                 }
                 throw error
             }
@@ -1214,7 +1217,11 @@ final class DataStore: ObservableObject {
                 self.error = "Could not remove queued rain delay changes — verify your schedule"
             }
             if serverRollbackFailed {
-                self.error = "Undo rollback incomplete — verify your schedule"
+                if let existing = self.error {
+                    self.error = existing + " Undo rollback incomplete — verify your schedule"
+                } else {
+                    self.error = "Undo rollback incomplete — verify your schedule"
+                }
             }
             throw error
         }
