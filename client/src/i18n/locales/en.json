@@ -610,7 +610,8 @@
     "year": "year",
     "billed_once_a_year_cancel_anytime": "Billed once a year. Cancel anytime.",
     "one_payment_covers_the_whole_season_no_card_hits_in_winter": "One payment covers the whole season. No card hits in winter.",
-    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "Annual? The Rain-Proof Guarantee still applies — unused months refunded."
+    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "Annual? The Rain-Proof Guarantee still applies — unused months refunded.",
+    "save_savings": "Save ${{savings}}"
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",

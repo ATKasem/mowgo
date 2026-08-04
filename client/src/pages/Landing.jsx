@@ -327,11 +327,11 @@ export default function Landing() {
                   {plan.highlight && <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-brand text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">{tr("Most Popular")}</span></div>}
                   <h3 className={`text-lg font-bold ${plan.highlight ? 'text-brand-hover dark:text-emerald-400 mt-3' : 'text-[var(--color-text-primary)] dark:text-white'}`}>{plan.name}</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr(plan.desc)}</p>
-                  <div className="mt-5 mb-6">
+                  <div className="mt-5 mb-6 min-h-[72px]">
                     <span className="text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white">{plan.price === '0' ? tr('Free') : `$${billingInterval === 'year' && plan.annualPrice ? plan.annualPrice : plan.price}`}</span>
                     {plan.price !== '0' && <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] font-medium">/{tr(billingInterval === 'year' && plan.annualPrice ? 'year' : plan.period)}</span>}
-                    {billingInterval === 'year' && plan.annualPrice && (
-                      <span className="ml-2 inline-block align-middle text-[11px] font-bold text-brand bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5">{tr("2 months free")}</span>
+                    {billingInterval === 'year' && plan.annualPrice && plan.price !== '0' && (
+                      <span className="ml-2 inline-block align-middle text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5">{tr('Save ${{savings}}', { savings: String(Number(plan.price) * 12 - Number(plan.annualPrice)) })}</span>
                     )}
                     {billingInterval === 'year' && plan.price !== '0' && (
                       <p className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-1.5">{tr("Billed once a year. Cancel anytime.")}</p>

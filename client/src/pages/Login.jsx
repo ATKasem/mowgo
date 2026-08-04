@@ -160,7 +160,7 @@ export default function Login() {
             <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
           </Link>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
-          {mode === 'signup' && <p className="text-sm text-gray-500 dark:text-gray-400 -mt-3 mb-4 text-center">{tr("Create your free account — 5 clients, no credit card.")}</p>}
+          {mode === 'signup' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr("Create your free account — 5 clients, no credit card.")}</p>}
         </div>
 
         {confirmSent ? (

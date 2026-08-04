@@ -662,7 +662,8 @@
     "year": "año",
     "billed_once_a_year_cancel_anytime": "Se cobra una vez al año. Cancela cuando quieras.",
     "one_payment_covers_the_whole_season_no_card_hits_in_winter": "Un solo pago cubre toda la temporada. Sin cargos en invierno.",
-    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "¿Plan anual? La Garantía Rain-Proof sigue aplicando — se reembolsan los meses no usados."
+    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "¿Plan anual? La Garantía Rain-Proof sigue aplicando — se reembolsan los meses no usados.",
+    "save_savings": "Ahorra ${{savings}}"
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
