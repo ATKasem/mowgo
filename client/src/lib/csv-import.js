@@ -74,6 +74,75 @@ function parseRecords(source, delimiter) {
   return records;
 }
 
+export function cleanClientRows(rows) {
+  const placeholders = /^(n\/?a|n\/?a\/?n|unknown|\?|none|-+|tbd|missing|not sure)$/i;
+  const normalizePhone = value => {
+    let digits = String(value).replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+    return digits.length === 10
+      ? `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+      : digits;
+  };
+  const seenNamesAndAddresses = new Set();
+  const seenNamesAndPhones = new Set();
+  const cleanedRows = [];
+  let cleaned = 0;
+  let duplicates = 0;
+
+  rows.forEach(sourceRow => {
+    const row = {};
+    let changed = false;
+    ['name', 'address', 'phone', 'email', 'rate'].forEach(field => {
+      const original = String(sourceRow?.[field] ?? '');
+      let value = original.trim().replace(/\s+/g, ' ');
+      if (placeholders.test(value)) value = '';
+      row[field] = value;
+      if (value !== original) changed = true;
+    });
+
+    const phone = normalizePhone(row.phone);
+    if (phone !== row.phone) changed = true;
+    row.phone = phone;
+
+    if (row.rate && !/^\d+$/.test(row.rate)) {
+      const match = row.rate.match(/\d+(?:\.\d+)?/);
+      const rate = match ? match[0] : '';
+      if (rate !== row.rate) changed = true;
+      row.rate = rate;
+    }
+
+    if (!row.address && row.name.includes(',')) {
+      const comma = row.name.indexOf(',');
+      row.address = row.name.slice(comma + 1).trim();
+      row.name = row.name.slice(0, comma).trim();
+      changed = true;
+    }
+
+    if (!row.phone) {
+      const match = row.name.match(/\b(?:1\d{10}|\d{10})\b/);
+      if (match) {
+        row.phone = normalizePhone(match[0]);
+        row.name = row.name.replace(match[0], '').trim().replace(/\s+/g, ' ');
+        changed = true;
+      }
+    }
+
+    const name = row.name.toLowerCase();
+    const nameAndAddress = `${name}|${row.address.toLowerCase()}`;
+    const nameAndPhone = row.phone ? `${name}|${row.phone}` : '';
+    if (changed) cleaned += 1;
+    if (seenNamesAndAddresses.has(nameAndAddress) || (nameAndPhone && seenNamesAndPhones.has(nameAndPhone))) {
+      duplicates += 1;
+      return;
+    }
+    seenNamesAndAddresses.add(nameAndAddress);
+    if (nameAndPhone) seenNamesAndPhones.add(nameAndPhone);
+    cleanedRows.push(row);
+  });
+
+  return { rows: cleanedRows, cleaned, duplicates };
+}
+
 export function parseClientCsv(text) {
   const source = String(text || '').replace(/^\uFEFF/, '');
   const firstText = firstRecord(source);

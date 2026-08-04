@@ -986,6 +986,7 @@
     "paste": "Paste",
     "paste_your_client_list_from_excel_or_csv": "Paste your client list (from Excel or CSV)",
     "count_valid_clients": "{{count}} valid clients",
+    "we_ll_organize_your_list_automatically_cleaned_rows_tidied_up_duplicates": "We'll organize your list automatically: {{cleaned}} rows tidied up, {{duplicates}} duplicates removed.",
     "name": "Name",
     "address": "Address",
     "phone": "Phone",

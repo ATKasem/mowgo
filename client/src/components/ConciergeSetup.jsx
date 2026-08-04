@@ -3,7 +3,7 @@ import { Loader2, Upload } from 'lucide-react';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useAuth } from '../App';
 import { loadProfile } from '../lib/data';
-import { parseClientCsv } from '../lib/csv-import';
+import { cleanClientRows, parseClientCsv } from '../lib/csv-import';
 
 export default function ConciergeSetup({ onDone }) {
   const { tr } = useLocalizedText('concierge');
@@ -25,7 +25,10 @@ export default function ConciergeSetup({ onDone }) {
     timer.current = setTimeout(() => setParsedText(rawText), 400);
     return () => clearTimeout(timer.current);
   }, [rawText]);
-  const parsed = useMemo(() => parseClientCsv(parsedText), [parsedText]);
+  const parsed = useMemo(() => {
+    const result = parseClientCsv(parsedText);
+    return { ...result, ...cleanClientRows(result.rows) };
+  }, [parsedText]);
 
   function readFile(file) {
     if (!file) return;
@@ -69,7 +72,7 @@ export default function ConciergeSetup({ onDone }) {
         </label>
         <div><label className="label">{tr('Paste')}</label><textarea className="input min-h-32 resize-y" value={rawText} onChange={e => setRawText(e.target.value)} placeholder={tr('Paste your client list (from Excel or CSV)')} /></div>
       </div>
-      {parsedText.trim() && <div className="space-y-3"><p className="text-sm font-semibold">{tr('{{count}} valid clients', { count: parsed.rows.length })}</p><div className="overflow-x-auto"><table className="w-full text-xs"><thead><tr className="text-left border-b dark:border-gray-700">{['Name','Address','Phone','Email','Rate'].map(h => <th key={h} className="p-2">{tr(h)}</th>)}</tr></thead><tbody>{parsed.rows.slice(0, 5).map((row, index) => <tr key={index} className="border-b dark:border-gray-800">{['name','address','phone','email','rate'].map(field => <td key={field} className="p-2">{row[field]}</td>)}</tr>)}</tbody></table></div>{parsed.errors.map(item => <p key={`${item.row}-${item.message}`} className="text-xs text-red-600 dark:text-red-400">{tr('Row {{row}}: {{message}}', { row: item.row, message: tr(item.message) })}</p>)}</div>}
+      {parsedText.trim() && <div className="space-y-3"><p className="text-sm font-semibold">{tr('{{count}} valid clients', { count: parsed.rows.length })}</p>{(parsed.cleaned > 0 || parsed.duplicates > 0) && <p className="text-xs text-emerald-600 dark:text-emerald-400">{tr("We'll organize your list automatically: {{cleaned}} rows tidied up, {{duplicates}} duplicates removed.", { cleaned: parsed.cleaned, duplicates: parsed.duplicates })}</p>}<div className="overflow-x-auto"><table className="w-full text-xs"><thead><tr className="text-left border-b dark:border-gray-700">{['Name','Address','Phone','Email','Rate'].map(h => <th key={h} className="p-2">{tr(h)}</th>)}</tr></thead><tbody>{parsed.rows.slice(0, 5).map((row, index) => <tr key={index} className="border-b dark:border-gray-800">{['name','address','phone','email','rate'].map(field => <td key={field} className="p-2">{row[field]}</td>)}</tr>)}</tbody></table></div>{parsed.errors.map(item => <p key={`${item.row}-${item.message}`} className="text-xs text-red-600 dark:text-red-400">{tr('Row {{row}}: {{message}}', { row: item.row, message: tr(item.message) })}</p>)}</div>}
       {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       <button className="btn-primary w-full" disabled={submitting || !businessName.trim() || parsed.rows.length < 1}>{submitting ? <><Loader2 className="w-4 h-4 animate-spin" />{tr('Submitting...')}</> : tr('Submit setup request')}</button>
     </form>

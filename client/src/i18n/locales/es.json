@@ -999,6 +999,7 @@
     "paste": "Pegar",
     "paste_your_client_list_from_excel_or_csv": "Pega tu lista de clientes (desde Excel o CSV)",
     "count_valid_clients": "{{count}} clientes válidos",
+    "we_ll_organize_your_list_automatically_cleaned_rows_tidied_up_duplicates": "Organizaremos tu lista automáticamente: {{cleaned}} filas ordenadas, {{duplicates}} duplicados eliminados.",
     "name": "Nombre",
     "address": "DIRECCIÓN",
     "phone": "Teléfono",
