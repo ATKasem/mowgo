@@ -1,12 +1,17 @@
 package com.mowgo.app.ui.screens.today
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
 import com.mowgo.app.data.JobPhotoRepository
+import com.mowgo.app.data.RainDelayHistoryStore
+import com.mowgo.app.data.WeatherForecast
+import com.mowgo.app.data.WeatherRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
+import com.mowgo.app.data.model.RainDelayEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +31,12 @@ data class TodayUiState(
     val businessName: String = "Green Thumb Lawn Care",
     val showRainDelayDialog: Boolean = false,
     val rainDelayCount: Int = 0,
+    val rainDelayTargetDate: String = LocalDate.now().plusDays(1).toString(),
+    val rainDelayHistory: List<RainDelayEntry> = emptyList(),
+    val showRainDelayHistory: Boolean = false,
+    val isApplyingRainDelay: Boolean = false,
+    val isUndoingRainDelay: Boolean = false,
+    val weatherAlert: WeatherForecast? = null,
     val showSnackbar: String? = null,
     val showNewJobDialog: Boolean = false,
     val editingJob: JobWithClient? = null,
@@ -65,10 +76,13 @@ data class TodayUiState(
         }
 }
 
-class TodayViewModel : ViewModel() {
+class TodayViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = JobRepository()
     private val photoRepository = JobPhotoRepository(repository)
+    private val historyStore = RainDelayHistoryStore(application.applicationContext)
+    private val weatherRepository = WeatherRepository()
+    private var loadGeneration = 0
 
     private val _uiState = MutableStateFlow(TodayUiState())
     val uiState: StateFlow<TodayUiState> = _uiState.asStateFlow()
@@ -78,18 +92,23 @@ class TodayViewModel : ViewModel() {
     }
 
     fun loadData() {
+        val generation = ++loadGeneration
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            if (generation == loadGeneration) _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val jobs = repository.loadJobs()
                 val clients = repository.loadClients()
-                _uiState.value = _uiState.value.copy(
+                val history = historyStore.load()
+                val weather = weatherRepository.forecast(null, null)?.firstOrNull { it.precipitationProbability >= 60 }
+                if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     jobs = jobs,
                     clients = clients,
+                    rainDelayHistory = history,
+                    weatherAlert = weather,
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+                if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Failed to load data",
                 )
@@ -145,6 +164,7 @@ class TodayViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(
             showRainDelayDialog = true,
             rainDelayCount = count,
+            rainDelayTargetDate = LocalDate.now().plusDays(1).toString(),
         )
     }
 
@@ -152,20 +172,44 @@ class TodayViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(showRainDelayDialog = false)
     }
 
-    fun confirmRainDelay() {
-        val count = _uiState.value.rainDelayCount
-        _uiState.value = _uiState.value.copy(showRainDelayDialog = false)
+    fun confirmRainDelay(targetDate: String) {
+        val sourceDate = LocalDate.now().toString()
+        _uiState.value = _uiState.value.copy(isApplyingRainDelay = true, rainDelayTargetDate = targetDate)
         viewModelScope.launch {
             try {
-                val moved = repository.rainDelay()
+                val entry = repository.rainDelay(sourceDate, targetDate)
+                val history = if (entry == null) historyStore.load() else historyStore.add(entry)
                 _uiState.value = _uiState.value.copy(
-                    showSnackbar = "Moved $moved jobs to tomorrow",
+                    showRainDelayDialog = false,
+                    isApplyingRainDelay = false,
+                    rainDelayHistory = history,
+                    showSnackbar = if (entry == null) "No jobs moved" else "Moved ${entry.jobCount} jobs to ${entry.targetDate}",
                 )
                 loadData()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
+                    isApplyingRainDelay = false,
                     showSnackbar = "Failed to delay: ${e.message}",
                 )
+            }
+        }
+    }
+
+    fun showRainDelayHistory() { _uiState.value = _uiState.value.copy(showRainDelayHistory = true) }
+    fun dismissRainDelayHistory() { if (!_uiState.value.isUndoingRainDelay) _uiState.value = _uiState.value.copy(showRainDelayHistory = false) }
+
+    fun undoRainDelay(entry: RainDelayEntry) {
+        if (_uiState.value.isUndoingRainDelay) return
+        _uiState.value = _uiState.value.copy(isUndoingRainDelay = true)
+        viewModelScope.launch {
+            try {
+                val result = repository.undoRainDelay(entry)
+                val history = historyStore.replace(entry.createdAt, result.remainingEntry)
+                val message = if (result.skippedCount > 0) "Partially undone — ${result.skippedCount} job(s) were missing or rescheduled manually." else "Rain delay undone"
+                _uiState.value = _uiState.value.copy(isUndoingRainDelay = false, rainDelayHistory = history, showSnackbar = message)
+                loadData()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(isUndoingRainDelay = false, showSnackbar = "Undo failed: ${error.message}")
             }
         }
     }

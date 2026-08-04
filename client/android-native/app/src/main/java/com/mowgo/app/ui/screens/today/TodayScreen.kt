@@ -27,6 +27,9 @@ import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.ui.components.JobPhotoButton
 import com.mowgo.app.ui.components.JobPhotoThumbnail
 import com.mowgo.app.ui.theme.MowGoColors
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,36 +48,11 @@ fun TodayScreen(
         }
     }
 
-    // Rain delay confirmation dialog
     if (state.showRainDelayDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissRainDelayDialog() },
-            title = {
-                Text("Rain Delay", color = MowGoColors.TextPrimaryDark)
-            },
-            text = {
-                Text(
-                    text = "Move ${state.rainDelayCount} jobs to tomorrow?",
-                    color = MowGoColors.TextSecondaryDark,
-                )
-            },
-            containerColor = MowGoColors.SurfaceDark,
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.confirmRainDelay() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MowGoColors.RainBlue,
-                    ),
-                ) {
-                    Text("Move to Tomorrow")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.dismissRainDelayDialog() }) {
-                    Text("Cancel", color = MowGoColors.TextSecondaryDark)
-                }
-            },
-        )
+        RainDelayDialog(state.rainDelayCount, state.isApplyingRainDelay, viewModel::dismissRainDelayDialog, viewModel::confirmRainDelay)
+    }
+    if (state.showRainDelayHistory) {
+        RainDelayHistoryDialog(state.rainDelayHistory, state.isUndoingRainDelay, viewModel::dismissRainDelayHistory, viewModel::undoRainDelay)
     }
 
     // New job dialog
@@ -143,8 +121,18 @@ fun TodayScreen(
                     onRetry = { viewModel.refresh() },
                 )
             } else if (state.todayJobs.isEmpty()) {
-                // Empty state
-                EmptyContent()
+                Column(Modifier.fillMaxSize()) {
+                    TodayHeader(
+                        date = state.todayDate,
+                        weekday = state.todayWeekday,
+                        businessName = state.businessName,
+                        movableJobCount = state.movableJobCount,
+                        onRainDelay = viewModel::showRainDelayDialog,
+                        hasHistory = state.rainDelayHistory.isNotEmpty(),
+                        onHistory = viewModel::showRainDelayHistory,
+                    )
+                    EmptyContent()
+                }
             } else {
                 // Content
                 LazyColumn(
@@ -159,7 +147,17 @@ fun TodayScreen(
                             businessName = state.businessName,
                             movableJobCount = state.movableJobCount,
                             onRainDelay = { viewModel.showRainDelayDialog() },
+                            hasHistory = state.rainDelayHistory.isNotEmpty(),
+                            onHistory = viewModel::showRainDelayHistory,
                         )
+                    }
+
+                    state.weatherAlert?.let { forecast ->
+                        item {
+                            Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MowGoColors.RainBlue)) {
+                                Text("Rain chance ${forecast.precipitationProbability}% on ${forecast.date}", Modifier.padding(12.dp), color = MowGoColors.OnAccent, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
                     }
 
                     // Stats grid
@@ -214,6 +212,8 @@ private fun TodayHeader(
     businessName: String,
     movableJobCount: Int,
     onRainDelay: () -> Unit,
+    hasHistory: Boolean,
+    onHistory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -265,7 +265,46 @@ private fun TodayHeader(
                 fontWeight = FontWeight.SemiBold,
             )
         }
+        if (hasHistory) {
+            TextButton(onClick = onHistory, modifier = Modifier.align(Alignment.End)) {
+                Icon(Icons.Filled.History, null); Spacer(Modifier.width(4.dp)); Text("Rain Delay History")
+            }
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RainDelayDialog(count: Int, applying: Boolean, dismiss: () -> Unit, confirm: (String) -> Unit) {
+    var custom by remember { mutableStateOf(false) }
+    var showPicker by remember { mutableStateOf(false) }
+    val tomorrow = LocalDate.now().plusDays(1)
+    var target by remember { mutableStateOf(tomorrow) }
+    if (showPicker) {
+        val minimum = tomorrow.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+        val picker = rememberDatePickerState(initialSelectedDateMillis = target.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(), selectableDates = object : SelectableDates { override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis >= minimum })
+        DatePickerDialog({ showPicker = false }, confirmButton = { TextButton({ picker.selectedDateMillis?.let { target = Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate() }; showPicker = false }) { Text("OK") } }, dismissButton = { TextButton({ showPicker = false }) { Text("Cancel") } }) { DatePicker(picker) }
+    }
+    AlertDialog(
+        onDismissRequest = { if (!applying) dismiss() }, title = { Text("Rain Delay") }, containerColor = MowGoColors.SurfaceDark,
+        text = { Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Text("$count scheduled jobs will move", color = MowGoColors.TextPrimaryDark)
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                listOf("Tomorrow", "Pick a date").forEachIndexed { index, label -> SegmentedButton(selected = custom == (index == 1), onClick = { custom = index == 1; if (!custom) target = tomorrow }, shape = SegmentedButtonDefaults.itemShape(index, 2), label = { Text(label) }) }
+            }
+            if (custom) OutlinedButton({ showPicker = true }, Modifier.fillMaxWidth()) { Icon(Icons.Filled.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(target.toString()) }
+            Text("Only today's scheduled and in-progress jobs move.", color = MowGoColors.TextSecondaryDark)
+        } },
+        confirmButton = { Button({ confirm(target.toString()) }, enabled = !applying && count > 0, colors = ButtonDefaults.buttonColors(containerColor = MowGoColors.RainBlue)) { if (applying) CircularProgressIndicator(Modifier.size(18.dp)) else Text("Confirm Rain Delay") } },
+        dismissButton = { TextButton(dismiss, enabled = !applying) { Text("Cancel") } },
+    )
+}
+
+@Composable
+private fun RainDelayHistoryDialog(history: List<com.mowgo.app.data.model.RainDelayEntry>, undoing: Boolean, dismiss: () -> Unit, undo: (com.mowgo.app.data.model.RainDelayEntry) -> Unit) {
+    AlertDialog(onDismissRequest = { if (!undoing) dismiss() }, title = { Text("Rain Delay History") }, containerColor = MowGoColors.SurfaceDark,
+        text = { if (history.isEmpty()) Text("No rain delays yet") else LazyColumn(Modifier.heightIn(max = 420.dp)) { items(history, key = { it.createdAt }) { entry -> Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text("${entry.date} → ${entry.targetDate}", color = MowGoColors.TextPrimaryDark); Text("${entry.jobCount} job(s)", color = MowGoColors.TextSecondaryDark) }; OutlinedButton({ undo(entry) }, enabled = !undoing) { Text("Undo") } } } },
+        confirmButton = { TextButton(dismiss, enabled = !undoing) { Text("Done") } })
 }
 
 // ── Stats Row ───────────────────────────────────────────────────────────

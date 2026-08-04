@@ -14,6 +14,15 @@ import java.util.UUID
  */
 class InvoiceRepository {
 
+    suspend fun loadClients(): List<Client> {
+        if (!SupabaseClientProvider.isConfigured) return demoClients()
+        val userId = getCurrentUserId() ?: return emptyList()
+        return SupabaseClientProvider.client.from("clients").select {
+            filter { eq("user_id", userId) }
+            order("name", Order.ASCENDING)
+        }.decodeList<Client>()
+    }
+
     // ── Invoice CRUD ────────────────────────────────────────────────────
 
     /** Load all invoices for the current user. */
@@ -105,11 +114,11 @@ class InvoiceRepository {
     // ── Client CRUD ─────────────────────────────────────────────────────
 
     /** Create a new client. */
-    suspend fun createClient(client: Client) {
+    suspend fun createClient(client: Client): Client {
         if (!SupabaseClientProvider.isConfigured) {
             val newClient = client.copy(id = "demo-client-${System.currentTimeMillis()}")
             demoClientsMutable = listOf(newClient) + (demoClientsMutable ?: emptyList())
-            return
+            return newClient
         }
 
         val userId = getCurrentUserId() ?: throw IllegalStateException("Not authenticated")
@@ -125,6 +134,7 @@ class InvoiceRepository {
             "address" to (clientWithUser.address ?: ""), "phone" to (clientWithUser.phone ?: ""),
             "email" to (clientWithUser.email ?: ""), "rate" to clientWithUser.rate.toString(),
         ))
+        return clientWithUser
     }
 
     /** Update an existing client. */

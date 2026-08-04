@@ -3,9 +3,12 @@ package com.mowgo.app.data
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
+import com.mowgo.app.data.model.RainDelayEntry
+import com.mowgo.app.data.model.RainDelayUndoResult
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import java.time.LocalDate
+import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import kotlinx.serialization.SerialName
@@ -199,28 +202,28 @@ class JobRepository {
      * Move all today's scheduled/in_progress jobs to tomorrow (rain delay).
      * Returns the count of jobs moved.
      */
-    suspend fun rainDelay(): Int {
-        val today = dateFormat.format(LocalDate.now())
-        val tomorrow = dateFormat.format(LocalDate.now().plusDays(1))
+    suspend fun rainDelay(date: String, targetDate: String): RainDelayEntry? {
 
         if (!SupabaseClientProvider.isConfigured) {
             val affected = demoJobsMutable.filter {
-                it.scheduledDate == today &&
+                it.scheduledDate == date &&
                     (it.status == Job.STATUS_SCHEDULED || it.status == Job.STATUS_IN_PROGRESS)
             }
             demoJobsMutable = demoJobsMutable.map { jwc ->
-                if (jwc.scheduledDate == today &&
+                if (jwc.scheduledDate == date &&
                     (jwc.status == Job.STATUS_SCHEDULED || jwc.status == Job.STATUS_IN_PROGRESS)
                 ) {
-                    jwc.copy(job = jwc.job.copy(scheduledDate = tomorrow))
+                    jwc.copy(job = jwc.job.copy(scheduledDate = targetDate))
                 } else {
                     jwc
                 }
             }
-            return affected.size
+            if (affected.isEmpty()) return null
+            return RainDelayEntry(date, targetDate, affected.map { it.id }, affected.size,
+                Instant.now().toString(), affected.associate { it.id to it.scheduledDate })
         }
 
-        val userId = getCurrentUserId() ?: return 0
+        val userId = getCurrentUserId() ?: return null
 
         // Fetch all jobs for today and filter client-side (avoids complex OR filter DSL)
         val allJobs = SupabaseClientProvider.client.from("jobs")
@@ -230,25 +233,75 @@ class JobRepository {
             .decodeList<Job>()
 
         val jobsToMove = allJobs.filter {
-            it.scheduledDate == today &&
+            it.scheduledDate == date &&
                 (it.status == Job.STATUS_SCHEDULED || it.status == Job.STATUS_IN_PROGRESS)
         }
 
-        for (job in jobsToMove) {
-            SupabaseClientProvider.client.from("jobs")
-                .update(
-                    mapOf("scheduled_date" to tomorrow)
-                ) {
-                    filter { eq("id", job.id) }
-                }
+        val moved = mutableListOf<Job>()
+        try {
+            for (job in jobsToMove) {
+                updateJobDate(job.id, targetDate)
+                moved += job
+            }
+        } catch (error: Exception) {
+            for (job in moved) {
+                try { updateJobDate(job.id, job.scheduledDate) } catch (_: Exception) { }
+            }
+            throw error
         }
-
+        if (moved.isEmpty()) return null
+        val entry = RainDelayEntry(date, targetDate, moved.map { it.id }, moved.size,
+            Instant.now().toString(), moved.associate { it.id to it.scheduledDate })
         WebhookService.fire("rain.delay.applied", mapOf(
-            "status" to "applied", "from_date" to today, "to_date" to tomorrow,
-            "jobs_moved" to jobsToMove.size.toString(),
+            "count" to moved.size.toString(), "date" to date, "target_date" to targetDate,
         ))
+        return entry
+    }
 
-        return jobsToMove.size
+    suspend fun undoRainDelay(entry: RainDelayEntry): RainDelayUndoResult {
+        val current = loadJobs().associateBy { it.id }
+        val restored = mutableListOf<String>()
+        val skipped = mutableListOf<String>()
+        try {
+            for (jobId in entry.jobIds) {
+                val job = current[jobId]
+                val original = entry.originalDates[jobId]
+                if (job == null || original == null || job.scheduledDate != entry.targetDate) {
+                    skipped += jobId
+                } else {
+                    if (!SupabaseClientProvider.isConfigured) {
+                        demoJobsMutable = demoJobsMutable.map {
+                            if (it.id == jobId) it.copy(job = it.job.copy(scheduledDate = original)) else it
+                        }
+                    } else {
+                        updateJobDate(jobId, original)
+                    }
+                    restored += jobId
+                }
+            }
+        } catch (error: Exception) {
+            for (jobId in restored) {
+                try {
+                    if (!SupabaseClientProvider.isConfigured) {
+                        demoJobsMutable = demoJobsMutable.map {
+                            if (it.id == jobId) it.copy(job = it.job.copy(scheduledDate = entry.targetDate)) else it
+                        }
+                    } else updateJobDate(jobId, entry.targetDate)
+                } catch (_: Exception) { }
+            }
+            throw error
+        }
+        val remaining = if (skipped.isEmpty()) null else entry.copy(
+            jobIds = skipped, jobCount = skipped.size,
+            originalDates = entry.originalDates.filterKeys { it in skipped },
+        )
+        return RainDelayUndoResult(restored.size, skipped.size, remaining)
+    }
+
+    private suspend fun updateJobDate(jobId: String, date: String) {
+        SupabaseClientProvider.client.from("jobs").update(mapOf("scheduled_date" to date)) {
+            filter { eq("id", jobId) }
+        }
     }
 
     // ── Auth helper ──────────────────────────────────────────────────────

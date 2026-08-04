@@ -31,6 +31,8 @@ private val availableWebhookEvents = listOf(
     WebhookEvent("payment.failed", "Payment Failed", "Stripe payment fails"),
     WebhookEvent("rain.delay.applied", "Rain Delay Applied", "Jobs rescheduled due to rain"),
     WebhookEvent("job.skipped", "Job Skipped", "Job is skipped"),
+    WebhookEvent("lead.created", "Lead Created", "New lead added"),
+    WebhookEvent("lead.status.updated", "Lead Status Updated", "Lead status changes"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
