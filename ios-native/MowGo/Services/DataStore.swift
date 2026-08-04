@@ -1071,29 +1071,33 @@ final class DataStore: ObservableObject {
                     succeeded.append(job.id)
                     continue
                 }
-                // Rollback: re-sync the already-updated jobs to their original dates
+                // Rollback queued jobs locally and server-synced jobs remotely.
                 var failedToRemoveQueuedChanges = false
                 for jobId in succeeded {
-                    if let currentUserId {
-                        let removed = persistence?.removePendingMutations(
-                            operation: "job:schedule",
-                            entityId: jobId,
-                            currentUserId: currentUserId,
-                            payloadMatches: { payload in
-                                guard let decoded = try? JSONDecoder().decode(
-                                    JobSchedulePatch.self,
-                                    from: payload
-                                ) else { return false }
-                                return decoded.scheduledDate == targetDate
-                            }
-                        ) ?? false
+                    if queuedJobIds.contains(jobId) {
+                        let removed: Bool
+                        if let currentUserId {
+                            removed = persistence?.removePendingMutations(
+                                operation: "job:schedule",
+                                entityId: jobId,
+                                currentUserId: currentUserId,
+                                payloadMatches: { payload in
+                                    guard let decoded = try? JSONDecoder().decode(
+                                        JobSchedulePatch.self,
+                                        from: payload
+                                    ) else { return false }
+                                    return decoded.scheduledDate == targetDate
+                                }
+                            ) ?? false
+                        } else {
+                            removed = false
+                        }
                         if !removed {
                             failedToRemoveQueuedChanges = true
                             self.error = "Could not remove queued rain delay changes — verify your schedule"
                         }
-                    }
-                    if let original = originalDates[jobId],
-                       let realJob = self.jobs.first(where: { $0.id == jobId }) {
+                    } else if let original = originalDates[jobId],
+                              let realJob = self.jobs.first(where: { $0.id == jobId }) {
                         try? await updateJobSchedule(realJob, scheduledDate: original)
                     }
                 }
@@ -1130,7 +1134,7 @@ final class DataStore: ObservableObject {
         isUndoingRainDelay = true
         defer { isUndoingRainDelay = false }
 
-        var restored: [(Job, String)] = []
+        var restored: [(job: Job, originalDate: String, wasQueued: Bool)] = []
         var restoredIds: Set<UUID> = []
         var skippedCount = 0
         do {
@@ -1143,13 +1147,11 @@ final class DataStore: ObservableObject {
                 }
                 do {
                     let serverSynced = try await updateJobSchedule(job, scheduledDate: originalDate)
-                    if serverSynced {
-                        restored.append((job, originalDate))
-                    }
+                    restored.append((job, originalDate, !serverSynced))
                     restoredIds.insert(jobId)
                 } catch {
                     if isNetworkError(error) {
-                        restored.append((job, originalDate))
+                        restored.append((job, originalDate, true))
                         restoredIds.insert(jobId)
                         continue
                     }
@@ -1157,10 +1159,35 @@ final class DataStore: ObservableObject {
                 }
             }
         } catch {
-            for (job, _) in restored {
-                if let current = jobs.first(where: { $0.id == job.id }) {
+            var failedToRemoveQueuedChanges = false
+            for restoredJob in restored {
+                if restoredJob.wasQueued {
+                    let removed: Bool
+                    if let currentUserId {
+                        removed = persistence?.removePendingMutations(
+                            operation: "job:schedule",
+                            entityId: restoredJob.job.id,
+                            currentUserId: currentUserId,
+                            payloadMatches: { payload in
+                                guard let decoded = try? JSONDecoder().decode(
+                                    JobSchedulePatch.self,
+                                    from: payload
+                                ) else { return false }
+                                return decoded.scheduledDate == restoredJob.originalDate
+                            }
+                        ) ?? false
+                    } else {
+                        removed = false
+                    }
+                    if !removed {
+                        failedToRemoveQueuedChanges = true
+                    }
+                } else if let current = jobs.first(where: { $0.id == restoredJob.job.id }) {
                     try? await updateJobSchedule(current, scheduledDate: entry.targetDate)
                 }
+            }
+            if failedToRemoveQueuedChanges {
+                self.error = "Could not remove queued rain delay changes — verify your schedule"
             }
             throw error
         }
