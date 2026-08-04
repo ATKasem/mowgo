@@ -57,7 +57,7 @@ const plans = [
 ];
 
 const stats = [
-  { value: '1,140+', label: 'Landscaping businesses in OK', suffix: 'and growing 6.5% yearly' },
+  { value: '1,020+', label: 'Landscaping businesses in OK', suffix: 'Census County Business Patterns 2023' },
   { value: '0', label: 'per-user fees on any plan', suffix: 'Solo is $39 flat. Crew is $79 flat. Premium is $199 flat.' },
   { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job.' },
 ];
@@ -211,7 +211,7 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Built for Oklahoma crews,")} <span className="text-brand">{tr("not office managers")}</span></h2>
-          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,140+ landscaping businesses across Oklahoma.")}</p>
+          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,020+ landscaping businesses across Oklahoma.")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color, soon }, i) => (
@@ -345,7 +345,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Know what you pay every month")}</h2>
             <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Pay only when your client list grows. Cancel anytime.")}</p>
-            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$200+/month' })}</p>
+            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,020+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$200+/month' })}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
           <div className="flex justify-center mb-6">
