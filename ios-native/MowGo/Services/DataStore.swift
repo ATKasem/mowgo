@@ -837,12 +837,13 @@ final class DataStore: ObservableObject {
         }
     }
 
-    private func updateJobSchedule(_ job: Job, scheduledDate: String) async throws {
+    @discardableResult
+    private func updateJobSchedule(_ job: Job, scheduledDate: String) async throws -> Bool {
         var updated = job
         updated.scheduledDate = scheduledDate
         if auth?.isDemoMode == true {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) { jobs[idx] = updated }
-            return
+            return true
         }
         guard await canSync() else {
             struct P: Encodable { let scheduledDate: String }
@@ -852,7 +853,7 @@ final class DataStore: ObservableObject {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            return
+            return false
         }
         do {
             try await sb.update("jobs", id: job.id, JobSchedulePatch(scheduledDate: scheduledDate))
@@ -860,6 +861,7 @@ final class DataStore: ObservableObject {
                 jobs[idx] = updated
             }
             await fireWebhookJobUpdated(updated)
+            return true
         } catch {
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription
@@ -872,7 +874,7 @@ final class DataStore: ObservableObject {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            throw error
+            return false
         }
     }
 
@@ -1060,9 +1062,8 @@ final class DataStore: ObservableObject {
         var succeeded: [UUID] = []
         for job in pending {
             do {
-                let canSyncBeforeUpdate = await canSync()
-                try await updateJobSchedule(job, scheduledDate: targetDate)
-                if !canSyncBeforeUpdate { queuedJobIds.insert(job.id) }
+                let serverSynced = try await updateJobSchedule(job, scheduledDate: targetDate)
+                if !serverSynced { queuedJobIds.insert(job.id) }
                 succeeded.append(job.id)
             } catch {
                 if isNetworkError(error) {
@@ -1071,9 +1072,10 @@ final class DataStore: ObservableObject {
                     continue
                 }
                 // Rollback: re-sync the already-updated jobs to their original dates
+                var failedToRemoveQueuedChanges = false
                 for jobId in succeeded {
                     if let currentUserId {
-                        persistence?.removePendingMutations(
+                        let removed = persistence?.removePendingMutations(
                             operation: "job:schedule",
                             entityId: jobId,
                             currentUserId: currentUserId,
@@ -1084,7 +1086,11 @@ final class DataStore: ObservableObject {
                                 ) else { return false }
                                 return decoded.scheduledDate == targetDate
                             }
-                        )
+                        ) ?? false
+                        if !removed {
+                            failedToRemoveQueuedChanges = true
+                            self.error = "Could not remove queued rain delay changes — verify your schedule"
+                        }
                     }
                     if let original = originalDates[jobId],
                        let realJob = self.jobs.first(where: { $0.id == jobId }) {
@@ -1093,6 +1099,9 @@ final class DataStore: ObservableObject {
                 }
                 // Re-sync local state from server to prevent divergence
                 await loadAll()
+                if failedToRemoveQueuedChanges {
+                    self.error = "Could not remove queued rain delay changes — verify your schedule"
+                }
                 throw error
             }
         }
@@ -1133,8 +1142,10 @@ final class DataStore: ObservableObject {
                     continue
                 }
                 do {
-                    try await updateJobSchedule(job, scheduledDate: originalDate)
-                    restored.append((job, originalDate))
+                    let serverSynced = try await updateJobSchedule(job, scheduledDate: originalDate)
+                    if serverSynced {
+                        restored.append((job, originalDate))
+                    }
                     restoredIds.insert(jobId)
                 } catch {
                     if isNetworkError(error) {
