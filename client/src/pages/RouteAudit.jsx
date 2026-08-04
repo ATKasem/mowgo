@@ -49,7 +49,7 @@ export default function RouteAudit() {
         await response.json().catch(() => ({}));
         throw new Error(response.status === 429 ? t('routeAudit.errors.rateLimit') : t('routeAudit.errors.submit'));
       }
-      setResult(reportFor(lawnsBucket));
+      setResult({ ...reportFor(lawnsBucket), lawnsBucket, crewBucket });
     } catch (error) {
       setServerError(error.message || t('routeAudit.errors.submit'));
     } finally {
@@ -105,7 +105,7 @@ export default function RouteAudit() {
               </div>
               <p className="mt-4 text-xs font-medium text-gray-500">{t('routeAudit.report.estimate')}</p>
               <div className="mt-6 rounded-xl border border-gray-200 p-4"><h3 className="font-bold">{t('routeAudit.report.mathTitle')}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600">{t('routeAudit.report.formula')}</p></div>
-              {lawnsBucket === 'under_10' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p><Link to="/?section=pricing" onClick={() => setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0)} className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.pricing')} →</Link></> : lawnsBucket === '50_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p><Link to="/compare" className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.compare')} →</Link></> : crewBucket === '4_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p><Link to="/login?mode=signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.crewCta')}<ArrowRight className="h-4 w-4" /></Link></> : <Link to="/login?mode=signup" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.qualifiedCta')}<ArrowRight className="h-4 w-4" /></Link>}
+              {result.lawnsBucket === 'under_10' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p><Link to="/?section=pricing" onClick={() => setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0)} className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.pricing')} →</Link></> : result.lawnsBucket === '50_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p><Link to="/compare" className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.compare')} →</Link></> : result.crewBucket === '4_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p><Link to="/login?mode=signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.crewCta')}<ArrowRight className="h-4 w-4" /></Link></> : <Link to="/login?mode=signup" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.qualifiedCta')}<ArrowRight className="h-4 w-4" /></Link>}
             </div>
           )}
         </section>
