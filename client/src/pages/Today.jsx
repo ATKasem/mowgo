@@ -66,6 +66,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [selectedRainJobIds, setSelectedRainJobIds] = useState([]);
   const [rainHistory, setRainHistory] = useState([]);
   const [weather, setWeather] = useState(null);
+  const [hasBusinessLocation, setHasBusinessLocation] = useState(null);
   const [rainDelaySaving, setRainDelaySaving] = useState(false);
   const [rainDelayError, setRainDelayError] = useState('');
   const toggleTimeoutRef = useRef(null);
@@ -98,7 +99,9 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       if (!active) return;
       const lat = profile?.latitude ?? profile?.lat;
       const lng = profile?.longitude ?? profile?.lng;
-      if (lat == null || lng == null) return;
+      const hasLocation = lat != null && lng != null;
+      setHasBusinessLocation(hasLocation);
+      if (!hasLocation) return;
       getWeatherForLocation(lat, lng).then(result => { if (active) setWeather(result); });
     }).catch(() => {});
     return () => { active = false; };
@@ -620,6 +623,10 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
               <div><h3 id="rain-delay-title" className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Rain Delay')}</h3><p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('{{count}} affected job', { count: selectedRainJobIds.length })}</p></div>
               <button aria-label={tr('Close')} onClick={() => setShowRainDelay(false)} className="p-2 -m-2 text-[var(--color-text-muted)]"><X className="w-5 h-5" /></button>
             </div>
+
+            {hasBusinessLocation === false && (
+              <p className="text-xs text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/30 rounded-xl p-3 mb-4">{tr('Add your business location in Settings to see local rain forecasts.')}</p>
+            )}
 
             <div className="space-y-2 mb-5">
               <p className="label">{tr('Jobs to move')}</p>

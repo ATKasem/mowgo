@@ -705,14 +705,24 @@ export async function loadProfile() {
 }
 
 export async function saveProfile(profile) {
+  const normalizeCoordinate = (value, name, min, max) => {
+    if (value === null || value === undefined || value === '') return null;
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) {
+      throw new Error(`${name} must be a finite number between ${min} and ${max}`);
+    }
+    return value;
+  };
+  const latitude = normalizeCoordinate(profile.latitude, 'Latitude', -90, 90);
+  const longitude = normalizeCoordinate(profile.longitude, 'Longitude', -180, 180);
+
   if (isDemoMode()) {
     const userId = _currentDemoUserId();
     const idx = _teamMembers.findIndex(m => m.id === userId);
     if (idx >= 0) {
-      _teamMembers[idx] = { ..._teamMembers[idx], ...profile };
+      _teamMembers[idx] = { ..._teamMembers[idx], ...profile, latitude, longitude };
     }
     notify();
-    return profile;
+    return { ...profile, latitude, longitude };
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -720,10 +730,10 @@ export async function saveProfile(profile) {
 
   const { business_name, phone, avatar_url } = profile;
   const { error } = await supabase.from('profiles').upsert({
-    id: user.id, business_name, phone, avatar_url,
+    id: user.id, business_name, phone, avatar_url, latitude, longitude,
   });
   if (error) throw error;
-  return { ...profile, business_name, phone, avatar_url };
+  return { ...profile, business_name, phone, avatar_url, latitude, longitude };
 }
 
 // ===== Team / Crew =====

@@ -18,6 +18,10 @@ export default function Settings() {
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [locationQuery, setLocationQuery] = useState('');
+  const [resolvedLocation, setResolvedLocation] = useState('');
+  const [locationError, setLocationError] = useState('');
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
   const [notifyOnRain, setNotifyOnRain] = useState(() => localStorage.getItem('mf_notify_rain') !== 'false');
@@ -95,6 +99,35 @@ export default function Settings() {
       }
     }
     setIsLoading(false);
+  }
+
+  async function geocodeLocation() {
+    const query = locationQuery.trim();
+    if (!query || locationLoading) return;
+    setLocationLoading(true);
+    setLocationError('');
+    try {
+      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`);
+      if (!response.ok) throw new Error('Geocoding request failed');
+      const result = (await response.json()).results?.[0];
+      if (!result || !Number.isFinite(result.latitude) || !Number.isFinite(result.longitude)) {
+        throw new Error('Location not found');
+      }
+      setProfile(current => ({ ...current, latitude: result.latitude, longitude: result.longitude }));
+      setResolvedLocation([result.name, result.admin1, result.country].filter(Boolean).join(', '));
+    } catch (err) {
+      console.error('geocodeLocation:', err);
+      setLocationError(tr('Location not found. Try a city, state, or ZIP.'));
+    } finally {
+      setLocationLoading(false);
+    }
+  }
+
+  function removeLocation() {
+    setProfile(current => ({ ...current, latitude: null, longitude: null }));
+    setLocationQuery('');
+    setResolvedLocation('');
+    setLocationError('');
   }
 
   function toggleNotifyComplete(val) {
@@ -180,6 +213,37 @@ export default function Settings() {
               <div>
                 <label className="label">{tr("Phone Number")}</label>
                 <input value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="405-555-0100" className="input" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-brand-hover dark:text-emerald-400">{tr('Why do we ask? Rain Delay uses your location for accurate local forecasts.')}</p>
+                <label className="label" htmlFor="business-location">{tr('Business location')}</label>
+                <div className="flex gap-2">
+                  <input
+                    id="business-location"
+                    value={locationQuery}
+                    onChange={event => { setLocationQuery(event.target.value); setLocationError(''); }}
+                    onBlur={() => void geocodeLocation()}
+                    placeholder={tr('City, State or ZIP — e.g. Oklahoma City, OK')}
+                    className="input flex-1 min-w-0"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={event => event.preventDefault()}
+                    onClick={() => void geocodeLocation()}
+                    disabled={!locationQuery.trim() || locationLoading}
+                    className="btn-secondary px-3 disabled:opacity-50"
+                  >
+                    {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : tr('Find')}
+                  </button>
+                </div>
+                <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Used to show your local weather so Rain Delay knows when rain is coming at your location. Never shared with anyone.')}</p>
+                {resolvedLocation && <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">📍 {resolvedLocation}</p>}
+                {locationError && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{locationError}</p>}
+                {(profile.latitude != null || profile.longitude != null) && (
+                  <button type="button" onClick={removeLocation} className="text-xs font-medium text-[var(--color-text-muted)] hover:text-red-600 dark:hover:text-red-400">
+                    × {tr('Remove location')}
+                  </button>
+                )}
               </div>
               {error && (
                 <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
