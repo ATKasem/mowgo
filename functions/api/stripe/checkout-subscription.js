@@ -1,7 +1,7 @@
 /**
  * Cloudflare Pages Function — Stripe Subscription Checkout
  * POST /api/stripe/checkout-subscription
- * Body: { plan: 'solo' | 'crew', interval: 'month' | 'year' }
+ * Body: { plan: 'solo' | 'crew' | 'premium', interval: 'month' | 'year' }
  * Returns: { url: 'https://checkout.stripe.com/...' }
  */
 
@@ -38,7 +38,7 @@ export async function onRequestPost(context) {
     const { plan, interval = 'month' } = await request.json();
 
     // Validate plan + billing interval
-    if (!['solo', 'crew'].includes(plan)) {
+    if (!['solo', 'crew', 'premium'].includes(plan)) {
       return json({ error: 'Invalid plan' }, 400, origin);
     }
     if (!['month', 'year'].includes(interval)) {
@@ -46,9 +46,12 @@ export async function onRequestPost(context) {
     }
 
     const annual = interval === 'year';
-    const priceId = plan === 'solo'
-      ? (annual ? env.STRIPE_PRICE_SOLO_ANNUAL : env.STRIPE_PRICE_SOLO)
-      : (annual ? env.STRIPE_PRICE_CREW_ANNUAL : env.STRIPE_PRICE_CREW);
+    const priceIds = {
+      solo: annual ? env.STRIPE_PRICE_SOLO_ANNUAL : env.STRIPE_PRICE_SOLO,
+      crew: annual ? env.STRIPE_PRICE_CREW_ANNUAL : env.STRIPE_PRICE_CREW,
+      premium: annual ? env.STRIPE_PRICE_PREMIUM_ANNUAL : env.STRIPE_PRICE_PREMIUM,
+    };
+    const priceId = priceIds[plan];
     if (!priceId) {
       return json({ error: 'Price ID not configured' }, 500, origin);
     }

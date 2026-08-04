@@ -38,6 +38,21 @@ const plans = [
     cta: 'Start Free Trial',
     highlight: true,
   },
+  {
+    name: 'Premium',
+    price: '199',
+    annualPrice: '1990',
+    period: 'month',
+    desc: 'Everything in Crew',
+    features: [
+      'Everything in Crew',
+      'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
+      'Seasonal packs: spring pricing benchmarks, route templates',
+      'Priority text-first support',
+    ],
+    cta: 'Start Premium',
+    highlight: false,
+  },
   { name: 'Crew', price: '79', annualPrice: '790', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
 ];
 
@@ -320,7 +335,7 @@ export default function Landing() {
           {billingInterval === 'year' && (
             <p className="text-center text-sm font-medium text-brand dark:text-emerald-400 mb-6 -mt-2">{tr("One payment covers the whole season. No card hits in winter.")}</p>
           )}
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
             {plans.map((plan, i) => (
               <FadeIn key={plan.name} delay={i * 100}>
                 <div className={`card p-6 flex flex-col transition-all duration-300 ${plan.highlight ? 'ring-2 ring-emerald-500 dark:ring-emerald-400 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 scale-[1.02] relative' : 'hover:scale-[1.01]'}`}>
@@ -330,7 +345,7 @@ export default function Landing() {
                   <div className="mt-5 mb-6 min-h-[72px]">
                     <span className="text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white">{plan.price === '0' ? tr('Free') : `$${billingInterval === 'year' && plan.annualPrice ? plan.annualPrice : plan.price}`}</span>
                     {plan.price !== '0' && <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] font-medium">/{tr(billingInterval === 'year' && plan.annualPrice ? 'year' : plan.period)}</span>}
-                    {billingInterval === 'year' && plan.annualPrice && plan.price !== '0' && (
+                    {billingInterval === 'year' && plan.annualPrice && plan.price !== '0' && plan.name !== 'Premium' && (
                       <span className="ml-2 inline-block align-middle text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5">{tr('Save ${{savings}}', { savings: String(Number(plan.price) * 12 - Number(plan.annualPrice)) })}</span>
                     )}
                     {billingInterval === 'year' && plan.price !== '0' && (
@@ -383,6 +398,7 @@ export default function Landing() {
                   )}
                   {plan.highlight && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr(plan.scarcity)}</p>}
                   {plan.name === 'Crew' && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr("14-day free trial. Cancel anytime.")}</p>}
+                  {plan.name === 'Premium' && billingInterval === 'year' && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr("2 months free")}</p>}
                 </div>
               </FadeIn>
             ))}

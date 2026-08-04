@@ -1,8 +1,9 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle, Sprout, RefreshCw } from 'lucide-react';
+import { Check, CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle, Sprout, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { startCheckout } from '../lib/payments';
 import { useAuth } from '../App';
 import ConciergeSetup from '../components/ConciergeSetup';
 
@@ -33,6 +34,31 @@ export default function Subscribe() {
   const [error, setError] = useState('');
   const [conciergeClaimed, setConciergeClaimed] = useState(null);
   const [retry, setRetry] = useState(0);
+  const [billingInterval, setBillingInterval] = useState('month');
+  const [checkoutError, setCheckoutError] = useState('');
+
+  const paidPlans = [
+    { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs'], cta: 'Start Free Trial' },
+    {
+      name: 'Premium',
+      price: '199',
+      annualPrice: '1990',
+      features: [
+        'Everything in Crew',
+        'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
+        'Seasonal packs: spring pricing benchmarks, route templates',
+        'Priority text-first support',
+      ],
+      cta: 'Start Premium',
+    },
+    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Job assignment & tracking'], cta: 'Start Free Trial' },
+  ];
+
+  async function handleCheckout(plan) {
+    setCheckoutError('');
+    const result = await startCheckout(plan.toLowerCase(), billingInterval);
+    if (result?.error) setCheckoutError(result.error);
+  }
 
   useEffect(() => {
     if (status !== 'success' || !user) return;
@@ -142,14 +168,35 @@ export default function Subscribe() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
       <SubscribeNav tr={tr} />
-      <div className="text-center max-w-md mx-auto px-4 flex-1 flex flex-col items-center justify-center">
+      <div className="text-center max-w-5xl w-full mx-auto px-4 py-12 flex-1 flex flex-col items-center justify-center">
         <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-6">
           <XCircle className="w-8 h-8 text-gray-400" />
         </div>
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">{tr("No worries")}</h1>
         <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("You can always try the free plan or subscribe when you're ready.")}</p>
-        <div className="flex gap-3 justify-center">
-          <Link to="/login?mode=signup" className="btn-primary text-sm px-6 py-2.5">{tr("Try Free")}</Link>
+        <div className="inline-flex items-center rounded-xl bg-gray-100 dark:bg-gray-800 p-1 mb-6">
+          {['month', 'year'].map(interval => (
+            <button key={interval} type="button" onClick={() => setBillingInterval(interval)} className={`px-5 py-2 rounded-lg text-sm font-semibold min-h-[44px] ${billingInterval === interval ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>
+              {tr(interval === 'month' ? 'Monthly' : 'Annual')}{interval === 'year' && ` · ${tr('2 months free')}`}
+            </button>
+          ))}
+        </div>
+        {checkoutError && <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">{checkoutError}</p>}
+        <div className="grid md:grid-cols-3 gap-5 w-full text-left">
+          {paidPlans.map(plan => (
+            <div key={plan.name} className={`card p-6 flex flex-col ${plan.name === 'Premium' ? 'ring-2 ring-emerald-500' : ''}`}>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr(plan.name)}</h2>
+              <p className="mt-3 mb-5"><span className="text-4xl font-extrabold text-gray-900 dark:text-white">${billingInterval === 'year' ? plan.annualPrice : plan.price}</span><span className="text-gray-500">/{tr(billingInterval === 'year' ? 'year' : 'month')}</span></p>
+              {plan.name === 'Premium' && billingInterval === 'year' && <p className="-mt-3 mb-4 text-xs font-semibold text-emerald-600">{tr('2 months free')}</p>}
+              <ul className="space-y-3 flex-1">
+                {plan.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
+              </ul>
+              <button type="button" onClick={() => handleCheckout(plan.name)} className={plan.name === 'Premium' ? 'btn-primary mt-6 justify-center' : 'btn-secondary mt-6 justify-center'}>{tr(plan.cta)} <ArrowRight className="w-4 h-4" /></button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3 justify-center mt-8">
+          <Link to="/login?mode=signup" className="btn-secondary text-sm px-6 py-2.5">{tr("Try Free")}</Link>
           <Link to="/" className="btn-secondary text-sm px-6 py-2.5">{tr("Back Home")}</Link>
         </div>
       </div>

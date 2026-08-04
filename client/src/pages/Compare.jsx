@@ -50,6 +50,22 @@ const data = {
   gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
 };
 
+const mowgoTiers = [
+  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs'] },
+  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Job assignment & tracking'] },
+  {
+    name: 'Premium',
+    price: '$199/mo',
+    annualPrice: '$1,990/year · 2 months free',
+    features: [
+      'Everything in Crew',
+      'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
+      'Seasonal packs: spring pricing benchmarks, route templates',
+      'Priority text-first support',
+    ],
+  },
+];
+
 function Cell({ value, isFirst }) {
   const { tr } = useLocalizedText('compare');
   const base = `text-center py-2.5 px-2${isFirst ? ' bg-emerald-50 dark:bg-emerald-950/20' : ''}`;
@@ -179,6 +195,24 @@ export default function Compare() {
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Your data is yours")}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Yardbook is \"free\" because they sell your customer list. We never touch your data — no ads, no selling, no funny business.")}</p>
           </div>
+        </div>
+      </section>
+
+      {/* MowGo tier comparison */}
+      <section className="max-w-4xl mx-auto px-4 pb-20" aria-labelledby="mowgo-tier-heading">
+        <h2 id="mowgo-tier-heading" className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-8">{tr('Compare MowGo plans')}</h2>
+        <div className="grid md:grid-cols-3 gap-5">
+          {mowgoTiers.map(tier => (
+            <div key={tier.name} className={`rounded-2xl border p-6 flex flex-col ${tier.name === 'Premium' ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/10' : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'}`}>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tr(tier.name)}</h3>
+              <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">{tr(tier.price)}</p>
+              {tier.annualPrice && <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">{tr(tier.annualPrice)}</p>}
+              <ul className="space-y-3 mt-5 flex-1">
+                {tier.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
+              </ul>
+              {tier.name === 'Premium' && <a href="/#/" onClick={goToPricing} className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">{tr('Start Premium')} <ArrowRight className="w-4 h-4" /></a>}
+            </div>
+          ))}
         </div>
       </section>
 
