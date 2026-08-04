@@ -1073,6 +1073,7 @@ final class DataStore: ObservableObject {
                 }
                 // Rollback queued jobs locally and server-synced jobs remotely.
                 var failedToRemoveQueuedChanges = false
+                var serverRollbackFailed = false
                 for jobId in succeeded {
                     if queuedJobIds.contains(jobId) {
                         let removed: Bool
@@ -1098,13 +1099,22 @@ final class DataStore: ObservableObject {
                         }
                     } else if let original = originalDates[jobId],
                               let realJob = self.jobs.first(where: { $0.id == jobId }) {
-                        try? await updateJobSchedule(realJob, scheduledDate: original)
+                        let rollbackSynced = try? await updateJobSchedule(
+                            realJob,
+                            scheduledDate: original
+                        )
+                        if rollbackSynced != true {
+                            serverRollbackFailed = true
+                        }
                     }
                 }
                 // Re-sync local state from server to prevent divergence
                 await loadAll()
                 if failedToRemoveQueuedChanges {
                     self.error = "Could not remove queued rain delay changes — verify your schedule"
+                }
+                if serverRollbackFailed {
+                    self.error = "Rain delay rollback incomplete — verify your schedule"
                 }
                 throw error
             }
@@ -1160,6 +1170,7 @@ final class DataStore: ObservableObject {
             }
         } catch {
             var failedToRemoveQueuedChanges = false
+            var serverRollbackFailed = false
             for restoredJob in restored {
                 if restoredJob.wasQueued {
                     let removed: Bool
@@ -1181,13 +1192,29 @@ final class DataStore: ObservableObject {
                     }
                     if !removed {
                         failedToRemoveQueuedChanges = true
+                    } else if let index = jobs.firstIndex(where: {
+                        $0.id == restoredJob.job.id
+                    }) {
+                        var updated = jobs[index]
+                        updated.scheduledDate = entry.targetDate
+                        jobs[index] = updated
                     }
                 } else if let current = jobs.first(where: { $0.id == restoredJob.job.id }) {
-                    try? await updateJobSchedule(current, scheduledDate: entry.targetDate)
+                    let rollbackSynced = try? await updateJobSchedule(
+                        current,
+                        scheduledDate: entry.targetDate
+                    )
+                    if rollbackSynced != true {
+                        serverRollbackFailed = true
+                    }
                 }
             }
+            await loadAll()
             if failedToRemoveQueuedChanges {
                 self.error = "Could not remove queued rain delay changes — verify your schedule"
+            }
+            if serverRollbackFailed {
+                self.error = "Undo rollback incomplete — verify your schedule"
             }
             throw error
         }
