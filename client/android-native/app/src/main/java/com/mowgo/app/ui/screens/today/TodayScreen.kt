@@ -303,7 +303,7 @@ private fun RainDelayDialog(count: Int, applying: Boolean, dismiss: () -> Unit, 
 @Composable
 private fun RainDelayHistoryDialog(history: List<com.mowgo.app.data.model.RainDelayEntry>, undoing: Boolean, dismiss: () -> Unit, undo: (com.mowgo.app.data.model.RainDelayEntry) -> Unit) {
     AlertDialog(onDismissRequest = { if (!undoing) dismiss() }, title = { Text("Rain Delay History") }, containerColor = MowGoColors.SurfaceDark,
-        text = { if (history.isEmpty()) Text("No rain delays yet") else LazyColumn(Modifier.heightIn(max = 420.dp)) { items(history, key = { it.createdAt }) { entry -> Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text("${entry.date} → ${entry.targetDate}", color = MowGoColors.TextPrimaryDark); Text("${entry.jobCount} job(s)", color = MowGoColors.TextSecondaryDark) }; OutlinedButton({ undo(entry) }, enabled = !undoing) { Text("Undo") } } } },
+        text = { if (history.isEmpty()) Text("No rain delays yet") else LazyColumn(Modifier.heightIn(max = 420.dp)) { items(history, key = { it.createdAt }) { entry -> Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text("${entry.date} → ${entry.targetDate}", color = MowGoColors.TextPrimaryDark); Text("${entry.jobCount} job(s)", color = MowGoColors.TextSecondaryDark) }; OutlinedButton({ undo(entry) }, enabled = !undoing) { Text("Undo") } } } } },
         confirmButton = { TextButton(dismiss, enabled = !undoing) { Text("Done") } })
 }
 
