@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 
 const competitors = [
-  { name: 'MowGo', price: 'Free – $79', highlight: true },
+  { name: 'MowGo', price: 'Free – $199', highlight: true },
   { name: 'QuoteIQ', price: '$29.99–$699/mo' },
   { name: 'Jobber', price: '$139/mo Connect' },
   { name: 'Yardbook', price: 'Free (ads)' },
@@ -51,8 +51,8 @@ const data = {
 };
 
 const mowgoTiers = [
-  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs'] },
-  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Job assignment & tracking'] },
+  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'] },
+  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'] },
   {
     name: 'Premium',
     price: '$199/mo',

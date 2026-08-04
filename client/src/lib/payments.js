@@ -2,7 +2,7 @@
  * Redirect to Stripe Checkout via Cloudflare Pages Function.
  * The server-side endpoint handles Stripe API calls with the secret key.
  *
- * @param {'solo'|'crew'} plan
+ * @param {'solo'|'crew'|'premium'} plan
  * @param {'month'|'year'} interval
  */
 import { supabase } from './supabase';

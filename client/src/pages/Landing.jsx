@@ -58,7 +58,7 @@ const plans = [
 
 const stats = [
   { value: '1,140+', label: 'Landscaping businesses in OK', suffix: 'and growing 6.5% yearly' },
-  { value: '0', label: 'per-user fees on any plan', suffix: '— Solo is $39 flat, Crew is $79 flat' },
+  { value: '0', label: 'per-user fees on any plan', suffix: '— Solo is $39 flat, Crew is $79 flat, Premium is $199 flat' },
   { value: '<1%', label: 'of your revenue', suffix: '— Solo plan costs less than one missed job' },
 ];
 

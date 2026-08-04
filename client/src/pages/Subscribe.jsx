@@ -38,7 +38,7 @@ export default function Subscribe() {
   const [checkoutError, setCheckoutError] = useState('');
 
   const paidPlans = [
-    { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs'], cta: 'Start Free Trial' },
+    { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
     {
       name: 'Premium',
       price: '199',
@@ -51,7 +51,7 @@ export default function Subscribe() {
       ],
       cta: 'Start Premium',
     },
-    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Job assignment & tracking'], cta: 'Start Free Trial' },
+    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
   ];
 
   async function handleCheckout(plan) {
@@ -176,12 +176,12 @@ export default function Subscribe() {
         <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("You can always try the free plan or subscribe when you're ready.")}</p>
         <div className="inline-flex items-center rounded-xl bg-gray-100 dark:bg-gray-800 p-1 mb-6">
           {['month', 'year'].map(interval => (
-            <button key={interval} type="button" onClick={() => setBillingInterval(interval)} className={`px-5 py-2 rounded-lg text-sm font-semibold min-h-[44px] ${billingInterval === interval ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>
+            <button key={interval} type="button" onClick={() => { setBillingInterval(interval); setCheckoutError(''); }} className={`px-5 py-2 rounded-lg text-sm font-semibold min-h-[44px] ${billingInterval === interval ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>
               {tr(interval === 'month' ? 'Monthly' : 'Annual')}{interval === 'year' && ` · ${tr('2 months free')}`}
             </button>
           ))}
         </div>
-        {checkoutError && <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">{checkoutError}</p>}
+        {checkoutError && <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">{tr(checkoutError)}</p>}
         <div className="grid md:grid-cols-3 gap-5 w-full text-left">
           {paidPlans.map(plan => (
             <div key={plan.name} className={`card p-6 flex flex-col ${plan.name === 'Premium' ? 'ring-2 ring-emerald-500' : ''}`}>

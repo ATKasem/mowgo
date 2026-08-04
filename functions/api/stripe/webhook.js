@@ -39,19 +39,25 @@ export async function onRequestPost({ request, env }) {
       if (object.mode !== 'subscription') return ok();
 
       const subscription = await getSubscription(object.subscription, env);
-      await updateProfile({
-        env,
-        userId: object.metadata?.user_id,
-        customerId: customerIdOf(object.customer) || customerIdOf(subscription.customer),
-        tier: tierForSubscription(subscription, env),
-      });
+      const tier = tierForSubscription(subscription, env);
+      if (tier !== null) {
+        await updateProfile({
+          env,
+          userId: object.metadata?.user_id,
+          customerId: customerIdOf(object.customer) || customerIdOf(subscription.customer),
+          tier,
+        });
+      }
     } else if (event.type === 'customer.subscription.updated') {
-      await updateProfile({
-        env,
-        userId: object.metadata?.user_id,
-        customerId: customerIdOf(object.customer),
-        tier: tierForSubscription(object, env),
-      });
+      const tier = tierForSubscription(object, env);
+      if (tier !== null) {
+        await updateProfile({
+          env,
+          userId: object.metadata?.user_id,
+          customerId: customerIdOf(object.customer),
+          tier,
+        });
+      }
     } else {
       await updateProfile({
         env,
@@ -124,6 +130,7 @@ function requireConfiguration(env) {
     'SUPABASE_SERVICE_KEY',
     'STRIPE_PRICE_SOLO',
     'STRIPE_PRICE_CREW',
+    'STRIPE_PRICE_PREMIUM',
   ];
   if (required.some((name) => !env[name])) {
     throw new Error('Webhook configuration is incomplete');
@@ -149,10 +156,11 @@ function tierForSubscription(subscription, env) {
   const premiumPrices = [env.STRIPE_PRICE_PREMIUM, env.STRIPE_PRICE_PREMIUM_ANNUAL].filter(Boolean);
   const crewPrices = [env.STRIPE_PRICE_CREW, env.STRIPE_PRICE_CREW_ANNUAL].filter(Boolean);
   const soloPrices = [env.STRIPE_PRICE_SOLO, env.STRIPE_PRICE_SOLO_ANNUAL].filter(Boolean);
+  if (priceIds.length === 0) return 'free';
   if (priceIds.some((id) => premiumPrices.includes(id))) return 'premium';
   if (priceIds.some((id) => crewPrices.includes(id))) return 'crew';
   if (priceIds.some((id) => soloPrices.includes(id))) return 'solo';
-  return 'free';
+  return null;
 }
 
 function customerIdOf(customer) {
