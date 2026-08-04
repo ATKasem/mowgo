@@ -22,7 +22,7 @@ Jobber and Housecall Pro are built for big crews at $119+/month. Yardbook is "fr
 
 **SOLO PLAN — $39/MONTH**
 • Unlimited clients & jobs
-• AI Autopilot — chat to manage your CRM
+• Online booking link — clients book themselves
 • GPS route navigation
 • Recurring job automation
 • 14-day free trial
@@ -51,7 +51,7 @@ Place screenshots in `screenshots/` folder. Required: 6-8 screenshots.
 | 2 | Today schedule — job cards with rain delay button | Dark |
 | 3 | Client detail — notes, gate codes, nav buttons | Light |
 | 4 | Invoices — paid/unpaid with mark-as-paid | Light |
-| 5 | AI Autopilot — chat drawer with command | Dark |
+| 5 | Booking link — share your public booking page | Light |
 | 6 | Dark mode showcase — Today tab | Dark |
 | 7 | Landing page — pricing cards | Light |
 | 8 | Comparison page — MowGo vs competitors | Light |
@@ -99,4 +99,4 @@ Free tier = 5 clients. Solo + Crew have 14-day trials.
 - Stripe checkout uses live keys for subscription payments
 - Rain delay is the headline feature — test it on Today tab
 - Offline mode uses IndexedDB, syncs on reconnect
-- AI Autopilot uses OpenRouter API — requires API key for full functionality
+- Booking link — share your public booking page so clients self-schedule (no account needed)

@@ -278,7 +278,7 @@ private fun BillingSettingsScreen(
     val context = LocalContext.current
     val tier = state.profile?.tier?.lowercase() ?: "free"
     val price = when (tier) { "solo" -> "$39/mo"; "crew" -> "$79/mo"; else -> "$0/mo" }
-    val description = when (tier) { "solo" -> "15 clients · AI assistant"; "crew" -> "Unlimited · Team · Priority"; else -> "5 clients · Basic features" }
+    val description = when (tier) { "solo" -> "Unlimited clients · All features"; "crew" -> "Unlimited · Team · Priority"; else -> "5 clients · Basic features" }
     val isPaid = tier == "solo" || tier == "crew"
     var showCancelConfirmation by remember { mutableStateOf(false) }
 
