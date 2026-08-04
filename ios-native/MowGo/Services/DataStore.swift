@@ -1048,16 +1048,21 @@ final class DataStore: ObservableObject {
         let originalDates: [UUID: String] = Dictionary(
             uniqueKeysWithValues: pending.map { ($0.id, $0.scheduledDate) }
         )
+        var fullySynced = await canSync()
 
         // Apply all updates — on ANY failure, re-sync from server instead of
         // manual rollback (which can diverge if local state was already mutated).
         var succeeded: [UUID] = []
         for job in pending {
             do {
+                if !(await canSync()) {
+                    fullySynced = false
+                }
                 try await updateJobSchedule(job, scheduledDate: targetDate)
                 succeeded.append(job.id)
             } catch {
                 if isNetworkError(error) {
+                    fullySynced = false
                     succeeded.append(job.id)
                     continue
                 }
@@ -1083,7 +1088,9 @@ final class DataStore: ObservableObject {
         saveRainDelayEntry(entry)
         let movedJobs = pending.filter { succeeded.contains($0.id) }
         await firePushRainDelay(movedJobs, date: targetDate)
-        if auth?.isDemoMode != true, let userId = currentUserId {
+        // Offline rain-delay webhooks are accepted best-effort loss; only
+        // server-synced operations emit this event.
+        if fullySynced, auth?.isDemoMode != true, let userId = currentUserId {
             await WebhookService.shared.rainDelayApplied(
                 count: succeeded.count, date: date, targetDate: targetDate, userId: userId
             )
@@ -1097,6 +1104,7 @@ final class DataStore: ObservableObject {
         defer { isUndoingRainDelay = false }
 
         var restored: [(Job, String)] = []
+        var restoredIds: Set<UUID> = []
         var skippedCount = 0
         do {
             for jobId in entry.jobIds {
@@ -1106,8 +1114,18 @@ final class DataStore: ObservableObject {
                     skippedCount += 1
                     continue
                 }
-                try await updateJobSchedule(job, scheduledDate: originalDate)
-                restored.append((job, originalDate))
+                do {
+                    try await updateJobSchedule(job, scheduledDate: originalDate)
+                    restored.append((job, originalDate))
+                    restoredIds.insert(jobId)
+                } catch {
+                    if isNetworkError(error) {
+                        restored.append((job, originalDate))
+                        restoredIds.insert(jobId)
+                        continue
+                    }
+                    throw error
+                }
             }
         } catch {
             for (job, _) in restored {
@@ -1118,6 +1136,21 @@ final class DataStore: ObservableObject {
             throw error
         }
         if skippedCount > 0 {
+            let remainingDates = entry.originalDates.filter { !restoredIds.contains($0.key) }
+            if remainingDates.isEmpty {
+                rainDelayHistory.removeAll { $0.id == entry.id }
+            } else if let index = rainDelayHistory.firstIndex(where: { $0.id == entry.id }) {
+                rainDelayHistory[index] = RainDelayEntry(
+                    id: entry.id,
+                    date: entry.date,
+                    targetDate: entry.targetDate,
+                    jobIds: entry.jobIds.filter { remainingDates[$0] != nil },
+                    jobCount: remainingDates.count,
+                    createdAt: entry.createdAt,
+                    originalDates: remainingDates
+                )
+            }
+            persistRainDelayHistory()
             let message = "Partially undone — \(skippedCount) job\(skippedCount == 1 ? " was" : "s were") missing or rescheduled manually."
             self.error = message
             throw DataStoreError.partialRainDelayUndo(message)
@@ -1362,7 +1395,9 @@ final class DataStore: ObservableObject {
 
         guard await canSync() else {
             guard safeEnqueue("lead:update", id: id, payload: patch) else {
-                leads[index] = original
+                if let idx = leads.firstIndex(where: { $0.id == id }) {
+                    leads[idx] = original
+                }
                 throw DataStoreError.persistenceUnavailable
             }
             return
@@ -1373,28 +1408,37 @@ final class DataStore: ObservableObject {
                 await fireWebhookLeadStatusUpdated(updated)
             }
         } catch {
-            leads[index] = original
+            if let idx = leads.firstIndex(where: { $0.id == id }) {
+                leads[idx] = original
+            }
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription
                 throw error
             }
-            leads[index] = updated
+            if let idx = leads.firstIndex(where: { $0.id == id }) {
+                leads[idx] = updated
+            }
             guard safeEnqueue("lead:update", id: id, payload: patch) else {
-                leads[index] = original
+                if let idx = leads.firstIndex(where: { $0.id == id }) {
+                    leads[idx] = original
+                }
                 throw DataStoreError.persistenceUnavailable
             }
             self.error = "Saved offline — will sync when connected"
-            throw error
+            return
         }
     }
 
     func deleteLead(_ id: UUID) async throws {
-        let original = leads
+        guard let originalIndex = leads.firstIndex(where: { $0.id == id }) else { return }
+        let removed = leads[originalIndex]
         leads.removeAll { $0.id == id }
         if auth?.isDemoMode == true { return }
         guard await canSync() else {
             guard safeEnqueueEmpty("lead:delete", id: id) else {
-                leads = original
+                if !leads.contains(where: { $0.id == id }) {
+                    leads.insert(removed, at: min(originalIndex, leads.count))
+                }
                 throw DataStoreError.persistenceUnavailable
             }
             return
@@ -1402,14 +1446,18 @@ final class DataStore: ObservableObject {
         do {
             try await sb.delete("leads", id: id)
         } catch {
-            leads = original
+            if !leads.contains(where: { $0.id == id }) {
+                leads.insert(removed, at: min(originalIndex, leads.count))
+            }
             guard isNetworkError(error) else {
                 self.error = error.localizedDescription
                 throw error
             }
             leads.removeAll { $0.id == id }
             guard safeEnqueueEmpty("lead:delete", id: id) else {
-                leads = original
+                if !leads.contains(where: { $0.id == id }) {
+                    leads.insert(removed, at: min(originalIndex, leads.count))
+                }
                 throw DataStoreError.persistenceUnavailable
             }
             throw error
@@ -1431,6 +1479,13 @@ final class DataStore: ObservableObject {
         do {
             try await updateLead(lead.id, patch: LeadPatch(status: LeadStatus.won.rawValue, clientId: client.id))
         } catch {
+            if isNetworkError(error) {
+                if let index = leads.firstIndex(where: { $0.id == lead.id }) {
+                    leads[index].status = LeadStatus.won.rawValue
+                    leads[index].clientId = client.id
+                }
+                return
+            }
             try? await deleteClientOnServer(client.id)
             clients.removeAll { $0.id == client.id }
             if let index = leads.firstIndex(where: { $0.id == lead.id }) {
@@ -1452,7 +1507,10 @@ final class DataStore: ObservableObject {
 
         guard await canSync() else {
             clients.append(client)
-            safeEnqueue("client:create", id: client.id, payload: client)
+            guard safeEnqueue("client:create", id: client.id, payload: client) else {
+                clients.removeAll { $0.id == client.id }
+                throw DataStoreError.persistenceUnavailable
+            }
             return
         }
         do {
@@ -1481,7 +1539,10 @@ final class DataStore: ObservableObject {
                 throw error
             }
             clients.append(client)
-            safeEnqueue("client:create", id: client.id, payload: client)
+            guard safeEnqueue("client:create", id: client.id, payload: client) else {
+                clients.removeAll { $0.id == client.id }
+                throw DataStoreError.persistenceUnavailable
+            }
             self.error = "Saved offline — will sync when connected"
             return
         }
