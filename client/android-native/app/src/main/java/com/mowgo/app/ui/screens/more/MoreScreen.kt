@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -90,7 +92,24 @@ private fun MoreRootScreen(
     viewModel: MoreViewModel,
     onSignedOut: () -> Unit,
 ) {
+    val context = LocalContext.current
     var confirmSignOut by remember { mutableStateOf(false) }
+    val clientsExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        if (uri != null) viewModel.exportData("clients", uri, context.contentResolver)
+    }
+    val jobsExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        if (uri != null) viewModel.exportData("jobs", uri, context.contentResolver)
+    }
+    val invoicesExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        if (uri != null) viewModel.exportData("invoices", uri, context.contentResolver)
+    }
+    LaunchedEffect(state.exportMessage, state.exportError) {
+        val message = state.exportMessage ?: state.exportError
+        if (message != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            viewModel.dismissExportResult()
+        }
+    }
     if (confirmSignOut) {
         AlertDialog(
             onDismissRequest = { confirmSignOut = false },
@@ -124,6 +143,14 @@ private fun MoreRootScreen(
                         HorizontalDivider(Modifier.padding(start = 56.dp))
                         SettingsRow(Icons.Default.Link, "Integrations", "Zapier, Make, n8n webhooks") { navigate(MoreDestination.INTEGRATIONS) }
                     }
+                }
+                SectionLabel("Export data")
+                Card {
+                    ExportRow(Icons.Default.People, "Export Clients", state.exportLoadingAction == "clients", state.exportLoadingAction == null) { clientsExport.launch("mowgo-clients.csv") }
+                    HorizontalDivider(Modifier.padding(start = 56.dp))
+                    ExportRow(Icons.Default.Work, "Export Jobs", state.exportLoadingAction == "jobs", state.exportLoadingAction == null) { jobsExport.launch("mowgo-jobs.csv") }
+                    HorizontalDivider(Modifier.padding(start = 56.dp))
+                    ExportRow(Icons.Default.ReceiptLong, "Export Invoices", state.exportLoadingAction == "invoices", state.exportLoadingAction == null) { invoicesExport.launch("mowgo-invoices.csv") }
                 }
                 SectionLabel("About")
                 Card { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -167,6 +194,17 @@ private fun SettingsRow(icon: ImageVector, title: String, subtitle: String, onCl
     leadingContent = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
     trailingContent = { Icon(Icons.Default.ChevronRight, null) },
     modifier = Modifier.clickable(onClick = onClick),
+)
+
+@Composable
+private fun ExportRow(icon: ImageVector, title: String, loading: Boolean, enabled: Boolean, onClick: () -> Unit) = ListItem(
+    headlineContent = { Text(title) },
+    leadingContent = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
+    trailingContent = {
+        if (loading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+        else Icon(Icons.Default.FileDownload, null)
+    },
+    modifier = Modifier.clickable(enabled = enabled, onClick = onClick),
 )
 
 @Composable

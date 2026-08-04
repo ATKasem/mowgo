@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @EnvironmentObject var auth: AuthService
+    @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showingSignOut = false
@@ -20,6 +22,9 @@ struct SettingsView: View {
     @State private var phone = ""
     @State private var email = ""
     @State private var profileSaveError: String?
+    @State private var exportFile: ExportFile?
+    @State private var exportError: String?
+    @State private var exporting: String?
     @AppStorage("jobCompletionAlerts") private var jobCompletionAlerts = true
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
 
@@ -52,6 +57,9 @@ struct SettingsView: View {
                             BookingLinkRow(url: bookingURL)
                         }
 
+                        SectionHeader("Data")
+                        exportLinks
+
                         SectionHeader("About")
                         appInfoCard
                         signOutButton
@@ -71,6 +79,17 @@ struct SettingsView: View {
             .onChange(of: auth.user?.businessName) { _, _ in loadProfileDraft() }
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView(currentTier: auth.user?.tier ?? "free")
+            }
+            .sheet(item: $exportFile) { file in
+                ActivityView(activityItems: [file.url])
+            }
+            .alert("Export Failed", isPresented: Binding(
+                get: { exportError != nil },
+                set: { if !$0 { exportError = nil } }
+            )) {
+                Button("OK", role: .cancel) { exportError = nil }
+            } message: {
+                Text(exportError ?? "Could not create the export file.")
             }
             .alert("Sign Out", isPresented: $showingSignOut) {
                 Button("Sign Out", role: .destructive) { Task { await auth.signOut() } }
@@ -147,6 +166,101 @@ struct SettingsView: View {
         }
         .background(theme.surface)
         .cornerRadius(16)
+    }
+
+    private var exportLinks: some View {
+        VStack(spacing: 0) {
+            ExportRow(title: "Export Clients", loading: exporting == "Export Clients") {
+                Task<Void, Never> { await exportClients() }
+            }
+            Divider().padding(.leading, 52)
+            ExportRow(title: "Export Jobs", loading: exporting == "Export Jobs") {
+                Task<Void, Never> { await exportJobs() }
+            }
+            Divider().padding(.leading, 52)
+            ExportRow(title: "Export Invoices", loading: exporting == "Export Invoices") {
+                Task<Void, Never> { await exportInvoices() }
+            }
+            Divider().padding(.leading, 52)
+            ExportRow(title: "Export Leads", loading: exporting == "Export Leads") {
+                Task<Void, Never> { await exportLeads() }
+            }
+        }
+        .background(theme.surface)
+        .cornerRadius(16)
+        .disabled(exporting != nil)
+    }
+
+    @MainActor
+    private func exportClients() async {
+        await performExport(title: "Export Clients", filename: "mowgo-clients.csv") {
+            let clients: [Client]
+            if await SupabaseService.shared.isConfigured {
+                clients = try await SupabaseService.shared.fetchExportClients()
+            } else {
+                clients = store.clients
+            }
+            return ExportService.csv(from: clients)
+        }
+    }
+
+    @MainActor
+    private func exportJobs() async {
+        await performExport(title: "Export Jobs", filename: "mowgo-jobs.csv") {
+            let jobs: [Job]
+            if await SupabaseService.shared.isConfigured {
+                jobs = try await SupabaseService.shared.fetchExportJobs()
+            } else {
+                jobs = store.jobs
+            }
+            return ExportService.csv(from: jobs)
+        }
+    }
+
+    @MainActor
+    private func exportInvoices() async {
+        await performExport(title: "Export Invoices", filename: "mowgo-invoices.csv") {
+            let invoices: [Invoice]
+            if await SupabaseService.shared.isConfigured {
+                invoices = try await SupabaseService.shared.fetchExportInvoices()
+            } else {
+                invoices = store.invoices
+            }
+            return ExportService.csv(from: invoices)
+        }
+    }
+
+    @MainActor
+    private func exportLeads() async {
+        await performExport(title: "Export Leads", filename: "mowgo-leads.csv") {
+            ExportService.csv(from: store.leads)
+        }
+    }
+
+    @MainActor
+    private func performExport(
+        title: String,
+        filename: String,
+        csv: () async throws -> String
+    ) async {
+        exporting = title
+        exportError = nil
+        defer { exporting = nil }
+        do {
+            export(try await csv(), filename: filename)
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func export(_ csv: String, filename: String) {
+        do {
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+            try csv.write(to: url, atomically: true, encoding: .utf8)
+            exportFile = ExportFile(url: url)
+        } catch {
+            exportError = error.localizedDescription
+        }
     }
 
     private func loadProfileDraft() {
@@ -285,6 +399,52 @@ private struct SettingsLinkRow: View {
         .padding(14)
         .contentShape(Rectangle())
     }
+}
+
+private struct ExportFile: Identifiable {
+    let url: URL
+    var id: URL { url }
+}
+
+private struct ExportRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let title: String
+    let loading: Bool
+    let action: () -> Void
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: "square.and.arrow.up")
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(MowGoTheme.deepGreen)
+                    .background(MowGoTheme.deepGreen.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                Text(title).font(.subheadline.weight(.medium)).foregroundColor(theme.textPrimary)
+                Spacer()
+                if loading {
+                    ProgressView().controlSize(.small)
+                } else {
+                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundColor(theme.textMuted)
+                }
+            }
+            .padding(14)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 private struct BusinessProfileSettingsView: View {

@@ -414,6 +414,36 @@ actor SupabaseService {
         return profiles.first
     }
 
+    func fetchExportJobs() async throws -> [Job] {
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
+        let profile = try await fetchProfile()
+        let filter = profile?.role == "crew"
+            ? "assigned_to=eq.\(uid.uuidString)"
+            : "user_id=eq.\(uid.uuidString)"
+        let path = "/rest/v1/jobs?select=*,clients!left(*)&\(filter)&order=scheduled_date.asc"
+        let data = try await request("GET", path)
+        return try decoder.decode([Job].self, from: data)
+    }
+
+    func fetchExportClients() async throws -> [Client] {
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
+        let profile = try await fetchProfile()
+        let ownerId = profile?.role == "crew" ? profile?.businessId : uid
+        guard let ownerId else { return [] }
+        let path = "/rest/v1/clients?select=*&user_id=eq.\(ownerId.uuidString)&order=name.asc"
+        let data = try await request("GET", path)
+        return try decoder.decode([Client].self, from: data)
+    }
+
+    func fetchExportInvoices() async throws -> [Invoice] {
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
+        let profile = try await fetchProfile()
+        if profile?.role == "crew" { return [] }
+        let path = "/rest/v1/invoices?select=*,clients!left(name)&user_id=eq.\(uid.uuidString)&order=created_at.desc"
+        let data = try await request("GET", path)
+        return try decoder.decode([Invoice].self, from: data)
+    }
+
     func insert<Payload: Encodable, Result: Decodable>(
         _ table: String,
         _ item: Payload

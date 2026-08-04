@@ -21,7 +21,22 @@ const differentiators = [
 
 const plans = [
   { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
-  { name: 'Solo', price: '39', period: 'month', desc: 'For independent landscapers with a full schedule', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial', highlight: true },
+  {
+    name: 'Solo',
+    price: '39',
+    period: 'month',
+    desc: 'For independent landscapers with a full schedule',
+    features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
+    bonuses: [
+      { text: 'Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.', value: '$150 value' },
+      { text: '"What to Charge in Your City" report: real mow prices from your Oklahoma market.', value: '$49 value' },
+      { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
+    ],
+    guarantee: 'The Rain-Proof Guarantee: use Solo for 30 days, send 10 invoices, schedule 5 recurring clients. Not more organized? Full refund of your first month. No questions, no hoops.',
+    scarcity: 'Concierge setup is limited to 20 new businesses per week.',
+    cta: 'Start Free Trial',
+    highlight: true,
+  },
   { name: 'Crew', price: '79', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
 ];
 
@@ -133,6 +148,7 @@ export default function Landing() {
               <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("View Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
             </div>
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Rain delay on free tier. No credit card required.")}</p>
+            <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Cancel anytime. 30-day money-back guarantee. No contracts.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -255,7 +271,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Simple, transparent pricing")}</h2>
             <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Upgrade when you are ready. Cancel anytime.")}</p>
-            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} AI receptionist.", { price: '$39/month', competitorPrice: '$300/month' })}</p>
+            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$300/month' })}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
           <div className="grid md:grid-cols-3 gap-6">
@@ -277,15 +293,46 @@ export default function Landing() {
                       </li>
                     ))}
                   </ul>
+                  {plan.highlight && (
+                    <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4">
+                      <div className="bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl p-3">
+                        <p className="text-xs font-bold uppercase tracking-wide text-brand">{tr('Free Launch Kit — $278 value, included with Solo')}</p>
+                        <div className="mt-3 space-y-3">
+                          {plan.bonuses.map(bonus => (
+                            <div key={bonus.text} className="flex items-start gap-2">
+                              <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-brand" />
+                              <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1">{tr(bonus.text)}</span>
+                              <span className="text-[10px] font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/30 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {plan.highlight && (
+                    <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-[var(--color-text-primary)] dark:text-gray-200">
+                      <Shield className="w-4 h-4 flex-shrink-0 text-brand" />
+                      <span>{tr(plan.guarantee)}</span>
+                    </p>
+                  )}
                   {plan.name === 'Free' ? (
                     <Link to="/login" className="group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200 min-h-[44px]">{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
                   ) : (
                     <button onClick={() => handleStartCheckout(plan.name.toLowerCase())} className={`group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm active:scale-[0.97] transition-all duration-200 min-h-[44px] ${plan.highlight ? 'bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] hover:bg-gray-800 dark:hover:bg-[var(--color-surface-secondary)] shadow-lg hover:shadow-xl hover:shadow-gray-900/25 dark:hover:shadow-white/20 hover:-translate-y-0.5' : 'bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50'}`}>{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
                   )}
+                  {plan.highlight && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr(plan.scarcity)}</p>}
                 </div>
               </FadeIn>
             ))}
           </div>
+          <FadeIn delay={200}>
+            <div className="mt-10 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700 text-center">
+              <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-white mb-2">{tr('The Rain-Proof Guarantee')}</h3>
+              <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for Oklahoma crews. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}</p>
+            </div>
+          </FadeIn>
           <FadeIn delay={400}>
             <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.")}</p>
           </FadeIn>

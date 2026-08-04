@@ -1,7 +1,10 @@
 package com.mowgo.app.ui.screens.more
 
+import android.content.ContentResolver
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mowgo.app.data.ExportRepository
 import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.PaymentRepository
 import com.mowgo.app.data.SettingsRepository
@@ -23,6 +26,9 @@ data class MoreUiState(
     val billingError: String? = null,
     val billingMessage: String? = null,
     val pendingBillingUrl: String? = null,
+    val exportLoadingAction: String? = null,
+    val exportMessage: String? = null,
+    val exportError: String? = null,
 )
 
 class MoreViewModel(
@@ -30,6 +36,7 @@ class MoreViewModel(
     private val profileRepository: ProfileRepository = ProfileRepository(),
     private val authRepository: AuthRepository = AuthRepository(),
     private val paymentRepository: PaymentRepository = PaymentRepository(),
+    private val exportRepository: ExportRepository = ExportRepository(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MoreUiState())
     val uiState: StateFlow<MoreUiState> = _uiState.asStateFlow()
@@ -185,4 +192,32 @@ class MoreViewModel(
     }
 
     fun dismissSaveMessage() { _uiState.value = _uiState.value.copy(saveMessage = null) }
+
+    fun exportData(kind: String, uri: Uri, contentResolver: ContentResolver) {
+        if (_uiState.value.exportLoadingAction != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(exportLoadingAction = kind, exportMessage = null, exportError = null)
+            try {
+                val csv = when (kind) {
+                    "clients" -> exportRepository.clientsCsv(exportRepository.exportClients())
+                    "jobs" -> exportRepository.jobsCsv(exportRepository.exportJobs())
+                    "invoices" -> exportRepository.invoicesCsv(exportRepository.exportInvoices())
+                    else -> throw IllegalArgumentException("Unknown export type")
+                }
+                val output = contentResolver.openOutputStream(uri)
+                    ?: throw IllegalStateException("Could not open the selected file")
+                output.use { it.write(csv.toByteArray(Charsets.UTF_8)) }
+                _uiState.value = _uiState.value.copy(exportLoadingAction = null, exportMessage = "Exported")
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    exportLoadingAction = null,
+                    exportError = error.message ?: "Export failed",
+                )
+            }
+        }
+    }
+
+    fun dismissExportResult() {
+        _uiState.value = _uiState.value.copy(exportMessage = null, exportError = null)
+    }
 }

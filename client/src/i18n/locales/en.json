@@ -533,7 +533,20 @@
     "we_re_the_only_one": "— we're the only one",
     "of_your_revenue": "of your revenue",
     "solo_plan_costs_less_than_one_missed_job": "— Solo plan costs less than one missed job",
-    "solo_costs_price_and_is_built_for_the_1_140_oklahoma_crews_who_don_t_nee": "Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} AI receptionist."
+    "solo_costs_price_and_is_built_for_the_1_140_oklahoma_crews_who_don_t_nee": "Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.",
+    "cancel_anytime_30_day_money_back_guarantee_no_contracts": "Cancel anytime. 30-day money-back guarantee. No contracts.",
+    "done_for_you_setup_we_import_your_clients_and_pre_schedule_your_first_30": "Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.",
+    "what_to_charge_in_your_city_report_real_mow_prices_from_your_oklahoma_ma": "\"What to Charge in Your City\" report: real mow prices from your Oklahoma market.",
+    "template_pack_15_ready_to_send_scripts_invoices_reminders_price_raises_n": "Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.",
+    "150_value": "$150 value",
+    "49_value": "$49 value",
+    "79_value": "$79 value",
+    "the_rain_proof_guarantee_use_solo_for_30_days_send_10_invoices_schedule_": "The Rain-Proof Guarantee: use Solo for 30 days, send 10 invoices, schedule 5 recurring clients. Not more organized? Full refund of your first month. No questions, no hoops.",
+    "concierge_setup_is_limited_to_20_new_businesses_per_week": "Concierge setup is limited to 20 new businesses per week.",
+    "free_launch_kit_278_value_included_with_solo": "Free Launch Kit — $278 value, included with Solo",
+    "the_rain_proof_guarantee": "The Rain-Proof Guarantee",
+    "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "We built MowGo for Oklahoma crews. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.",
+    "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -776,7 +789,16 @@
     "booking_link": "Booking Link",
     "share_this_link_with_customers_so_they_can_book_a_service_online_no_login_required": "Share this link with customers so they can book a service online — no login required.",
     "copied": "Copied!",
-    "copy": "Copy"
+    "copy": "Copy",
+    "export_data": "Export data",
+    "download_your_business_data_as_csv_your_data_yours_to_keep": "Download your business data as CSV. Your data, yours to keep.",
+    "export_clients": "Export Clients",
+    "export_jobs": "Export Jobs",
+    "export_invoices": "Export Invoices",
+    "export_leads": "Export Leads",
+    "export_failed_please_try_again": "Export failed. Please try again.",
+    "exporting": "Exporting...",
+    "exported": "Exported"
   },
   "subscribe": {
     "payment_was_not_completed": "Payment was not completed",

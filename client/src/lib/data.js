@@ -126,6 +126,52 @@ export async function loadJobs() {
   }));
 }
 
+export async function fetchJobsForExport() {
+  const mapJob = job => ({
+    id: job.id,
+    user_id: job.user_id,
+    client_id: job.client_id,
+    client_name: job.clients?.name ?? job.client_name ?? '',
+    assigned_to: job.assigned_to ?? '',
+    title: job.title ?? '',
+    scheduled_date: job.scheduled_date,
+    scheduled_time: job.scheduled_time,
+    status: job.status,
+    notes: job.notes ?? '',
+    route_order: job.route_order ?? '',
+    created_at: job.created_at,
+  });
+  if (isDemoMode()) {
+    const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
+    if (!profile) return [];
+    const jobs = profile.role === 'crew' ? _jobs.filter(j => j.assigned_to === profile.id) : _jobs;
+    return jobs.map(mapJob);
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role, business_id')
+    .eq('id', user.id)
+    .single();
+  if (profileError) throw new Error('Failed to load profile: ' + (profileError.message || 'Unknown error'));
+
+  let query = supabase
+    .from('jobs')
+    .select('*, clients!left(*)')
+    .order('route_order', { ascending: true });
+
+  query = profile?.role === 'crew'
+    ? query.eq('assigned_to', user.id)
+    : query.eq('user_id', user.id);
+
+  const { data, error } = await query;
+  if (error) throw new Error('Failed to export jobs: ' + (error.message || 'Unknown error'));
+  return (data || []).map(mapJob);
+}
+
 export async function createJob(job) {
   if (isDemoMode()) {
     const client = _clients.find(c => c.id === job.client_id);
@@ -380,6 +426,31 @@ export async function loadClients() {
   }));
 }
 
+export async function fetchClientsForExport() {
+  if (isDemoMode()) return [..._clients];
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role, business_id')
+    .eq('id', user.id)
+    .single();
+  if (profileError) throw new Error('Failed to load profile: ' + (profileError.message || 'Unknown error'));
+
+  const ownerId = profile?.role === 'crew' ? profile.business_id : user.id;
+  if (!ownerId) return [];
+
+  const { data, error } = await supabase
+    .from('clients')
+    .select('*')
+    .eq('user_id', ownerId)
+    .order('name');
+  if (error) throw new Error('Failed to export clients: ' + (error.message || 'Unknown error'));
+  return data || [];
+}
+
 export async function createClient(client) {
   // Free tier limit: max 5 clients
   const FREE_CLIENT_LIMIT = 5;
@@ -476,6 +547,15 @@ export async function loadLeads() {
   return data || [];
 }
 
+export async function fetchLeadsForExport() {
+  if (isDemoMode()) return [..._leads];
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase.from('leads').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
 export async function createLead(lead) {
   const payload = { name: lead.name.trim(), phone: lead.phone?.trim() || null, email: lead.email?.trim() || null, address: lead.address?.trim() || null, source: lead.source || 'other', notes: lead.notes?.trim() || null, status: 'new' };
   if (isDemoMode()) {
@@ -558,6 +638,35 @@ export async function loadInvoices() {
     created_at: inv.created_at,
     paid_at: inv.paid_at,
   }));
+}
+
+export async function fetchInvoicesForExport() {
+  const mapInvoice = invoice => ({
+    id: invoice.id,
+    user_id: invoice.user_id,
+    client_id: invoice.client_id,
+    client_name: invoice.clients?.name ?? invoice.client_name ?? '',
+    job_id: invoice.job_id ?? '',
+    amount: invoice.amount,
+    status: invoice.status,
+    paid_at: invoice.paid_at ?? '',
+    created_at: invoice.created_at,
+  });
+  if (isDemoMode()) {
+    const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
+    return profile?.role === 'owner' ? _invoices.map(mapInvoice) : [];
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*, clients!left(*)')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+  if (error) throw new Error('Failed to export invoices: ' + (error.message || 'Unknown error'));
+  return (data || []).map(mapInvoice);
 }
 
 export async function createInvoice(invoice) {

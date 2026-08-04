@@ -553,7 +553,20 @@
     "we_re_the_only_one": "— somos los únicos",
     "of_your_revenue": "de tus ingresos",
     "solo_plan_costs_less_than_one_missed_job": "— el plan Solo cuesta menos que un trabajo perdido",
-    "solo_costs_price_and_is_built_for_the_1_140_oklahoma_crews_who_don_t_nee": "Solo cuesta {{price}} y está pensado para los más de 1,140 equipos de Oklahoma que no necesitan una recepcionista con IA de {{competitorPrice}}."
+    "solo_costs_price_and_is_built_for_the_1_140_oklahoma_crews_who_don_t_nee": "Solo cuesta {{price}} y está hecho para los más de 1,140 equipos de Oklahoma que no necesitan un sistema empresarial de {{competitorPrice}}.",
+    "cancel_anytime_30_day_money_back_guarantee_no_contracts": "Cancela cuando quieras. Garantía de devolución de 30 días. Sin contratos.",
+    "done_for_you_setup_we_import_your_clients_and_pre_schedule_your_first_30": "Configuración hecha por nosotros: importamos tus clientes y agendamos tus primeros 30 días en 48 horas.",
+    "what_to_charge_in_your_city_report_real_mow_prices_from_your_oklahoma_ma": "Informe \"Cuánto cobrar en tu ciudad\": precios reales de tu mercado de Oklahoma.",
+    "template_pack_15_ready_to_send_scripts_invoices_reminders_price_raises_n": "Paquete de plantillas: 15 mensajes listos para enviar: facturas, recordatorios, subidas de precio, seguimiento de ausencias.",
+    "150_value": "Valor de $150",
+    "49_value": "Valor de $49",
+    "79_value": "Valor de $79",
+    "the_rain_proof_guarantee_use_solo_for_30_days_send_10_invoices_schedule_": "La Garantía a Prueba de Lluvia: usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. ¿No estás más organizado? Te devolvemos el primer mes completo. Sin preguntas, sin trámites.",
+    "concierge_setup_is_limited_to_20_new_businesses_per_week": "La configuración asistida está limitada a 20 negocios nuevos por semana.",
+    "free_launch_kit_278_value_included_with_solo": "Kit de lanzamiento gratis: valor de $278, incluido con Solo",
+    "the_rain_proof_guarantee": "La garantía a prueba de lluvia",
+    "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "Creamos MowGo para los equipos de Oklahoma. Usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. Si no te sientes más organizado, te devolvemos el primer mes completo. Sin preguntas, sin trámites. Tus datos siempre son tuyos.",
+    "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Aplica para Solo. Sin cargos de configuración. Sin contratos. Cancela cuando quieras."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -796,7 +809,16 @@
     "booking_link": "Enlace de Reserva",
     "share_this_link_with_customers_so_they_can_book_a_service_online_no_login_required": "Comparte este enlace con tus clientes para que puedan reservar un servicio en línea — sin necesidad de iniciar sesión.",
     "copied": "¡Copiado!",
-    "copy": "Copiar"
+    "copy": "Copiar",
+    "export_data": "Exportar datos",
+    "download_your_business_data_as_csv_your_data_yours_to_keep": "Descarga los datos de tu negocio como CSV. Tus datos, tuyos para conservar.",
+    "export_clients": "Exportar clientes",
+    "export_jobs": "Exportar trabajos",
+    "export_invoices": "Exportar facturas",
+    "export_leads": "Exportar clientes potenciales",
+    "export_failed_please_try_again": "No se pudo exportar. Inténtalo de nuevo.",
+    "exporting": "Exportando...",
+    "exported": "Exportado"
   },
   "subscribe": {
     "payment_was_not_completed": "El pago no se completó",

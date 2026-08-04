@@ -1,11 +1,12 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { loadProfile, saveProfile, loadTeamMembers, inviteTeamMember, removeTeamMember } from '../lib/data';
+import { loadProfile, saveProfile, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
+import { downloadCsv, toCsv } from '../lib/csv';
 import { TEAM_MEMBER_COLORS } from '../lib/constants';
 import { isDemoMode } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
-import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy } from 'lucide-react';
+import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 
@@ -33,7 +34,11 @@ export default function Settings() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteSending, setInviteSending] = useState(false);
   const [bookingCopied, setBookingCopied] = useState(false);
+  const [exportLoading, setExportLoading] = useState({});
+  const [exported, setExported] = useState({});
+  const [exportError, setExportError] = useState('');
   const bookingCopyTimer = useRef(null);
+  const exportTimers = useRef({});
 
   // Booking link — use the live domain. Inside Capacitor (Android/iOS shell),
   // window.location.origin is a local scheme (https://localhost) that customers
@@ -48,6 +53,7 @@ export default function Settings() {
   useEffect(() => {
     return () => {
       if (bookingCopyTimer.current) clearTimeout(bookingCopyTimer.current);
+      Object.values(exportTimers.current).forEach(clearTimeout);
     };
   }, []);
 
@@ -184,6 +190,31 @@ export default function Settings() {
       setError(err.message || tr('Unable to open subscription management'));
     } finally {
       setPortalLoading(false);
+    }
+  }
+
+  async function handleExport(type, fetchRows) {
+    setExportLoading(current => ({ ...current, [type]: true }));
+    setExportError('');
+    try {
+      const rows = await fetchRows();
+      const fallbackHeaders = {
+        clients: ['id','user_id','name','address','phone','email','rate','created_at'],
+        jobs: ['id','user_id','client_id','client_name','assigned_to','title','scheduled_date','scheduled_time','status','notes','route_order','created_at'],
+        invoices: ['id','user_id','client_id','client_name','job_id','amount','status','paid_at','created_at'],
+        leads: ['id','user_id','name','phone','email','address','source','notes','status','client_id','created_at','updated_at'],
+      };
+      downloadCsv(`mowgo-${type}.csv`, toCsv(rows, fallbackHeaders[type]));
+      setExported(current => ({ ...current, [type]: true }));
+      if (exportTimers.current[type]) clearTimeout(exportTimers.current[type]);
+      exportTimers.current[type] = setTimeout(() => {
+        setExported(current => ({ ...current, [type]: false }));
+      }, 2500);
+    } catch (err) {
+      console.error(`Export ${type} failed:`, err);
+      setExportError(tr('Export failed. Please try again.'));
+    } finally {
+      setExportLoading(current => ({ ...current, [type]: false }));
     }
   }
 
@@ -438,6 +469,35 @@ export default function Settings() {
               {bookingCopied ? <><CheckCircle className="w-4 h-4" />{tr("Copied!")}</> : <><Copy className="w-4 h-4" />{tr("Copy")}</>}
             </button>
           </div>
+        </div>
+
+        {/* Data Export */}
+        <div className="card p-5 space-y-3">
+          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Download className="w-4 h-4 text-brand" />{tr('Export data')}</h3>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('Download your business data as CSV. Your data, yours to keep.')}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {[
+              ['clients', 'Export Clients', fetchClientsForExport],
+              ['jobs', 'Export Jobs', fetchJobsForExport],
+              ['invoices', 'Export Invoices', fetchInvoicesForExport],
+              ['leads', 'Export Leads', fetchLeadsForExport],
+            ].map(([type, label, fetchRows]) => (
+              <button
+                key={type}
+                type="button"
+                disabled={exportLoading[type]}
+                onClick={() => handleExport(type, fetchRows)}
+                className="btn-secondary w-full disabled:opacity-60"
+              >
+                {exportLoading[type]
+                  ? <><Loader2 className="w-4 h-4 animate-spin" />{tr('Exporting...')}</>
+                  : exported[type]
+                    ? <><CheckCircle className="w-4 h-4 text-brand" />{tr('Exported')}</>
+                    : <><Download className="w-4 h-4" />{tr(label)}</>}
+              </button>
+            ))}
+          </div>
+          {exportError && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{exportError}</p>}
         </div>
 
         {/* Help */}
