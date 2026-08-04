@@ -12,6 +12,7 @@ struct MowGoApp: App {
     @UIApplicationDelegateAdaptor(PushAppDelegate.self) private var appDelegate
     @StateObject private var auth = AuthService()
     @StateObject private var store: DataStore
+    private let push = PushNotificationService.shared
     @AppStorage("appearanceMode") private var appearanceMode = AppearancePreference.system.rawValue
     @State private var showSessionExpiredAlert = false
     @State private var showUpgradeSuccessToast = false
@@ -88,20 +89,21 @@ struct MowGoApp: App {
             .task(id: authLoadState) {
                 guard !auth.isLoading else { return }
                 store.auth = auth
-                if auth.isAuthenticated {
+                if auth.isDemoMode {
+                    await store.prepareForDemoMode()
+                    store.loadDemoData()
+                } else if auth.isAuthenticated {
                     await store.loadAll()
                     // Register for push notifications after authentication
                     await MainActor.run {
-                        PushNotificationService.shared.setCurrentUserId(store.currentUserId)
-                        PushNotificationService.shared.registerForPushNotifications()
+                        push.setCurrentUserId(store.currentUserId)
+                        push.registerForPushNotifications()
                     }
-                } else if auth.isDemoMode {
-                    store.loadDemoData()
                 } else {
                     // Clear device token when signed out
                     await MainActor.run {
-                        PushNotificationService.shared.setCurrentUserId(store.currentUserId)
-                        PushNotificationService.shared.clearDeviceToken()
+                        push.setCurrentUserId(store.currentUserId)
+                        push.clearDeviceToken()
                     }
                     await store.clear()
                 }

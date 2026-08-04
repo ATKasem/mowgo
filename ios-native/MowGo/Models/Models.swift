@@ -184,6 +184,8 @@ enum LeadStatus: String, Codable, CaseIterable {
 }
 
 struct Lead: Codable, Identifiable, Equatable {
+    private static let isoFormatter = ISO8601DateFormatter()
+
     let id: UUID
     var userId: UUID?
     var name: String
@@ -235,38 +237,29 @@ struct Lead: Codable, Identifiable, Equatable {
     }
 
     init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: DynamicCodingKey.self)
-        id = try values.decode(UUID.self, forKey: DynamicCodingKey("id"))
-        userId = try values.decodeIfPresent(UUID.self, forKey: DynamicCodingKey("userId"))
-        name = try values.decode(String.self, forKey: DynamicCodingKey("name"))
-        phone = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("phone"))
-        email = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("email"))
-        address = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("address"))
-        source = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("source")) ?? "other"
-        notes = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("notes"))
-        status = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("status")) ?? "new"
-        clientId = try values.decodeIfPresent(UUID.self, forKey: DynamicCodingKey("clientId"))
-        createdAt = Self.decodeDate(from: values, forKey: DynamicCodingKey("createdAt"))
-        updatedAt = Self.decodeDate(from: values, forKey: DynamicCodingKey("updatedAt"))
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(UUID.self, forKey: .id)
+        userId = try values.decodeIfPresent(UUID.self, forKey: .userId)
+        name = try values.decode(String.self, forKey: .name)
+        phone = try values.decodeIfPresent(String.self, forKey: .phone)
+        email = try values.decodeIfPresent(String.self, forKey: .email)
+        address = try values.decodeIfPresent(String.self, forKey: .address)
+        source = try values.decodeIfPresent(String.self, forKey: .source) ?? "other"
+        notes = try values.decodeIfPresent(String.self, forKey: .notes)
+        status = try values.decodeIfPresent(String.self, forKey: .status) ?? "new"
+        clientId = try values.decodeIfPresent(UUID.self, forKey: .clientId)
+        createdAt = Self.decodeDate(from: values, forKey: .createdAt)
+        updatedAt = Self.decodeDate(from: values, forKey: .updatedAt)
     }
 
     private static func decodeDate(
-        from values: KeyedDecodingContainer<DynamicCodingKey>,
-        forKey key: DynamicCodingKey
+        from values: KeyedDecodingContainer<CodingKeys>,
+        forKey key: CodingKeys
     ) -> Date? {
         guard let value = try? values.decode(String.self, forKey: key) else {
             return nil
         }
-        return ISO8601DateFormatter().date(from: value)
-    }
-
-    private struct DynamicCodingKey: CodingKey {
-        let stringValue: String
-        let intValue: Int? = nil
-
-        init(_ stringValue: String) { self.stringValue = stringValue }
-        init?(stringValue: String) { self.stringValue = stringValue }
-        init?(intValue: Int) { return nil }
+        return isoFormatter.date(from: value)
     }
 }
 

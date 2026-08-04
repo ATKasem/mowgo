@@ -94,6 +94,14 @@ actor WebhookService {
         await fire(userId: userId, event: "lead.status.updated", payload: leadPayload(lead))
     }
 
+    func rainDelayApplied(count: Int, date: String, targetDate: String, userId: UUID) async {
+        await fire(userId: userId, event: "rain.delay.applied", payload: [
+            "count": count,
+            "date": date,
+            "target_date": targetDate
+        ])
+    }
+
     private func leadPayload(_ lead: Lead) -> [String: Any] {
         return [
             "lead_id": lead.id.uuidString,

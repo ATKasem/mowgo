@@ -211,6 +211,7 @@ final class DataStore: ObservableObject {
             self.error = "Unable to load your account. Please try again."
             return
         }
+        loadRainDelayHistory()
 
         // Cache reads are safe only after the authenticated owner is known.
         if let persistence, persistence.hasCachedData(currentUserId: currentUserId) {
@@ -324,15 +325,17 @@ final class DataStore: ObservableObject {
             do {
                 async let j = sb.fetchJobs()
                 async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
+                async let l: [Lead] = sb.fetch("leads", query: ["order": "created_at.desc"])
                 async let i = sb.fetchInvoices()
                 async let r: [RecurringJob] = sb.fetch("recurring_jobs")
-                let refreshed = try await (j, c, i, r)
+                let refreshed = try await (j, c, l, i, r)
                 guard !Task.isCancelled,
                       generation == loadGeneration,
                       self.currentUserId == currentUserId else { return }
-                let (freshJobs, freshClients, freshInvoices, freshTemplates) = refreshed
+                let (freshJobs, freshClients, freshLeads, freshInvoices, freshTemplates) = refreshed
                 jobs = freshJobs
                 clients = freshClients
+                leads = freshLeads
                 invoices = freshInvoices
                 recurringJobs = freshTemplates
                 persistence.saveJobs(freshJobs, currentUserId: currentUserId)
@@ -419,7 +422,7 @@ final class DataStore: ObservableObject {
             ))
 
         case "client:delete":
-            try await sb.delete("clients", id: mutation.entityId)
+            try await deleteClientOnServer(mutation.entityId)
 
         case "lead:create":
             let lead = try JSONDecoder().decode(Lead.self, from: mutation.payload)
@@ -436,7 +439,9 @@ final class DataStore: ObservableObject {
         case "lead:update":
             let patch = try JSONDecoder().decode(LeadPatch.self, from: mutation.payload)
             try await sb.update("leads", id: mutation.entityId, patch)
-            if patch.status != nil, let lead = leads.first(where: { $0.id == mutation.entityId }) {
+            if let status = patch.status,
+               var lead = leads.first(where: { $0.id == mutation.entityId }) {
+                lead.status = status
                 await fireWebhookLeadStatusUpdated(lead)
             }
 
@@ -589,6 +594,10 @@ final class DataStore: ObservableObject {
         ))
     }
 
+    private func deleteClientOnServer(_ id: UUID) async throws {
+        try await sb.delete("clients", id: id)
+    }
+
     /// Server-only create (no offline fallback, no local state mutation).
     private func createRecurringJobOnServer(_ template: RecurringJob) async throws -> RecurringJob {
         guard let userId = try await sb.getCurrentUserId() else {
@@ -635,6 +644,7 @@ final class DataStore: ObservableObject {
         estimates = []
         teamMembers = []
         recurringJobs = []
+        rainDelayHistory = []
         currentUserId = nil
         isLoading = false
         error = nil
@@ -831,7 +841,9 @@ final class DataStore: ObservableObject {
         }
         guard await canSync() else {
             struct P: Encodable { let scheduledDate: String }
-            safeEnqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
+            guard safeEnqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate)) else {
+                throw DataStoreError.persistenceUnavailable
+            }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -849,7 +861,9 @@ final class DataStore: ObservableObject {
                 throw error
             }
             struct P: Encodable { let scheduledDate: String }
-            safeEnqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
+            guard safeEnqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate)) else {
+                throw DataStoreError.persistenceUnavailable
+            }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -1020,14 +1034,15 @@ final class DataStore: ObservableObject {
     }
 
     private var isRainDelaying = false
+    private var isUndoingRainDelay = false
 
-    func rainDelay(for date: String, to targetDate: String) async throws {
-        guard !isRainDelaying else { return }
+    func rainDelay(for date: String, to targetDate: String) async throws -> Bool {
+        guard !isRainDelaying, !isUndoingRainDelay else { return false }
         isRainDelaying = true
         defer { isRainDelaying = false }
 
         let pending = jobs.filter { $0.scheduledDate == date && $0.status == .scheduled }
-        guard !pending.isEmpty else { return }
+        guard !pending.isEmpty else { return false }
 
         // Snapshot original dates for clean rollback
         let originalDates: [UUID: String] = Dictionary(
@@ -1042,6 +1057,10 @@ final class DataStore: ObservableObject {
                 try await updateJobSchedule(job, scheduledDate: targetDate)
                 succeeded.append(job.id)
             } catch {
+                if isNetworkError(error) {
+                    succeeded.append(job.id)
+                    continue
+                }
                 // Rollback: re-sync the already-updated jobs to their original dates
                 for jobId in succeeded {
                     if let original = originalDates[jobId],
@@ -1057,25 +1076,39 @@ final class DataStore: ObservableObject {
         let entry = RainDelayEntry(
             date: date,
             targetDate: targetDate,
-            jobIds: pending.map(\.id),
-            jobCount: pending.count,
+            jobIds: succeeded,
+            jobCount: succeeded.count,
             originalDates: originalDates
         )
         saveRainDelayEntry(entry)
-        await firePushRainDelay(pending, date: targetDate)
+        let movedJobs = pending.filter { succeeded.contains($0.id) }
+        await firePushRainDelay(movedJobs, date: targetDate)
+        if auth?.isDemoMode != true, let userId = currentUserId {
+            await WebhookService.shared.rainDelayApplied(
+                count: succeeded.count, date: date, targetDate: targetDate, userId: userId
+            )
+        }
+        return true
     }
 
     func undoRainDelay(_ entry: RainDelayEntry) async throws {
+        guard !isRainDelaying, !isUndoingRainDelay else { return }
+        isUndoingRainDelay = true
+        defer { isUndoingRainDelay = false }
+
         var restored: [(Job, String)] = []
+        var skippedCount = 0
         do {
             for jobId in entry.jobIds {
                 guard let originalDate = entry.originalDates[jobId],
-                      let job = jobs.first(where: { $0.id == jobId }) else { continue }
+                      let job = jobs.first(where: { $0.id == jobId }),
+                      job.scheduledDate == entry.targetDate else {
+                    skippedCount += 1
+                    continue
+                }
                 try await updateJobSchedule(job, scheduledDate: originalDate)
                 restored.append((job, originalDate))
             }
-            rainDelayHistory.removeAll { $0.id == entry.id }
-            persistRainDelayHistory()
         } catch {
             for (job, _) in restored {
                 if let current = jobs.first(where: { $0.id == job.id }) {
@@ -1084,6 +1117,13 @@ final class DataStore: ObservableObject {
             }
             throw error
         }
+        if skippedCount > 0 {
+            let message = "Partially undone — \(skippedCount) job\(skippedCount == 1 ? " was" : "s were") missing or rescheduled manually."
+            self.error = message
+            throw DataStoreError.partialRainDelayUndo(message)
+        }
+        rainDelayHistory.removeAll { $0.id == entry.id }
+        persistRainDelayHistory()
     }
 
     func saveRainDelayEntry(_ entry: RainDelayEntry) {
@@ -1093,7 +1133,7 @@ final class DataStore: ObservableObject {
     }
 
     func loadRainDelayHistory() {
-        guard let data = UserDefaults.standard.data(forKey: "rainDelayHistory"),
+        guard let data = UserDefaults.standard.data(forKey: rainDelayHistoryKey),
               let decoded = try? JSONDecoder().decode([RainDelayEntry].self, from: data) else {
             rainDelayHistory = []
             return
@@ -1103,7 +1143,11 @@ final class DataStore: ObservableObject {
 
     private func persistRainDelayHistory() {
         guard let data = try? JSONEncoder().encode(rainDelayHistory) else { return }
-        UserDefaults.standard.set(data, forKey: "rainDelayHistory")
+        UserDefaults.standard.set(data, forKey: rainDelayHistoryKey)
+    }
+
+    private var rainDelayHistoryKey: String {
+        "rainDelayHistory_\(currentUserId?.uuidString ?? "anonymous")"
     }
 
     // MARK: - Recurring Jobs
@@ -1235,6 +1279,28 @@ final class DataStore: ObservableObject {
         error = nil
     }
 
+    func prepareForDemoMode() async {
+        loadGeneration += 1
+        loadTask?.cancel()
+        pollingTask?.cancel()
+        syncTask?.cancel()
+        _ = await loadTask?.value
+        _ = await pollingTask?.value
+        _ = await syncTask?.value
+        loadTask = nil
+        pollingTask = nil
+        syncTask = nil
+        jobs = []
+        clients = []
+        leads = []
+        invoices = []
+        estimates = []
+        teamMembers = []
+        recurringJobs = []
+        rainDelayHistory = []
+        currentUserId = nil
+    }
+
     func createLead(_ lead: Lead) async throws {
         if auth?.isDemoMode == true {
             leads.insert(lead, at: 0)
@@ -1242,7 +1308,10 @@ final class DataStore: ObservableObject {
         }
         guard await canSync() else {
             leads.insert(lead, at: 0)
-            safeEnqueue("lead:create", id: lead.id, payload: lead)
+            guard safeEnqueue("lead:create", id: lead.id, payload: lead) else {
+                leads.removeAll { $0.id == lead.id }
+                throw DataStoreError.persistenceUnavailable
+            }
             return
         }
         do {
@@ -1262,9 +1331,12 @@ final class DataStore: ObservableObject {
                 throw error
             }
             leads.insert(lead, at: 0)
-            safeEnqueue("lead:create", id: lead.id, payload: lead)
+            guard safeEnqueue("lead:create", id: lead.id, payload: lead) else {
+                leads.removeAll { $0.id == lead.id }
+                throw DataStoreError.persistenceUnavailable
+            }
             self.error = "Saved offline — will sync when connected"
-            throw error
+            return
         }
     }
 
@@ -1289,7 +1361,10 @@ final class DataStore: ObservableObject {
         if auth?.isDemoMode == true { return }
 
         guard await canSync() else {
-            safeEnqueue("lead:update", id: id, payload: patch)
+            guard safeEnqueue("lead:update", id: id, payload: patch) else {
+                leads[index] = original
+                throw DataStoreError.persistenceUnavailable
+            }
             return
         }
         do {
@@ -1304,7 +1379,10 @@ final class DataStore: ObservableObject {
                 throw error
             }
             leads[index] = updated
-            safeEnqueue("lead:update", id: id, payload: patch)
+            guard safeEnqueue("lead:update", id: id, payload: patch) else {
+                leads[index] = original
+                throw DataStoreError.persistenceUnavailable
+            }
             self.error = "Saved offline — will sync when connected"
             throw error
         }
@@ -1315,7 +1393,10 @@ final class DataStore: ObservableObject {
         leads.removeAll { $0.id == id }
         if auth?.isDemoMode == true { return }
         guard await canSync() else {
-            safeEnqueueEmpty("lead:delete", id: id)
+            guard safeEnqueueEmpty("lead:delete", id: id) else {
+                leads = original
+                throw DataStoreError.persistenceUnavailable
+            }
             return
         }
         do {
@@ -1327,7 +1408,10 @@ final class DataStore: ObservableObject {
                 throw error
             }
             leads.removeAll { $0.id == id }
-            safeEnqueueEmpty("lead:delete", id: id)
+            guard safeEnqueueEmpty("lead:delete", id: id) else {
+                leads = original
+                throw DataStoreError.persistenceUnavailable
+            }
             throw error
         }
     }
@@ -1344,7 +1428,16 @@ final class DataStore: ObservableObject {
             return
         }
         try await createClient(client)
-        try await updateLead(lead.id, patch: LeadPatch(status: LeadStatus.won.rawValue, clientId: client.id))
+        do {
+            try await updateLead(lead.id, patch: LeadPatch(status: LeadStatus.won.rawValue, clientId: client.id))
+        } catch {
+            try? await deleteClientOnServer(client.id)
+            clients.removeAll { $0.id == client.id }
+            if let index = leads.firstIndex(where: { $0.id == lead.id }) {
+                leads[index] = lead
+            }
+            throw error
+        }
     }
 
     func createClient(_ client: Client) async throws {
@@ -1447,7 +1540,7 @@ final class DataStore: ObservableObject {
             return
         }
         do {
-            try await sb.delete("clients", id: client.id)
+            try await deleteClientOnServer(client.id)
             clients.removeAll { $0.id == client.id }
         } catch {
             guard isNetworkError(error) else {
@@ -1666,17 +1759,27 @@ final class DataStore: ObservableObject {
     }
 
     /// Best-effort enqueue that never throws — sets self.error on failure.
-    private func safeEnqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) {
-        do { try enqueue(operation, id: id, payload: payload) } catch {
+    @discardableResult
+    private func safeEnqueue<P: Encodable>(_ operation: String, id: UUID, payload: P) -> Bool {
+        do {
+            try enqueue(operation, id: id, payload: payload)
+            return true
+        } catch {
             self.error = "Could not save locally — offline sync unavailable"
+            return false
         }
     }
 
     /// Best-effort empty enqueue that never throws.
-    private func safeEnqueueEmpty(_ operation: String, id: UUID) {
+    @discardableResult
+    private func safeEnqueueEmpty(_ operation: String, id: UUID) -> Bool {
         struct Empty: Encodable {}
-        do { try enqueue(operation, id: id, payload: Empty()) } catch {
+        do {
+            try enqueue(operation, id: id, payload: Empty())
+            return true
+        } catch {
             self.error = "Could not save locally — offline sync unavailable"
+            return false
         }
     }
 
@@ -1706,6 +1809,7 @@ enum DataStoreError: LocalizedError {
     case freeTierLimit(String)
     case permissionDenied
     case persistenceUnavailable
+    case partialRainDelayUndo(String)
     case serverError(String)
 
     var errorDescription: String? {
@@ -1720,6 +1824,8 @@ enum DataStoreError: LocalizedError {
             "Only the business owner can manage team members."
         case .persistenceUnavailable:
             "Offline changes could not be saved on this device."
+        case .partialRainDelayUndo(let message):
+            message
         case .serverError(let message):
             message
         }

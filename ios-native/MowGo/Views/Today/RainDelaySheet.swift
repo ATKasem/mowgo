@@ -75,9 +75,12 @@ struct RainDelaySheet: View {
         isApplying = true
         Task<Void, Never> {
             do {
-                try await store.rainDelay(for: date, to: targetDate)
-                if let entry = store.rainDelayHistory.first { onApplied(entry) }
-                dismiss()
+                if try await store.rainDelay(for: date, to: targetDate) {
+                    if let entry = store.rainDelayHistory.first { onApplied(entry) }
+                    dismiss()
+                } else {
+                    isApplying = false
+                }
             } catch {
                 self.error = error.localizedDescription
                 isApplying = false
@@ -91,6 +94,7 @@ struct RainDelayHistoryView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @State private var error: String?
+    @State private var isUndoing = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -108,7 +112,9 @@ struct RainDelayHistoryView: View {
                                     .font(.caption).foregroundColor(theme.textMuted)
                             }
                             Spacer()
-                            Button("Undo") { undo(entry) }.buttonStyle(.bordered)
+                            Button("Undo") { undo(entry) }
+                                .buttonStyle(.bordered)
+                                .disabled(isUndoing)
                         }
                         .listRowBackground(theme.surface)
                     }
@@ -122,7 +128,9 @@ struct RainDelayHistoryView: View {
     }
 
     private func undo(_ entry: RainDelayEntry) {
+        isUndoing = true
         Task<Void, Never> {
+            defer { isUndoing = false }
             do { try await store.undoRainDelay(entry) }
             catch let caught { error = caught.localizedDescription }
         }
