@@ -25,6 +25,7 @@ const plans = [
   {
     name: 'Solo',
     price: '39',
+    annualPrice: '390',
     period: 'month',
     desc: 'For independent landscapers with a full schedule',
     features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'],
@@ -38,7 +39,7 @@ const plans = [
     cta: 'Start Free Trial',
     highlight: true,
   },
-  { name: 'Crew', price: '79', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Crew', price: '79', annualPrice: '790', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
 ];
 
 const stats = [
@@ -64,21 +65,23 @@ export default function Landing() {
   const { tr, t, i18n } = useLocalizedText('landing');
   const navigate = useNavigate();
   const [paymentError, setPaymentError] = useState('');
+  const [billingInterval, setBillingInterval] = useState('month');
   const errorTimerRef = useRef(null);
 
   useEffect(() => {
     return () => { if (errorTimerRef.current) clearTimeout(errorTimerRef.current); };
   }, []);
 
-  async function handleStartCheckout(plan) {
+  async function handleStartCheckout(plan, interval = 'month') {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         sessionStorage.setItem('mowgo_plan_intent', plan);
+        sessionStorage.setItem('mowgo_interval_intent', interval);
         navigate('/login?mode=signup');
         return;
       }
-      const r = await startCheckout(plan);
+      const r = await startCheckout(plan, interval);
       if (r?.error) {
         setPaymentError(r.error);
         if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
@@ -297,6 +300,25 @@ export default function Landing() {
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$300/month' })}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-1 gap-1">
+              <button
+                onClick={() => setBillingInterval('month')}
+                className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'month' ? 'bg-brand text-white shadow' : 'text-[var(--color-text-secondary)] dark:text-gray-300 hover:text-[var(--color-text-primary)]'}`}
+              >
+                {tr("Monthly")}
+              </button>
+              <button
+                onClick={() => setBillingInterval('year')}
+                className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'year' ? 'bg-brand text-white shadow' : 'text-[var(--color-text-secondary)] dark:text-gray-300 hover:text-[var(--color-text-primary)]'}`}
+              >
+                {tr("Annual")} <span className={`ml-1 text-[11px] font-bold ${billingInterval === 'year' ? 'text-white/90' : 'text-brand'}`}>{tr("2 months free")}</span>
+              </button>
+            </div>
+          </div>
+          {billingInterval === 'year' && (
+            <p className="text-center text-sm font-medium text-brand dark:text-emerald-400 mb-6 -mt-2">{tr("One payment covers the whole season. No card hits in winter.")}</p>
+          )}
           <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan, i) => (
               <FadeIn key={plan.name} delay={i * 100}>
@@ -305,8 +327,14 @@ export default function Landing() {
                   <h3 className={`text-lg font-bold ${plan.highlight ? 'text-brand-hover dark:text-emerald-400 mt-3' : 'text-[var(--color-text-primary)] dark:text-white'}`}>{plan.name}</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr(plan.desc)}</p>
                   <div className="mt-5 mb-6">
-                    <span className="text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white">{plan.price === '0' ? tr('Free') : `$${plan.price}`}</span>
-                    {plan.price !== '0' && <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] font-medium">/{tr(plan.period)}</span>}
+                    <span className="text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white">{plan.price === '0' ? tr('Free') : `$${billingInterval === 'year' && plan.annualPrice ? plan.annualPrice : plan.price}`}</span>
+                    {plan.price !== '0' && <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] font-medium">/{tr(billingInterval === 'year' && plan.annualPrice ? 'year' : plan.period)}</span>}
+                    {billingInterval === 'year' && plan.annualPrice && (
+                      <span className="ml-2 inline-block align-middle text-[11px] font-bold text-brand bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5">{tr("2 months free")}</span>
+                    )}
+                    {billingInterval === 'year' && plan.price !== '0' && (
+                      <p className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-1.5">{tr("Billed once a year. Cancel anytime.")}</p>
+                    )}
                   </div>
                   <ul className="space-y-3 flex-1 border-t border-gray-100 dark:border-gray-800 pt-4">
                     {plan.features.map(f => (
@@ -335,13 +363,13 @@ export default function Landing() {
                   {plan.highlight && (
                     <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-[var(--color-text-primary)] dark:text-gray-200">
                       <Shield className="w-4 h-4 flex-shrink-0 text-brand" />
-                      <span>{tr(plan.guarantee)}</span>
+                      <span>{tr(plan.guarantee)}{billingInterval === 'year' && plan.annualPrice ? ` ${tr("Annual? The Rain-Proof Guarantee still applies — unused months refunded.")}` : ''}</span>
                     </p>
                   )}
                   {plan.name === 'Free' ? (
                     <Link to="/login?mode=signup" className="group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200 min-h-[44px]">{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
                   ) : (
-                    <button onClick={() => handleStartCheckout(plan.name.toLowerCase())} className={`group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm active:scale-[0.97] transition-all duration-200 min-h-[44px] ${plan.highlight ? 'bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] hover:bg-gray-800 dark:hover:bg-[var(--color-surface-secondary)] shadow-lg hover:shadow-xl hover:shadow-gray-900/25 dark:hover:shadow-white/20 hover:-translate-y-0.5' : 'bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50'}`}>{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
+                    <button onClick={() => handleStartCheckout(plan.name.toLowerCase(), billingInterval)} className={`group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm active:scale-[0.97] transition-all duration-200 min-h-[44px] ${plan.highlight ? 'bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] hover:bg-gray-800 dark:hover:bg-[var(--color-surface-secondary)] shadow-lg hover:shadow-xl hover:shadow-gray-900/25 dark:hover:shadow-white/20 hover:-translate-y-0.5' : 'bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50'}`}>{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
                   )}
                   {plan.highlight && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr(plan.scarcity)}</p>}
                   {plan.name === 'Crew' && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr("14-day free trial. Cancel anytime.")}</p>}

@@ -109,7 +109,8 @@ export default function Login() {
       if (intent) {
         try {
           const { startCheckout } = await import('../lib/payments');
-          const r = await startCheckout(intent);
+          const interval = sessionStorage.getItem('mowgo_interval_intent') || 'month';
+          const r = await startCheckout(intent, interval);
           if (r?.error) {
             setError(r.error);
             setLoading(false);
@@ -117,6 +118,7 @@ export default function Login() {
           }
           // startCheckout redirects to Stripe on success — only then drop the intent
           sessionStorage.removeItem('mowgo_plan_intent');
+          sessionStorage.removeItem('mowgo_interval_intent');
           return;
         } catch (checkoutError) {
           setError(checkoutError.message || tr('Payment failed'));

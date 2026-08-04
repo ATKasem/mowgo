@@ -35,6 +35,11 @@ const tierToEnvKey: Record<string, string> = {
   crew: "STRIPE_PRICE_CREW",
 };
 
+const tierToEnvKeyAnnual: Record<string, string> = {
+  solo: "STRIPE_PRICE_SOLO_ANNUAL",
+  crew: "STRIPE_PRICE_CREW_ANNUAL",
+};
+
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const cors = originHeaders(origin);
@@ -67,7 +72,7 @@ serve(async (req) => {
       });
     }
 
-    let { tier } = await req.json();
+    let { tier, interval = "month" } = await req.json();
     // "free" plan users upgrade to Solo
     if (tier === "free") tier = "solo";
 
@@ -80,9 +85,20 @@ serve(async (req) => {
         }
       );
     }
+    if (!["month", "year"].includes(interval)) {
+      return new Response(
+        JSON.stringify({ error: "interval must be 'month' or 'year'" }),
+        {
+          status: 400,
+          headers: { ...cors, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    const priceId = Deno.env.get(tierToEnvKey[tier]);
+    const priceId = Deno.env.get(
+      interval === "year" ? tierToEnvKeyAnnual[tier] : tierToEnvKey[tier]
+    );
 
     if (!stripeKey || !priceId) {
       return new Response(
@@ -185,9 +201,11 @@ serve(async (req) => {
           cancel_url: "https://mowgo.app/settings",
           "metadata[user_id]": user.id,
           "metadata[tier]": tier,
+          "metadata[interval]": interval,
           "subscription_data[trial_period_days]": String(trialDays),
           "subscription_data[metadata][user_id]": user.id,
           "subscription_data[metadata][tier]": tier,
+          "subscription_data[metadata][interval]": interval,
         }).toString(),
       }
     );

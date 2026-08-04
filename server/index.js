@@ -46,6 +46,8 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
       priceToTier: {
         [process.env.STRIPE_PRICE_SOLO]: 'solo',
         [process.env.STRIPE_PRICE_CREW]: 'crew',
+        [process.env.STRIPE_PRICE_SOLO_ANNUAL]: 'solo',
+        [process.env.STRIPE_PRICE_CREW_ANNUAL]: 'crew',
       },
     });
   } catch (err) {

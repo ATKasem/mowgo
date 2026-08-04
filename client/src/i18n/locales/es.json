@@ -642,7 +642,14 @@
     "see_every_job_for_the_week_in_one_place": "Mira todos los trabajos de la semana en un solo lugar.",
     "rain_on_tuesday_eight_clients_to_rebook": "Llueve el martes. Ocho clientes por reagendar.",
     "one_tap_fixes_it": "Un toque lo resuelve.",
-    "when_oklahoma_rain_hits_mowgo_moves_your_whole_schedule_forward_and_text": "Cuando llegue la lluvia en Oklahoma, MowGo mueve todo su calendario y les avisa a sus clientes automáticamente. Trabajos, rutas y facturas en un solo lugar. Gratis para 5 clientes. Sin tarjeta de crédito."
+    "when_oklahoma_rain_hits_mowgo_moves_your_whole_schedule_forward_and_text": "Cuando llegue la lluvia en Oklahoma, MowGo mueve todo su calendario y les avisa a sus clientes automáticamente. Trabajos, rutas y facturas en un solo lugar. Gratis para 5 clientes. Sin tarjeta de crédito.",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "2_months_free": "2 meses gratis",
+    "year": "año",
+    "billed_once_a_year_cancel_anytime": "Se cobra una vez al año. Cancela cuando quieras.",
+    "one_payment_covers_the_whole_season_no_card_hits_in_winter": "Un solo pago cubre toda la temporada. Sin cargos en invierno.",
+    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "¿Plan anual? La Garantía Rain-Proof sigue aplicando — se reembolsan los meses no usados."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",

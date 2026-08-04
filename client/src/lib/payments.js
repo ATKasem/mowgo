@@ -3,10 +3,11 @@
  * The server-side endpoint handles Stripe API calls with the secret key.
  *
  * @param {'solo'|'crew'} plan
+ * @param {'month'|'year'} interval
  */
 import { supabase } from './supabase';
 
-export async function startCheckout(plan) {
+export async function startCheckout(plan, interval = 'month') {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) return { error: 'Log in or create an account before subscribing.' };
@@ -17,7 +18,7 @@ export async function startCheckout(plan) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({ plan, interval }),
     });
 
     const data = await res.json();

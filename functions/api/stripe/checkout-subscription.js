@@ -1,7 +1,7 @@
 /**
  * Cloudflare Pages Function — Stripe Subscription Checkout
  * POST /api/stripe/checkout-subscription
- * Body: { plan: 'solo' | 'crew' }
+ * Body: { plan: 'solo' | 'crew', interval: 'month' | 'year' }
  * Returns: { url: 'https://checkout.stripe.com/...' }
  */
 
@@ -35,16 +35,24 @@ export async function onRequestPost(context) {
     if (!authResponse.ok) return json({ error: 'Unauthorized' }, 401, origin);
     const user = await authResponse.json();
 
-    const { plan } = await request.json();
+    const { plan, interval = 'month' } = await request.json();
 
-    // Validate plan
+    // Validate plan + billing interval
     if (!['solo', 'crew'].includes(plan)) {
       return json({ error: 'Invalid plan' }, 400, origin);
     }
+    if (!['month', 'year'].includes(interval)) {
+      return json({ error: 'Invalid billing interval' }, 400, origin);
+    }
 
+    const annual = interval === 'year';
     const priceId = plan === 'solo'
-      ? (env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO)
-      : (env.STRIPE_PRICE_CREW || env.VITE_STRIPE_PRICE_CREW);
+      ? (annual
+        ? (env.STRIPE_PRICE_SOLO_ANNUAL || env.VITE_STRIPE_PRICE_SOLO_ANNUAL)
+        : (env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO))
+      : (annual
+        ? (env.STRIPE_PRICE_CREW_ANNUAL || env.VITE_STRIPE_PRICE_CREW_ANNUAL)
+        : (env.STRIPE_PRICE_CREW || env.VITE_STRIPE_PRICE_CREW));
     if (!priceId) {
       return json({ error: 'Price ID not configured' }, 500, origin);
     }
@@ -123,8 +131,10 @@ export async function onRequestPost(context) {
         'subscription_data[trial_period_days]': String(trialDays),
         'metadata[user_id]': user.id,
         'metadata[tier]': plan,
+        'metadata[interval]': interval,
         'subscription_data[metadata][user_id]': user.id,
         'subscription_data[metadata][tier]': plan,
+        'subscription_data[metadata][interval]': interval,
         success_url: `${appUrl}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appUrl}/#/pricing`,
         allow_promotion_codes: 'true',
