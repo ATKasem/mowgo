@@ -54,8 +54,8 @@ const data = {
 };
 
 const mowgoTiers = [
-  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'] },
-  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'] },
+  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'] },
+  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'] },
   {
     name: 'Premium',
     price: '$199/mo',

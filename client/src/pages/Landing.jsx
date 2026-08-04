@@ -28,7 +28,7 @@ const plans = [
     annualPrice: '390',
     period: 'month',
     desc: 'For independent landscapers with a full schedule',
-    features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'],
+    features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
     bonuses: [
       { text: 'Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.', value: '$150 value' },
       { text: '"What to Charge in Your City" report: real mow prices from your Oklahoma market.', value: '$49 value' },
@@ -38,6 +38,7 @@ const plans = [
     cta: 'Start Free Trial',
     highlight: true,
   },
+  { name: 'Crew', price: '79', annualPrice: '790', period: 'month', desc: 'For 2-3 person crews', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
   {
     name: 'Premium',
     price: '199',
@@ -53,7 +54,6 @@ const plans = [
     cta: 'Start Premium',
     highlight: false,
   },
-  { name: 'Crew', price: '79', annualPrice: '790', period: 'month', desc: 'For small OK crews of 2-3 landscapers', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial', highlight: false },
 ];
 
 const stats = [
@@ -339,7 +339,7 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
             {plans.map((plan, i) => (
               <FadeIn key={plan.name} delay={i * 100}>
-                <div className={`card p-6 flex flex-col transition-all duration-300 ${plan.highlight ? 'ring-2 ring-emerald-500 dark:ring-emerald-400 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 scale-[1.02] relative' : 'hover:scale-[1.01]'}`}>
+                <div className={`card p-6 flex flex-col h-full transition-all duration-300 ${plan.highlight ? 'ring-2 ring-emerald-500 dark:ring-emerald-400 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 scale-[1.02] relative' : 'hover:scale-[1.01]'}`}>
                   {plan.highlight && <div className="absolute -top-3 inset-x-0 flex justify-center"><span className="bg-brand text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">{tr("Most Popular")}</span></div>}
                   <h3 className={`text-lg font-bold ${plan.highlight ? 'text-brand-hover dark:text-emerald-400 mt-3' : 'text-[var(--color-text-primary)] dark:text-white'}`}>{plan.name}</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr(plan.desc)}</p>

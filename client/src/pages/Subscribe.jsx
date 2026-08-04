@@ -38,7 +38,8 @@ export default function Subscribe() {
   const [checkoutError, setCheckoutError] = useState('');
 
   const paidPlans = [
-    { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
+    { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
+    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
     {
       name: 'Premium',
       price: '199',
@@ -51,7 +52,6 @@ export default function Subscribe() {
       ],
       cta: 'Start Premium',
     },
-    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Unlimited clients', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
   ];
 
   async function handleCheckout(plan) {
@@ -184,7 +184,7 @@ export default function Subscribe() {
         {checkoutError && <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">{tr(checkoutError)}</p>}
         <div className="grid md:grid-cols-3 gap-5 w-full text-left">
           {paidPlans.map(plan => (
-            <div key={plan.name} className={`card p-6 flex flex-col ${plan.name === 'Premium' ? 'ring-2 ring-emerald-500' : ''}`}>
+            <div key={plan.name} className={`card p-6 flex flex-col h-full ${plan.name === 'Premium' ? 'ring-2 ring-emerald-500' : ''}`}>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">{tr(plan.name)}</h2>
               <p className="mt-3 mb-5"><span className="text-4xl font-extrabold text-gray-900 dark:text-white">${billingInterval === 'year' ? plan.annualPrice : plan.price}</span><span className="text-gray-500">/{tr(billingInterval === 'year' ? 'year' : 'month')}</span></p>
               {plan.name === 'Premium' && billingInterval === 'year' && <p className="-mt-3 mb-4 text-xs font-semibold text-emerald-600">{tr('2 months free')}</p>}
