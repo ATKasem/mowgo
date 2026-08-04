@@ -119,11 +119,11 @@ export default function Compare() {
             <Zap className="w-4 h-4" aria-hidden="true" /> {tr("The honest comparison")}
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-4">
-            {tr("MowGo vs")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Everyone")}</span>
+            {tr("See what your crew gets")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("for less")}</span>
           </h1>
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-8">
             {tr('We built MowGo because the other options are either too expensive, too complicated, or sell your data.')}{' '}
-            {tr("Here's how we compare — no fluff, no asterisks.")}
+            {tr("Compare price and field tools side by side. No fluff. No hidden catches.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
@@ -162,7 +162,7 @@ export default function Compare() {
               <CloudRain className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Rain delay included on MowGo Free")}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Rain tomorrow? One tap moves your whole day, even on MowGo's free plan.")}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Rain tomorrow? Tap once. Every job moves, even on MowGo's free plan.")}</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/20">
@@ -254,7 +254,7 @@ export default function Compare() {
       <section className="bg-gradient-to-br from-emerald-500 via-green-600 to-green-700 py-20">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-white mb-4">{tr("Rain delay included on MowGo Free.")}</h2>
-          <p className="text-emerald-100 text-lg mb-8">{tr("One-tap rain delay on the free plan. Just a better way to run your crew.")}</p>
+          <p className="text-emerald-100 text-lg mb-8">{tr("Tap once to move every rain-day job. Pay nothing for your first 5 clients.")}</p>
           <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {tr("Start Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>

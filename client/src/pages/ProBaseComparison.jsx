@@ -99,7 +99,7 @@ export default function ProBaseComparison() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              {tr("Free is a great price. But ProBase has no rain delay, no offline mode, and no accounting sync. When the storm hits at 6am, MowGo moves your whole route in one tap.")}
+              {tr("ProBase costs $0. But it has no rain delay, no offline mode, and no accounting sync. When a storm hits at 6am, MowGo moves your whole route in one tap.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -130,7 +130,7 @@ export default function ProBaseComparison() {
                 {tr("ProBase has zero weather features. You\u2019re opening every client, rescheduling every stop by hand \u2014 20, 30, 40 texts \u2014 while the rain starts. MowGo users tap one button and the whole route shifts to tomorrow. Clients get notified automatically.")}
               </p>
               <p className="mt-4 text-gray-500 dark:text-gray-400 leading-relaxed">
-                {tr("That\u2019s not a feature list difference. That\u2019s a whole day of revenue.")}
+                {tr("That difference can save a whole day of revenue.")}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">

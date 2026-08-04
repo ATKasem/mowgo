@@ -82,8 +82,8 @@ export default function SwitchingFromLawnPro() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-              {tr("Ditching LawnPro?")}<br />
-              <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Welcome to MowGo")}</span>
+              {tr("Leave LawnPro without losing your week.")}<br />
+              <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Move your first 5 clients free.")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
@@ -142,7 +142,7 @@ export default function SwitchingFromLawnPro() {
               {tr("What MowGo")} <span className="text-emerald-500">{tr("does differently")}</span>
             </h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-14 max-w-xl mx-auto text-lg">
-              {tr("Every feature was designed by talking to lawn care operators — not accountants. Here's what you actually need.")}
+              {tr("Built from talks with lawn care operators. These tools keep a small crew moving.")}
             </p>
           </FadeIn>
           <div className="grid md:grid-cols-2 gap-5">
@@ -304,7 +304,7 @@ export default function SwitchingFromLawnPro() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Ready to make the switch?")}</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Move your first 5 clients free.")}</h2>
             <p className="text-emerald-100 text-lg mb-10">{tr("Free for 5 clients. No credit card. Import your data in minutes.")}</p>
             <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               {tr("Start Free")}

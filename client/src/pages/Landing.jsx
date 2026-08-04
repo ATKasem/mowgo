@@ -144,7 +144,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("Scheduling, routes, and invoicing for Oklahoma lawn care crews. Rain delay that actually understands OK weather. Free for 5 clients — no credit card.")}
+              {tr("Keep jobs moving when Oklahoma rain hits. Schedule work, manage clients, and send invoices in one place. Free for 5 clients — no credit card.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -172,7 +172,7 @@ export default function Landing() {
             </div>
             <img src="/landing/dashboard.png" alt={tr("MowGo dashboard screenshot")} className="w-full h-auto" loading="eager" />
           </div>
-          <p className="text-center text-sm text-[var(--color-text-muted)] mt-4">{tr("The MowGo dashboard — your whole week at a glance.")}</p>
+          <p className="text-center text-sm text-[var(--color-text-muted)] mt-4">{tr("See every job for the week in one place.")}</p>
         </FadeIn>
       </section>
 
@@ -220,7 +220,7 @@ export default function Landing() {
         <FadeIn delay={200}>
           <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
             <h3 className="text-lg font-bold text-white mb-1">{tr("How MowGo Solo stacks up")}</h3>
-            <p className="text-sm text-[var(--color-text-muted)] mb-6">{tr("Same features, fraction of the price.")}</p>
+            <p className="text-sm text-[var(--color-text-muted)] mb-6">{tr("See what $39/mo gets your crew.")}</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -292,8 +292,8 @@ export default function Landing() {
       <section id="pricing" className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Simple, transparent pricing")}</h2>
-            <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Upgrade when you are ready. Cancel anytime.")}</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Know what you pay every month")}</h2>
+            <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Pay only when your client list grows. Cancel anytime.")}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$300/month' })}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
@@ -369,7 +369,7 @@ export default function Landing() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-surface)]/10 rounded-full blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Built in OKC. Used by Oklahoma crews.")}</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Run your next 5 clients free.")}</h2>
             <p className="text-emerald-100 text-lg mb-10">{tr("Free for 5 clients. No credit card. 2 minutes.")}</p>
             <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-[var(--color-surface)] text-brand-hover font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               {tr("Start Free")}

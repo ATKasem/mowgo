@@ -56,10 +56,10 @@ export default function QuoteIQAlternative() {
             {tr("July 2026 Update")}
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-            {tr("QuoteIQ Discontinued Free Plan? Here's a Better Alternative for Lawn Care Pros")}
+            {tr("Need a New Free Lawn Care App After QuoteIQ's July 2026 Change?")}
           </h1>
           <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            {tr("Operators report that QuoteIQ's free-plan change displaced hundreds of lawn care pros. If you relied on QuoteIQ to run your business, here's what happened and what to look for next.")}
+            {tr("Operators report that QuoteIQ's free-plan change displaced hundreds of lawn care pros. See what they reported and what to check before you switch.")}
           </p>
         </div>
       </section>
@@ -77,7 +77,7 @@ export default function QuoteIQAlternative() {
               {tr("In July 2026, QuoteIQ announced it was")} <strong className="text-gray-900 dark:text-white">{tr("discontinuing its free plan")}</strong> {tr("entirely. If you were a small lawn care operator or solo mowing business using QuoteIQ's free tier to manage your clients and schedule, you were suddenly left scrambling for an alternative.")}
             </p>
             <p>
-              {tr("The free plan had been QuoteIQ's biggest draw for small crews — a simple way to manage jobs without paying enterprise-level software fees. But the company decided to go all-in on paid plans, leaving the operators who built their workflow around the free tool out in the cold.")}
+              {tr("Small crews used QuoteIQ's free plan to manage jobs without a monthly software bill. After the reported change, those crews had to choose a paid plan or move their work.")}
             </p>
             <div className="card p-5 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
               <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
@@ -85,7 +85,7 @@ export default function QuoteIQAlternative() {
               </p>
             </div>
             <p>
-              {tr("If that sounds familiar, you're not alone. And you don't have to settle for overpriced software just because QuoteIQ changed the rules. There are better options — and one of them is completely free.")}
+              {tr("If that happened to you, compare the price, limits, and field tools before you move. MowGo gives you a free option for 5 clients.")}
             </p>
           </div>
         </section>
@@ -96,7 +96,7 @@ export default function QuoteIQAlternative() {
             {tr("What to Look for in a Replacement")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            {tr("Not all lawn care apps are created equal. If QuoteIQ just burned you, don't rush into the first paid alternative. Here's what actually matters when you're looking for a replacement:")}
+            {tr("Check these four things before you move your clients and schedule to another app:")}
           </p>
           <div className="space-y-4">
             {whatToLookFor.map(({ icon: Icon, title, desc }, i) => (
@@ -119,7 +119,7 @@ export default function QuoteIQAlternative() {
             {tr("MowGo vs QuoteIQ")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            {tr("Here's how MowGo stacks up against what QuoteIQ used to offer — and where it falls short now that the free plan is gone:")}
+            {tr("Compare MowGo with QuoteIQ side by side. The table shows where each one fits.")}
           </p>
           <div className="overflow-x-auto">
             <div className="card overflow-hidden min-w-[600px]">
@@ -171,7 +171,7 @@ export default function QuoteIQAlternative() {
           <div className="relative px-8 py-12 text-center">
             <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">{tr("Try MowGo Free")}</h2>
             <p className="text-emerald-100 mb-8 max-w-md mx-auto leading-relaxed">
-              {tr("Start with 5 clients on the free plan — no credit card required. MowGo was built for lawn care pros like you: mobile-first, rain delay auto-reschedule, and zero per-user fees.")}
+              {tr("Run 5 clients free with no credit card. Move rain-day jobs in one tap and pay zero per-user fees.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">

@@ -62,11 +62,11 @@ export default function JobberPriceIncrease() {
             {tr("Pricing as of August 2026")}
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-            {tr("Jobber Price Increase 2026: What Lawn Care Businesses Need to Know")}
+            {tr("Jobber's 2026 Price Increase: What a 1–3 Person Lawn Crew Pays")}
             <span className="block text-emerald-500 mt-2 text-2xl sm:text-3xl md:text-4xl">{tr("(And Better Alternatives)")}</span>
           </h1>
           <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            {tr("Jobber just raised prices again. If you're running a small lawn care business with 1–3 crew members, you're probably paying too much. Here's what changed and what to look for instead.")}
+            {tr("Run a 1–3 person lawn crew? See Jobber's August 2026 price, the added-user math, and a lower-cost option.")}
           </p>
         </div>
       </section>
@@ -109,7 +109,7 @@ export default function JobberPriceIncrease() {
           </h2>
           <div className="space-y-4 text-gray-600 dark:text-gray-400 leading-relaxed">
             <p>
-              {tr("If you're a solo operator or running a crew of 1–3 people, Jobber's pricing model works against you. Here's the math:")}
+              {tr("For a solo operator or 1–3 person crew, each added user raises the bill. Here is the math:")}
             </p>
             <div className="card p-5">
               <ul className="space-y-3">
@@ -128,7 +128,7 @@ export default function JobberPriceIncrease() {
               </ul>
             </div>
             <p>
-              {tr("The lawn care software market has exploded over the past few years, and companies like Jobber have used that leverage to raise prices repeatedly. If you're feeling squeezed, you're not alone — and you have options.")}
+              {tr("If software costs squeeze your small crew, compare the monthly total before you renew. You have options.")}
             </p>
           </div>
         </section>
@@ -139,7 +139,7 @@ export default function JobberPriceIncrease() {
             {tr("What to Look for in an Alternative")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            {tr("Not all lawn care apps are created equal. Here's what actually matters when you're comparing alternatives to Jobber:")}
+            {tr("Check these four things before you move your crew to another app:")}
           </p>
           <div className="space-y-4">
             {whatToLookFor.map(({ icon: Icon, title, desc }, i) => (
@@ -162,7 +162,7 @@ export default function JobberPriceIncrease() {
             {tr("MowGo vs Jobber")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            {tr("Here's a straightforward comparison of what you get with MowGo Solo ($39/mo) versus Jobber Connect ($139/mo) — the tier most small crews land on:")}
+            {tr("Compare MowGo Solo ($39/mo) with Jobber Connect ($139/mo) side by side:")}
           </p>
           <div className="overflow-x-auto">
             <div className="card overflow-hidden min-w-[600px]">
@@ -214,7 +214,7 @@ export default function JobberPriceIncrease() {
           <div className="relative px-8 py-12 text-center">
             <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4 tracking-tight">{tr("Try MowGo Free")}</h2>
             <p className="text-emerald-100 mb-8 max-w-md mx-auto leading-relaxed">
-              {tr("Start with 5 clients on the free plan. No credit card required. Upgrade to Solo when you're ready — still less than a third of Jobber Connect.")}
+              {tr("Run 5 clients free with no credit card. Upgrade to Solo when you are ready — still less than a third of Jobber Connect.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">

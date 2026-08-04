@@ -107,7 +107,7 @@ export default function RuunlyComparison() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              {tr("See what Ruunly actually costs vs MowGo. No asterisks, no fine print — just the numbers.")}
+              {tr("Enter your monthly revenue. See what Ruunly costs next to MowGo. No asterisks. Just the math.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -221,7 +221,7 @@ export default function RuunlyComparison() {
       <section id="features" className="max-w-4xl mx-auto px-4 pb-16 md:pb-24">
         <FadeIn>
           <h2 className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white tracking-tight mb-3">{tr("Feature Comparison")}</h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-10">{tr("MowGo gives you more for less. Here's the proof.")}</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-10">{tr("Compare each plan, fee, and field tool side by side.")}</p>
         </FadeIn>
         <FadeIn delay={100}>
           <div className="overflow-x-auto -mx-4 px-4" role="region" aria-label={tr("Feature comparison table — scroll horizontally on mobile")}>
@@ -330,7 +330,7 @@ export default function RuunlyComparison() {
           <FadeIn>
             <div className="text-center mb-10">
               <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{tr("Platform Fee Exposé")}</h2>
-              <p className="text-gray-500 dark:text-gray-400 mt-2">{tr("Ruunly's sticker price is a lie. Here's what you actually pay.")}</p>
+              <p className="text-gray-500 dark:text-gray-400 mt-2">{tr("Add Ruunly's platform fee to the sticker price. Here is the monthly total.")}</p>
             </div>
           </FadeIn>
           <FadeIn delay={100}>
