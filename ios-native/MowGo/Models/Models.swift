@@ -175,6 +175,145 @@ struct Client: Codable, Identifiable, Equatable {
     var createdAt: String?
 }
 
+// MARK: - Lead
+
+enum LeadStatus: String, Codable, CaseIterable {
+    case new, contacted, quoted, won, lost
+
+    var displayName: String { rawValue.capitalized }
+}
+
+struct Lead: Codable, Identifiable, Equatable {
+    let id: UUID
+    var userId: UUID?
+    var name: String
+    var phone: String?
+    var email: String?
+    var address: String?
+    var source: String
+    var notes: String?
+    var status: String
+    var clientId: UUID?
+    var createdAt: Date?
+    var updatedAt: Date?
+
+    init(
+        id: UUID,
+        userId: UUID? = nil,
+        name: String,
+        phone: String? = nil,
+        email: String? = nil,
+        address: String? = nil,
+        source: String = "other",
+        notes: String? = nil,
+        status: String = "new",
+        clientId: UUID? = nil,
+        createdAt: Date? = nil,
+        updatedAt: Date? = nil
+    ) {
+        self.id = id
+        self.userId = userId
+        self.name = name
+        self.phone = phone
+        self.email = email
+        self.address = address
+        self.source = source
+        self.notes = notes
+        self.status = status
+        self.clientId = clientId
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case userId = "user_id"
+        case name, phone, email, address, source, notes, status
+        case clientId = "client_id"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: DynamicCodingKey.self)
+        id = try values.decode(UUID.self, forKey: DynamicCodingKey("id"))
+        userId = try values.decodeIfPresent(UUID.self, forKey: DynamicCodingKey("userId"))
+        name = try values.decode(String.self, forKey: DynamicCodingKey("name"))
+        phone = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("phone"))
+        email = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("email"))
+        address = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("address"))
+        source = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("source")) ?? "other"
+        notes = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("notes"))
+        status = try values.decodeIfPresent(String.self, forKey: DynamicCodingKey("status")) ?? "new"
+        clientId = try values.decodeIfPresent(UUID.self, forKey: DynamicCodingKey("clientId"))
+        createdAt = Self.decodeDate(from: values, forKey: DynamicCodingKey("createdAt"))
+        updatedAt = Self.decodeDate(from: values, forKey: DynamicCodingKey("updatedAt"))
+    }
+
+    private static func decodeDate(
+        from values: KeyedDecodingContainer<DynamicCodingKey>,
+        forKey key: DynamicCodingKey
+    ) -> Date? {
+        guard let value = try? values.decode(String.self, forKey: key) else {
+            return nil
+        }
+        return ISO8601DateFormatter().date(from: value)
+    }
+
+    private struct DynamicCodingKey: CodingKey {
+        let stringValue: String
+        let intValue: Int? = nil
+
+        init(_ stringValue: String) { self.stringValue = stringValue }
+        init?(stringValue: String) { self.stringValue = stringValue }
+        init?(intValue: Int) { return nil }
+    }
+}
+
+struct LeadPatch: Codable {
+    var name: String?
+    var phone: String?
+    var email: String?
+    var address: String?
+    var source: String?
+    var notes: String?
+    var status: String?
+    var clientId: UUID?
+
+    private enum CodingKeys: String, CodingKey {
+        case name, phone, email, address, source, notes, status
+        case clientId = "client_id"
+    }
+}
+
+struct RainDelayEntry: Codable, Identifiable, Equatable {
+    let id: UUID
+    let date: String
+    let targetDate: String
+    let jobIds: [UUID]
+    let jobCount: Int
+    let createdAt: Date
+    let originalDates: [UUID: String]
+
+    init(
+        id: UUID = UUID(),
+        date: String,
+        targetDate: String,
+        jobIds: [UUID],
+        jobCount: Int,
+        createdAt: Date = Date(),
+        originalDates: [UUID: String]
+    ) {
+        self.id = id
+        self.date = date
+        self.targetDate = targetDate
+        self.jobIds = jobIds
+        self.jobCount = jobCount
+        self.createdAt = createdAt
+        self.originalDates = originalDates
+    }
+}
+
 // MARK: - Invoice
 
 struct Invoice: Codable, Identifiable, Equatable {

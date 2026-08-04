@@ -86,6 +86,23 @@ actor WebhookService {
         ])
     }
 
+    func leadCreated(_ lead: Lead, userId: UUID) async {
+        await fire(userId: userId, event: "lead.created", payload: leadPayload(lead))
+    }
+
+    func leadStatusUpdated(_ lead: Lead, userId: UUID) async {
+        await fire(userId: userId, event: "lead.status.updated", payload: leadPayload(lead))
+    }
+
+    private func leadPayload(_ lead: Lead) -> [String: Any] {
+        return [
+            "lead_id": lead.id.uuidString,
+            "name": lead.name,
+            "status": lead.status,
+            "source": lead.source
+        ]
+    }
+
     func invoicePaid(_ invoice: Invoice, userId: UUID) async {
         await fire(userId: userId, event: "invoice.paid", payload: [
             "invoice_id": invoice.id.uuidString,

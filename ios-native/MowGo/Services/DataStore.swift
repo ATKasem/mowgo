@@ -37,6 +37,18 @@ private struct ClientUpdate: Encodable {
     let tags: [String]?
 }
 
+private struct LeadInsert: Encodable {
+    let id: UUID
+    let userId: UUID
+    let name: String
+    let phone: String?
+    let email: String?
+    let address: String?
+    let source: String
+    let notes: String?
+    let status: String
+}
+
 private struct JobInsert: Encodable {
     let id: UUID
     let userId: UUID
@@ -115,12 +127,14 @@ private struct EstimateJobPatch: Encodable { let jobId: UUID? }
 final class DataStore: ObservableObject {
     @Published var jobs: [Job] = []
     @Published var clients: [Client] = []
+    @Published var leads: [Lead] = []
     @Published var invoices: [Invoice] = []
     @Published var estimates: [Estimate] = []
     @Published var teamMembers: [UserProfile] = []
     @Published var recurringJobs: [RecurringJob] = []
     @Published var isLoading = false
     @Published var error: String?
+    @Published private(set) var rainDelayHistory: [RainDelayEntry] = []
 
     private let sb = SupabaseService.shared
     weak var auth: AuthService?
@@ -129,6 +143,7 @@ final class DataStore: ObservableObject {
 
     init(modelContainer: ModelContainer) {
         self.persistence = Persistence(modelContainer: modelContainer)
+        loadRainDelayHistory()
     }
 
     // MARK: - Load
@@ -171,6 +186,7 @@ final class DataStore: ObservableObject {
             }
             jobs = []
             clients = []
+            leads = []
             invoices = []
             estimates = []
             recurringJobs = []
@@ -187,6 +203,7 @@ final class DataStore: ObservableObject {
         guard let currentUserId = self.currentUserId else {
             jobs = []
             clients = []
+            leads = []
             invoices = []
             estimates = []
             recurringJobs = []
@@ -206,15 +223,16 @@ final class DataStore: ObservableObject {
             do {
                 async let j = sb.fetchJobs()
                 async let c: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
+                async let l: [Lead] = sb.fetch("leads", query: ["order": "created_at.desc"])
                 async let i = sb.fetchInvoices()
                 async let r: [RecurringJob] = sb.fetch("recurring_jobs")
-                let loaded = try await (j, c, i, r)
+                let loaded = try await (j, c, l, i, r)
                 guard !Task.isCancelled, generation == loadGeneration else { return }
-                (jobs, clients, invoices, recurringJobs) = loaded
+                (jobs, clients, leads, invoices, recurringJobs) = loaded
                 // Persist to local cache for offline fallback
                 persistence?.saveJobs(loaded.0, currentUserId: currentUserId)
                 persistence?.saveClients(loaded.1, currentUserId: currentUserId)
-                persistence?.saveInvoices(loaded.2, currentUserId: currentUserId)
+                persistence?.saveInvoices(loaded.3, currentUserId: currentUserId)
                 // Replay any offline mutations queued while disconnected
                 await syncPendingMutations()
                 guard !Task.isCancelled, generation == loadGeneration else { return }
@@ -403,6 +421,28 @@ final class DataStore: ObservableObject {
         case "client:delete":
             try await sb.delete("clients", id: mutation.entityId)
 
+        case "lead:create":
+            let lead = try JSONDecoder().decode(Lead.self, from: mutation.payload)
+            guard let userId = currentUserId ?? lead.userId else {
+                throw DataStoreError.authenticationRequired
+            }
+            let created: Lead = try await sb.insert("leads", LeadInsert(
+                id: lead.id, userId: userId, name: lead.name, phone: lead.phone,
+                email: lead.email, address: lead.address, source: lead.source,
+                notes: lead.notes, status: lead.status
+            ))
+            await fireWebhookLeadCreated(created)
+
+        case "lead:update":
+            let patch = try JSONDecoder().decode(LeadPatch.self, from: mutation.payload)
+            try await sb.update("leads", id: mutation.entityId, patch)
+            if patch.status != nil, let lead = leads.first(where: { $0.id == mutation.entityId }) {
+                await fireWebhookLeadStatusUpdated(lead)
+            }
+
+        case "lead:delete":
+            try await sb.delete("leads", id: mutation.entityId)
+
         case "invoice:pay":
             struct P: Decodable { let paidAt: String }
             let p = try JSONDecoder().decode(P.self, from: mutation.payload)
@@ -590,6 +630,7 @@ final class DataStore: ObservableObject {
         }
         jobs = []
         clients = []
+        leads = []
         invoices = []
         estimates = []
         teamMembers = []
@@ -784,6 +825,10 @@ final class DataStore: ObservableObject {
     private func updateJobSchedule(_ job: Job, scheduledDate: String) async throws {
         var updated = job
         updated.scheduledDate = scheduledDate
+        if auth?.isDemoMode == true {
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) { jobs[idx] = updated }
+            return
+        }
         guard await canSync() else {
             struct P: Encodable { let scheduledDate: String }
             safeEnqueue("job:schedule", id: job.id, payload: P(scheduledDate: scheduledDate))
@@ -928,6 +973,16 @@ final class DataStore: ObservableObject {
         await WebhookService.shared.customerCreated(client, userId: userId)
     }
 
+    private func fireWebhookLeadCreated(_ lead: Lead) async {
+        guard let userId = self.currentUserId else { return }
+        await WebhookService.shared.leadCreated(lead, userId: userId)
+    }
+
+    private func fireWebhookLeadStatusUpdated(_ lead: Lead) async {
+        guard let userId = self.currentUserId else { return }
+        await WebhookService.shared.leadStatusUpdated(lead, userId: userId)
+    }
+
     private func fireWebhookInvoicePaid(_ invoice: Invoice) async {
         guard let userId = self.currentUserId else { return }
         await WebhookService.shared.invoicePaid(invoice, userId: userId)
@@ -966,14 +1021,13 @@ final class DataStore: ObservableObject {
 
     private var isRainDelaying = false
 
-    func rainDelay(for date: String) async throws {
+    func rainDelay(for date: String, to targetDate: String) async throws {
         guard !isRainDelaying else { return }
         isRainDelaying = true
         defer { isRainDelaying = false }
 
         let pending = jobs.filter { $0.scheduledDate == date && $0.status == .scheduled }
         guard !pending.isEmpty else { return }
-        let tomorrow = nextDay(date)
 
         // Snapshot original dates for clean rollback
         let originalDates: [UUID: String] = Dictionary(
@@ -985,7 +1039,7 @@ final class DataStore: ObservableObject {
         var succeeded: [UUID] = []
         for job in pending {
             do {
-                try await updateJobSchedule(job, scheduledDate: tomorrow)
+                try await updateJobSchedule(job, scheduledDate: targetDate)
                 succeeded.append(job.id)
             } catch {
                 // Rollback: re-sync the already-updated jobs to their original dates
@@ -1000,8 +1054,56 @@ final class DataStore: ObservableObject {
                 throw error
             }
         }
-        // Send push notification after successful rain delay
-        await firePushRainDelay(pending, date: tomorrow)
+        let entry = RainDelayEntry(
+            date: date,
+            targetDate: targetDate,
+            jobIds: pending.map(\.id),
+            jobCount: pending.count,
+            originalDates: originalDates
+        )
+        saveRainDelayEntry(entry)
+        await firePushRainDelay(pending, date: targetDate)
+    }
+
+    func undoRainDelay(_ entry: RainDelayEntry) async throws {
+        var restored: [(Job, String)] = []
+        do {
+            for jobId in entry.jobIds {
+                guard let originalDate = entry.originalDates[jobId],
+                      let job = jobs.first(where: { $0.id == jobId }) else { continue }
+                try await updateJobSchedule(job, scheduledDate: originalDate)
+                restored.append((job, originalDate))
+            }
+            rainDelayHistory.removeAll { $0.id == entry.id }
+            persistRainDelayHistory()
+        } catch {
+            for (job, _) in restored {
+                if let current = jobs.first(where: { $0.id == job.id }) {
+                    try? await updateJobSchedule(current, scheduledDate: entry.targetDate)
+                }
+            }
+            throw error
+        }
+    }
+
+    func saveRainDelayEntry(_ entry: RainDelayEntry) {
+        rainDelayHistory.insert(entry, at: 0)
+        rainDelayHistory = Array(rainDelayHistory.prefix(50))
+        persistRainDelayHistory()
+    }
+
+    func loadRainDelayHistory() {
+        guard let data = UserDefaults.standard.data(forKey: "rainDelayHistory"),
+              let decoded = try? JSONDecoder().decode([RainDelayEntry].self, from: data) else {
+            rainDelayHistory = []
+            return
+        }
+        rainDelayHistory = Array(decoded.prefix(50))
+    }
+
+    private func persistRainDelayHistory() {
+        guard let data = try? JSONEncoder().encode(rainDelayHistory) else { return }
+        UserDefaults.standard.set(data, forKey: "rainDelayHistory")
     }
 
     // MARK: - Recurring Jobs
@@ -1105,6 +1207,145 @@ final class DataStore: ObservableObject {
     }
 
     // MARK: - Clients
+
+    // MARK: - Leads
+
+    func loadLeads() async {
+        guard await sb.isConfigured else {
+            leads = DemoData().leads
+            return
+        }
+        do {
+            leads = try await sb.fetch("leads", query: ["order": "created_at.desc"])
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func loadDemoData() {
+        let demo = DemoData()
+        jobs = demo.jobs
+        clients = demo.clients
+        leads = demo.leads
+        invoices = demo.invoices
+        estimates = demo.estimates
+        teamMembers = demo.teamMembers
+        currentUserId = DemoData.demoOwnerId
+        isLoading = false
+        error = nil
+    }
+
+    func createLead(_ lead: Lead) async throws {
+        if auth?.isDemoMode == true {
+            leads.insert(lead, at: 0)
+            return
+        }
+        guard await canSync() else {
+            leads.insert(lead, at: 0)
+            safeEnqueue("lead:create", id: lead.id, payload: lead)
+            return
+        }
+        do {
+            guard let userId = try await sb.getCurrentUserId() else {
+                throw DataStoreError.authenticationRequired
+            }
+            let created: Lead = try await sb.insert("leads", LeadInsert(
+                id: lead.id, userId: userId, name: lead.name, phone: lead.phone,
+                email: lead.email, address: lead.address, source: lead.source,
+                notes: lead.notes, status: lead.status
+            ))
+            leads.insert(created, at: 0)
+            await fireWebhookLeadCreated(created)
+        } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            leads.insert(lead, at: 0)
+            safeEnqueue("lead:create", id: lead.id, payload: lead)
+            self.error = "Saved offline — will sync when connected"
+            throw error
+        }
+    }
+
+    func updateLeadStatus(_ id: UUID, status: LeadStatus) async throws {
+        try await updateLead(id, patch: LeadPatch(status: status.rawValue))
+    }
+
+    func updateLead(_ id: UUID, patch: LeadPatch) async throws {
+        guard let index = leads.firstIndex(where: { $0.id == id }) else { return }
+        let original = leads[index]
+        var updated = original
+        if let name = patch.name { updated.name = name }
+        if let phone = patch.phone { updated.phone = phone }
+        if let email = patch.email { updated.email = email }
+        if let address = patch.address { updated.address = address }
+        if let source = patch.source { updated.source = source }
+        if let notes = patch.notes { updated.notes = notes }
+        if let status = patch.status { updated.status = status }
+        if let clientId = patch.clientId { updated.clientId = clientId }
+        leads[index] = updated
+
+        if auth?.isDemoMode == true { return }
+
+        guard await canSync() else {
+            safeEnqueue("lead:update", id: id, payload: patch)
+            return
+        }
+        do {
+            try await sb.update("leads", id: id, patch)
+            if patch.status != nil {
+                await fireWebhookLeadStatusUpdated(updated)
+            }
+        } catch {
+            leads[index] = original
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            leads[index] = updated
+            safeEnqueue("lead:update", id: id, payload: patch)
+            self.error = "Saved offline — will sync when connected"
+            throw error
+        }
+    }
+
+    func deleteLead(_ id: UUID) async throws {
+        let original = leads
+        leads.removeAll { $0.id == id }
+        if auth?.isDemoMode == true { return }
+        guard await canSync() else {
+            safeEnqueueEmpty("lead:delete", id: id)
+            return
+        }
+        do {
+            try await sb.delete("leads", id: id)
+        } catch {
+            leads = original
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            leads.removeAll { $0.id == id }
+            safeEnqueueEmpty("lead:delete", id: id)
+            throw error
+        }
+    }
+
+    func convertLeadToClient(_ lead: Lead) async throws {
+        let client = Client(
+            id: UUID(), name: lead.name, address: lead.address,
+            phone: lead.phone, email: lead.email, rate: 0,
+            cleaningNotes: lead.notes
+        )
+        if auth?.isDemoMode == true {
+            clients.append(client)
+            try await updateLead(lead.id, patch: LeadPatch(status: LeadStatus.won.rawValue, clientId: client.id))
+            return
+        }
+        try await createClient(client)
+        try await updateLead(lead.id, patch: LeadPatch(status: LeadStatus.won.rawValue, clientId: client.id))
+    }
 
     func createClient(_ client: Client) async throws {
         // Free tier limit: max 5 clients. Unknown tier (nil) defaults to
@@ -1385,14 +1626,19 @@ final class DataStore: ObservableObject {
                 do {
                     async let latestJobs = sb.fetchJobs()
                     async let latestClients: [Client] = sb.fetch("clients", query: ["order": "name.asc"])
+                    async let latestLeads: [Lead] = sb.fetch("leads", query: ["order": "created_at.desc"])
                     async let latestInvoices = sb.fetchInvoices()
-                    let (latest, clients, invoices) = try await (latestJobs, latestClients, latestInvoices)
+                    let refreshed = try await (latestJobs, latestClients, latestLeads, latestInvoices)
+                    let (latest, clients, leads, invoices) = refreshed
                     guard !Task.isCancelled, self.loadGeneration == generation else { return }
                     if latest.map(\.id) != self.jobs.map(\.id) || latest != self.jobs {
                         self.jobs = latest
                     }
                     if clients != self.clients {
                         self.clients = clients
+                    }
+                    if leads != self.leads {
+                        self.leads = leads
                     }
                     if invoices != self.invoices {
                         self.invoices = invoices
@@ -1402,13 +1648,6 @@ final class DataStore: ObservableObject {
                 }
             }
         }
-    }
-
-    private func nextDay(_ date: String) -> String {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
-        guard let d = f.date(from: date) else { return date }
-        guard let next = Calendar.current.date(byAdding: .day, value: 1, to: d) else { return date }
-        return f.string(from: next)
     }
 
     // MARK: - Mutation Queue Helpers
@@ -1525,6 +1764,12 @@ struct DemoData {
         Client(id: UUID(), name: "Smith Residence", address: "123 Main St, Edmond, OK", phone: "405-555-0101", rate: 45, keyCode: "1234", petInstructions: "Friendly lab, back gate"),
         Client(id: UUID(), name: "Johnson Home", address: "456 Oak Ave, OKC, OK", phone: "405-555-0202", rate: 65),
         Client(id: UUID(), name: "Williams Estate", address: "789 Pine Rd, Edmond, OK", rate: 80, petInstructions: "2 dogs, use side gate"),
+    ]
+
+    let leads: [Lead] = [
+        Lead(id: UUID(), name: "Taylor Reed", phone: "405-555-0303", email: "taylor@example.com", address: "24 Cedar Ln, Edmond, OK", source: "Referral", notes: "Asked about weekly mowing", status: "new"),
+        Lead(id: UUID(), name: "Oak Street Dental", phone: "405-555-0410", source: "Website", notes: "Commercial quote requested", status: "quoted"),
+        Lead(id: UUID(), name: "Morgan Lee", email: "morgan@example.com", source: "Facebook", status: "lost")
     ]
 
     let invoices: [Invoice] = [

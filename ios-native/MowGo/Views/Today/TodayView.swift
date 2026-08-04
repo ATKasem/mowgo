@@ -14,6 +14,7 @@ struct TodayView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Binding var selectedTab: Int
     @State private var showingRainConfirm = false
+    @State private var showingRainHistory = false
     @State private var showingActionSheet = false
     @State private var showingAddJob = false
     @State private var showingAddClient = false
@@ -26,6 +27,8 @@ struct TodayView: View {
     @State private var calendarMode: CalendarMode = .week
     @State private var isOperating = false
     @State private var bannerDismissTask: Task<Void, Never>?
+    @State private var undoEntry: RainDelayEntry?
+    @State private var weatherForecast: WeatherForecast?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -97,6 +100,15 @@ struct TodayView: View {
                             // Control bar — date nav + rain delay
                             controlBar
 
+                            if let rainNotice {
+                                Button { showingRainConfirm = true } label: {
+                                    Text("🌧️ Rain \(rainNotice.percent)% \(rainNotice.day) — Rain delay?")
+                                        .font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(12).background(MowGoTheme.rainBlue.opacity(0.18)).cornerRadius(12)
+                                }
+                                .buttonStyle(.plain)
+                            }
+
                             // Error
                             if let err = operationError {
                                 Text(err).font(.caption).foregroundColor(.red)
@@ -155,13 +167,15 @@ struct TodayView: View {
                 if showNotificationBanner, let msg = notificationMessage {
                     VStack {
                         Spacer()
-                        Text(msg)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(MowGoTheme.deepGreen)
-                            .cornerRadius(12)
+                        HStack(spacing: 12) {
+                            Text(msg).font(.subheadline.weight(.medium)).foregroundColor(.white)
+                            if undoEntry != nil {
+                                Button("Undo") { undoLatestRainDelay() }
+                                    .font(.subheadline.weight(.bold)).foregroundColor(.white)
+                            }
+                        }
+                            .padding(.horizontal, 16).padding(.vertical, 10)
+                            .background(MowGoTheme.deepGreen).cornerRadius(12)
                             .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                             .padding(.bottom, 16)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -196,21 +210,15 @@ struct TodayView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
-            .alert("Move \(scheduledCount) jobs to tomorrow?", isPresented: $showingRainConfirm) {
-                Button("Yes, rain delay", role: .destructive) {
-                    UINotificationFeedbackGenerator().notificationOccurred(.warning)
-                    Task {
-                        do {
-                            operationError = nil
-                            try await store.rainDelay(for: dateString)
-                        } catch {
-                            operationError = error.localizedDescription
-                        }
-                    }
+            .sheet(isPresented: $showingRainConfirm) {
+                RainDelaySheet(date: dateString, affectedCount: scheduledCount) { entry in
+                    undoEntry = entry
+                    showBanner("Rain delay applied to \(entry.jobCount) job\(entry.jobCount == 1 ? "" : "s")")
                 }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("All scheduled jobs for today will be rescheduled.")
+                .environmentObject(store)
+            }
+            .sheet(isPresented: $showingRainHistory) {
+                RainDelayHistoryView().environmentObject(store)
             }
             .sheet(isPresented: $showingAddJob) {
                 NewJobFormView(date: dateString, teamMembers: store.teamMembers)
@@ -222,6 +230,11 @@ struct TodayView: View {
                 if auth.user?.tier == "crew" {
                     Task { await store.loadTeamMembers() }
                 }
+            }
+            .task {
+                guard !auth.isDemoMode else { return }
+                // Coordinates are intentionally nil until profile location fields exist.
+                weatherForecast = await WeatherService().forecast(latitude: nil, longitude: nil)
             }
         }
     }
@@ -529,6 +542,13 @@ struct TodayView: View {
 
             // Rain delay (today only)
             if isToday {
+                Button { showingRainHistory = true } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.caption).foregroundColor(theme.textPrimary)
+                        .padding(6).background(theme.surfaceElevated).clipShape(Circle())
+                }
+                .accessibilityLabel("Rain delay history")
+
                 Button { showingRainConfirm = true } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "cloud.rain.fill")
@@ -584,6 +604,31 @@ struct TodayView: View {
             try? await Task.sleep(for: .seconds(3))
             guard !Task.isCancelled else { return }
             withAnimation { showNotificationBanner = false }
+        }
+    }
+
+    private var rainNotice: (percent: Int, day: String)? {
+        guard isToday, !auth.isDemoMode, let weatherForecast else { return nil }
+        if let percent = weatherForecast.todayPrecipitationProbability, percent >= 60 {
+            return (percent, "today")
+        }
+        if let percent = weatherForecast.tomorrowPrecipitationProbability, percent >= 60 {
+            return (percent, "tomorrow")
+        }
+        return nil
+    }
+
+    private func undoLatestRainDelay() {
+        guard let entry = undoEntry else { return }
+        bannerDismissTask?.cancel()
+        Task<Void, Never> {
+            do {
+                try await store.undoRainDelay(entry)
+                undoEntry = nil
+                showBanner("Rain delay undone")
+            } catch {
+                operationError = error.localizedDescription
+            }
         }
     }
 

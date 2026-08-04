@@ -15,6 +15,9 @@ struct ClientsView: View {
     @State private var searchText = ""
     @State private var showNewClient = false
     @State private var editingClient: Client?
+    @State private var selectedSegment = 0
+    @State private var showNewLead = false
+    @State private var operationError: String?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -31,8 +34,18 @@ struct ClientsView: View {
                 if store.isLoading {
                     ProgressView().tint(MowGoTheme.deepGreen)
                 } else {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 8) {
+                    VStack(spacing: 0) {
+                        Picker("View", selection: $selectedSegment) {
+                            Text("Clients").tag(0)
+                            Text("Leads").tag(1)
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+
+                        if selectedSegment == 0 {
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 8) {
                             if !store.clients.isEmpty {
                                 Text("\(store.clients.count) clients")
                                     .font(.headline)
@@ -66,28 +79,32 @@ struct ClientsView: View {
                                 .padding(.top, 40)
                             }
 
-                            LazyVStack(spacing: 8) {
-                            ForEach(filtered) { client in
-                                ClientCard(
-                                    client: client,
-                                    isExpanded: expandedId == client.id,
-                                    onTap: {
-                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                            expandedId = expandedId == client.id ? nil : client.id
+                                    LazyVStack(spacing: 8) {
+                                        ForEach(filtered) { client in
+                                            ClientCard(
+                                                client: client,
+                                                isExpanded: expandedId == client.id,
+                                                onTap: {
+                                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                                        expandedId = expandedId == client.id ? nil : client.id
+                                                    }
+                                                },
+                                                onEdit: {
+                                                    editingClient = client
+                                                }
+                                            )
                                         }
-                                    },
-                                    onEdit: {
-                                        editingClient = client
                                     }
-                                )
+                                }
+                                .padding(16)
                             }
+                            .searchable(text: $searchText, prompt: "Search clients...")
+                            .refreshable {
+                                await store.loadAll()
+                            }
+                        } else {
+                            leadsList
                         }
-                        }
-                        .padding(16)
-                    }
-                    .searchable(text: $searchText, prompt: "Search clients...")
-                    .refreshable {
-                        await store.loadAll()
                     }
                 }
             }
@@ -97,12 +114,12 @@ struct ClientsView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        showNewClient = true
+                        if selectedSegment == 0 { showNewClient = true } else { showNewLead = true }
                     } label: {
                         Image(systemName: "plus")
                             .foregroundColor(MowGoTheme.deepGreen)
                     }
-                    .accessibilityLabel("Add client")
+                    .accessibilityLabel(selectedSegment == 0 ? "Add client" : "Add lead")
                 }
             }
             .sheet(isPresented: $showNewClient) {
@@ -115,6 +132,108 @@ struct ClientsView: View {
                     .environmentObject(store)
                     .environmentObject(auth)
             }
+            .sheet(isPresented: $showNewLead) {
+                NewLeadFormView().environmentObject(store)
+            }
+        }
+    }
+
+    private var leadsList: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                if let operationError {
+                    Text(operationError).font(.caption).foregroundColor(.red)
+                }
+                if store.leads.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "person.crop.circle.badge.questionmark")
+                            .font(.system(size: 40)).foregroundColor(theme.surfaceElevated)
+                        Text("No leads yet").font(.headline).foregroundColor(theme.textPrimary)
+                        Text("Add a lead to start building your pipeline")
+                            .font(.subheadline).foregroundColor(theme.textMuted)
+                    }
+                    .frame(maxWidth: .infinity).padding(.top, 40)
+                } else {
+                    ForEach(store.leads) { lead in
+                        leadRow(lead)
+                            .contextMenu {
+                                if lead.status == LeadStatus.lost.rawValue {
+                                    Button("Delete", role: .destructive) { deleteLead(lead) }
+                                }
+                            }
+                    }
+                }
+            }
+            .padding(16)
+        }
+        .refreshable { await store.loadLeads() }
+    }
+
+    private func leadRow(_ lead: Lead) -> some View {
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(lead.name).font(.subheadline.weight(.semibold)).foregroundColor(theme.textPrimary)
+                    Text(lead.source.capitalized)
+                        .font(.caption2.weight(.medium)).foregroundColor(MowGoTheme.deepGreen)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(MowGoTheme.deepGreen.opacity(0.12)).clipShape(Capsule())
+                }
+                Spacer()
+                Menu {
+                    Picker("Status", selection: Binding(
+                        get: { LeadStatus(rawValue: lead.status) ?? .new },
+                        set: { updateStatus(lead, status: $0) }
+                    )) {
+                        ForEach(LeadStatus.allCases, id: \.self) { status in
+                            Text(status.displayName).tag(status)
+                        }
+                    }
+                } label: {
+                    Label((LeadStatus(rawValue: lead.status) ?? .new).displayName, systemImage: "chevron.down")
+                        .font(.caption.weight(.medium))
+                }
+            }
+
+            HStack(spacing: 8) {
+                if let phone = lead.phone, let url = URL(string: "tel:\(phone.filter { $0.isNumber || $0 == "+" })") {
+                    Link(destination: url) { Image(systemName: "phone.fill") }
+                        .buttonStyle(.bordered).accessibilityLabel("Call \(lead.name)")
+                }
+                if let email = lead.email, let url = URL(string: "mailto:\(email)") {
+                    Link(destination: url) { Image(systemName: "envelope.fill") }
+                        .buttonStyle(.bordered).accessibilityLabel("Email \(lead.name)")
+                }
+                Spacer()
+                if lead.status != LeadStatus.won.rawValue {
+                    Button("Convert") { convert(lead) }
+                        .font(.caption.weight(.semibold)).buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen)
+                }
+            }
+        }
+        .padding(12).background(theme.surface).cornerRadius(12)
+    }
+
+    private func updateStatus(_ lead: Lead, status: LeadStatus) {
+        Task<Void, Never> {
+            do { try await store.updateLeadStatus(lead.id, status: status) }
+            catch { operationError = error.localizedDescription }
+        }
+    }
+
+    private func convert(_ lead: Lead) {
+        Task<Void, Never> {
+            do {
+                try await store.convertLeadToClient(lead)
+                selectedSegment = 0
+            } catch { operationError = error.localizedDescription }
+        }
+    }
+
+    private func deleteLead(_ lead: Lead) {
+        Task<Void, Never> {
+            do { try await store.deleteLead(lead.id) }
+            catch { operationError = error.localizedDescription }
         }
     }
 }
