@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase, isDemoMode } from '../lib/supabase';
-import { Calendar, Clock, User, Phone, MapPin, FileText, CheckCircle, Loader2, AlertCircle, Leaf } from 'lucide-react';
+import { createLead } from '../lib/data';
+import { Calendar, Clock, User, Phone, Mail, MapPin, FileText, CheckCircle, Loader2, AlertCircle, Leaf } from 'lucide-react';
 
 const TIME_SLOTS = [
   '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
@@ -40,6 +41,7 @@ function formatTime(t) {
 
 export default function Booking() {
   const { businessId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
   const days = useMemo(() => getNext7Days(), []);
 
@@ -54,6 +56,7 @@ export default function Booking() {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -61,6 +64,14 @@ export default function Booking() {
   const submittingRef = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [mode, setMode] = useState(searchParams.get('mode') === 'quote' ? 'quote' : 'book');
+
+  function changeMode(next) {
+    setMode(next); setError(''); setSubmitted(false);
+    const params = new URLSearchParams(searchParams);
+    if (next === 'quote') params.set('mode', 'quote'); else params.delete('mode');
+    setSearchParams(params, { replace: true });
+  }
 
   // Load business profile
   useEffect(() => {
@@ -130,11 +141,11 @@ export default function Booking() {
     e.preventDefault();
     if (submittingRef.current) return; // synchronous double-submit guard
     setError('');
-    if (!selectedDate || !selectedTime) {
+    if (mode === 'book' && (!selectedDate || !selectedTime)) {
       setError(t('booking.select_date_time'));
       return;
     }
-    if (!name.trim() || !phone.trim() || !address.trim()) {
+    if (!name.trim() || (mode === 'book' && (!phone.trim() || !address.trim())) || (mode === 'quote' && !phone.trim() && !email.trim())) {
       setError(t('booking.fill_fields'));
       return;
     }
@@ -142,11 +153,19 @@ export default function Booking() {
     setSubmitting(true);
     submittingRef.current = true;
     try {
+      if (mode === 'quote' && isDemoMode()) {
+        await createLead({ name, phone, email, address, source: 'booking_link', notes: '' });
+        setSubmitted(true);
+        return;
+      }
       const apiUrl = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${apiUrl}/api/booking`, {
+      const res = await fetch(`${apiUrl}${mode === 'quote' ? '/api/leads/public' : '/api/booking'}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSON.stringify(mode === 'quote' ? {
+          business_id: businessId,
+          name: name.trim(), phone: phone.trim(), email: email.trim(), address: address.trim(),
+        } : {
           business_id: businessId,
           customer_name: name.trim(),
           customer_phone: phone.trim(),
@@ -194,13 +213,13 @@ export default function Booking() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-6">
         <div className="text-center max-w-sm">
           <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('booking.booked')}</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{mode === 'quote' ? t('booking.request_sent') : t('booking.booked')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-            {t('booking.thanks_for_booking', { name: businessName })}
+            {mode === 'quote' ? t('booking.they_will_get_back_to_you', { name: businessName }) : t('booking.thanks_for_booking', { name: businessName })}
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          {mode === 'book' && <p className="text-sm text-gray-500 dark:text-gray-400">
             {selectedDate} at {formatTime(selectedTime)}
-          </p>
+          </p>}
         </div>
       </div>
     );
@@ -218,8 +237,13 @@ export default function Booking() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('booking.book_a_service')}</p>
         </div>
 
+        <div className="grid grid-cols-2 bg-gray-100 dark:bg-gray-900 rounded-xl p-1 mb-4">
+          <button type="button" onClick={() => changeMode('book')} className={`rounded-lg py-2 text-sm font-semibold transition ${mode === 'book' ? 'bg-white dark:bg-gray-800 text-emerald-600 shadow-sm' : 'text-gray-500'}`}>{t('booking.book_now')}</button>
+          <button type="button" onClick={() => changeMode('quote')} className={`rounded-lg py-2 text-sm font-semibold transition ${mode === 'quote' ? 'bg-white dark:bg-gray-800 text-emerald-600 shadow-sm' : 'text-gray-500'}`}>{t('booking.request_a_quote')}</button>
+        </div>
+
         {/* Date picker */}
-        <div className="card p-4 mb-4">
+        {mode === 'book' && <div className="card p-4 mb-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-emerald-500" />
             {t('booking.pick_a_date')}
@@ -240,10 +264,10 @@ export default function Booking() {
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Time slots */}
-        {selectedDate && (
+        {mode === 'book' && selectedDate && (
           <div className="card p-4 mb-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <Clock className="w-4 h-4 text-emerald-500" />
@@ -281,7 +305,7 @@ export default function Booking() {
         )}
 
         {/* Customer form */}
-        {selectedDate && selectedTime && (
+        {(mode === 'quote' || (selectedDate && selectedTime)) && (
           <form onSubmit={handleSubmit} className="card p-4 space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
               <User className="w-4 h-4 text-emerald-500" />
@@ -300,6 +324,10 @@ export default function Booking() {
                 />
               </div>
             </div>
+            {mode === 'quote' && <div>
+              <label className="label">{t('booking.email')} <span className="text-gray-400 font-normal">({t('booking.optional')})</span></label>
+              <div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={t('booking.email_placeholder')} className="input pl-10" /></div>
+            </div>}
             <div>
               <label className="label">{t('booking.phone')}</label>
               <div className="relative">
@@ -309,7 +337,7 @@ export default function Booking() {
                   onChange={e => setPhone(e.target.value)}
                   placeholder={t('booking.phone_placeholder')}
                   className="input pl-10"
-                  required
+                  required={mode === 'book'}
                 />
               </div>
             </div>
@@ -322,11 +350,11 @@ export default function Booking() {
                   onChange={e => setAddress(e.target.value)}
                   placeholder={t('booking.address_placeholder')}
                   className="input pl-10"
-                  required
+                  required={mode === 'book'}
                 />
               </div>
             </div>
-            <div>
+            {mode === 'book' && <div>
               <label className="label">{t('booking.notes')} <span className="text-gray-400 font-normal">({t('booking.optional')})</span></label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -338,12 +366,12 @@ export default function Booking() {
                   rows={2}
                 />
               </div>
-            </div>
+            </div>}
 
             {/* Summary */}
-            <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3 text-xs text-emerald-700 dark:text-emerald-400">
+            {mode === 'book' && <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3 text-xs text-emerald-700 dark:text-emerald-400">
               {t('booking.summary', { date: selectedDate, time: formatTime(selectedTime) })}
-            </div>
+            </div>}
 
             {error && (
               <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3">
@@ -358,8 +386,8 @@ export default function Booking() {
               className="btn-primary w-full"
             >
               {submitting
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('booking.booking')}</>
-                : <><Calendar className="w-4 h-4" /> {t('booking.confirm_booking')}</>
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> {mode === 'quote' ? t('booking.sending') : t('booking.booking')}</>
+                : <><Calendar className="w-4 h-4" /> {mode === 'quote' ? t('booking.send_request') : t('booking.confirm_booking')}</>
               }
             </button>
           </form>

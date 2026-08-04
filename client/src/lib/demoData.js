@@ -9,6 +9,12 @@ export const demoClients = [
   { id: '5', name: 'Tom Harrison', address: '654 Birch Ct, Nichols Hills, OK', phone: '405-555-0105', email: 'tom@email.com', rate: 80, service_notes: 'Premium lawn — 0.6 acres. Mow with stripes, edge, blow, bag clippings.', key_code: '9023', alarm_code: '', pet_instructions: '', tags: ['do-not-service'] },
 ];
 
+export const demoLeads = [
+  { id: 'demo-lead-1', user_id: 'demo-owner-001', name: 'Sarah Mitchell', phone: '405-555-0130', email: 'sarah@example.com', address: '820 Cedar Ridge, Edmond, OK', source: 'booking_link', notes: 'Asked about weekly mowing and spring cleanup.', status: 'new', client_id: null, created_at: new Date(Date.now() - 86400000).toISOString(), updated_at: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'demo-lead-2', user_id: 'demo-owner-001', name: 'James Carter', phone: '405-555-0131', email: '', address: '44 NW 18th St, OKC, OK', source: 'referral', notes: 'Referred by Bill Henderson.', status: 'contacted', client_id: null, created_at: new Date(Date.now() - 86400000 * 3).toISOString(), updated_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+  { id: 'demo-lead-3', user_id: 'demo-owner-001', name: 'Olivia Brooks', phone: '', email: 'olivia@example.com', address: '1900 Lakeview Dr, Nichols Hills, OK', source: 'facebook', notes: 'Requested an estimate for a large corner lot.', status: 'quoted', client_id: null, created_at: new Date(Date.now() - 86400000 * 6).toISOString(), updated_at: new Date(Date.now() - 86400000 * 4).toISOString() },
+];
+
 // Demo owner profile id — all demo crew point here
 const DEMO_OWNER_ID = 'demo-owner-001';
 

@@ -6,11 +6,12 @@
  */
 
 import { supabase, isDemoMode } from './supabase';
-import { demoJobs, demoClients, demoInvoices, demoTeamMembers } from './demoData';
+import { demoJobs, demoClients, demoInvoices, demoTeamMembers, demoLeads } from './demoData';
 
 // ===== In-memory demo state (shared across pages) =====
 let _jobs = [...demoJobs];
 let _clients = [...demoClients];
+let _leads = [...demoLeads];
 let _invoices = [...demoInvoices];
 let _estimates = [
   { id: 'demo-est-1', user_id: 'demo-owner-001', client_id: '1', clients: demoClients[0], amount: 50, status: 'sent', note: 'Weekly lawn care', sent_at: new Date(Date.now() - 86400000 * 5).toISOString(), created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
@@ -385,6 +386,64 @@ export async function deleteClient(id) {
   if (isDemoMode()) { _clients = _clients.filter(c => c.id !== id); notify(); return; }
   const { error } = await supabase.from('clients').delete().eq('id', id);
   if (error) throw error;
+}
+
+// ===== Leads =====
+
+export async function loadLeads() {
+  if (isDemoMode()) return [..._leads];
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase.from('leads').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createLead(lead) {
+  const payload = { name: lead.name.trim(), phone: lead.phone?.trim() || null, email: lead.email?.trim() || null, address: lead.address?.trim() || null, source: lead.source || 'other', notes: lead.notes?.trim() || null, status: 'new' };
+  if (isDemoMode()) {
+    const now = new Date().toISOString();
+    const row = { ...payload, id: uid(), user_id: _currentDemoUserId(), client_id: null, created_at: now, updated_at: now };
+    _leads = [row, ..._leads]; notify(); return row;
+  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await supabase.from('leads').insert({ ...payload, user_id: user.id }).select().single();
+  if (error) throw error;
+  fireWebhook('lead.created', { lead_id: data.id, name: data.name, source: data.source, status: data.status });
+  return data;
+}
+
+export async function updateLead(id, patch) {
+  const safePatch = { ...patch, updated_at: new Date().toISOString() };
+  delete safePatch.id; delete safePatch.user_id; delete safePatch.created_at;
+  if (isDemoMode()) {
+    _leads = _leads.map(lead => lead.id === id ? { ...lead, ...safePatch } : lead); notify();
+    return _leads.find(lead => lead.id === id);
+  }
+  const { data, error } = await supabase.from('leads').update(safePatch).eq('id', id).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateLeadStatus(id, status) {
+  const row = await updateLead(id, { status });
+  fireWebhook('lead.status.updated', { lead_id: row.id, name: row.name, status: row.status, client_id: row.client_id });
+  return row;
+}
+
+export async function deleteLead(id) {
+  if (isDemoMode()) { _leads = _leads.filter(lead => lead.id !== id); notify(); return; }
+  const { error } = await supabase.from('leads').delete().eq('id', id);
+  if (error) throw error;
+}
+
+export async function convertLeadToClient(lead) {
+  if (!['new', 'contacted', 'quoted'].includes(lead.status)) throw new Error('Only active leads can be converted.');
+  const client = await createClient({ name: lead.name, phone: lead.phone || '', email: lead.email || '', address: lead.address || '', rate: 0, service_notes: lead.notes || '', key_code: '', alarm_code: '', pet_instructions: '', tags: [] });
+  const updated = await updateLead(lead.id, { client_id: client.id, status: 'won' });
+  fireWebhook('lead.status.updated', { lead_id: updated.id, name: updated.name, status: updated.status, client_id: updated.client_id });
+  return { client, lead: updated };
 }
 
 // ===== Invoices =====
