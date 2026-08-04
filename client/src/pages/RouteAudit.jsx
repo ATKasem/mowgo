@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, MapPin } from 'lucide-react';
 import Logo from '../components/Logo';
+import usePageTitle from '../hooks/usePageTitle';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIDPOINTS = { under_10: 7, '10_25': 17, '25_50': 37, '50_plus': 60 };
@@ -21,6 +22,7 @@ export default function RouteAudit() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [serverError, setServerError] = useState('');
+  usePageTitle(t('routeAudit.seo.title'), t('routeAudit.seo.description'));
 
   const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
 

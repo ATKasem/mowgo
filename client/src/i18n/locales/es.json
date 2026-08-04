@@ -300,7 +300,11 @@
     "jobber_pricing_explained": "Precios de Jobber, explicados",
     "see_the_full_comparison": "Ver la comparación completa",
     "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "La tarifa de $29/mes por usuario de Jobber se acumula: un equipo de 2 personas en Connect llega a $1,536/año ($1,188 base + $348 por el segundo usuario). MowGo Crew: $790/año, precio fijo, todo el equipo incluido.",
-    "run_your_next_5_clients_free": "Maneja tus próximos 5 clientes gratis."
+    "run_your_next_5_clients_free": "Maneja tus próximos 5 clientes gratis.",
+    "seo": {
+      "title": "MowGo vs Jobber, LawnPro, QuoteIQ y más — Comparación honesta (2026)",
+      "description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales."
+    }
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",
@@ -698,7 +702,11 @@
     "yes_offline_mode_keeps_working_in_rural_oklahoma_and_syncs_when_you_are_": "Sí. El modo sin conexión sigue funcionando en zonas rurales de Oklahoma y se sincroniza cuando vuelves a tener señal.",
     "no_catch_cancel_anytime_if_solo_does_not_make_you_more_organized_in_30_d": "No hay truco. Cancela cuando quieras. Si Solo no te hace sentir más organizado en 30 días, te devolvemos tu primer mes completo.",
     "solo_costs_price_and_is_built_for_the_1_020_oklahoma_crews_who_don_t_nee": "Solo cuesta {{price}} y está hecho para las más de 1,020 cuadrillas de Oklahoma que no necesitan un sistema empresarial de {{competitorPrice}}.",
-    "census_county_business_patterns_2023": "Census County Business Patterns 2023"
+    "census_county_business_patterns_2023": "Census County Business Patterns 2023",
+    "seo": {
+      "title": "MowGo — Software de programación, rutas y facturación para jardinería",
+      "description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito."
+    }
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -1365,6 +1373,10 @@
       "crew": "Con cuatro o más personas, el plan Crew ofrece asignación de trabajos y seguimiento del progreso de tu equipo.",
       "crewCta": "Explorar el plan Crew",
       "qualifiedCta": "Reserva tu llamada de configuración gratis"
+    },
+    "seo": {
+      "title": "Auditoría de rutas gratis — Descubre cuánto te cuestan tus rutas",
+      "description": "Recibe un estimado gratis de las horas e ingresos que te cuestan tus rutas de jardinería. Toma 30 segundos y llega a tu correo."
     }
   },
   "portalReturn": {

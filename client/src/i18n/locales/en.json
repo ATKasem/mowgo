@@ -283,7 +283,11 @@
     "jobber_pricing_explained": "Jobber pricing, explained",
     "see_the_full_comparison": "See the full comparison",
     "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.",
-    "run_your_next_5_clients_free": "Run your next 5 clients free."
+    "run_your_next_5_clients_free": "Run your next 5 clients free.",
+    "seo": {
+      "title": "MowGo vs Jobber, LawnPro, QuoteIQ & more — Honest Comparison (2026)",
+      "description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing."
+    }
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Real cost analysis",
@@ -648,7 +652,11 @@
     "yes_offline_mode_keeps_working_in_rural_oklahoma_and_syncs_when_you_are_": "Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.",
     "no_catch_cancel_anytime_if_solo_does_not_make_you_more_organized_in_30_d": "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full.",
     "solo_costs_price_and_is_built_for_the_1_020_oklahoma_crews_who_don_t_nee": "Solo costs {{price}} and is built for the 1,020+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.",
-    "census_county_business_patterns_2023": "Census County Business Patterns 2023"
+    "census_county_business_patterns_2023": "Census County Business Patterns 2023",
+    "seo": {
+      "title": "MowGo — Lawn Care Scheduling, Routing & Invoicing Software",
+      "description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card."
+    }
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -1271,6 +1279,10 @@
       "crew": "With four or more people, the Crew tier gives your team job assignment and progress tracking.",
       "crewCta": "Explore the Crew tier",
       "qualifiedCta": "Book your free setup call"
+    },
+    "seo": {
+      "title": "Free Route Audit — See What Your Routes Cost You",
+      "description": "Get a free estimate of the hours and revenue your lawn care routes are costing you. Takes 30 seconds, delivered to your email."
     }
   },
   "portalReturn": {

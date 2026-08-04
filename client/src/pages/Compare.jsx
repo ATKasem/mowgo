@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
@@ -82,6 +83,7 @@ export default function Compare() {
   const { tr, t, i18n } = useLocalizedText('compare');
   const navigate = useNavigate();
   const [checkoutError, setCheckoutError] = useState('');
+  usePageTitle(tr('seo.title'), tr('seo.description'));
 
   function goToPricing(e) {
     e.preventDefault();

@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { useState, useEffect, useRef } from 'react';
 import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, DollarSign, Shield, AlertCircle, ChevronDown } from 'lucide-react';
 import Logo from '../components/Logo';
@@ -93,6 +94,7 @@ export default function Landing() {
   const [billingInterval, setBillingInterval] = useState('month');
   const [kitOpen, setKitOpen] = useState(false);
   const errorTimerRef = useRef(null);
+  usePageTitle(tr('seo.title'), tr('seo.description'));
 
   useEffect(() => {
     return () => { if (errorTimerRef.current) clearTimeout(errorTimerRef.current); };
