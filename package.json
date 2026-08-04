@@ -1,0 +1,9 @@
+{
+  "name": "mowgo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "MowGo monorepo root — build entry for Cloudflare Pages Git integration.",
+  "scripts": {
+    "build": "npm --prefix client run build"
+  }
+}
