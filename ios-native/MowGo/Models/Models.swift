@@ -385,6 +385,7 @@ struct UserProfile: Codable, Identifiable {
         case "free": "Free"
         case "solo": "Solo"
         case "crew": "Crew"
+        case "premium": "Premium"
         default: tier ?? "Free"
         }
     }

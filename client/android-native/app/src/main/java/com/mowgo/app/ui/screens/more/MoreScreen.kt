@@ -140,7 +140,7 @@ private fun MoreRootScreen(
                     SettingsRow(Icons.Default.Contrast, "Appearance", appearance.replaceFirstChar { it.titlecase() }) { navigate(MoreDestination.APPEARANCE) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
                     SettingsRow(Icons.Default.CreditCard, "Billing", tierLabel(state.profile?.tier)) { navigate(MoreDestination.BILLING) }
-                    if (state.profile?.tier == "solo" || state.profile?.tier == "crew") {
+                    if (state.profile?.tier == "solo" || state.profile?.tier == "crew" || state.profile?.tier == "premium") {
                         HorizontalDivider(Modifier.padding(start = 56.dp))
                         SettingsRow(Icons.Default.Link, "Integrations", "Zapier, Make, n8n webhooks") { navigate(MoreDestination.INTEGRATIONS) }
                     }
@@ -460,6 +460,7 @@ private fun BillingPlanCard(
         !isAnnual -> null
         tier == "solo" -> "Save $78"
         tier == "crew" -> "Save $158"
+        tier == "premium" -> "Save $398"
         else -> null
     }
     Card(Modifier.fillMaxWidth()) {

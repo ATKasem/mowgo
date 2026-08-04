@@ -166,6 +166,7 @@ struct SubscriptionPlanCard: View {
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var tierOrder: Int {
         switch tier {
+        case "premium": return 3
         case "crew": return 2
         case "solo": return 1
         default: return 0
@@ -173,6 +174,7 @@ struct SubscriptionPlanCard: View {
     }
     private var userTierOrder: Int {
         switch userTier.lowercased() {
+        case "premium": return 3
         case "crew": return 2
         case "solo": return 1
         default: return 0
@@ -189,8 +191,8 @@ struct SubscriptionPlanCard: View {
                     Text(price)
                         .font(.title3.weight(.bold))
                         .foregroundColor(MowGoTheme.deepGreen)
-                    if billingInterval == "year", tier == "solo" || tier == "crew" {
-                        Text(tier == "solo" ? "Save $78" : "Save $158")
+                    if billingInterval == "year", tier == "solo" || tier == "crew" || tier == "premium" {
+                        Text(tier == "solo" ? "Save $78" : tier == "crew" ? "Save $158" : "Save $398")
                             .font(.caption)
                             .foregroundColor(MowGoTheme.deepGreen)
                     }

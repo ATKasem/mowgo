@@ -294,7 +294,7 @@ struct SettingsView: View {
 
     private var isPaidTier: Bool {
         let tier = auth.user?.tier ?? "free"
-        return tier == "solo" || tier == "crew"
+        return tier == "solo" || tier == "crew" || tier == "premium"
     }
 
     private func openCustomerPortal() {
@@ -358,6 +358,7 @@ struct SettingsView: View {
         switch auth.user?.tier {
         case "solo": "Unlimited clients & jobs · Recurring jobs"
         case "crew": "Unlimited clients · Full team access"
+        case "premium": "Everything in Crew · Priority concierge · Seasonal packs · Priority support"
         default: "5 clients · Basic features"
         }
     }
