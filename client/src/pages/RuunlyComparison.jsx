@@ -22,7 +22,6 @@ const features = [
   { label: 'Price',             mowgoFree: '$0',          mowgoSolo: '$39/mo',    ruunlyStarter: '$19 + fees',   ruunlyPro: '$59 + fees',  type: 'price' },
   { label: 'Clients',           mowgoFree: '5',           mowgoSolo: 'Unlimited',  ruunlyStarter: '25',           ruunlyPro: '100',         type: 'text' },
   { label: 'Rain Delay',        mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
-  { label: 'AI',                mowgoFree: 'No AI',       mowgoSolo: 'Unlimited',  ruunlyStarter: '13 quotes',    ruunlyPro: '26 quotes',   type: 'text' },
   { label: 'Route Optimization',mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
   { label: 'SMS Campaigns',     mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
   { label: 'QuickBooks',        mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
@@ -376,7 +375,7 @@ export default function RuunlyComparison() {
         <div className="relative max-w-2xl mx-auto px-4 py-24 text-center">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("The math doesn't lie.")}</h2>
-            <p className="text-emerald-100 text-lg mb-10">{tr("MowGo Solo: $39/mo flat. No platform fees. Free rain delay. Unlimited AI. Try it free.")}</p>
+            <p className="text-emerald-100 text-lg mb-10">{tr("MowGo Solo: $39/mo flat. No platform fees. Free rain delay. Try it free.")}</p>
             <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               {tr("Try MowGo Free")}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

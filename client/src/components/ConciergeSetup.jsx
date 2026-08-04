@@ -61,7 +61,7 @@ export default function ConciergeSetup({ onDone }) {
 
   return (
     <form onSubmit={submit} className="card p-5 space-y-5 text-left">
-      <div><h2 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Your done-for-you setup is included')}</h2><p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr("Tell us about your business and we'll import your clients within 48 hours.")}</p></div>
+      <div><h2 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Your done-for-you setup is included')}</h2><p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr('Tell us about your business: we import your clients within 48 hours.')}</p></div>
       <div className="grid sm:grid-cols-2 gap-4">
         <div><label className="label">{tr('Business name')}</label><input className="input" value={businessName} maxLength={200} onChange={e => setBusinessName(e.target.value)} /></div>
         <div><label className="label">{tr('Client count (optional)')}</label><input className="input" type="number" min="0" step="1" value={clientCount} onChange={e => setClientCount(e.target.value)} /></div>

@@ -309,7 +309,7 @@ export default function Settings() {
         {!isDemoMode() && ['solo', 'crew'].includes(profile?.tier) && conciergeClaimed === false && (
           showConcierge ? <ConciergeSetup onDone={() => { setConciergeClaimed(true); setShowConcierge(false); }} /> : (
             <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-brand/30">
-              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup included: we'll import your clients and pre-schedule your first 30 days.")}</p>
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup: we import your clients and pre-schedule your first 30 days.")}</p>
               <button type="button" className="btn-primary whitespace-nowrap" onClick={() => setShowConcierge(true)}>{conciergeTr('Claim it')}</button>
             </div>
           )
@@ -472,7 +472,7 @@ export default function Settings() {
         {/* Booking Link */}
         <div className="card p-5 space-y-3">
           <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><LinkIcon className="w-4 h-4 text-brand" />{tr("Booking Link")}</h3>
-          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Share this link with customers so they can book a service online — no login required.")}</p>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Share this link so customers can book online — no login needed.")}</p>
           <div className="flex items-center gap-2">
             <input
               readOnly
