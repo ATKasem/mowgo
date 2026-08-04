@@ -103,12 +103,16 @@ actor WebhookService {
     }
 
     private func leadPayload(_ lead: Lead) -> [String: Any] {
-        return [
+        var payload: [String: Any] = [
             "lead_id": lead.id.uuidString,
             "name": lead.name,
             "status": lead.status,
             "source": lead.source
         ]
+        if let clientId = lead.clientId {
+            payload["client_id"] = clientId.uuidString
+        }
+        return payload
     }
 
     func invoicePaid(_ invoice: Invoice, userId: UUID) async {

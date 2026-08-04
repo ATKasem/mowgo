@@ -169,6 +169,28 @@ final class Persistence {
         }
     }
 
+    /// Remove queued mutations for one entity and operation. Returns whether
+    /// at least one matching mutation was removed.
+    @discardableResult
+    func removePendingMutations(operation: String, entityId: UUID) -> Bool {
+        let targetOperation = operation
+        let targetEntityId = entityId
+        let descriptor = FetchDescriptor<PendingMutation>(
+            predicate: #Predicate {
+                $0.operation == targetOperation && $0.entityId == targetEntityId
+            }
+        )
+        do {
+            let mutations = try context.fetch(descriptor)
+            for mutation in mutations { context.delete(mutation) }
+            if !mutations.isEmpty { try context.save() }
+            return !mutations.isEmpty
+        } catch {
+            print("[Persistence] failed to remove pending mutations: \(error)")
+            return false
+        }
+    }
+
     /// Clear all pending mutations (e.g. on sign-out).
     func clearAllMutations(currentUserId: UUID) {
         do {

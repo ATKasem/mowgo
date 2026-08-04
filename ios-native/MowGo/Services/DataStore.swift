@@ -426,6 +426,10 @@ final class DataStore: ObservableObject {
 
         case "lead:create":
             let lead = try JSONDecoder().decode(Lead.self, from: mutation.payload)
+            let existing: [Lead] = try await sb.fetch(
+                "leads", query: ["id": "eq.\(lead.id.uuidString)"]
+            )
+            if !existing.isEmpty { return }
             guard let userId = currentUserId ?? lead.userId else {
                 throw DataStoreError.authenticationRequired
             }
@@ -1048,26 +1052,28 @@ final class DataStore: ObservableObject {
         let originalDates: [UUID: String] = Dictionary(
             uniqueKeysWithValues: pending.map { ($0.id, $0.scheduledDate) }
         )
-        var fullySynced = await canSync()
+        var queuedJobIds: Set<UUID> = []
 
         // Apply all updates — on ANY failure, re-sync from server instead of
         // manual rollback (which can diverge if local state was already mutated).
         var succeeded: [UUID] = []
         for job in pending {
             do {
-                if !(await canSync()) {
-                    fullySynced = false
-                }
+                let canSyncBeforeUpdate = await canSync()
                 try await updateJobSchedule(job, scheduledDate: targetDate)
+                if !canSyncBeforeUpdate { queuedJobIds.insert(job.id) }
                 succeeded.append(job.id)
             } catch {
                 if isNetworkError(error) {
-                    fullySynced = false
+                    queuedJobIds.insert(job.id)
                     succeeded.append(job.id)
                     continue
                 }
                 // Rollback: re-sync the already-updated jobs to their original dates
                 for jobId in succeeded {
+                    persistence?.removePendingMutations(
+                        operation: "job:schedule", entityId: jobId
+                    )
                     if let original = originalDates[jobId],
                        let realJob = self.jobs.first(where: { $0.id == jobId }) {
                         try? await updateJobSchedule(realJob, scheduledDate: original)
@@ -1090,7 +1096,7 @@ final class DataStore: ObservableObject {
         await firePushRainDelay(movedJobs, date: targetDate)
         // Offline rain-delay webhooks are accepted best-effort loss; only
         // server-synced operations emit this event.
-        if fullySynced, auth?.isDemoMode != true, let userId = currentUserId {
+        if queuedJobIds.isEmpty, auth?.isDemoMode != true, let userId = currentUserId {
             await WebhookService.shared.rainDelayApplied(
                 count: succeeded.count, date: date, targetDate: targetDate, userId: userId
             )
@@ -1460,7 +1466,8 @@ final class DataStore: ObservableObject {
                 }
                 throw DataStoreError.persistenceUnavailable
             }
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
@@ -1486,7 +1493,12 @@ final class DataStore: ObservableObject {
                 }
                 return
             }
-            try? await deleteClientOnServer(client.id)
+            let creationWasQueued = persistence?.removePendingMutations(
+                operation: "client:create", entityId: client.id
+            ) ?? false
+            if !creationWasQueued {
+                try? await deleteClientOnServer(client.id)
+            }
             clients.removeAll { $0.id == client.id }
             if let index = leads.firstIndex(where: { $0.id == lead.id }) {
                 leads[index] = lead
