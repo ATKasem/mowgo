@@ -227,7 +227,7 @@ struct TodayView: View {
                 NewClientFormView()
             }
             .onAppear {
-                if auth.user?.tier == "crew" {
+                if auth.user?.tier == "crew" || auth.user?.tier == "premium" {
                     Task { await store.loadTeamMembers() }
                 }
             }
@@ -451,7 +451,7 @@ struct TodayView: View {
     // MARK: - Crew Filter
 
     private var crewFilterBar: some View {
-        let canManageCrew = auth.user?.tier == "crew"
+        let canManageCrew = auth.user?.tier == "crew" || auth.user?.tier == "premium"
         return Group {
             if canManageCrew && store.teamMembers.count >= 2 {
                 HStack(spacing: 8) {
