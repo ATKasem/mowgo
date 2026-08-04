@@ -623,8 +623,6 @@
     "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "Creamos MowGo para los equipos de Oklahoma. Usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. Si no te sientes más organizado, te devolvemos el primer mes completo. Sin preguntas, sin trámites. Tus datos siempre son tuyos.",
     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Aplica para Solo. Sin cargos de configuración. Sin contratos. Cancela cuando quieras.",
     "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Los pagos con Stripe están activos. La optimización de rutas llega después — los primeros usuarios de Oklahoma reciben funciones nuevas sin aumento de precio.",
-    "less_rain_day_chaos_less_paperwork": "Menos caos en días de lluvia. Menos papeleo.",
-    "more_mowing": "Más corte.",
     "pricing": "Precios",
     "coming_soon": "Muy pronto",
     "mowgo_dashboard_screenshot": "Captura de pantalla del panel de MowGo",
@@ -640,9 +638,11 @@
     "know_what_you_pay_every_month": "Sabes lo que pagas cada mes",
     "see_what_39_mo_gets_your_crew": "Mira lo que $39/mes le da a tu equipo.",
     "start_free_pay_only_when_your_client_list_grows_cancel_anytime": "Empieza gratis. Paga solo cuando crezca tu lista de clientes. Cancela cuando quieras.",
-    "keep_jobs_moving_when_oklahoma_rain_hits_schedule_work_manage_clients_an": "Mantenga los trabajos en movimiento cuando llegue la lluvia en Oklahoma. Programe trabajo, administre clientes y envíe facturas en un solo lugar. Gratis para 5 clientes, sin tarjeta de crédito.",
     "run_your_next_5_clients_free": "Maneja tus próximos 5 clientes gratis.",
-    "see_every_job_for_the_week_in_one_place": "Mira todos los trabajos de la semana en un solo lugar."
+    "see_every_job_for_the_week_in_one_place": "Mira todos los trabajos de la semana en un solo lugar.",
+    "rain_on_tuesday_eight_clients_to_rebook": "Llueve el martes. Ocho clientes por reagendar.",
+    "one_tap_fixes_it": "Un toque lo resuelve.",
+    "when_oklahoma_rain_hits_mowgo_moves_your_whole_schedule_forward_and_text": "Cuando llegue la lluvia en Oklahoma, MowGo mueve todo su calendario y les avisa a sus clientes automáticamente. Trabajos, rutas y facturas en un solo lugar. Gratis para 5 clientes. Sin tarjeta de crédito."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",

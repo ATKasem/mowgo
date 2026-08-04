@@ -139,12 +139,12 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Less rain-day chaos. Less paperwork.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("More mowing.")}</span>
+              {tr("Rain on Tuesday. Eight clients to rebook.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("One tap fixes it.")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("Keep jobs moving when Oklahoma rain hits. Schedule work, manage clients, and send invoices in one place. Free for 5 clients — no credit card.")}
+              {tr("When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place. Free for 5 clients. No credit card.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
