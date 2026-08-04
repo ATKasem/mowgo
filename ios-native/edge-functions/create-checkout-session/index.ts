@@ -7,6 +7,8 @@
 //   STRIPE_SECRET_KEY     — your Stripe secret key
 //   STRIPE_PRICE_SOLO     — Stripe Price ID for Solo tier (price_xxx)
 //   STRIPE_PRICE_CREW     — Stripe Price ID for Crew tier (price_xxx)
+//   STRIPE_PRICE_PREMIUM  — Stripe Price ID for Premium tier (price_xxx)
+//   STRIPE_PRICE_PREMIUM_ANNUAL — Stripe annual Price ID for Premium tier (price_xxx)
 //   STRIPE_TRIAL_DAYS     — optional, defaults to 14 to match web checkout
 //
 // Supabase automatically provides SUPABASE_URL, SUPABASE_ANON_KEY, and
@@ -33,11 +35,13 @@ function originHeaders(origin: string | null) {
 const tierToEnvKey: Record<string, string> = {
   solo: "STRIPE_PRICE_SOLO",
   crew: "STRIPE_PRICE_CREW",
+  premium: "STRIPE_PRICE_PREMIUM",
 };
 
 const tierToEnvKeyAnnual: Record<string, string> = {
   solo: "STRIPE_PRICE_SOLO_ANNUAL",
   crew: "STRIPE_PRICE_CREW_ANNUAL",
+  premium: "STRIPE_PRICE_PREMIUM_ANNUAL",
 };
 
 serve(async (req) => {
@@ -78,7 +82,7 @@ serve(async (req) => {
 
     if (!tier || !tierToEnvKey[tier]) {
       return new Response(
-        JSON.stringify({ error: "tier must be 'solo' or 'crew'" }),
+        JSON.stringify({ error: "tier must be 'solo', 'crew' or 'premium'" }),
         {
           status: 400,
           headers: { ...cors, "Content-Type": "application/json" },

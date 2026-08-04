@@ -283,9 +283,10 @@ private fun BillingSettingsScreen(
     val description = when (tier) {
         "solo" -> "Unlimited clients & jobs"
         "crew" -> "Everything in Solo · Unlimited clients · Team"
+        "premium" -> "Everything in Crew"
         else -> "5 clients · Rain delay · Invoicing"
     }
-    val isPaid = tier == "solo" || tier == "crew"
+    val isPaid = tier == "solo" || tier == "crew" || tier == "premium"
     var showCancelConfirmation by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.pendingBillingUrl) {
@@ -361,7 +362,7 @@ private fun BillingSettingsScreen(
         }
         BillingPlanCard(
             name = "Free",
-            feature = "5 clients · Rain delay · Invoicing",
+            features = listOf("5 clients · Rain delay · Invoicing"),
             tier = "free",
             currentTier = tier,
             billingInterval = billingInterval,
@@ -370,7 +371,7 @@ private fun BillingSettingsScreen(
         )
         BillingPlanCard(
             name = "Solo",
-            feature = "Unlimited clients & jobs",
+            features = listOf("Unlimited clients & jobs"),
             tier = "solo",
             currentTier = tier,
             billingInterval = billingInterval,
@@ -379,8 +380,22 @@ private fun BillingSettingsScreen(
         )
         BillingPlanCard(
             name = "Crew",
-            feature = "Everything in Solo · Unlimited clients · Team",
+            features = listOf("Everything in Solo · Unlimited clients · Team"),
             tier = "crew",
+            currentTier = tier,
+            billingInterval = billingInterval,
+            loadingAction = state.billingLoadingAction,
+            subscribe = startCheckout,
+        )
+        BillingPlanCard(
+            name = "Premium",
+            features = listOf(
+                "Everything in Crew",
+                "Priority concierge setup — clients imported + first 30 days pre-scheduled in 48h",
+                "Seasonal packs: spring pricing benchmarks, route templates",
+                "Priority text-first support",
+            ),
+            tier = "premium",
             currentTier = tier,
             billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
@@ -424,20 +439,21 @@ private fun BillingSettingsScreen(
 @Composable
 private fun BillingPlanCard(
     name: String,
-    feature: String,
+    features: List<String>,
     tier: String,
     currentTier: String,
     billingInterval: String,
     loadingAction: String?,
     subscribe: (String, String) -> Unit,
 ) {
-    val order = mapOf("free" to 0, "solo" to 1, "crew" to 2)
+    val order = mapOf("free" to 0, "solo" to 1, "crew" to 2, "premium" to 3)
     val isCurrent = tier == currentTier
     val canUpgrade = (order[tier] ?: 0) > (order[currentTier] ?: 0)
     val isAnnual = billingInterval == "year"
     val price = when (tier) {
         "solo" -> if (isAnnual) "$390/yr" else "$39/mo"
         "crew" -> if (isAnnual) "$790/yr" else "$79/mo"
+        "premium" -> if (isAnnual) "$1,990/yr" else "$199/mo"
         else -> "$0/mo"
     }
     val savings = when {
@@ -477,10 +493,12 @@ private fun BillingPlanCard(
                     }
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.CheckCircle, null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
-                Spacer(Modifier.width(8.dp))
-                Text(feature, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            features.forEach { feature ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.CheckCircle, null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(8.dp))
+                    Text(feature, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
             if (canUpgrade) {
                 val action = "checkout:$tier"
@@ -503,6 +521,7 @@ private fun BillingPlanCard(
 private fun tierLabel(tier: String?, billingInterval: String = "month"): String = when (tier) {
     "solo" -> if (billingInterval == "year") "Solo · $390/yr" else "Solo · $39/mo"
     "crew" -> if (billingInterval == "year") "Crew · $790/yr" else "Crew · $79/mo"
+    "premium" -> if (billingInterval == "year") "Premium · $1,990/yr" else "Premium · $199/mo"
     else -> "Free Plan"
 }
 
@@ -511,5 +530,6 @@ private fun tierLabel(tier: String?, billingInterval: String = "month"): String 
 private fun planName(tier: String?): String = when (tier) {
     "solo" -> "Solo Plan"
     "crew" -> "Crew Plan"
+    "premium" -> "Premium Plan"
     else -> "Free Plan"
 }

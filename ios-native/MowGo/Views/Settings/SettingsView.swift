@@ -727,6 +727,21 @@ struct SubscriptionView: View {
                             userTier: normalizedCurrentTier,
                             billingInterval: billingInterval
                         )
+
+                        SubscriptionPlanCard(
+                            name: "Premium",
+                            price: billingInterval == "year" ? "$1,990/yr" : "$199/mo",
+                            features: [
+                                "Everything in Crew",
+                                "Priority concierge setup — clients imported + first 30 days pre-scheduled in 48h",
+                                "Seasonal packs: spring pricing benchmarks, route templates",
+                                "Priority text-first support"
+                            ],
+                            tier: "premium",
+                            isCurrent: normalizedCurrentTier == "premium",
+                            userTier: normalizedCurrentTier,
+                            billingInterval: billingInterval
+                        )
                     }
                     .padding(16)
                 }
