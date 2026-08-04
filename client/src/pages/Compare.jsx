@@ -357,7 +357,7 @@ export default function Compare() {
       {/* Bottom CTA */}
       <section className="bg-gradient-to-br from-emerald-500 via-green-600 to-green-700 py-20">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-white mb-4">{tr("Rain delay included on MowGo Free")}</h2>
+          <h2 className="text-3xl font-extrabold text-white mb-4">{tr("Run your next 5 clients free.")}</h2>
           <p className="text-emerald-100 text-lg mb-8">{tr("Tap once to move every rain-day job. Pay nothing for your first 5 clients.")}</p>
           <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {tr("Start Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />

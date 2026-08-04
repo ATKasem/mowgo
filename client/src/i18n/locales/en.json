@@ -285,7 +285,8 @@
     "switching_is_the_risky_part_so_we_made_it_the_safe_part_we_import_your_j": "Switching is the risky part — so we made it the safe part. We import your Jobber clients and pre-schedule your first 30 days within 48 hours. And if MowGo doesn't make you more organized in 30 days, we refund you. Jobber doesn't offer that.",
     "jobber_pricing_explained": "Jobber pricing, explained",
     "see_the_full_comparison": "See the full comparison",
-    "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included."
+    "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.",
+    "run_your_next_5_clients_free": "Run your next 5 clients free."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Real cost analysis",
@@ -581,7 +582,7 @@
     "scheduling_routes_and_invoicing_for_oklahoma_lawn_care_crews_rain_delay_": "Scheduling, routes, and invoicing for Oklahoma lawn care crews. Rain delay that actually understands OK weather. Free for 5 clients — no credit card.",
     "rain_delay_on_free_tier_no_credit_card_required": "Rain delay on free tier. No credit card required.",
     "built_for_oklahoma_crews": "Built for Oklahoma crews,",
-    "other_apps_were_built_in_silicon_valley_for_20_person_operations_mowgo_w": "Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,100+ landscaping businesses across Oklahoma.",
+    "other_apps_were_built_in_silicon_valley_for_20_person_operations_mowgo_w": "Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,140+ landscaping businesses across Oklahoma.",
     "things_our_competitors_won_t_tell_you": "Things our competitors won't tell you",
     "how_mowgo_solo_stacks_up": "How MowGo Solo stacks up",
     "same_features_fraction_of_the_price": "Same features, fraction of the price.",
@@ -613,7 +614,7 @@
     "not_office_managers": "not office managers",
     "landscaping_businesses_in_ok": "Landscaping businesses in OK",
     "and_growing_6_5_yearly": "and growing 6.5% yearly",
-    "solo_is_39_flat_crew_is_79_flat_premium_is_199_flat": "— Solo is $39 flat, Crew is $79 flat, Premium is $199 flat",
+    "solo_is_39_flat_crew_is_79_flat_premium_is_199_flat": "Solo is $39 flat. Crew is $79 flat. Premium is $199 flat.",
     "competitors_with_free_rain_delay": "Competitors with free rain delay",
     "we_re_the_only_one": "— we're the only one",
     "of_your_revenue": "of your revenue",
@@ -634,7 +635,7 @@
     "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.",
     "rain_on_tuesday_eight_clients_to_rebook": "Rain on Tuesday. Eight clients to rebook.",
     "one_tap_fixes_it": "One tap fixes it.",
-    "when_oklahoma_rain_hits_mowgo_moves_your_whole_schedule_forward_and_text": "When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place. Free for 5 clients. No credit card.",
+    "when_oklahoma_rain_hits_mowgo_moves_your_whole_schedule_forward_and_text": "When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place.",
     "monthly": "Monthly",
     "annual": "Annual",
     "2_months_free": "2 months free",
@@ -643,7 +644,23 @@
     "one_payment_covers_the_whole_season_no_card_hits_in_winter": "One payment covers the whole season. No card hits in winter.",
     "save_savings": "Save ${{savings}}",
     "30_day_rain_proof_guarantee_refund_if_you_re_not_more_organized": "30-day Rain-Proof Guarantee — refund if you're not more organized.",
-    "annual_unused_months_refunded": "Annual? Unused months refunded."
+    "annual_unused_months_refunded": "Annual? Unused months refunded.",
+    "route_optimization": "Route Optimization",
+    "no_per_user_fees": "No Per-User Fees",
+    "solo_costs_less_than_one_missed_job": "Solo costs less than one missed job.",
+    "operators_on_mowgo": "Operators on MowGo",
+    "is_it_really_free": "Is it really free?",
+    "what_happens_if_i_want_to_switch_from_jobber_or_lawnpro": "What happens if I want to switch from Jobber or LawnPro?",
+    "does_it_work_without_cell_service": "Does it work without cell service?",
+    "what_s_the_catch": "What's the catch?",
+    "jobber_connect_is_139_mo_99_mo_billed_annually_plus_29_mo_per_additional": "Jobber Connect is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.",
+    "smarter_daily_routes_across_okc_tulsa_edmond_and_beyond_less_time_on_i_3": "Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.",
+    "jobber_charges_29_mo_per_extra_crew_member_mowgo_charges_once_your_whole": "Jobber charges $29/mo per extra crew member. MowGo charges once — your whole crew is included.",
+    "questions_answered_straight": "Questions, answered straight",
+    "free_for_your_first_5_clients_forever_no_credit_card_rain_delay_scheduli": "Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.",
+    "on_solo_and_up_we_import_your_clients_and_pre_schedule_your_first_30_day": "On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.",
+    "yes_offline_mode_keeps_working_in_rural_oklahoma_and_syncs_when_you_are_": "Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.",
+    "no_catch_cancel_anytime_if_solo_does_not_make_you_more_organized_in_30_d": "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -1010,7 +1027,8 @@
     "see_the_comparison": "See the Comparison",
     "mo": "/mo",
     "cheaper_isn_t_cheaper_if_the_features_don_t_work": "\"Cheaper\" isn't cheaper if the features don't work.",
-    "mowgo_was_born_because_i_got_tired_of_losing_client_data_in_other_apps_e": "\"MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving.\""
+    "mowgo_was_born_because_i_got_tired_of_losing_client_data_in_other_apps_e": "\"MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving.\"",
+    "you_trusted_lawnpro_with_your_business_if_reports_from_former_lawnpro_us": "You trusted LawnPro with your business. If reports from former LawnPro users about lost data, broken sync, or surprise price hikes sound familiar, keep reading. MowGo was built for operators who are tired of that."
   },
   "today": {
     "crew_assignments_are_temporarily_unavailable": "Crew assignments are temporarily unavailable.",

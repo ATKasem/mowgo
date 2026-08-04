@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle, ChevronDown } from 'lucide-react';
+import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, DollarSign, Shield, AlertCircle, ChevronDown } from 'lucide-react';
 import Logo from '../components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
@@ -8,14 +8,14 @@ import { supabase } from '../lib/supabase';
 
 const features = [
   { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Planning', desc: 'Route optimization is coming soon — smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500', soon: true },
+  { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500', soon: true },
   { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice sends automatically. Client pays via Stripe link. Track paid vs unpaid at a glance.', color: 'from-amber-500 to-orange-500' },
 ];
 
 const differentiators = [
   { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural Oklahoma? MowGo keeps working without internet and syncs when you are back in range.' },
-  { icon: Moon, title: 'Dark Mode Built In', desc: 'Early Oklahoma mornings are hard enough. Dark mode at 6am keeps the screen easy on your eyes.' },
+  { icon: DollarSign, title: 'No Per-User Fees', desc: 'Jobber charges $29/mo per extra crew member. MowGo charges once — your whole crew is included.' },
   { icon: Shield, title: 'Built in OKC, Not Silicon Valley', desc: 'We are not a VC-funded startup in California guessing what Oklahoma crews need. We talk to local operators every week.' },
   { icon: Users, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
 ];
@@ -58,8 +58,19 @@ const plans = [
 
 const stats = [
   { value: '1,140+', label: 'Landscaping businesses in OK', suffix: 'and growing 6.5% yearly' },
-  { value: '0', label: 'per-user fees on any plan', suffix: '— Solo is $39 flat, Crew is $79 flat, Premium is $199 flat' },
-  { value: '<1%', label: 'of your revenue', suffix: '— Solo plan costs less than one missed job' },
+  { value: '0', label: 'per-user fees on any plan', suffix: 'Solo is $39 flat. Crew is $79 flat. Premium is $199 flat.' },
+  { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job.' },
+];
+
+// TODO: collect real operator quotes (ask at the 10th invoice / first rain-delay save).
+// Section stays hidden until testimonials exist — never fabricate proof.
+const testimonials = [];
+
+const faqs = [
+  { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
+  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.' },
+  { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
+  { q: "What's the catch?", a: "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full." },
 ];
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -163,7 +174,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place. Free for 5 clients. No credit card.")}
+              {tr("When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -200,7 +211,7 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Built for Oklahoma crews,")} <span className="text-brand">{tr("not office managers")}</span></h2>
-          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,100+ landscaping businesses across Oklahoma.")}</p>
+          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,140+ landscaping businesses across Oklahoma.")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color, soon }, i) => (
@@ -288,7 +299,7 @@ export default function Landing() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("Jobber Connect is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro is currently broken — no active mobile app or web dashboard.")}</p>
+            <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("Jobber Connect is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.")}</p>
           </div>
         </FadeIn>
       </section>
@@ -308,13 +319,33 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Testimonials (hidden until real quotes exist) */}
+      {testimonials.length > 0 && (
+        <section className="max-w-4xl mx-auto px-4 pb-24">
+          <FadeIn>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-14 tracking-tight">{tr("Operators on MowGo")}</h2>
+          </FadeIn>
+          <div className="grid md:grid-cols-3 gap-5">
+            {testimonials.map((t, i) => (
+              <FadeIn key={i} delay={i * 100}>
+                <div className="card p-6 h-full flex flex-col">
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1 leading-relaxed">"{tr(t.quote)}"</p>
+                  <p className="mt-4 text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr(t.name)}</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">{tr(t.role)}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Pricing */}
       <section id="pricing" className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-4">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Know what you pay every month")}</h2>
             <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Pay only when your client list grows. Cancel anytime.")}</p>
-            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$300/month' })}</p>
+            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,140+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$200+/month' })}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
           <div className="flex justify-center mb-6">
@@ -415,6 +446,26 @@ export default function Landing() {
           <FadeIn delay={400}>
             <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.")}</p>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="max-w-2xl mx-auto px-4 py-20">
+        <FadeIn>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-12 tracking-tight">{tr("Questions, answered straight")}</h2>
+        </FadeIn>
+        <div className="space-y-4">
+          {faqs.map((f, i) => (
+            <FadeIn key={f.q} delay={i * 75}>
+              <details className="group card p-5">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer text-[var(--color-text-primary)] dark:text-white font-semibold min-h-[44px] list-none [&::-webkit-details-marker]:hidden">
+                  {tr(f.q)}
+                  <ChevronDown className="w-4 h-4 text-[var(--color-text-muted)] shrink-0 transition-transform duration-200 group-open:rotate-180" />
+                </summary>
+                <p className="mt-3 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed">{tr(f.a)}</p>
+              </details>
+            </FadeIn>
+          ))}
         </div>
       </section>
 

@@ -88,7 +88,7 @@ export default function SwitchingFromLawnPro() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              {tr("You trusted LawnPro with your business. If reports from former LawnPro users about lost data, broken sync, or surprise price hikes sound familiar, you're not alone. MowGo was built for operators who are tired of that.")}
+              {tr("You trusted LawnPro with your business. If reports from former LawnPro users about lost data, broken sync, or surprise price hikes sound familiar, keep reading. MowGo was built for operators who are tired of that.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
