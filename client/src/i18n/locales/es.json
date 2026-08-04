@@ -1303,6 +1303,71 @@
     "that_difference_can_save_a_whole_day_of_revenue": "Esa diferencia puede ahorrar un día entero de ingresos.",
     "probase_costs_0_but_it_has_no_rain_delay_no_offline_mode_and_no_accounti": "ProBase cuesta $0. Pero no tiene retraso por lluvia, ni modo fuera de línea ni sincronización de contabilidad. Cuando llega una tormenta a las 6 a.m., MowGo mueve toda tu ruta con un solo toque."
   },
+  "routeAudit": {
+    "landingCta": "Prueba la auditoría de rutas gratis",
+    "eyebrow": "Auditoría de rutas personalizada y gratis",
+    "headline": "Auditoría de rutas gratis: descubre las horas — y el dinero — que pierdes cada semana por una mala programación",
+    "subheadline": "Ingresa tus datos. Te mostraremos cuánto vale una ruta optimizada para TU negocio de jardinería. Sin registro ni spam: solo los cálculos.",
+    "bullets": {
+      "hours": "Descubre las horas semanales estimadas que pierdes regresando sobre tu ruta",
+      "revenue": "Descubre los ingresos que dejas sobre la mesa cada temporada",
+      "fixes": "3 mejoras rápidas que puedes aplicar esta semana"
+    },
+    "form": {
+      "title": "Haz tu auditoría gratis",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "zip": "Código postal",
+      "zipPlaceholder": "73102",
+      "lawns": "Céspedes por semana",
+      "crew": "Tamaño de la cuadrilla",
+      "select": "Selecciona una opción",
+      "submit": "Haz mi auditoría gratis →",
+      "submitting": "Preparando tu auditoría...",
+      "scarcity": "Damos de alta a 50 nuevas cuadrillas este mes — los cupos se están llenando."
+    },
+    "options": {
+      "under10": "Menos de 10",
+      "10to25": "10–25",
+      "25to50": "25–50",
+      "50plus": "50+",
+      "solo": "Solo yo",
+      "2to3": "2–3",
+      "4plus": "4+"
+    },
+    "validation": {
+      "name": "Ingresa tu nombre.",
+      "email": "Ingresa un correo electrónico válido.",
+      "zip": "Ingresa un código postal válido de 5 dígitos.",
+      "lawns": "Selecciona cuántos céspedes atiendes por semana.",
+      "crew": "Selecciona el tamaño de tu cuadrilla."
+    },
+    "errors": {
+      "rateLimit": "Demasiadas solicitudes. Inténtalo de nuevo más tarde.",
+      "submit": "No pudimos preparar tu auditoría. Inténtalo de nuevo."
+    },
+    "report": {
+      "title": "Tu auditoría de rutas",
+      "delivery": "Tu auditoría está en camino a {{email}} — revisa tu bandeja de entrada en unos 2 minutos.",
+      "hours": "horas/semana",
+      "monthly": "impacto mensual",
+      "annual": "impacto anual",
+      "estimate": "Estimación basada en promedios de la industria.",
+      "mathTitle": "Estos son los cálculos",
+      "formula": "Céspedes semanales × 0.75 horas = horas semanales perdidas. Horas semanales × 4.33 semanas × $45/hora = impacto mensual en ingresos. Impacto mensual × 12 × factor estacional de 0.6 = impacto anual (temporada de césped ≈ 7 meses)."
+    },
+    "branches": {
+      "small": "Quizás todavía no necesites automatización — esto es lo que ofrecemos cuando crezcas.",
+      "pricing": "Ver precios",
+      "large": "MowGo está diseñado para operadores independientes y equipos pequeños — consulta estas herramientas para operaciones más grandes.",
+      "compare": "Compara tus opciones",
+      "crew": "Con cuatro o más personas, el plan Crew ofrece asignación de trabajos y seguimiento del progreso de tu equipo.",
+      "crewCta": "Explorar el plan Crew",
+      "qualifiedCta": "Reserva tu llamada de configuración gratis"
+    }
+  },
   "portalReturn": {
     "app_not_installed": "¿App no instalada?"
   }

@@ -173,6 +173,7 @@ export default function Landing() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("View Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
+              <Link to="/route-audit" className="group inline-flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-gray-300 font-semibold text-sm underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors">{t('routeAudit.landingCta')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
             </div>
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Rain delay on free tier. No credit card required.")}</p>
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Cancel anytime. 30-day money-back guarantee. No contracts.")}</p>

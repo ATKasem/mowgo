@@ -1206,6 +1206,71 @@
     "start_free": "Start free",
     "see_all_comparisons": "See all comparisons"
   },
+  "routeAudit": {
+    "landingCta": "Try the free route audit",
+    "eyebrow": "Free personalized route audit",
+    "headline": "Free Route Audit: see the hours — and dollars — you're losing to bad scheduling every week",
+    "subheadline": "Enter your numbers. We'll show you what an optimized route is worth to YOUR lawn business. No signup, no spam — just the math.",
+    "bullets": {
+      "hours": "See your estimated weekly hours wasted on backtracking",
+      "revenue": "See the revenue left on the table each season",
+      "fixes": "3 quick fixes you can apply this week"
+    },
+    "form": {
+      "title": "Run your free audit",
+      "name": "First name",
+      "namePlaceholder": "Your first name",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "zip": "ZIP code",
+      "zipPlaceholder": "73102",
+      "lawns": "Lawns per week",
+      "crew": "Crew size",
+      "select": "Select one",
+      "submit": "Run my free audit →",
+      "submitting": "Running your audit...",
+      "scarcity": "We onboard 50 new crews this month — spots are filling."
+    },
+    "options": {
+      "under10": "Under 10",
+      "10to25": "10–25",
+      "25to50": "25–50",
+      "50plus": "50+",
+      "solo": "Just me (solo)",
+      "2to3": "2–3",
+      "4plus": "4+"
+    },
+    "validation": {
+      "name": "Enter your first name.",
+      "email": "Enter a valid email address.",
+      "zip": "Enter a valid 5-digit ZIP code.",
+      "lawns": "Select your lawns per week.",
+      "crew": "Select your crew size."
+    },
+    "errors": {
+      "rateLimit": "Too many requests. Please try again later.",
+      "submit": "Could not run your audit. Please try again."
+    },
+    "report": {
+      "title": "Your route audit",
+      "delivery": "Your audit is on its way to {{email}} — check your inbox in ~2 minutes.",
+      "hours": "hours/week",
+      "monthly": "monthly impact",
+      "annual": "annual impact",
+      "estimate": "Estimate based on industry averages.",
+      "mathTitle": "Here's the math",
+      "formula": "Weekly lawns × 0.75 hours = weekly hours wasted. Weekly hours × 4.33 weeks × $45/hour = monthly revenue impact. Monthly impact × 12 × 0.6 seasonal factor = annual impact (lawn season ≈ 7 months)."
+    },
+    "branches": {
+      "small": "You might not need automation yet — here's what we offer when you grow.",
+      "pricing": "See pricing",
+      "large": "MowGo is built for solo crews and small teams — check out these tools for larger operations.",
+      "compare": "Compare your options",
+      "crew": "With four or more people, the Crew tier gives your team job assignment and progress tracking.",
+      "crewCta": "Explore the Crew tier",
+      "qualifiedCta": "Book your free setup call"
+    }
+  },
   "portalReturn": {
     "app_not_installed": "App not installed?"
   }

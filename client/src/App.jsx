@@ -24,6 +24,7 @@ import ProBaseComparison from './pages/ProBaseComparison';
 import Booking from './pages/Booking';
 import PortalReturn from './pages/PortalReturn';
 import AdminConcierge from './pages/AdminConcierge';
+import RouteAudit from './pages/RouteAudit';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
 
@@ -185,6 +186,7 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />
+          <Route path="/route-audit" element={<RouteAudit />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/blog/jobber-price-increase-2026" element={<JobberPriceIncrease />} />
           <Route path="/privacy" element={<Privacy />} />
