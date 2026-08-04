@@ -53,7 +53,7 @@ export async function onRequestPost(context) {
       return json({ error: 'Price ID not configured' }, 500, origin);
     }
 
-    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || env.VITE_STRIPE_TRIAL_DAYS || '14', 10) || 14;
+    const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || '14', 10) || 14;
     const appUrl = env.APP_URL || origin || 'https://mowgo.pages.dev';
 
     const profileResponse = await fetch(
@@ -132,7 +132,7 @@ export async function onRequestPost(context) {
         'subscription_data[metadata][tier]': plan,
         'subscription_data[metadata][interval]': interval,
         success_url: `${appUrl}/#/subscribe?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/#/pricing`,
+        cancel_url: `${appUrl}/#/`,
         allow_promotion_codes: 'true',
         'payment_method_types[0]': 'card',
       }).toString(),

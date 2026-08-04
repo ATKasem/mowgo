@@ -198,7 +198,7 @@ serve(async (req) => {
           "line_items[0][price]": priceId,
           "line_items[0][quantity]": "1",
           success_url: "mowgo://settings?upgraded=true",
-          cancel_url: "https://mowgo.app/settings",
+          cancel_url: "mowgo://settings",
           "metadata[user_id]": user.id,
           "metadata[tier]": tier,
           "metadata[interval]": interval,
