@@ -37,6 +37,8 @@ export default function RouteAudit() {
 
     setSubmitting(true);
     setServerError('');
+    const lawnsBucket = form.lawns_bucket;
+    const crewBucket = form.crew_bucket;
     try {
       const response = await fetch('/api/route-audit', {
         method: 'POST',
@@ -47,7 +49,7 @@ export default function RouteAudit() {
         await response.json().catch(() => ({}));
         throw new Error(response.status === 429 ? t('routeAudit.errors.rateLimit') : t('routeAudit.errors.submit'));
       }
-      setResult(reportFor(form.lawns_bucket));
+      setResult(reportFor(lawnsBucket));
     } catch (error) {
       setServerError(error.message || t('routeAudit.errors.submit'));
     } finally {
@@ -83,9 +85,9 @@ export default function RouteAudit() {
               <div className="mt-6 space-y-5">
                 {[
                   ['name', 'text', 'name'], ['email', 'email', 'email'], ['zip', 'text', 'zip'],
-                ].map(([name, type, translation]) => <label key={name} className="block text-sm font-semibold">{t(`routeAudit.form.${translation}`)}<input className={fieldClass} name={name} type={type} value={form[name]} onChange={update} placeholder={t(`routeAudit.form.${translation}Placeholder`)} maxLength={name === 'email' ? 254 : name === 'zip' ? 5 : 100} inputMode={name === 'zip' ? 'numeric' : undefined} aria-invalid={Boolean(errors[name])} />{errors[name] && <span className="mt-1 block text-sm font-normal text-red-600">{errors[name]}</span>}</label>)}
-                <label className="block text-sm font-semibold">{t('routeAudit.form.lawns')}<select className={fieldClass} name="lawns_bucket" value={form.lawns_bucket} onChange={update}><option value="">{t('routeAudit.form.select')}</option><option value="under_10">{t('routeAudit.options.under10')}</option><option value="10_25">{t('routeAudit.options.10to25')}</option><option value="25_50">{t('routeAudit.options.25to50')}</option><option value="50_plus">{t('routeAudit.options.50plus')}</option></select>{errors.lawns_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.lawns_bucket}</span>}</label>
-                <label className="block text-sm font-semibold">{t('routeAudit.form.crew')}<select className={fieldClass} name="crew_bucket" value={form.crew_bucket} onChange={update}><option value="">{t('routeAudit.form.select')}</option><option value="solo">{t('routeAudit.options.solo')}</option><option value="2_3">{t('routeAudit.options.2to3')}</option><option value="4_plus">{t('routeAudit.options.4plus')}</option></select>{errors.crew_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.crew_bucket}</span>}</label>
+                ].map(([name, type, translation]) => <label key={name} className="block text-sm font-semibold">{t(`routeAudit.form.${translation}`)}<input className={fieldClass} name={name} type={type} value={form[name]} onChange={update} placeholder={t(`routeAudit.form.${translation}Placeholder`)} maxLength={name === 'email' ? 254 : name === 'zip' ? 5 : 100} inputMode={name === 'zip' ? 'numeric' : undefined} disabled={submitting} aria-invalid={Boolean(errors[name])} />{errors[name] && <span className="mt-1 block text-sm font-normal text-red-600">{errors[name]}</span>}</label>)}
+                <label className="block text-sm font-semibold">{t('routeAudit.form.lawns')}<select className={fieldClass} name="lawns_bucket" value={form.lawns_bucket} onChange={update} disabled={submitting}><option value="">{t('routeAudit.form.select')}</option><option value="under_10">{t('routeAudit.options.under10')}</option><option value="10_25">{t('routeAudit.options.10to25')}</option><option value="25_50">{t('routeAudit.options.25to50')}</option><option value="50_plus">{t('routeAudit.options.50plus')}</option></select>{errors.lawns_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.lawns_bucket}</span>}</label>
+                <label className="block text-sm font-semibold">{t('routeAudit.form.crew')}<select className={fieldClass} name="crew_bucket" value={form.crew_bucket} onChange={update} disabled={submitting}><option value="">{t('routeAudit.form.select')}</option><option value="solo">{t('routeAudit.options.solo')}</option><option value="2_3">{t('routeAudit.options.2to3')}</option><option value="4_plus">{t('routeAudit.options.4plus')}</option></select>{errors.crew_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.crew_bucket}</span>}</label>
               </div>
               {serverError && <p className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{serverError}</p>}
               <button disabled={submitting} className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 font-bold text-white transition hover:bg-emerald-700 disabled:opacity-60">{submitting ? t('routeAudit.form.submitting') : t('routeAudit.form.submit')}</button>
@@ -103,7 +105,7 @@ export default function RouteAudit() {
               </div>
               <p className="mt-4 text-xs font-medium text-gray-500">{t('routeAudit.report.estimate')}</p>
               <div className="mt-6 rounded-xl border border-gray-200 p-4"><h3 className="font-bold">{t('routeAudit.report.mathTitle')}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600">{t('routeAudit.report.formula')}</p></div>
-              {form.lawns_bucket === 'under_10' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p><Link to="/?section=pricing" onClick={() => setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0)} className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.pricing')} →</Link></> : form.lawns_bucket === '50_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p><Link to="/compare" className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.compare')} →</Link></> : form.crew_bucket === '4_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p><Link to="/login?mode=signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.crewCta')}<ArrowRight className="h-4 w-4" /></Link></> : <Link to="/login?mode=signup" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.qualifiedCta')}<ArrowRight className="h-4 w-4" /></Link>}
+              {lawnsBucket === 'under_10' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p><Link to="/?section=pricing" onClick={() => setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0)} className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.pricing')} →</Link></> : lawnsBucket === '50_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p><Link to="/compare" className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.compare')} →</Link></> : crewBucket === '4_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p><Link to="/login?mode=signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.crewCta')}<ArrowRight className="h-4 w-4" /></Link></> : <Link to="/login?mode=signup" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.qualifiedCta')}<ArrowRight className="h-4 w-4" /></Link>}
             </div>
           )}
         </section>

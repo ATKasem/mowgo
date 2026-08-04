@@ -41,6 +41,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'Route audits are not configured.' }, 503);
   try {
     const body = await request.json();
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Invalid request.' }, 400);
     const name = typeof body.name === 'string' ? body.name.trim() : '';
     const email = typeof body.email === 'string' ? body.email.trim() : '';
     const zip = typeof body.zip === 'string' ? body.zip.trim() : '';
