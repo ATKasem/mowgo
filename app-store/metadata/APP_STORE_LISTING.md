@@ -47,14 +47,14 @@ Place screenshots in `screenshots/` folder. Required: 6-8 screenshots.
 
 | # | Screen | Mode |
 |---|--------|------|
-| 1 | Home dashboard — greeting, stats, quick actions | Light |
+| 1 | Home dashboard — greeting, stats, quick actions | Dark |
 | 2 | Today schedule — job cards with rain delay button | Dark |
 | 3 | Client detail — notes, gate codes, nav buttons | Light |
-| 4 | Invoices — paid/unpaid with mark-as-paid | Light |
-| 5 | Booking link — share your public booking page | Light |
+| 4 | Invoices — paid/unpaid with mark-as-paid | Dark |
+| 5 | Jobs — date-grouped job list with filters | Dark |
 | 6 | Dark mode showcase — Today tab | Dark |
-| 7 | Landing page — pricing cards | Light |
-| 8 | Comparison page — MowGo vs competitors | Light |
+| 7 | Landing page — pricing cards | Dark |
+| 8 | Comparison page — MowGo vs competitors | Dark |
 
 **How to take screenshots:**
 1. Open Safari on iPhone → mowgo.pages.dev
