@@ -268,7 +268,20 @@
     "for_less": "por menos",
     "compare_price_and_field_tools_side_by_side_no_fluff_no_hidden_catches": "Compara el precio y las herramientas de campo lado a lado. Sin rodeos. Sin costos ocultos.",
     "tap_once_to_move_every_rain_day_job_pay_nothing_for_your_first_5_clients": "Toca una vez para mover todos los trabajos de un día de lluvia. No pagas nada por tus primeros 5 clientes.",
-    "see_what_your_crew_gets": "Mira lo que obtiene tu equipo"
+    "see_what_your_crew_gets": "Mira lo que obtiene tu equipo",
+    "jobber_looks_cheaper_look_closer": "Jobber parece más barato. Mire más de cerca.",
+    "straight_talk_if_you_only_need_a_calendar_for_your_jobs_jobber_core_at_2": "Hablemos claro: si solo necesita un calendario para sus trabajos, Jobber Core a $29/mes (facturación anual) es un buen trato. Esta página no está aquí para convencerlo de lo contrario.",
+    "payments_automation_isn_t_in_that_plan": "La automatización de pagos no viene en ese plan.",
+    "jobber_s_own_pricing_page_automated_reminders_and_collect_payments_autom": "La propia página de precios de Jobber: los recordatorios automáticos y el cobro automático empiezan en Connect — $99/mes con facturación anual ($1,188/año). MowGo Solo: $390/año, ambos incluidos.",
+    "every_extra_crew_member_costs_29_mo_more": "Cada miembro adicional del equipo cuesta $29/mes más.",
+    "a_2_person_crew_on_jobber_core_runs_696_yr_before_you_add_a_single_thing": "Un equipo de 2 personas en Jobber Core llega a $696/año antes de agregar nada. MowGo: $390/año, precio fijo, equipo incluido.",
+    "rain_delay_that_moves_your_whole_day_in_one_tap_mowgo_only": "Retraso por lluvia que mueve todo su día con un toque — solo en MowGo.",
+    "one_tap_moves_every_job_clients_get_notified_automatically_included_even": "Un toque mueve todos los trabajos. Los clientes reciben aviso automáticamente. Incluido incluso en MowGo Free.",
+    "jobber_core_348_yr_calendar_only_jobber_connect_1_188_yr_what_mowgo_does": "Jobber Core $348/año (solo calendario) · Jobber Connect $1,188/año (lo que hace MowGo) · MowGo Solo $390/año (todo, precio fijo)",
+    "the_gap_between_mowgo_and_jobber_s_cheapest_is_42_a_year_about_3_50_a_mo": "La diferencia entre MowGo y el plan más barato de Jobber es $42 al año — unos $3.50 al mes. La diferencia en lo que recibe es el resto.",
+    "switching_is_the_risky_part_so_we_made_it_the_safe_part_we_import_your_j": "Cambiar es la parte riesgosa — por eso la hicimos segura. Importamos sus clientes de Jobber y pre-programamos sus primeros 30 días en 48 horas. Y si MowGo no lo hace más organizado en 30 días, le reembolsamos. Jobber no ofrece eso.",
+    "jobber_pricing_explained": "Precios de Jobber, explicados",
+    "see_the_full_comparison": "Ver la comparación completa"
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",

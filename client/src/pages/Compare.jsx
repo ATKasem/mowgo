@@ -181,6 +181,48 @@ export default function Compare() {
         </div>
       </section>
 
+      {/* Jobber unselle — honest annual-price block */}
+      <section className="max-w-4xl mx-auto px-4 pb-16">
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl p-6 md:p-10">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-3">{tr("Jobber looks cheaper. Look closer.")}</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("Straight talk: if you only need a calendar for your jobs, Jobber Core at $29/mo (annual billing) is a fair deal. This page isn't here to convince you otherwise.")}</p>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
+                <X className="w-4 h-4 text-red-500 shrink-0" /> {tr("Payments automation isn't in that plan.")}
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's own pricing page: automated reminders and collect payments automatically start at Connect — $99/mo billed annually ($1,188/yr). MowGo Solo: $390/yr, both included.")}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
+                <X className="w-4 h-4 text-red-500 shrink-0" /> {tr("Every extra crew member costs $29/mo more.")}
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("A 2-person crew on Jobber Core runs $696/yr before you add a single thing. MowGo: $390/yr, flat, crew included.")}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
+                <Check className="w-4 h-4 text-emerald-500 shrink-0" /> {tr("Rain delay that moves your whole day in one tap — MowGo only.")}
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("One tap moves every job. Clients get notified automatically. Included even on MowGo Free.")}</p>
+            </div>
+          </div>
+          <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4 mb-6 text-sm text-center font-medium text-gray-700 dark:text-gray-300">
+            {tr("Jobber Core $348/yr (calendar only) · Jobber Connect $1,188/yr (what MowGo does) · MowGo Solo $390/yr (everything, flat)")}
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{tr("The gap between MowGo and Jobber's cheapest is $42 a year — about $3.50 a month. The gap in what you get is the whole difference.")}</p>
+          <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/40 p-5 mb-8">
+            <div className="flex items-start gap-2.5">
+              <Shield className="w-5 h-5 text-brand shrink-0 mt-0.5" />
+              <p className="text-sm text-gray-700 dark:text-gray-300">{tr("Switching is the risky part — so we made it the safe part. We import your Jobber clients and pre-schedule your first 30 days within 48 hours. And if MowGo doesn't make you more organized in 30 days, we refund you. Jobber doesn't offer that.")}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/blog/jobber-price-increase-2026" className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 text-white font-semibold px-6 py-3 hover:bg-emerald-700 min-h-[44px] transition-colors">{tr("Jobber pricing, explained")} <ArrowRight className="w-4 h-4" /></Link>
+            <a href="#comparison" className="inline-flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold px-6 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 min-h-[44px] transition-colors">{tr("See the full comparison")}</a>
+          </div>
+        </div>
+      </section>
+
       {/* Comparison table */}
       <section id="comparison" className="max-w-4xl mx-auto px-4 pb-24">
         <h2 className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3">{tr("Feature comparison")}</h2>
