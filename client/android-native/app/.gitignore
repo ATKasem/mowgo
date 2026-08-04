@@ -1,0 +1,3 @@
+
+# Release signing (never commit)
+/keystore.properties

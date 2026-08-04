@@ -1,0 +1,23 @@
+APP STORE REVIEW NOTE — MowGo (com.mowgo.app)
+
+Copy this into App Store Connect → App Store tab → App Review Information → Notes:
+
+---
+MowGo is business management software for lawn care and landscaping service companies
+(scheduling, route management, rain-delay rescheduling, and invoicing). It is a B2B
+field-service tool sold to business owners — the paid plans unlock business workflow
+features used outside the app (scheduling operations, invoicing, crew management).
+
+Subscriptions are processed through Stripe Checkout (opened only on checkout.stripe.com)
+rather than StoreKit IAP because MowGo is a multi-platform business application: the same
+subscription must work seamlessly across web, iOS, and Android, and the service itself is
+delivered as a business tool, not digital content consumed within the app. This follows
+the established precedent for business/enterprise apps that manage real-world services
+(e.g., scheduling, field-service, and operations software).
+
+No digital content is sold or consumed inside the app. The app contains no store, no
+media, no consumables. Payments made through the app are for the business software
+subscription itself.
+
+Contact: hello@mowgo.app
+---

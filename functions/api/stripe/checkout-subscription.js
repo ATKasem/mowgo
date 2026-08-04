@@ -22,7 +22,7 @@ export async function onRequestPost(context) {
   // Guard: Stripe secret key must be configured before making API calls
   const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
   const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
-  const supabaseServiceKey = env.SUPABASE_SERVICE_KEY;
+  const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
   if (!env.STRIPE_SECRET_KEY || !supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
     console.error('Stripe or Supabase server configuration is incomplete');
     return json({ error: 'Payment system not configured' }, 500, origin);

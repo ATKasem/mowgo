@@ -57,7 +57,7 @@ export async function onRequestPost({ request, env }) {
 
     // Get owner's profile to verify they're an owner
     const ownerProfileRes = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,businessName`,
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,business_name`,
       { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
     );
     const ownerProfiles = await ownerProfileRes.json();
@@ -81,7 +81,7 @@ export async function onRequestPost({ request, env }) {
 
       // Check if they already have a profile
       const existingProfileRes = await fetch(
-        `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}&select=id,businessId`,
+        `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}&select=id,business_id`,
         { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
       );
       const existingProfiles = await existingProfileRes.json();
@@ -99,7 +99,7 @@ export async function onRequestPost({ request, env }) {
               'Prefer': 'return=representation'
             },
             body: JSON.stringify({
-              businessId: ownerId,
+              business_id: ownerId,
               role: 'crew',
               tier: 'crew'
             })
@@ -129,10 +129,10 @@ export async function onRequestPost({ request, env }) {
             },
             body: JSON.stringify({
               id: invitedUserId,
-              businessName: email.split('@')[0],
+              business_name: email.split('@')[0],
               tier: 'crew',
               role: 'crew',
-              businessId: ownerId
+              business_id: ownerId
             })
           }
         );
@@ -163,7 +163,7 @@ export async function onRequestPost({ request, env }) {
             email_confirm: true,
             user_metadata: {
               business_name: email.split('@')[0],
-              invited_by: ownerProfile.businessName || ownerId
+              invited_by: ownerProfile.business_name || ownerId
             }
           })
         }
@@ -190,10 +190,10 @@ export async function onRequestPost({ request, env }) {
           },
           body: JSON.stringify({
             id: invitedUserId,
-            businessName: email.split('@')[0],
+            business_name: email.split('@')[0],
             tier: 'crew',
             role: 'crew',
-            businessId: ownerId
+            business_id: ownerId
           })
         }
       );
@@ -204,6 +204,42 @@ export async function onRequestPost({ request, env }) {
       }
 
       const [profile] = await insertRes.json();
+
+      // New users can't log in without a password — send a set-password link.
+      // If the email fails, the invite still succeeds (they can use forgot-password).
+      try {
+        const linkRes = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
+          method: 'POST',
+          headers: {
+            'apikey': serviceKey,
+            'Authorization': `Bearer ${serviceKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ type: 'recovery', email })
+        });
+        if (linkRes.ok && env.RESEND_API_KEY) {
+          const { properties } = await linkRes.json();
+          const resetUrl = properties?.action_link || '';
+          if (resetUrl) {
+            await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: 'MowGo <invoices@mowgo.app>',
+                to: [email],
+                subject: "You've been added to a MowGo crew — set your password",
+                html: `<p>${ownerProfile.business_name || 'Your crew lead'} added you to their MowGo crew.</p><p><a href="${resetUrl}">Set your password here</a> — it takes 30 seconds.</p><p>Once set, log in at <a href="https://mowgo.pages.dev">mowgo.pages.dev</a>.</p>`
+              })
+            });
+          }
+        }
+      } catch (e) {
+        // invite still succeeds; user can use forgot-password
+      }
+
       return Response.json({
         invited: email,
         flow: 'new_user',

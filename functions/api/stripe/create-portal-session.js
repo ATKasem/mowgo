@@ -14,7 +14,7 @@ export async function onRequestPost({ request, env }) {
 
   const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
   const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
-  const supabaseServiceKey = env.SUPABASE_SERVICE_KEY;
+  const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
   if (!env.STRIPE_SECRET_KEY || !supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
     return json({ error: 'Billing portal not configured' }, 500, origin);
   }

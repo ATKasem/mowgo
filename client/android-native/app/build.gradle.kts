@@ -14,19 +14,39 @@ android {
         applicationId = "com.mowgo.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = 10
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Supabase config — injected at build time
-        buildConfigField("String", "SUPABASE_URL", "\"https://vqgiynfrpsqddjrayczc.supabase.co\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz\"")
-        buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj\"")
+        // Supabase/Stripe config — overridable via local.properties (gitignored).
+        // Defaults fall back to the committed values so CI builds still work.
+        val props = java.util.Properties().apply {
+            val f = rootProject.file("local.properties")
+            if (f.exists()) f.inputStream().use { load(it) }
+        }
+        buildConfigField("String", "SUPABASE_URL", "\"${props.getProperty("SUPABASE_URL", "https://vqgiynfrpsqddjrayczc.supabase.co")}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${props.getProperty("SUPABASE_ANON_KEY", "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz")}\"")
+        buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"${props.getProperty("STRIPE_PUBLISHABLE_KEY", "pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj")}\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            // Populated from keystore.properties (gitignored) — see app/keystore.properties.example
+            val ks = java.util.Properties().apply {
+                val f = rootProject.file("keystore.properties")
+                if (f.exists()) f.inputStream().use { load(it) }
+            }
+            storeFile = ks.getProperty("storeFile")?.let { rootProject.file(it) }
+            storePassword = ks.getProperty("storePassword")
+            keyAlias = ks.getProperty("keyAlias")
+            keyPassword = ks.getProperty("keyPassword")
+        }
     }
 
     buildTypes {
         release {
+            signingConfig = if (signingConfigs.getByName("release").storeFile != null) signingConfigs.getByName("release") else null
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

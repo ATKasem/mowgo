@@ -19,6 +19,16 @@ const theme = localStorage.getItem('mowgo-theme') || 'system';
 const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 document.documentElement.classList.toggle('dark', isDark);
 
+// Register the service worker (PWA install + offline app shell).
+// Only in production: dev server hot-reload clashes with SW caching.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.error('SW registration failed:', err);
+    });
+  });
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

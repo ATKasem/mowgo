@@ -127,12 +127,16 @@ function requireConfiguration(env) {
   const required = [
     'STRIPE_SECRET_KEY',
     'SUPABASE_URL',
-    'SUPABASE_SERVICE_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
     'STRIPE_PRICE_SOLO',
     'STRIPE_PRICE_CREW',
     'STRIPE_PRICE_PREMIUM',
   ];
-  if (required.some((name) => !env[name])) {
+  // Tolerate legacy SUPABASE_SERVICE_KEY naming (set in older CF env configs)
+  if (!env.SUPABASE_SERVICE_ROLE_KEY && !env.SUPABASE_SERVICE_KEY) {
+    throw new Error('Webhook configuration is incomplete');
+  }
+  if (required.filter((name) => name !== 'SUPABASE_SERVICE_ROLE_KEY').some((name) => !env[name])) {
     throw new Error('Webhook configuration is incomplete');
   }
 }
@@ -192,11 +196,12 @@ async function updateProfile({ env, userId, customerId, tier }) {
 }
 
 async function patchProfile(env, filter, profile) {
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
   const response = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?${filter}`, {
     method: 'PATCH',
     headers: {
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${serviceKey}`,
+      apikey: serviceKey,
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
     },

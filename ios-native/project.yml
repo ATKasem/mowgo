@@ -11,6 +11,8 @@ targets:
     configFiles:
       Debug: MowGo/Config.xcconfig
       Release: MowGo/Config.xcconfig
+    capabilities:
+      - pushNotifications
     sources:
       - path: MowGo
     settings:
@@ -24,6 +26,7 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_NSCameraUsageDescription: "MowGo uses your camera to attach photos to jobs."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "MowGo accesses your photo library to attach photos to jobs."
         INFOPLIST_KEY_CFBundleURLTypes:
           - CFBundleURLName: com.mowgo.app
             CFBundleURLSchemes:
@@ -41,4 +44,4 @@ targets:
 packages:
   stripe-ios:
     url: https://github.com/stripe/stripe-ios.git
-    from: 23.0.0
+    from: 23.2.0

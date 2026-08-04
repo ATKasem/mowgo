@@ -98,7 +98,7 @@ struct PaymentView: View {
             guard let windowScene = UIApplication.shared.connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
                 .first(where: { $0.activationState == .foregroundActive }),
-                  let rootVC = windowScene.keyWindow?.rootViewController,
+                  let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController,
                   let presentingVC = topmostViewController(from: rootVC) else {
                 paymentError = "Could not present payment sheet."
                 return
