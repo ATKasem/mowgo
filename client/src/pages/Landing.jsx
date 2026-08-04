@@ -78,6 +78,7 @@ export default function Landing() {
       if (!session?.access_token) {
         sessionStorage.setItem('mowgo_plan_intent', plan);
         sessionStorage.setItem('mowgo_interval_intent', interval);
+        sessionStorage.setItem('mowgo_intent_time', String(Date.now()));
         navigate('/login?mode=signup');
         return;
       }

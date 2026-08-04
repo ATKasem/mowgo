@@ -146,8 +146,10 @@ function tierForSubscription(subscription, env) {
   const priceIds = (subscription.items?.data || []).map((item) => (
     typeof item.price === 'string' ? item.price : item.price?.id
   ));
-  if (priceIds.includes(env.STRIPE_PRICE_CREW)) return 'crew';
-  if (priceIds.includes(env.STRIPE_PRICE_SOLO)) return 'solo';
+  const crewPrices = [env.STRIPE_PRICE_CREW, env.STRIPE_PRICE_CREW_ANNUAL].filter(Boolean);
+  const soloPrices = [env.STRIPE_PRICE_SOLO, env.STRIPE_PRICE_SOLO_ANNUAL].filter(Boolean);
+  if (priceIds.some((id) => crewPrices.includes(id))) return 'crew';
+  if (priceIds.some((id) => soloPrices.includes(id))) return 'solo';
   return 'free';
 }
 

@@ -106,24 +106,41 @@ export default function Login() {
       }
 
       const intent = sessionStorage.getItem('mowgo_plan_intent');
+      const clearIntent = () => {
+        sessionStorage.removeItem('mowgo_plan_intent');
+        sessionStorage.removeItem('mowgo_interval_intent');
+        sessionStorage.removeItem('mowgo_intent_time');
+      };
       if (intent) {
-        try {
-          const { startCheckout } = await import('../lib/payments');
-          const interval = sessionStorage.getItem('mowgo_interval_intent') || 'month';
-          const r = await startCheckout(intent, interval);
-          if (r?.error) {
-            setError(r.error);
+        const interval = sessionStorage.getItem('mowgo_interval_intent') || 'month';
+        const intentTime = Number(sessionStorage.getItem('mowgo_intent_time') || 0);
+        const valid = ['solo', 'crew'].includes(intent)
+          && ['month', 'year'].includes(interval)
+          && Date.now() - intentTime < 30 * 60 * 1000;
+        if (!valid) {
+          // Stale, malformed, or expired intent — never hijack a normal login.
+          clearIntent();
+        } else {
+          try {
+            const { startCheckout } = await import('../lib/payments');
+            const r = await startCheckout(intent, interval);
+            if (r?.error) {
+              // Deterministic failure (validation/config) — drop the intent so
+              // the next login goes to /app instead of retrying forever.
+              clearIntent();
+              setError(r.error);
+              setLoading(false);
+              return;
+            }
+            // startCheckout redirects to Stripe on success — only then drop the intent
+            clearIntent();
+            return;
+          } catch (checkoutError) {
+            // Transport-level failure — keep the intent so the user can retry.
+            setError(checkoutError.message || tr('Payment failed'));
             setLoading(false);
             return;
           }
-          // startCheckout redirects to Stripe on success — only then drop the intent
-          sessionStorage.removeItem('mowgo_plan_intent');
-          sessionStorage.removeItem('mowgo_interval_intent');
-          return;
-        } catch (checkoutError) {
-          setError(checkoutError.message || tr('Payment failed'));
-          setLoading(false);
-          return;
         }
       }
       navigate('/app');

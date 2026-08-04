@@ -39,6 +39,8 @@ function webhookEnv() {
     SUPABASE_SERVICE_KEY: 'service_key',
     STRIPE_PRICE_SOLO: 'price_solo',
     STRIPE_PRICE_CREW: 'price_crew',
+    STRIPE_PRICE_SOLO_ANNUAL: 'price_solo_annual',
+    STRIPE_PRICE_CREW_ANNUAL: 'price_crew_annual',
   };
 }
 
@@ -173,6 +175,90 @@ test('subscription updates fall back to customer lookup and map the solo price',
     assert.deepEqual(JSON.parse(requests[0].options.body), {
       tier: 'solo',
       stripe_customer_id: 'cus_2',
+    });
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('annual checkout completion maps the annual crew price to the crew tier', async () => {
+  const { onRequestPost } = await loadWebhook();
+  const originalFetch = global.fetch;
+  const requests = [];
+  global.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (String(url).endsWith('/v1/subscriptions/sub_annual_crew')) {
+      return Response.json({
+        id: 'sub_annual_crew',
+        customer: 'cus_annual_crew',
+        items: { data: [{ price: { id: 'price_crew_annual' } }] },
+      });
+    }
+    if (String(url).includes('/rest/v1/profiles?id=eq.user_annual_crew')) {
+      return new Response(null, { status: 204 });
+    }
+    throw new Error(`Unexpected fetch: ${url}`);
+  };
+
+  try {
+    const response = await onRequestPost({
+      request: signedRequest({
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            mode: 'subscription',
+            customer: 'cus_annual_crew',
+            subscription: 'sub_annual_crew',
+            metadata: { user_id: 'user_annual_crew' },
+          },
+        },
+      }),
+      env: webhookEnv(),
+    });
+
+    assert.equal(response.status, 200);
+    const patch = requests.find(({ options }) => options.method === 'PATCH');
+    assert.ok(patch);
+    assert.deepEqual(JSON.parse(patch.options.body), {
+      tier: 'crew',
+      stripe_customer_id: 'cus_annual_crew',
+    });
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('annual subscription updates map the annual solo price to the solo tier', async () => {
+  const { onRequestPost } = await loadWebhook();
+  const originalFetch = global.fetch;
+  const requests = [];
+  global.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (String(url).includes('/rest/v1/profiles?stripe_customer_id=eq.cus_annual_solo')) {
+      return new Response(null, { status: 204 });
+    }
+    throw new Error(`Unexpected fetch: ${url}`);
+  };
+
+  try {
+    const response = await onRequestPost({
+      request: signedRequest({
+        type: 'customer.subscription.updated',
+        data: {
+          object: {
+            customer: 'cus_annual_solo',
+            metadata: {},
+            items: { data: [{ price: { id: 'price_solo_annual' } }] },
+          },
+        },
+      }),
+      env: webhookEnv(),
+    });
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(JSON.parse(requests[0].options.body), {
+      tier: 'solo',
+      stripe_customer_id: 'cus_annual_solo',
     });
   } finally {
     global.fetch = originalFetch;

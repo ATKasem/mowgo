@@ -197,7 +197,7 @@ export default function Compare() {
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                 <X className="w-4 h-4 text-red-500 shrink-0" /> {tr("Every extra crew member costs $29/mo more.")}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("A 2-person crew on Jobber Core runs $696/yr before you add a single thing. MowGo: $390/yr, flat, crew included.")}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.")}</p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
@@ -218,7 +218,11 @@ export default function Compare() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link to="/blog/jobber-price-increase-2026" className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 text-white font-semibold px-6 py-3 hover:bg-emerald-700 min-h-[44px] transition-colors">{tr("Jobber pricing, explained")} <ArrowRight className="w-4 h-4" /></Link>
-            <a href="#comparison" className="inline-flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold px-6 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 min-h-[44px] transition-colors">{tr("See the full comparison")}</a>
+            <a
+              href="#comparison"
+              onClick={(e) => { e.preventDefault(); const el = document.getElementById('comparison'); if (el) { el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: 'smooth' }); } }}
+              className="inline-flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold px-6 py-3 hover:bg-gray-200 dark:hover:bg-gray-700 min-h-[44px] transition-colors"
+            >{tr("See the full comparison")}</a>
           </div>
         </div>
       </section>
@@ -295,7 +299,7 @@ export default function Compare() {
       {/* Bottom CTA */}
       <section className="bg-gradient-to-br from-emerald-500 via-green-600 to-green-700 py-20">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-white mb-4">{tr("Rain delay included on MowGo Free.")}</h2>
+          <h2 className="text-3xl font-extrabold text-white mb-4">{tr("Rain delay included on MowGo Free")}</h2>
           <p className="text-emerald-100 text-lg mb-8">{tr("Tap once to move every rain-day job. Pay nothing for your first 5 clients.")}</p>
           <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {tr("Start Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />

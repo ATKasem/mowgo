@@ -47,12 +47,8 @@ export async function onRequestPost(context) {
 
     const annual = interval === 'year';
     const priceId = plan === 'solo'
-      ? (annual
-        ? (env.STRIPE_PRICE_SOLO_ANNUAL || env.VITE_STRIPE_PRICE_SOLO_ANNUAL)
-        : (env.STRIPE_PRICE_SOLO || env.VITE_STRIPE_PRICE_SOLO))
-      : (annual
-        ? (env.STRIPE_PRICE_CREW_ANNUAL || env.VITE_STRIPE_PRICE_CREW_ANNUAL)
-        : (env.STRIPE_PRICE_CREW || env.VITE_STRIPE_PRICE_CREW));
+      ? (annual ? env.STRIPE_PRICE_SOLO_ANNUAL : env.STRIPE_PRICE_SOLO)
+      : (annual ? env.STRIPE_PRICE_CREW_ANNUAL : env.STRIPE_PRICE_CREW);
     if (!priceId) {
       return json({ error: 'Price ID not configured' }, 500, origin);
     }
