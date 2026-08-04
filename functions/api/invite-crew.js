@@ -57,7 +57,7 @@ export async function onRequestPost({ request, env }) {
 
     // Get owner's profile to verify they're an owner
     const ownerProfileRes = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,business_name`,
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,business_name,role`,
       { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
     );
     const ownerProfiles = await ownerProfileRes.json();
@@ -218,8 +218,7 @@ export async function onRequestPost({ request, env }) {
           body: JSON.stringify({ type: 'recovery', email })
         });
         if (linkRes.ok && env.RESEND_API_KEY) {
-          const { properties } = await linkRes.json();
-          const resetUrl = properties?.action_link || '';
+          const { action_link: resetUrl } = await linkRes.json();
           if (resetUrl) {
             await fetch('https://api.resend.com/emails', {
               method: 'POST',
