@@ -105,8 +105,8 @@ final class StripeService: ObservableObject {
 
     // MARK: - Subscription checkout (Stripe Checkout redirect)
 
-    func createCheckoutSession(tier: String) async throws -> URL {
-        let body: [String: Any] = ["tier": tier]
+    func createCheckoutSession(tier: String, interval: String = "month") async throws -> URL {
+        let body: [String: Any] = ["tier": tier, "interval": interval]
         let data = try await sb.requestFunction("create-checkout-session", body: body)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         guard let urlString = json?["url"] as? String,

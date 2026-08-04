@@ -25,6 +25,7 @@ data class MoreUiState(
     val billingLoadingAction: String? = null,
     val billingError: String? = null,
     val billingMessage: String? = null,
+    val billingInterval: String = "month",
     val pendingBillingUrl: String? = null,
     val exportLoadingAction: String? = null,
     val exportMessage: String? = null,
@@ -92,7 +93,11 @@ class MoreViewModel(
     fun setCompletionAlerts(value: Boolean) { viewModelScope.launch { settingsRepository.setJobCompletionAlerts(value) } }
     fun setRainAlerts(value: Boolean) { viewModelScope.launch { settingsRepository.setRainDelayAlerts(value) } }
 
-    fun startCheckout(tier: String) {
+    fun setBillingInterval(interval: String) {
+        _uiState.value = _uiState.value.copy(billingInterval = interval)
+    }
+
+    fun startCheckout(tier: String, interval: String = "month") {
         if (_uiState.value.billingLoadingAction != null) return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -101,7 +106,7 @@ class MoreViewModel(
                 billingMessage = null,
             )
             try {
-                val url = paymentRepository.createCheckoutSession(tier)
+                val url = paymentRepository.createCheckoutSession(tier, interval)
                 _uiState.value = _uiState.value.copy(
                     billingLoadingAction = null,
                     pendingBillingUrl = url,

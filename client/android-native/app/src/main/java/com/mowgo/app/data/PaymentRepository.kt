@@ -54,11 +54,11 @@ class PaymentRepository(
         }
     }
 
-    suspend fun createCheckoutSession(tier: String): String {
+    suspend fun createCheckoutSession(tier: String, interval: String = "month"): String {
         ensureConfigured()
         val response = post(
             function = "create-checkout-session",
-            body = json.encodeToString(CheckoutRequest.serializer(), CheckoutRequest(tier)),
+            body = json.encodeToString(CheckoutRequest.serializer(), CheckoutRequest(tier, interval)),
         )
         val url = decode<UrlResponse>(response).url
         return validateStripeUrl(url, CHECKOUT_HOST)
@@ -148,7 +148,7 @@ class PaymentRepository(
         @SerialName("payment_intent_id") val paymentIntentId: String,
     )
 
-    @Serializable private data class CheckoutRequest(val tier: String)
+    @Serializable private data class CheckoutRequest(val tier: String, val interval: String = "month")
     @Serializable private data class UrlResponse(val url: String = "")
     @Serializable private data class SuccessResponse(val success: Boolean = false)
     @Serializable private data class ErrorResponse(val error: String? = null)

@@ -157,6 +157,7 @@ struct SubscriptionPlanCard: View {
     let tier: String
     let isCurrent: Bool
     var userTier: String = "free"
+    var billingInterval: String = "month"
 
     private let stripe = StripeService.shared
     @State private var isPurchasing = false
@@ -188,6 +189,11 @@ struct SubscriptionPlanCard: View {
                     Text(price)
                         .font(.title3.weight(.bold))
                         .foregroundColor(MowGoTheme.deepGreen)
+                    if billingInterval == "year", tier == "solo" || tier == "crew" {
+                        Text(tier == "solo" ? "Save $78" : "Save $158")
+                            .font(.caption)
+                            .foregroundColor(MowGoTheme.deepGreen)
+                    }
                 }
                 Spacer()
                 if isCurrent {
@@ -250,7 +256,7 @@ struct SubscriptionPlanCard: View {
         isPurchasing = true
         error = nil
         do {
-            let url = try await stripe.createCheckoutSession(tier: tier)
+            let url = try await stripe.createCheckoutSession(tier: tier, interval: billingInterval)
             // Open in Safari
             let didOpen = await UIApplication.shared.open(url)
             if !didOpen {

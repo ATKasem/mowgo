@@ -357,7 +357,7 @@ struct SettingsView: View {
 
     private var tierDescription: String {
         switch auth.user?.tier {
-        case "solo": "15 clients · AI assistant"
+        case "solo": "Unlimited clients & jobs · Recurring jobs"
         case "crew": "Unlimited · Team · Priority"
         default: "5 clients · Basic features"
         }
@@ -652,6 +652,7 @@ private struct BillingSettingsView: View {
 struct SubscriptionView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @State private var billingInterval = "month"
     let currentTier: String
 
     /// When true, Free card is hidden (user is already above Free).
@@ -670,44 +671,71 @@ struct SubscriptionView: View {
 
                 ScrollView {
                     VStack(spacing: 16) {
+                        VStack(spacing: 4) {
+                            Picker("Billing interval", selection: $billingInterval) {
+                                Text("Month").tag("month")
+                                Text("Annual").tag("year")
+                            }
+                            .pickerStyle(.segmented)
+                            .tint(MowGoTheme.deepGreen)
+
+                            HStack {
+                                Color.clear
+                                    .frame(maxWidth: .infinity)
+                                Text("2 months free")
+                                    .font(.caption)
+                                    .foregroundColor(MowGoTheme.deepGreen)
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+
                         if showFreeCard {
                         SubscriptionPlanCard(
                             name: "Free",
                             price: "$0/mo",
-                            features: ["5 clients", "Basic scheduling", "Invoice tracking"],
+                            features: [
+                                "Up to 5 clients",
+                                "Daily job scheduling",
+                                "Rain delay auto-reschedule",
+                                "Invoice tracking",
+                                "Dark mode + installable PWA"
+                            ],
                             tier: "free",
                             isCurrent: normalizedCurrentTier == "free",
-                            userTier: normalizedCurrentTier
+                            userTier: normalizedCurrentTier,
+                            billingInterval: billingInterval
                         )
                         }
 
                         SubscriptionPlanCard(
                             name: "Solo",
-                            price: "$39/mo",
+                            price: billingInterval == "year" ? "$390/yr" : "$39/mo",
                             features: [
-                                "15 clients",
-                                "Route optimization",
-                                "Photo attachments",
-                                "Priority support"
+                                "Unlimited clients & jobs",
+                                "Recurring job automation",
+                                "GPS route navigation (coming soon)",
+                                "Client notes, codes & pets",
+                                "Offline mode"
                             ],
                             tier: "solo",
                             isCurrent: normalizedCurrentTier == "solo",
-                            userTier: normalizedCurrentTier
+                            userTier: normalizedCurrentTier,
+                            billingInterval: billingInterval
                         )
 
                         SubscriptionPlanCard(
                             name: "Crew",
-                            price: "$79/mo",
+                            price: billingInterval == "year" ? "$790/yr" : "$79/mo",
                             features: [
                                 "Everything in Solo",
                                 "Unlimited clients",
-                                "Multi-user / crew",
                                 "Job assignment & tracking",
                                 "Team progress dashboard"
                             ],
                             tier: "crew",
                             isCurrent: normalizedCurrentTier == "crew",
-                            userTier: normalizedCurrentTier
+                            userTier: normalizedCurrentTier,
+                            billingInterval: billingInterval
                         )
                     }
                     .padding(16)

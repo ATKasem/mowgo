@@ -73,6 +73,7 @@ fun MoreScreen(
             state = state,
             back = { destination = MoreDestination.ROOT },
             startCheckout = viewModel::startCheckout,
+            setBillingInterval = viewModel::setBillingInterval,
             openCustomerPortal = viewModel::openCustomerPortal,
             cancelSubscription = viewModel::cancelSubscription,
             billingUrlHandled = viewModel::billingUrlHandled,
@@ -269,7 +270,8 @@ private fun AppearanceSettingsScreen(mode: String, back: () -> Unit, select: (St
 private fun BillingSettingsScreen(
     state: MoreUiState,
     back: () -> Unit,
-    startCheckout: (String) -> Unit,
+    startCheckout: (String, String) -> Unit,
+    setBillingInterval: (String) -> Unit,
     openCustomerPortal: () -> Unit,
     cancelSubscription: () -> Unit,
     billingUrlHandled: () -> Unit,
@@ -277,8 +279,17 @@ private fun BillingSettingsScreen(
 ) {
     val context = LocalContext.current
     val tier = state.profile?.tier?.lowercase() ?: "free"
-    val price = when (tier) { "solo" -> "$39/mo"; "crew" -> "$79/mo"; else -> "$0/mo" }
-    val description = when (tier) { "solo" -> "Unlimited clients · All features"; "crew" -> "Unlimited · Team · Priority"; else -> "5 clients · Basic features" }
+    val billingInterval = state.billingInterval
+    val price = when (tier) {
+        "solo" -> if (billingInterval == "year") "$390/yr" else "$39/mo"
+        "crew" -> if (billingInterval == "year") "$790/yr" else "$79/mo"
+        else -> "$0/mo"
+    }
+    val description = when (tier) {
+        "solo" -> "Unlimited clients & jobs"
+        "crew" -> "Everything in Solo · Unlimited clients · Team"
+        else -> "5 clients · Rain delay · Invoicing"
+    }
     val isPaid = tier == "solo" || tier == "crew"
     var showCancelConfirmation by remember { mutableStateOf(false) }
 
@@ -315,7 +326,7 @@ private fun BillingSettingsScreen(
     DetailScaffold("Billing", back) {
         Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Current Plan", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(tierLabel(tier), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(tierLabel(tier, billingInterval), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(price, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
             Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (isPaid) {
@@ -336,30 +347,48 @@ private fun BillingSettingsScreen(
         } }
 
         SectionLabel("Plans")
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            listOf("month" to "Month", "year" to "Annual").forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = billingInterval == option.first,
+                    onClick = { setBillingInterval(option.first) },
+                    shape = SegmentedButtonDefaults.itemShape(index, 2),
+                    label = { Text(option.second) },
+                )
+            }
+        }
+        if (billingInterval == "year") {
+            Text(
+                "2 months free",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+        }
         BillingPlanCard(
             name = "Free",
-            price = "$0/mo",
-            feature = "5 clients · Basic features",
+            feature = "5 clients · Rain delay · Invoicing",
             tier = "free",
             currentTier = tier,
+            billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
         )
         BillingPlanCard(
             name = "Solo",
-            price = "$39/mo",
-            feature = "15 clients · AI assistant",
+            feature = "Unlimited clients & jobs",
             tier = "solo",
             currentTier = tier,
+            billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
         )
         BillingPlanCard(
             name = "Crew",
-            price = "$79/mo",
-            feature = "Unlimited · Team · Priority",
+            feature = "Everything in Solo · Unlimited clients · Team",
             tier = "crew",
             currentTier = tier,
+            billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
         )
@@ -401,22 +430,37 @@ private fun BillingSettingsScreen(
 @Composable
 private fun BillingPlanCard(
     name: String,
-    price: String,
     feature: String,
     tier: String,
     currentTier: String,
+    billingInterval: String,
     loadingAction: String?,
-    subscribe: (String) -> Unit,
+    subscribe: (String, String) -> Unit,
 ) {
     val order = mapOf("free" to 0, "solo" to 1, "crew" to 2)
     val isCurrent = tier == currentTier
     val canUpgrade = (order[tier] ?: 0) > (order[currentTier] ?: 0)
+    val isAnnual = billingInterval == "year"
+    val price = when (tier) {
+        "solo" -> if (isAnnual) "$390/yr" else "$39/mo"
+        "crew" -> if (isAnnual) "$790/yr" else "$79/mo"
+        else -> "$0/mo"
+    }
+    val savings = when {
+        !isAnnual -> null
+        tier == "solo" -> "Save $78"
+        tier == "crew" -> "Save $158"
+        else -> null
+    }
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Text(price, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    savings?.let {
+                        Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                    }
                 }
                 if (isCurrent) {
                     Surface(
@@ -440,7 +484,7 @@ private fun BillingPlanCard(
             if (canUpgrade) {
                 val action = "checkout:$tier"
                 Button(
-                    onClick = { subscribe(tier) },
+                    onClick = { subscribe(tier, billingInterval) },
                     enabled = loadingAction == null,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -455,8 +499,8 @@ private fun BillingPlanCard(
     }
 }
 
-private fun tierLabel(tier: String?): String = when (tier) {
-    "solo" -> "Solo · $39/mo"
-    "crew" -> "Crew · $79/mo"
+private fun tierLabel(tier: String?, billingInterval: String = "month"): String = when (tier) {
+    "solo" -> if (billingInterval == "year") "Solo · $390/yr" else "Solo · $39/mo"
+    "crew" -> if (billingInterval == "year") "Crew · $790/yr" else "Crew · $79/mo"
     else -> "Free Plan"
 }
