@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, isDemoMode } from '../lib/supabase';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import Logo from '../components/Logo';
@@ -8,9 +8,10 @@ import Logo from '../components/Logo';
 export default function Login() {
   const { tr, t, i18n } = useLocalizedText('login');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [mode, setMode] = useState('login'); // login | signup | forgot
+  const [mode, setMode] = useState(() => (searchParams.get('mode') === 'signup' ? 'signup' : 'login')); // login | signup | forgot
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
@@ -104,6 +105,25 @@ export default function Login() {
         }
       }
 
+      const intent = sessionStorage.getItem('mowgo_plan_intent');
+      if (intent) {
+        try {
+          const { startCheckout } = await import('../lib/payments');
+          const r = await startCheckout(intent);
+          if (r?.error) {
+            setError(r.error);
+            setLoading(false);
+            return;
+          }
+          // startCheckout redirects to Stripe on success — only then drop the intent
+          sessionStorage.removeItem('mowgo_plan_intent');
+          return;
+        } catch (checkoutError) {
+          setError(checkoutError.message || tr('Payment failed'));
+          setLoading(false);
+          return;
+        }
+      }
       navigate('/app');
     } catch (err) {
       setError(tr('Connection failed. Check your internet and try again.'));
@@ -116,9 +136,12 @@ export default function Login() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <Logo size="lg" className="mx-auto mb-3" />
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
+          <Link to="/">
+            <Logo size="lg" className="mx-auto mb-3" />
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
+          </Link>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
+          {mode === 'signup' && <p className="text-sm text-gray-500 dark:text-gray-400 -mt-3 mb-4 text-center">{tr("Create your free account — 5 clients, no credit card.")}</p>}
         </div>
 
         {confirmSent ? (

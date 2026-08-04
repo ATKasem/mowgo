@@ -251,7 +251,19 @@
     "return_to_mowgo": "Volver a MowGo",
     "tap_below_to_go_back_to_the_app": "Toca abajo para volver a la app",
     "open_mowgo": "Abrir MowGo",
-    "download_from_app_store": "Descargar desde App Store"
+    "download_from_app_store": "Descargar desde App Store",
+    "rain_tomorrow_one_tap_moves_your_whole_day_even_on_mowgo_s_free_plan": "¿Lluvia mañana? Un toque mueve todo tu día, incluso en el plan gratuito de MowGo.",
+    "switch_from_lawnpro": "Cambiar de LawnPro",
+    "one_tap_rain_delay_on_the_free_plan_just_a_better_way_to_run_your_crew": "Retraso por lluvia de un toque en el plan gratuito. Simplemente una mejor manera de dirigir tu equipo.",
+    "quoteiq_alternative": "Alternativa a QuoteIQ",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
+    "compare_ruunly": "Comparar Ruunly",
+    "compare": "Comparar",
+    "mowgo_dashboard_screenshot": "Captura de pantalla del panel de MowGo",
+    "rain_delay_included_on_mowgo_free": "Retraso por lluvia incluido en MowGo Free",
+    "jobber_connect_is_139_mo_month_to_month_or_99_mo_billed_annually_plus_29": "Jobber Connect cuesta $139/mes mes a mes, o $99/mes con facturación anual, más $29/mes por cada usuario adicional. MowGo cuesta $39–$79 fijos.",
+    "jobber_pricing": "Precios de Jobber",
+    "compare_probase": "Comparar ProBase"
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",
@@ -306,7 +318,10 @@
     "on_every_plan_including_free_one_tap_moves_your_whole_schedule_clients_g": "En todos los planes — incluido el Gratis. Un toque mueve todo tu horario. Los clientes reciben aviso automáticamente.",
     "platform_fee_expose": "Exposición de tarifas de plataforma",
     "see_what_ruunly_actually_costs_vs_mowgo_no_asterisks_no_fine_print_just_": "Mira cuánto cuesta Ruunly realmente vs MowGo. Sin asteriscos, sin letra pequeña — solo los números.",
-    "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter_pl": "Debes actualizar al plan Pro ($59/mes) solo para tener retraso por lluvia. El plan Starter no lo incluye."
+    "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter_pl": "Debes actualizar al plan Pro ($59/mes) solo para tener retraso por lluvia. El plan Starter no lo incluye.",
+    "coming_soon": "Muy pronto",
+    "platform_fee_expos": "Exposición de tarifas de plataforma",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento."
   },
   "home": {
     "clear": "Despejado",
@@ -494,7 +509,12 @@
     "and_better_alternatives": "(y mejores alternativas)",
     "a_solo_operator_on_jobber_connect_pays_price_for_features_they_might_not": "Un operador independiente con Jobber Connect paga {{price}} por funciones que quizá no necesita, como informes avanzados y administración de equipos. Estás pagando por un negocio que todavía no tienes.",
     "a_3_person_crew_on_jobber_connect_pays_a_base_base_plus_peruser_per_user": "Un equipo de 3 personas con Jobber Connect paga una base de {{base}} más {{perUser}} por usuario, unos {{total}}. Para un negocio de jardinería que factura {{revenue}} al mes, eso significa destinar el 2 % directamente al software.",
-    "mowgo_solo_costs_price_72_less_than_jobber_connect_with_no_per_user_fees": "MowGo Solo cuesta {{price}}, un 72 % menos que Jobber Connect, sin cargos por usuario."
+    "mowgo_solo_costs_price_72_less_than_jobber_connect_with_no_per_user_fees": "MowGo Solo cuesta {{price}}, un 72 % menos que Jobber Connect, sin cargos por usuario.",
+    "pricing_as_of_august_2026": "Precios a partir de agosto de 2026",
+    "jobber_connect_charges_29_mo_for_each_additional_user_a_3_person_crew_pa": "Jobber Connect cobra $29/mes por cada usuario adicional. Un equipo de 3 personas paga $197 al mes en facturación mensual una vez que se incluyen dos usuarios adicionales.",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
+    "compare": "Comparar",
+    "pricing_as_of_august_2026_jobber_connect_is_139_mo_month_to_month_or_99_": "Precios a partir de agosto de 2026. Jobber Connect cuesta $139/mes mes a mes o $99/mes con facturación anual:"
   },
   "landing": {
     "rain_delay_auto_reschedule": "Reprogramación automática por lluvia",
@@ -587,7 +607,21 @@
     "the_rain_proof_guarantee": "La garantía a prueba de lluvia",
     "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "Creamos MowGo para los equipos de Oklahoma. Usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. Si no te sientes más organizado, te devolvemos el primer mes completo. Sin preguntas, sin trámites. Tus datos siempre son tuyos.",
     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Aplica para Solo. Sin cargos de configuración. Sin contratos. Cancela cuando quieras.",
-    "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Los pagos con Stripe están activos. La optimización de rutas llega después — los primeros usuarios de Oklahoma reciben funciones nuevas sin aumento de precio."
+    "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Los pagos con Stripe están activos. La optimización de rutas llega después — los primeros usuarios de Oklahoma reciben funciones nuevas sin aumento de precio.",
+    "less_rain_day_chaos_less_paperwork": "Menos caos en días de lluvia. Menos papeleo.",
+    "more_mowing": "Más corte.",
+    "pricing": "Precios",
+    "coming_soon": "Muy pronto",
+    "mowgo_dashboard_screenshot": "Captura de pantalla del panel de MowGo",
+    "the_mowgo_dashboard_your_whole_week_at_a_glance": "El panel de MowGo: toda tu semana de un vistazo.",
+    "gps_route_navigation_coming_soon": "Navegación de ruta GPS (próximamente)",
+    "14_day_free_trial_cancel_anytime": "Prueba gratuita de 14 días. Cancela en cualquier momento.",
+    "29_user": "$29/usuario",
+    "applies_to_solo_no_setup_fees_no_contracts_cancel_anytime": "Aplica para Solo. Sin tarifas de instalación. Sin contratos. Cancele en cualquier momento.",
+    "works_on_iphone_android_and_desktop_as_an_installable_home_screen_app_pw": "Funciona en iPhone, Android y escritorio como una aplicación de pantalla de inicio instalable (PWA).",
+    "jobber_connect_is_139_mo_99_mo_billed_annually_plus_29_mo_per_additional": "Jobber Connect cuesta $139/mes ($99/mes facturado anualmente) más $29/mes por usuario adicional. LawnPro actualmente no funciona: no hay aplicación móvil activa ni panel web.",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
+    "29_per_additional_user": "$29 por usuario adicional"
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -620,7 +654,9 @@
     "this_password_reset_link_has_expired_please_request_a_new_one": "Este enlace para restablecer la contraseña venció. Solicita uno nuevo.",
     "this_password_reset_link_is_invalid_or_has_expired_please_request_a_new_": "Este enlace para restablecer la contraseña no es válido o venció. Solicita uno nuevo.",
     "we_sent_a_confirmation_link_to_email_click_it_to_activate_your_account": "Enviamos un enlace de confirmación a {{email}}. Ábrelo para activar tu cuenta.",
-    "if_an_account_exists_for_email_you_ll_receive_a_password_reset_link_shor": "Si existe una cuenta para {{email}}, pronto recibirás un enlace para restablecer tu contraseña."
+    "if_an_account_exists_for_email_you_ll_receive_a_password_reset_link_shor": "Si existe una cuenta para {{email}}, pronto recibirás un enlace para restablecer tu contraseña.",
+    "create_your_free_account_5_clients_no_credit_card": "Crea tu cuenta gratuita: 5 clientes, sin tarjeta de crédito.",
+    "payment_failed": "Pago fallido"
   },
   "privacy": {
     "back_to_mowgo": "Volver a MowGo",
@@ -707,7 +743,11 @@
     "discontinuing_its_free_plan": "descontinuaría su plan gratis",
     "entirely_if_you_were_a_small_lawn_care_operator_or_solo_mowing_business_": "por completo. Si tenías un pequeño negocio de jardinería o trabajabas por tu cuenta y usabas el plan gratis de QuoteIQ para administrar clientes y agenda, de repente tuviste que buscar una alternativa.",
     "free_for_real_use": "gratis para uso real",
-    "with_5_clients_on_the_forever_free_plan_no_credit_card_no_catch": "con 5 clientes en el plan gratis para siempre. Sin tarjeta ni trucos."
+    "with_5_clients_on_the_forever_free_plan_no_credit_card_no_catch": "con 5 clientes en el plan gratis para siempre. Sin tarjeta ni trucos.",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
+    "compare": "Comparar",
+    "operators_reported_that_hundreds_of_small_lawn_care_businesses_many_of_t": "Los operadores informaron que cientos de pequeñas empresas de cuidado del césped (muchas de ellas operadores individuales o equipos de 1 a 3 personas) perdieron la herramienta gratuita en la que confiaban a diario. Algunos fueron obligados a aceptar planes pagos que no podían justificar. Otros tuvieron que exportar sus datos y empezar de nuevo en otro lugar.",
+    "operators_report_that_quoteiq_s_free_plan_change_displaced_hundreds_of_l": "Los operadores informan que el cambio de plan gratuito de QuoteIQ desplazó a cientos de profesionales del cuidado del césped. Si confió en QuoteIQ para administrar su negocio, esto es lo que sucedió y qué buscar a continuación."
   },
   "resetPassword": {
     "passwords_do_not_match": "Las contraseñas no coinciden.",
@@ -855,7 +895,9 @@
     "no_worries": "No te preocupes",
     "you_can_always_try_the_free_plan_or_subscribe_when_you_re_ready": "Puedes probar el plan gratis o suscribirte cuando estés listo.",
     "back_home": "Volver al inicio",
-    "we_couldn_t_verify_your_payment_please_try_again": "No pudimos verificar su pago. Por favor, inténtelo de nuevo."
+    "we_couldn_t_verify_your_payment_please_try_again": "No pudimos verificar su pago. Por favor, inténtelo de nuevo.",
+    "compare": "Comparar",
+    "log_in": "Iniciar sesión"
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Reportes de pérdida de datos",
@@ -927,7 +969,13 @@
     "see_the_comparison": "Ver la comparación",
     "mo": "/mes",
     "cheaper_isn_t_cheaper_if_the_features_don_t_work": "«Más barato» no sale más barato si las funciones no sirven.",
-    "mowgo_was_born_because_i_got_tired_of_losing_client_data_in_other_apps_e": "«MowGo nació porque me cansé de perder datos de clientes en otras apps. Cada función existe porque un operador real la pidió. Sin humo de capital de riesgo ni “funciones empresariales” que nadie necesita. Solo las herramientas que mantienen a tu equipo en marcha»."
+    "mowgo_was_born_because_i_got_tired_of_losing_client_data_in_other_apps_e": "«MowGo nació porque me cansé de perder datos de clientes en otras apps. Cada función existe porque un operador real la pidió. Sin humo de capital de riesgo ni “funciones empresariales” que nadie necesita. Solo las herramientas que mantienen a tu equipo en marcha».",
+    "works_on_iphone_android_and_desktop_as_an_installable_home_screen_app_pw": "Funciona en iPhone, Android y escritorio como una aplicación de pantalla de inicio instalable (PWA).",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
+    "you_trusted_lawnpro_with_your_business_if_reports_from_former_lawnpro_us": "Le confiaste tu negocio a LawnPro. Si los informes de antiguos usuarios de LawnPro sobre pérdida de datos, sincronización rota o aumentos sorpresa de precios te suenan familiares, no estás solo. MowGo fue creado para operadores cansados de eso.",
+    "compare": "Comparar",
+    "these_are_reports_from_former_lawnpro_users_as_of_mid_2026_if_any_of_the": "Estos son informes de antiguos usuarios de LawnPro de mediados de 2026. Si alguno de ellos te suena familiar, sigue leyendo.",
+    "both_are_39_mo_compare_the_included_features_above_to_decide_which_fits_": "Ambas cuestan $39/mes: compara las funciones incluidas arriba y decide cuál se adapta a tu negocio."
   },
   "today": {
     "crew_assignments_are_temporarily_unavailable": "Las asignaciones del equipo no están disponibles por ahora.",
@@ -1121,7 +1169,27 @@
     "try_mowgo_free_rain_delay_included": "Prueba MowGo gratis. Retraso por lluvia incluido.",
     "5_clients_free_forever_no_credit_card_when_it_rains_you_ll_see_why_we_bu": "5 clientes gratis para siempre. Sin tarjeta. Cuando llueva, verás por qué lo construimos.",
     "start_free": "Empieza gratis",
-    "see_all_comparisons": "Ver todas las comparaciones"
+    "see_all_comparisons": "Ver todas las comparaciones",
+    "that_u2019s_not_a_feature_list_difference_that_u2019s_a_whole_day_of_rev": "Esa no es una diferencia de lista de funciones. Es un día entero de ingresos.",
+    "verified_august_2026_probase_wins_on_free_u2014_we_u2019ll_say_it_here_u": "Verificado en agosto de 2026. ProBase gana en el plan gratis: lo decimos sin rodeos. Aquí está todo lo demás.",
+    "if_that_u2019s_you_u2014_probase_is_legitimately_free_and_you_should_use": "Si ese es tu caso, ProBase es legítimamente gratuito y deberías usarlo. MowGo está diseñado para el otro 95%: equipos que pierden un día de ingresos cada vez que llueve y que quieren un software que no intente ser un mercado.",
+    "you_u2019re_a_solo_operator_who_never_needs_to_reschedule_for_weather_an": "Eres un operador independiente que nunca necesita reprogramar por el clima, y ​​$0/mes para siempre es más importante que cualquier otra cosa.",
+    "feature_comparison_table_u2014_scroll_horizontally_on_mobile": "Tabla de comparación de funciones: desplázate horizontalmente en el móvil",
+    "you_want_marketplace_job_leads_u2014_probase_can_feed_you_work_from_thei": "Quieres clientes del marketplace: ProBase puede darte trabajo desde su marketplace (y se lleva una parte de esos trabajos).",
+    "probase_has_zero_weather_features_you_u2019re_opening_every_client_resch": "ProBase no tiene funciones meteorológicas. Estás abriendo a cada cliente, reprogramando cada parada manualmente — 20, 30, 40 mensajes de texto — mientras comienza a llover. Los usuarios de MowGo tocan un botón y toda la ruta pasa al día siguiente. Los clientes reciben notificaciones automáticamente.",
+    "free_is_a_great_price_but_probase_has_no_rain_delay_no_offline_mode_and_": "Gratis es un gran precio. Pero ProBase no tiene retraso por lluvia, ni modo fuera de línea ni sincronización de contabilidad. Cuando llega la tormenta a las 6 a.m., MowGo mueve toda tu ruta con un solo toque.",
+    "works_on_iphone_android_and_desktop_as_an_installable_home_screen_app_pw": "Funciona en iPhone, Android y escritorio como una aplicación de pantalla de inicio instalable (PWA).",
+    "you_run_a_pool_service_u2014_they_cover_chemical_logging_and_water_testi": "Tienes un servicio de piscinas: ellos cubren el registro químico y las pruebas de agua.",
+    "5_clients_free_forever_no_credit_card_when_it_rains_you_u2019ll_see_why_": "5 clientes gratis para siempre. Sin tarjeta de crédito. Cuando llueva, verás por qué construimos esto.",
+    "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
+    "you_never_work_in_the_rain_never_lose_signal_and_don_u2019t_need_account": "Nunca trabajas bajo la lluvia, nunca pierdes señal y no necesitas sincronización contable.",
+    "when_mowgo_isn_u2019t_right": "Cuando MowGo no está bien",
+    "it_u2019s_6am_storm_u2019s_rolling_in_what_does_your_software_do": "Son las 6 a. m. Se acerca la tormenta. ¿Qué hace tu software?",
+    "honest_answer_choose_probase_if_u2026": "Respuesta honesta: elige ProBase si…",
+    "install_on_every_screen": "Instalar en cada pantalla",
+    "probase_u2014_0_mo": "ProBase — $0/mes",
+    "mowgo_u2014_free_tier": "MowGo — nivel gratuito",
+    "mowgo_s_installable_web_app_keeps_working_offline_so_your_schedule_stays": "La aplicación web instalable de MowGo sigue funcionando sin conexión, por lo que su agenda permanece disponible cuando cae la señal."
   },
   "portalReturn": {
     "app_not_installed": "¿App no instalada?"

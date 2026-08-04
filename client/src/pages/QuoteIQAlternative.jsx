@@ -28,17 +28,17 @@ export default function QuoteIQAlternative() {
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
+          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline min-h-[44px] inline-flex items-center">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" />
             </div>
             MowGo
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              {tr("Home")}
+            <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
+              {tr("Compare")}
             </Link>
-            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
               {tr("Log In")}
             </Link>
           </div>
@@ -59,7 +59,7 @@ export default function QuoteIQAlternative() {
             {tr("QuoteIQ Discontinued Free Plan? Here's a Better Alternative for Lawn Care Pros")}
           </h1>
           <p className="mt-6 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            {tr("QuoteIQ just axed its free plan and displaced hundreds of lawn care pros. If you relied on QuoteIQ to run your business, here's what happened and what to look for next.")}
+            {tr("Operators report that QuoteIQ's free-plan change displaced hundreds of lawn care pros. If you relied on QuoteIQ to run your business, here's what happened and what to look for next.")}
           </p>
         </div>
       </section>
@@ -81,7 +81,7 @@ export default function QuoteIQAlternative() {
             </p>
             <div className="card p-5 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
               <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-                <strong>{tr("The result:")}</strong> Hundreds of small lawn care businesses — many of them solo operators or crews of 1–3 people — lost the free tool they relied on daily. Some were pushed into paid plans they couldn't justify. Others had to export their data and start over somewhere else.
+                <strong>{tr("The result:")}</strong> {tr("Operators reported that hundreds of small lawn care businesses — many of them solo operators or crews of 1–3 people — lost the free tool they relied on daily. Some were pushed into paid plans they couldn't justify. Others had to export their data and start over somewhere else.")}
               </p>
             </div>
             <p>
@@ -174,7 +174,7 @@ export default function QuoteIQAlternative() {
               {tr("Start with 5 clients on the free plan — no credit card required. MowGo was built for lawn care pros like you: mobile-first, rain delay auto-reschedule, and zero per-user fees.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
+              <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
                 {tr("Start Free")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -183,6 +183,7 @@ export default function QuoteIQAlternative() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
+            <p className="mt-4 text-sm text-emerald-100/80">{tr("30-day Rain-Proof Guarantee on Solo. Cancel anytime.")}</p>
           </div>
         </section>
       </article>
@@ -195,7 +196,7 @@ export default function QuoteIQAlternative() {
             MowGo &copy; 2026
           </div>
           <div className="flex gap-6 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Home")}</Link>
+            <Link to="/compare" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Compare")}</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Privacy")}</Link>
             <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{tr("Contact")}</a>
           </div>

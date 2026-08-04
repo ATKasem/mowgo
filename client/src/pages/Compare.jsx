@@ -5,7 +5,7 @@ import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from
 const competitors = [
   { name: 'MowGo', price: 'Free – $79', highlight: true },
   { name: 'QuoteIQ', price: '$29.99–$699/mo' },
-  { name: 'Jobber', price: '$29–$199/mo' },
+  { name: 'Jobber', price: '$139/mo Connect' },
   { name: 'Yardbook', price: 'Free (ads)' },
   { name: 'LawnPro', price: '$0–$39' },
   { name: 'Housecall Pro', price: '$79–$189' },
@@ -26,7 +26,7 @@ const features = [
   { label: 'Auto Invoicing', key: 'invoicing', desc: 'Invoice auto-created on job complete' },
   { label: 'Client Notes & Codes', key: 'notes', desc: 'Gate codes, pets, mow height' },
   { label: 'Recurring Jobs', key: 'recurring', desc: 'Weekly/biweekly/monthly auto-schedule' },
-  { label: 'Native Apps', key: 'native', desc: 'App Store + Google Play (not just PWA)' },
+  { label: 'Installable Web App', key: 'pwa', desc: 'Works on iPhone, Android, and desktop as a PWA' },
   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
   { label: 'Stripe Payments', key: 'stripe', desc: 'Accept cards online' },
   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
@@ -44,7 +44,7 @@ const data = {
   invoicing:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
   notes:        [ true,  true,  true,  true,  true,  true,  false, false, false, false ],
   recurring:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
-  native:       [ 'soon', true,  true,  false, false, true,  false, false, false, false ],
+  pwa:          [ true,   true,  true,  false, false, true,  false, false, false, false ],
   privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
   stripe:       [ true,  true,  true,  false, true,  true,  false, false, true,  true  ],
   gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
@@ -88,27 +88,24 @@ export default function Compare() {
       {/* Sticky Nav */}
       <nav aria-label={tr("Compare page navigation")} className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
+          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline min-h-[44px] inline-flex items-center">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" aria-hidden="true" />
             </div>
             MowGo
           </Link>
           <div className="flex items-center gap-2">
+            <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
+              {tr("Compare")}
+            </Link>
             <a
               href="/#pricing"
               onClick={goToPricing}
-              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center"
             >
               {tr("Pricing")}
             </a>
-            <Link to="/compare/ruunly" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              {tr("vs Ruunly")}
-            </Link>
-            <Link to="/compare/probase" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-              {tr("vs ProBase")}
-            </Link>
-            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
               {tr("Log In")}
             </Link>
           </div>
@@ -129,13 +126,31 @@ export default function Compare() {
             {tr("Here's how we compare — no fluff, no asterisks.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               {tr("Try MowGo Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Link>
             <a href="#comparison" className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-gray-200 dark:hover:bg-gray-700 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               {tr("See the table")}
             </a>
           </div>
+        </div>
+      </section>
+
+      <section className="max-w-4xl mx-auto px-4 pt-12">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl">
+          <div className="flex items-center gap-1.5 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+          </div>
+          <img src="/landing/dashboard.png" alt={tr("MowGo dashboard screenshot")} className="w-full h-auto rounded-xl" />
+        </div>
+        <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+          <Link to="/compare/ruunly" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("Compare Ruunly")}</Link>
+          <Link to="/compare/probase" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("Compare ProBase")}</Link>
+          <Link to="/quoteiq-alternative" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("QuoteIQ alternative")}</Link>
+          <Link to="/switch-from-lawnpro" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("Switch from LawnPro")}</Link>
+          <Link to="/blog/jobber-price-increase-2026" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("Jobber pricing")}</Link>
         </div>
       </section>
 
@@ -146,8 +161,8 @@ export default function Compare() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20">
               <CloudRain className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
-            <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Only app with rain delay")}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Rain tomorrow? One tap moves your whole day. No competitor has this — not QuoteIQ, not Jobber, not anyone.")}</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Rain delay included on MowGo Free")}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Rain tomorrow? One tap moves your whole day, even on MowGo's free plan.")}</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/20">
@@ -179,7 +194,7 @@ export default function Compare() {
                 <th scope="col" className="text-left py-3 px-3 font-semibold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-950 z-10">{tr("Feature")}</th>
                 {competitors.map(c => (
                   <th key={c.name} scope="col" className={`py-3 px-2 text-center font-semibold whitespace-nowrap ${c.highlight ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20' : 'text-gray-600 dark:text-gray-400'}`}>
-                    <div>{c.name}</div>
+                    <div>{c.name === 'Ruunly' ? <Link to="/compare/ruunly" className="hover:underline">{c.name}</Link> : c.name === 'ProBase' ? <Link to="/compare/probase" className="hover:underline">{c.name}</Link> : c.name === 'QuoteIQ' ? <Link to="/quoteiq-alternative" className="hover:underline">{c.name}</Link> : c.name === 'LawnPro' ? <Link to="/switch-from-lawnpro" className="hover:underline">{c.name}</Link> : c.name === 'Jobber' ? <Link to="/blog/jobber-price-increase-2026" className="hover:underline">{c.name}</Link> : c.name}</div>
                     <div className="text-[10px] font-normal text-gray-400 dark:text-gray-500 mt-0.5">{c.price}</div>
                   </th>
                 ))}
@@ -212,7 +227,7 @@ export default function Compare() {
             {tr("TurfHop's own pricing and features pages were down (500 errors) on Aug 3, 2026 — verify current features with them before you buy.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Jobber's $29 plan is the hook — automated reminders and auto-pay start at Connect $99, and the AI Receptionist is a $29/mo add-on (or bundled in Plus $199). MowGo includes them all at $49–$79 flat.")}
+            {tr("Jobber Connect is $139/mo month-to-month or $99/mo billed annually, plus $29/mo for each additional user. MowGo is $39–$79 flat.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Some competitors charge a sign-up fee and hide their top tier behind a sales call — MowGo publishes $39/$79 and takes a card.")}
@@ -229,7 +244,7 @@ export default function Compare() {
           <p className="text-sm text-gray-400 dark:text-gray-500">
             {tr("Think something's wrong?")} <a href="mailto:hello@mowgo.app" className="text-emerald-500 hover:underline">{tr("Tell us")}</a> {tr("and we'll fix it. We're not afraid of the truth.")}
           </p>
-          <Link to="/login" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+          <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {tr("Try MowGo Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
@@ -238,11 +253,12 @@ export default function Compare() {
       {/* Bottom CTA */}
       <section className="bg-gradient-to-br from-emerald-500 via-green-600 to-green-700 py-20">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-white mb-4">{tr("The only lawn care app with free rain delay.")}</h2>
-          <p className="text-emerald-100 text-lg mb-8">{tr("0 competitors. 0 asterisks. Just a better way to run your crew.")}</p>
-          <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+          <h2 className="text-3xl font-extrabold text-white mb-4">{tr("Rain delay included on MowGo Free.")}</h2>
+          <p className="text-emerald-100 text-lg mb-8">{tr("One-tap rain delay on the free plan. Just a better way to run your crew.")}</p>
+          <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {tr("Start Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
+          <p className="mt-4 text-sm text-emerald-100/80">{tr("30-day Rain-Proof Guarantee on Solo. Cancel anytime.")}</p>
         </div>
       </section>
 
@@ -256,9 +272,9 @@ export default function Compare() {
             MowGo © 2026
           </div>
           <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Home")}</Link>
+            <Link to="/compare" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Compare")}</Link>
             <a href="#" onClick={goToPricing} className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Pricing")}</a>
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("App")}</Link>
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
             <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>

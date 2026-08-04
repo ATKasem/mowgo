@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 // Verified pricing & facts (August 3, 2026)
 // ProBase: $0/mo forever, marketplace-funded (take % of marketplace jobs), PWA only, no rain delay,
-// no offline, no native apps, no QuickBooks/Xero (their own Jobber page admits it).
+// no offline, no dedicated mobile apps, no QuickBooks/Xero (their own Jobber page admits it).
 // MowGo: Free (5 clients) / Solo $39 / Crew $79. Flat fee, no take-rate, no per-user fees.
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -25,7 +25,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 const features = [
   { label: 'Rain delay auto-reschedule', desc: 'One tap moves today\u2019s route to tomorrow', mowgo: true, probase: false, star: true },
   { label: 'Offline mode', desc: 'Keep working with no cell service, syncs later', mowgo: true, probase: false },
-  { label: 'Native iOS & Android apps', desc: 'App Store / Play Store apps, not a website shortcut', mowgo: true, probase: false },
+  { label: 'Installable web app (PWA)', desc: 'Works on iPhone, Android, and desktop from the home screen', mowgo: true, probase: true },
   { label: 'QuickBooks / accounting sync', desc: 'Via Zapier webhooks (ProBase: \u201cnot designed for businesses that need accounting sync\u201d)', mowgo: true, probase: false },
   { label: 'Client self-booking link', desc: 'Clients book their own slot from your link', mowgo: true, probase: false },
   { label: 'Flat fee, no take-rate', desc: 'MowGo charges a flat monthly fee. No % of your revenue', mowgo: true, probase: false },
@@ -61,17 +61,17 @@ export default function ProBaseComparison() {
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
+          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline min-h-[44px] inline-flex items-center">
             <div className="w-7 h-7 rounded-lg bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" aria-hidden="true" />
             </div>
             MowGo
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
               {tr("Compare")}
             </Link>
-            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
               {tr("Log In")}
             </Link>
           </div>
@@ -99,7 +99,7 @@ export default function ProBaseComparison() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              {tr("Free is a great price. But ProBase has no rain delay, no offline mode, no native app, and no accounting sync. When the storm hits at 6am, MowGo moves your whole route in one tap.")}
+              {tr("Free is a great price. But ProBase has no rain delay, no offline mode, and no accounting sync. When the storm hits at 6am, MowGo moves your whole route in one tap.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -228,14 +228,14 @@ export default function ProBaseComparison() {
                 <WifiOff className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Works in the field")}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{tr("Native apps with offline mode. ProBase is a PWA \u2014 dead without signal. MowGo keeps your whole day in your pocket.")}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{tr("MowGo's installable web app keeps working offline, so your schedule stays available when signal drops.")}</p>
             </div>
             <div className="rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mb-4">
                 <Smartphone className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Real apps, real sync")}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{tr("iOS and Android on the App Store and Play Store. Push notifications for rain delays and payments.")}</p>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("Install on every screen")}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{tr("Works on iPhone, Android, and desktop as an installable home-screen app (PWA).")}</p>
             </div>
             <div className="rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mb-4">
@@ -254,13 +254,14 @@ export default function ProBaseComparison() {
           <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">{tr("Try MowGo free. Rain delay included.")}</h2>
           <p className="mt-3 text-emerald-100 max-w-xl mx-auto">{tr("5 clients free forever. No credit card. When it rains, you\u2019ll see why we built this.")}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/login" className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 font-bold rounded-xl px-8 py-3.5 text-base shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
+            <Link to="/login?mode=signup" className="inline-flex items-center justify-center gap-2 bg-white text-emerald-700 font-bold rounded-xl px-8 py-3.5 text-base shadow-xl hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               {tr("Start free")} <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
             <Link to="/compare" className="inline-flex items-center justify-center gap-2 bg-emerald-600/60 hover:bg-emerald-600/80 text-white font-semibold rounded-xl px-8 py-3.5 text-base border border-emerald-400/40 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               {tr("See all comparisons")}
             </Link>
           </div>
+          <p className="mt-4 text-sm text-emerald-100/80">{tr("30-day Rain-Proof Guarantee on Solo. Cancel anytime.")}</p>
         </div>
       </section>
     </div>

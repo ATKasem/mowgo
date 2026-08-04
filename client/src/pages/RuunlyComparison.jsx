@@ -22,10 +22,10 @@ const features = [
   { label: 'Price',             mowgoFree: '$0',          mowgoSolo: '$39/mo',    ruunlyStarter: '$19 + fees',   ruunlyPro: '$59 + fees',  type: 'price' },
   { label: 'Clients',           mowgoFree: '5',           mowgoSolo: 'Unlimited',  ruunlyStarter: '25',           ruunlyPro: '100',         type: 'text' },
   { label: 'Rain Delay',        mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
-  { label: 'Route Optimization',mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
+  { label: 'Route Optimization',mowgoFree: 'Coming soon', mowgoSolo: 'Coming soon',ruunlyStarter: false,          ruunlyPro: false,         type: 'qualified' },
   { label: 'SMS Campaigns',     mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
   { label: 'QuickBooks',        mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
-  { label: 'Mobile App',        mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
+  { label: 'Installable Web App (PWA)', mowgoFree: true,  mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
   { label: 'Platform Fees',     mowgoFree: '$0',          mowgoSolo: '$0',         ruunlyStarter: '2.5%',        ruunlyPro: '1.5%',        type: 'fee' },
   { label: 'Lawn-Specific Fields', mowgoFree: true,       mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
 ];
@@ -69,17 +69,17 @@ export default function RuunlyComparison() {
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline">
+          <Link to="/" className="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg no-underline min-h-[44px] inline-flex items-center">
             <div className="w-7 h-7 rounded-lg bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
               <Sprout className="w-4 h-4 text-white" aria-hidden="true" />
             </div>
             MowGo
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <Link to="/compare" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
               {tr("Compare")}
             </Link>
-            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <Link to="/login" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] inline-flex items-center">
               {tr("Log In")}
             </Link>
           </div>
@@ -265,6 +265,13 @@ export default function RuunlyComparison() {
                           </td>
                         );
                       }
+                      if (f.type === 'qualified') {
+                        return (
+                          <td key={col} className={`text-center py-3 px-2${cellBg}`}>
+                            {val === 'Coming soon' ? <span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">{tr("Coming soon")}</span> : <X className="w-5 h-5 text-red-400 mx-auto" aria-hidden="true" />}
+                          </td>
+                        );
+                      }
                       return (
                         <td key={col} className={`text-center py-3 px-2 text-xs font-medium${cellBg}`}>
                           <span className={f.type === 'fee' && !isMowGo ? 'text-red-500 dark:text-red-400' : f.type === 'fee' && isMowGo ? 'text-emerald-500 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}>
@@ -376,10 +383,11 @@ export default function RuunlyComparison() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("The math doesn't lie.")}</h2>
             <p className="text-emerald-100 text-lg mb-10">{tr("MowGo Solo: $39/mo flat. No platform fees. Free rain delay. Try it free.")}</p>
-            <Link to="/login" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
+            <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-white text-emerald-600 font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               {tr("Try MowGo Free")}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
+            <p className="mt-4 text-sm text-emerald-100/80">{tr("30-day Rain-Proof Guarantee on Solo. Cancel anytime.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -394,9 +402,9 @@ export default function RuunlyComparison() {
             MowGo &copy; 2026
           </div>
           <div className="flex gap-2 text-sm text-gray-400 dark:text-gray-500">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Home")}</Link>
             <Link to="/compare" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("App")}</Link>
+            <Link to="/compare" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
+            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
             <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>

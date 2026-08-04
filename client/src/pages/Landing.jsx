@@ -2,12 +2,13 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
 import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
 import Logo from '../components/Logo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
+import { supabase } from '../lib/supabase';
 
 const features = [
   { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Planning', desc: 'Optimized daily routes across OKC, Tulsa, Edmond, and beyond. Spend less time on I-35 and more time mowing.', color: 'from-emerald-500 to-teal-500' },
+  { icon: MapPin, title: 'Route Planning', desc: 'Route optimization is coming soon — smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500', soon: true },
   { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice sends automatically. Client pays via Stripe link. Track paid vs unpaid at a glance.', color: 'from-amber-500 to-orange-500' },
 ];
@@ -26,7 +27,7 @@ const plans = [
     price: '39',
     period: 'month',
     desc: 'For independent landscapers with a full schedule',
-    features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
+    features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation (coming soon)', 'Client notes, codes & pets', 'Offline mode'],
     bonuses: [
       { text: 'Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.', value: '$150 value' },
       { text: '"What to Charge in Your City" report: real mow prices from your Oklahoma market.', value: '$49 value' },
@@ -42,7 +43,7 @@ const plans = [
 
 const stats = [
   { value: '1,140+', label: 'Landscaping businesses in OK', suffix: 'and growing 6.5% yearly' },
-  { value: '0', label: 'Competitors with free rain delay', suffix: '— we\'re the only one' },
+  { value: '0', label: 'per-user fees on any plan', suffix: '— Solo is $39 flat, Crew is $79 flat' },
   { value: '<1%', label: 'of your revenue', suffix: '— Solo plan costs less than one missed job' },
 ];
 
@@ -61,6 +62,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 
 export default function Landing() {
   const { tr, t, i18n } = useLocalizedText('landing');
+  const navigate = useNavigate();
   const [paymentError, setPaymentError] = useState('');
   const errorTimerRef = useRef(null);
 
@@ -70,6 +72,12 @@ export default function Landing() {
 
   async function handleStartCheckout(plan) {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        sessionStorage.setItem('mowgo_plan_intent', plan);
+        navigate('/login?mode=signup');
+        return;
+      }
       const r = await startCheckout(plan);
       if (r?.error) {
         setPaymentError(r.error);
@@ -102,13 +110,13 @@ export default function Landing() {
             MowGo
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/compare" className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800">
+            <Link to="/compare" className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
               {tr("Compare")}
             </Link>
-            <Link to="/compare/ruunly" className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800">
-              {tr("vs Ruunly")}
-            </Link>
-            <Link to="/login" className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800">
+            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
+              {tr("Pricing")}
+            </button>
+            <Link to="/login" className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
               {tr("Log In")}
             </Link>
           </div>
@@ -131,7 +139,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Lawn care software")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("built in Oklahoma")}</span>
+              {tr("Less rain-day chaos. Less paperwork.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("More mowing.")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
@@ -141,7 +149,7 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/login" className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
+              <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
                 {tr("Start Free")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -153,6 +161,21 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Product Screenshot */}
+      <section className="max-w-4xl mx-auto px-4 -mt-8">
+        <FadeIn>
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl shadow-emerald-500/10 overflow-hidden">
+            <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-4 py-2.5 border-b border-gray-200 dark:border-gray-700">
+              <span className="w-3 h-3 rounded-full bg-red-400" />
+              <span className="w-3 h-3 rounded-full bg-amber-400" />
+              <span className="w-3 h-3 rounded-full bg-emerald-400" />
+            </div>
+            <img src="/landing/dashboard.png" alt={tr("MowGo dashboard screenshot")} className="w-full h-auto" loading="eager" />
+          </div>
+          <p className="text-center text-sm text-[var(--color-text-muted)] mt-4">{tr("The MowGo dashboard — your whole week at a glance.")}</p>
+        </FadeIn>
+      </section>
+
       {/* Features */}
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
@@ -160,14 +183,14 @@ export default function Landing() {
           <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,100+ landscaping businesses across Oklahoma.")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
-          {features.map(({ icon: Icon, title, desc, color }, i) => (
+          {features.map(({ icon: Icon, title, desc, color, soon }, i) => (
             <FadeIn key={title} delay={i * 100}>
               <div className="group card p-6 flex gap-4 hover:border-emerald-200 dark:hover:border-emerald-800 cursor-default">
                 <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr(title)}</h3>
+                  <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr(title)}{soon && <span className="ml-2 inline-block bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">{tr("Coming soon")}</span>}</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1 leading-relaxed">{tr(desc)}</p>
                 </div>
               </div>
@@ -227,7 +250,7 @@ export default function Landing() {
                   <tr className="border-b border-gray-800">
                     <td className="py-2.5 pr-4 text-[var(--color-text-muted)]">{tr("Per-User Fees")}</td>
                     <td className="text-center py-2.5 px-3"><span className="text-emerald-400 font-medium">{tr("None")}</span></td>
-                    <td className="text-center py-2.5 px-3"><span className="text-[var(--color-text-secondary)]">{tr("$30/user")}</span></td>
+                    <td className="text-center py-2.5 px-3"><span className="text-[var(--color-text-secondary)]">{tr("$29 per additional user")}</span></td>
                     <td className="text-center py-2.5 pl-3"><span className="text-[var(--color-text-secondary)]">{tr("N/A")}</span></td>
                   </tr>
                   <tr className="border-b border-gray-800">
@@ -245,7 +268,7 @@ export default function Landing() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("LawnPro is currently broken — no active mobile app or web dashboard. Jobber Connect charges $30/user/seat on top of $139.")}</p>
+            <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("Jobber Connect is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro is currently broken — no active mobile app or web dashboard.")}</p>
           </div>
         </FadeIn>
       </section>
@@ -296,13 +319,13 @@ export default function Landing() {
                   {plan.highlight && (
                     <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4">
                       <div className="bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl p-3">
-                        <p className="text-xs font-bold uppercase tracking-wide text-brand">{tr('Free Launch Kit — $278 value, included with Solo')}</p>
+                        <p className="text-sm font-bold uppercase tracking-wide text-brand">{tr('Free Launch Kit — $278 value, included with Solo')}</p>
                         <div className="mt-3 space-y-3">
                           {plan.bonuses.map(bonus => (
                             <div key={bonus.text} className="flex items-start gap-2">
                               <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-brand" />
-                              <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1">{tr(bonus.text)}</span>
-                              <span className="text-[10px] font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/30 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
+                              <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1">{tr(bonus.text)}</span>
+                              <span className="text-xs font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/30 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
                             </div>
                           ))}
                         </div>
@@ -316,11 +339,12 @@ export default function Landing() {
                     </p>
                   )}
                   {plan.name === 'Free' ? (
-                    <Link to="/login" className="group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200 min-h-[44px]">{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
+                    <Link to="/login?mode=signup" className="group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200 min-h-[44px]">{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
                   ) : (
                     <button onClick={() => handleStartCheckout(plan.name.toLowerCase())} className={`group mt-6 text-center inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm active:scale-[0.97] transition-all duration-200 min-h-[44px] ${plan.highlight ? 'bg-gray-900 dark:bg-[var(--color-surface)] text-white dark:text-[var(--color-text-primary)] hover:bg-gray-800 dark:hover:bg-[var(--color-surface-secondary)] shadow-lg hover:shadow-xl hover:shadow-gray-900/25 dark:hover:shadow-white/20 hover:-translate-y-0.5' : 'bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50'}`}>{tr(plan.cta)} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
                   )}
                   {plan.highlight && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr(plan.scarcity)}</p>}
+                  {plan.name === 'Crew' && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr("14-day free trial. Cancel anytime.")}</p>}
                 </div>
               </FadeIn>
             ))}
@@ -347,11 +371,12 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">{tr("Built in OKC. Used by Oklahoma crews.")}</h2>
             <p className="text-emerald-100 text-lg mb-10">{tr("Free for 5 clients. No credit card. 2 minutes.")}</p>
-            <Link to="/login" className="group inline-flex items-center gap-2 bg-[var(--color-surface)] text-brand-hover font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
+            <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-[var(--color-surface)] text-brand-hover font-bold rounded-xl px-8 py-3.5 text-base hover:bg-emerald-50 transition-all hover:shadow-xl hover:-translate-y-0.5">
               {tr("Start Free")}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="mt-4 text-emerald-200/80 text-sm">{tr("Available on iPhone, Android, and desktop.")}</p>
+            <p className="mt-4 text-emerald-200/80 text-sm">{tr("Works on iPhone, Android, and desktop as an installable home-screen app (PWA).")}</p>
+            <p className="mt-2 text-emerald-100/80 text-sm">{tr("30-day Rain-Proof Guarantee on Solo. Cancel anytime.")}</p>
           </FadeIn>
         </div>
       </section>
@@ -364,7 +389,8 @@ export default function Landing() {
             MowGo &copy; 2026
           </div>
           <div className="flex gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
-            <Link to="/login" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("App")}</Link>
+            <Link to="/compare" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
+            <Link to="/login" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
             <a href="mailto:hello@mowgo.app" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>
