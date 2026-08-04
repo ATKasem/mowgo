@@ -70,7 +70,7 @@ private struct JobStatusPatch: Encodable {
     let status: Job.JobStatus
 }
 
-private struct JobSchedulePatch: Encodable {
+private struct JobSchedulePatch: Codable {
     let scheduledDate: String
 }
 
@@ -649,6 +649,7 @@ final class DataStore: ObservableObject {
         teamMembers = []
         recurringJobs = []
         rainDelayHistory = []
+        persistRainDelayHistory()
         currentUserId = nil
         isLoading = false
         error = nil
@@ -1071,9 +1072,20 @@ final class DataStore: ObservableObject {
                 }
                 // Rollback: re-sync the already-updated jobs to their original dates
                 for jobId in succeeded {
-                    persistence?.removePendingMutations(
-                        operation: "job:schedule", entityId: jobId
-                    )
+                    if let currentUserId {
+                        persistence?.removePendingMutations(
+                            operation: "job:schedule",
+                            entityId: jobId,
+                            currentUserId: currentUserId,
+                            payloadMatches: { payload in
+                                guard let decoded = try? JSONDecoder().decode(
+                                    JobSchedulePatch.self,
+                                    from: payload
+                                ) else { return false }
+                                return decoded.scheduledDate == targetDate
+                            }
+                        )
+                    }
                     if let original = originalDates[jobId],
                        let realJob = self.jobs.first(where: { $0.id == jobId }) {
                         try? await updateJobSchedule(realJob, scheduledDate: original)
@@ -1486,20 +1498,25 @@ final class DataStore: ObservableObject {
         do {
             try await updateLead(lead.id, patch: LeadPatch(status: LeadStatus.won.rawValue, clientId: client.id))
         } catch {
-            if isNetworkError(error) {
-                if let index = leads.firstIndex(where: { $0.id == lead.id }) {
-                    leads[index].status = LeadStatus.won.rawValue
-                    leads[index].clientId = client.id
-                }
-                return
-            }
-            let creationWasQueued = persistence?.removePendingMutations(
-                operation: "client:create", entityId: client.id
-            ) ?? false
+            let creationWasQueued = currentUserId.map {
+                persistence?.removePendingMutations(
+                    operation: "client:create",
+                    entityId: client.id,
+                    currentUserId: $0
+                ) ?? false
+            } ?? false
+            var cleanupSucceeded = true
             if !creationWasQueued {
-                try? await deleteClientOnServer(client.id)
+                do {
+                    try await deleteClientOnServer(client.id)
+                } catch {
+                    cleanupSucceeded = false
+                    self.error = "Converted client cleanup failed — delete client manually"
+                }
             }
-            clients.removeAll { $0.id == client.id }
+            if cleanupSucceeded {
+                clients.removeAll { $0.id == client.id }
+            }
             if let index = leads.firstIndex(where: { $0.id == lead.id }) {
                 leads[index] = lead
             }
