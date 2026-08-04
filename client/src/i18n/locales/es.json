@@ -716,7 +716,8 @@
     "seo": {
       "title": "MowGo — Software de programación, rutas y facturación para jardinería",
       "description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito."
-    }
+    },
+    "mowgo_operator": "Operador de MowGo"
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -1197,10 +1198,17 @@
     "retry": "Reintentar"
   },
   "reviewPrompt": {
-    "loving_mowgo": "¿Te gusta MowGo?",
-    "help_us_out_with_a_review": "Ayúdanos con una reseña ⭐",
     "leave_a_review": "Dejar una reseña",
-    "maybe_later": "Quizás después"
+    "maybe_later": "Quizás después",
+    "10_jobs_done_how_is_it_going": "10 trabajos terminados. ¿Cómo va todo?",
+    "one_line_about_what_changed_for_your_business_it_might_end_up_on_our_sit": "Una línea sobre lo que cambió para tu negocio: podría aparecer en nuestro sitio.",
+    "example_i_stopped_rebooking_rain_outs_by_hand_whole_week_moves_in_one_ta": "Ejemplo: “Dejé de reagendar los días de lluvia a mano. Toda la semana se mueve con un toque.”",
+    "share_it": "Compartir",
+    "saving": "Guardando…",
+    "thanks_that_helps_other_crews": "Gracias: eso ayuda a otras cuadrillas.",
+    "want_to_leave_a_public_review_too": "¿Quieres dejar también una reseña pública?",
+    "review_on_capterra": "Reseña en Capterra",
+    "could_not_save_try_again": "No se pudo guardar. Inténtalo de nuevo."
   },
   "concierge": {
     "your_done_for_you_setup_is_included": "Tu configuración hecha por nosotros está incluida",

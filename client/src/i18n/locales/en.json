@@ -666,7 +666,8 @@
     "seo": {
       "title": "MowGo — Lawn Care Scheduling, Routing & Invoicing Software",
       "description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card."
-    }
+    },
+    "mowgo_operator": "MowGo operator"
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -1125,10 +1126,17 @@
     "retry": "Retry"
   },
   "reviewPrompt": {
-    "loving_mowgo": "Loving MowGo?",
-    "help_us_out_with_a_review": "Help us out with a review ⭐",
     "leave_a_review": "Leave a Review",
-    "maybe_later": "Maybe Later"
+    "maybe_later": "Maybe Later",
+    "10_jobs_done_how_is_it_going": "10 jobs done. How is it going?",
+    "one_line_about_what_changed_for_your_business_it_might_end_up_on_our_sit": "One line about what changed for your business — it might end up on our site.",
+    "example_i_stopped_rebooking_rain_outs_by_hand_whole_week_moves_in_one_ta": "Example: “I stopped rebooking rain-outs by hand. Whole week moves in one tap.”",
+    "share_it": "Share it",
+    "saving": "Saving…",
+    "thanks_that_helps_other_crews": "Thanks — that helps other crews.",
+    "want_to_leave_a_public_review_too": "Want to leave a public review too?",
+    "review_on_capterra": "Review on Capterra",
+    "could_not_save_try_again": "Could not save. Try again."
   },
   "concierge": {
     "your_done_for_you_setup_is_included": "Your done-for-you setup is included",

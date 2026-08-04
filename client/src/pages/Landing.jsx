@@ -63,9 +63,8 @@ const stats = [
   { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job.' },
 ];
 
-// TODO: collect real operator quotes (ask at the 10th invoice / first rain-delay save).
-// Section stays hidden until testimonials exist — never fabricate proof.
-const testimonials = [];
+// Testimonials are fetched from the approved queue (users submit in-app at the 10th job).
+// Section stays hidden until real approved quotes exist — never fabricate proof.
 
 const faqs = [
   { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
@@ -93,8 +92,27 @@ export default function Landing() {
   const [paymentError, setPaymentError] = useState('');
   const [billingInterval, setBillingInterval] = useState('month');
   const [kitOpen, setKitOpen] = useState(false);
+  const [testimonials, setTestimonials] = useState([]);
   const errorTimerRef = useRef(null);
   usePageTitle(tr('seo.title'), tr('seo.description'));
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('testimonials')
+          .select('quote, name, role')
+          .eq('approved', true)
+          .order('created_at', { ascending: false })
+          .limit(6);
+        if (!cancelled && Array.isArray(data)) setTestimonials(data);
+      } catch (e) {
+        // No proof section is fine — never render fabricated quotes
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     return () => { if (errorTimerRef.current) clearTimeout(errorTimerRef.current); };
@@ -331,9 +349,9 @@ export default function Landing() {
             {testimonials.map((t, i) => (
               <FadeIn key={i} delay={i * 100}>
                 <div className="card p-6 h-full flex flex-col">
-                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1 leading-relaxed">"{tr(t.quote)}"</p>
-                  <p className="mt-4 text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr(t.name)}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{tr(t.role)}</p>
+                  <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1 leading-relaxed">"{t.quote}"</p>
+                  <p className="mt-4 text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{t.name || tr('MowGo operator')}</p>
+                  {t.role && <p className="text-xs text-[var(--color-text-muted)]">{t.role}</p>}
                 </div>
               </FadeIn>
             ))}
