@@ -223,11 +223,15 @@ class JobRepository {
         }
 
         val userId = getCurrentUserId() ?: return null
+        val profile = ProfileRepository().loadProfile()
 
         // Fetch all jobs for today and filter client-side (avoids complex OR filter DSL)
         val allJobs = SupabaseClientProvider.client.from("jobs")
             .select {
-                filter { eq("user_id", userId) }
+                filter {
+                    if (profile?.role == "crew") eq("assigned_to", userId)
+                    else eq("user_id", userId)
+                }
             }
             .decodeList<Job>()
 

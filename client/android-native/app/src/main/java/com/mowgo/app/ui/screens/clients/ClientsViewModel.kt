@@ -91,7 +91,7 @@ class ClientsViewModel : ViewModel() {
     }
 
     fun updateLeadStatus(lead: Lead, status: LeadStatus) = mutate("Lead status updated") {
-        leadRepository.updateLeadStatus(lead.id, status)
+        leadRepository.updateLeadStatus(lead, status)
     }
 
     fun deleteLead(lead: Lead) {
