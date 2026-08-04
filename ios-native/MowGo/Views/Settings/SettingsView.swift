@@ -704,7 +704,7 @@ struct SubscriptionView: View {
                             features: [
                                 "Unlimited clients & jobs",
                                 "Recurring job automation",
-                                "GPS route navigation (coming soon)",
+                                "GPS route navigation",
                                 "Client notes, codes & pets",
                                 "Offline mode"
                             ],
