@@ -3,15 +3,17 @@ import { useState, useEffect, useRef } from 'react';
 import { loadProfile, saveProfile, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
 import { downloadCsv, toCsv } from '../lib/csv';
 import { TEAM_MEMBER_COLORS } from '../lib/constants';
-import { isDemoMode } from '../lib/supabase';
+import { isDemoMode, supabase } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
 import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
+import ConciergeSetup from '../components/ConciergeSetup';
 
 export default function Settings() {
   const { tr, t, i18n } = useLocalizedText('settings');
+  const { tr: conciergeTr } = useLocalizedText('concierge');
   const { user } = useAuth();
   const [profile, setProfile] = useState({ business_name: '', phone: '', tier: 'free' });
   const [saved, setSaved] = useState(false);
@@ -23,6 +25,8 @@ export default function Settings() {
   const [resolvedLocation, setResolvedLocation] = useState('');
   const [locationError, setLocationError] = useState('');
   const [locationLoading, setLocationLoading] = useState(false);
+  const [conciergeClaimed, setConciergeClaimed] = useState(null);
+  const [showConcierge, setShowConcierge] = useState(false);
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
   const [notifyOnRain, setNotifyOnRain] = useState(() => localStorage.getItem('mf_notify_rain') !== 'false');
@@ -56,6 +60,18 @@ export default function Settings() {
       Object.values(exportTimers.current).forEach(clearTimeout);
     };
   }, []);
+
+  useEffect(() => {
+    if (isDemoMode() || !user) return;
+    let active = true;
+    supabase.from('concierge_requests').select('id').eq('user_id', user.id).maybeSingle()
+      .then(({ data, error: claimError }) => {
+        if (!active) return;
+        if (claimError) console.error('Concierge claim check:', claimError);
+        setConciergeClaimed(Boolean(data));
+      });
+    return () => { active = false; };
+  }, [user]);
 
   useEffect(() => {
     let active = true;
@@ -289,6 +305,15 @@ export default function Settings() {
             </>
           )}
         </form>
+
+        {!isDemoMode() && ['solo', 'crew'].includes(profile?.tier) && conciergeClaimed === false && (
+          showConcierge ? <ConciergeSetup onDone={() => { setConciergeClaimed(true); setShowConcierge(false); }} /> : (
+            <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-brand/30">
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup included: we'll import your clients and pre-schedule your first 30 days.")}</p>
+              <button type="button" className="btn-primary whitespace-nowrap" onClick={() => setShowConcierge(true)}>{conciergeTr('Claim it')}</button>
+            </div>
+          )
+        )}
 
         {/* Plan Info */}
         <div className="card p-5 space-y-3">

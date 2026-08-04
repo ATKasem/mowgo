@@ -23,6 +23,7 @@ import RuunlyComparison from './pages/RuunlyComparison';
 import ProBaseComparison from './pages/ProBaseComparison';
 import Booking from './pages/Booking';
 import PortalReturn from './pages/PortalReturn';
+import AdminConcierge from './pages/AdminConcierge';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
 
@@ -196,6 +197,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/portal-return" element={<PortalReturn />} />
+          <Route path="/admin/concierge" element={<AdminConcierge />} />
 
           {/* Protected */}
           <Route element={

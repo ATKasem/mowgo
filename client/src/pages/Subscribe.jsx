@@ -3,13 +3,30 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../App';
+import ConciergeSetup from '../components/ConciergeSetup';
 
 export default function Subscribe() {
   const { tr, t, i18n } = useLocalizedText('subscribe');
+  const { tr: conciergeTr } = useLocalizedText('concierge');
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [status, setStatus] = useState(sessionId ? 'verifying' : 'cancelled');
   const [error, setError] = useState('');
+  const [conciergeClaimed, setConciergeClaimed] = useState(null);
+
+  useEffect(() => {
+    if (status !== 'success' || !user) return;
+    let active = true;
+    supabase.from('concierge_requests').select('id').eq('user_id', user.id).maybeSingle()
+      .then(({ data, error: claimError }) => {
+        if (!active) return;
+        if (claimError) console.error('Concierge claim check:', claimError);
+        setConciergeClaimed(Boolean(data));
+      });
+    return () => { active = false; };
+  }, [status, user]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -59,7 +76,8 @@ export default function Subscribe() {
   if (status === 'success') {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
+        <div className="text-center max-w-2xl w-full mx-auto px-4 py-10 space-y-6">
+          <div className="card p-6">
           <div className="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
           </div>
@@ -68,6 +86,9 @@ export default function Subscribe() {
           <Link to="/login" className="btn-primary text-base px-8 py-3 gap-2">
             {tr("Go to Dashboard")} <ArrowRight className="w-4 h-4" />
           </Link>
+          </div>
+          {user && conciergeClaimed === false && <ConciergeSetup onDone={() => setConciergeClaimed(true)} />}
+          {user && conciergeClaimed === true && <p className="text-sm text-gray-600 dark:text-gray-300">{conciergeTr("Your setup request is in — we'll be in touch within 48 hours.")}</p>}
         </div>
       </div>
     );
