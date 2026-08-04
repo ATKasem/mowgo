@@ -365,7 +365,11 @@
     "30_day_rain_proof_guarantee_on_solo_cancel_anytime": "Garantía de 30 días a prueba de lluvia en Solo. Cancela en cualquier momento.",
     "compare_each_plan_fee_and_field_tool_side_by_side": "Compare cada plan, tarifa y herramienta de campo uno al lado del otro.",
     "add_ruunly_s_platform_fee_to_the_sticker_price_here_is_the_monthly_total": "Agregue la tarifa de la plataforma de Ruunly al precio de etiqueta. Aquí está el total mensual.",
-    "enter_your_monthly_revenue_see_what_ruunly_costs_next_to_mowgo_no_asteri": "Ingrese sus ingresos mensuales. Mira lo que cuesta Ruunly junto a MowGo. Sin asteriscos. Sólo las matemáticas."
+    "enter_your_monthly_revenue_see_what_ruunly_costs_next_to_mowgo_no_asteri": "Ingrese sus ingresos mensuales. Mira lo que cuesta Ruunly junto a MowGo. Sin asteriscos. Sólo las matemáticas.",
+    "seo": {
+      "title": "Calculadora de costo real de Ruunly — ¿$19/mes o $169/mes?",
+      "description": "Ruunly dice $19/mes. Las matemáticas dicen $169/mes. Usa el control deslizante para ver el costo real con comisiones de Ruunly vs los $39 planos de MowGo."
+    }
   },
   "home": {
     "clear": "Despejado",
@@ -563,7 +567,13 @@
     "compare_mowgo_solo_39_mo_with_jobber_connect_139_mo_side_by_side": "Compare MowGo Solo ($39/mes) con Jobber Connect ($139/mes) uno al lado del otro:",
     "for_a_solo_operator_or_1_3_person_crew_each_added_user_raises_the_bill_h": "Para un operador en solitario o un equipo de 1 a 3 personas, cada usuario agregado aumenta la factura. Aquí están las matemáticas:",
     "if_software_costs_squeeze_your_small_crew_compare_the_monthly_total_befo": "Si los costos del software aprietan a tu equipo pequeño, compara el total mensual antes de renovar. Tienes opciones.",
-    "check_these_four_things_before_you_move_your_crew_to_another_app": "Revisa estas cuatro cosas antes de mover a tu equipo a otra aplicación:"
+    "check_these_four_things_before_you_move_your_crew_to_another_app": "Revisa estas cuatro cosas antes de mover a tu equipo a otra aplicación:",
+    "39_mo": "$39/mes",
+    "29_mo_per_additional_user": "$29/mes por usuario adicional",
+    "seo": {
+      "title": "Aumento de precios de Jobber 2026 — cuánto pagan las cuadrillas de 1-3 personas",
+      "description": "Jobber Connect cuesta $139/mes más $29/mes por usuario. Mira el costo real para operadores individuales y cuadrillas pequeñas, y la alternativa plana de MowGo. Agosto de 2026."
+    }
   },
   "landing": {
     "premium": "Premium",
@@ -792,7 +802,6 @@
     "none": "Ninguno",
     "charges_per_user_on_paid_plans": "Cobra por usuario en los planes de pago",
     "transaction_fees": "Comisiones por transacción",
-    "none_you_keep_what_you_earn": "Ninguna; te quedas con lo que ganas",
     "payment_processing_fees_apply": "Se aplican comisiones por procesamiento de pagos",
     "drag_and_drop_scheduling": "Programación con arrastrar y soltar",
     "yes_move_jobs_with_one_finger": "Sí; mueve trabajos con un dedo",
@@ -803,7 +812,6 @@
     "desktop_oriented_interface": "Interfaz pensada para computadora",
     "home": "Inicio",
     "log_in": "Iniciar sesión",
-    "july_2026_update": "Actualización de julio de 2026",
     "quoteiq_discontinued_free_plan_here_s_a_better_alternative_for_lawn_care": "¿QuoteIQ descontinuó su plan gratis? Esta es una mejor alternativa para profesionales de jardinería",
     "quoteiq_just_axed_its_free_plan_and_displaced_hundreds_of_lawn_care_pros": "QuoteIQ eliminó su plan gratis y dejó sin herramienta a cientos de profesionales de jardinería. Si dependías de QuoteIQ para administrar tu negocio, te contamos qué ocurrió y qué debes buscar ahora.",
     "what_happened_to_quoteiq_s_free_plan": "¿Qué pasó con el plan gratis de QuoteIQ?",
@@ -837,7 +845,14 @@
     "check_these_four_things_before_you_move_your_clients_and_schedule_to_ano": "Verifique estas cuatro cosas antes de trasladar a sus clientes y programarlos a otra aplicación:",
     "if_that_happened_to_you_compare_the_price_limits_and_field_tools_before_": "Si eso te pasó, compara el precio, los límites y las herramientas de campo antes de migrar. MowGo te ofrece una opción gratis para 5 clientes.",
     "run_5_clients_free_with_no_credit_card_move_rain_day_jobs_in_one_tap_and": "Gestiona 5 clientes gratis sin tarjeta de crédito. Mueva trabajos de emergencia con un solo toque y no pague tarifas por usuario.",
-    "need_a_new_free_lawn_care_app_after_quoteiq_s_july_2026_change": "¿Necesitas una app de césped gratis después del cambio de QuoteIQ de julio de 2026?"
+    "need_a_new_free_lawn_care_app_after_quoteiq_s_july_2026_change": "¿Necesitas una app de césped gratis después del cambio de QuoteIQ de julio de 2026?",
+    "august_2026_update": "Actualización de agosto de 2026",
+    "check_these_five_things_before_you_move_your_clients_and_schedule_to_ano": "Revisa estas cinco cosas antes de mover tus clientes y tu agenda a otra app:",
+    "no_platform_fee_stripe_s_cut_only": "Sin comisión de plataforma: solo la de Stripe",
+    "seo": {
+      "title": "Alternativa a QuoteIQ para jardinería — plan gratis, 5 clientes",
+      "description": "QuoteIQ discontinuó su plan gratis en julio de 2026. MowGo da a las cuadrillas de jardinería una opción gratis: 5 clientes para siempre, sin tarjeta."
+    }
   },
   "resetPassword": {
     "passwords_do_not_match": "Las contraseñas no coinciden.",
@@ -1092,7 +1107,11 @@
     "both_are_39_mo_compare_the_included_features_above_to_decide_which_fits_": "Ambas cuestan $39/mes: compara las funciones incluidas arriba y decide cuál se adapta a tu negocio.",
     "leave_lawnpro_without_losing_your_week": "Deja LawnPro sin perder tu semana.",
     "move_your_first_5_clients_free": "Mueve tus primeros 5 clientes gratis.",
-    "built_from_talks_with_lawn_care_operators_these_tools_keep_a_small_crew_": "Construido a partir de conversaciones con operadores de cuidado del césped. Estas herramientas mantienen en movimiento a un pequeño equipo."
+    "built_from_talks_with_lawn_care_operators_these_tools_keep_a_small_crew_": "Construido a partir de conversaciones con operadores de cuidado del césped. Estas herramientas mantienen en movimiento a un pequeño equipo.",
+    "seo": {
+      "title": "Cambia de LawnPro a MowGo — conserva tu semana, mueve 5 clientes gratis",
+      "description": "Sal de LawnPro sin perder tu semana. Importa tus primeros 5 clientes gratis, reagendado por lluvia incluido, sin tarjeta de crédito."
+    }
   },
   "today": {
     "crew_assignments_are_temporarily_unavailable": "Las asignaciones del equipo no están disponibles por ahora.",
@@ -1276,7 +1295,7 @@
     "you_want_marketplace_job_leads_probase_can_feed_you_work_from_their_mark": "Quieres clientes de marketplace — ProBase puede darte trabajo de su marketplace (y se lleva un porcentaje de esos trabajos).",
     "you_run_a_pool_service_they_cover_chemical_logging_and_water_testing": "Manejas un servicio de albercas — cubren registro químico y análisis de agua.",
     "you_never_work_in_the_rain_never_lose_signal_and_don_t_need_accounting_s": "Nunca trabajas bajo la lluvia, nunca pierdes señal y no necesitas sincronización contable.",
-    "if_that_s_you_probase_is_legitimately_free_and_you_should_use_it_mowgo_i": "Si ese eres tú — ProBase es legítimamente gratis y deberías usarlo. MowGo está hecho para el otro 95%: cuadrillas que pierden un día de ingresos cada vez que llueve y quieren software que no intente ser un marketplace.",
+    "if_that_s_you_probase_is_legitimately_free_and_you_should_use_it_mowgo_i": "Si ese es tu caso, ProBase es legítimamente gratis y deberías usarlo. MowGo está hecho para cuadrillas que pierden un día de ingresos cada vez que llueve y quieren un software que no intente ser un marketplace.",
     "works_in_the_field": "Funciona en el campo",
     "native_apps_with_offline_mode_probase_is_a_pwa_dead_without_signal_mowgo": "Apps nativas con modo sin señal. ProBase es una PWA — muerta sin conexión. MowGo guarda todo tu día en tu bolsillo.",
     "real_apps_real_sync": "Apps reales, sincronización real",
@@ -1289,7 +1308,6 @@
     "see_all_comparisons": "Ver todas las comparaciones",
     "that_u2019s_not_a_feature_list_difference_that_u2019s_a_whole_day_of_rev": "Esa no es una diferencia de lista de funciones. Es un día entero de ingresos.",
     "verified_august_2026_probase_wins_on_free_u2014_we_u2019ll_say_it_here_u": "Verificado en agosto de 2026. ProBase gana en el plan gratis: lo decimos sin rodeos. Aquí está todo lo demás.",
-    "if_that_u2019s_you_u2014_probase_is_legitimately_free_and_you_should_use": "Si ese es tu caso, ProBase es legítimamente gratuito y deberías usarlo. MowGo está diseñado para el otro 95%: equipos que pierden un día de ingresos cada vez que llueve y que quieren un software que no intente ser un mercado.",
     "you_u2019re_a_solo_operator_who_never_needs_to_reschedule_for_weather_an": "Eres un operador independiente que nunca necesita reprogramar por el clima, y ​​$0/mes para siempre es más importante que cualquier otra cosa.",
     "feature_comparison_table_u2014_scroll_horizontally_on_mobile": "Tabla de comparación de funciones: desplázate horizontalmente en el móvil",
     "you_want_marketplace_job_leads_u2014_probase_can_feed_you_work_from_thei": "Quieres clientes del marketplace: ProBase puede darte trabajo desde su marketplace (y se lleva una parte de esos trabajos).",
@@ -1308,7 +1326,38 @@
     "mowgo_u2014_free_tier": "MowGo — nivel gratuito",
     "mowgo_s_installable_web_app_keeps_working_offline_so_your_schedule_stays": "La aplicación web instalable de MowGo sigue funcionando sin conexión, así tu agenda sigue disponible cuando se cae la señal.",
     "that_difference_can_save_a_whole_day_of_revenue": "Esa diferencia puede ahorrar un día entero de ingresos.",
-    "probase_costs_0_but_it_has_no_rain_delay_no_offline_mode_and_no_accounti": "ProBase cuesta $0. Pero no tiene retraso por lluvia, ni modo fuera de línea ni sincronización de contabilidad. Cuando llega una tormenta a las 6 a.m., MowGo mueve toda tu ruta con un solo toque."
+    "probase_costs_0_but_it_has_no_rain_delay_no_offline_mode_and_no_accounti": "ProBase cuesta $0. Pero no tiene retraso por lluvia, ni modo fuera de línea ni sincronización de contabilidad. Cuando llega una tormenta a las 6 a.m., MowGo mueve toda tu ruta con un solo toque.",
+    "rain_delay_auto_reschedule": "Reagendado automático por lluvia",
+    "one_tap_moves_today_s_route_to_tomorrow": "Un toque mueve la ruta de hoy a mañana",
+    "offline_mode": "Modo sin conexión",
+    "keep_working_with_no_cell_service_syncs_later": "Sigue trabajando sin señal, sincroniza después",
+    "installable_web_app_pwa": "App web instalable (PWA)",
+    "works_on_iphone_android_and_desktop_from_the_home_screen": "Funciona en iPhone, Android y escritorio desde la pantalla de inicio",
+    "quickbooks_accounting_sync": "Sincronización con QuickBooks / contabilidad",
+    "via_zapier_webhooks_probase_not_designed_for_businesses_that_need_accoun": "Vía webhooks de Zapier (ProBase: \"no diseñado para negocios que necesitan sincronización contable\")",
+    "client_self_booking_link": "Enlace de reserva para clientes",
+    "clients_book_their_own_slot_from_your_link": "Los clientes reservan su propio espacio desde tu enlace",
+    "flat_fee_no_take_rate": "Tarifa plana, sin comisión",
+    "mowgo_charges_a_flat_monthly_fee_no_of_your_revenue": "MowGo cobra una tarifa mensual plana. Sin % de tus ingresos",
+    "price": "Precio",
+    "probase_is_genuinely_free_that_s_the_trade_off": "ProBase es genuinamente gratis. Ese es el intercambio",
+    "marketplace_job_leads": "Clientes potenciales del marketplace",
+    "probase_can_feed_you_jobs_from_their_marketplace_they_take_a_cut": "ProBase puede darte trabajos de su marketplace (se llevan una comisión)",
+    "tip_collection": "Recolección de propinas",
+    "built_into_online_payments": "Incluida en los pagos en línea",
+    "ai_service_notes": "Notas de servicio con IA",
+    "plain_language_notes_structured_records": "Notas en lenguaje sencillo → registros estructurados",
+    "automated_review_requests": "Solicitudes automáticas de reseñas",
+    "prompts_customers_to_leave_google_reviews": "Invita a los clientes a dejar reseñas de Google",
+    "seo": {
+      "title": "ProBase vs MowGo — comparación honesta para cuadrillas",
+      "description": "ProBase es gratis. Hasta que llueve. Compara reagendado por lluvia, modo sin conexión y precios lado a lado. Actualizado en agosto de 2026."
+    },
+    "yes": "Sí",
+    "no": "No",
+    "free_79_mo": "Gratis – $79/mes",
+    "0_forever": "$0 para siempre",
+    "0_mo": "$0/mes"
   },
   "routeAudit": {
     "landingCta": "Prueba la auditoría de rutas gratis",

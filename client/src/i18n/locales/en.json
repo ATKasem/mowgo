@@ -342,7 +342,11 @@
     "on_every_plan_including_free_one_tap_moves_your_whole_schedule_clients_g": "On every plan — including Free. One tap moves your whole schedule. Clients get notified automatically.",
     "platform_fee_expose": "Platform Fee Exposé",
     "see_what_ruunly_actually_costs_vs_mowgo_no_asterisks_no_fine_print_just_": "See what Ruunly actually costs vs MowGo. No asterisks, no fine print — just the numbers.",
-    "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter_pl": "You must upgrade to the Pro plan ($59/mo) just to get rain delay. Starter plan doesn't include it."
+    "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter_pl": "You must upgrade to the Pro plan ($59/mo) just to get rain delay. Starter plan doesn't include it.",
+    "seo": {
+      "title": "Ruunly Real Cost Calculator — $19/mo or $169/mo?",
+      "description": "Ruunly says $19/mo. The math says $169/mo. Use the revenue slider to see Ruunly’s real platform-fee cost vs MowGo’s flat $39."
+    }
   },
   "home": {
     "clear": "Clear",
@@ -528,7 +532,13 @@
     "and_better_alternatives": "(And Better Alternatives)",
     "a_solo_operator_on_jobber_connect_pays_price_for_features_they_might_not": "A solo operator on Jobber Connect pays {{price}} for features they might not need (advanced reporting and team management). You're paying for a business you don't have yet.",
     "a_3_person_crew_on_jobber_connect_pays_a_base_base_plus_peruser_per_user": "A 3-person crew on Jobber Connect pays a {{base}} base plus {{perUser}} per user, about {{total}}. For a lawn care business earning {{revenue}} per month, that's 2% going straight to software.",
-    "mowgo_solo_costs_price_72_less_than_jobber_connect_with_no_per_user_fees": "MowGo Solo costs {{price}}, 72% less than Jobber Connect, with no per-user fees."
+    "mowgo_solo_costs_price_72_less_than_jobber_connect_with_no_per_user_fees": "MowGo Solo costs {{price}}, 72% less than Jobber Connect, with no per-user fees.",
+    "39_mo": "$39/mo",
+    "29_mo_per_additional_user": "$29/mo per additional user",
+    "seo": {
+      "title": "Jobber Price Increase 2026 — What 1-3 Person Lawn Crews Pay",
+      "description": "Jobber Connect is $139/mo plus $29/mo per user. See the real math for solo operators and small crews, and MowGo’s flat alternative. August 2026."
+    }
   },
   "landing": {
     "premium": "Premium",
@@ -740,7 +750,6 @@
     "none": "None",
     "charges_per_user_on_paid_plans": "Charges per user on paid plans",
     "transaction_fees": "Transaction fees",
-    "none_you_keep_what_you_earn": "None — you keep what you earn",
     "payment_processing_fees_apply": "Payment processing fees apply",
     "drag_and_drop_scheduling": "Drag-and-drop scheduling",
     "yes_move_jobs_with_one_finger": "Yes — move jobs with one finger",
@@ -751,7 +760,6 @@
     "desktop_oriented_interface": "Desktop-oriented interface",
     "home": "Home",
     "log_in": "Log In",
-    "july_2026_update": "July 2026 Update",
     "quoteiq_discontinued_free_plan_here_s_a_better_alternative_for_lawn_care": "QuoteIQ Discontinued Free Plan? Here's a Better Alternative for Lawn Care Pros",
     "quoteiq_just_axed_its_free_plan_and_displaced_hundreds_of_lawn_care_pros": "QuoteIQ just axed its free plan and displaced hundreds of lawn care pros. If you relied on QuoteIQ to run your business, here's what happened and what to look for next.",
     "what_happened_to_quoteiq_s_free_plan": "What Happened to QuoteIQ's Free Plan?",
@@ -775,7 +783,14 @@
     "discontinuing_its_free_plan": "discontinuing its free plan",
     "entirely_if_you_were_a_small_lawn_care_operator_or_solo_mowing_business_": "entirely. If you were a small lawn care operator or solo mowing business using QuoteIQ's free tier to manage your clients and schedule, you were suddenly left scrambling for an alternative.",
     "free_for_real_use": "free for real use",
-    "with_5_clients_on_the_forever_free_plan_no_credit_card_no_catch": "— with 5 clients on the forever-free plan. No credit card, no catch."
+    "with_5_clients_on_the_forever_free_plan_no_credit_card_no_catch": "— with 5 clients on the forever-free plan. No credit card, no catch.",
+    "august_2026_update": "August 2026 Update",
+    "check_these_five_things_before_you_move_your_clients_and_schedule_to_ano": "Check these five things before you move your clients and schedule to another app:",
+    "no_platform_fee_stripe_s_cut_only": "No platform fee — Stripe’s cut only",
+    "seo": {
+      "title": "QuoteIQ Alternative for Lawn Care — Free Plan, 5 Clients",
+      "description": "QuoteIQ discontinued its free plan in July 2026. MowGo gives lawn care crews a free option: 5 clients forever, no credit card."
+    }
   },
   "resetPassword": {
     "passwords_do_not_match": "Passwords do not match.",
@@ -1020,7 +1035,11 @@
     "mo": "/mo",
     "cheaper_isn_t_cheaper_if_the_features_don_t_work": "\"Cheaper\" isn't cheaper if the features don't work.",
     "mowgo_was_born_because_i_got_tired_of_losing_client_data_in_other_apps_e": "\"MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving.\"",
-    "you_trusted_lawnpro_with_your_business_if_reports_from_former_lawnpro_us": "You trusted LawnPro with your business. If reports from former LawnPro users about lost data, broken sync, or surprise price hikes sound familiar, keep reading. MowGo was built for operators who are tired of that."
+    "you_trusted_lawnpro_with_your_business_if_reports_from_former_lawnpro_us": "You trusted LawnPro with your business. If reports from former LawnPro users about lost data, broken sync, or surprise price hikes sound familiar, keep reading. MowGo was built for operators who are tired of that.",
+    "seo": {
+      "title": "Switch from LawnPro to MowGo — Keep Your Week, Move 5 Clients Free",
+      "description": "Move from LawnPro without losing your week. Import your first 5 clients free, rain delay included, no credit card."
+    }
   },
   "today": {
     "crew_assignments_are_temporarily_unavailable": "Crew assignments are temporarily unavailable.",
@@ -1204,7 +1223,7 @@
     "you_want_marketplace_job_leads_probase_can_feed_you_work_from_their_mark": "You want marketplace job leads — ProBase can feed you work from their marketplace (and takes a cut of those jobs).",
     "you_run_a_pool_service_they_cover_chemical_logging_and_water_testing": "You run a pool service — they cover chemical logging and water testing.",
     "you_never_work_in_the_rain_never_lose_signal_and_don_t_need_accounting_s": "You never work in the rain, never lose signal, and don’t need accounting sync.",
-    "if_that_s_you_probase_is_legitimately_free_and_you_should_use_it_mowgo_i": "If that’s you — ProBase is legitimately free and you should use it. MowGo is built for the other 95%: crews who lose a day of revenue every time it rains, and who want software that isn’t trying to be a marketplace.",
+    "if_that_s_you_probase_is_legitimately_free_and_you_should_use_it_mowgo_i": "If that’s you — ProBase is legitimately free and you should use it. MowGo is built for crews who lose a day of revenue every time it rains, and who want software that isn’t trying to be a marketplace.",
     "works_in_the_field": "Works in the field",
     "native_apps_with_offline_mode_probase_is_a_pwa_dead_without_signal_mowgo": "Native apps with offline mode. ProBase is a PWA — dead without signal. MowGo keeps your whole day in your pocket.",
     "real_apps_real_sync": "Real apps, real sync",
@@ -1214,7 +1233,38 @@
     "try_mowgo_free_rain_delay_included": "Try MowGo free. Rain delay included.",
     "5_clients_free_forever_no_credit_card_when_it_rains_you_ll_see_why_we_bu": "5 clients free forever. No credit card. When it rains, you’ll see why we built this.",
     "start_free": "Start free",
-    "see_all_comparisons": "See all comparisons"
+    "see_all_comparisons": "See all comparisons",
+    "rain_delay_auto_reschedule": "Rain delay auto-reschedule",
+    "one_tap_moves_today_s_route_to_tomorrow": "One tap moves today’s route to tomorrow",
+    "offline_mode": "Offline mode",
+    "keep_working_with_no_cell_service_syncs_later": "Keep working with no cell service, syncs later",
+    "installable_web_app_pwa": "Installable web app (PWA)",
+    "works_on_iphone_android_and_desktop_from_the_home_screen": "Works on iPhone, Android, and desktop from the home screen",
+    "quickbooks_accounting_sync": "QuickBooks / accounting sync",
+    "via_zapier_webhooks_probase_not_designed_for_businesses_that_need_accoun": "Via Zapier webhooks (ProBase: “not designed for businesses that need accounting sync”)",
+    "client_self_booking_link": "Client self-booking link",
+    "clients_book_their_own_slot_from_your_link": "Clients book their own slot from your link",
+    "flat_fee_no_take_rate": "Flat fee, no take-rate",
+    "mowgo_charges_a_flat_monthly_fee_no_of_your_revenue": "MowGo charges a flat monthly fee. No % of your revenue",
+    "price": "Price",
+    "probase_is_genuinely_free_that_s_the_trade_off": "ProBase is genuinely free. That’s the trade-off",
+    "marketplace_job_leads": "Marketplace job leads",
+    "probase_can_feed_you_jobs_from_their_marketplace_they_take_a_cut": "ProBase can feed you jobs from their marketplace (they take a cut)",
+    "tip_collection": "Tip collection",
+    "built_into_online_payments": "Built into online payments",
+    "ai_service_notes": "AI service notes",
+    "plain_language_notes_structured_records": "Plain-language notes → structured records",
+    "automated_review_requests": "Automated review requests",
+    "prompts_customers_to_leave_google_reviews": "Prompts customers to leave Google reviews",
+    "seo": {
+      "title": "ProBase vs MowGo — Honest Comparison for Lawn Crews",
+      "description": "ProBase is free. Until it rains. Compare rain delay, offline mode, and pricing side by side. Updated August 2026."
+    },
+    "yes": "Yes",
+    "no": "No",
+    "free_79_mo": "Free – $79/mo",
+    "0_forever": "$0 forever",
+    "0_mo": "$0/mo"
   },
   "routeAudit": {
     "landingCta": "Try the free route audit",

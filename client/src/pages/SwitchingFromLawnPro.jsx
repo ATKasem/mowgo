@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { useState, useEffect, useRef } from 'react';
 import { CloudRain, AlertTriangle, Check, X, ArrowRight, Sprout, Shield, Users, Zap, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -45,6 +46,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 
 export default function SwitchingFromLawnPro() {
   const { tr, t, i18n } = useLocalizedText('switchingFromLawnPro');
+  usePageTitle(tr('seo.title'), tr('seo.description'));
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
       {/* Nav */}

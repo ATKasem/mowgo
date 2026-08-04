@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { Sprout, ArrowRight, Check, X, DollarSign, Users, CloudRain, Smartphone, Wifi, Gift, Calendar, FileText, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +16,7 @@ const comparisonRows = [
   { feature: 'Rain delay auto-reschedule', mowgo: 'Yes — one tap', quoteiq: 'Manual reschedule only' },
   { feature: 'Offline mode', mowgo: 'Yes — works without cell service', quoteiq: 'Not available' },
   { feature: 'Per-user fees', mowgo: 'None', quoteiq: 'Charges per user on paid plans' },
-  { feature: 'Transaction fees', mowgo: 'None — you keep what you earn', quoteiq: 'Payment processing fees apply' },
+  { feature: 'Transaction fees', mowgo: 'No platform fee — Stripe\u2019s cut only', quoteiq: 'Payment processing fees apply' },
   { feature: 'Drag-and-drop scheduling', mowgo: 'Yes — move jobs with one finger', quoteiq: 'Basic list-based scheduling' },
   { feature: 'Auto-invoicing', mowgo: 'Yes — automatic on job complete', quoteiq: 'Manual invoicing workflow' },
   { feature: 'Mobile-first design', mowgo: 'Yes — built for the truck', quoteiq: 'Desktop-oriented interface' },
@@ -23,6 +24,7 @@ const comparisonRows = [
 
 export default function QuoteIQAlternative() {
   const { tr, t, i18n } = useLocalizedText('quoteIQAlternative');
+  usePageTitle(tr('seo.title'), tr('seo.description'));
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
       {/* Nav */}
@@ -53,7 +55,7 @@ export default function QuoteIQAlternative() {
         <div className="relative max-w-3xl mx-auto px-4 pt-16 pb-12 md:pt-24 md:pb-16 text-center">
           <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <AlertTriangle className="w-4 h-4" />
-            {tr("July 2026 Update")}
+            {tr("August 2026 Update")}
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
             {tr("Need a New Free Lawn Care App After QuoteIQ's July 2026 Change?")}
@@ -96,7 +98,7 @@ export default function QuoteIQAlternative() {
             {tr("What to Look for in a Replacement")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-            {tr("Check these four things before you move your clients and schedule to another app:")}
+            {tr("Check these five things before you move your clients and schedule to another app:")}
           </p>
           <div className="space-y-4">
             {whatToLookFor.map(({ icon: Icon, title, desc }, i) => (
@@ -140,7 +142,7 @@ export default function QuoteIQAlternative() {
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
                           <Check className="w-4 h-4 flex-shrink-0" />
-                          {row.mowgo}
+                          {tr(row.mowgo)}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-center">
@@ -148,7 +150,7 @@ export default function QuoteIQAlternative() {
                           {row.quoteiq.includes('Discontinued') || row.quoteiq.includes('Not') || row.quoteiq.includes('Manual') || row.quoteiq.includes('Basic') || row.quoteiq.includes('Charges') ? (
                             <X className="w-4 h-4 flex-shrink-0 text-gray-400" />
                           ) : null}
-                          {row.quoteiq}
+                          {tr(row.quoteiq)}
                         </span>
                       </td>
                     </tr>

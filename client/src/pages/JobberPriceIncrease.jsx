@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { Sprout, ArrowRight, Check, X, DollarSign, Users, CloudRain, Smartphone, Wifi, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -29,6 +30,7 @@ const comparisonRows = [
 
 export default function JobberPriceIncrease() {
   const { tr, t, i18n } = useLocalizedText('jobberPriceIncrease');
+  usePageTitle(tr('seo.title'), tr('seo.description'));
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
       {/* Nav */}
@@ -183,7 +185,7 @@ export default function JobberPriceIncrease() {
                       <td className="px-5 py-3 text-center">
                         <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
                           <Check className="w-4 h-4 flex-shrink-0" />
-                          {row.mowgo}
+                          {tr(row.mowgo)}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-center">
@@ -191,7 +193,7 @@ export default function JobberPriceIncrease() {
                           {row.jobber.includes('No') || row.jobber.includes('Limited') ? (
                             <X className="w-4 h-4 flex-shrink-0 text-gray-400" />
                           ) : null}
-                          {row.jobber}
+                          {tr(row.jobber)}
                         </span>
                       </td>
                     </tr>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { Sprout, Check, X, ArrowRight, AlertTriangle, DollarSign, CloudRain, Calculator, TrendingDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -55,6 +56,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 
 export default function RuunlyComparison() {
   const { tr } = useLocalizedText('ruunlyComparison');
+  usePageTitle(tr('seo.title'), tr('seo.description'));
 
   // Calculator state
   const [revenue, setRevenue] = useState(4000);

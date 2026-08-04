@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { Sprout, Check, X, ArrowRight, CloudRain, WifiOff, Smartphone, Calculator, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -37,24 +38,26 @@ const features = [
 ];
 
 function Cell({ value, column }) {
+  const { tr } = useLocalizedText('probaseComparison');
   if (typeof value === 'boolean') {
     return (
       <td className={`py-3 px-3 text-center ${column === 'mowgo' ? 'bg-emerald-50/70 dark:bg-emerald-950/20' : ''}`}>
         {value
-          ? <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold text-sm"><Check className="w-4 h-4" aria-hidden="true" /> Yes</span>
-          : <span className="inline-flex items-center gap-1 text-gray-400 dark:text-gray-600 font-medium text-sm"><X className="w-4 h-4" aria-hidden="true" /> No</span>}
+          ? <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold text-sm"><Check className="w-4 h-4" aria-hidden="true" /> {tr('Yes')}</span>
+          : <span className="inline-flex items-center gap-1 text-gray-400 dark:text-gray-600 font-medium text-sm"><X className="w-4 h-4" aria-hidden="true" /> {tr('No')}</span>}
       </td>
     );
   }
   return (
     <td className={`py-3 px-3 text-center font-semibold text-sm ${column === 'mowgo' ? 'bg-emerald-50/70 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
-      {value}
+      {tr(value)}
     </td>
   );
 }
 
 export default function ProBaseComparison() {
   const { tr } = useLocalizedText('probaseComparison');
+  usePageTitle(tr('seo.title'), tr('seo.description'));
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 selection:bg-emerald-200 dark:selection:bg-emerald-800">
@@ -173,11 +176,11 @@ export default function ProBaseComparison() {
                   <th scope="col" className="text-left py-3 px-3 font-semibold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-950 z-10">{tr("Feature")}</th>
                   <th scope="col" className="py-3 px-2 text-center font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20">
                     <div>{tr("MowGo")}</div>
-                    <div className="text-[10px] font-normal text-emerald-500/70 dark:text-emerald-400/60">Free \u2013 $79/mo</div>
+                    <div className="text-[10px] font-normal text-emerald-500/70 dark:text-emerald-400/60">{tr('Free \u2013 $79/mo')}</div>
                   </th>
                   <th scope="col" className="py-3 px-2 text-center font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20">
                     <div>{tr("ProBase")}</div>
-                    <div className="text-[10px] font-normal text-blue-500/70 dark:text-blue-400/60">$0/mo</div>
+                    <div className="text-[10px] font-normal text-blue-500/70 dark:text-blue-400/60">{tr('$0/mo')}</div>
                   </th>
                 </tr>
               </thead>
@@ -185,9 +188,9 @@ export default function ProBaseComparison() {
                 {features.map((f) => (
                   <tr key={f.label} className={`border-b border-gray-100 dark:border-gray-800 ${f.star ? 'bg-emerald-50/50 dark:bg-emerald-950/10' : ''}`}>
                     <th scope="row" className="text-left py-3 px-3 font-medium text-gray-700 dark:text-gray-300 sticky left-0 bg-white dark:bg-gray-950">
-                      {f.label}
+                      {tr(f.label)}
                       {f.star && <span className="ml-2 text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 rounded px-1.5 py-0.5">{tr("MowGo only")}</span>}
-                      <div className="text-xs font-normal text-gray-400 dark:text-gray-500 mt-0.5">{f.desc}</div>
+                      <div className="text-xs font-normal text-gray-400 dark:text-gray-500 mt-0.5">{tr(f.desc)}</div>
                     </th>
                     <Cell value={f.mowgo} column="mowgo" />
                     <Cell value={f.probase} column="probase" />
@@ -213,7 +216,7 @@ export default function ProBaseComparison() {
               <li className="flex gap-2"><span className="text-amber-500 font-bold" aria-hidden="true">•</span> {tr("You never work in the rain, never lose signal, and don\u2019t need accounting sync.")}</li>
             </ul>
             <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-              {tr("If that\u2019s you \u2014 ProBase is legitimately free and you should use it. MowGo is built for the other 95%: crews who lose a day of revenue every time it rains, and who want software that isn\u2019t trying to be a marketplace.")}
+              {tr("If that\u2019s you \u2014 ProBase is legitimately free and you should use it. MowGo is built for crews who lose a day of revenue every time it rains, and who want software that isn\u2019t trying to be a marketplace.")}
             </p>
           </div>
         </FadeIn>
