@@ -128,7 +128,6 @@ struct SettingsView: View {
             BillingSettingsView(
                 tierLabel: auth.user?.tierLabel ?? "Free",
                 tierDescription: tierDescription,
-                tierPrice: tierPrice,
                 isPaidTier: isPaidTier,
                 errorMessage: cancelError ?? portalError,
                 onManageSubscription: openCustomerPortal,
@@ -358,16 +357,8 @@ struct SettingsView: View {
     private var tierDescription: String {
         switch auth.user?.tier {
         case "solo": "Unlimited clients & jobs · Recurring jobs"
-        case "crew": "Unlimited · Team · Priority"
+        case "crew": "Unlimited clients · Full team access"
         default: "5 clients · Basic features"
-        }
-    }
-
-    private var tierPrice: String {
-        switch auth.user?.tier {
-        case "solo": "$39/mo"
-        case "crew": "$79/mo"
-        default: "$0/mo"
         }
     }
 }
@@ -602,7 +593,6 @@ private struct BillingSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     let tierLabel: String
     let tierDescription: String
-    let tierPrice: String
     let isPaidTier: Bool
     let errorMessage: String?
     let onManageSubscription: () -> Void
@@ -619,7 +609,7 @@ private struct BillingSettingsView: View {
                     HStack(alignment: .firstTextBaseline) {
                         Text(tierLabel).font(.title2.weight(.bold)).foregroundColor(theme.textPrimary)
                         Spacer()
-                        Text(tierPrice).font(.headline).foregroundColor(MowGoTheme.deepGreen)
+                        Text("Billed monthly or annually").font(.caption).foregroundColor(theme.textMuted)
                     }
                     Text(tierDescription).font(.subheadline).foregroundColor(theme.textMuted)
                 }

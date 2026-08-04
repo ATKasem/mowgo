@@ -197,13 +197,18 @@ struct SubscriptionPlanCard: View {
                 }
                 Spacer()
                 if isCurrent {
-                    Text("Current")
-                        .font(.caption.weight(.medium))
-                        .foregroundColor(MowGoTheme.deepGreen)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(MowGoTheme.deepGreen.opacity(MowGoTheme.accentOpacity))
-                        .cornerRadius(8)
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("Current")
+                            .font(.caption.weight(.medium))
+                            .foregroundColor(MowGoTheme.deepGreen)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(MowGoTheme.deepGreen.opacity(MowGoTheme.accentOpacity))
+                            .cornerRadius(8)
+                        Text("Billing interval changes via Manage Billing")
+                            .font(.caption2)
+                            .foregroundColor(theme.textMuted)
+                    }
                 }
             }
 

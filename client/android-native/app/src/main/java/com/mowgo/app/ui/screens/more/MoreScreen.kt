@@ -280,11 +280,6 @@ private fun BillingSettingsScreen(
     val context = LocalContext.current
     val tier = state.profile?.tier?.lowercase() ?: "free"
     val billingInterval = state.billingInterval
-    val price = when (tier) {
-        "solo" -> if (billingInterval == "year") "$390/yr" else "$39/mo"
-        "crew" -> if (billingInterval == "year") "$790/yr" else "$79/mo"
-        else -> "$0/mo"
-    }
     val description = when (tier) {
         "solo" -> "Unlimited clients & jobs"
         "crew" -> "Everything in Solo · Unlimited clients · Team"
@@ -326,8 +321,7 @@ private fun BillingSettingsScreen(
     DetailScaffold("Billing", back) {
         Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Current Plan", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(tierLabel(tier, billingInterval), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text(price, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+            Text(planName(tier), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (isPaid) {
                 Spacer(Modifier.height(8.dp))
@@ -463,15 +457,22 @@ private fun BillingPlanCard(
                     }
                 }
                 if (isCurrent) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                        shape = MaterialTheme.shapes.small,
-                    ) {
+                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                            shape = MaterialTheme.shapes.small,
+                        ) {
+                            Text(
+                                "Current",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            )
+                        }
                         Text(
-                            "Current",
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            "Billing interval changes via Manage Billing",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -502,5 +503,13 @@ private fun BillingPlanCard(
 private fun tierLabel(tier: String?, billingInterval: String = "month"): String = when (tier) {
     "solo" -> if (billingInterval == "year") "Solo · $390/yr" else "Solo · $39/mo"
     "crew" -> if (billingInterval == "year") "Crew · $790/yr" else "Crew · $79/mo"
+    else -> "Free Plan"
+}
+
+/** Cadence-neutral plan name for the Current Plan card — the user's actual
+ *  billing interval is not stored in the profile, so never claim one. */
+private fun planName(tier: String?): String = when (tier) {
+    "solo" -> "Solo Plan"
+    "crew" -> "Crew Plan"
     else -> "Free Plan"
 }
