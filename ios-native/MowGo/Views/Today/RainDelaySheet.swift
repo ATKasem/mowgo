@@ -124,7 +124,7 @@ struct RainDelayHistoryView: View {
     private func undo(_ entry: RainDelayEntry) {
         Task<Void, Never> {
             do { try await store.undoRainDelay(entry) }
-            catch { error = error.localizedDescription }
+            catch let caught { error = caught.localizedDescription }
         }
     }
 }
