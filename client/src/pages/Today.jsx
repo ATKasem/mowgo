@@ -1,10 +1,9 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useWeather } from '../lib/useWeather';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, updateJob, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard } from '../lib/data';
+import { createJob, updateJobStatus, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Circle, CloudRain, Repeat, Loader2 } from 'lucide-react';
+import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
@@ -27,6 +26,12 @@ function getNextDate(currentDate, recurrence) {
     default: return null;
   }
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function addDays(dateString, days) {
+  const value = new Date(`${dateString}T12:00:00`);
+  value.setDate(value.getDate() + days);
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
 }
 
 export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, loading }) {
@@ -54,6 +59,15 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [crewFilter, setCrewFilter] = useState(null); // null = show all
   const [teamDashboard, setTeamDashboard] = useState([]);
   const [photoModalJob, setPhotoModalJob] = useState(null); // job being photographed
+  const [showRainDelay, setShowRainDelay] = useState(false);
+  const [showRainHistory, setShowRainHistory] = useState(false);
+  const [rainTargetMode, setRainTargetMode] = useState('tomorrow');
+  const [customRainDate, setCustomRainDate] = useState('');
+  const [selectedRainJobIds, setSelectedRainJobIds] = useState([]);
+  const [rainHistory, setRainHistory] = useState([]);
+  const [weather, setWeather] = useState(null);
+  const [rainDelaySaving, setRainDelaySaving] = useState(false);
+  const [rainDelayError, setRainDelayError] = useState('');
   const toggleTimeoutRef = useRef(null);
   const statusToggleTimeoutsRef = useRef(new Map());
   const pendingRecurringRef = useRef(new Set());
@@ -63,14 +77,119 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   useEffect(() => { jobsRef.current = jobs; }, [jobs]);
   useEffect(() => { formRef.current = form; }, [form]);
 
-  const { rainLikely, todayRainChance } = useWeather();
-
   // Filtered jobs computed early for use in effects and render
   const dateFiltered = useMemo(() => jobs.filter(j => j.scheduled_date === date), [jobs, date]);
   const filtered = useMemo(() => crewFilter
     ? dateFiltered.filter(j => j.assigned_to === crewFilter)
     : dateFiltered, [dateFiltered, crewFilter]);
   const doneCount = useMemo(() => filtered.filter(j => j.status === 'done' || j.status === 'in_progress').length, [filtered]);
+  const rainDelayCandidates = useMemo(() => dateFiltered.filter(j => j.status !== 'done'), [dateFiltered]);
+  const tomorrow = useMemo(() => addDays(date, 1), [date]);
+
+  useEffect(() => {
+    let active = true;
+    loadRainDelayHistory().then(items => { if (active) setRainHistory(items); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    loadProfile().then(profile => {
+      if (!active) return;
+      const lat = profile?.latitude ?? profile?.lat;
+      const lng = profile?.longitude ?? profile?.lng;
+      if (lat == null || lng == null) return;
+      getWeatherForLocation(lat, lng).then(result => { if (active) setWeather(result); });
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const weatherDays = useMemo(() => {
+    if (!weather?.daily) return [];
+    return weather.daily.time.map((day, index) => ({
+      date: day,
+      rain: weather.daily.precipitation_probability_max?.[index] ?? 0,
+    }));
+  }, [weather]);
+  const todayWeatherDate = new Date().toLocaleDateString('en-CA');
+  const tomorrowWeatherDate = addDays(todayWeatherDate, 1);
+  const bannerWeather = weatherDays.find(item => item.date === todayWeatherDate && item.rain >= 60)
+    || weatherDays.find(item => item.date === tomorrowWeatherDate && item.rain >= 60);
+  const suggestedDryDate = weatherDays.find(item => item.date >= tomorrow && item.rain < 60)?.date || null;
+
+  function openRainDelay() {
+    const ids = rainDelayCandidates.map(job => job.id);
+    if (!ids.length) return;
+    setSelectedRainJobIds(ids);
+    setRainTargetMode('tomorrow');
+    setCustomRainDate(tomorrow);
+    setRainDelayError('');
+    setShowRainDelay(true);
+  }
+
+  async function undoRainDelay(entry) {
+    const grouped = Object.entries(entry.originalDates || {}).reduce((groups, [jobId, originalDate]) => {
+      (groups[originalDate] ||= []).push(jobId);
+      return groups;
+    }, {});
+    if (!Object.keys(grouped).length) return;
+    try {
+      await Promise.all(Object.entries(grouped).map(([originalDate, ids]) => rainDelayJobs(ids, originalDate)));
+      setJobs(prev => prev.map(job => entry.originalDates[job.id] ? { ...job, scheduled_date: entry.originalDates[job.id] } : job));
+      const next = await removeRainDelayEntry(entry.createdAt);
+      setRainHistory(next);
+      setCompletedToast({ name: tr('{{count}} job restored', { count: entry.jobCount }), amount: 0, type: 'rain' });
+      if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+      toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
+    } catch (error) {
+      console.error('Rain delay undo:', error);
+      setCompletedToast({ name: tr('Could not undo rain delay'), amount: 0, type: 'error' });
+    }
+  }
+
+  async function applyRainDelay() {
+    const targetDate = rainTargetMode === 'tomorrow' ? tomorrow : rainTargetMode === 'dry' ? suggestedDryDate : customRainDate;
+    if (!targetDate || targetDate < tomorrow) {
+      setRainDelayError(tr('Choose a date on or after tomorrow.'));
+      return;
+    }
+    const jobsToMove = rainDelayCandidates.filter(job => selectedRainJobIds.includes(job.id));
+    if (!jobsToMove.length) {
+      setRainDelayError(tr('Select at least one job.'));
+      return;
+    }
+    setRainDelaySaving(true);
+    setRainDelayError('');
+    const entry = {
+      date,
+      targetDate,
+      jobIds: jobsToMove.map(job => job.id),
+      jobCount: jobsToMove.length,
+      createdAt: new Date().toISOString(),
+      originalDates: Object.fromEntries(jobsToMove.map(job => [job.id, job.scheduled_date])),
+    };
+    try {
+      await rainDelayJobs(entry.jobIds, targetDate);
+      setJobs(prev => prev.map(job => entry.jobIds.includes(job.id) ? { ...job, scheduled_date: targetDate } : job));
+      const next = await saveRainDelayEntry(entry);
+      setRainHistory(next);
+      setShowRainDelay(false);
+      setCompletedToast({
+        name: tr('{{count}} job moved to {{date}}', { count: entry.jobCount, date: targetDate }),
+        amount: 0,
+        type: 'rain',
+        actionLabel: tr('Undo'),
+        onAction: () => { setCompletedToast(null); void undoRainDelay(entry); },
+      });
+      if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+      toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 6000);
+    } catch (error) {
+      console.error('Rain delay:', error);
+      setRainDelayError(tr('Could not move jobs. Try again.'));
+    } finally {
+      setRainDelaySaving(false);
+    }
+  }
 
   // Load clients for the NewJobForm dropdown
   useEffect(() => {
@@ -364,58 +483,16 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
         )}
       </div>
 
-      {/* Rain delay — always visible when there are incomplete jobs */}
-      {filtered.some(j => j.status !== 'done') && (
-        <div className="mb-5">
-          <button
-            onClick={() => {
-              const toMove = filtered.filter(j => j.status !== 'done' && j.scheduled_date === date);
-              if (toMove.length === 0) return;
-              if (!window.confirm(tr('Move {{count}} job to tomorrow?', { count: toMove.length }))) return;
-              const tomorrow = new Date(date);
-              tomorrow.setDate(tomorrow.getDate() + 1);
-              const nextDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
-              const toMoveIds = new Set(toMove.map(j => j.id));
-              // Optimistic update
-              setJobs(prev => prev.map(j =>
-                toMoveIds.has(j.id)
-                  ? { ...j, scheduled_date: nextDate }
-                  : j
-              ));
-              // Persist to server with rollback on failure
-              Promise.allSettled(toMove.map(j => updateJob(j.id, { scheduled_date: nextDate })))
-                .then(results => {
-                  const failed = results.filter(r => r.status === 'rejected');
-                  if (failed.length > 0) {
-                    console.error('Rain delay: some jobs failed to move', failed.map(r => r.reason));
-                    // Roll back only the jobs that actually failed
-                    const failedIds = new Set(
-                      toMove.filter((_, i) => results[i].status === 'rejected').map(j => j.id)
-                    );
-                    setJobs(prev => prev.map(j =>
-                      failedIds.has(j.id) && j.scheduled_date === nextDate
-                        ? { ...j, scheduled_date: date }
-                        : j
-                    ));
-                    setCompletedToast({ name: tr('Failed to move {{count}} job', { count: failed.length }), amount: 0, type: 'rain' });
-                  } else {
-                    setCompletedToast({ name: tr('{{count}} job moved to tomorrow', { count: toMove.length }), amount: 0, type: 'rain' });
-                  }
-                  if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
-                  toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 3500);
-                });
-            }}
-            className="w-full flex items-center gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 rounded-xl px-3 py-3 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group min-h-[44px]"
-          >
-            <CloudRain className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="flex-1 text-left min-w-0">
-              <span className="font-semibold">{(todayRainChance() ?? 0)}%</span> {tr('chance of rain — move')}{' '}
-              <span className="underline decoration-dotted underline-offset-2 group-hover:decoration-solid">
-                {filtered.filter(j => j.status !== 'done' && j.scheduled_date === date).length} {tr('remaining to tomorrow')}
-              </span>
-            </span>
-            <span className="text-[10px] bg-amber-200/50 dark:bg-amber-800/30 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{tr("Move All")}</span>
-          </button>
+      {bannerWeather && rainDelayCandidates.length > 0 && (
+        <button onClick={openRainDelay} className="w-full mb-5 flex items-center gap-2 bg-sky-50 dark:bg-sky-950/20 border border-sky-200/60 dark:border-sky-800/40 text-sky-800 dark:text-sky-300 rounded-xl px-3 py-2.5 text-xs font-medium hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors min-h-[44px]">
+          <CloudRain className="w-4 h-4 flex-shrink-0" />
+          <span className="flex-1 text-left">{tr('Rain {{pct}}% {{day}} — Rain delay?', { pct: bannerWeather.rain, day: bannerWeather.date === tomorrowWeatherDate ? tr('tomorrow') : tr('today') })}</span>
+        </button>
+      )}
+
+      {rainDelayCandidates.length > 0 && (
+        <div className="flex justify-end -mt-2 mb-3">
+          <button onClick={openRainDelay} className="text-xs font-semibold text-brand-hover dark:text-[#4ade80] hover:underline inline-flex items-center gap-1"><CloudRain className="w-3.5 h-3.5" />{tr('Rain Delay')}</button>
         </div>
       )}
 
@@ -534,6 +611,58 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           />
         ))}
       </div>
+
+      {showRainDelay && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="rain-delay-title">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowRainDelay(false)} />
+          <div className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto bg-[var(--color-surface)] dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl border border-[var(--color-border)] dark:border-gray-700">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div><h3 id="rain-delay-title" className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Rain Delay')}</h3><p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('{{count}} affected job', { count: selectedRainJobIds.length })}</p></div>
+              <button aria-label={tr('Close')} onClick={() => setShowRainDelay(false)} className="p-2 -m-2 text-[var(--color-text-muted)]"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="space-y-2 mb-5">
+              <p className="label">{tr('Jobs to move')}</p>
+              {rainDelayCandidates.map(job => (
+                <label key={job.id} className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] dark:border-gray-700 p-3 cursor-pointer">
+                  <input type="checkbox" checked={selectedRainJobIds.includes(job.id)} onChange={() => setSelectedRainJobIds(ids => ids.includes(job.id) ? ids.filter(id => id !== job.id) : [...ids, job.id])} className="accent-[#4ade80]" />
+                  <span className="text-sm text-[var(--color-text-primary)] dark:text-gray-200 truncate">{job.clients?.name || job.title || tr('Job')}</span>
+                </label>
+              ))}
+            </div>
+
+            <fieldset className="space-y-2 mb-4">
+              <legend className="label mb-2">{tr('Move to')}</legend>
+              <label className="flex items-center gap-3"><input type="radio" name="rain-target" checked={rainTargetMode === 'tomorrow'} onChange={() => setRainTargetMode('tomorrow')} className="accent-[#4ade80]" /><span className="text-sm">{tr('Tomorrow')} · {tomorrow}</span></label>
+              <label className="flex items-center gap-3"><input type="radio" name="rain-target" checked={rainTargetMode === 'custom'} onChange={() => setRainTargetMode('custom')} className="accent-[#4ade80]" /><span className="text-sm">{tr('Pick a date')}</span></label>
+              {rainTargetMode === 'custom' && <input type="date" min={tomorrow} value={customRainDate} onChange={event => setCustomRainDate(event.target.value)} className="input mt-2" />}
+              {suggestedDryDate && <label className="flex items-center gap-3"><input type="radio" name="rain-target" checked={rainTargetMode === 'dry'} onChange={() => setRainTargetMode('dry')} className="accent-[#4ade80]" /><span className="text-sm">{tr('Next dry day')} · {suggestedDryDate}</span></label>}
+            </fieldset>
+
+            <p className="text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-secondary)] dark:bg-gray-800 rounded-xl p-3 mb-4">{tr('Only {{count}} jobs move. Your schedule stays intact.', { count: selectedRainJobIds.length })}</p>
+            {rainDelayError && <p role="alert" className="text-xs text-red-600 dark:text-red-400 mb-3">{rainDelayError}</p>}
+            <div className="flex items-center gap-3">
+              <button onClick={() => { setShowRainDelay(false); setShowRainHistory(true); }} className="btn-secondary gap-1.5"><History className="w-4 h-4" />{tr('History')}</button>
+              <button disabled={rainDelaySaving || selectedRainJobIds.length === 0} onClick={applyRainDelay} className="btn-primary flex-1 disabled:opacity-50">{rainDelaySaving ? tr('Moving...') : tr('Move {{count}} job', { count: selectedRainJobIds.length })}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRainHistory && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="rain-history-title">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowRainHistory(false)} />
+          <div className="relative w-full sm:max-w-md max-h-[80vh] overflow-y-auto bg-[var(--color-surface)] dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl border border-[var(--color-border)] dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4"><h3 id="rain-history-title" className="text-lg font-bold">{tr('Rain Delay History')}</h3><button aria-label={tr('Close')} onClick={() => setShowRainHistory(false)}><X className="w-5 h-5" /></button></div>
+            {rainHistory.length === 0 ? <p className="text-sm text-[var(--color-text-muted)] py-6 text-center">{tr('No rain delays yet.')}</p> : <div className="space-y-3">{rainHistory.map(entry => (
+              <div key={entry.createdAt} className="border border-[var(--color-border)] dark:border-gray-700 rounded-xl p-3 flex items-center gap-3">
+                <div className="flex-1 min-w-0"><p className="text-sm font-semibold">{entry.date} → {entry.targetDate}</p><p className="text-xs text-[var(--color-text-muted)]">{tr('{{count}} job', { count: entry.jobCount })}</p></div>
+                <button disabled={!entry.originalDates} onClick={() => void undoRainDelay(entry)} className="btn-secondary text-xs gap-1 disabled:opacity-40"><RotateCcw className="w-3.5 h-3.5" />{tr('Undo')}</button>
+              </div>
+            ))}</div>}
+          </div>
+        </div>
+      )}
 
       {/* Photo upload modal — shown after marking a job complete */}
       {photoModalJob && (

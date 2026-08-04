@@ -21,7 +21,7 @@ export default function InvoiceToast({ toast }) {
     <div role="status" aria-live="polite" className="fixed inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out', top: 'calc(4rem + env(safe-area-inset-top, 0px) + 8px)' }}>
       <div className={`${bg} px-4 py-3 mx-4 flex items-center gap-2 pointer-events-auto shadow-lg max-w-sm`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
-        <div>
+        <div className="min-w-0">
           <p className={`text-sm font-semibold ${textColor}`}>
             {isRain || isError || toast.type === 'recurring'
               ? toast.name
@@ -29,6 +29,11 @@ export default function InvoiceToast({ toast }) {
           </p>
           {!isRain && !isError && <p className={`text-xs ${subColor}`}>${toast.amount ?? '0'} — {tr('unpaid')}</p>}
         </div>
+        {toast.actionLabel && toast.onAction && (
+          <button type="button" onClick={toast.onAction} className={`ml-2 text-xs font-bold underline underline-offset-2 ${textColor}`}>
+            {toast.actionLabel}
+          </button>
+        )}
       </div>
     </div>
   );

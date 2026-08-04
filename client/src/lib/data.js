@@ -258,6 +258,83 @@ export async function updateJobStatus(id, status) {
   return updateJob(id, { status });
 }
 
+/** Move a set of jobs to one date. Demo mode updates the shared in-memory store. */
+export async function rainDelayJobs(jobIds, targetDate) {
+  const ids = [...new Set(jobIds || [])];
+  if (!ids.length) return [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) throw new Error('Invalid target date');
+
+  if (isDemoMode()) {
+    const idSet = new Set(ids);
+    _jobs = _jobs.map(job => idSet.has(job.id) ? { ...job, scheduled_date: targetDate } : job);
+    notify();
+    return _jobs.filter(job => idSet.has(job.id));
+  }
+
+  // Keep this on updateJob so existing mapping, RLS, and webhook behavior stay consistent.
+  return Promise.all(ids.map(id => updateJob(id, { scheduled_date: targetDate })));
+}
+
+async function rainDelayHistoryKey() {
+  let userId = _currentDemoUserId();
+  if (!isDemoMode()) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    userId = user.id;
+  }
+  return `mowgo_rain_delay_history_${userId}`;
+}
+
+/** Load the current user's local rain-delay history. */
+export async function loadRainDelayHistory() {
+  try {
+    const key = await rainDelayHistoryKey();
+    if (!key) return [];
+    const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Add or replace a local rain-delay entry and retain the newest 50. */
+export async function saveRainDelayEntry(entry) {
+  const key = await rainDelayHistoryKey();
+  if (!key) return [];
+  const history = await loadRainDelayHistory();
+  const next = [entry, ...history.filter(item => item.createdAt !== entry.createdAt)].slice(0, 50);
+  try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* storage unavailable */ }
+  return next;
+}
+
+/** Remove an entry after undoing it. */
+export async function removeRainDelayEntry(createdAt) {
+  const key = await rainDelayHistoryKey();
+  if (!key) return [];
+  const next = (await loadRainDelayHistory()).filter(item => item.createdAt !== createdAt);
+  try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* storage unavailable */ }
+  return next;
+}
+
+/** Fetch daily Open-Meteo data for a business location. */
+export async function getWeatherForLocation(lat, lng) {
+  if (isDemoMode() || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) return null;
+  try {
+    const params = new URLSearchParams({
+      latitude: String(lat),
+      longitude: String(lng),
+      daily: 'precipitation_probability_max,temperature_2m_max',
+      timezone: 'auto',
+    });
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!response.ok) return null;
+    const weather = await response.json();
+    return weather?.daily?.time?.length ? weather : null;
+  } catch {
+    return null;
+  }
+}
+
 // ===== Clients =====
 
 export async function loadClients() {
