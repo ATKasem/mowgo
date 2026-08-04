@@ -1,6 +1,9 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
+import { startCheckout } from '../lib/payments';
+import { supabase } from '../lib/supabase';
 
 const competitors = [
   { name: 'MowGo', price: 'Free – $199', highlight: true },
@@ -78,6 +81,7 @@ function Cell({ value, isFirst }) {
 export default function Compare() {
   const { tr, t, i18n } = useLocalizedText('compare');
   const navigate = useNavigate();
+  const [checkoutError, setCheckoutError] = useState('');
 
   function goToPricing(e) {
     e.preventDefault();
@@ -89,6 +93,24 @@ export default function Compare() {
       if (attempts < 30) requestAnimationFrame(() => tryScroll(attempts + 1));
     };
     requestAnimationFrame(() => tryScroll());
+  }
+
+  async function handlePremiumCheckout() {
+    setCheckoutError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        sessionStorage.setItem('mowgo_plan_intent', 'premium');
+        sessionStorage.setItem('mowgo_interval_intent', 'month');
+        sessionStorage.setItem('mowgo_intent_time', String(Date.now()));
+        navigate('/login?mode=signup');
+        return;
+      }
+      const result = await startCheckout('premium', 'month');
+      if (result?.error) setCheckoutError(result.error);
+    } catch (error) {
+      setCheckoutError(error.message || tr('Payment failed'));
+    }
   }
 
   return (
@@ -201,6 +223,7 @@ export default function Compare() {
       {/* MowGo tier comparison */}
       <section className="max-w-4xl mx-auto px-4 pb-20" aria-labelledby="mowgo-tier-heading">
         <h2 id="mowgo-tier-heading" className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-8">{tr('Compare MowGo plans')}</h2>
+        {checkoutError && <p role="alert" className="mb-5 text-center text-sm font-medium text-red-600 dark:text-red-400">{checkoutError}</p>}
         <div className="grid md:grid-cols-3 gap-5">
           {mowgoTiers.map(tier => (
             <div key={tier.name} className={`rounded-2xl border p-6 flex flex-col ${tier.name === 'Premium' ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/10' : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'}`}>
@@ -210,7 +233,7 @@ export default function Compare() {
               <ul className="space-y-3 mt-5 flex-1">
                 {tier.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
               </ul>
-              {tier.name === 'Premium' && <a href="/#/" onClick={goToPricing} className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">{tr('Start Premium')} <ArrowRight className="w-4 h-4" /></a>}
+              {tier.name === 'Premium' && <button type="button" onClick={handlePremiumCheckout} className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">{tr('Start Premium')} <ArrowRight className="w-4 h-4" /></button>}
             </div>
           ))}
         </div>

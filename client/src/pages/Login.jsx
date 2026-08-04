@@ -114,7 +114,7 @@ export default function Login() {
       if (intent) {
         const interval = sessionStorage.getItem('mowgo_interval_intent') || 'month';
         const intentTime = Number(sessionStorage.getItem('mowgo_intent_time') || 0);
-        const valid = ['solo', 'crew'].includes(intent)
+        const valid = ['solo', 'crew', 'premium'].includes(intent)
           && ['month', 'year'].includes(interval)
           && Date.now() - intentTime < 30 * 60 * 1000;
         if (!valid) {
