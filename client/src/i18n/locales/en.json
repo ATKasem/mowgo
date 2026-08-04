@@ -594,7 +594,6 @@
     "150_value": "$150 value",
     "49_value": "$49 value",
     "79_value": "$79 value",
-    "the_rain_proof_guarantee_use_solo_for_30_days_send_10_invoices_schedule_": "The Rain-Proof Guarantee: use Solo for 30 days, send 10 invoices, schedule 5 recurring clients. Not more organized? Full refund of your first month. No questions, no hoops.",
     "concierge_setup_is_limited_to_20_new_businesses_per_week": "Concierge setup is limited to 20 new businesses per week.",
     "free_launch_kit_278_value_included_with_solo": "Free Launch Kit — $278 value, included with Solo",
     "the_rain_proof_guarantee": "The Rain-Proof Guarantee",
@@ -610,8 +609,9 @@
     "year": "year",
     "billed_once_a_year_cancel_anytime": "Billed once a year. Cancel anytime.",
     "one_payment_covers_the_whole_season_no_card_hits_in_winter": "One payment covers the whole season. No card hits in winter.",
-    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "Annual? The Rain-Proof Guarantee still applies — unused months refunded.",
-    "save_savings": "Save ${{savings}}"
+    "save_savings": "Save ${{savings}}",
+    "30_day_rain_proof_guarantee_refund_if_you_re_not_more_organized": "30-day Rain-Proof Guarantee — refund if you're not more organized.",
+    "annual_unused_months_refunded": "Annual? Unused months refunded."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",

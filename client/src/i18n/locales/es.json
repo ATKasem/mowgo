@@ -629,7 +629,6 @@
     "150_value": "Valor de $150",
     "49_value": "Valor de $49",
     "79_value": "Valor de $79",
-    "the_rain_proof_guarantee_use_solo_for_30_days_send_10_invoices_schedule_": "La Garantía a Prueba de Lluvia: usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. ¿No estás más organizado? Te devolvemos el primer mes completo. Sin preguntas, sin trámites.",
     "concierge_setup_is_limited_to_20_new_businesses_per_week": "La configuración asistida está limitada a 20 negocios nuevos por semana.",
     "free_launch_kit_278_value_included_with_solo": "Kit de lanzamiento gratis: valor de $278, incluido con Solo",
     "the_rain_proof_guarantee": "La garantía a prueba de lluvia",
@@ -662,8 +661,9 @@
     "year": "año",
     "billed_once_a_year_cancel_anytime": "Se cobra una vez al año. Cancela cuando quieras.",
     "one_payment_covers_the_whole_season_no_card_hits_in_winter": "Un solo pago cubre toda la temporada. Sin cargos en invierno.",
-    "annual_the_rain_proof_guarantee_still_applies_unused_months_refunded": "¿Plan anual? La Garantía Rain-Proof sigue aplicando — se reembolsan los meses no usados.",
-    "save_savings": "Ahorra ${{savings}}"
+    "save_savings": "Ahorra ${{savings}}",
+    "30_day_rain_proof_guarantee_refund_if_you_re_not_more_organized": "Garantía Rain-Proof de 30 días — reembolso si no estás más organizado.",
+    "annual_unused_months_refunded": "¿Plan anual? Se reembolsan los meses no usados."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",

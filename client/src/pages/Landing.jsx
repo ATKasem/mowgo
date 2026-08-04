@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle } from 'lucide-react';
+import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, Moon, Shield, AlertCircle, ChevronDown } from 'lucide-react';
 import Logo from '../components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
@@ -34,7 +34,6 @@ const plans = [
       { text: '"What to Charge in Your City" report: real mow prices from your Oklahoma market.', value: '$49 value' },
       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
     ],
-    guarantee: 'The Rain-Proof Guarantee: use Solo for 30 days, send 10 invoices, schedule 5 recurring clients. Not more organized? Full refund of your first month. No questions, no hoops.',
     scarcity: 'Concierge setup is limited to 20 new businesses per week.',
     cta: 'Start Free Trial',
     highlight: true,
@@ -66,6 +65,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const [paymentError, setPaymentError] = useState('');
   const [billingInterval, setBillingInterval] = useState('month');
+  const [kitOpen, setKitOpen] = useState(false);
   const errorTimerRef = useRef(null);
 
   useEffect(() => {
@@ -347,24 +347,33 @@ export default function Landing() {
                   </ul>
                   {plan.highlight && (
                     <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4">
-                      <div className="bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl p-3">
-                        <p className="text-sm font-bold uppercase tracking-wide text-brand">{tr('Free Launch Kit — $278 value, included with Solo')}</p>
-                        <div className="mt-3 space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => setKitOpen(!kitOpen)}
+                        aria-expanded={kitOpen}
+                        aria-controls="launch-kit-panel"
+                        className="w-full flex items-center justify-between gap-2 text-left min-h-[44px]"
+                      >
+                        <span className="text-sm font-bold uppercase tracking-wide text-brand">{tr('Free Launch Kit — $278 value, included with Solo')}</span>
+                        <ChevronDown className={`w-4 h-4 shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 ${kitOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {kitOpen && (
+                        <div id="launch-kit-panel" className="mt-3 space-y-3">
                           {plan.bonuses.map(bonus => (
                             <div key={bonus.text} className="flex items-start gap-2">
                               <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-brand" />
                               <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1">{tr(bonus.text)}</span>
-                              <span className="text-xs font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/30 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
+                              <span className="text-xs font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
                             </div>
                           ))}
                         </div>
-                      </div>
+                      )}
                     </div>
                   )}
                   {plan.highlight && (
                     <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-[var(--color-text-primary)] dark:text-gray-200">
                       <Shield className="w-4 h-4 flex-shrink-0 text-brand" />
-                      <span>{tr(plan.guarantee)}{billingInterval === 'year' && plan.annualPrice ? ` ${tr("Annual? The Rain-Proof Guarantee still applies — unused months refunded.")}` : ''}</span>
+                      <span>{tr("30-day Rain-Proof Guarantee — refund if you're not more organized.")}{billingInterval === 'year' && plan.annualPrice ? ` ${tr("Annual? Unused months refunded.")}` : ''}</span>
                     </p>
                   )}
                   {plan.name === 'Free' ? (
@@ -383,7 +392,7 @@ export default function Landing() {
               <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
               <h3 className="text-xl font-bold text-white mb-2">{tr('The Rain-Proof Guarantee')}</h3>
               <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for Oklahoma crews. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
-              <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}{billingInterval === 'year' && <span> {tr("Annual? Unused months refunded.")}</span>}</p>
             </div>
           </FadeIn>
           <FadeIn delay={400}>
