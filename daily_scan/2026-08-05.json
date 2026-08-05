@@ -1,81 +1,74 @@
 {
-  "scan_ts": "2026-08-05T02:00:00Z",
-  "scan_label": "Nightly vault sync — Wed Aug 5 02:00 UTC (window since Aug 4 13:55Z; Aug 4 nightly skipped → vault backfilled)",
+  "scan_ts": "2026-08-05T12:08:00Z",
+  "scan_label": "7am CST — Wed Aug 5 (window since 02:06Z nightly sync; last human msg anywhere: Blasian 'hello' Jul 29 15:39Z, Day 8)",
   "channels_scanned": {
     "mowgo": {
       "channel_id": "1529248227394850916",
-      "status": "6 new messages since Aug 4 13:55Z — ALL bot cron reports (Concierge notification test 14:52Z ×1; Intel Engine 3 OK runs [16:35Z pricing / 20:45Z feature-ideas / 00:50Z competitor, last split 2-part] = 5 msgs). ZERO human messages.",
-      "last_human_msg": "Blasian — 'hello' 2026-07-29T15:39Z (~7 days silent, Day 8)"
+      "status": "8 new messages since 02:06Z — ALL bot cron reports: Intel Run 2/4 (05:26Z industry trends, 2 msgs), Stripe health check (09:14Z, 2 msgs — mowflow.pages.dev now RETIRED), Intel Run 3/4 (09:52Z pricing, 2 msgs). ZERO human messages.",
+      "last_human_msg": "Blasian — 'hello' 2026-07-29T15:39Z (~7 days silent; his leads question Day 8)"
     },
     "outreach": {
       "channel_id": "1529711006023024680",
-      "status": "44 new messages — FIRST activity in 10 days (dormant since Jul 26 14:12Z). Aug 4 15:07-15:48: OK rate report asset (real, $55.25 avg), SMS Batch 1 scripts (21 leads), Reddit+IG content draft, IG carousel + Reels assets (B2/B2V/B3/B4). Aug 5 01:17: NEW '🌱 Rule of 100' daily cron (job d37092913d72) — 5 texts to send today + 3 FB/IG posts. 01:33: full 21-script SMS batch posted (Day 1/2/7 per lead). 01:48: phone-ready rate-report HTML. ⚠️ 02:02-02:06: DUPLICATE subset re-posted (12 msgs, byte-identical; OKC Top Choice #10 ×3 total).",
-      "note": "SMS outreach engine now live: honest rate-report hooks, no app pitch in msg 1, log sends 🔴→🟡 in LEAD_TRACKER.md. DUPLICATE-POST BUG in Rule of 100 cron needs dedup fix (double-text risk if copied from channel)."
+      "status": "0 new messages since 02:06:50Z (last scan already captured the 02:02-02:06 duplicate batch). No new Rule of 100 posts — dedup fix NOT yet deployed; next cron run ~01:17Z tomorrow.",
+      "note": "Canonical SMS batch = 01:33Z posts; 02:02Z subset (12 msgs) + OKC Top Choice x3 = the duplicate bug, unfixed."
     },
     "cowork": {
       "channel_id": "1529736297847980153",
-      "status": "0 new messages since Aug 4 13:55Z. Provider-failover watchdog spam held stopped (fix verified 13:50Z Aug 4, script silent since). Channel still holds ~127 failure messages from the flood.",
-      "note": "Cleanup of ~127 spam messages + watchdog delivery-channel decision still open (Aaron/Bot)."
+      "status": "0 new messages since Aug 4 13:45Z. Watchdog spam held stopped (fix verified Aug 4 13:50Z). ~127 'Script not found' spam messages STILL uncleaned in channel.",
+      "note": "Cleanup + watchdog delivery-channel decision still open."
     },
     "leads": {
       "channel_id": "1529707289014042804",
       "status": "0 new messages (5 total). Blasian's 'How would we get leads for MowGo' (Jul 28 17:03Z) STILL UNANSWERED — Day 8.",
-      "note": "Lead tracker: 17 leads, 5 emailed (Jul 29-31), 0 replies. SMS Batch 1 (21 scripts) queued; Day-1 texts named for NG Outdoor/Frankies/A Plus/Mow-Town/Complete."
+      "note": "LEAD_TRACKER.md untouched since Aug 2 13:25Z — 5 emails sent Jul 29-31 still 0 replies; zero Day-1 SMS sends logged."
     }
   },
   "overnight_messages_needing_attention": [
     {
-      "id": "rule100_duplicate_post",
-      "ts": "2026-08-05T02:02-02:06Z",
-      "content": "RULE OF 100 CRON DUPLICATE-POST BUG — job d37092913d72 posted the full 21-script SMS batch to #🌱mowgo-outreach at 01:33Z, then re-posted a 12-message subset at 02:02Z (leads 3/5/6/9/10/12/14/15/17/18/21) with OKC Top Choice (#10) posted a THIRD time at 02:06:50Z. Content byte-identical to the 01:33 posts. No new information; channel noise + double-text risk if sends are copied from the channel.",
-      "significance": "MEDIUM-HIGH (outreach hygiene) — fix dedup in the cron; canonical batch = 01:33Z posts.",
-      "action": "Bot: add dedup/state-check to Rule of 100 cron (track last-posted message IDs)."
+      "id": "intel_run2_trends",
+      "ts": "2026-08-05T05:26Z",
+      "content": "INTEL RUN 2/4 (trends): Missed-call economics now quantified — 27% of home-services inbound unanswered (2 independent analyses agree), 85% of callers who hit voicemail never call back (CallRail), avg missed call ~$285-1,200. Labor: 59% of landscape firms say hiring harder than pre-COVID, 76% open roles. Market: $2.33B (2025) → $3.97B (2035). PE consolidation at record pace but ALL commercial/mid-market — 1-3 person residential long tail untouched. Reddit sweep: 3rd straight quiet (0 high-priority); draft #41 (1vfvq1g slow-season work) banked as Aug 7 backup.",
+      "significance": "MEDIUM — 3 copy flags banked (85%-never-call-back, 59%-hiring, 27%-missed); strengthens 'call becomes a booked job' wedge without building voice AI.",
+      "action": "Part 2: bank flags into compare page / digest (already in intel/2026-08-05_0514.md)."
     },
     {
-      "id": "jobber_29_verified",
-      "ts": "2026-08-05T01:12Z (Intel Run 1/4)",
-      "content": "JOBBER '$29/mo' VERIFIED — Tue watch item CLOSED: Core $29/mo is annual-only bait (1 user, $348 upfront; $49 month-to-month). Reminders + autopay still gated at Connect $99+; Grow $149 (2-way SMS, job costing); Plus $399 (AI Receptionist, Marketing Suite). MowGo's flat-price compare story survives with receipts. Collection-loop gate proof now 5-competitor: Jobber $99 / HCP $149 / GorillaDesk $99 / QuoteIQ $149.99 / LawnPro $249 vs MowGo $49/$79 flat.",
-      "significance": "HIGH — compare-page claim unlocked; resolves $29 vs $49/$139 conflict (both real, different billing terms).",
-      "action": "Part 2: update compare page with verified ladder if not already current."
+      "id": "stripe_check_0914",
+      "ts": "2026-08-05T09:14Z",
+      "content": "STRIPE HEALTH CHECK: mowgo.pages.dev ✅ healthy — functions live (POST /api/stripe/checkout-subscription → 401 JSON = executing, JWT+Origin gate), server-side restricted LIVE key (rk_live_), no publishable key in bundle = BY DESIGN (server-side checkout). NEW: mowflow.pages.dev now RETIRED — serves 'MowGo has moved' stub, old MowFlow build + cs_live_ checkout GONE. Resolves the Jul 31 finding ('deletion didn't stick').",
+      "significance": "HIGH (positive) — mowflow_project_delete effectively CLOSED; only unproven Stripe link remains the logged-in e2e checkout.",
+      "action": "Aaron: manual logged-in test checkout (Day 20) — last unproven link. Bot: verify CF project deletion if desired (domain retired regardless)."
     },
     {
-      "id": "concierge_test",
-      "ts": "2026-08-04T14:52Z",
-      "content": "CONCIERGE NOTIFICATION CHANNEL WIRED (TEST) — test message shows a formatted concierge request template (business, clients, user, timestamp, addresses). New pipeline exists but has never carried a real request.",
-      "significance": "LOW-MED (infra) — verify with a real end-to-end request.",
-      "action": "Bot/Aaron: trigger one real concierge request to confirm delivery + formatting."
+      "id": "intel_run3_pricing",
+      "ts": "2026-08-05T09:52Z",
+      "content": "INTEL RUN 3/4 (pricing): Jobber '$29/mo' RESOLVED = Core billed ANNUALLY, 1 user, +$29/seat (no new tier; zero price movement since Aug 1); AI Receptionist confirmed Plus feature ($399+). Service Autopilot VERIFIED — NEW matrix row: Startup $49 + signup fee, Pro $199, Pro Plus $499, ALL annual-only ('$49 teaser then $199-499' pattern). QuoteIQ top end UP: Elite $299 / Max $699 officially (entry frozen $29.99) — 'their top tiers just went up again' = true compare line. TurfHop /pricing+/features HTTP 500 ~90h+ (9th check).",
+      "significance": "MEDIUM-HIGH — 4-way pricing ammo for compare page + switcher campaign (Jobber/SA/QuoteIQ all verified today).",
+      "action": "Part 2: refresh compare page (SA row + QuoteIQ top-up + Jobber annual terms)."
     },
     {
-      "id": "intel_runs_ok",
-      "ts": "2026-08-04T16:35Z / 20:45Z / 2026-08-05T00:50Z",
-      "content": "INTEL ENGINE — 3 consecutive OK runs (pricing_intelligence 16:35Z, feature_ideas 20:45Z, competitor_monitoring 00:50Z). State v24, seen 253→341, leads #38-40 banked. Cadence fully recovered after Aug 4's provider-timeout failures.",
-      "significance": "LOW (positive) — reliability back to normal.",
-      "action": "None."
-    },
-    {
-      "id": "sms_batch_day1",
-      "ts": "2026-08-05T01:17Z",
-      "content": "SMS BATCH 1 — DAY 1 TEXTS QUEUED (5): NG Outdoor (Edmond), Frankies (Norman), A Plus (OKC), Mow-Town (Ardmore), Complete Lawn Care (Tulsa). All verified phones, zero Day-1 sends logged; hooks map to the real $55.25 rate report. Full 21-script batch posted 01:33Z.",
-      "significance": "HIGH — first SMS outreach wave; tracker still shows 0 replies across the 5 emails sent Jul 29-31.",
-      "action": "Aaron: send Day-1 texts, log 🔴→🟡 in LEAD_TRACKER.md. Follow-ups (Emerge/Metro Green/Bigfoot/Simply + Campbell & Sons) Day 8 overdue — 2nd follow-up script if silent by Fri."
+      "id": "reddit_drafts_4344",
+      "ts": "2026-08-05T09:52Z (sweep 09:26Z)",
+      "content": "REDDIT SWEEP: FIRST productive one after 3 quiet. Draft #43 (1vfyg2j r/sweatystartup 'What actually worked to get your first 5-10 customers?' — fencing co founder, friend-mode Nextdoor/realtor/yard-sign story, zero product) = NEW #1 for the Aug 7 22:21Z slot (~2.6d old at posting). Draft #44 (1vfyelq AI-assistant calls) = backup. Fallbacks: #38/#40/#41. New fetch pattern: www.reddit.com/comments/{id}.rss after 3-min cooldown at 60s spacing (old.reddit 301s when throttled).",
+      "significance": "MEDIUM — Aug 7 kit is now fully stocked; slot gate unchanged (no posting until Fri Aug 7 22:21Z).",
+      "action": "Part 2: finalize #43 draft kit; watch 1vg1ltw + 1vfzyn2 as extra fallbacks."
     }
   ],
   "open_tasks": {
     "critical": [
       {
         "id": "stripe_e2e_verify",
-        "title": "Logged-in end-to-end test checkout (the ONLY unproven Stripe link — Day 19)",
-        "days_open": 19,
+        "title": "Logged-in end-to-end test checkout (the ONLY unproven Stripe link — Day 20)",
+        "days_open": 20,
         "owner": "Aaron (manual)",
-        "status": "🟡 STILL UNPROVEN — stack verified live Aug 4 (14 env vars, all 3 endpoints JSON 401/403 after deploy f8460eba); health-check cron probe still reads the wrong env-var field",
+        "status": "🟡 STILL UNPROVEN — 09:14Z check: all green (functions live, keys valid, no-key-in-bundle = by design)",
         "note": "Everything green except a real user checkout with a real card."
       },
       {
         "id": "softwareworld_submit",
         "title": "Submit MowGo to SoftwareWorld + directories (Capterra/G2/SoftwareAdvice/GetApp)",
-        "days_open": 23,
+        "days_open": 24,
         "owner": "Aaron (manual)",
-        "status": "❌ NO PROGRESS — Day 23 of listicle absence; QuoteIQ co-founder self-ranks #1 in his own listicles",
+        "status": "❌ NO PROGRESS — Day 24 of listicle absence; QuoteIQ co-founder self-ranks #1",
         "note": "10-15 min each; highest-leverage 30 min on the plate."
       },
       {
@@ -83,37 +76,37 @@
         "title": "Fix Rule of 100 cron duplicate-post bug (job d37092913d72) — 12-msg subset re-posted 02:02Z Aug 5",
         "days_open": 1,
         "owner": "Bot",
-        "status": "🆕 OPEN — byte-identical re-post of SMS scripts 30 min after full batch; OKC Top Choice ×3 total; double-text risk",
+        "status": "🆕 STILL OPEN — no fix deployed; next cron run ~01:17Z tomorrow; double-text risk persists",
         "note": "Add last-posted-ID tracking / dedup check before each post."
       },
       {
         "id": "sms_batch1_sends",
-        "title": "SMS Batch 1 Day-1 sends — NG Outdoor / Frankies / A Plus / Mow-Town / Complete (5 named today)",
+        "title": "SMS Batch 1 Day-1 sends — NG Outdoor / Frankies / A Plus / Mow-Town / Complete (5 named)",
         "days_open": 1,
         "owner": "Aaron (manual)",
-        "status": "🆕 QUEUED — scripts posted 01:33Z; log 🔴→🟡 in LEAD_TRACKER.md",
+        "status": "🆕 QUEUED — scripts in #outreach 01:33Z; LEAD_TRACKER.md untouched since Aug 2 → ZERO sends logged",
         "note": "Never pitch the app in message 1; offer rate report on reply."
       },
       {
         "id": "emerge_followup",
-        "title": "Send 4 overdue follow-ups + Campbell & Sons — Day 8, 0 replies; 2nd follow-up script if silent by Fri",
-        "days_open": 8,
+        "title": "Send 4 overdue follow-ups + Campbell & Sons — Day 9, 0 replies; 2nd follow-up script if silent by Fri",
+        "days_open": 9,
         "owner": "Aaron (manual)",
-        "status": "🔴 OVERDUE Day 8 — 5 emails sent Jul 29-31, 0 replies",
+        "status": "🔴 OVERDUE Day 9 — 5 emails sent Jul 29-31, 0 replies",
         "note": "Emerge/Metro Green/Bigfoot/Simply drafts ready; highest-ROI minutes."
       },
       {
         "id": "jobber_switcher_wave",
         "title": "Competitor import (CSV) + /switch page — Jobber switcher window open through ~Aug 15",
-        "days_open": 5,
+        "days_open": 6,
         "owner": "Dev",
-        "status": "⚠️ WINDOW OPEN — Jobber '$29' now VERIFIED as annual-bait (Core $29 annual/$49 monthly; Connect $99+ gates reminders+autopay)",
-        "note": "Switcher messaging can now use verified numbers."
+        "status": "⚠️ WINDOW OPEN — $29 now VERIFIED as annual-bait (1-yr lock, +$29/seat); SA/QuoteIQ teasers verified too",
+        "note": "Switcher messaging can now use 3 verified competitor ladders."
       },
       {
         "id": "online_booking",
         "title": "Ship online booking link (P0)",
-        "days_open": 14,
+        "days_open": 15,
         "owner": "Dev",
         "status": "❌ NOT STARTED — every competitor has one",
         "note": "1-2 days; quotes v1 still #1 per escalation."
@@ -123,18 +116,18 @@
       {
         "id": "quotes_v1",
         "title": "Minimal Quotes v1 (line items → Approve link → job) — #1 BUILD PRIORITY",
-        "days_open": 5,
+        "days_open": 6,
         "owner": "Dev",
-        "status": "🚀 UNCHANGED — QuoteIQ Essentials $29.99 + Elite $299/Max $699 re-confirmed",
+        "status": "🚀 UNCHANGED — QuoteIQ Elite/Max now officially $299/$699 (top-end up)",
         "note": "3-5 days, scoped (docs/quotes-v1-scope.md)."
       },
       {
         "id": "reddit_queue",
-        "title": "Reddit cadence — pipeline LIVE + clean; NEXT SLOT ≥ Fri Aug 7 22:21Z (96h gate)",
-        "days_open": 14,
+        "title": "Reddit cadence — NEXT SLOT ≥ Fri Aug 7 22:21Z (96h gate); kit fully stocked",
+        "days_open": 15,
         "owner": "Bot/Aaron",
-        "status": "🟢 GATED — drafts #38 (Nextdoor 1vfhp9z) + #40 (hydroseeding 1vfpd5m) ready; 1vfci4c r/smallbusiness missed-calls = freshest on-ICP thread in days (banked, friend-mode)",
-        "note": "Karma-builders banked: 1vff40b / 1vfa9cq / 1vfamp8. TurfHop outage = ammo if still down. Friend-poster cron (9b2791494b1b) paused — resume decision for Aaron."
+        "status": "🟢 GATED — #1 = draft #43 (1vfyg2j fencing co, freshest); backups #44/#38/#40/#41; fallbacks 1vg1ltw + 1vfzyn2",
+        "note": "Friend-poster cron (9b2791494b1b) still paused — resume decision for Aaron."
       },
       {
         "id": "blasian_leads_question",
@@ -147,64 +140,64 @@
       {
         "id": "jobber_promo_posts",
         "title": "Post 'Jobber promo just ended' campaign (drafts A/B/D ready)",
-        "days_open": 6,
+        "days_open": 7,
         "owner": "Aaron (manual)",
         "status": "⏳ OVERDUE — was due Mon Aug 3; no evidence posted",
-        "note": "Switcher window closing ~Aug 15; now has verified $29-bait receipts."
+        "note": "Switcher window ~Aug 15; ammo now: $29 annual-bait + SA $49 teaser + QuoteIQ top-up."
       },
       {
         "id": "auto_pay_card_on_file",
         "title": "Card-on-file auto-pay — feature gap #3",
-        "days_open": 4,
+        "days_open": 5,
         "owner": "Dev",
-        "status": "🆕 RE-VALIDATED — Jobber explicit; SoloOp $0; MowStack ships it; LawnPro gates it at $249",
+        "status": "🆕 RE-VALIDATED — Jobber explicit; SoloOp $0; MowStack ships it; LawnPro gates at $249",
         "note": "1-2d; after quotes v1 / per Aaron decision."
       },
       {
         "id": "rain_delay_shift",
-        "title": "Rain-delay 'shift +1 day' with one-tap auto-text — FEATURE IDEA #1 (UPGRADED: Jobber shipped auto-notify + bulk shift Jul 24)",
-        "days_open": 1,
+        "title": "Rain-delay 'shift +1 day' with one-tap auto-text — FEATURE IDEA #1",
+        "days_open": 2,
         "owner": "Dev",
-        "status": "🆕 VALIDATED-BY-COMPETITOR — rain = top pain in OK_LEADS_100 (Emerge, NG Outdoor); marketing page exists",
+        "status": "🆕 VALIDATED-BY-COMPETITOR — Jobber shipped auto-notify + bulk shift Jul 24; rain = top pain",
         "note": "S-M effort, high retention; close the loop in-app."
       },
       {
         "id": "photo_proof",
         "title": "Photo proof galleries in completion emails",
-        "days_open": 5,
+        "days_open": 6,
         "owner": "Dev",
         "status": "🆕 1-2 days — MowStack ships it; feeds Google-review loop",
-        "note": "Review-request (#2) got new evidence: QuoteIQ review-farming + Jobber Marketing Suite at Plus $399+."
+        "note": "Review-request (#2) evidence: QuoteIQ review-farming + Jobber Marketing Suite $399+."
       },
       {
         "id": "cowork_channel_cleanup",
         "title": "Clean ~127 watchdog-failure spam messages from #🤝mowgo-cowork + decide watchdog delivery channel",
-        "days_open": 2,
+        "days_open": 3,
         "owner": "Aaron/Bot",
         "status": "🆕 Spam stopped (13:50Z Aug 4); cleanup + delivery routing still needed",
         "note": "0 new failures since fix — watchdog holding."
       },
       {
         "id": "jobber_receptionist_399",
-        "title": "Jobber AI Receptionist now Plus-only $399+ (was '$99 add-on' QuoteIQ attacks) — refresh compare page if citing old figure",
+        "title": "Jobber AI Receptionist = Plus-only $399+ — CONFIRMED 2nd time (09:26Z run: explicitly listed as Plus feature)",
         "days_open": 1,
         "owner": "Bot",
-        "status": "🆕 OPEN — captured Run 1/4 Aug 5",
-        "note": "Also: Jobber claims 300,000+ pros (own site)."
+        "status": "✅ CLOSED — verified twice; use in compare page if citing receptionist gating",
+        "note": "Jobber claims 300,000+ pros (own site)."
       }
     ],
     "low": [
       {
         "id": "mowflow_project_delete",
-        "title": "Delete mowflow.pages.dev PROJECT (domain retired Aug 2; project remains — CF guard 8000076)",
-        "owner": "Aaron (manual)",
-        "status": "🟡 Still blocked for bot; one-click decision on plate"
+        "title": "mowflow.pages.dev — EFFECTIVELY RETIRED (09:14Z check: 'MowGo has moved' stub, old build + cs_live_ checkout GONE)",
+        "owner": "Aaron/Bot",
+        "status": "✅ OUTCOME ACHIEVED — CF project deletion itself may still be pending; one-click confirm on plate"
       },
       {
         "id": "trial_length_decision",
         "title": "Decide trial 7 vs 14 days (checkout grants 7, copy says 14) + CF env cleanup (VITE_FORCE_DEMO etc.)",
         "owner": "Aaron",
-        "status": "⏳ Plate decision — 14 env vars confirmed present; cleanup = remove stale VITE_* if unused"
+        "status": "⏳ Plate decision"
       },
       {
         "id": "concierge_e2e_test",
@@ -216,7 +209,7 @@
         "id": "mxbuild_profile",
         "title": "Profile MX Build ($49/mo estimates/invoices/payments entrant — direct price-point competitor)",
         "owner": "Bot",
-        "status": "🆕 Still owed from Aug 4 lane"
+        "status": "🆕 Still owed (was Aug 4 lane; SA took priority this morning)"
       },
       {
         "id": "lawnboss_monitor",
@@ -234,58 +227,65 @@
         "id": "ve8hew_monitor",
         "title": "Monitor new entrant 1ve8hew '60-second invoice app' (solo dev, recruiting testers)",
         "owner": "Bot",
-        "status": "🟢 Competitor watch — invoice-only wedge = MowGo's core action"
+        "status": "🟢 Competitor watch"
       }
     ],
     "closed_since_yesterday": [
-      "jobber_pricing_verify → CLOSED Aug 5 (Intel Run 1/4): '$29/mo' = annual-bait (Core $29 annual/$348 upfront, $49 monthly); Connect $99+ still gates reminders+autopay; LawnBoss's $169 = wrong third-party figure, don't inherit",
-      "provider_failover_watchdog → HELD: 0 new failures since the 13:50Z Aug 4 fix; script silent-when-healthy",
-      "invoice_reminders_cron → CLOSED Aug 4 (2 consecutive OK runs)",
-      "stripe_functions_regression → CLOSED Aug 4 (functions live after deploy f8460eba; 14 env vars verified)",
-      "reddit_1ve82mp + 1vcr90y → POSTED + verified visible; next slot ≥ Aug 7 22:21Z"
+      "jobber_pricing_verify → CLOSED Aug 5 09:26Z: $29 = Core ANNUAL (1-yr lock, +$29/seat), no new tier; zero price movement since Aug 1",
+      "serviceautopilot_verify → CLOSED Aug 5 09:26Z: $49 + signup fee, annual-only; real plans $199-499 — NEW matrix row",
+      "mowflow_project_delete → EFFECTIVELY CLOSED Aug 5 09:14Z: legacy domain retired (stub live, old MowFlow build + cs_live_ checkout gone)",
+      "jobber_receptionist_399 → CONFIRMED (2nd verification): AI Receptionist = Plus feature $399+"
     ]
   },
   "blockers_for_aaron": [
     {
-      "blocker": "Stripe: logged-in end-to-end test checkout — Day 19, the only unproven link",
-      "detail": "Functions live + 14 env vars verified. Landing 'Stripe payments are live' is TRUE. A real checkout with his account is the final proof. (Health-check cron probe should be fixed to read deployment_configs.production.env_vars — it keeps false-alarming.)"
+      "blocker": "Stripe: logged-in end-to-end test checkout — Day 20, the ONLY unproven link",
+      "detail": "09:14Z health check: functions live, keys valid, no-key-in-bundle is by-design server-side checkout. Landing 'Stripe payments are live' = TRUE. One real checkout with his account closes it."
     },
     {
-      "blocker": "SMS Batch 1 Day-1 sends + 4+1 lead follow-ups (Day 8, 0 replies)",
-      "detail": "5 Day-1 texts named (NG Outdoor, Frankies, A Plus, Mow-Town, Complete) — scripts in #🌱mowgo-outreach 01:33Z. Follow-ups Emerge/Metro Green/Bigfoot/Simply + Campbell & Sons overdue; 2nd follow-up script if silent by Fri. Log 🔴→🟡 in LEAD_TRACKER.md."
+      "blocker": "SMS Batch 1 Day-1 sends + 4+1 lead follow-ups (Day 9, 0 replies)",
+      "detail": "5 Day-1 texts named (NG Outdoor, Frankies, A Plus, Mow-Town, Complete) — scripts in #outreach 01:33Z. LEAD_TRACKER untouched since Aug 2 → NOTHING sent/logged yet. Follow-ups Emerge/Metro Green/Bigfoot/Simply + Campbell & Sons overdue; 2nd follow-up script if silent by Fri."
     },
     {
       "blocker": "Blasian silent Day 8; leads question unanswered; human loop dead ~7 days",
       "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md. Zero human messages anywhere since Jul 29 15:39Z. Reply first — restarts the loop."
     },
     {
-      "blocker": "SoftwareWorld + directory submissions — Day 23",
-      "detail": "MowGo absent from every 'best of 2026' list; QuoteIQ co-founder self-ranks #1 in his own listicles; name collision with Canadian SnowGo/MowGo app. 10-15 min each."
+      "blocker": "SoftwareWorld + directory submissions — Day 24",
+      "detail": "MowGo absent from every 'best of 2026' list; QuoteIQ co-founder self-ranks #1 in his own listicles. 10-15 min each."
     },
     {
       "blocker": "Rule of 100 cron duplicate-post bug (bot-fixable) + cowork channel cleanup",
-      "detail": "Cron d37092913d72 re-posted 12 SMS scripts 30 min after the full batch (OKC Top Choice ×3). Bot fix: dedup/state check. ~127 watchdog-spam messages still in cowork channel; watchdog delivery channel decision pending."
+      "detail": "Cron d37092913d72 re-posted 12 SMS scripts at 02:02Z (OKC Top Choice x3). Bot fix: dedup/state check — do BEFORE tomorrow's ~01:17Z run. ~127 watchdog-spam messages still in cowork channel; watchdog delivery channel decision pending."
     },
     {
-      "blocker": "One-click decisions: trial 7 vs 14 days · mowflow project deletion · friend-poster cron resume (9b2791494b1b) · Jobber promo posts (overdue, drafts ready)",
-      "detail": "Switcher window closes ~Aug 15; Jobber '$29-bait' receipts now available as ammo."
+      "blocker": "One-click decisions: trial 7 vs 14 days · mowflow CF project deletion confirm · friend-poster cron resume (9b2791494b1b) · Jobber promo posts (overdue, drafts ready)",
+      "detail": "Switcher window closes ~Aug 15; verified ammo now: Jobber $29 annual-bait, SA $49 teaser+signup fee, QuoteIQ top tiers up ($299/$699)."
     }
   ],
   "quick_wins_sub_30min": [
     {
       "id": "rule100_dedup_fix",
-      "title": "Add dedup/state check to Rule of 100 cron (stops duplicate script posts)",
+      "title": "Add dedup/state check to Rule of 100 cron (stops duplicate script posts) — do before ~01:17Z tomorrow",
       "estimate": "10 min",
       "owner": "Bot",
       "impact": "MEDIUM — prevents double-text risk + channel noise",
       "actionable_by_bot": true
     },
     {
-      "id": "jobber_compare_refresh",
-      "title": "Refresh compare page with verified Jobber ladder (Core $29 annual-bait / Connect $99 / Grow $149 / Plus $399) + LawnPro $249 gate",
+      "id": "compare_page_refresh",
+      "title": "Refresh compare page: add Service Autopilot row ($49 teaser + signup fee, annual-only, $199-499 real), QuoteIQ top-up line (Elite $299/Max $699), Jobber $29 annual terms",
       "estimate": "15 min",
       "owner": "Bot",
-      "impact": "MEDIUM — 5-competitor gate proof; switcher ammo",
+      "impact": "MEDIUM — 3 verified competitor ladders; switcher ammo",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "aug7_reddit_kit",
+      "title": "Finalize Aug 7 22:21Z kit — draft #43 (1vfyg2j) as #1, backups #44/#38/#40/#41; watch 1vg1ltw + 1vfzyn2",
+      "estimate": "20 min",
+      "owner": "Bot/Aaron",
+      "impact": "MEDIUM — next legal slot Fri Aug 7; first productive sweep in days stocked it",
       "actionable_by_bot": true
     },
     {
@@ -293,12 +293,12 @@
       "title": "Send 5 Day-1 SMS texts (scripts posted 01:33Z) + log in LEAD_TRACKER",
       "estimate": "10 min",
       "owner": "Aaron (manual)",
-      "impact": "HIGH — first SMS wave; 0 replies across emails so far",
+      "impact": "HIGH — first SMS wave; 0 replies across emails so far; tracker untouched since Aug 2",
       "actionable_by_bot": false
     },
     {
       "id": "followup_emails",
-      "title": "Send 4 overdue follow-ups + Campbell & Sons (Day 8) — 2nd follow-up script if silent by Fri",
+      "title": "Send 4 overdue follow-ups + Campbell & Sons (Day 9) — 2nd follow-up script if silent by Fri",
       "estimate": "10 min",
       "owner": "Aaron (manual)",
       "impact": "HIGH — warm leads going cold",
@@ -321,35 +321,26 @@
       "actionable_by_bot": true
     },
     {
-      "id": "aug7_reddit_drafts",
-      "title": "Finalize Aug 7 window kit (drafts #38 Nextdoor + #40 hydroseeding; fresh-thread sweep Aug 7-8)",
-      "estimate": "20 min",
-      "owner": "Bot/Aaron",
-      "impact": "MEDIUM — next legal slot ≥ Fri Aug 7 22:21Z",
+      "id": "mxbuild_profile",
+      "title": "Profile MX Build ($49/mo entrant) — still owed from Aug 4 lane",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "LOW — completes competitor matrix at MowGo's price point",
       "actionable_by_bot": true
     }
   ],
   "pricing_status": {
-    "recommendation": "HOLD $39/$79 flat — 'flat everything: no per-user, no % of revenue, no AI-credit metering'. COLLECTION-LOOP GATE PROOF NOW 5-COMPETITOR: Jobber Connect $99 · HCP $149 · GorillaDesk $99 · QuoteIQ $149.99 · LawnPro $249 — MowGo ships the whole loop at $49/$79. TurfHop Orbit AI credit-metered (1 action = 1 credit) — no-credits counter triple-verified.",
-    "new": "Jobber '$29/mo' VERIFIED = annual-bait (Core $29 annual/$348 upfront, $49 monthly; Connect $99+/Grow $149/Plus $399) — headline drop is billing bait; everything MowGo sells is still $99+ on Jobber. QuoteIQ all-in on AI (Autopilot voice/35+ actions, Copilot, Estimator, Before/After AI, Virtual Call Team; Elite $299/Max $699 re-confirmed). LawnPro: free 25-client cap; 2-way text + auto-charge at Plus $249. MX Build $49 entrant still to profile. TurfHop /pricing down ~87h+ (10th check, .NET stack trace leaking).",
+    "recommendation": "HOLD $39/$79 flat — 'flat everything: no per-user, no % of revenue, no AI-credit metering'. The $29-49 band is now PROVEN all-teaser: Jobber $29 (annual lock +$29/seat), QuoteIQ $29.99 (bait tier, real tiers $149.99-699), SA $49 (signup fee, annual-only, real plans $199-499). MowGo Solo $39 month-to-month is the only honest sticker in the band.",
+    "new": "Jobber $29 RESOLVED (annual-Core, no new tier; AI Receptionist = Plus $399+). Service Autopilot VERIFIED (new matrix row: $49+signup fee, annual-only, Pro $199/Pro Plus $499). QuoteIQ top end UP: Elite $299 / Max $699 officially (entry frozen $29.99) — 'their top tiers just went up again' line is true. TurfHop /pricing 500 ~90h+ (9th check).",
     "copy_flags_banked": [
-      "60% of lawn companies get paid late. MowGo invoices the second the job's done.",
-      "Jobber's '$29' is annual-bait — $348 upfront. MowGo is $39 flat, month to month.",
-      "QuoteIQ charges $299 for quotes + route optimization — MowGo includes both.",
-      "The collection loop (reminders, autopay, routes, texting) is $99–249 everywhere. MowGo ships it at $49/$79 flat.",
-      "Contractors miss 27% of inbound calls — but 1-3 person crews don't need an AI front desk; they need the missed call to become a booked job tomorrow.",
-      "AI receptionists are credit-metered everywhere (TurfHop Orbit AI: 1 action = 1 credit) — MowGo is flat.",
-      "Planned software spend doubled year-over-year — but cost is the #1 blocker. MowGo is flat.",
-      "SA charges a sign-up fee and hides Elite behind a sales call — MowGo publishes $39/$79 and takes a card."
+      "Service Autopilot's $49 is a teaser — signup fee, annual commitment, real plans $199-499. MowGo: $39-79 flat, no signup fee, month-to-month.",
+      "Jobber's $29/mo requires a 1-year commitment, 1 user, and $29 per extra seat. MowGo Solo $39 is flat and month-to-month.",
+      "QuoteIQ's route optimization is on the $299 tier. MowGo Crew is $79 flat.",
+      "Home services miss 20-40% of calls at peak; 85% of callers who hit voicemail never call back (CallRail). MowGo's flat-price loop keeps the lead alive.",
+      "59% of landscape firms say hiring is harder than pre-COVID (LMN) — crews can't hire, so the software has to do the office work.",
+      "27% of home-services inbound calls go unanswered (2 independent analyses). At 1-3 crews you don't need a $99+/mo AI front desk — you need the call to become a booked job tomorrow."
     ]
   },
-  "summary": "50 messages synced (6 mowgo + 44 outreach + 0 cowork) — ZERO human messages anywhere (Blasian silent Day 8; his leads question Day 8; draft ready). 🟢 OUTREACH ENGINE SHIPPED: #🌱mowgo-outreach came alive after 10 dormant days — real OK rate report ($55.25 avg), SMS Batch 1 (21 per-lead Day 1/2/7 scripts), Reddit+IG content draft, carousel/Reels assets, phone-ready HTML, and a new '🌱 Rule of 100' daily cron (job d37092913d72) posting 5 texts + 3 FB/IG posts; Day-1 texts named for NG Outdoor/Frankies/A Plus/Mow-Town/Complete. ⚠️ NEW BUG: the Rule of 100 cron re-posted a 12-message subset of the SMS batch at 02:02Z (byte-identical; OKC Top Choice ×3) — dedup fix needed (double-text risk). ✅ JOBBER '$29' VERIFIED CLOSED: annual-bait ($348 upfront; $49 monthly); Connect $99+ still gates reminders+autopay; collection-loop gate proof now 5-competitor ($99-249 vs MowGo $49/$79). 🚀 Feature #1 upgraded: rain-delay 'shift +1 day' auto-text — Jobber shipped the same idea Jul 24. 🧪 Concierge notification channel wired (test only — needs real request). ✅ Intel Engine cadence recovered (3 OK runs, state v24, seen 253→341); provider watchdog holding silent; invoice reminders healthy. 🐦 Reddit: NO posting until ≥ Fri Aug 7 22:21Z; drafts #38 (Nextdoor) + #40 (hydroseeding) ready; 1vfci4c missed-calls thread banked. Aaron's plate: 5 Day-1 SMS sends, 4+1 follow-ups (Day 8, 0 replies), Blasian reply (Day 8), logged-in Stripe checkout (Day 19), SoftwareWorld (Day 23), Jobber promo posts (overdue), 3 one-click decisions. Vault: 2026-08-05 sync + raw dumps written; 2026-08-04 nightly was skipped — BACKFILLED from the Aug 4 13:55Z scan.",
-  "vault_files_written": [
-    "/opt/data/mowgo/vault/2026-08-05_daily-sync.md",
-    "/opt/data/mowgo/vault/2026-08-05_channel-mowgo-raw.md",
-    "/opt/data/mowgo/vault/2026-08-05_channel-outreach-raw.md",
-    "/opt/data/mowgo/vault/2026-08-05_channel-cowork-raw.md",
-    "/opt/data/mowgo/vault/2026-08-04_daily-sync.md (backfill)",
-    "/opt/data/mowgo/vault/index.md (updated)"
-  ]
+  "summary": "8 new messages overnight-to-morning, ALL bot cron reports — ZERO human messages anywhere (Blasian silent ~7 days; his leads question Day 8; draft ready). 🟢 INTEL: 2 clean runs — 05:26Z trends (missed-call economics quantified: 27% missed / 85% never call back; labor 59% harder to hire; market $2.33B→$3.97B) and 09:52Z pricing (Jobber $29 RESOLVED = annual-Core teaser; Service Autopilot VERIFIED = new $49-teaser-$199-499 row; QuoteIQ top end UP to $299/$699; TurfHop 500 ~90h+ 9th check). ✅ STRIPE: 09:14Z check all green + mowflow.pages.dev RETIRED ('MowGo has moved' stub; old cs_live_ build gone) — closes the Jul 31 finding; only unproven link remains the logged-in e2e checkout (Day 20, Aaron). 🐦 REDDIT: first productive sweep in days — draft #43 (1vfyg2j first-5-customers) = NEW #1 for the Aug 7 22:21Z slot, #44 backup; NO posting until Fri. ⚠️ Rule of 100 dedup fix STILL not deployed (next run ~01:17Z tomorrow — double-text risk). 📋 Aaron's plate: 5 Day-1 SMS sends + 4+1 follow-ups (Day 9, 0 replies, tracker untouched since Aug 2), Blasian reply (Day 8), logged-in Stripe checkout (Day 20), SoftwareWorld (Day 24), Jobber promo posts (overdue, 3-competitor verified ammo now), 3-4 one-click decisions. Bot's plate (Part 2): rule100 dedup, compare-page refresh (SA row + QuoteIQ top-up), Aug 7 kit finalize, concierge e2e, MX Build profile.",
+  "vault_files_written": []
 }
