@@ -280,6 +280,13 @@ class InvoicesViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
+                // Defense-in-depth: mirror web/iOS caps on manual invoices.
+                if (amount <= 0 || amount > 100_000) {
+                    _uiState.value = _uiState.value.copy(
+                        showSnackbar = "Amount must be between \$0.01 and \$100,000",
+                    )
+                    return@launch
+                }
                 val invoice = Invoice(
                     clientId = clientId,
                     amount = amount,
