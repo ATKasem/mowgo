@@ -1,9 +1,10 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
+import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, ensureClientCoords } from '../lib/data';
+import { optimizeRoute } from '../lib/optimizeRoute';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw } from 'lucide-react';
+import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw, Route as RouteIcon } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
@@ -74,6 +75,9 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const pendingRecurringRef = useRef(new Set());
   const jobsRef = useRef(jobs);
   const formRef = useRef(form);
+  const [optimizing, setOptimizing] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const routeUndoRef = useRef(null); // previousOrder snapshot for toast Undo
 
   useEffect(() => { jobsRef.current = jobs; }, [jobs]);
   useEffect(() => { formRef.current = form; }, [form]);
@@ -101,6 +105,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const lng = profile?.longitude ?? profile?.lng;
       const hasLocation = lat != null && lng != null;
       setHasBusinessLocation(hasLocation);
+      setProfile(profile);
       if (!hasLocation) return;
       getWeatherForLocation(lat, lng).then(result => { if (active) setWeather(result); });
     }).catch(() => {});
@@ -477,6 +482,93 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     void persistReorder(job.id, dateJobs[pos + 1].id);
   }
 
+  // Route Optimization v1 — paid tiers, whole-day owner view only
+  // (route_order is date-wide: crew members / filtered views would reorder
+  // other assignees' stops).
+  const canOptimize = !loading && !isCrewMember && crewFilter === null
+    && ['solo', 'crew', 'premium'].includes(profile?.tier)
+    && dateFiltered.length >= 3
+    && dateFiltered.filter(j => j.clients?.address).length >= 2;
+
+  // Date-scoped renumber from an ordered id list — same rollback shape as
+  // reorderWithinDate (previousOrder + updates).
+  function reorderToSequence(prev, orderedIds, currentDate) {
+    const updated = [...prev];
+    const previousOrder = prev
+      .filter(j => j.scheduled_date === currentDate)
+      .map(j => ({ id: j.id, route_order: j.route_order }));
+    const idSet = new Set(orderedIds);
+    let order = 1;
+    for (let i = 0; i < updated.length; i++) {
+      if (updated[i].scheduled_date === currentDate && idSet.has(updated[i].id)) {
+        updated[i] = { ...updated[i], route_order: order++ };
+      }
+    }
+    const updates = updated
+      .filter(j => j.scheduled_date === currentDate && idSet.has(j.id))
+      .map(j => ({ id: j.id, route_order: j.route_order }));
+    return { updated, updates, previousOrder };
+  }
+
+  async function handleOptimize() {
+    if (optimizing) return; // double-tap guard
+    setOptimizing(true);
+    try {
+      const dayJobs = jobsRef.current.filter(j => j.scheduled_date === date);
+      const coordsMap = await ensureClientCoords(dayJobs.map(j => j.clients).filter(Boolean));
+      const anchor = profile?.latitude != null && profile?.longitude != null
+        ? { lat: profile.latitude, lng: profile.longitude }
+        : null;
+      const positioned = dayJobs.map(j => ({
+        id: j.id,
+        lat: j.clients ? (coordsMap[j.clients.id]?.lat ?? null) : null,
+        lng: j.clients ? (coordsMap[j.clients.id]?.lng ?? null) : null,
+      }));
+      const orderedIds = optimizeRoute(positioned, anchor);
+
+      setJobs(prev => {
+        const result = reorderToSequence(prev, orderedIds, date);
+        if (!result) return prev;
+        routeUndoRef.current = result.previousOrder;
+        reorderJobs(result.updates).catch(err => {
+          console.error('optimize persist failed:', err);
+          setJobs(current => current.map(job => {
+            const previous = result.previousOrder.find(item => item.id === job.id);
+            return previous ? { ...job, route_order: previous.route_order } : job;
+          }));
+        });
+        return result.updated;
+      });
+
+      setCompletedToast({
+        name: tr('Route optimized'),
+        amount: 0,
+        type: 'plain',
+        actionLabel: tr('Undo'),
+        onAction: () => {
+          const undo = routeUndoRef.current;
+          if (!undo) return;
+          routeUndoRef.current = null;
+          setCompletedToast(null);
+          reorderJobs(undo).catch(err => console.error('optimize undo failed:', err));
+          setJobs(prev => prev.map(job => {
+            const previous = undo.find(item => item.id === job.id);
+            return previous ? { ...job, route_order: previous.route_order } : job;
+          }));
+        },
+      });
+      if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+      toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 6000);
+    } catch (err) {
+      console.error('Optimize:', err);
+      setCompletedToast({ name: tr('Could not optimize route. Try again.'), amount: 0, type: 'error' });
+      setTimeout(() => setCompletedToast(null), 4000);
+    } finally {
+      setOptimizing(false);
+    }
+  }
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -502,6 +594,11 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             )}
           </div>
         </div>
+        {canOptimize && (
+          <button onClick={handleOptimize} disabled={optimizing} className="btn-secondary gap-1.5 text-sm disabled:opacity-50">
+            <RouteIcon className="w-4 h-4" />{optimizing ? tr('Optimizing...') : tr('Optimize')}
+          </button>
+        )}
         {!teamLoading && !isCrewMember && (
           <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />{tr("New Job")}</button>
         )}
