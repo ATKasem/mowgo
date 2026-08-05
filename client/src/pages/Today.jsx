@@ -500,10 +500,12 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   // Date-scoped reorder from an ordered id list — same rollback shape as
   // reorderWithinDate (previousOrder + updates). APPLIES the permutation:
   // physical array order + route_order both follow orderedIds (Claude Code
-  // CRITICAL fix — membership-only renumbering was a no-op).
+  // CRITICAL fix). Ranks rebuild over ids still present in prev, so a job
+  // deleted mid-geocode can't leave gaps (Mimo LOW fix).
   function reorderToSequence(prev, orderedIds, currentDate) {
-    const rank = new Map(orderedIds.map((id, i) => [id, i + 1]));
-    const ordered = orderedIds.map(id => prev.find(j => j.id === id)).filter(Boolean);
+    const presentIds = orderedIds.filter(id => prev.some(j => j.id === id));
+    const rank = new Map(presentIds.map((id, i) => [id, i + 1]));
+    const ordered = presentIds.map(id => prev.find(j => j.id === id));
     const previousOrder = prev
       .filter(j => j.scheduled_date === currentDate)
       .map(j => ({ id: j.id, route_order: j.route_order }));
@@ -513,7 +515,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const next = ordered[oi++];
       return next ? { ...next, route_order: rank.get(next.id) } : j;
     });
-    const updates = ordered.map(j => ({ id: j.id, route_order: rank.get(j.id) }));
+    const updates = presentIds.map(id => ({ id, route_order: rank.get(id) }));
     return { updated, updates, previousOrder };
   }
 
@@ -579,14 +581,14 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
 
   function orderedStops() {
     return [...jobs]
-      .filter(j => j.scheduled_date === date)
+      .filter(j => j.scheduled_date === date && j.clients) // null-client jobs can't be geocoded (Mimo LOW fix)
       .sort((a, b) => (a.route_order ?? 0) - (b.route_order ?? 0))
       .map(j => ({
-        id: j.clients?.id ?? j.id, // CLIENT id — ensureClientCoords persists by client id (Claude Code HIGH fix)
+        id: j.clients.id, // CLIENT id — ensureClientCoords persists by client id (Claude Code HIGH fix)
         jobId: j.id,
-        address: j.clients?.address || j.title || '',
-        lat: j.clients?.latitude ?? null,
-        lng: j.clients?.longitude ?? null,
+        address: j.clients.address || j.title || '',
+        lat: j.clients.latitude ?? null,
+        lng: j.clients.longitude ?? null,
       }));
   }
 
@@ -597,6 +599,10 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   }
 
   async function openRouteLink(mode) {
+    // Pre-open the tab BEFORE any await — transient user activation expires
+    // across network awaits and Safari/iOS blocks late window.open
+    // (Mimo HIGH fix — the previous fix still opened it post-await).
+    const win = mode === 'all' ? window.open('', '_blank') : null;
     const stops = orderedStops();
     const coordsMap = await ensureClientCoords(stops.map(s => ({ id: s.id, address: s.address, latitude: s.lat, longitude: s.lng })));
     const withCoords = stops.map(s => ({
@@ -607,9 +613,6 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     if (mode === 'all') {
       const anchor = profile?.latitude != null && profile?.longitude != null
         ? { lat: profile.latitude, lng: profile.longitude } : null;
-      // Open the tab synchronously — window.open after await gets popup-blocked
-      // on Safari/iOS (Claude Code HIGH fix).
-      const win = window.open('', '_blank');
       const { url, skipped, truncated, count } = buildRouteLink(navApp, anchor, withCoords);
       if (!url) { if (win) win.close(); return; }
       if (win) win.location.href = url; else window.location.href = url;
