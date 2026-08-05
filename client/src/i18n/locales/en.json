@@ -284,10 +284,8 @@
     "see_the_full_comparison": "See the full comparison",
     "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.",
     "run_your_next_5_clients_free": "Run your next 5 clients free.",
-    "seo": {
-      "title": "MowGo vs Jobber, LawnPro, QuoteIQ & more — Honest Comparison (2026)",
-      "description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing."
-    }
+    "seo_title": "MowGo vs Jobber, LawnPro, QuoteIQ & more — Honest Comparison (2026)",
+    "seo_description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Real cost analysis",
@@ -343,10 +341,8 @@
     "platform_fee_expose": "Platform Fee Exposé",
     "see_what_ruunly_actually_costs_vs_mowgo_no_asterisks_no_fine_print_just_": "See what Ruunly actually costs vs MowGo. No asterisks, no fine print — just the numbers.",
     "you_must_upgrade_to_the_pro_plan_59_mo_just_to_get_rain_delay_starter_pl": "You must upgrade to the Pro plan ($59/mo) just to get rain delay. Starter plan doesn't include it.",
-    "seo": {
-      "title": "Ruunly Real Cost Calculator — $19/mo or $169/mo?",
-      "description": "Ruunly says $19/mo. The math says $169/mo. Use the revenue slider to see Ruunly’s real platform-fee cost vs MowGo’s flat $39."
-    }
+    "seo_title": "Ruunly Real Cost Calculator — $19/mo or $169/mo?",
+    "seo_description": "Ruunly says $19/mo. The math says $169/mo. Use the revenue slider to see Ruunly’s real platform-fee cost vs MowGo’s flat $39."
   },
   "home": {
     "clear": "Clear",
@@ -535,10 +531,8 @@
     "mowgo_solo_costs_price_72_less_than_jobber_connect_with_no_per_user_fees": "MowGo Solo costs {{price}}, 72% less than Jobber Connect, with no per-user fees.",
     "39_mo": "$39/mo",
     "29_mo_per_additional_user": "$29/mo per additional user",
-    "seo": {
-      "title": "Jobber Price Increase 2026 — What 1-3 Person Lawn Crews Pay",
-      "description": "Jobber Connect is $139/mo plus $29/mo per user. See the real math for solo operators and small crews, and MowGo’s flat alternative. August 2026."
-    }
+    "seo_title": "Jobber Price Increase 2026 — What 1-3 Person Lawn Crews Pay",
+    "seo_description": "Jobber Connect is $139/mo plus $29/mo per user. See the real math for solo operators and small crews, and MowGo’s flat alternative. August 2026."
   },
   "landing": {
     "premium": "Premium",
@@ -547,7 +541,7 @@
     "start_premium": "Start Premium",
     "everything_in_crew": "Everything in Crew",
     "everything_in_solo": "Everything in Solo",
-    "month": "/month",
+    "month": "month",
     "priority_concierge_setup_your_clients_imported_first_30_days_pre_schedul": "Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h",
     "seasonal_packs_spring_pricing_benchmarks_route_templates": "Seasonal packs: spring pricing benchmarks, route templates",
     "priority_text_first_support": "Priority text-first support",
@@ -663,15 +657,13 @@
     "no_catch_cancel_anytime_if_solo_does_not_make_you_more_organized_in_30_d": "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full.",
     "solo_costs_price_and_is_built_for_the_1_020_oklahoma_crews_who_don_t_nee": "Solo costs {{price}} and is built for the 1,020+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.",
     "census_county_business_patterns_2023": "Census County Business Patterns 2023",
-    "seo": {
-      "title": "MowGo — Lawn Care Scheduling, Routing & Invoicing Software",
-      "description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card."
-    },
     "mowgo_operator": "MowGo operator",
     "why_should_i_pay_yearly": "Why should I pay yearly?",
     "two_months_free_78_off_solo_158_off_crew_and_one_payment_covers_the_whol": "Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.",
     "what_happens_to_my_data_if_i_cancel": "What happens to my data if I cancel?",
-    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Your data stays yours, always. Export it anytime. After cancel, we keep it safe for 90 days and delete on request."
+    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Your data stays yours, always. Export it anytime. After cancel, we keep it safe for 90 days and delete on request.",
+    "seo_title": "MowGo — Lawn Care Scheduling, Routing & Invoicing Software",
+    "seo_description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -794,10 +786,8 @@
     "august_2026_update": "August 2026 Update",
     "check_these_five_things_before_you_move_your_clients_and_schedule_to_ano": "Check these five things before you move your clients and schedule to another app:",
     "no_platform_fee_stripe_s_cut_only": "No platform fee — Stripe’s cut only",
-    "seo": {
-      "title": "QuoteIQ Alternative for Lawn Care — Free Plan, 5 Clients",
-      "description": "QuoteIQ discontinued its free plan in July 2026. MowGo gives lawn care crews a free option: 5 clients forever, no credit card."
-    }
+    "seo_title": "QuoteIQ Alternative for Lawn Care — Free Plan, 5 Clients",
+    "seo_description": "QuoteIQ discontinued its free plan in July 2026. MowGo gives lawn care crews a free option: 5 clients forever, no credit card."
   },
   "resetPassword": {
     "passwords_do_not_match": "Passwords do not match.",
@@ -1043,10 +1033,8 @@
     "cheaper_isn_t_cheaper_if_the_features_don_t_work": "\"Cheaper\" isn't cheaper if the features don't work.",
     "mowgo_was_born_because_i_got_tired_of_losing_client_data_in_other_apps_e": "\"MowGo was born because I got tired of losing client data in other apps. Every feature exists because a real operator asked for it. No VC fluff. No 'enterprise features' nobody needs. Just the tools that keep your crew moving.\"",
     "you_trusted_lawnpro_with_your_business_if_reports_from_former_lawnpro_us": "You trusted LawnPro with your business. If reports from former LawnPro users about lost data, broken sync, or surprise price hikes sound familiar, keep reading. MowGo was built for operators who are tired of that.",
-    "seo": {
-      "title": "Switch from LawnPro to MowGo — Keep Your Week, Move 5 Clients Free",
-      "description": "Move from LawnPro without losing your week. Import your first 5 clients free, rain delay included, no credit card."
-    }
+    "seo_title": "Switch from LawnPro to MowGo — Keep Your Week, Move 5 Clients Free",
+    "seo_description": "Move from LawnPro without losing your week. Import your first 5 clients free, rain delay included, no credit card."
   },
   "today": {
     "crew_assignments_are_temporarily_unavailable": "Crew assignments are temporarily unavailable.",
@@ -1270,15 +1258,13 @@
     "plain_language_notes_structured_records": "Plain-language notes → structured records",
     "automated_review_requests": "Automated review requests",
     "prompts_customers_to_leave_google_reviews": "Prompts customers to leave Google reviews",
-    "seo": {
-      "title": "ProBase vs MowGo — Honest Comparison for Lawn Crews",
-      "description": "ProBase is free. Until it rains. Compare rain delay, offline mode, and pricing side by side. Updated August 2026."
-    },
     "yes": "Yes",
     "no": "No",
     "free_79_mo": "Free – $79/mo",
     "0_forever": "$0 forever",
-    "0_mo": "$0/mo"
+    "0_mo": "$0/mo",
+    "seo_title": "ProBase vs MowGo — Honest Comparison for Lawn Crews",
+    "seo_description": "ProBase is free. Until it rains. Compare rain delay, offline mode, and pricing side by side. Updated August 2026."
   },
   "routeAudit": {
     "landingCta": "Try the free route audit",
@@ -1344,10 +1330,8 @@
       "crewCta": "Explore the Crew tier",
       "qualifiedCta": "Book your free setup call"
     },
-    "seo": {
-      "title": "Free Route Audit — See What Your Routes Cost You",
-      "description": "Get a free estimate of the hours and revenue your lawn care routes are costing you. Takes 30 seconds, delivered to your email."
-    }
+    "seo_title": "Free Route Audit — See What Your Routes Cost You",
+    "seo_description": "Get a free estimate of the hours and revenue your lawn care routes are costing you. Takes 30 seconds, delivered to your email."
   },
   "portalReturn": {
     "app_not_installed": "App not installed?"

@@ -301,10 +301,8 @@
     "see_the_full_comparison": "Ver la comparación completa",
     "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "La tarifa de $29/mes por usuario de Jobber se acumula: un equipo de 2 personas en Connect llega a $1,536/año ($1,188 base + $348 por el segundo usuario). MowGo Crew: $790/año, precio fijo, todo el equipo incluido.",
     "run_your_next_5_clients_free": "Maneja tus próximos 5 clientes gratis.",
-    "seo": {
-      "title": "MowGo vs Jobber, LawnPro, QuoteIQ y más — Comparación honesta (2026)",
-      "description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales."
-    }
+    "seo_title": "MowGo vs Jobber, LawnPro, QuoteIQ y más — Comparación honesta (2026)",
+    "seo_description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales."
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",
@@ -366,10 +364,8 @@
     "compare_each_plan_fee_and_field_tool_side_by_side": "Compare cada plan, tarifa y herramienta de campo uno al lado del otro.",
     "add_ruunly_s_platform_fee_to_the_sticker_price_here_is_the_monthly_total": "Agregue la tarifa de la plataforma de Ruunly al precio de etiqueta. Aquí está el total mensual.",
     "enter_your_monthly_revenue_see_what_ruunly_costs_next_to_mowgo_no_asteri": "Ingrese sus ingresos mensuales. Mira lo que cuesta Ruunly junto a MowGo. Sin asteriscos. Sólo las matemáticas.",
-    "seo": {
-      "title": "Calculadora de costo real de Ruunly — ¿$19/mes o $169/mes?",
-      "description": "Ruunly dice $19/mes. Las matemáticas dicen $169/mes. Usa el control deslizante para ver el costo real con comisiones de Ruunly vs los $39 planos de MowGo."
-    }
+    "seo_title": "Calculadora de costo real de Ruunly — ¿$19/mes o $169/mes?",
+    "seo_description": "Ruunly dice $19/mes. Las matemáticas dicen $169/mes. Usa el control deslizante para ver el costo real con comisiones de Ruunly vs los $39 planos de MowGo."
   },
   "home": {
     "clear": "Despejado",
@@ -570,10 +566,8 @@
     "check_these_four_things_before_you_move_your_crew_to_another_app": "Revisa estas cuatro cosas antes de mover a tu equipo a otra aplicación:",
     "39_mo": "$39/mes",
     "29_mo_per_additional_user": "$29/mes por usuario adicional",
-    "seo": {
-      "title": "Aumento de precios de Jobber 2026 — cuánto pagan las cuadrillas de 1-3 personas",
-      "description": "Jobber Connect cuesta $139/mes más $29/mes por usuario. Mira el costo real para operadores individuales y cuadrillas pequeñas, y la alternativa plana de MowGo. Agosto de 2026."
-    }
+    "seo_title": "Aumento de precios de Jobber 2026 — cuánto pagan las cuadrillas de 1-3 personas",
+    "seo_description": "Jobber Connect cuesta $139/mes más $29/mes por usuario. Mira el costo real para operadores individuales y cuadrillas pequeñas, y la alternativa plana de MowGo. Agosto de 2026."
   },
   "landing": {
     "premium": "Premium",
@@ -582,7 +576,7 @@
     "start_premium": "Empieza con Premium",
     "everything_in_crew": "Todo lo incluido en Equipo",
     "everything_in_solo": "Todo lo de Solo",
-    "month": "/mes",
+    "month": "mes",
     "priority_concierge_setup_your_clients_imported_first_30_days_pre_schedul": "Configuración de conserjería prioritaria — importamos tus clientes y pre-programamos tus primeros 30 días en 48h",
     "seasonal_packs_spring_pricing_benchmarks_route_templates": "Paquetes de temporada: referencias de precios de primavera, plantillas de rutas",
     "priority_text_first_support": "Soporte prioritario por texto",
@@ -713,15 +707,13 @@
     "no_catch_cancel_anytime_if_solo_does_not_make_you_more_organized_in_30_d": "No hay truco. Cancela cuando quieras. Si Solo no te hace sentir más organizado en 30 días, te devolvemos tu primer mes completo.",
     "solo_costs_price_and_is_built_for_the_1_020_oklahoma_crews_who_don_t_nee": "Solo cuesta {{price}} y está hecho para las más de 1,020 cuadrillas de Oklahoma que no necesitan un sistema empresarial de {{competitorPrice}}.",
     "census_county_business_patterns_2023": "Census County Business Patterns 2023",
-    "seo": {
-      "title": "MowGo — Software de programación, rutas y facturación para jardinería",
-      "description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito."
-    },
     "mowgo_operator": "Operador de MowGo",
     "why_should_i_pay_yearly": "¿Por qué pagar anualmente?",
     "two_months_free_78_off_solo_158_off_crew_and_one_payment_covers_the_whol": "Dos meses gratis ($78 de descuento en Solo, $158 en Crew) y un solo pago cubre toda la temporada — sin cargos a la tarjeta en invierno. La Garantía Rain-Proof sigue aplicando: se reembolsan los meses no usados.",
     "what_happens_to_my_data_if_i_cancel": "¿Qué pasa con mis datos si cancelo?",
-    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Sus datos siempre son suyos. Expórtelos cuando quiera. Tras cancelar, los conservamos seguros por 90 días y los eliminamos a petición."
+    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Sus datos siempre son suyos. Expórtelos cuando quiera. Tras cancelar, los conservamos seguros por 90 días y los eliminamos a petición.",
+    "seo_title": "MowGo — Software de programación, rutas y facturación para jardinería",
+    "seo_description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -856,10 +848,8 @@
     "august_2026_update": "Actualización de agosto de 2026",
     "check_these_five_things_before_you_move_your_clients_and_schedule_to_ano": "Revisa estas cinco cosas antes de mover tus clientes y tu agenda a otra app:",
     "no_platform_fee_stripe_s_cut_only": "Sin comisión de plataforma: solo la de Stripe",
-    "seo": {
-      "title": "Alternativa a QuoteIQ para jardinería — plan gratis, 5 clientes",
-      "description": "QuoteIQ discontinuó su plan gratis en julio de 2026. MowGo da a las cuadrillas de jardinería una opción gratis: 5 clientes para siempre, sin tarjeta."
-    }
+    "seo_title": "Alternativa a QuoteIQ para jardinería — plan gratis, 5 clientes",
+    "seo_description": "QuoteIQ discontinuó su plan gratis en julio de 2026. MowGo da a las cuadrillas de jardinería una opción gratis: 5 clientes para siempre, sin tarjeta."
   },
   "resetPassword": {
     "passwords_do_not_match": "Las contraseñas no coinciden.",
@@ -1115,10 +1105,8 @@
     "leave_lawnpro_without_losing_your_week": "Deja LawnPro sin perder tu semana.",
     "move_your_first_5_clients_free": "Mueve tus primeros 5 clientes gratis.",
     "built_from_talks_with_lawn_care_operators_these_tools_keep_a_small_crew_": "Construido a partir de conversaciones con operadores de cuidado del césped. Estas herramientas mantienen en movimiento a un pequeño equipo.",
-    "seo": {
-      "title": "Cambia de LawnPro a MowGo — conserva tu semana, mueve 5 clientes gratis",
-      "description": "Sal de LawnPro sin perder tu semana. Importa tus primeros 5 clientes gratis, reagendado por lluvia incluido, sin tarjeta de crédito."
-    }
+    "seo_title": "Cambia de LawnPro a MowGo — conserva tu semana, mueve 5 clientes gratis",
+    "seo_description": "Sal de LawnPro sin perder tu semana. Importa tus primeros 5 clientes gratis, reagendado por lluvia incluido, sin tarjeta de crédito."
   },
   "today": {
     "crew_assignments_are_temporarily_unavailable": "Las asignaciones del equipo no están disponibles por ahora.",
@@ -1363,15 +1351,13 @@
     "plain_language_notes_structured_records": "Notas en lenguaje sencillo → registros estructurados",
     "automated_review_requests": "Solicitudes automáticas de reseñas",
     "prompts_customers_to_leave_google_reviews": "Invita a los clientes a dejar reseñas de Google",
-    "seo": {
-      "title": "ProBase vs MowGo — comparación honesta para cuadrillas",
-      "description": "ProBase es gratis. Hasta que llueve. Compara reagendado por lluvia, modo sin conexión y precios lado a lado. Actualizado en agosto de 2026."
-    },
     "yes": "Sí",
     "no": "No",
     "free_79_mo": "Gratis – $79/mes",
     "0_forever": "$0 para siempre",
-    "0_mo": "$0/mes"
+    "0_mo": "$0/mes",
+    "seo_title": "ProBase vs MowGo — comparación honesta para cuadrillas",
+    "seo_description": "ProBase es gratis. Hasta que llueve. Compara reagendado por lluvia, modo sin conexión y precios lado a lado. Actualizado en agosto de 2026."
   },
   "routeAudit": {
     "landingCta": "Prueba la auditoría de rutas gratis",
@@ -1437,10 +1423,8 @@
       "crewCta": "Explorar el plan Crew",
       "qualifiedCta": "Reserva tu llamada de configuración gratis"
     },
-    "seo": {
-      "title": "Auditoría de rutas gratis — Descubre cuánto te cuestan tus rutas",
-      "description": "Recibe un estimado gratis de las horas e ingresos que te cuestan tus rutas de jardinería. Toma 30 segundos y llega a tu correo."
-    }
+    "seo_title": "Auditoría de rutas gratis — Descubre cuánto te cuestan tus rutas",
+    "seo_description": "Recibe un estimado gratis de las horas e ingresos que te cuestan tus rutas de jardinería. Toma 30 segundos y llega a tu correo."
   },
   "portalReturn": {
     "app_not_installed": "¿App no instalada?"
