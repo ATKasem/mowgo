@@ -179,20 +179,66 @@ async function updateProfile({ env, userId, customerId, tier }) {
     ...(customerId ? { stripe_customer_id: customerId } : {}),
   };
 
-  if (userId) {
-    const matched = await patchProfile(
-      env,
-      `id=eq.${encodeURIComponent(userId)}`,
-      profile,
-    );
-    if (matched || !customerId) return;
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
+
+  // Bound best-effort calls so a stalled Supabase request can never delay the webhook
+  const withTimeout = (promise, ms = 4000) =>
+    Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('tier-log timeout')), ms))]);
+
+  // Best-effort tier-change logging for churn-by-tier tracking.
+  // Never breaks the payment flow: any failure here is swallowed.
+  async function logTierChange(resolvedUserId, newTier) {
+    if (!resolvedUserId) return;
+    try {
+      await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/tier_events`, {
+        method: 'POST',
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({ user_id: resolvedUserId, tier: newTier, source: 'webhook' }),
+      }));
+    } catch (e) {
+      // logging is best-effort — never fail the webhook over it
+    }
   }
 
-  await patchProfile(
+  // Fetch the PREVIOUS tier BEFORE patching (change detection must read pre-state).
+  async function previousTier(filter) {
+    try {
+      const res = await withTimeout(fetch(
+        `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=id,tier`,
+        { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+      ));
+      if (!res.ok) return null;
+      const [row] = await res.json();
+      return row || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  if (userId) {
+    const before = await previousTier(`id=eq.${encodeURIComponent(userId)}`);
+    const matched = await patchProfile(env, `id=eq.${encodeURIComponent(userId)}`, profile);
+    if (matched || !customerId) {
+      if (before && before.tier !== tier) await logTierChange(userId, tier);
+      return;
+    }
+  }
+
+  // Fallback: identify by customer id — read pre-state first, then patch, then log
+  const before = await previousTier(`stripe_customer_id=eq.${encodeURIComponent(customerId)}`);
+  const matchedByCustomer = await patchProfile(
     env,
     `stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
     profile,
   );
+  if (matchedByCustomer && before && before.tier !== tier) {
+    await logTierChange(before.id, tier);
+  }
 }
 
 async function patchProfile(env, filter, profile) {
