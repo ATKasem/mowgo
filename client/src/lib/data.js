@@ -117,6 +117,8 @@ export async function loadJobs() {
       phone: j.clients.phone,
       email: j.clients.email,
       rate: j.clients.rate,
+      latitude: j.clients.latitude ?? null,
+      longitude: j.clients.longitude ?? null,
       service_notes: j.clients.cleaning_notes,
       key_code: j.clients.key_code,
       alarm_code: j.clients.alarm_code,
@@ -446,12 +448,64 @@ export async function loadClients() {
     phone: c.phone,
     email: c.email,
     rate: c.rate,
+    latitude: c.latitude ?? null,
+    longitude: c.longitude ?? null,
     service_notes: c.cleaning_notes,
     key_code: c.key_code,
     alarm_code: c.alarm_code,
     pet_instructions: c.pet_instructions,
     tags: c.tags || [],
   }));
+}
+
+// ===== Route Optimization: geocoding =====
+
+/** Open-Meteo geocoding — free, no key (same provider as getWeatherForLocation). */
+export async function geocodeAddress(address) {
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(address)}&count=1&language=en&format=json`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const hit = data?.results?.[0];
+    return hit && typeof hit.latitude === 'number' && typeof hit.longitude === 'number'
+      ? { latitude: hit.latitude, longitude: hit.longitude }
+      : null;
+  } catch {
+    return null; // graceful failure — never throw
+  }
+}
+
+export async function updateClientCoords(clientId, lat, lng) {
+  return updateClient(clientId, { latitude: lat, longitude: lng });
+}
+
+/**
+ * Lazy backfill: for clients with an address but no coords, geocode
+ * sequentially (~100ms apart, rate-limit-safe), persist, and return a
+ * clientId → {lat, lng} map. Coords already on the row are reused — the
+ * second Optimize tap makes zero new geocode calls.
+ */
+export async function ensureClientCoords(clients) {
+  const map = {};
+  let pending = 0;
+  for (const client of clients) {
+    if (!client || !client.address) continue;
+    if (client.latitude != null && client.longitude != null) {
+      map[client.id] = { lat: client.latitude, lng: client.longitude };
+      continue;
+    }
+    pending++;
+    if (pending > 1) await new Promise(r => setTimeout(r, 100));
+    const coords = await geocodeAddress(client.address);
+    if (coords) {
+      try { await updateClientCoords(client.id, coords.latitude, coords.longitude); } catch (err) {
+        console.error('geocode persist failed:', err);
+      }
+      map[client.id] = { lat: coords.latitude, lng: coords.longitude };
+    }
+  }
+  return map;
 }
 
 export async function fetchClientsForExport() {
@@ -970,9 +1024,10 @@ export async function saveProfile(profile) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { business_name, phone, venmo_handle, cashapp_handle, zelle_handle } = profile;
+  const { business_name, phone, venmo_handle, cashapp_handle, zelle_handle, preferred_nav_app } = profile;
   const { error } = await supabase.from('profiles').upsert({
     id: user.id, business_name, phone, latitude, longitude,
+    preferred_nav_app: preferred_nav_app || null,
     venmo_handle: venmo_handle || null,
     cashapp_handle: cashapp_handle || null,
     zelle_handle: zelle_handle || null,
