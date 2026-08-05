@@ -14,10 +14,35 @@
  *   SUPABASE_SERVICE_ROLE_KEY — service_role key (never exposed to client)
  */
 
+const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
+const RATE_LIMIT_MAX = 10;
+const inviteAttempts = new Map();
+
+function corsOrigin(request) {
+  const origin = request?.headers?.get?.('origin');
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgoapp.com';
+}
+
+function checkRateLimit(key) {
+  const now = Date.now();
+  const entry = inviteAttempts.get(key);
+  if (!entry || now >= entry.resetTime) {
+    inviteAttempts.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count += 1;
+  return true;
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+}
+
 export async function onRequestPost({ request, env }) {
-  const origin = request.headers.get('origin');
   const corsHeaders = {
-    'Access-Control-Allow-Origin': origin || '*',
+    'Access-Control-Allow-Origin': corsOrigin(request),
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
@@ -55,9 +80,14 @@ export async function onRequestPost({ request, env }) {
     }
     const { id: ownerId } = await ownerRes.json();
 
+    const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
+    if (!checkRateLimit(`owner:${ownerId}`) || !checkRateLimit(`ip:${ip}`)) {
+      return Response.json({ error: 'Too many invitations. Please try again later.' }, { status: 429, headers: corsHeaders });
+    }
+
     // Get owner's profile to verify they're an owner
     const ownerProfileRes = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,business_name,role`,
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,business_name,role,tier`,
       { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
     );
     const ownerProfiles = await ownerProfileRes.json();
@@ -65,6 +95,9 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ error: 'Only account owners can invite crew' }, { status: 403, headers: corsHeaders });
     }
     const ownerProfile = ownerProfiles[0];
+    if (!['crew', 'premium'].includes(ownerProfile.tier)) {
+      return Response.json({ error: 'Crew invitations require a Crew or Premium plan' }, { status: 403, headers: corsHeaders });
+    }
 
     // Step 2: Check if user already exists in auth.users
     const listRes = await fetch(
@@ -81,12 +114,35 @@ export async function onRequestPost({ request, env }) {
 
       // Check if they already have a profile
       const existingProfileRes = await fetch(
-        `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}&select=id,business_id`,
+        `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}&select=id,business_id,role`,
         { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
       );
       const existingProfiles = await existingProfileRes.json();
 
       if (existingProfiles?.length > 0) {
+        const existingProfile = existingProfiles[0];
+        if (existingProfile.business_id != null) {
+          return Response.json({ error: 'This user already belongs to a business' }, { status: 409, headers: corsHeaders });
+        }
+        // Default role is 'owner' for every account, so role alone can't tell a
+        // fresh signup from an active business owner. An owner who has created
+        // clients/jobs/invoices is running their own business — converting them
+        // into someone else's crew would lock them out of their data (account
+        // takeover). Only users with NO business data may join another crew.
+        const ownedData = await fetch(
+          `${supabaseUrl}/rest/v1/clients?select=id&user_id=eq.${invitedUserId}&limit=1`,
+          { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
+        );
+        const ownedJobs = await fetch(
+          `${supabaseUrl}/rest/v1/jobs?select=id&user_id=eq.${invitedUserId}&limit=1`,
+          { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
+        );
+        const [clients, jobs] = await Promise.all([ownedData, ownedJobs]).then(([c, j]) =>
+          Promise.all([c.json(), j.json()])
+        );
+        if ((Array.isArray(clients) && clients.length > 0) || (Array.isArray(jobs) && jobs.length > 0)) {
+          return Response.json({ error: 'This user is already running their own business' }, { status: 409, headers: corsHeaders });
+        }
         // Update their business_id to join this owner's crew
         const updateRes = await fetch(
           `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}`,
@@ -230,7 +286,7 @@ export async function onRequestPost({ request, env }) {
                 from: 'MowGo <invoices@mowgoapp.com>',
                 to: [email],
                 subject: "You've been added to a MowGo crew — set your password",
-                html: `<p>${ownerProfile.business_name || 'Your crew lead'} added you to their MowGo crew.</p><p><a href="${resetUrl}">Set your password here</a> — it takes 30 seconds.</p><p>Once set, log in at <a href="https://mowgoapp.com">mowgoapp.com</a>.</p>`
+                html: `<p>${escapeHtml(ownerProfile.business_name || 'Your crew lead')} added you to their MowGo crew.</p><p><a href="${resetUrl}">Set your password here</a> — it takes 30 seconds.</p><p>Once set, log in at <a href="https://mowgoapp.com">mowgoapp.com</a>.</p>`
               })
             });
           }
@@ -254,7 +310,7 @@ export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Origin': corsOrigin(request),
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',

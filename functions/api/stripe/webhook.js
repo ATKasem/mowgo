@@ -5,6 +5,8 @@
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
+const withTimeout = (promise, ms = 4000) =>
+  Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('Supabase timeout')), ms))]);
 
 export async function onRequestPost({ request, env }) {
   const body = await request.text();
@@ -29,6 +31,8 @@ export async function onRequestPost({ request, env }) {
   ].includes(event.type)) {
     return ok();
   }
+
+  if (await isDuplicateEvent(event.id, env)) return ok();
 
   try {
     requireConfiguration(env);
@@ -71,6 +75,29 @@ export async function onRequestPost({ request, env }) {
   } catch (error) {
     console.error('Stripe webhook processing failed:', error);
     return new Response('Webhook processing failed', { status: 500 });
+  }
+}
+
+async function isDuplicateEvent(eventId, env) {
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
+  if (!eventId || !env.SUPABASE_URL || !serviceKey) return false;
+  try {
+    const response = await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/webhook_events`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=ignore-duplicates,return=representation',
+      },
+      body: JSON.stringify({ event_id: eventId }),
+    }));
+    if (!response.ok) throw new Error(`dedup insert returned ${response.status}`);
+    const inserted = await response.json();
+    return Array.isArray(inserted) && inserted.length === 0;
+  } catch (error) {
+    console.error('Stripe webhook dedup failed; continuing processing:', error);
+    return false;
   }
 }
 
@@ -180,10 +207,6 @@ async function updateProfile({ env, userId, customerId, tier }) {
   };
 
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
-
-  // Bound best-effort calls so a stalled Supabase request can never delay the webhook
-  const withTimeout = (promise, ms = 4000) =>
-    Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('tier-log timeout')), ms))]);
 
   // Best-effort tier-change logging for churn-by-tier tracking.
   // Never breaks the payment flow: any failure here is swallowed.

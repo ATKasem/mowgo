@@ -109,6 +109,7 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto)
 
     // Supabase (no BOM — versions pinned in catalog)
     implementation(libs.supabase.core)

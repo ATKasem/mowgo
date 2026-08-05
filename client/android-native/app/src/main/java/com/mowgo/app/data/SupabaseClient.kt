@@ -1,5 +1,6 @@
 package com.mowgo.app.data
 
+import android.content.Context
 import com.mowgo.app.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -17,12 +18,21 @@ import io.github.jan.supabase.realtime.Realtime
  */
 object SupabaseClientProvider {
 
+    private lateinit var applicationContext: Context
+
+    fun initialize(context: Context) {
+        applicationContext = context.applicationContext
+    }
+
     val client: SupabaseClient by lazy {
+        check(::applicationContext.isInitialized) { "SupabaseClientProvider must be initialized by MowGoApplication" }
         createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_ANON_KEY,
         ) {
-            install(Auth)
+            install(Auth) {
+                sessionManager = EncryptedSessionManager(applicationContext)
+            }
             install(Postgrest)
             install(Realtime)
         }

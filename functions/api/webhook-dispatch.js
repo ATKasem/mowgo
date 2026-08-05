@@ -14,6 +14,8 @@
  *   SUPABASE_SERVICE_ROLE_KEY — service role key (config lookup)
  */
 
+const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+
 /** Block SSRF: only https, no private/link-local hosts */
 async function isSafeWebhookUrl(rawUrl) {
   let u;
@@ -33,7 +35,9 @@ async function isSafeWebhookUrl(rawUrl) {
     if (a === 10 || a === 127) return false;
     if (a === 169 && b === 254) return false; // metadata
     if (a === 172 && b >= 16 && b <= 31) return false;
+    if (a === 192 && b === 0) return false;
     if (a === 192 && b === 168) return false;
+    if (a === 198 && (b === 18 || b === 19)) return false;
     if (a === 0 || a === 100 || a === 198) return false;
     if (a >= 224) return false; // multicast/reserved
   }
@@ -41,9 +45,10 @@ async function isSafeWebhookUrl(rawUrl) {
   return true;
 }
 
-function corsHeaders(origin) {
+function corsHeaders(request) {
+  const origin = request?.headers?.get?.('origin');
   return {
-    'Access-Control-Allow-Origin': origin || '*',
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgoapp.com',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
@@ -79,8 +84,7 @@ async function verifyToken(token, env) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const origin = request.headers.get('origin');
-  const headers = corsHeaders(origin);
+  const headers = corsHeaders(request);
 
   // --- Parse body ---
   let body;
@@ -190,9 +194,7 @@ export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': request.headers.get('origin') || 'https://mowgo.pages.dev',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      ...corsHeaders(request),
       'Access-Control-Max-Age': '86400',
     },
   });

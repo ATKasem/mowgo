@@ -1,5 +1,6 @@
+// dev-only server — production webhooks run in functions/api/stripe/webhook.js
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing']);
-const VALID_TIERS = new Set(['solo', 'crew']);
+const VALID_TIERS = new Set(['solo', 'crew', 'premium']);
 
 function constructStripeEvent(stripe, rawBody, signature, webhookSecret) {
   if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET is not configured');

@@ -28,6 +28,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.LaunchedEffect
+import com.mowgo.app.BuildConfig
+import com.mowgo.app.data.SupabaseClientProvider
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -134,8 +145,35 @@ fun JobPhotoButton(
 @Composable
 fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
     val displayUrl = photoUrl?.takeIf { it.isNotBlank() && !it.startsWith("demo://") } ?: return
+    // DB stores the storage PATH (signed URLs expire). Resolve a fresh signed
+    // URL at render time; legacy absolute URLs pass through unchanged.
+    var resolved by remember(displayUrl) { mutableStateOf<String?>(null) }
+    LaunchedEffect(displayUrl) {
+        resolved = if (displayUrl.startsWith("http")) displayUrl
+        else runCatching {
+            SupabaseClientProvider.client.auth.currentSessionOrNull()?.let { session ->
+                val req = Request.Builder()
+                    .url("${BuildConfig.SUPABASE_URL}/storage/v1/object/sign/job-photo/$displayUrl")
+                    .header("apikey", BuildConfig.SUPABASE_ANON_KEY)
+                    .header("Authorization", "Bearer ${session.accessToken}")
+                    .header("Content-Type", "application/json")
+                    .post("{\"expiresIn\":3600}".toRequestBody("application/json".toMediaType()))
+                    .build()
+                val body = withContext(Dispatchers.IO) {
+                    OkHttpClient().newCall(req).execute().use { it.body?.string().orEmpty() }
+                }
+                val signedPath = runCatching {
+                    kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                        .decodeFromString<SignedUrlResponse>(body).signedURL
+                }.getOrNull() ?: return@LaunchedEffect
+                if (signedPath.startsWith("http")) signedPath
+                else "${BuildConfig.SUPABASE_URL}/storage/v1$signedPath"
+            }
+        }.getOrNull()
+    }
+    val finalUrl = resolved ?: return
     AsyncImage(
-        model = displayUrl,
+        model = finalUrl,
         contentDescription = "Job photo",
         contentScale = ContentScale.Crop,
         modifier = modifier
@@ -143,6 +181,9 @@ fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
             .clip(RoundedCornerShape(8.dp)),
     )
 }
+
+@Serializable
+private data class SignedUrlResponse(val signedURL: String)
 
 private fun compressJpeg(contentResolver: ContentResolver, uri: Uri): ByteArray {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }

@@ -67,7 +67,7 @@ class TeamRepository(
         val requestJson = json.encodeToString(InviteRequest.serializer(), InviteRequest(normalizedEmail))
         val requestBody = RequestBody.create("application/json".toMediaType(), requestJson)
         val request = Request.Builder()
-            .url("https://mowgo.pages.dev/api/invite-crew")
+            .url("https://mowgoapp.com/api/invite-crew")
             .header("Authorization", "Bearer $token")
             .header("Content-Type", "application/json")
             .post(requestBody)

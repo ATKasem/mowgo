@@ -344,6 +344,8 @@ actor SupabaseService {
 
     // MARK: - Photo Upload
 
+    /// Uploads a job photo. Returns the storage PATH (signed URLs expire —
+    /// callers resolve a fresh signed URL via `signedPhotoURL(for:)` at render).
     func uploadJobPhoto(jobId: UUID, imageData: Data) async throws -> String {
         guard let uid = try await getCurrentUserId() else {
             throw SupabaseError.network
@@ -360,7 +362,7 @@ actor SupabaseService {
             req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         req.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
-        req.setValue("public", forHTTPHeaderField: "x-upsert")
+        req.setValue("true", forHTTPHeaderField: "x-upsert")
         req.httpBody = imageData
 
         let (data, response) = try await URLSession.shared.data(for: req)
@@ -373,26 +375,33 @@ actor SupabaseService {
             )
         }
 
-        guard let signURL = URL(string: "\(baseURL)/storage/v1/object/sign/job-photo/\(path)"),
+        return path
+    }
+
+    /// Resolve a stored photo path to a fresh 1-hour signed URL.
+    /// Absolute URLs (legacy rows) pass through unchanged; nil on failure.
+    func signedPhotoURL(for pathOrURL: String?) async -> String? {
+        guard let pathOrURL, !pathOrURL.isEmpty else { return nil }
+        if pathOrURL.hasPrefix("http") || pathOrURL.hasPrefix("demo://") { return pathOrURL }
+        guard let signURL = URL(string: "\(baseURL)/storage/v1/object/sign/job-photo/\(pathOrURL)"),
               let token else {
-            throw SupabaseError.network
+            return nil
         }
         var signRequest = URLRequest(url: signURL)
         signRequest.httpMethod = "POST"
         signRequest.setValue(anonKey, forHTTPHeaderField: "apikey")
         signRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         signRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        signRequest.httpBody = try JSONEncoder().encode(["expiresIn": 3600])
-        let (signedData, signedResponse) = try await URLSession.shared.data(for: signRequest)
-        guard let signedHTTP = signedResponse as? HTTPURLResponse,
+        signRequest.httpBody = try? JSONEncoder().encode(["expiresIn": 3600])
+        guard let (signedData, signedResponse) = try? await URLSession.shared.data(for: signRequest),
+              let signedHTTP = signedResponse as? HTTPURLResponse,
               (200...299).contains(signedHTTP.statusCode) else {
-            throw SupabaseError.httpStatus(
-                (signedResponse as? HTTPURLResponse)?.statusCode ?? 0,
-                detail: Self.extractErrorMessage(from: signedData)
-            )
+            return nil
         }
         struct SignedURLResponse: Decodable { let signedURL: String }
-        let signedPath = try JSONDecoder().decode(SignedURLResponse.self, from: signedData).signedURL
+        guard let signedPath = try? JSONDecoder().decode(SignedURLResponse.self, from: signedData).signedURL else {
+            return nil
+        }
         return signedPath.hasPrefix("http") ? signedPath : "\(baseURL)/storage/v1\(signedPath)"
     }
 

@@ -1,3 +1,4 @@
+// NOTE: CF dashboard Rate Limiting rules recommended for production-grade limits (per-isolate map is best-effort).
 const WINDOW_MS = 15 * 60 * 1000;
 const LIMIT = 5;
 const attempts = new Map();

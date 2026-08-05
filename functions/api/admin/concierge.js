@@ -1,6 +1,12 @@
 const ALIASES = { name: ['name','client name','client_name','customer name','customer','client'], address: ['address','street','location'], phone: ['phone','phone number','phone_number','mobile','cell'], email: ['email','e-mail','email address'], rate: ['rate','price','amount','cost','mow price'] };
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function cors(request) { return { 'Access-Control-Allow-Origin': request.headers.get('origin') || '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, x-admin-code', 'Access-Control-Max-Age': '86400' }; }
+const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
+const RATE_LIMIT_MAX = 20;
+const adminAttempts = new Map();
+function cors(request) { const origin=request?.headers?.get?.('origin'); return { 'Access-Control-Allow-Origin': origin&&ALLOWED_ORIGINS.includes(origin)?origin:'https://mowgoapp.com', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, x-admin-code', 'Access-Control-Max-Age': '86400' }; }
+function allowed(request) { const ip=request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')||'unknown';const now=Date.now();const entry=adminAttempts.get(ip);if(!entry||now>=entry.reset){adminAttempts.set(ip,{count:1,reset:now+RATE_LIMIT_WINDOW});return true;}if(entry.count>=RATE_LIMIT_MAX)return false;entry.count+=1;return true; }
+function timingSafeEqual(left,right) { const a=String(left||''),b=String(right||'');let diff=a.length^b.length;const length=Math.max(a.length,b.length);for(let i=0;i<length;i++)diff|=(a.charCodeAt(i)||0)^(b.charCodeAt(i)||0);return diff===0; }
 function firstRecord(source) { let value='',quoted=false; for(let i=0;i<source.length;i++){const c=source[i];if(c==='"'){value+=c;if(quoted&&source[i+1]==='"'){value+='"';i++;}else quoted=!quoted;}else if((c==='\n'||c==='\r')&&!quoted){if(value.trim())return value;if(c==='\r'&&source[i+1]==='\n')i++;value='';}else value+=c;}return value.trim()?value:''; }
 function delimiter(line) { const counts={ '\t':0, ';':0, ',':0 }; let quoted=false; for(let i=0;i<line.length;i++){if(line[i]==='"'){if(quoted&&line[i+1]==='"')i++;else quoted=!quoted;}else if(!quoted&&Object.hasOwn(counts,line[i]))counts[line[i]]++;} return counts['\t']?'\t':counts[';']&&!counts[',']?';':','; }
 function records(source,delimiter) { const out=[];let cells=[],value='',quoted=false,row=1,startRow=1;const push=()=>{cells.push(value.trim());out.push({cells,row:startRow});cells=[];value='';startRow=row;};for(let i=0;i<source.length;i++){const c=source[i];if(c==='"'){if(quoted&&source[i+1]==='"'){value+='"';i++;}else quoted=!quoted;}else if(c===delimiter&&!quoted){cells.push(value.trim());value='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&source[i+1]==='\n')i++;push();row++;startRow=row;}else{value+=c;if(c==='\n'||c==='\r')row++;}}if(value||cells.length)push();return out;}
@@ -23,19 +29,21 @@ function cleanClientRows(rows) {
     if(changed)cleaned++;if(seenNamesAndAddresses.has(nameAndAddress)||(nameAndPhone&&seenNamesAndPhones.has(nameAndPhone))){duplicates++;return;}seenNamesAndAddresses.add(nameAndAddress);if(nameAndPhone)seenNamesAndPhones.add(nameAndPhone);cleanedRows.push(row);
   });return {rows:cleanedRows,cleaned,duplicates};
 }
-function auth(context) { return Boolean(context.env.CONCIERGE_ADMIN_CODE) && context.request.headers.get('x-admin-code') === context.env.CONCIERGE_ADMIN_CODE; }
+function auth(context) { return Boolean(context.env.CONCIERGE_ADMIN_CODE) && timingSafeEqual(context.request.headers.get('x-admin-code'),context.env.CONCIERGE_ADMIN_CODE); }
 function service(env) { return { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json' }; }
 async function getRequest(env, id) { if(!UUID_RE.test(id||''))return null; const response=await fetch(`${env.SUPABASE_URL}/rest/v1/concierge_requests?id=eq.${id}&select=*`,{headers:service(env)}); if(!response.ok)throw new Error('Failed to load request'); return (await response.json())[0]||null; }
 function response(data,status,request){return Response.json(data,{status,headers:cors(request)});}
 
 export function onRequestOptions({request}) { return new Response(null,{status:204,headers:cors(request)}); }
 export async function onRequestGet(context) {
+  if(!allowed(context.request))return response({error:'Too many requests. Please try again later.'},429,context.request);
   if(!auth(context))return response({error:'Unauthorized'},401,context.request);
   if(!context.env.SUPABASE_URL||!context.env.SUPABASE_SERVICE_ROLE_KEY)return response({error:'Server misconfigured'},500,context.request);
   const url=new URL(context.request.url); if(url.searchParams.get('action')!=='list')return response({error:'Invalid action'},400,context.request);
   try { const result=await fetch(`${context.env.SUPABASE_URL}/rest/v1/concierge_requests?select=*&order=created_at.asc`,{headers:service(context.env)}); const requests=await result.json(); if(!result.ok)throw new Error('Failed to list requests'); return response({requests},200,context.request); } catch(error){return response({error:error.message},500,context.request);}
 }
 export async function onRequestPost(context) {
+  if(!allowed(context.request))return response({error:'Too many requests. Please try again later.'},429,context.request);
   if(!auth(context))return response({error:'Unauthorized'},401,context.request);
   const {env,request}=context; if(!env.SUPABASE_URL||!env.SUPABASE_SERVICE_ROLE_KEY)return response({error:'Server misconfigured'},500,request);
   let body; try{body=await request.json();}catch{return response({error:'Invalid JSON'},400,request);}

@@ -60,7 +60,9 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
 
     /// Called by MowGoApp when registration fails.
     func handleRegistrationError(_ error: Error) {
+        #if DEBUG
         print("Push registration failed: \(error.localizedDescription)")
+        #endif
         isRegistered = false
     }
 
@@ -68,7 +70,9 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
 
     private func saveDeviceToken(_ token: String) {
         guard let userId = currentUserId else {
+            #if DEBUG
             print("[PushNotificationService] Cannot save device token: current user ID is unavailable")
+            #endif
             return
         }
         Task {
@@ -76,7 +80,9 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
                 // Upsert device_token on the user's profile
                 try await sb.updateDeviceToken(userId: userId, token: token)
             } catch {
+                #if DEBUG
                 print("Failed to save device token: \(error.localizedDescription)")
+                #endif
             }
         }
     }
@@ -119,7 +125,9 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
                 "body": body,
             ])
         } catch {
+            #if DEBUG
             print("Failed to send push: \(error.localizedDescription)")
+            #endif
         }
     }
 

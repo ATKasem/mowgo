@@ -21,7 +21,9 @@ actor WebhookService {
     func fire(userId: UUID, event: String, payload: [String: Any]) async {
         // await required — SupabaseService is an actor; token is actor-isolated
         guard let token = await SupabaseService.shared.token, !token.isEmpty else {
+            #if DEBUG
             print("[WebhookService] Skipping \(event) — no auth token (demo mode?)")
+            #endif
             return
         }
 
@@ -31,7 +33,9 @@ actor WebhookService {
         ]
 
         guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else {
+            #if DEBUG
             print("[WebhookService] Failed to serialise body for \(event)")
+            #endif
             return
         }
 
@@ -41,14 +45,20 @@ actor WebhookService {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.httpBody = bodyData
 
+        #if DEBUG
         print("[WebhookService] Firing event: \(event)")
+        #endif
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
             if let http = response as? HTTPURLResponse, http.statusCode >= 300 {
+                #if DEBUG
                 print("[WebhookService] Event \(event) returned HTTP \(http.statusCode)")
+                #endif
             }
         } catch {
+            #if DEBUG
             print("[WebhookService] Failed to fire event \(event): \(error.localizedDescription)")
+            #endif
         }
     }
 

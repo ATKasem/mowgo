@@ -1,5 +1,6 @@
 package com.mowgo.app.data
 
+import com.mowgo.app.BuildConfig
 import com.mowgo.app.data.auth.AuthRepository
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
@@ -35,11 +36,11 @@ object WebhookService {
                         .post(body.toRequestBody(jsonMediaType))
                         .build()
                     client.newCall(request).execute().use { response ->
-                        if (!response.isSuccessful) println("[WebhookService] $event returned HTTP ${response.code}")
+                        if (BuildConfig.DEBUG && !response.isSuccessful) println("[WebhookService] $event returned HTTP ${response.code}")
                     }
                 }
             } catch (error: Exception) {
-                println("[WebhookService] Failed to fire $event: ${error.message}")
+                if (BuildConfig.DEBUG) println("[WebhookService] Failed to fire $event: ${error.message}")
             }
         }
     }

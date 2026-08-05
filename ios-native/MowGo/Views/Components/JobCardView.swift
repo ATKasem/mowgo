@@ -23,6 +23,7 @@ struct JobCardView: View {
     @State private var showSkipConfirm = false
     @State private var showMapPicker = false
     @State private var isToggling = false
+    @State private var resolvedPhotoURL: URL?
 
     private var assignedMember: UserProfile? {
         guard let assignedTo = job.assignedTo else { return nil }
@@ -173,7 +174,7 @@ struct JobCardView: View {
 
                 // Photo thumbnail row
                 if let photoUrl = job.photoUrl, !photoUrl.isEmpty {
-                    AsyncImage(url: URL(string: photoUrl)) { image in
+                    AsyncImage(url: resolvedPhotoURL) { image in
                         image
                             .resizable()
                             .scaledToFill()
@@ -184,6 +185,16 @@ struct JobCardView: View {
                     .cornerRadius(6)
                     .clipped()
                     .accessibilityLabel("Job photo")
+                    .task(id: job.photoUrl) {
+                        // DB stores the storage PATH (signed URLs expire) —
+                        // resolve a fresh signed URL at render time.
+                        if photoUrl.hasPrefix("http") || photoUrl.hasPrefix("demo://") {
+                            resolvedPhotoURL = URL(string: photoUrl)
+                        } else {
+                            resolvedPhotoURL = await SupabaseService.shared.signedPhotoURL(for: photoUrl)
+                                .flatMap(URL.init(string:))
+                        }
+                    }
                 }
             }
 

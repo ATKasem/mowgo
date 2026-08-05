@@ -38,7 +38,9 @@ final class Persistence {
             }
             try context.save()
         } catch {
+            #if DEBUG
             print("[Persistence] failed to save jobs: \(error)")
+            #endif
         }
     }
 
@@ -55,7 +57,9 @@ final class Persistence {
             }
             try context.save()
         } catch {
+            #if DEBUG
             print("[Persistence] failed to save clients: \(error)")
+            #endif
         }
     }
 
@@ -72,7 +76,9 @@ final class Persistence {
             }
             try context.save()
         } catch {
+            #if DEBUG
             print("[Persistence] failed to save invoices: \(error)")
+            #endif
         }
     }
 
@@ -86,7 +92,10 @@ final class Persistence {
         )
         let cached: [JobCache]
         do { cached = try context.fetch(descriptor) } catch {
-            print("[Persistence] failed to load jobs: \(error)"); return []
+            #if DEBUG
+            print("[Persistence] failed to load jobs: \(error)")
+            #endif
+            return []
         }
         return cached.compactMap { $0.toJob() }
     }
@@ -99,7 +108,10 @@ final class Persistence {
         )
         let cached: [ClientCache]
         do { cached = try context.fetch(descriptor) } catch {
-            print("[Persistence] failed to load clients: \(error)"); return []
+            #if DEBUG
+            print("[Persistence] failed to load clients: \(error)")
+            #endif
+            return []
         }
         return cached.compactMap { $0.toClient() }
     }
@@ -112,7 +124,10 @@ final class Persistence {
         )
         let cached: [InvoiceCache]
         do { cached = try context.fetch(descriptor) } catch {
-            print("[Persistence] failed to load invoices: \(error)"); return []
+            #if DEBUG
+            print("[Persistence] failed to load invoices: \(error)")
+            #endif
+            return []
         }
         return cached.compactMap { $0.toInvoice() }
     }
@@ -156,7 +171,9 @@ final class Persistence {
         do {
             return try context.fetch(descriptor)
         } catch {
+            #if DEBUG
             print("[Persistence] failed to load mutations: \(error)")
+            #endif
             return []
         }
     }
@@ -165,7 +182,9 @@ final class Persistence {
     func removeMutation(_ mutation: PendingMutation) {
         context.delete(mutation)
         do { try context.save() } catch {
+            #if DEBUG
             print("[Persistence] failed to remove mutation: \(error)")
+            #endif
         }
     }
 
@@ -197,7 +216,9 @@ final class Persistence {
             if !mutations.isEmpty { try context.save() }
             return !mutations.isEmpty
         } catch {
+            #if DEBUG
             print("[Persistence] failed to remove pending mutations: \(error)")
+            #endif
             return false
         }
     }
@@ -212,7 +233,9 @@ final class Persistence {
             for item in mutations { context.delete(item) }
             try context.save()
         } catch {
+            #if DEBUG
             print("[Persistence] failed to clear mutations: \(error)")
+            #endif
         }
     }
 
@@ -237,24 +260,32 @@ final class Persistence {
             let jobs = try context.fetch(descriptor)
             for item in jobs { context.delete(item) }
         } catch {
+            #if DEBUG
             print("[Persistence] failed to clear jobs: \(error)")
+            #endif
         }
         do {
             let descriptor = FetchDescriptor<ClientCache>(predicate: #Predicate { $0.userId == currentUserId })
             let clients = try context.fetch(descriptor)
             for item in clients { context.delete(item) }
         } catch {
+            #if DEBUG
             print("[Persistence] failed to clear clients: \(error)")
+            #endif
         }
         do {
             let descriptor = FetchDescriptor<InvoiceCache>(predicate: #Predicate { $0.userId == currentUserId })
             let invoices = try context.fetch(descriptor)
             for item in invoices { context.delete(item) }
         } catch {
+            #if DEBUG
             print("[Persistence] failed to clear invoices: \(error)")
+            #endif
         }
         do { try context.save() } catch {
+            #if DEBUG
             print("[Persistence] failed to save after clear: \(error)")
+            #endif
         }
         clearAllMutations(currentUserId: currentUserId)
     }
