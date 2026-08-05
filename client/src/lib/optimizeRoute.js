@@ -37,8 +37,15 @@ export function nearestNeighborTour(entries, anchor) {
   return tour;
 }
 
+function totalWithAnchor(tour, anchor) {
+  return (anchor ? haversineKm(anchor, tour[0]) : 0) + tourDistance(tour);
+}
+
 // 2-opt — repeat until no improving 2-reversal exists (N ≤ ~15/day → instant).
-export function twoOpt(tour) {
+// Anchor-aware: the acceptance test includes the anchor→first-stop leg, so a
+// reversal that saves inter-stop miles but costs more from the business
+// location is rejected (Claude Code review fix).
+export function twoOpt(tour, anchor = null) {
   let best = [...tour];
   let improved = true;
   while (improved) {
@@ -50,7 +57,7 @@ export function twoOpt(tour) {
           ...best.slice(i, k + 1).reverse(),
           ...best.slice(k + 1),
         ];
-        if (tourDistance(candidate) < tourDistance(best)) {
+        if (totalWithAnchor(candidate, anchor) < totalWithAnchor(best, anchor)) {
           best = candidate;
           improved = true;
         }
@@ -76,7 +83,12 @@ export function optimizeRoute(jobs, anchor) {
     .map((j, idx) => ({ idx, lat: j.lat, lng: j.lng }))
     .filter(p => p.lat == null || p.lng == null);
 
-  const ordered = twoOpt(nearestNeighborTour(addressable, anchor || null));
+  // Defensive size cap: 2-opt is ~O(n³); a real day rarely exceeds ~30 stops.
+  // Above that, nearest-neighbor only, so a huge bulk-imported day can never
+  // freeze the tab (Claude Code review fix).
+  const ordered = addressable.length <= 30
+    ? twoOpt(nearestNeighborTour(addressable, anchor || null), anchor || null)
+    : nearestNeighborTour(addressable, anchor || null);
 
   // Merge: unaddressable jobs slot back into their original gaps, in their
   // original relative order.

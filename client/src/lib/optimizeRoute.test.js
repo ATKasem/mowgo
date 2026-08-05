@@ -66,6 +66,24 @@ test('optimizeRoute: <2 addressable returns original order', () => {
   assert.deepEqual(optimizeRoute(jobs, OKC), ['a', 'b', 'c']);
 });
 
+test('optimizeRoute: 2-opt is anchor-aware (never worsens the anchor-inclusive total)', () => {
+  // 1D counterexample from Claude Code review: Y is anchor-nearest, but an
+  // inter-stop-only 2-opt would move it off the front for a worse real drive.
+  const anchor = { lat: 0, lng: 0 };
+  const jobs = [
+    { id: 'y', lat: 0, lng: 1 },
+    { id: 'm1', lat: 0, lng: -2 },
+    { id: 'm2', lat: 0, lng: -5 },
+    { id: 'x', lat: 0, lng: 9 },
+  ];
+  const withAnchorTotal = tour => haversineKm(anchor, tour[0]) + tourDistance(tour);
+  const inputTotal = withAnchorTotal(jobs);
+  const order = optimizeRoute(jobs, anchor);
+  const byId = Object.fromEntries(jobs.map(j => [j.id, j]));
+  assert.ok(withAnchorTotal(order.map(id => byId[id])) <= inputTotal,
+    `anchor-inclusive total must not worsen: ${withAnchorTotal(order.map(id => byId[id]))} vs ${inputTotal}`);
+});
+
 test('optimizeRoute: empty and single-job arrays', () => {
   assert.deepEqual(optimizeRoute([], OKC), []);
   assert.deepEqual(optimizeRoute([{ id: 'a', lat: 1, lng: 2 }], OKC), ['a']);

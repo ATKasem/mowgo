@@ -41,8 +41,12 @@ export async function onRequestPost({ request, env }) {
 
   const { orders } = body;
   if (!Array.isArray(orders)) return jsonResponse(request, { error: 'orders must be an array' }, 400);
-  if (!orders.every(({ id, route_order }) => typeof id === 'string' && Number.isInteger(route_order))) {
-    return jsonResponse(request, { error: 'Each order requires an id and integer route_order' }, 400);
+  if (orders.length > 100) return jsonResponse(request, { error: 'Too many orders' }, 400);
+  if (!orders.every(({ id, route_order }) => typeof id === 'string' && Number.isInteger(route_order) && route_order >= 1)) {
+    return jsonResponse(request, { error: 'Each order requires an id and positive integer route_order' }, 400);
+  }
+  if (new Set(orders.map(o => o.route_order)).size !== orders.length) {
+    return jsonResponse(request, { error: 'route_order values must be unique' }, 400);
   }
 
   const serviceHeaders = {
