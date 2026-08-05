@@ -7,6 +7,10 @@ Send from Aaron's phone (personal = higher reply rate). Mark ✅ sent / 🔄 rep
 ## Rewrite pass 2026-08-05 (copy audit)
 Fixes applied: (a) no Day-1 pitches anymore — every opener is conversation or the rate-report offer; (b) the lead magnet (rate report) is now the default Day-2 pivot instead of "want to see the app"; (c) openers rotate across 4 patterns so the batch doesn't read like a template; (d) objection pre-emption ("if you're already set, all good") moves into Day 1 so replies aren't defensive.
 
+## NAME ENRICHMENT (added 2026-08-05 — verified sources only, no guessing)
+Named opens go out with Day 1: #2 Tom, #3 Randy, #5 Austin, #6 Chad, #9 Austin, #10 Brett, #12 Milo, #14 Alejandro, #15 Bo, #17 Scott, #18 Jayden, #20 Blake, #21 Butch (13/21 named; full sources in names-enrichment.md).
+**#11 Atlas Green = Santos (MEDIUM confidence, ZoomInfo only) — NOT patched; verify before ever using.** #4, #7, #8, #13, #16, #19 unnamed — keep "Hey, this is Aaron" form.
+
 ## SEND ORDER (priority queue — added 2026-08-05, audit pass)
 Send in this order, NOT list order. Small/phone-only/no-booking-system crews reply 2-3× more than established players. 5-10/day max.
 
@@ -46,7 +50,7 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 3. LBR Lawn Care (Tulsa/Owasso/BA) — (918) 888-3796
 - Angle: since 2004, commercial + residential, 3-5 crew. Licensed & insured.
-- Day 1: "Hey, this is Aaron with MowGo. LBR's been going since 2004 — commercial AND residential is a lot of moving parts. Got a 30-second question for you — okay to text?"
+- Day 1: "Hey Randy, this is Aaron with MowGo. LBR's been going since 2004 — commercial AND residential is a lot of moving parts. Got a 30-second question for you — okay to text?"
 - Day 2: "Quick one: do you run your routes off a map, a book, or an app? I'll send you what crews your size are switching to — and the real Tulsa rates while I'm at it."
 - Day 7: "Last check — if you're happy with how scheduling works now, all good. If not, happy to show you the free tier."
 
@@ -58,13 +62,13 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 5. Hicks Lawn & Landscaping (Stillwater) — (405) 215-9184
 - Angle: family-owned, residential + commercial, minimal website.
-- Day 1: "Hey, this is Aaron with MowGo — saw Hicks does residential AND commercial in Stillwater. Honest question: do you run both on one calendar or keep them separate?"
+- Day 1: "Hey Austin, this is Aaron with MowGo — saw Hicks does residential AND commercial in Stillwater. Honest question: do you run both on one calendar or keep them separate?"
 - Day 2: "Stillwater crew question: does rain ever push your week into chaos? I asked around and most crews say it's their #1 headache. I'll send what the fix looks like — 2 min read, no pitch."
 - Day 7: "Last check from me. If scheduling's handled, all good — just wanted to make sure you knew about the free tier."
 
 ### 6. Thogy's Lawn Care (Ardmore) — (580) 465-0044
 - Angle: family-owned 20+ years, Ardmore-only, basic website.
-- Day 1: "Hey, this is Aaron with MowGo. Thogy's been in Ardmore 20+ years — that's a solid rep. Quick question: are you still doing schedules on paper or in your head, or are you using an app?"
+- Day 1: "Hey Chad, this is Aaron with MowGo. Thogy's been in Ardmore 20+ years — that's a solid rep. Quick question: are you still doing schedules on paper or in your head, or are you using an app?"
 - Day 2: "If you're on paper — most Ardmore crews we talk to are too, and they say the same thing: invoicing is the painful part. I put together the real Ardmore rates too. Want both sent over?"
 - Day 7: "Last one, promise. If it's not a fit, no hard feelings — just wanted to reach out once."
 
@@ -82,13 +86,13 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 9. Eberly's Professional Lawn Care (Midwest City) — (405) 931-0161
 - Angle: quote-request form only, serves 7 cities.
-- Day 1: "Hey, this is Aaron with MowGo. Saw Eberly's covers 7 cities — that's a big service area to route. How do you plan your days when jobs span OKC to Choctaw?"
+- Day 1: "Hey Austin, this is Aaron with MowGo. Saw Eberly's covers 7 cities — that's a big service area to route. How do you plan your days when jobs span OKC to Choctaw?"
 - Day 2: "Following up — crews with big service areas tell me route order is where the time goes. I put together the OKC metro rate map if you want it — free."
 - Day 7: "Last check from me. If you're set, all good — just wanted to reach out once."
 
 ### 10. OKC Top Choice Lawn Care (Yukon) — (405) 822-2155
 - Angle: 7-step program + tree + windows + snow removal (multi-service).
-- Day 1: "Hey, this is Aaron with MowGo. Lawn, trees, windows, AND snow — you've got 4 businesses in one. How do you keep the schedule straight year-round?"
+- Day 1: "Hey Brett, this is Aaron with MowGo. Lawn, trees, windows, AND snow — you've got 4 businesses in one. How do you keep the schedule straight year-round?"
 - Day 2: "Quick one — do you use the same calendar for all services, or juggle separate ones? Most multi-service crews say that's the pain point. I'll send how they fix it — short read, free."
 - Day 7: "Last check. If you're happy with how it's organized, no worries at all. Stay busy!"
 
@@ -100,7 +104,7 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 12. A Plus Lawns & Services (OKC) — (405) 535-5139
 - Angle: phone-only operation, no website, 1-2 crew.
-- Day 1: "Hey, this is Aaron with MowGo. Saw A Plus runs on phone only — that's how a lot of OKC crews start. Quick question: do you text clients to remind them about jobs, or just show up?"
+- Day 1: "Hey Milo, this is Aaron with MowGo. Saw A Plus runs on phone only — that's how a lot of OKC crews start. Quick question: do you text clients to remind them about jobs, or just show up?"
 - Day 2: "If you ever want automatic reminders so you never lose a job to a forgotten appointment, that's our thing — but first, the OKC rate sheet's free if you want it."
 - Day 7: "Last check from me. If you're good, all good. Hope the season's treating you well!"
 
@@ -112,13 +116,13 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 14. Aguilar Brothers Lawn & Landscape (Claremore) — (918) 986-5824
 - Angle: 4.9 rating (94 reviews), full landscaping, insured.
-- Day 1: "Hey, this is Aaron with MowGo. 94 reviews at 4.9 — that's earned, not luck. With all the services you offer, how do you keep jobs from double-booking?"
+- Day 1: "Hey Alejandro, this is Aaron with MowGo. 94 reviews at 4.9 — that's earned, not luck. With all the services you offer, how do you keep jobs from double-booking?"
 - Day 2: "Following up — if you're already set, all good, truly. But I put together the Claremore/OK rate benchmarks if you want a second opinion on pricing. Free."
 - Day 7: "Last check. If you're set, all good. Congrats on the reputation — that's earned!"
 
 ### 15. Natural Lawn (OKC/Edmond) — (405) 721-8112
 - Angle: NaturaLawn franchise, organic-based, multi-city.
-- Day 1: "Hey, this is Aaron with MowGo. Saw Natural Lawn covers Edmond to Choctaw — big area. Do you run the organic program visits on a set rotation, or does it vary week to week?"
+- Day 1: "Hey Bo, this is Aaron with MowGo. Saw Natural Lawn covers Edmond to Choctaw — big area. Do you run the organic program visits on a set rotation, or does it vary week to week?"
 - Day 2: "Quick follow-up — if it varies, that's where most crews lose track. I put together the OKC rate report if you want a benchmark — free, no strings."
 - Day 7: "Last one from me. If you're covered, no worries at all. Have a good season!"
 
@@ -130,13 +134,13 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 17. Scott's Professional Lawncare (Midwest City) — (405) 328-9699
 - Angle: 7 services (mowing to fertilizing), 1-2 crew, 5 cities.
-- Day 1: "Hey, this is Aaron with MowGo. Saw Scott's offers 7 services — mowing, bagging, edging, fertilizing... that's a lot for a small crew. Do you track all of them per client?"
+- Day 1: "Hey Scott, this is Aaron with MowGo. Saw Scott's offers 7 services — mowing, bagging, edging, fertilizing... that's a lot for a small crew. Do you track all of them per client?"
 - Day 2: "Quick one — if you do, most crews your size say pricing per service is the first thing to nail. I've got the Midwest City/OKC rates if you want to check yours. Free."
 - Day 7: "Last one. If you're set, no problem. Just wanted to reach out once!"
 
 ### 18. J&C Mowing (Del City) — (405) 996-7036
 - Angle: small operation, no website, Facebook only.
-- Day 1: "Hey, this is Aaron with MowGo. Saw J&C's on Facebook only — that's how a lot of good crews fly under the radar. Do you book jobs through FB messages?"
+- Day 1: "Hey Jayden, this is Aaron with MowGo. Saw J&C's on Facebook only — that's how a lot of good crews fly under the radar. Do you book jobs through FB messages?"
 - Day 2: "If you do — a booking link might help you look bigger than you are. And the OKC rate sheet's free if you want a pricing check. Either way, no pitch."
 - Day 7: "Last check from me. If you're good, all good. Stay busy out there!"
 
@@ -154,7 +158,7 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 21. Nutri-Green (Tulsa) — (918) 322-5757 (from top-priority list; verify before send)
 - Angle: 20+ years, 7-step program, already sends text/call reminders (manual!) — they'd see value fast.
-- Day 1: "Hey, this is Aaron with MowGo. 20+ years AND you already send pre-service reminders — most crews don't bother, respect. Do you send those by hand every week?"
+- Day 1: "Hey Butch, this is Aaron with MowGo. 20+ years AND you already send pre-service reminders — most crews don't bother, respect. Do you send those by hand every week?"
 - Day 2: "Following up — if you're hand-sending reminders now, I know how that adds up. The Tulsa rate report's free if you want it, and I can show you what automated reminders look like. Your call."
 - Day 7: "Last one. If you're happy with your setup, no worries — just wanted to reach out once."
 
