@@ -321,6 +321,23 @@ export async function rainDelayJobs(jobIds, targetDate) {
   return Promise.all(ids.map(id => updateJob(id, { scheduled_date: targetDate })));
 }
 
+/**
+ * Fire-and-forget: ask the send-rain-delay-sms edge function to text affected clients.
+ * Never blocks the rain-delay UI; failures are logged only.
+ */
+export async function sendRainDelaySms(jobIds, targetDate) {
+  if (isDemoMode() || !jobIds?.length) return;
+  try {
+    const { data, error } = await supabase.functions.invoke('send-rain-delay-sms', {
+      body: { jobIds, targetDate },
+    });
+    if (error) console.warn('Rain-delay SMS failed:', error.message || error);
+    else console.info('Rain-delay SMS result:', data);
+  } catch (e) {
+    console.warn('Rain-delay SMS error:', e?.message || e);
+  }
+}
+
 async function rainDelayHistoryKey() {
   let userId = _currentDemoUserId();
   if (!isDemoMode()) {

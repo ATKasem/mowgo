@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
+import { createJob, updateJobStatus, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw } from 'lucide-react';
 import JobCard from '../components/JobCard';
@@ -173,6 +173,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     };
     try {
       await rainDelayJobs(entry.jobIds, targetDate);
+      // Text affected clients (fire-and-forget — never blocks the UI).
+      sendRainDelaySms(entry.jobIds, targetDate);
       setJobs(prev => prev.map(job => entry.jobIds.includes(job.id) ? { ...job, scheduled_date: targetDate } : job));
       const next = await saveRainDelayEntry(entry);
       setRainHistory(next);
