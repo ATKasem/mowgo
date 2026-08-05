@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { updateInvoiceStatus } from '../lib/data';
+import { updateInvoiceStatus, invoicePayLine, invoiceNudgeText } from '../lib/data';
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 import EstimatesSection from '../components/EstimatesSection';
@@ -14,14 +14,15 @@ function invoiceText(invoice, tr, language) {
   const date = invoice.created_at
     ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
     : tr('today');
-  const phone = localStorage.getItem('mf_business_phone') || '';
-  const bizName = localStorage.getItem('mf_business_name') || '';
 
-  const payInfo = phone
-    ? tr('Pay via Venmo @{{business}} or Zelle: {{phone}}', { business: bizName || 'YourBiz', phone })
-    : tr('Please send payment at your earliest convenience.');
+  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!', { name, date, amount, paymentInfo: invoicePayLine() });
+}
 
-  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}} Thanks!', { name, date, amount, paymentInfo: payInfo });
+/** Unpaid/overdue invoices older than 3 days get a Nudge (mirrors estimates). */
+function isStaleInvoice(invoice) {
+  return invoice.status !== 'paid'
+    && invoice.created_at
+    && Date.now() - new Date(invoice.created_at).getTime() > 3 * 24 * 60 * 60 * 1000;
 }
 
 const STATUS_FILTERS = [
@@ -198,6 +199,21 @@ export default function Invoices({ invoices = [], setInvoices }) {
                           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-[var(--color-surface)] rotate-45" />
                         </span>
                       </button>
+                      {isStaleInvoice(invoice) && (
+                        <button
+                          onClick={async e => {
+                            e.stopPropagation();
+                            try {
+                              await navigator.clipboard.writeText(invoiceNudgeText(invoice));
+                              setCopiedIds(prev => new Set([...prev, `nudge-${invoice.id}`]));
+                              setTimeout(() => setCopiedIds(prev => { const n = new Set(prev); n.delete(`nudge-${invoice.id}`); return n; }), 2500);
+                            } catch { /* clipboard denied */ }
+                          }}
+                          className="btn-secondary text-xs text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                        >
+                          {copiedIds.has(`nudge-${invoice.id}`) ? tr('Copied!') : tr('Nudge')}
+                        </button>
+                      )}
                     </div>
                     <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
                       <p className="text-xs font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2">{tr("Change status")}</p>

@@ -6,7 +6,7 @@ import { TEAM_MEMBER_COLORS } from '../lib/constants';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
-import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download } from 'lucide-react';
+import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, DollarSign } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 import ConciergeSetup from '../components/ConciergeSetup';
@@ -15,7 +15,7 @@ export default function Settings() {
   const { tr, t, i18n } = useLocalizedText('settings');
   const { tr: conciergeTr } = useLocalizedText('concierge');
   const { user } = useAuth();
-  const [profile, setProfile] = useState({ business_name: '', phone: '', tier: 'free' });
+  const [profile, setProfile] = useState({ business_name: '', phone: '', tier: 'free', venmo_handle: '', cashapp_handle: '', zelle_handle: '' });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -109,6 +109,9 @@ export default function Settings() {
       // Also store locally for clipboard invoice texts
       localStorage.setItem('mf_business_name', profile.business_name || '');
       localStorage.setItem('mf_business_phone', profile.phone || '');
+      localStorage.setItem('mf_venmo_handle', profile.venmo_handle || '');
+      localStorage.setItem('mf_cashapp_handle', profile.cashapp_handle || '');
+      localStorage.setItem('mf_zelle_handle', profile.zelle_handle || '');
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
@@ -260,6 +263,24 @@ export default function Settings() {
               <div>
                 <label className="label">{tr("Phone Number")}</label>
                 <input value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="405-555-0100" className="input" />
+              </div>
+              <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white flex items-center gap-2"><DollarSign className="w-4 h-4 text-brand" />{tr("How Clients Pay You")}</h4>
+                  <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-1">{tr("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.")}</p>
+                </div>
+                <div>
+                  <label className="label">Zelle</label>
+                  <input value={profile.zelle_handle || ''} onChange={e => setProfile({ ...profile, zelle_handle: e.target.value })} placeholder={tr("Phone or email clients use to Zelle you")} className="input" />
+                </div>
+                <div>
+                  <label className="label">Venmo</label>
+                  <input value={profile.venmo_handle || ''} onChange={e => setProfile({ ...profile, venmo_handle: e.target.value })} placeholder="@GreenThumb" className="input" />
+                </div>
+                <div>
+                  <label className="label">Cash App</label>
+                  <input value={profile.cashapp_handle || ''} onChange={e => setProfile({ ...profile, cashapp_handle: e.target.value })} placeholder="$GreenThumb" className="input" />
+                </div>
               </div>
               <div className="space-y-2">
                 <p className="text-xs font-medium text-brand-hover dark:text-emerald-400">{tr('Why do we ask? Rain Delay uses your location for accurate local forecasts.')}</p>

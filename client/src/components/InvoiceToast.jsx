@@ -23,11 +23,9 @@ export default function InvoiceToast({ toast }) {
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <div className="min-w-0">
           <p className={`text-sm font-semibold ${textColor}`}>
-            {isRain || isError || toast.type === 'recurring'
-              ? toast.name
-              : tr('Invoice created for {{name}}', { name: toast.name })}
+            {toast.name}
           </p>
-          {!isRain && !isError && <p className={`text-xs ${subColor}`}>${toast.amount ?? '0'} — {tr('unpaid')}</p>}
+          {toast.type === 'invoice' && <p className={`text-xs ${subColor}`}>${toast.amount ?? '0'} — {tr('unpaid')}</p>}
         </div>
         {toast.actionLabel && toast.onAction && (
           <button type="button" onClick={toast.onAction} className={`ml-2 text-xs font-bold underline underline-offset-2 ${textColor}`}>

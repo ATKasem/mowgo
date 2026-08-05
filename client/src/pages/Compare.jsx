@@ -32,7 +32,7 @@ const features = [
   { label: 'Recurring Jobs', key: 'recurring', desc: 'Weekly/biweekly/monthly auto-schedule' },
   { label: 'Installable Web App', key: 'pwa', desc: 'Works on iPhone, Android, and desktop as a PWA' },
   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
-  { label: 'Stripe Payments', key: 'stripe', desc: 'Accept cards online' },
+  { label: 'Zero-Fee Payments', key: 'stripe', desc: 'Venmo, Zelle, Cash App — no card processing fees' },
   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
 ];
 
@@ -50,7 +50,7 @@ const data = {
   recurring:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
   pwa:          [ true,   true,  true,  false, false, true,  false, false, false, false ],
   privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
-  stripe:       [ true,  true,  true,  false, true,  true,  false, false, true,  true  ],
+  stripe:       [ true,  false, false, false, false, false, false, false, false, false ],
   gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
 };
 

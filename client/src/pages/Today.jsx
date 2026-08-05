@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
+import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw } from 'lucide-react';
 import JobCard from '../components/JobCard';
@@ -294,6 +294,20 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       try {
         const newStatus = job.status === 'scheduled' ? 'in_progress' : job.status === 'in_progress' ? 'done' : 'scheduled';
         await updateJobStatus(job.id, newStatus);
+        // Auto-create invoice on completion (idempotent per job; skip $0 rates).
+        let invoiceCreated = false;
+        if (newStatus === 'done' && Number(job.clients?.rate || 0) > 0) {
+          try {
+            const inv = await createInvoice({
+              client_id: job.client_id,
+              clients: job.clients,
+              amount: job.clients?.rate,
+              job_id: job.id,
+            });
+            invoiceCreated = true;
+            setInvoices(prev => prev.some(i => i.id === inv.id) ? prev : [inv, ...prev]);
+          } catch (invErr) { console.error('Auto-invoice failed:', invErr); }
+        }
         // Track completed jobs for review prompt
         if (newStatus === 'done' && localStorage.getItem('mf_review_prompts') !== 'false' && localStorage.getItem('mf_review_prompt_shown') !== 'true') {
           const prev = parseInt(localStorage.getItem('mf_completed_jobs') || '0', 10);
@@ -356,10 +370,15 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
               setCompletedToast({ name: tr('{{client}} · {{label}} job already scheduled', { client: clientName, label: recLabel }), amount: job.clients?.rate || 0, type: 'recurring' });
             }
           } else {
-            setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0, type: 'recurring' });
+            // Done (no recurrence): invoice toast only if one was actually created.
+            setCompletedToast({
+              name: job.clients?.name || tr('Job'),
+              amount: invoiceCreated ? (job.clients?.rate || 0) : 0,
+              type: invoiceCreated ? 'invoice' : 'plain',
+            });
           }
         } else if (job.status !== 'done') {
-          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0, type: 'recurring' });
+          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: 0, type: 'plain' });
         }
         const toastTimeout = setTimeout(() => setCompletedToast(null), 4000);
         toggleTimeoutRef.current = toastTimeout;

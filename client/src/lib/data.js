@@ -693,7 +693,12 @@ export async function createInvoice(invoice) {
   }
 
   if (isDemoMode()) {
-    const newInvoice = { ...invoice, amount, id: uid(), status: 'unpaid' };
+    // Dedupe by job_id and always stamp created_at (Nudge eligibility depends on it).
+    if (invoice.job_id) {
+      const existing = _invoices.find(i => i.job_id === invoice.job_id);
+      if (existing) return existing;
+    }
+    const newInvoice = { ...invoice, amount, id: uid(), status: 'unpaid', created_at: new Date().toISOString() };
     _invoices = [newInvoice, ..._invoices];
     notify();
     return newInvoice;
@@ -701,14 +706,57 @@ export async function createInvoice(invoice) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { data, error } = await supabase.from('invoices').insert({
-    user_id: user.id,
-    client_id: invoice.client_id || invoice.clients?.id,
-    amount,
-    status: 'unpaid',
-  }).select('*, clients!left(*)').single();
+  // Idempotent: a job that's toggled done->todo->done must not double-invoice.
+  if (invoice.job_id) {
+    const { data: existing, error: lookupError } = await supabase
+      .from('invoices')
+      .select('id, client_id, amount, status, created_at, job_id')
+      .eq('job_id', invoice.job_id)
+      .maybeSingle();
+    if (lookupError) throw lookupError;
+    if (existing) {
+      return {
+        id: existing.id,
+        clients: invoice.clients || null,
+        amount: existing.amount,
+        status: existing.status,
+        created_at: existing.created_at,
+      };
+    }
+  }
 
-  if (error) throw error;
+  let data;
+  try {
+    const { data: inserted, error } = await supabase.from('invoices').insert({
+      user_id: user.id,
+      client_id: invoice.client_id || invoice.clients?.id,
+      amount,
+      status: 'unpaid',
+      job_id: invoice.job_id || null,
+    }).select('*, clients!left(*)').single();
+    if (error) throw error;
+    data = inserted;
+  } catch (insertError) {
+    // Unique-violation race (23505): another call created it first — return the existing row.
+    if (insertError?.code === '23505' && invoice.job_id) {
+      const { data: raced, error: raceError } = await supabase
+        .from('invoices')
+        .select('id, client_id, amount, status, created_at, job_id')
+        .eq('job_id', invoice.job_id)
+        .maybeSingle();
+      if (raceError) throw raceError;
+      if (raced) {
+        return {
+          id: raced.id,
+          clients: invoice.clients || null,
+          amount: raced.amount,
+          status: raced.status,
+          created_at: raced.created_at,
+        };
+      }
+    }
+    throw insertError;
+  }
 
   return {
     id: data.id,
@@ -813,6 +861,39 @@ export function estimateNudgeText(estimate) {
   return `Hi ${estimate.clients?.name || 'there'}, just checking in on your estimate for $${Number(estimate.amount).toFixed(2)} from ${date} — still want me to hold the spot? Happy to adjust anything. Thanks!`;
 }
 
+/**
+ * Payment methods the operator configured for invoice texts, in preference
+ * order (research: clients default to the first option listed — Zelle is the
+ * most-used free rail, so it leads).
+ */
+export function invoicePayMethods() {
+  const zelle = (localStorage.getItem('mf_zelle_handle') || '').trim();
+  const venmo = (localStorage.getItem('mf_venmo_handle') || '').trim();
+  const cashapp = (localStorage.getItem('mf_cashapp_handle') || '').trim();
+  const parts = [];
+  if (zelle) parts.push(`Zelle: ${zelle}`);
+  if (venmo) parts.push(`Venmo: @${venmo.replace(/^@/, '')}`);
+  if (cashapp) parts.push(`Cash App: $${cashapp.replace(/^\$/, '')}`);
+  return parts;
+}
+
+export function invoicePayLine() {
+  const methods = invoicePayMethods();
+  return methods.length
+    ? `Pay via ${methods.join(' · ')}`
+    : 'Please send payment at your earliest convenience';
+}
+
+/** Friendly reminder for unpaid invoices (mirrors estimateNudgeText). */
+export function invoiceNudgeText(invoice) {
+  const name = invoice.clients?.name || 'there';
+  const amount = Number(invoice.amount || 0).toFixed(2);
+  const date = invoice.created_at
+    ? new Date(invoice.created_at).toLocaleDateString()
+    : '';
+  return `Hi ${name} — friendly reminder: $${amount}${date ? ` from ${date}` : ''} is still due. ${invoicePayLine()}. Thanks!`;
+}
+
 // ===== Profile =====
 
 export async function loadProfile() {
@@ -827,6 +908,15 @@ export async function loadProfile() {
 
   const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (error) { console.error('loadProfile:', error); return null; }
+  // Hydrate the clipboard-text mirrors so invoice texts work on any device
+  // the operator signs into (cleared on a fresh profile/account).
+  if (data) {
+    localStorage.setItem('mf_business_name', data.business_name || '');
+    localStorage.setItem('mf_business_phone', data.phone || '');
+    localStorage.setItem('mf_venmo_handle', data.venmo_handle || '');
+    localStorage.setItem('mf_cashapp_handle', data.cashapp_handle || '');
+    localStorage.setItem('mf_zelle_handle', data.zelle_handle || '');
+  }
   return data;
 }
 
@@ -854,9 +944,12 @@ export async function saveProfile(profile) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { business_name, phone, avatar_url } = profile;
+  const { business_name, phone, avatar_url, venmo_handle, cashapp_handle, zelle_handle } = profile;
   const { error } = await supabase.from('profiles').upsert({
     id: user.id, business_name, phone, avatar_url, latitude, longitude,
+    venmo_handle: venmo_handle || null,
+    cashapp_handle: cashapp_handle || null,
+    zelle_handle: zelle_handle || null,
   });
   if (error) throw error;
   return { ...profile, business_name, phone, avatar_url, latitude, longitude };
@@ -987,7 +1080,7 @@ export async function inviteTeamMember(email) {
     return member;
   }
 
-  return authenticatedApiRequest('/api/team/invite', {
+  return authenticatedApiRequest('/api/invite-crew', {
     method: 'POST',
     body: JSON.stringify({ email: normalizedEmail }),
   });
@@ -1122,7 +1215,7 @@ const _demoPhotos = new Map();
  * @param {string} jobId
  * @param {File} file - image file from input/camera
  * @param {'before'|'after'} type
- * @returns {Promise<string>} public URL of the uploaded photo
+ * @returns {Promise<string>} one-hour signed URL of the uploaded photo
  */
 export async function uploadJobPhoto(jobId, file, type) {
   const timestamp = Date.now();
@@ -1146,19 +1239,21 @@ export async function uploadJobPhoto(jobId, file, type) {
 
   if (uploadError) throw uploadError;
 
-  const { data: urlData } = supabase.storage
+  const { data: urlData, error: signedUrlError } = await supabase.storage
     .from('job-photo')
-    .getPublicUrl(storagePath);
+    .createSignedUrl(storagePath, 3600);
+
+  if (signedUrlError) throw signedUrlError;
 
   // Store URL on the job record if photo_before/photo_after columns exist
   const colName = type === 'before' ? 'photo_before' : 'photo_after';
   try {
-    await supabase.from('jobs').update({ [colName]: urlData.publicUrl }).eq('id', jobId);
+    await supabase.from('jobs').update({ [colName]: urlData.signedUrl }).eq('id', jobId);
   } catch {
     // Column may not exist yet — storage is the source of truth
   }
 
-  return urlData.publicUrl;
+  return urlData.signedUrl;
 }
 
 /**
@@ -1187,11 +1282,12 @@ export async function getJobPhotos(jobId) {
   const result = { before: null, after: null };
   for (const f of files) {
     const filePath = `${folderPath}/${f.name}`;
-    const { data: urlData } = supabase.storage
+    const { data: urlData, error: signedUrlError } = await supabase.storage
       .from('job-photo')
-      .getPublicUrl(filePath);
-    if (f.name.startsWith('before-')) result.before = urlData.publicUrl;
-    if (f.name.startsWith('after-')) result.after = urlData.publicUrl;
+      .createSignedUrl(filePath, 3600);
+    if (signedUrlError) continue;
+    if (f.name.startsWith('before-')) result.before = urlData.signedUrl;
+    if (f.name.startsWith('after-')) result.after = urlData.signedUrl;
   }
   return result;
 }
