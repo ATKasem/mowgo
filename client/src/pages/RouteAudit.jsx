@@ -22,7 +22,7 @@ export default function RouteAudit() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [serverError, setServerError] = useState('');
-  usePageTitle(t('routeAudit.seo.title'), t('routeAudit.seo.description'));
+  usePageTitle(t('routeAudit.seo_title'), t('routeAudit.seo_description'));
 
   const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
 

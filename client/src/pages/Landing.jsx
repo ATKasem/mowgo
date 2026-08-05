@@ -72,7 +72,7 @@ const faqs = [
   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
   { q: "What's the catch?", a: "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full." },
   { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
-  { q: 'What happens to my data if I cancel?', a: 'Your data stays yours, always. Export it anytime. After cancel, we keep it safe for 90 days and delete on request.' },
+  { q: 'What happens to my data if I cancel?', a: 'Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request.' },
 ];
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -515,8 +515,11 @@ export default function Landing() {
             <Logo size="xs" />
             MowGo &copy; 2026
           </div>
-          <div className="flex gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+          <div className="flex flex-wrap justify-center gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
             <Link to="/compare" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
+            <Link to="/blog/jobber-price-increase-2026" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Jobber pricing")}</Link>
+            <Link to="/switch-from-lawnpro" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("LawnPro alternative")}</Link>
+            <Link to="/quoteiq-alternative" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("QuoteIQ alternative")}</Link>
             <Link to="/login" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
             <a href="mailto:hello@mowgoapp.com" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>

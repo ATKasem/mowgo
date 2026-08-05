@@ -407,7 +407,7 @@ export default function RuunlyComparison() {
             <Link to="/compare" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
             <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
-            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
+            <a href="mailto:hello@mowgoapp.com" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>
         </div>
       </footer>

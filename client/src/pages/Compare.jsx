@@ -348,7 +348,7 @@ export default function Compare() {
 
         <div className="mt-10 text-center space-y-6">
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            {tr("Think something's wrong?")} <a href="mailto:hello@mowgo.app" className="text-emerald-500 hover:underline">{tr("Tell us")}</a> {tr("and we'll fix it. We're not afraid of the truth.")}
+            {tr("Think something's wrong?")} <a href="mailto:hello@mowgoapp.com" className="text-emerald-500 hover:underline">{tr("Tell us")}</a> {tr("and we'll fix it. We're not afraid of the truth.")}
           </p>
           <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {tr("Try MowGo Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
@@ -382,7 +382,7 @@ export default function Compare() {
             <a href="#" onClick={goToPricing} className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Pricing")}</a>
             <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
-            <a href="mailto:hello@mowgo.app" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Contact")}</a>
+            <a href="mailto:hello@mowgoapp.com" className="hover:text-gray-600 dark:hover:text-gray-300 py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>
         </div>
       </footer>

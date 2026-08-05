@@ -528,7 +528,7 @@ export default function Settings() {
         {/* Help */}
         <div className="card p-5 space-y-3">
           <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-[var(--color-text-muted)]" />{tr("Help & Support")}</h3>
-          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Need help? Email us at")} <a href="mailto:hello@mowgo.app" className="text-brand-hover dark:text-emerald-400 hover:underline">hello@mowgo.app</a></p>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Need help? Email us at")} <a href="mailto:hello@mowgoapp.com" className="text-brand-hover dark:text-emerald-400 hover:underline">hello@mowgoapp.com</a></p>
           <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("MowGo v1.0 · Built for lawn care crews ·")} <a href="https://mowgo.pages.dev" className="hover:text-brand transition-colors">mowgo.pages.dev</a></p>
         </div>
 

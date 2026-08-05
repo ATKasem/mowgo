@@ -661,9 +661,12 @@
     "why_should_i_pay_yearly": "Why should I pay yearly?",
     "two_months_free_78_off_solo_158_off_crew_and_one_payment_covers_the_whol": "Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.",
     "what_happens_to_my_data_if_i_cancel": "What happens to my data if I cancel?",
-    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Your data stays yours, always. Export it anytime. After cancel, we keep it safe for 90 days and delete on request.",
     "seo_title": "MowGo — Lawn Care Scheduling, Routing & Invoicing Software",
-    "seo_description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card."
+    "seo_description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card.",
+    "jobber_pricing": "Jobber pricing",
+    "lawnpro_alternative": "LawnPro alternative",
+    "quoteiq_alternative": "QuoteIQ alternative",
+    "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -732,7 +735,9 @@
     "anonymous_analytics_about_how_you_use_the_app_to_help_us_improve": "anonymous analytics about how you use the app to help us improve.",
     "for_payment_processing": "for payment processing",
     "our_database_provider_your_data_is_encrypted_at_rest": "our database provider (your data is encrypted at rest)",
-    "only_when_required_by_valid_legal_process": "only when required by valid legal process"
+    "only_when_required_by_valid_legal_process": "only when required by valid legal process",
+    "privacy_policy_mowgo": "Privacy Policy — MowGo",
+    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "MowGo privacy policy. Your data stays yours — no ads, no selling, no funny business."
   },
   "quoteIQAlternative": {
     "rain_delay_auto_reschedule": "Rain delay auto-reschedule",
@@ -1330,8 +1335,8 @@
       "crewCta": "Explore the Crew tier",
       "qualifiedCta": "Book your free setup call"
     },
-    "seo_title": "Free Route Audit — See What Your Routes Cost You",
-    "seo_description": "Get a free estimate of the hours and revenue your lawn care routes are costing you. Takes 30 seconds, delivered to your email."
+    "seo_title": "Free Route Audit for Oklahoma Lawn Care Crews",
+    "seo_description": "Get a free route audit for your lawn care business. See how much drive time and gas you can save with MowGo routing."
   },
   "portalReturn": {
     "app_not_installed": "App not installed?"

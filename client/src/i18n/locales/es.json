@@ -711,9 +711,12 @@
     "why_should_i_pay_yearly": "¿Por qué pagar anualmente?",
     "two_months_free_78_off_solo_158_off_crew_and_one_payment_covers_the_whol": "Dos meses gratis ($78 de descuento en Solo, $158 en Crew) y un solo pago cubre toda la temporada — sin cargos a la tarjeta en invierno. La Garantía Rain-Proof sigue aplicando: se reembolsan los meses no usados.",
     "what_happens_to_my_data_if_i_cancel": "¿Qué pasa con mis datos si cancelo?",
-    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Sus datos siempre son suyos. Expórtelos cuando quiera. Tras cancelar, los conservamos seguros por 90 días y los eliminamos a petición.",
     "seo_title": "MowGo — Software de programación, rutas y facturación para jardinería",
-    "seo_description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito."
+    "seo_description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito.",
+    "jobber_pricing": "Precios de Jobber",
+    "lawnpro_alternative": "Alternativa a LawnPro",
+    "quoteiq_alternative": "Alternativa a QuoteIQ",
+    "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Sus datos siempre son suyos. Expórtelos cuando quiera. Si cancela, eliminamos sus datos a petición."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -784,7 +787,9 @@
     "anonymous_analytics_about_how_you_use_the_app_to_help_us_improve": "datos analíticos anónimos sobre cómo usas la app, que nos ayudan a mejorarla.",
     "for_payment_processing": "para procesar pagos",
     "our_database_provider_your_data_is_encrypted_at_rest": "nuestro proveedor de base de datos (tus datos están cifrados en reposo)",
-    "only_when_required_by_valid_legal_process": "solo cuando lo exija un proceso legal válido"
+    "only_when_required_by_valid_legal_process": "solo cuando lo exija un proceso legal válido",
+    "privacy_policy_mowgo": "Política de privacidad — MowGo",
+    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "Política de privacidad de MowGo. Sus datos siempre son suyos — sin anuncios, sin venta de datos, sin trucos."
   },
   "quoteIQAlternative": {
     "rain_delay_auto_reschedule": "Reprogramación automática por lluvia",
@@ -1423,8 +1428,8 @@
       "crewCta": "Explorar el plan Crew",
       "qualifiedCta": "Reserva tu llamada de configuración gratis"
     },
-    "seo_title": "Auditoría de rutas gratis — Descubre cuánto te cuestan tus rutas",
-    "seo_description": "Recibe un estimado gratis de las horas e ingresos que te cuestan tus rutas de jardinería. Toma 30 segundos y llega a tu correo."
+    "seo_title": "Auditoría de rutas gratuita para equipos de jardinería en Oklahoma",
+    "seo_description": "Obtenga una auditoría de rutas gratuita para su negocio de jardinería. Vea cuánto tiempo de manejo y gasolina puede ahorrar con el enrutamiento de MowGo."
   },
   "portalReturn": {
     "app_not_installed": "¿App no instalada?"

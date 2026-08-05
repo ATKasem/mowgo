@@ -1,9 +1,11 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import usePageTitle from '../hooks/usePageTitle';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Privacy() {
   const { tr, t, i18n } = useLocalizedText('privacy');
+  usePageTitle(tr('Privacy Policy — MowGo'), tr('MowGo privacy policy. Your data stays yours — no ads, no selling, no funny business.'));
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="max-w-2xl mx-auto px-4 py-12">
@@ -62,7 +64,7 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("5. Contact")}</h2>
-            <p>{tr("For privacy questions, contact us at")} <a href="mailto:privacy@mowgo.app" className="text-sky-600 dark:text-sky-400">privacy@mowgo.app</a>.</p>
+            <p>{tr("For privacy questions, contact us at")} <a href="mailto:privacy@mowgoapp.com" className="text-sky-600 dark:text-sky-400">privacy@mowgoapp.com</a>.</p>
           </section>
         </div>
       </div>

@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>MowGo — Lawn Care Business Software</title>
-    <meta name="description" content="Simple scheduling, routing, and invoicing for lawn care crews" />
+    <title>MowGo — Lawn Care Business Software for Oklahoma Crews</title>
+    <meta name="description" content="Rain delay auto-reschedule, scheduling, routing, and invoicing for Oklahoma lawn care crews. Free for your first 5 clients. No credit card." />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#10b981" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -13,6 +13,51 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Open Graph / social share (FB/IG-first strategy) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MowGo" />
+    <meta property="og:title" content="MowGo — Lawn Care Business Software for Oklahoma Crews" />
+    <meta property="og:description" content="Rain on Tuesday? One tap moves your whole schedule and texts every client. Built in Oklahoma City, for Oklahoma crews. Free for 5 clients." />
+    <meta property="og:url" content="https://mowgo.pages.dev/" />
+    <meta property="og:image" content="https://mowgo.pages.dev/landing/dashboard.png" />
+    <meta property="og:image:width" content="1536" />
+    <meta property="og:image:height" content="643" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MowGo — Lawn Care Business Software for Oklahoma Crews" />
+    <meta name="twitter:description" content="Rain on Tuesday? One tap moves your whole schedule and texts every client. Free for 5 clients." />
+    <meta name="twitter:image" content="https://mowgo.pages.dev/landing/dashboard.png" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "MowGo",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web, iOS, Android (PWA)",
+          "description": "Scheduling, routing, and invoicing software for lawn care crews. Rain delay auto-reschedule included on the free tier.",
+          "offers": [
+            { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD" },
+            { "@type": "Offer", "name": "Solo", "price": "39", "priceCurrency": "USD" },
+            { "@type": "Offer", "name": "Crew", "price": "79", "priceCurrency": "USD" }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Is MowGo really free?", "acceptedAnswer": { "@type": "Answer", "text": "Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included." } },
+            { "@type": "Question", "name": "What happens if I want to switch from Jobber or LawnPro?", "acceptedAnswer": { "@type": "Answer", "text": "On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week." } },
+            { "@type": "Question", "name": "Does MowGo work without cell service?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range." } },
+            { "@type": "Question", "name": "Why should I pay yearly?", "acceptedAnswer": { "@type": "Answer", "text": "Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded." } },
+            { "@type": "Question", "name": "What happens to my data if I cancel?", "acceptedAnswer": { "@type": "Answer", "text": "Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request." } }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
