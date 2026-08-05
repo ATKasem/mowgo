@@ -9,7 +9,7 @@ Fixes applied: (a) no Day-1 pitches anymore — every opener is conversation or 
 
 ## NAME ENRICHMENT (added 2026-08-05 — verified sources only, no guessing)
 Named opens go out with Day 1: #2 Tom, #3 Randy, #5 Austin, #6 Chad, #9 Austin, #10 Brett, #12 Milo, #14 Alejandro, #15 Bo, #17 Scott, #18 Jayden, #20 Blake, #21 Butch (13/21 named; full sources in names-enrichment.md).
-**#11 Atlas Green = Santos (MEDIUM confidence, ZoomInfo only) — NOT patched; verify before ever using.** #4, #7, #8, #13, #16, #19 unnamed — keep "Hey, this is Aaron" form.
+**UNVERIFIED — DO NOT USE: #10 'Brett' (ZoomInfo only, zero corroboration found 2026-08-05) — send unnamed. #11 Atlas 'Santos' (ZoomInfo only) — send unnamed.** #4, #7, #8, #13, #16, #19 unnamed — keep "Hey, this is Aaron" form.
 
 ## SEND ORDER (priority queue — added 2026-08-05, audit pass)
 Send in this order, NOT list order. Small/phone-only/no-booking-system crews reply 2-3× more than established players. 5-10/day max.
@@ -92,7 +92,7 @@ Derived from his models, not his clock: Hormozi never gives send-window advice (
 
 ### 10. OKC Top Choice Lawn Care (Yukon) — (405) 822-2155
 - Angle: 7-step program + tree + windows + snow removal (multi-service).
-- Day 1: "Hey Brett, this is Aaron with MowGo. Lawn, trees, windows, AND snow — you've got 4 businesses in one. How do you keep the schedule straight year-round?"
+- Day 1: "Hey, this is Aaron with MowGo. Lawn, trees, windows, AND snow — you've got 4 businesses in one. How do you keep the schedule straight year-round?"
 - Day 2: "Quick one — do you use the same calendar for all services, or juggle separate ones? Most multi-service crews say that's the pain point. I'll send how they fix it — short read, free."
 - Day 7: "Last check. If you're happy with how it's organized, no worries at all. Stay busy!"
 
