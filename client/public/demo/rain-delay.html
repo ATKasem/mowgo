@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MowGo rain delay demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0f1a;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .phone {
+    width: 390px; height: 844px; background: #0d1117; border-radius: 48px;
+    border: 10px solid #1b2430; box-shadow: 0 30px 80px rgba(0,0,0,.6); overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .statusbar { height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 28px; color: #e6edf3; font-size: 14px; font-weight: 600; }
+  .header { padding: 8px 20px 12px; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 30px; height: 30px; border-radius: 8px; background: #22c55e; display: flex; align-items: center; justify-content: center; }
+  .logo span { color: #0a0f1a; font-size: 16px; font-weight: 800; }
+  .header h1 { color: #e6edf3; font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
+  .sub { padding: 0 20px 10px; color: #8b949e; font-size: 13px; }
+  .sub b { color: #22c55e; }
+  .banner { margin: 4px 16px 14px; border: 1px solid #f59e0b66; background: #f59e0b14; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .banner .ic { font-size: 20px; }
+  .banner .txt { flex: 1; color: #e6edf3; font-size: 13px; line-height: 1.35; }
+  .banner .txt small { display: block; color: #8b949e; font-size: 11.5px; margin-top: 2px; }
+  .btn { background: #22c55e; color: #062b12; font-weight: 800; font-size: 13px; border: 0; border-radius: 10px; padding: 9px 14px; white-space: nowrap; }
+  .btn.done { background: #18311f; color: #22c55e; border: 1px solid #22c55e55; }
+  .cards { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: hidden; }
+  .card { background: #161b22; border: 1px solid #21262d; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot.done { background: #22c55e; } .dot.sched { background: #f59e0b; } .dot.prog { background: #3b82f6; }
+  .card .who { color: #e6edf3; font-size: 15px; font-weight: 600; }
+  .card .meta { color: #8b949e; font-size: 12px; margin-top: 2px; }
+  .card .time { margin-left: auto; color: #8b949e; font-size: 12.5px; font-weight: 600; }
+  .badge { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+  .badge.done { background: #22c55e22; color: #4ade80; }
+  .badge.sched { background: #f59e0b22; color: #fbbf24; }
+  .badge.prog { background: #3b82f622; color: #60a5fa; }
+  .moved { border-color: #22c55e55; }
+  .notified { padding: 14px 16px; background: #22c55e14; border-top: 1px solid #22c55e33; color: #4ade80; font-size: 12.5px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .nav { display: flex; border-top: 1px solid #21262d; background: #0d1117; padding: 10px 8px 22px; }
+  .nav div { flex: 1; text-align: center; color: #484f58; font-size: 10.5px; font-weight: 600; }
+  .nav div.on { color: #22c55e; }
+  .nav .n { display: block; font-size: 17px; margin-bottom: 2px; }
+  #stateB, #stateC { display: none; }
+  body.b #stateB { display: flex; } body.b #stateA { display: none; }
+  body.c #stateC { display: flex; } body.c #stateA, body.c #stateB { display: none; }
+  .state { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="header"><div class="logo"><span>🌱</span></div><h1>MowGo</h1></div>
+  <div class="sub" id="subA">8 jobs · 2 completed · <b>Rain expected</b></div>
+  <div class="sub" id="subB" style="display:none">8 jobs · 2 completed · <b>Moved to tomorrow</b></div>
+
+  <div id="stateA" class="state">
+    <div class="banner"><span class="ic">🌧️</span><div class="txt">Rain expected today<small>Move 8 jobs to tomorrow</small></div><button class="btn">Move All</button></div>
+    <div class="cards">
+      <div class="card"><div class="dot done"></div><div><div class="who">Bill Henderson</div><div class="meta">Mow + Edge · Weekly</div></div><span class="badge done">Done</span></div>
+      <div class="card"><div class="dot sched"></div><div><div class="who">Marcus Lee</div><div class="meta">Quick Mow · Every 2 weeks</div></div><span class="badge sched">Scheduled</span></div>
+      <div class="card"><div class="dot sched"></div><div><div class="who">David &amp; Emma Ruiz</div><div class="meta">Biweekly Service</div></div><span class="badge sched">Scheduled</span></div>
+      <div class="card"><div class="dot sched"></div><div><div class="who">Sarah Johnson</div><div class="meta">Mow + Trim · Weekly</div></div><span class="badge sched">Scheduled</span></div>
+      <div class="card"><div class="dot prog"></div><div><div class="who">Mike Peterson</div><div class="meta">Mow Only · Biweekly</div></div><span class="badge prog">Now</span></div>
+    </div>
+  </div>
+
+  <div id="stateB" class="state">
+    <div class="banner"><span class="ic">✅</span><div class="txt">Moved 8 jobs to tomorrow<small>Clients are being notified</small></div><button class="btn done">Moved</button></div>
+    <div class="cards">
+      <div class="card moved"><div class="dot done"></div><div><div class="who">Marcus Lee</div><div class="meta">Quick Mow · Tomorrow 10:00</div></div><span class="badge done">Moved</span></div>
+      <div class="card moved"><div class="dot done"></div><div><div class="who">David &amp; Emma Ruiz</div><div class="meta">Biweekly Service · Tomorrow 12:00</div></div><span class="badge done">Moved</span></div>
+      <div class="card moved"><div class="dot done"></div><div><div class="who">Sarah Johnson</div><div class="meta">Mow + Trim · Tomorrow 9:00</div></div><span class="badge done">Moved</span></div>
+      <div class="card moved"><div class="dot done"></div><div><div class="who">Mike Peterson</div><div class="meta">Mow Only · Tomorrow 14:00</div></div><span class="badge done">Moved</span></div>
+    </div>
+    <div class="notified">💬 8/8 clients notified by text</div>
+  </div>
+
+  <div id="stateC" class="state">
+    <div class="banner" style="border-color:#22c55e66;background:#22c55e14"><span class="ic">☀️</span><div class="txt">All jobs done<small>Rain delay handled in one tap</small></div></div>
+    <div class="cards">
+      <div class="card moved"><div class="dot done"></div><div><div class="who">Marcus Lee</div><div class="meta">Quick Mow · Completed</div></div><span class="badge done">Done</span></div>
+      <div class="card moved"><div class="dot done"></div><div><div class="who">David &amp; Emma Ruiz</div><div class="meta">Biweekly Service · Completed</div></div><span class="badge done">Done</span></div>
+      <div class="card moved"><div class="dot done"></div><div><div class="who">Sarah Johnson</div><div class="meta">Mow + Trim · Completed</div></div><span class="badge done">Done</span></div>
+      <div class="card moved"><div class="dot done"></div><div><div class="who">Mike Peterson</div><div class="meta">Mow Only · Completed</div></div><span class="badge done">Done</span></div>
+    </div>
+    <div class="notified">💰 6 invoices paid this week</div>
+  </div>
+
+  <div class="nav"><div class="on"><span class="n">🏠</span>Today</div><div><span class="n">📅</span>Jobs</div><div><span class="n">👥</span>Clients</div><div><span class="n">🧾</span>Invoices</div><div><span class="n">⚙️</span>Settings</div></div>
+</div>
+<script>
+  const s = new URLSearchParams(location.search).get('state');
+  if (s === 'b') document.body.classList.add('b');
+  if (s === 'c') document.body.classList.add('c');
+</script>
+</body>
+</html>
