@@ -7,6 +7,24 @@ Send from Aaron's phone (personal = higher reply rate). Mark ✅ sent / 🔄 rep
 ## Rewrite pass 2026-08-05 (copy audit)
 Fixes applied: (a) no Day-1 pitches anymore — every opener is conversation or the rate-report offer; (b) the lead magnet (rate report) is now the default Day-2 pivot instead of "want to see the app"; (c) openers rotate across 4 patterns so the batch doesn't read like a template; (d) objection pre-emption ("if you're already set, all good") moves into Day 1 so replies aren't defensive.
 
+## SEND ORDER (priority queue — added 2026-08-05, audit pass)
+Send in this order, NOT list order. Small/phone-only/no-booking-system crews reply 2-3× more than established players. 5-10/day max.
+
+**Tier 1 (send first — highest reply odds):**
+12 A Plus Lawns (phone-only, no site) → 18 J&C Mowing (FB only, small) → 6 Thogy's (paper scheduling) → 20 Mow-Town (small, active) → 8 Premier (phone-only bookings) → 17 Scott's (1-2 crew, 7 services) → 13 J & Jays (1-2 crew, top-rated) → 21 Nutri-Green (already sends manual reminders = warm)
+
+**Tier 2 (send next):**
+1 Campbell & Sons (has email) → 5 Hicks (minimal site) → 9 Eberly's (form-only) → 16 Custom Cuts → 3 LBR (multi-service) → 7 Diverse (multi-service) → 14 Aguilar Brothers (full landscaping)
+
+**Tier 3 (lowest priority — established/locked-in):**
+2 Complete Lawn Care (24yr) → 4 Leisure Lawn → 10 OKC Top Choice → 19 Sungarden (commercial) → 11 Atlas (1959) → 15 NaturaLawn (franchise)
+
+## EXECUTION RULES (audit pass 2026-08-05)
+1. **Timing:** send Tue-Thu only, 8-10am or 5-7pm CT. No Mondays, no Fridays, no weekends.
+2. **Cadence is the lever:** Day 2 goes out ~24h after Day 1 at the same time; Day 7 last touch. Most replies come on Day 2 — never skip it.
+3. **Report on tap:** have the "What to Charge in Your City" PDF/screenshot ready in your phone before sending Day 1s. When a lead says yes, send it within minutes — speed to value is the whole play.
+4. **Never pitch in message 1.** Conversation or the report offer only. App comes after 3-4 exchanges.
+
 ---
 
 ## The 21 leads (phone-first batch)
