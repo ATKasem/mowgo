@@ -34,6 +34,7 @@ const features = [
   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
   { label: 'Zero-Fee Payments', key: 'stripe', desc: 'Venmo, Zelle, Cash App — no card processing fees' },
   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
+  { label: 'Route Optimization', key: 'route', desc: 'One-tap optimized routes + send stops to your maps app' },
 ];
 
 // ✅ = confirmed, ❌ = not available, 🔜 = coming soon
@@ -52,6 +53,8 @@ const data = {
   privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
   stripe:       [ true,  false, false, false, false, false, false, false, false, false ],
   gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
+  // Route Optimization availability — researched Aug 5, 2026: QuoteIQ (myquoteiq.com, all plans), Jobber (help.getjobber.com, Connect+), Yardbook (support.yardbook.com), LawnPro (lawnprosoftware.com/features/routing), Housecall Pro 'soon' (alpha per help.housecallpro.com), GreenRoute (greenrouteapp.com), LawnBoss (lawnboss.app), SoloOp (solo-op.com), TurfHop (youraspire.com lawn routing list)
+  route:        [ true,  true,  true,  true,  true,  'soon', true,  true,  true,  true ],
 };
 
 const mowgoTiers = [

@@ -23,7 +23,7 @@ const features = [
   { label: 'Price',             mowgoFree: '$0',          mowgoSolo: '$39/mo',    ruunlyStarter: '$19 + fees',   ruunlyPro: '$59 + fees',  type: 'price' },
   { label: 'Clients',           mowgoFree: '5',           mowgoSolo: 'Unlimited',  ruunlyStarter: '25',           ruunlyPro: '100',         type: 'text' },
   { label: 'Rain Delay',        mowgoFree: true,          mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
-  { label: 'Route Optimization',mowgoFree: 'Coming soon', mowgoSolo: 'Coming soon',ruunlyStarter: false,          ruunlyPro: false,         type: 'qualified' },
+  { label: 'Route Optimization', mowgoFree: false, mowgoSolo: true, ruunlyStarter: false, ruunlyPro: false, type: 'qualified' },
   { label: 'SMS Campaigns',     mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: true,          type: 'bool' },
   { label: 'QuickBooks',        mowgoFree: false,         mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
   { label: 'Installable Web App (PWA)', mowgoFree: true,  mowgoSolo: true,         ruunlyStarter: false,          ruunlyPro: false,         type: 'bool' },
@@ -270,7 +270,9 @@ export default function RuunlyComparison() {
                       if (f.type === 'qualified') {
                         return (
                           <td key={col} className={`text-center py-3 px-2${cellBg}`}>
-                            {val === 'Coming soon' ? <span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">{tr("Coming soon")}</span> : <X className="w-5 h-5 text-red-400 mx-auto" aria-hidden="true" />}
+                            {val === true ? <Check className="w-5 h-5 text-emerald-500 mx-auto" aria-hidden="true" />
+                              : val === 'Coming soon' ? <span className="text-[10px] font-semibold uppercase text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">{tr("Coming soon")}</span>
+                              : <X className="w-5 h-5 text-red-400 mx-auto" aria-hidden="true" />}
                           </td>
                         );
                       }

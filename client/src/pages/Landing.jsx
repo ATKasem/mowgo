@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase';
 
 const features = [
   { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500', soon: true },
+  { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500' },
   { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. An invoice is created automatically — one tap copies a payment text. Clients pay via Venmo, Zelle, or Cash App. No processing fees.', color: 'from-amber-500 to-orange-500' },
 ];
@@ -465,7 +465,7 @@ export default function Landing() {
             </div>
           </FadeIn>
           <FadeIn delay={400}>
-            <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Card checkout is live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.")}</p>
+            <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Route optimization is live — included on Solo, Crew, and Premium.")}</p>
           </FadeIn>
         </div>
       </section>
