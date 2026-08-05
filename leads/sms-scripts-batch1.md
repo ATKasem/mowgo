@@ -19,11 +19,14 @@ Send in this order, NOT list order. Small/phone-only/no-booking-system crews rep
 **Tier 3 (lowest priority — established/locked-in):**
 2 Complete Lawn Care (24yr) → 4 Leisure Lawn → 10 OKC Top Choice → 19 Sungarden (commercial) → 11 Atlas (1959) → 15 NaturaLawn (franchise)
 
-## EXECUTION RULES (audit pass 2026-08-05)
-1. **Timing:** send Tue-Thu only, 8-10am or 5-7pm CT. No Mondays, no Fridays, no weekends.
-2. **Cadence is the lever:** Day 2 goes out ~24h after Day 1 at the same time; Day 7 last touch. Most replies come on Day 2 — never skip it.
-3. **Report on tap:** have the "What to Charge in Your City" PDF/screenshot ready in your phone before sending Day 1s. When a lead says yes, send it within minutes — speed to value is the whole play.
-4. **Never pitch in message 1.** Conversation or the report offer only. App comes after 3-4 exchanges.
+## EXECUTION RULES (audit pass 2026-08-05 — Hormozi-derived framing)
+Derived from his models, not his clock: Hormozi never gives send-window advice ("methods expire, models last") — these rules are the models applied:
+
+1. **Timing = the Lead Value Equation's denominator.** Time Delay × Effort sit below the line — your conversion score rises when you hit owners at peak *mental availability*: start of day (8-10am, planning mode) and end of workday (5-7pm, phone-in-hand mode). You're not "picking a good window" — you're minimizing time delay to the moment they think about their business.
+2. **Day 2 at the same time = follow-up is the model, not a courtesy.** "The fortune is in the follow-up." Most replies land on the second touch while the imprint is still fresh — 24h keeps Time Delay minimal. Never skip it.
+3. **Consistency beats perfection (Rule of 100).** 100 units/day × 100 days — momentum beats genius. Pick the Tue-Thu 8-10/5-7 windows you can *sustain* and never break the streak. A perfect window skipped is worth less than an imperfect one repeated. If you can sustain daily, daily wins.
+4. **Report on tap = killing Effort + Time Delay.** When they say yes, send within minutes. The Lead Value Equation says this is a multiplier on the same message.
+5. **Never pitch in message 1.** Conversation or the report offer only. App comes after 3-4 exchanges.
 
 ---
 
