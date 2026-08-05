@@ -49,6 +49,15 @@ final class AuthService: ObservableObject {
                 isDemoMode = true
                 isAuthenticated = true
                 isLoading = false
+                // Demo profile so profile edits (incl. payment handles) work in demo.
+                user = UserProfile(
+                    id: DemoData.demoOwnerId,
+                    businessName: "Green Thumb Lawn Care",
+                    phone: "405-555-0100",
+                    email: "owner@mowgo.app",
+                    tier: "solo",
+                    role: "owner"
+                )
             }
         }
     }
@@ -127,16 +136,22 @@ final class AuthService: ObservableObject {
         }
     }
 
-    func updateProfile(businessName: String, phone: String, email: String) async throws {
+    func updateProfile(businessName: String, phone: String, email: String, venmoHandle: String = "", cashappHandle: String = "", zelleHandle: String = "") async throws {
         let name = businessName.trimmingCharacters(in: .whitespacesAndNewlines)
         let normalizedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
         let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedVenmo = venmoHandle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedCashapp = cashappHandle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedZelle = zelleHandle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { throw ProfileUpdateError.businessNameRequired }
 
         if isDemoMode {
             user?.businessName = name
             user?.phone = normalizedPhone.isEmpty ? nil : normalizedPhone
             user?.email = normalizedEmail.isEmpty ? nil : normalizedEmail
+            user?.venmoHandle = normalizedVenmo.isEmpty ? nil : normalizedVenmo
+            user?.cashappHandle = normalizedCashapp.isEmpty ? nil : normalizedCashapp
+            user?.zelleHandle = normalizedZelle.isEmpty ? nil : normalizedZelle
             return
         }
 
@@ -144,12 +159,20 @@ final class AuthService: ObservableObject {
         struct ProfilePatch: Encodable {
             let businessName: String
             let phone: String?
-            let email: String?
+            let venmoHandle: String?
+            let cashappHandle: String?
+            let zelleHandle: String?
         }
         try await sb.update(
             "profiles",
             id: id,
-            ProfilePatch(businessName: name, phone: normalizedPhone.isEmpty ? nil : normalizedPhone, email: normalizedEmail.isEmpty ? nil : normalizedEmail)
+            ProfilePatch(
+                businessName: name,
+                phone: normalizedPhone.isEmpty ? nil : normalizedPhone,
+                venmoHandle: normalizedVenmo.isEmpty ? nil : normalizedVenmo,
+                cashappHandle: normalizedCashapp.isEmpty ? nil : normalizedCashapp,
+                zelleHandle: normalizedZelle.isEmpty ? nil : normalizedZelle
+            )
         )
         await loadProfile()
     }

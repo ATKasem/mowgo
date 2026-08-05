@@ -62,6 +62,49 @@ class InvoiceRepository {
             .insert(invoiceWithUser)
     }
 
+    /**
+     * Auto-invoice for a completed job (mirrors web). Idempotent per job_id —
+     * callers should skip $0 rates before invoking.
+     */
+    suspend fun createInvoiceForJob(jobId: String, clientId: String, amount: Double): Invoice? {
+        val existing = loadInvoices().firstOrNull { it.jobId == jobId }
+        if (existing != null) return existing
+
+        if (!SupabaseClientProvider.isConfigured) {
+            val newInvoice = Invoice(
+                id = "demo-inv-${System.currentTimeMillis()}",
+                clientId = clientId,
+                jobId = jobId,
+                amount = amount,
+                status = Invoice.STATUS_UNPAID,
+                createdAt = Instant.now().toString(),
+            )
+            demoInvoicesMutable = listOf(newInvoice) + demoInvoicesMutable
+            return newInvoice
+        }
+
+        val userId = getCurrentUserId() ?: throw IllegalStateException("Not authenticated")
+        val invoice = Invoice(
+            userId = userId,
+            clientId = clientId,
+            jobId = jobId,
+            amount = amount,
+            status = Invoice.STATUS_UNPAID,
+        )
+        return try {
+            SupabaseClientProvider.client.from("invoices")
+                .insert(invoice) { select() }
+                .decodeSingle<Invoice>()
+        } catch (e: Exception) {
+            // Unique job_id violation (23505): a concurrent call created it first.
+            if (e.message?.contains("duplicate key") == true || e.message?.contains("23505") == true) {
+                loadInvoices().firstOrNull { it.jobId == jobId }
+            } else {
+                throw e
+            }
+        }
+    }
+
     /** Mark an invoice as paid with current timestamp. */
     suspend fun markInvoicePaid(invoiceId: String) {
         if (!SupabaseClientProvider.isConfigured) {

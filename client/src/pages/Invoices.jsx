@@ -1,21 +1,39 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { updateInvoiceStatus, invoicePayLine, invoiceNudgeText } from '../lib/data';
+import { updateInvoiceStatus, invoicePayMethods } from '../lib/data';
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 import EstimatesSection from '../components/EstimatesSection';
 
 const iconMap = { CheckCircle, AlertCircle };
 
+/** Localized payment line (methods are data; the wrapper is translated). */
+function invoicePaymentInfo(tr) {
+  const methods = invoicePayMethods();
+  return methods.length
+    ? tr('Pay via {{methods}}', { methods: methods.join(' · ') })
+    : tr('Please send payment at your earliest convenience');
+}
+
 /** Generate invoice text for clipboard */
 function invoiceText(invoice, tr, language) {
   const name = invoice.clients?.name || tr('Client');
-  const amount = invoice.amount || 0;
+  const amount = Number(invoice.amount || 0).toFixed(2);
   const date = invoice.created_at
     ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
     : tr('today');
 
-  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!', { name, date, amount, paymentInfo: invoicePayLine() });
+  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!', { name, date, amount, paymentInfo: invoicePaymentInfo(tr) });
+}
+
+/** Friendly reminder text for stale unpaid invoices. */
+function invoiceNudgeText(invoice, tr, language) {
+  const name = invoice.clients?.name || tr('Client');
+  const amount = Number(invoice.amount || 0).toFixed(2);
+  const date = invoice.created_at
+    ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
+    : '';
+  return tr('Hi {{name}} — friendly reminder: ${{amount}} from {{date}} is still due. {{paymentInfo}}. Thanks!', { name, amount, date, paymentInfo: invoicePaymentInfo(tr) });
 }
 
 /** Unpaid/overdue invoices older than 3 days get a Nudge (mirrors estimates). */
@@ -204,7 +222,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
                           onClick={async e => {
                             e.stopPropagation();
                             try {
-                              await navigator.clipboard.writeText(invoiceNudgeText(invoice));
+                              await navigator.clipboard.writeText(invoiceNudgeText(invoice, tr, i18n.resolvedLanguage));
                               setCopiedIds(prev => new Set([...prev, `nudge-${invoice.id}`]));
                               setTimeout(() => setCopiedIds(prev => { const n = new Set(prev); n.delete(`nudge-${invoice.id}`); return n; }), 2500);
                             } catch { /* clipboard denied */ }

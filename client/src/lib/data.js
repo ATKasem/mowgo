@@ -696,12 +696,12 @@ export async function createInvoice(invoice) {
     // Dedupe by job_id and always stamp created_at (Nudge eligibility depends on it).
     if (invoice.job_id) {
       const existing = _invoices.find(i => i.job_id === invoice.job_id);
-      if (existing) return existing;
+      if (existing) return { invoice: existing, created: false };
     }
     const newInvoice = { ...invoice, amount, id: uid(), status: 'unpaid', created_at: new Date().toISOString() };
     _invoices = [newInvoice, ..._invoices];
     notify();
-    return newInvoice;
+    return { invoice: newInvoice, created: true };
   }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
@@ -716,11 +716,14 @@ export async function createInvoice(invoice) {
     if (lookupError) throw lookupError;
     if (existing) {
       return {
-        id: existing.id,
-        clients: invoice.clients || null,
-        amount: existing.amount,
-        status: existing.status,
-        created_at: existing.created_at,
+        invoice: {
+          id: existing.id,
+          clients: invoice.clients || null,
+          amount: existing.amount,
+          status: existing.status,
+          created_at: existing.created_at,
+        },
+        created: false,
       };
     }
   }
@@ -747,11 +750,14 @@ export async function createInvoice(invoice) {
       if (raceError) throw raceError;
       if (raced) {
         return {
-          id: raced.id,
-          clients: invoice.clients || null,
-          amount: raced.amount,
-          status: raced.status,
-          created_at: raced.created_at,
+          invoice: {
+            id: raced.id,
+            clients: invoice.clients || null,
+            amount: raced.amount,
+            status: raced.status,
+            created_at: raced.created_at,
+          },
+          created: false,
         };
       }
     }
@@ -759,19 +765,22 @@ export async function createInvoice(invoice) {
   }
 
   return {
-    id: data.id,
-    clients: data.clients ? {
-      id: data.clients.id,
-      name: data.clients.name,
-      address: data.clients.address,
-      phone: data.clients.phone,
-      email: data.clients.email,
-      rate: data.clients.rate,
-      service_notes: data.clients.cleaning_notes,
-    } : null,
-    amount: data.amount,
-    status: data.status,
-    created_at: data.created_at,
+    invoice: {
+      id: data.id,
+      clients: data.clients ? {
+        id: data.clients.id,
+        name: data.clients.name,
+        address: data.clients.address,
+        phone: data.clients.phone,
+        email: data.clients.email,
+        rate: data.clients.rate,
+        service_notes: data.clients.cleaning_notes,
+      } : null,
+      amount: data.amount,
+      status: data.status,
+      created_at: data.created_at,
+    },
+    created: true,
   };
 }
 
@@ -877,29 +886,19 @@ export function invoicePayMethods() {
   return parts;
 }
 
-export function invoicePayLine() {
-  const methods = invoicePayMethods();
-  return methods.length
-    ? `Pay via ${methods.join(' · ')}`
-    : 'Please send payment at your earliest convenience';
-}
-
-/** Friendly reminder for unpaid invoices (mirrors estimateNudgeText). */
-export function invoiceNudgeText(invoice) {
-  const name = invoice.clients?.name || 'there';
-  const amount = Number(invoice.amount || 0).toFixed(2);
-  const date = invoice.created_at
-    ? new Date(invoice.created_at).toLocaleDateString()
-    : '';
-  return `Hi ${name} — friendly reminder: $${amount}${date ? ` from ${date}` : ''} is still due. ${invoicePayLine()}. Thanks!`;
-}
-
 // ===== Profile =====
 
 export async function loadProfile() {
   if (isDemoMode()) {
     const userId = _currentDemoUserId();
     const member = _teamMembers.find(m => m.id === userId);
+    // Demo mode: reset the clipboard-text mirrors so a real account's
+    // payment handles can't leak into demo invoice texts.
+    localStorage.setItem('mf_business_name', 'Green Thumb Lawn Care');
+    localStorage.setItem('mf_business_phone', '405-555-0100');
+    localStorage.setItem('mf_venmo_handle', '');
+    localStorage.setItem('mf_cashapp_handle', '');
+    localStorage.setItem('mf_zelle_handle', '');
     return member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo', role: 'owner', business_id: null };
   }
 
@@ -907,7 +906,13 @@ export async function loadProfile() {
   if (!user) return null;
 
   const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (error) { console.error('loadProfile:', error); return null; }
+  if (error) {
+    console.error('loadProfile:', error);
+    // Don't leave a previous account's payment handles in the clipboard mirrors.
+    ['mf_business_name', 'mf_business_phone', 'mf_venmo_handle', 'mf_cashapp_handle', 'mf_zelle_handle']
+      .forEach(k => localStorage.removeItem(k));
+    return null;
+  }
   // Hydrate the clipboard-text mirrors so invoice texts work on any device
   // the operator signs into (cleared on a fresh profile/account).
   if (data) {

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
+import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.RainDelayHistoryStore
 import com.mowgo.app.data.WeatherForecast
@@ -77,6 +78,7 @@ data class TodayUiState(
 class TodayViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = JobRepository()
+    private val invoiceRepository = InvoiceRepository()
     private val photoRepository = JobPhotoRepository(repository)
     private val historyStore = RainDelayHistoryStore(application.applicationContext)
     private val weatherRepository = WeatherRepository()
@@ -122,6 +124,22 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 repository.updateJobStatus(jobId, newStatus)
+                // Auto-invoice on completion (mirrors web): idempotent per job, $0 rates skipped.
+                if (newStatus == Job.STATUS_DONE) {
+                    _uiState.value.jobs.firstOrNull { it.id == jobId }?.let { jobWithClient ->
+                        if (jobWithClient.clientRate > 0) {
+                            runCatching {
+                                invoiceRepository.createInvoiceForJob(
+                                    jobId = jobId,
+                                    clientId = jobWithClient.job.clientId,
+                                    amount = jobWithClient.clientRate,
+                                )
+                            }.onFailure { e ->
+                                android.util.Log.w("TodayViewModel", "auto-invoice failed", e)
+                            }
+                        }
+                    }
+                }
                 // Reload to get fresh state
                 loadData()
             } catch (e: Exception) {

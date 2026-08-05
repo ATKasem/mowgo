@@ -6,9 +6,11 @@ import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.EstimateRepository
 import com.mowgo.app.data.JobRepository
 import com.mowgo.app.data.PaymentRepository
+import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.data.model.Estimate
+import com.mowgo.app.data.model.Profile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +27,7 @@ data class InvoicesUiState(
     val invoices: List<Invoice> = emptyList(),
     val estimates: List<Estimate> = emptyList(),
     val clients: List<Client> = emptyList(),
+    val profile: Profile? = null,
     val showNewInvoiceDialog: Boolean = false,
     val showNewEstimateDialog: Boolean = false,
     val selectedEstimate: Estimate? = null,
@@ -94,11 +97,13 @@ class InvoicesViewModel : ViewModel() {
                 val invoices = invoiceRepository.loadInvoices()
                 val clients = jobRepository.loadClients()
                 val estimates = estimateRepository.loadEstimates()
+                val profile = ProfileRepository().loadProfile()
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     invoices = invoices,
                     clients = clients,
                     estimates = estimates,
+                    profile = profile,
                 )
             } catch (e: Exception) {
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
@@ -224,6 +229,49 @@ class InvoicesViewModel : ViewModel() {
 
     fun dismissNewInvoiceDialog() {
         _uiState.value = _uiState.value.copy(showNewInvoiceDialog = false)
+    }
+
+    // ── Payment request texts (mirror web: Zelle first — clients default to
+    // the first option listed; only configured methods appear) ───────────
+
+    private fun payMethods(profile: Profile?): List<String> {
+        if (profile == null) return emptyList()
+        val parts = mutableListOf<String>()
+        if (profile.zelleHandle.isNotBlank()) parts += "Zelle: ${profile.zelleHandle.trim()}"
+        if (profile.venmoHandle.isNotBlank()) {
+            parts += "Venmo: @${profile.venmoHandle.trim().removePrefix("@")}"
+        }
+        if (profile.cashappHandle.isNotBlank()) {
+            parts += "Cash App: ${'$'}${profile.cashappHandle.trim().removePrefix("$")}"
+        }
+        return parts
+    }
+
+    fun invoicePayLine(): String {
+        val methods = payMethods(_uiState.value.profile)
+        return if (methods.isEmpty()) {
+            "Please send payment at your earliest convenience"
+        } else {
+            "Pay via ${methods.joinToString(" · ")}"
+        }
+    }
+
+    fun invoiceText(invoice: Invoice, clientName: String?): String {
+        val name = clientName?.takeIf { it.isNotBlank() } ?: "there"
+        val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
+        val date = invoice.createdAt?.take(10)?.let { raw ->
+            runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
+        } ?: ""
+        return "Hi $name — your lawn was serviced${if (date.isNotEmpty()) " on $date" else ""}. $$amount due. ${invoicePayLine()}. Thanks!"
+    }
+
+    fun invoiceNudgeText(invoice: Invoice, clientName: String?): String {
+        val name = clientName?.takeIf { it.isNotBlank() } ?: "there"
+        val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
+        val date = invoice.createdAt?.take(10)?.let { raw ->
+            runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
+        } ?: ""
+        return "Hi $name — friendly reminder: $$amount${if (date.isNotEmpty()) " from $date" else ""} is still due. ${invoicePayLine()}. Thanks!"
     }
 
     fun createInvoice(

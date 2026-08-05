@@ -222,18 +222,27 @@ private fun DetailScaffold(title: String, back: () -> Unit, content: @Composable
 }
 
 @Composable
-private fun BusinessProfileScreen(state: MoreUiState, back: () -> Unit, save: (String, String, String) -> Unit, dismissMessage: () -> Unit) {
+private fun BusinessProfileScreen(state: MoreUiState, back: () -> Unit, save: (String, String, String, String, String, String) -> Unit, dismissMessage: () -> Unit) {
     val context = LocalContext.current
     var name by remember(state.profile) { mutableStateOf(state.profile?.businessName ?: "") }
     var phone by remember(state.profile) { mutableStateOf(state.profile?.phone ?: "") }
     var email by remember(state.profile) { mutableStateOf(state.profile?.email ?: "") }
+    var venmo by remember(state.profile) { mutableStateOf(state.profile?.venmoHandle ?: "") }
+    var cashapp by remember(state.profile) { mutableStateOf(state.profile?.cashappHandle ?: "") }
+    var zelle by remember(state.profile) { mutableStateOf(state.profile?.zelleHandle ?: "") }
     LaunchedEffect(state.saveMessage) { state.saveMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show(); dismissMessage() } }
     DetailScaffold("Business Profile", back) {
         OutlinedTextField(name, { name = it }, label = { Text("Business name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(phone, { phone = it }, label = { Text("Phone") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(email, { email = it }, label = { Text("Email") }, singleLine = true, enabled = false, modifier = Modifier.fillMaxWidth())
+        HorizontalDivider()
+        Text("How clients pay you", style = MaterialTheme.typography.titleSmall)
+        OutlinedTextField(zelle, { zelle = it }, label = { Text("Zelle (phone or email)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(venmo, { venmo = it }, label = { Text("Venmo (@handle)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(cashapp, { cashapp = it }, label = { Text("Cash App (\$handle)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        Text("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.", style = MaterialTheme.typography.bodySmall, color = MowGoColors.TextSecondaryDark)
         state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-        Button(onClick = { if (name.isNotBlank()) save(name.trim(), phone.trim(), email.trim()) }, enabled = name.isNotBlank() && !state.isSaving, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = { if (name.isNotBlank()) save(name.trim(), phone.trim(), email.trim(), venmo.trim(), cashapp.trim(), zelle.trim()) }, enabled = name.isNotBlank() && !state.isSaving, modifier = Modifier.fillMaxWidth()) {
             if (state.isSaving) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text("Save Changes")
         }
     }

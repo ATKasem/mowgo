@@ -20,12 +20,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
@@ -44,6 +47,8 @@ fun InvoicesScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showingEstimates by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
     val paymentSheet = activity?.let { hostActivity ->
@@ -284,6 +289,14 @@ fun InvoicesScreen(
                             onPay = { viewModel.payInvoice(item) },
                             onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
                             onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
+                            onCopyText = {
+                                clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName)))
+                                scope.launch { snackbarHostState.showSnackbar("Payment text copied — paste it into a text to the client") }
+                            },
+                            onNudge = {
+                                clipboard.setText(AnnotatedString(viewModel.invoiceNudgeText(item.invoice, item.clientName)))
+                                scope.launch { snackbarHostState.showSnackbar("Reminder copied — paste it into a text") }
+                            },
                         )
                     }
                 }
@@ -418,9 +431,17 @@ private fun InvoiceCard(
     onPay: () -> Unit,
     onMarkPaid: () -> Unit,
     onDelete: () -> Unit,
+    onCopyText: (() -> Unit)? = null,
+    onNudge: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val isPaid = invoice.status == Invoice.STATUS_PAID
+    val canNudge = !isPaid && onNudge != null && (invoice.createdAt?.let { raw ->
+        runCatching {
+            java.time.Instant.parse(raw)
+                .isBefore(java.time.Instant.now().minus(java.time.Duration.ofDays(3)))
+        }.getOrDefault(false)
+    } ?: false)
 
     Card(
         modifier = Modifier
@@ -511,6 +532,44 @@ private fun InvoiceCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (!isPaid) {
+                        onCopyText?.let { copyText ->
+                            OutlinedButton(
+                                onClick = copyText,
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MowGoColors.DeepGreenDark,
+                                ),
+                                border = ButtonDefaults.outlinedButtonBorder.copy(
+                                    brush = androidx.compose.ui.graphics.SolidColor(
+                                        MowGoColors.DeepGreenDark.copy(alpha = 0.5f),
+                                    ),
+                                ),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp),
+                            ) {
+                                Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Copy text", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                        if (canNudge) {
+                            OutlinedButton(
+                                onClick = { onNudge?.invoke() },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MowGoColors.WarningDark,
+                                ),
+                                border = ButtonDefaults.outlinedButtonBorder.copy(
+                                    brush = androidx.compose.ui.graphics.SolidColor(
+                                        MowGoColors.WarningDark.copy(alpha = 0.5f),
+                                    ),
+                                ),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp),
+                            ) {
+                                Text("Nudge", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                         if (showPay) {
                             Button(
                                 onClick = onPay,

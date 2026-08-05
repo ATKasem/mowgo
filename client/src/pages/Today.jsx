@@ -298,13 +298,13 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
         let invoiceCreated = false;
         if (newStatus === 'done' && Number(job.clients?.rate || 0) > 0) {
           try {
-            const inv = await createInvoice({
+            const { invoice: inv, created } = await createInvoice({
               client_id: job.client_id,
               clients: job.clients,
               amount: job.clients?.rate,
               job_id: job.id,
             });
-            invoiceCreated = true;
+            invoiceCreated = created;
             setInvoices(prev => prev.some(i => i.id === inv.id) ? prev : [inv, ...prev]);
           } catch (invErr) { console.error('Auto-invoice failed:', invErr); }
         }

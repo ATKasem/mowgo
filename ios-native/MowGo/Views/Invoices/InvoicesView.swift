@@ -7,6 +7,7 @@ struct InvoicesView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var segment = Segment.invoices
     @State private var selectedInvoice: Invoice?
+    @State private var selectedInvoiceDetail: Invoice?
     @State private var selectedEstimate: Estimate?
     @State private var showPayment = false
     @State private var showNewEstimate = false
@@ -40,6 +41,7 @@ struct InvoicesView: View {
             .task { await store.loadEstimates() }
             .sheet(isPresented: $showPayment) { paymentSheet }
             .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
+            .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
             .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
         }
     }
@@ -47,7 +49,9 @@ struct InvoicesView: View {
     private var invoiceList: some View {
         ScrollView { VStack(spacing: 16) {
             if !unpaid.isEmpty { totalBar; sectionHeader("Unpaid") }
-            ForEach(unpaid) { inv in InvoiceRow(invoice: inv, showPay: true) { selectedInvoice = inv; showPayment = true } }
+            ForEach(unpaid) { inv in InvoiceRow(invoice: inv, showPay: true) { selectedInvoice = inv; showPayment = true }
+                .onTapGesture { selectedInvoiceDetail = inv }
+                .contentShape(Rectangle()) }
             if !paid.isEmpty { sectionHeader("Paid") }
             ForEach(paid) { inv in InvoiceRow(invoice: inv, showPay: false) {} }
             if unpaid.isEmpty && paid.isEmpty { invoiceEmpty }
@@ -86,6 +90,115 @@ struct InvoiceRow: View {
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     var body: some View { HStack(spacing: 12) { VStack(alignment: .leading) { Text(invoice.clientName ?? "Invoice").font(.subheadline.weight(.medium)); if let date = invoice.createdAt { Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted) } }; Spacer(); status; Text(invoice.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold)); if showPay { Button("Pay") { UIImpactFeedbackGenerator(style: .medium).impactOccurred(); onPay() }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small) } }.foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12) }
     private var status: some View { Text(showPay ? "Due" : "Paid").font(.caption2.weight(.medium)).foregroundColor(showPay ? MowGoTheme.warning : MowGoTheme.success).padding(.horizontal, 8).padding(.vertical, 3).background((showPay ? MowGoTheme.warning : MowGoTheme.success).opacity(0.12)).clipShape(Capsule()) }
+}
+
+private struct InvoiceDetailView: View {
+    @EnvironmentObject var store: DataStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var showPayment = false
+    let invoice: Invoice
+    @Environment(\.colorScheme) private var colorScheme
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    HStack { Text("Client").foregroundColor(theme.textMuted); Spacer(); Text(invoice.clientName ?? "Unknown") }
+                    HStack { Text("Amount").foregroundColor(theme.textMuted); Spacer(); Text(invoice.amount.formatted(.currency(code: "USD"))) }
+                    if let date = invoice.createdAt {
+                        HStack { Text("Created").foregroundColor(theme.textMuted); Spacer(); Text(String(date.prefix(10))) }
+                    }
+                }
+                Section {
+                    Button("Copy payment text") { copy(invoiceText) }
+                    if canNudge {
+                        Button("Nudge") { copy(nudgeText) }.tint(.orange)
+                    }
+                    Button("Pay via Stripe") { showPayment = true }
+                    Button("Mark Paid") { markPaid() }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(theme.background)
+            .navigationTitle("Invoice").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
+            .sheet(isPresented: $showPayment) {
+                NavigationStack {
+                    PaymentView(invoice: invoice).navigationTitle("Payment")
+                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { showPayment = false } } }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private var canNudge: Bool {
+        guard invoice.status == .unpaid,
+              let value = invoice.createdAt,
+              let date = Self.parseISODate(value) else { return false }
+        return date < Calendar.current.date(byAdding: .day, value: -3, to: Date())!
+    }
+
+    /// Tolerant ISO-8601 parser: Supabase timestamps carry fractional seconds,
+    /// which the default ISO8601DateFormatter rejects.
+    private static func parseISODate(_ value: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) { return date }
+        return ISO8601DateFormatter().date(from: value)
+    }
+
+    private func copy(_ text: String) {
+        UIPasteboard.general.string = text
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+
+    private func markPaid() {
+        Task {
+            try? await store.markInvoicePaid(invoice)
+            dismiss()
+        }
+    }
+
+    /// Payment methods the operator configured, Zelle first (mirrors web —
+    /// clients default to the first option listed).
+    private var payMethods: [String] {
+        guard let profile = store.auth?.user else { return [] }
+        var parts: [String] = []
+        if let zelle = profile.zelleHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !zelle.isEmpty {
+            parts.append("Zelle: \(zelle)")
+        }
+        if let venmo = profile.venmoHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !venmo.isEmpty {
+            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: .regularExpression))")
+        }
+        if let cashapp = profile.cashappHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !cashapp.isEmpty {
+            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: .regularExpression))")
+        }
+        return parts
+    }
+
+    private var payLine: String {
+        let methods = payMethods
+        return methods.isEmpty
+            ? "Please send payment at your earliest convenience"
+            : "Pay via \(methods.joined(separator: " · "))"
+    }
+
+    private var shortDate: String {
+        guard let value = invoice.createdAt, let date = Self.parseISODate(value) else { return "" }
+        return date.formatted(.dateTime.month(.abbreviated).day())
+    }
+
+    private var invoiceText: String {
+        let datePart = shortDate.isEmpty ? "" : " on \(shortDate)"
+        return "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
+    }
+
+    private var nudgeText: String {
+        let datePart = shortDate.isEmpty ? "" : " from \(shortDate)"
+        return "Hi \(invoice.clientName ?? "there") — friendly reminder: \(invoice.amount.formatted(.currency(code: "USD")))\(datePart) is still due. \(payLine). Thanks!"
+    }
 }
 
 struct EstimateRow: View {

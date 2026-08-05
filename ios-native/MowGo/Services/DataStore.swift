@@ -303,7 +303,9 @@ final class DataStore: ObservableObject {
                 persistence.removeMutation(mutation)
                 replayedCount += 1
             } catch {
+                #if DEBUG
                 print("[DataStore] replay failed for \(mutation.operation) \(mutation.entityId): \(error)")
+                #endif
                 // Remove permanently broken or already-done mutations
                 if error is DecodingError || error is PendingMutationError {
                     persistence.removeMutation(mutation)
@@ -342,7 +344,9 @@ final class DataStore: ObservableObject {
                 persistence.saveClients(freshClients, currentUserId: currentUserId)
                 persistence.saveInvoices(freshInvoices, currentUserId: currentUserId)
             } catch {
+                #if DEBUG
                 print("[DataStore] post-replay refresh failed: \(error)")
+                #endif
             }
         }
     }
@@ -464,6 +468,38 @@ final class DataStore: ObservableObject {
                 updated.status = .paid
                 updated.paidAt = p.paidAt
                 await fireWebhookInvoicePaid(updated)
+            }
+
+        case "invoice:create":
+            struct C: Decodable { let jobId: UUID; let clientId: UUID; let amount: Double }
+            let c = try JSONDecoder().decode(C.self, from: mutation.payload)
+            // Idempotent: the unique job_id index rejects duplicates; check first.
+            if invoices.contains(where: { $0.jobId == c.jobId }) { break }
+            guard let userId = currentUserId else { break }
+            struct InvoiceInsert: Encodable {
+                let userId: UUID
+                let clientId: UUID
+                let jobId: UUID
+                let amount: Double
+                let status: String
+            }
+            do {
+                let created: Invoice = try await sb.insert("invoices", InvoiceInsert(
+                    userId: userId, clientId: c.clientId, jobId: c.jobId, amount: c.amount, status: "unpaid"
+                ))
+                invoices.insert(created, at: 0)
+            } catch {
+                // Unique violation (a concurrent insert won the race): the
+                // invoice already exists — resolve it so the FIFO queue never
+                // blocks on a permanently-failing mutation.
+                if let existing = try? await sb.fetchInvoices().first(where: { $0.jobId == c.jobId }),
+                   !invoices.contains(where: { $0.id == existing.id }) {
+                    invoices.insert(existing, at: 0)
+                } else {
+                    #if DEBUG
+                    print("[DataStore] invoice:create replay failed: \(error)")
+                    #endif
+                }
             }
 
         case "recurring:create":
@@ -806,12 +842,22 @@ final class DataStore: ObservableObject {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
+            // Queue the invoice only AFTER the status change is queued, so
+            // replay order can't create an invoice for a job that isn't done.
+            if status == .done {
+                await handleCompletedJob(updated)
+            }
             return
         }
         do {
             try await sb.update("jobs", id: job.id, JobStatusPatch(status: status))
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
+            }
+            // Invoice only after the status change persisted (no orphan
+            // invoices when the update fails).
+            if status == .done {
+                await handleCompletedJob(updated)
             }
             await fireWebhookJobUpdated(updated)
             switch status {
@@ -830,6 +876,11 @@ final class DataStore: ObservableObject {
             }
             struct P: Encodable { let status: String }
             safeEnqueue("job:status", id: job.id, payload: P(status: status.rawValue))
+            // Network-fallback path: queue the invoice right after the status
+            // so replay produces the same result as the happy path.
+            if status == .done {
+                await handleCompletedJob(updated)
+            }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -972,6 +1023,68 @@ final class DataStore: ObservableObject {
     func skipJob(_ job: Job) async throws {
         try await updateJobStatus(job, status: .skipped)
     }
+
+    // MARK: - Auto-Invoicing
+
+    /// One invoice per completed job, amount = client rate, $0 rates skipped.
+    /// Idempotent: an existing invoice for the same job is never duplicated.
+    private func handleCompletedJob(_ job: Job) async {
+        guard let rate = job.clients?.rate, rate > 0, let clientId = job.clientId else { return }
+        if invoices.contains(where: { $0.jobId == job.id }) { return }
+
+        if auth?.isDemoMode == true {
+            var created = Invoice(
+                id: UUID(), clientId: clientId, jobId: job.id, amount: rate,
+                status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
+                clients: Invoice.ClientRef(name: job.clients?.name)
+            )
+            invoices.insert(created, at: 0)
+            return
+        }
+
+        guard await canSync() else {
+            struct P: Encodable { let jobId: UUID; let clientId: UUID; let amount: Double }
+            _ = safeEnqueue("invoice:create", id: UUID(), payload: P(
+                jobId: job.id, clientId: clientId, amount: centsDouble(rate)
+            ))
+            return
+        }
+
+        do {
+            try await createInvoice(jobId: job.id, clientId: clientId, amount: rate, clientName: job.clients?.name)
+        } catch {
+            #if DEBUG
+            print("[DataStore] auto-invoice failed: \(error)")
+            #endif
+        }
+    }
+
+    /// Money-safe Double: round to cents before encoding so Postgres numeric
+    /// columns never receive binary-float noise (0.1+0.2 artifacts).
+    private func centsDouble(_ amount: Decimal) -> Double {
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &amount, 2, .plain)
+        return NSDecimalNumber(decimal: rounded).doubleValue
+    }
+
+    private func createInvoice(jobId: UUID, clientId: UUID, amount: Decimal, clientName: String?) async throws {
+        struct InvoiceInsert: Encodable {
+            let userId: UUID
+            let clientId: UUID
+            let jobId: UUID
+            let amount: Double
+            let status: String
+        }
+        guard let userId = currentUserId else { return }
+        let inserted: Invoice = try await sb.insert("invoices", InvoiceInsert(
+            userId: userId, clientId: clientId, jobId: jobId,
+            amount: centsDouble(amount), status: "unpaid"
+        ))
+        var created = inserted
+        created.clients = Invoice.ClientRef(name: clientName)
+        invoices.insert(created, at: 0)
+    }
+
     // MARK: - Webhook Notifications
 
     private func fireWebhookJobCompleted(_ job: Job) async {
@@ -1820,7 +1933,7 @@ final class DataStore: ObservableObject {
         //   1. New user → creates auth user + profile
         //   2. Existing user → updates their profile to join crew
         let token = await sb.token ?? ""
-        let url = URL(string: "https://mowgo.pages.dev/api/invite-crew")!
+        let url = URL(string: "https://mowgoapp.com/api/invite-crew")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")

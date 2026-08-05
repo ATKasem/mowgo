@@ -71,16 +71,19 @@ class MoreViewModel(
         loadProfile()
     }
 
-    fun updateProfile(name: String, phone: String, email: String) {
+    fun updateProfile(name: String, phone: String, email: String, venmoHandle: String = "", cashappHandle: String = "", zelleHandle: String = "") {
         // Invalidate any in-flight load so it can't clobber the saved profile.
         profileLoadGeneration++
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, error = null, saveMessage = null)
             try {
-                profileRepository.updateProfile(name, phone, email)
+                profileRepository.updateProfile(name, phone, email, venmoHandle, cashappHandle, zelleHandle)
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    profile = (_uiState.value.profile ?: Profile()).copy(businessName = name, phone = phone, email = email),
+                    profile = (_uiState.value.profile ?: Profile()).copy(
+                        businessName = name, phone = phone, email = email,
+                        venmoHandle = venmoHandle, cashappHandle = cashappHandle, zelleHandle = zelleHandle,
+                    ),
                     saveMessage = "Changes saved",
                 )
             } catch (error: Exception) {

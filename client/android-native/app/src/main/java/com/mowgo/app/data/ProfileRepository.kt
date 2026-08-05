@@ -15,13 +15,23 @@ class ProfileRepository {
         return profiles.firstOrNull()
     }
 
-    suspend fun updateProfile(businessName: String, phone: String, email: String) {
+    suspend fun updateProfile(
+        businessName: String,
+        phone: String,
+        email: String,
+        venmoHandle: String = "",
+        cashappHandle: String = "",
+        zelleHandle: String = "",
+    ) {
         if (!SupabaseClientProvider.isConfigured) {
             val current = demoProfile()
             demoProfileMutable = Profile(
                 businessName = businessName,
                 phone = phone,
                 email = email,
+                venmoHandle = venmoHandle,
+                cashappHandle = cashappHandle,
+                zelleHandle = zelleHandle,
                 tier = current.tier,
                 role = current.role,
                 businessId = current.businessId,
@@ -30,10 +40,17 @@ class ProfileRepository {
         }
         val userId = SupabaseClientProvider.auth.currentSessionOrNull()?.user?.id
             ?: throw IllegalStateException("Not authenticated")
-        // RLS only grants authenticated updates to business_name + phone — email is
-        // auth-managed and must NOT be included or the whole update is rejected.
+        // RLS grants authenticated updates to business_name, phone, and the
+        // payment handles (019) — email is auth-managed and must NOT be
+        // included or the whole update is rejected.
         SupabaseClientProvider.client.from("profiles").update(
-            mapOf("business_name" to businessName, "phone" to phone)
+            mapOf(
+                "business_name" to businessName,
+                "phone" to phone,
+                "venmo_handle" to venmoHandle,
+                "cashapp_handle" to cashappHandle,
+                "zelle_handle" to zelleHandle,
+            )
         ) { filter { eq("id", userId) } }
     }
 

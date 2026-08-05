@@ -378,6 +378,9 @@ struct UserProfile: Codable, Identifiable {
     var role: String?
     var businessId: UUID?
     var stripeCustomerId: String?
+    var venmoHandle: String?
+    var cashappHandle: String?
+    var zelleHandle: String?
     var createdAt: String?
 
     var tierLabel: String {

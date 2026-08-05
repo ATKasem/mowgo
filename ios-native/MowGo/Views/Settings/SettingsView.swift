@@ -21,6 +21,9 @@ struct SettingsView: View {
     @State private var businessName = ""
     @State private var phone = ""
     @State private var email = ""
+    @State private var venmoHandle = ""
+    @State private var cashappHandle = ""
+    @State private var zelleHandle = ""
     @State private var profileSaveError: String?
     @State private var exportFile: ExportFile?
     @State private var exportError: String?
@@ -114,6 +117,9 @@ struct SettingsView: View {
                 businessName: $businessName,
                 phone: $phone,
                 email: $email,
+                venmoHandle: $venmoHandle,
+                cashappHandle: $cashappHandle,
+                zelleHandle: $zelleHandle,
                 saveError: $profileSaveError,
                 onSave: saveProfile
             )
@@ -266,12 +272,18 @@ struct SettingsView: View {
         businessName = auth.user?.businessName ?? ""
         phone = auth.user?.phone ?? ""
         email = auth.user?.email ?? ""
+        venmoHandle = auth.user?.venmoHandle ?? ""
+        cashappHandle = auth.user?.cashappHandle ?? ""
+        zelleHandle = auth.user?.zelleHandle ?? ""
     }
 
     private func saveProfile() async {
         profileSaveError = nil
         do {
-            try await auth.updateProfile(businessName: businessName, phone: phone, email: email)
+            try await auth.updateProfile(
+                businessName: businessName, phone: phone, email: email,
+                venmoHandle: venmoHandle, cashappHandle: cashappHandle, zelleHandle: zelleHandle
+            )
         } catch {
             profileSaveError = error.localizedDescription
         }
@@ -444,6 +456,9 @@ private struct BusinessProfileSettingsView: View {
     @Binding var businessName: String
     @Binding var phone: String
     @Binding var email: String
+    @Binding var venmoHandle: String
+    @Binding var cashappHandle: String
+    @Binding var zelleHandle: String
     @Binding var saveError: String?
     let onSave: () async -> Void
     @State private var isSaving = false
@@ -466,6 +481,25 @@ private struct BusinessProfileSettingsView: View {
                         .disableAutocorrection(true)
                 } footer: {
                     Text("This information appears on customer-facing messages and invoices.")
+                }
+                Section {
+                    TextField("Zelle (phone or email)", text: $zelleHandle)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                    TextField("Venmo (@handle)", text: $venmoHandle)
+                        .textInputAutocapitalization(.never)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                    TextField("Cash App ($handle)", text: $cashappHandle)
+                        .textInputAutocapitalization(.never)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                } header: {
+                    Text("How clients pay you")
+                } footer: {
+                    Text("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.")
                 }
                 if let saveError {
                     Section { Text(saveError).foregroundColor(.red) }
