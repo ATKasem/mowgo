@@ -285,7 +285,9 @@
     "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.",
     "run_your_next_5_clients_free": "Run your next 5 clients free.",
     "seo_title": "MowGo vs Jobber, LawnPro, QuoteIQ & more — Honest Comparison (2026)",
-    "seo_description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing."
+    "seo_description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing.",
+    "route_optimization": "Route Optimization",
+    "one_tap_optimized_routes_send_stops_to_your_maps_app": "One-tap optimized routes + send stops to your maps app"
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Real cost analysis",
@@ -677,7 +679,8 @@
     "jobber_pricing": "Jobber pricing",
     "lawnpro_alternative": "LawnPro alternative",
     "quoteiq_alternative": "QuoteIQ alternative",
-    "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request."
+    "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request.",
+    "route_optimization_is_live_included_on_solo_crew_and_premium": "Route optimization is live — included on Solo, Crew, and Premium."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -1119,7 +1122,24 @@
     "count_job_restored_other": "{{count}} jobs restored",
     "could_not_undo_rain_delay": "Could not undo rain delay",
     "could_not_move_jobs_try_again": "Could not move jobs. Try again.",
-    "team_progress": "Team Progress"
+    "team_progress": "Team Progress",
+    "optimize": "Optimize",
+    "optimizing": "Optimizing...",
+    "send_route": "Send route",
+    "send_all_stops": "Send all stops",
+    "send_one_by_one": "Send one by one",
+    "route_optimized": "Route optimized",
+    "google_maps": "Google Maps",
+    "apple_maps": "Apple Maps",
+    "waze": "Waze",
+    "navigation_app": "Navigation app",
+    "some_addresses_couldn_t_be_mapped": "Some addresses couldn't be mapped",
+    "waze_doesn_t_support_multi_stop_routes": "Waze doesn't support multi-stop routes",
+    "count_stops_sent": "{{count}} stops sent",
+    "stops_without_addresses_were_skipped": "Stops without addresses were skipped",
+    "stops_are_in_optimized_order_tap_one_to_open_it_in_your_navigation_app": "Stops are in optimized order. Tap one to open it in your navigation app.",
+    "no_stops_with_addresses_on_this_day": "No stops with addresses on this day.",
+    "could_not_optimize_route_try_again": "Could not optimize route. Try again."
   },
   "dashboard": {
     "revenue_today": "Revenue Today",

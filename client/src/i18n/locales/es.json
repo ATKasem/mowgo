@@ -302,7 +302,9 @@
     "jobber_s_29_mo_per_user_fee_adds_up_a_2_person_crew_on_connect_runs_1_53": "La tarifa de $29/mes por usuario de Jobber se acumula: un equipo de 2 personas en Connect llega a $1,536/año ($1,188 base + $348 por el segundo usuario). MowGo Crew: $790/año, precio fijo, todo el equipo incluido.",
     "run_your_next_5_clients_free": "Maneja tus próximos 5 clientes gratis.",
     "seo_title": "MowGo vs Jobber, LawnPro, QuoteIQ y más — Comparación honesta (2026)",
-    "seo_description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales."
+    "seo_description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales.",
+    "route_optimization": "Optimización de rutas",
+    "one_tap_optimized_routes_send_stops_to_your_maps_app": "Rutas optimizadas con un solo toque + envía paradas a tu aplicación de mapas"
   },
   "ruunlyComparison": {
     "real_cost_analysis": "Análisis de costo real",
@@ -727,7 +729,8 @@
     "jobber_pricing": "Precios de Jobber",
     "lawnpro_alternative": "Alternativa a LawnPro",
     "quoteiq_alternative": "Alternativa a QuoteIQ",
-    "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Sus datos siempre son suyos. Expórtelos cuando quiera. Si cancela, eliminamos sus datos a petición."
+    "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Sus datos siempre son suyos. Expórtelos cuando quiera. Si cancela, eliminamos sus datos a petición.",
+    "route_optimization_is_live_included_on_solo_crew_and_premium": "La optimización de rutas ya está disponible: incluida en Solo, Crew y Premium."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -1191,7 +1194,24 @@
     "no_photo": "Sin foto",
     "photo_added": "Foto añadida",
     "take_photo": "Tomar foto",
-    "upload_photo": "Subir foto"
+    "upload_photo": "Subir foto",
+    "optimize": "Optimizar",
+    "optimizing": "Optimizando...",
+    "send_route": "Enviar ruta",
+    "send_all_stops": "Enviar todas las paradas",
+    "send_one_by_one": "Enviar uno por uno",
+    "route_optimized": "Ruta optimizada",
+    "google_maps": "Google Maps",
+    "apple_maps": "Apple Maps",
+    "waze": "Waze",
+    "navigation_app": "Aplicación de navegación",
+    "some_addresses_couldn_t_be_mapped": "Algunas direcciones no se pudieron asignar",
+    "waze_doesn_t_support_multi_stop_routes": "Waze no admite rutas con paradas múltiples",
+    "count_stops_sent": "{{count}} paradas enviadas",
+    "stops_without_addresses_were_skipped": "Se omitieron paradas sin dirección.",
+    "stops_are_in_optimized_order_tap_one_to_open_it_in_your_navigation_app": "Las paradas están en orden optimizado. Toque uno para abrirlo en su aplicación de navegación.",
+    "no_stops_with_addresses_on_this_day": "No hay paradas con direcciones en este día.",
+    "could_not_optimize_route_try_again": "No se pudo optimizar la ruta. Inténtalo de nuevo."
   },
   "dashboard": {
     "revenue_today": "Ingresos Hoy",
