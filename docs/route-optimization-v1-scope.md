@@ -2,7 +2,7 @@
 
 **Status:** 🆕 SCOPED — Aug 5, 2026
 **Why:** The landing page already promises it ("Route Optimization — Coming soon" card + "Card checkout is live. Route optimization ships next — Oklahoma early adopters get new features at no price increase."). A promised feature that never ships is the strongest negative WOM available. It's also the #1 competitive gap flagged in the Aug 1 analysis ("#1 feature request from crews") — Jobber sells routing as a ~$49/mo add-on; MowGo's counter-positioning is "routing included." Hormozi lens (applied Aug 5): not the rate limiter (activation is), but the promise is public, the infra exists (route_order + reorderJobs + Open-Meteo already in stack), and it's a daily-habit retention hook. Decision: ONE small honest v1, $0 APIs, paid tiers only. The mistake would be building Jobber-level turn-by-turn (paid map APIs, nobody in the 1-3 person ICP asks for it).
-**Decision (Aug 5 poll):** Send-route targets the user's preferred navigation app — Google, Apple Maps, or Waze — not Google-only. Sourced: Apple Maps supports multi-stop via unified Maps URLs (Apple docs: multiple `waypoint` params); Waze does not support multi-stop deep links (one stop per route, official); Google caps ~10 stops (8 waypoints + destination without an API key). Waze users get next-stop + per-stop tap.
+**Decision (Aug 5 poll):** Send-route targets the user's preferred navigation app — Google, Apple Maps, or Waze — not Google-only. Sourced: Apple Maps supports multi-stop via unified Maps URLs (Apple docs: multiple `waypoint` params); Waze does not support multi-stop deep links (one stop per route, official); Google caps ~10 stops (8 waypoints + destination without an API key). Waze users get next-stop + per-stop tap. **Second round (Aug 5):** the user chooses — "Send all stops" (multi-stop link) **or** "Send one by one" (single-stop links stepped through the optimized order, works in every app incl. Waze). The in-app reorder is the floor — nav links are the add-on, never the reverse.
 
 **Owner:** Dev (Mimo-assisted — Codex usage out until Aug 8, then restore Codex). **Priority:** next sprint (card is live on the page).
 
@@ -45,12 +45,13 @@
 - `scheduled_time` is **not** touched by reordering — matches existing drag-and-drop behavior (order is what the crew follows; times stay put).
 
 ### 4. Send route (preferred-app navigation)
-- New **"Send route"** button next to Optimize (same visibility rule: paid tiers, ≥3 jobs, ≥2 addressable). Opens the current on-screen order — the same order the crew follows — as a multi-stop route.
+- New **"Send route"** button next to Optimize (same visibility rule: paid tiers, ≥3 jobs, ≥2 addressable). Opens the current on-screen order — the same order the crew follows. **Chooser on tap: "Send all stops" or "Send one by one"** (both persist nothing extra — pure links).
+- **Send all stops** → multi-stop deep link (Google/Apple only). **Send one by one** → a sheet listing the stops in optimized order; tapping a row opens that single stop in the preferred app. Works in every app including Waze. The in-app reorder is the floor — this button is the delivery vehicle, and v1 ships even if nav links slip.
 - Preference picker (small, 3 options on Today): `preferred_nav_app` — Google Maps / Apple Maps / Waze. Persists via PATCH profile (same path as 013 latitude/longitude). Platform default until chosen: iOS → Apple Maps, Android → Google Maps.
 - URL builders in `client/src/lib/navLinks.js` — pure functions, no fetch, unit-testable:
   - **Google:** `https://www.google.com/maps/dir/?api=1&origin=<anchor lat,lng>&destination=<last stop>&waypoints=<mid stops, | separated>` (coords). Cap ~10 stops (8 waypoints + destination without an API key — documented Google limit). Over cap: first N sent, toast notes the rest stay per-stop.
   - **Apple:** `https://maps.apple.com/directions?source=<anchor>&destination=<last stop address>&waypoint=<mid stop lat,lng>&waypoint=…&mode=driving` — Apple's unified Maps URL format (official docs: multiple `waypoint` params supported). iOS 16+; older iOS degrades to single destination (per-stop tap remains).
-  - **Waze:** no multi-stop deep link exists (one stop per route — official). Waze preference → button becomes "Send next stop to Waze" (`https://waze.com/ul?ll=<lat>,<lng>&navigate=yes`); the full route stays in-app + per-stop tap.
+  - **Waze:** no multi-stop deep link exists (one stop per route — official). "Send all stops" is hidden for Waze with honest copy; "Send one by one" is their path (`https://waze.com/ul?ll=<lat>,<lng>&navigate=yes` per stop).
 - Stops without coords are skipped from the link; toast counts skipped. Opens via `window.open`. Same builders later feed the native apps (dartboard parity item).
 
 ### 5. Landing + copy (fact-lock)
@@ -85,8 +86,8 @@
 7. Geocode failure: button still works with partial coords, honest toast
 8. Build green → deployed → live bundle grep shows the new landing line + card flip
 9. Mimo review pass: no HIGH/MEDIUM findings unaddressed
-10. Send route: Google URL contains anchor + stops in optimized order; cap truncation over ~10 stops
-11. Apple URL uses unified format (destination + waypoint params); Waze preference → next-stop link + honest copy
-12. Preference persists across reload; platform default applies until user picks
+10. Send route: chooser shows both options; Google URL contains anchor + stops in optimized order; cap truncation over ~10 stops
+11. "Send one by one" sheet lists stops in optimized order; each row opens the preferred app single-stop link (incl. Waze); "Send all stops" hidden for Waze
+12. Apple URL uses unified format (destination + waypoint params); preference persists; platform default applies until user picks
 
 ## Effort: 1-2 days (Mimo-assisted). Landing order: migration + data layer (d1) → Today button + algorithm + nav links/preference (d1-2) → landing/i18n + review + deploy (d2).
