@@ -475,3 +475,15 @@
 - `1vg1p06` r/smallbusiness "How do I get clients and keep them coming?" — dance fitness class owner. Off-ICP (not a trade), comments already solid. Skip.
 - `1vg1ltw` r/smallbusiness "Where do your enquiries actually come from these days?" (08:39Z) — promising enquiry-sources topic (Nextdoor/GBP voice fits) but OP context unknown this run (rate limits). WATCH — fetch in Aug 6-7 sweeps if still alive.
 - `1vfzyn2` r/smallbusiness "If you had 60 days to build a business that makes $700/month" (07:03Z) — Template B (boring-business) fits; banked template already covers the angle. Only engage if it's still getting traction at the Aug 7 slot.
+
+### 46. Skip log — Aug 5 13:52Z sweep (evaluated, do NOT engage)
+- `1vg7p2s` r/smallbusiness "What are some actually good ways of getting a steady stream of quality leads" — OP is B2B e-commerce (Clay + cold email stack), off-ICP. Skip.
+- `1vg4uo2` r/smallbusiness "I stopped looking for software for our Friday close..." — consultancy/agency close-process meta, off-ICP. Skip.
+- `1vg51lb` r/smallbusiness "Software engineer building a plumbing business on the side" — dev→trades story already banked (#40/#43); no draft for a slot ~6 days out. Log only.
+- `1vg53sn` r/WhichCRM Dubsado/HoneyBook retrospective — creative-pros CRM, off-ICP. Skip.
+- `1vg71ar`/`1vg667u` r/Entrepreneur (hard lessons / first hire) — generic, no lawn signal. Skip.
+- `1vg6wkx` r/smallbusiness "built a free tool to track link opens" — builder promo, never engage. Skip.
+- r/CRM `1vg681m` HubSpot 1,000-list enterprise — off-segment. Skip.
+- **WATCH status change:** `1vg1ltw` + `1vfzyn2` absent from this 48h feed window — likely removed/dead. Drop to low priority; final check next sweep, then purge.
+- r/LawnCarePros 0 new in 48h (2nd consecutive quiet window); r/sweatystartup 0 new on-ICP.
+- **Sweep result:** 0 new drafts. Aug 7 22:21Z kit unchanged: ① #43 (1vfyg2j) → ② #44 (1vfyelq) → ③ #38/#40/#41 → ④ 1vg1ltw/1vfzyn2 (drop if dead).
