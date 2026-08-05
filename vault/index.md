@@ -1,12 +1,21 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-08-02
+> **Last updated:** 2026-08-05
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
+| 2026-08-05 | `2026-08-05_daily-sync.md` | **Main sync note** — Jobber "$29" verified as annual-bait (CLOSED), collection-loop gate proof 5-competitor, rain-delay shift #1 feature, SMS Batch 1 + Rule of 100 cron live (duplicate-post bug), outreach channel reactivated (44 msgs) | 
+| 2026-08-05 | `2026-08-05_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 6 new) |
+| 2026-08-05 | `2026-08-05_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (67 messages, **44 new — first activity since Jul 26**) |
+| 2026-08-05 | `2026-08-05_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (100 messages, 0 new; watchdog spam stopped Aug 4 13:50Z) |
+| 2026-08-04 | `2026-08-04_daily-sync.md` | **BACKFILLED** (nightly sync skipped) — provider-watchdog spam crisis fixed, Stripe re-verified post-deploy, Reddit pipeline resumed, invoice-reminders closed |
+| 2026-08-03 | `2026-08-03_daily-sync.md` | **Main sync note** — Quotes v1 escalated to #1 build priority (QuoteIQ $299 gate), SA pricing verified, Stripe verify-session bug fixed, invoice-reminders cron BROKEN, Monday plate |
+| 2026-08-03 | `2026-08-03_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 16 new) |
+| 2026-08-03 | `2026-08-03_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (23 messages, 0 new) |
+| 2026-08-03 | `2026-08-03_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages, 0 new) |
 | 2026-08-02 | `2026-08-02_daily-sync.md` | **Main sync note** — Stripe Day 16 RESOLVED (checkout live), mowflow domain neutralized, decisions, tasks, research, action items |
 | 2026-08-02 | `2026-08-02_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 14 new) |
 | 2026-08-02 | `2026-08-02_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (23 messages, 0 new) |
@@ -44,7 +53,7 @@
 
 | Reference | Link/Path |
 |-----------|-----------|
-| MowGo web app | `mowgo.pages.dev` (checkout broken — see daily sync) |
+| MowGo web app | `mowgo.pages.dev` (Stripe payments live — verify-session bug fixed Aug 2) |
 | MowGo iOS repo | `/opt/data/mowgo/ios-native/` |
 | Discord server | Blasian's server (guild: `1520146213750440147`) |
 | Discord #🌱mowgo | `1529248227394850916` |
@@ -55,4 +64,4 @@
 
 ---
 
-*Index updated by MowGo nightly vault sync — 2026-08-02 02:00 UTC*
+*Index updated by MowGo nightly vault sync — 2026-08-05 02:00 UTC*
