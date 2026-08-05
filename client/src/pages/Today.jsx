@@ -1,10 +1,11 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, ensureClientCoords } from '../lib/data';
+import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, ensureClientCoords, saveProfile } from '../lib/data';
+import { buildRouteLink, buildSingleStopUrl } from '../lib/navLinks';
 import { optimizeRoute } from '../lib/optimizeRoute';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw, Route as RouteIcon } from 'lucide-react';
+import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw, Route as RouteIcon, Navigation } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
 import InvoiceToast from '../components/InvoiceToast';
@@ -78,6 +79,11 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [optimizing, setOptimizing] = useState(false);
   const [profile, setProfile] = useState(null);
   const routeUndoRef = useRef(null); // previousOrder snapshot for toast Undo
+  const [showRouteChooser, setShowRouteChooser] = useState(false);
+  const [showOneByOne, setShowOneByOne] = useState(false);
+  const [oneByOneStops, setOneByOneStops] = useState([]);
+  const [navApp, setNavApp] = useState(() =>
+    (typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent)) ? 'apple' : 'google');
 
   useEffect(() => { jobsRef.current = jobs; }, [jobs]);
   useEffect(() => { formRef.current = form; }, [form]);
@@ -106,6 +112,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const hasLocation = lat != null && lng != null;
       setHasBusinessLocation(hasLocation);
       setProfile(profile);
+      if (profile?.preferred_nav_app) setNavApp(profile.preferred_nav_app);
       if (!hasLocation) return;
       getWeatherForLocation(lat, lng).then(result => { if (active) setWeather(result); });
     }).catch(() => {});
@@ -568,6 +575,52 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     }
   }
 
+  function orderedStops() {
+    return [...jobs]
+      .filter(j => j.scheduled_date === date)
+      .sort((a, b) => (a.route_order ?? 0) - (b.route_order ?? 0))
+      .map(j => ({
+        id: j.id,
+        address: j.clients?.address || j.title || '',
+        lat: j.clients?.latitude ?? null,
+        lng: j.clients?.longitude ?? null,
+      }));
+  }
+
+  async function saveNavAppPref(app) {
+    try { await saveProfile({ ...profile, preferred_nav_app: app }); } catch (err) {
+      console.error('save nav pref:', err);
+    }
+  }
+
+  async function openRouteLink(mode) {
+    const stops = orderedStops();
+    const coordsMap = await ensureClientCoords(stops.map(s => ({ id: s.id, address: s.address, latitude: s.lat, longitude: s.lng })));
+    const withCoords = stops.map(s => ({
+      ...s,
+      lat: coordsMap[s.id]?.lat ?? s.lat,
+      lng: coordsMap[s.id]?.lng ?? s.lng,
+    }));
+    if (mode === 'all') {
+      const anchor = profile?.latitude != null && profile?.longitude != null
+        ? { lat: profile.latitude, lng: profile.longitude } : null;
+      const { url, skipped, truncated } = buildRouteLink(navApp, anchor, withCoords);
+      if (!url) return;
+      window.open(url, '_blank');
+      if (skipped > 0) {
+        setCompletedToast({ name: tr('Stops without addresses were skipped'), amount: 0, type: 'plain' });
+        setTimeout(() => setCompletedToast(null), 4000);
+      }
+      if (truncated) {
+        setCompletedToast({ name: tr('{{count}} stops sent', { count: 10 }), amount: 0, type: 'plain' });
+        setTimeout(() => setCompletedToast(null), 4000);
+      }
+    } else {
+      setOneByOneStops(withCoords.filter(s => s.lat != null && s.lng != null));
+      setShowOneByOne(true);
+    }
+  }
+
 
   if (loading) {
     return (
@@ -595,9 +648,14 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           </div>
         </div>
         {canOptimize && (
-          <button onClick={handleOptimize} disabled={optimizing} className="btn-secondary gap-1.5 text-sm disabled:opacity-50">
-            <RouteIcon className="w-4 h-4" />{optimizing ? tr('Optimizing...') : tr('Optimize')}
-          </button>
+          <>
+            <button onClick={handleOptimize} disabled={optimizing} className="btn-secondary gap-1.5 text-sm disabled:opacity-50">
+              <RouteIcon className="w-4 h-4" />{optimizing ? tr('Optimizing...') : tr('Optimize')}
+            </button>
+            <button onClick={() => setShowRouteChooser(true)} className="btn-secondary gap-1.5 text-sm">
+              <Navigation className="w-4 h-4" />{tr('Send route')}
+            </button>
+          </>
         )}
         {!teamLoading && !isCrewMember && (
           <button onClick={() => setShowForm(!showForm)} disabled={saving} className="btn-primary gap-1.5"><Plus className="w-4 h-4" />{tr("New Job")}</button>
@@ -808,6 +866,80 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             >
               {tr('Done')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showRouteChooser && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="route-chooser-title">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowRouteChooser(false)} />
+          <div className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto bg-[var(--color-surface)] dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl border border-[var(--color-border)] dark:border-gray-700">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <h3 id="route-chooser-title" className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Send route')}</h3>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('Navigation app')}</p>
+              </div>
+              <button aria-label={tr('Close')} onClick={() => setShowRouteChooser(false)} className="p-2 -m-2 text-[var(--color-text-muted)]"><X className="w-5 h-5" /></button>
+            </div>
+            <fieldset className="space-y-2 mb-4">
+              <legend className="label mb-2">{tr('Navigation app')}</legend>
+              {[
+                { value: 'google', label: tr('Google Maps') },
+                { value: 'apple', label: tr('Apple Maps') },
+                { value: 'waze', label: tr('Waze') },
+              ].map(opt => (
+                <label key={opt.value} className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] dark:border-gray-700 p-3 cursor-pointer">
+                  <input type="radio" name="nav-app" checked={navApp === opt.value} onChange={() => { setNavApp(opt.value); void saveNavAppPref(opt.value); }} className="accent-[#4ade80]" />
+                  <span className="text-sm">{opt.label}</span>
+                </label>
+              ))}
+            </fieldset>
+            <div className="space-y-2">
+              <button
+                disabled={navApp === 'waze'}
+                onClick={() => { setShowRouteChooser(false); void openRouteLink('all'); }}
+                className="btn-primary w-full disabled:opacity-50"
+              >
+                {tr('Send all stops')}
+              </button>
+              {navApp === 'waze' && (
+                <p className="text-xs text-[var(--color-text-muted)]">{tr("Waze doesn't support multi-stop routes")}</p>
+              )}
+              <button
+                onClick={() => { setShowRouteChooser(false); void openRouteLink('one-by-one'); }}
+                className="btn-secondary w-full"
+              >
+                {tr('Send one by one')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showOneByOne && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="one-by-one-title">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowOneByOne(false)} />
+          <div className="relative w-full sm:max-w-md max-h-[80vh] overflow-y-auto bg-[var(--color-surface)] dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl border border-[var(--color-border)] dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h3 id="one-by-one-title" className="text-lg font-bold">{tr('Send one by one')}</h3>
+              <button aria-label={tr('Close')} onClick={() => setShowOneByOne(false)}><X className="w-5 h-5" /></button>
+            </div>
+            <p className="text-xs text-[var(--color-text-muted)] mb-4">{tr('Stops are in optimized order. Tap one to open it in your navigation app.')}</p>
+            <div className="space-y-2">
+              {oneByOneStops.map((stop, i) => (
+                <button
+                  key={stop.id}
+                  onClick={() => window.open(buildSingleStopUrl(navApp, stop), '_blank')}
+                  className="w-full flex items-center gap-3 rounded-xl border border-[var(--color-border)] dark:border-gray-700 p-3 text-left hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-800 transition-colors"
+                >
+                  <span className="w-6 h-6 rounded-full bg-brand/10 text-brand-hover dark:text-[#4ade80] flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</span>
+                  <span className="text-sm text-[var(--color-text-primary)] dark:text-gray-200 truncate flex-1">{stop.address}</span>
+                </button>
+              ))}
+              {oneByOneStops.length === 0 && (
+                <p className="text-sm text-[var(--color-text-muted)] py-6 text-center">{tr('No stops with addresses on this day.')}</p>
+              )}
+            </div>
           </div>
         </div>
       )}
