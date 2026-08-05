@@ -12,7 +12,7 @@ Sources used this week (all verified this session):
 
 ---
 
-## MONDAY — Business Tip (FB text + IG 2-slide carousel)
+## MONDAY: Business Tip (FB text + IG 2-slide carousel)
 
 **Hormozi:** §9 pain is the pitch, sell at deprivation. §41 numbers make it real.
 
@@ -41,7 +41,7 @@ Hashtags: #lawncare #lawncarebusiness #landscaping #lawnservice #smallbusinessow
 
 ---
 
-## TUESDAY — Efficiency (FB text + IG photo)
+## TUESDAY: Efficiency (FB text + IG photo)
 
 **Hormozi:** §44 Rule of 100 (time leverage). §13 name the enemy (the enemy is Monday morning).
 
@@ -61,7 +61,7 @@ rain day moves 8 jobs with one action or with 32 texts.
 
 ---
 
-## WEDNESDAY — Relatable / Engagement (FB text + IG engagement post)
+## WEDNESDAY: Relatable / Engagement (FB text + IG engagement post)
 
 **Hormozi:** §41 engagement posts feed Rule of 100 (replies = reach). Never pitch on this day.
 
@@ -79,7 +79,7 @@ notebook in the truck.
 
 ---
 
-## THURSDAY — Business Tip (FB text + IG 2-slide carousel)
+## THURSDAY: Business Tip (FB text + IG 2-slide carousel)
 
 **Hormozi:** §9 sell at deprivation (show what they pay now). §41 the math is the proof.
 
@@ -104,7 +104,7 @@ Hashtags: #lawncare #lawncarebusiness #lawnservice #smallbusinessowner #entrepre
 
 ---
 
-## FRIDAY — Efficiency (FB text + IG photo)
+## FRIDAY: Efficiency (FB text + IG photo)
 
 **Hormozi:** §44 leverage, remove friction. Soft MowGo (describe the flow, not the pitch).
 
@@ -123,7 +123,7 @@ replaces two days of chasing.
 
 ---
 
-## SATURDAY — Seasonal (FB text + IG photo)
+## SATURDAY: Seasonal (FB text + IG photo)
 
 **Hormozi:** §26 timeliness beats evergreen. Be the expert, earn the follow.
 
