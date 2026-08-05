@@ -1,5 +1,23 @@
 const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
 
+// In-memory rate limit: 30 reorders / 15 min per user (per-isolate, same
+// pattern as sms-optin.js / webhook-dispatch.js — Claude Code LOW-2 fix).
+const REORDER_RATE_LIMIT_MAX = 30;
+const REORDER_RATE_LIMIT_WINDOW = 15 * 60 * 1000;
+const reorderAttempts = new Map();
+
+function rateLimit(userId) {
+  const now = Date.now();
+  const entry = reorderAttempts.get(userId);
+  if (!entry || now >= entry.reset) {
+    reorderAttempts.set(userId, { count: 1, reset: now + REORDER_RATE_LIMIT_WINDOW });
+    return true;
+  }
+  if (entry.count >= REORDER_RATE_LIMIT_MAX) return false;
+  entry.count += 1;
+  return true;
+}
+
 function corsHeaders(request) {
   const origin = request?.headers?.get?.('origin');
   return {
@@ -31,6 +49,7 @@ export async function onRequestPost({ request, env }) {
   if (!userRes.ok) return jsonResponse(request, { error: 'Invalid token' }, 401);
   const { id: userId } = await userRes.json();
   if (!userId) return jsonResponse(request, { error: 'Invalid token' }, 401);
+  if (!rateLimit(userId)) return jsonResponse(request, { error: 'Too many requests' }, 429);
 
   let body;
   try {

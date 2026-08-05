@@ -501,11 +501,17 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   // reorderWithinDate (previousOrder + updates). APPLIES the permutation:
   // physical array order + route_order both follow orderedIds (Claude Code
   // CRITICAL fix). Ranks rebuild over ids still present in prev, so a job
-  // deleted mid-geocode can't leave gaps (Mimo LOW fix).
+  // deleted mid-geocode can't leave gaps (Mimo LOW fix); jobs created during
+  // the geocode await are appended contiguously (Claude Code LOW-1 fix).
   function reorderToSequence(prev, orderedIds, currentDate) {
     const presentIds = orderedIds.filter(id => prev.some(j => j.id === id));
-    const rank = new Map(presentIds.map((id, i) => [id, i + 1]));
-    const ordered = presentIds.map(id => prev.find(j => j.id === id));
+    const presentSet = new Set(presentIds);
+    const extras = prev
+      .filter(j => j.scheduled_date === currentDate && !presentSet.has(j.id))
+      .map(j => j.id);
+    const allIds = [...presentIds, ...extras];
+    const rank = new Map(allIds.map((id, i) => [id, i + 1]));
+    const ordered = allIds.map(id => prev.find(j => j.id === id));
     const previousOrder = prev
       .filter(j => j.scheduled_date === currentDate)
       .map(j => ({ id: j.id, route_order: j.route_order }));
@@ -515,8 +521,22 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const next = ordered[oi++];
       return next ? { ...next, route_order: rank.get(next.id) } : j;
     });
-    const updates = presentIds.map(id => ({ id, route_order: rank.get(id) }));
+    const updates = allIds.map(id => ({ id, route_order: rank.get(id) }));
     return { updated, updates, previousOrder };
+  }
+
+  // Restore a day's physical array order + route_order from a snapshot
+  // (Undo / persist-failure rollback). The rendered list follows array order,
+  // so patching route_order alone would leave it visually stuck in the
+  // optimized order (Claude Code HIGH-1 fix).
+  function restoreDaySequence(prev, dateIds, orderById, currentDate) {
+    const ordered = dateIds.map(id => prev.find(j => j.id === id)).filter(Boolean);
+    let oi = 0;
+    return prev.map(j => {
+      if (j.scheduled_date !== currentDate) return j;
+      const next = ordered[oi++];
+      return next ? { ...next, route_order: orderById.get(next.id) } : j;
+    });
   }
 
   async function handleOptimize() {
@@ -536,16 +556,24 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const orderedIds = optimizeRoute(positioned, anchor);
       const missingCount = positioned.filter(p => p.lat == null || p.lng == null).length;
 
+      // Snapshot the PRE-optimize day (array order + route_order) before the
+      // optimistic apply — Undo and persist-failure rollback both need it.
+      // The persist-failure path uses this LOCAL snapshot (not the ref), so a
+      // second optimize mid-flight can't mis-route the rollback.
+      const snap = {
+        date,
+        dateIds: dayJobs.map(j => j.id),
+        previousOrder: dayJobs.map(j => ({ id: j.id, route_order: j.route_order })),
+      };
+      routeUndoRef.current = snap;
+
       setJobs(prev => {
         const result = reorderToSequence(prev, orderedIds, date);
         if (!result) return prev;
-        routeUndoRef.current = result.previousOrder;
         reorderJobs(result.updates).catch(err => {
           console.error('optimize persist failed:', err);
-          setJobs(current => current.map(job => {
-            const previous = result.previousOrder.find(item => item.id === job.id);
-            return previous ? { ...job, route_order: previous.route_order } : job;
-          }));
+          const orderById = new Map(snap.previousOrder.map(o => [o.id, o.route_order]));
+          setJobs(current => restoreDaySequence(current, snap.dateIds, orderById, snap.date));
         });
         return result.updated;
       });
@@ -558,13 +586,22 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
         onAction: () => {
           const undo = routeUndoRef.current;
           if (!undo) return;
-          routeUndoRef.current = null;
           setCompletedToast(null);
-          reorderJobs(undo).catch(err => console.error('optimize undo failed:', err));
-          setJobs(prev => prev.map(job => {
-            const previous = undo.find(item => item.id === job.id);
-            return previous ? { ...job, route_order: previous.route_order } : job;
-          }));
+          // Keep the snapshot until the RPC succeeds — on failure the user can
+          // tap Undo again (toast stays in the undo slot), and the error is
+          // surfaced instead of swallowed (Claude Code MEDIUM-1 fix).
+          reorderJobs(undo.previousOrder).then(() => {
+            // Only clear the ref if it still points at THIS snapshot (a newer
+            // optimize's snapshot must survive).
+            if (routeUndoRef.current === undo) routeUndoRef.current = null;
+          }).catch(err => {
+            console.error('optimize undo failed:', err);
+            setCompletedToast({ name: tr('Could not optimize route. Try again.'), amount: 0, type: 'error' });
+            if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+            toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
+          });
+          const orderById = new Map(undo.previousOrder.map(o => [o.id, o.route_order]));
+          setJobs(prev => restoreDaySequence(prev, undo.dateIds, orderById, undo.date));
         },
       });
       if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
@@ -614,7 +651,15 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const anchor = profile?.latitude != null && profile?.longitude != null
         ? { lat: profile.latitude, lng: profile.longitude } : null;
       const { url, skipped, truncated, count } = buildRouteLink(navApp, anchor, withCoords);
-      if (!url) { if (win) win.close(); return; }
+      if (!url) {
+        if (win) win.close();
+        // No stop could be mapped at all — say so instead of a silent no-op
+        // (Claude Code MEDIUM-2 fix).
+        setCompletedToast({ name: tr('Some addresses couldn\'t be mapped'), amount: 0, type: 'error' });
+        if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+        toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
+        return;
+      }
       if (win) win.location.href = url; else window.location.href = url;
 
       const showToast = (name, ms) => {
@@ -625,7 +670,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       if (skipped > 0 && truncated) {
         // One toast at a time — chain instead of clobbering (Claude Code MEDIUM fix).
         showToast(tr('Stops without addresses were skipped'), 4000);
-        setTimeout(() => showToast(tr('{{count}} stops sent', { count }), 4000), 4200);
+        toggleTimeoutRef.current = setTimeout(() => showToast(tr('{{count}} stops sent', { count }), 4000), 4200);
       } else if (skipped > 0) {
         showToast(tr('Stops without addresses were skipped'), 4000);
       } else if (truncated) {
