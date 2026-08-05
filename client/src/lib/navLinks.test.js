@@ -12,18 +12,21 @@ const stops = [
 ];
 const anchor = { lat: 35.4676, lng: -97.5164 };
 
-test('Google: origin + destination + |-separated waypoints', () => {
+test('Google: origin + destination + | waypoints, commas encoded %2C, pipes %7C', () => {
   const { url, skipped, truncated } = buildGoogleDirUrl(anchor, stops);
   assert.equal(skipped, 0);
   assert.equal(truncated, false);
-  assert.match(url, /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&origin=35\.467600,-97\.516400&destination=35\.653500,-97\.481100&waypoints=/);
-  assert.match(url, /waypoints=35\.652800%2C-97\.478700\|35\.521900%2C-97\.437700/);
+  assert.match(url, /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&travelmode=driving&origin=35\.467600%2C-97\.516400&destination=35\.653500%2C-97\.481100&waypoints=/);
+  assert.match(url, /waypoints=35\.652800%2C-97\.478700%7C35\.521900%2C-97\.437700$/);
 });
 
-test('Google: truncates past 10 stops (8 waypoints + destination)', () => {
+test('Google: caps at 10 stops (9 waypoints + destination) and reports truncation', () => {
   const many = Array.from({ length: 13 }, (_, i) => ({ id: `s${i}`, address: `A ${i}`, lat: 35.5 + i / 1000, lng: -97.5 }));
-  const { truncated } = buildGoogleDirUrl(anchor, many);
+  const { url, truncated } = buildGoogleDirUrl(anchor, many);
   assert.equal(truncated, true);
+  const waypointCount = (url.match(/&waypoint=/g) || []).length;
+  const wp = url.split('waypoints=')[1];
+  assert.equal(wp.split('%7C').length, 9, 'exactly 9 waypoints at cap');
 });
 
 test('Google: stops without coords are skipped and counted', () => {
@@ -32,11 +35,31 @@ test('Google: stops without coords are skipped and counted', () => {
   assert.equal(skipped, 1);
 });
 
-test('Apple: unified URL with destination address + multiple waypoint params', () => {
-  const { url, skipped } = buildAppleDirUrl(anchor, stops);
+test('Apple: destination is the LAST stop, waypoints are the stops in between', () => {
+  const { url, skipped, truncated } = buildAppleDirUrl(anchor, stops);
   assert.equal(skipped, 0);
-  assert.match(url, /^https:\/\/maps\.apple\.com\/directions\?mode=driving&source=35\.467600,-97\.516400&destination=123%20Oak%20St%2C%20Edmond%2C%20OK/);
-  assert.match(url, /&waypoint=35\.521900%2C-97\.437700&waypoint=35\.653500%2C-97\.481100$/);
+  assert.equal(truncated, false);
+  // source = anchor coords (raw comma per Apple docs); destination = LAST stop
+  // address (encoded); waypoint = preceding stops (raw comma coords).
+  assert.match(url, /^https:\/\/maps\.apple\.com\/directions\?mode=driving&source=35\.467600,-97\.516400&destination=789%20Maple%20Dr%2C%20Edmond%2C%20OK/);
+  assert.match(url, /&waypoint=35\.652800,-97\.478700&waypoint=35\.521900,-97\.437700$/);
+});
+
+test('Apple: address with special characters is encoded (spaces, commas, ampersands, percent)', () => {
+  const tricky = [
+    { id: 'a', address: 'Elm Ave, OKC, OK', lat: 35.55, lng: -97.46 },
+    { id: 'b', address: 'Main St & 5th Ave #2, OKC, OK 100%', lat: 35.52, lng: -97.44 },
+  ];
+  const { url } = buildAppleDirUrl(null, tricky);
+  // destination (last stop) is the only place an address appears — must be fully encoded
+  assert.match(url, /destination=Main%20St%20%26%205th%20Ave%20%232%2C%20OKC%2C%20OK%20100%25/);
+});
+
+test('Apple: caps at 10 stops defensively', () => {
+  const many = Array.from({ length: 12 }, (_, i) => ({ id: `s${i}`, address: `A ${i}`, lat: 35.5 + i / 1000, lng: -97.5 }));
+  const { truncated, url } = buildAppleDirUrl(null, many);
+  assert.equal(truncated, true);
+  assert.equal((url.match(/&waypoint=/g) || []).length, 9, 'destination + 9 waypoints at cap');
 });
 
 test('Waze: single-stop ll + navigate=yes', () => {
