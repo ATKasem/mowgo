@@ -47,6 +47,7 @@
   .nav div.on { color: #22c55e; }
   .nav .n { display: block; font-size: 17px; margin-bottom: 2px; }
   #stateB, #stateC { display: none; }
+  #subB, #subC { display: none; }
   body.b #stateB { display: flex; } body.b #stateA { display: none; }
   body.c #stateC { display: flex; } body.c #stateA, body.c #stateB { display: none; }
   body.b #subA { display: none; } body.b #subB { display: block; }
@@ -59,8 +60,8 @@
   <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
   <div class="header"><div class="logo"><span>🌱</span></div><h1>MowGo</h1></div>
   <div class="sub" id="subA">8 jobs · 2 completed · <b>Rain expected</b></div>
-  <div class="sub" id="subB" style="display:none">8 jobs · 2 completed · <b>Moved to tomorrow</b></div>
-  <div class="sub" id="subC" style="display:none">8 jobs · 6 completed · <b>All done</b></div>
+  <div class="sub" id="subB">8 jobs · 2 completed · <b>Moved to tomorrow</b></div>
+  <div class="sub" id="subC">8 jobs · 6 completed · <b>All done</b></div>
 
   <div id="stateA" class="state">
     <div class="banner"><span class="ic">🌧️</span><div class="txt">Rain expected today<small>Move 8 jobs to tomorrow</small></div><button class="btn">Move All</button></div>
