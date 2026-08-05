@@ -32,8 +32,9 @@ begin
   end if;
 
   -- Amount is client-supplied; never trust a non-positive value across the
-  -- definer boundary.
-  if p_amount is null or p_amount <= 0 then
+  -- definer boundary. NaN is not <= 0 in Postgres (comparison is NULL), so
+  -- reject it explicitly.
+  if p_amount is null or p_amount <= 0 or p_amount <> p_amount then
     raise exception 'invalid amount';
   end if;
 
