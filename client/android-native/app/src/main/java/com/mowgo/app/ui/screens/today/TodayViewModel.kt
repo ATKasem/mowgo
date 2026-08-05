@@ -15,6 +15,7 @@ import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.data.model.RainDelayEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.mowgo.app.BuildConfig
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -135,7 +136,7 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                                     amount = jobWithClient.clientRate,
                                 )
                             }.onFailure { e ->
-                                android.util.Log.w("TodayViewModel", "auto-invoice failed", e)
+                                if (BuildConfig.DEBUG) android.util.Log.w("TodayViewModel", "auto-invoice failed", e)
                             }
                         }
                     }

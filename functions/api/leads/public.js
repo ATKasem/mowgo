@@ -1,4 +1,6 @@
 // NOTE: CF dashboard Rate Limiting rules recommended for production-grade limits (per-isolate map is best-effort).
+import { isSafeWebhookUrl } from '../_shared/safe-webhook-url.js';
+
 const WINDOW_MS = 15 * 60 * 1000;
 const LIMIT = 5;
 const attempts = new Map();
@@ -20,6 +22,7 @@ function allowed(ip) {
   if (entry.count >= LIMIT) return false;
   entry.count += 1; return true;
 }
+
 async function fireLeadWebhook(env, userId, lead) {
   try {
     const key = env.SUPABASE_SERVICE_ROLE_KEY;
@@ -29,7 +32,13 @@ async function fireLeadWebhook(env, userId, lead) {
     const timestamp = new Date().toISOString();
     const body = JSON.stringify({ event: 'lead.created', payload: { lead_id: lead.id, name: lead.name, source: lead.source, status: lead.status }, timestamp });
     await Promise.all((await res.json()).map(async config => {
-      if (!config.url?.startsWith('https://')) return;
+      // SSRF defense (shared with webhook-dispatch): https-only, blocks
+      // private IP literals AND DNS-rebinding targets, fail-closed.
+      const check = await isSafeWebhookUrl(config.url);
+      if (!check.ok) {
+        console.warn(`lead webhook: blocked unsafe URL for ${config.id}: ${check.reason}`);
+        return;
+      }
       const cryptoKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(config.secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
       const signature = Array.from(new Uint8Array(await crypto.subtle.sign('HMAC', cryptoKey, new TextEncoder().encode(body)))).map(b => b.toString(16).padStart(2, '0')).join('');
       await fetch(config.url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-MowGo-Signature': `sha256=${signature}`, 'X-MowGo-Event': 'lead.created' }, body, signal: AbortSignal.timeout(10000) });

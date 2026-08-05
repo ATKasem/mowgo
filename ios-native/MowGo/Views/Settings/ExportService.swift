@@ -12,7 +12,10 @@ enum ExportService {
             rows: clients.map { client in
                 [client.id.uuidString, client.userId?.uuidString, client.name, client.address,
                  client.phone, client.email, String(describing: client.rate), client.cleaningNotes,
-                 client.keyCode, client.alarmCode, client.petInstructions, client.tags?.joined(separator: ", "),
+                 // Security: physical-access credentials are redacted from exports.
+                 client.keyCode == nil || client.keyCode!.isEmpty ? "" : "***",
+                 client.alarmCode == nil || client.alarmCode!.isEmpty ? "" : "***",
+                 client.petInstructions, client.tags?.joined(separator: ", "),
                  client.createdAt]
             }
         )

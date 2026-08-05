@@ -7,6 +7,7 @@ import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
+import com.mowgo.app.BuildConfig
 import com.mowgo.app.data.model.JobWithClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -72,7 +73,7 @@ class JobsViewModel : ViewModel() {
                             amount = job.clientRate,
                         )
                     }.onFailure { e ->
-                        android.util.Log.w("JobsViewModel", "auto-invoice failed", e)
+                        if (BuildConfig.DEBUG) android.util.Log.w("JobsViewModel", "auto-invoice failed", e)
                     }
                 }
                 load()

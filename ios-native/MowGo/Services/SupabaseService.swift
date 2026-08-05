@@ -235,23 +235,31 @@ actor SupabaseService {
         if t?.isEmpty != false {
             t = UserDefaults.standard.string(forKey: "sb_token")
             if let migrated = t, !migrated.isEmpty {
-                // Migrate existing UserDefaults tokens to Keychain
+                // Migrate existing UserDefaults tokens to Keychain, removing
+                // each UserDefaults copy immediately after it is saved so a
+                // crash mid-migration cannot leave plaintext tokens behind.
                 saveToKeychain(key: "sb_token", value: migrated)
+                UserDefaults.standard.removeObject(forKey: "sb_token")
                 if let rt = UserDefaults.standard.string(forKey: "sb_refresh_token") {
                     saveToKeychain(key: "sb_refresh_token", value: rt)
+                    UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
                 }
                 if let exp = UserDefaults.standard.string(forKey: "sb_token_expiry") {
                     saveToKeychain(key: "sb_token_expiry", value: exp)
+                    UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
                 }
-                // Clear UserDefaults copies after migration
-                UserDefaults.standard.removeObject(forKey: "sb_token")
-                UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
-                UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
             }
         }
         guard let t = t, !t.isEmpty else {
             await signOut()
             return false
+        }
+        // Sweep any leftover UserDefaults token copies (crash mid-migration
+        // or older builds) — keychain is the single source of truth now.
+        if loadFromKeychain(key: "sb_token")?.isEmpty == false {
+            UserDefaults.standard.removeObject(forKey: "sb_token")
+            UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
+            UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
         }
         token = t
         refreshToken = loadFromKeychain(key: "sb_refresh_token")
@@ -383,6 +391,13 @@ actor SupabaseService {
     func signedPhotoURL(for pathOrURL: String?) async -> String? {
         guard let pathOrURL, !pathOrURL.isEmpty else { return nil }
         if pathOrURL.hasPrefix("http") || pathOrURL.hasPrefix("demo://") { return pathOrURL }
+        // Path-traversal defense-in-depth: only accept plain storage paths
+        // (bucket keys are UUID-segmented). Reject any traversal/absolute
+        // attempts — Supabase storage RLS already gates reads, this is a
+        // belt-and-braces guard before the URL is built.
+        if pathOrURL.hasPrefix("/") || pathOrURL.contains("..") || pathOrURL.contains("\\") {
+            return nil
+        }
         guard let signURL = URL(string: "\(baseURL)/storage/v1/object/sign/job-photo/\(pathOrURL)"),
               let token else {
             return nil

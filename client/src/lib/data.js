@@ -240,6 +240,17 @@ export async function updateJob(id, updates) {
     return _jobs.find(j => j.id === id);
   }
   const supabaseUpdates = { ...updates };
+  // Field allowlist (defense-in-depth; RLS is the real gate). Only known
+  // job columns may be written — a caller cannot sneak user_id/business_id
+  // or future columns through a spread.
+  const ALLOWED_JOB_FIELDS = [
+    'title', 'scheduled_date', 'scheduled_time', 'duration_minutes', 'status',
+    'route_order', 'recurrence', 'service_notes', 'assigned_to', 'client_id',
+    'notes', 'photo_before', 'photo_after', 'rain_delay_minutes', 'skip_reason',
+  ];
+  for (const key of Object.keys(supabaseUpdates)) {
+    if (!ALLOWED_JOB_FIELDS.includes(key)) delete supabaseUpdates[key];
+  }
   if (updates.recurrence !== undefined) {
     supabaseUpdates.recurrence_rule = updates.recurrence;
     delete supabaseUpdates.recurrence;
@@ -691,6 +702,10 @@ export async function createInvoice(invoice) {
   const amount = Number(invoice.amount);
   if (!Number.isFinite(amount) || amount <= 0) {
     throw new Error('Invoice amount must be a positive number');
+  }
+  // Defense-in-depth: cap manual invoice size ($100k) to match mobile.
+  if (amount > 100000) {
+    throw new Error('Invoice amount is too large');
   }
 
   if (isDemoMode()) {

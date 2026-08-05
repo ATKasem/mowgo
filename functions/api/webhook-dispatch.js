@@ -14,35 +14,30 @@
  *   SUPABASE_SERVICE_ROLE_KEY — service role key (config lookup)
  */
 
+import { isSafeWebhookUrl } from './_shared/safe-webhook-url.js';
+
 const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
 
-/** Block SSRF: only https, no private/link-local hosts */
-async function isSafeWebhookUrl(rawUrl) {
-  let u;
-  try {
-    u = new URL(rawUrl);
-  } catch {
+/** Per-user+IP rate limit: 20 dispatches per 15 min (in-memory, per-isolate). */
+const dispatchAttempts = new Map();
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+
+function rateLimitKey(userId, request) {
+  const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+  return `${userId}:${ip}`;
+}
+
+function isRateLimited(userId, request) {
+  const key = rateLimitKey(userId, request);
+  const now = Date.now();
+  const entry = dispatchAttempts.get(key);
+  if (!entry || now >= entry.resetTime) {
+    dispatchAttempts.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     return false;
   }
-  if (u.protocol !== 'https:') return false;
-  const host = u.hostname.toLowerCase();
-  // Direct IP or hostname resolves — block obvious internal targets
-  if (host === 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) return false;
-  // IPv4 private / link-local / loopback ranges
-  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
-  if (ipv4) {
-    const [a, b, c] = ipv4.slice(1).map(Number);
-    if (a === 10 || a === 127) return false;
-    if (a === 169 && b === 254) return false; // metadata
-    if (a === 172 && b >= 16 && b <= 31) return false;
-    if (a === 192 && b === 0) return false;
-    if (a === 192 && b === 168) return false;
-    if (a === 198 && (b === 18 || b === 19)) return false;
-    if (a === 0 || a === 100 || a === 198) return false;
-    if (a >= 224) return false; // multicast/reserved
-  }
-  if (host.startsWith('[')) return false; // IPv6 literal — block to be safe
-  return true;
+  entry.count += 1;
+  return entry.count > RATE_LIMIT_MAX;
 }
 
 function corsHeaders(request) {
@@ -111,6 +106,14 @@ export async function onRequestPost({ request, env }) {
     return Response.json({ error: 'Invalid token' }, { status: 401, headers });
   }
 
+  // --- Rate limit (per user+IP) ---
+  if (isRateLimited(userId, request)) {
+    return Response.json(
+      { error: 'Too many webhook dispatches. Please try again later.' },
+      { status: 429, headers },
+    );
+  }
+
   // --- Look up webhook configs ---
   const supabaseUrl = env.SUPABASE_URL;
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
@@ -155,8 +158,9 @@ export async function onRequestPost({ request, env }) {
   await Promise.all(
     matching.map(async (config) => {
       try {
-        if (!(await isSafeWebhookUrl(config.url))) {
-          console.warn(`webhook dispatch: blocked unsafe URL for ${config.id}`);
+        const check = await isSafeWebhookUrl(config.url);
+        if (!check.ok) {
+          console.warn(`webhook dispatch: blocked unsafe URL for ${config.id}: ${check.reason}`);
           failures++;
           return;
         }

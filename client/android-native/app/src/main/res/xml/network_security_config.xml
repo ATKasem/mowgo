@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- All MowGo traffic is HTTPS. Explicitly forbid cleartext on every API
+     level (API 26-27 devices would otherwise allow http:// by default). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

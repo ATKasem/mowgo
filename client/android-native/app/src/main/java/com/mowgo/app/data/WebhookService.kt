@@ -30,7 +30,7 @@ object WebhookService {
                 if (token != null) {
                     val body = JSONObject().put("event", event).put("payload", JSONObject(payload)).toString()
                     val request = Request.Builder()
-                        .url("https://mowgo.pages.dev/api/webhook-dispatch")
+                        .url("https://mowgoapp.com/api/webhook-dispatch")
                         .header("Authorization", "Bearer $token")
                         .header("Content-Type", "application/json")
                         .post(body.toRequestBody(jsonMediaType))

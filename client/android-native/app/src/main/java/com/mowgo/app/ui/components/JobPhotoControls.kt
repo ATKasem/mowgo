@@ -150,6 +150,9 @@ fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
     var resolved by remember(displayUrl) { mutableStateOf<String?>(null) }
     LaunchedEffect(displayUrl) {
         resolved = if (displayUrl.startsWith("http")) displayUrl
+        // Path-traversal defense-in-depth: storage keys are UUID-segmented;
+        // reject anything that isn't a plain relative path.
+        else if (displayUrl.startsWith("/") || displayUrl.contains("..") || displayUrl.contains("\\")) null
         else runCatching {
             SupabaseClientProvider.client.auth.currentSessionOrNull()?.let { session ->
                 val req = Request.Builder()

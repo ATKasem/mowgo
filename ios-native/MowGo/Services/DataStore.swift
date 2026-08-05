@@ -1109,6 +1109,10 @@ final class DataStore: ObservableObject {
         guard value > 0 else {
             throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Amount must be positive"])
         }
+        // Defense-in-depth: cap manual invoice size ($100k) to match web/Android.
+        guard value <= 100_000 else {
+            throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Amount is too large"])
+        }
         if auth?.isDemoMode == true {
             let demo = Invoice(id: UUID(), clientId: clientId, amount: amount, status: .unpaid,
                                createdAt: ISO8601DateFormatter().string(from: Date()),

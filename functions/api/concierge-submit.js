@@ -20,6 +20,9 @@ export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch { return Response.json({ error: 'Invalid JSON' }, { status: 400, headers }); }
   const businessName = typeof body.business_name === 'string' ? body.business_name.trim() : '';
+  // Strip Discord markdown so a malicious business name cannot inject
+  // formatting, spoilers, or link embeds into the concierge notification.
+  const safeBusinessName = businessName.replace(/[*_~`|>@#]/g, '').slice(0, 200);
   const csvContent = typeof body.csv_content === 'string' ? body.csv_content : '';
   if (!businessName || businessName.length > 200) return Response.json({ error: 'Business name is required and must be 200 characters or fewer' }, { status: 400, headers });
   if (!csvContent.trim() || csvContent.length > 100000) return Response.json({ error: 'CSV content is required and must be 100,000 characters or fewer' }, { status: 400, headers });
@@ -56,7 +59,7 @@ export async function onRequestPost({ request, env }) {
 
     if (env.DISCORD_BOT_TOKEN && env.DISCORD_CHANNEL_ID) {
       try {
-        const prefix = `🧹 New concierge request\n**Business:** ${businessName}\n**Clients:** ${body.client_count ?? 'Not provided'}\n**User:** ${user.id}\n**At:** ${new Date().toISOString()}\n\`\`\``;
+        const prefix = `🧹 New concierge request\n**Business:** ${safeBusinessName}\n**Clients:** ${body.client_count ?? 'Not provided'}\n**User:** ${user.id}\n**At:** ${new Date().toISOString()}\n\`\`\``;
         const suffix = '\n```';
         const preview = csvContent.replace(/`{3,}/g, "'''").slice(0, Math.min(1500, Math.max(0, 1999 - prefix.length - suffix.length)));
         await fetch(`https://discord.com/api/v10/channels/${env.DISCORD_CHANNEL_ID}/messages`, { method: 'POST', headers: { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ content: `${prefix}${preview}${suffix}`, allowed_mentions: { parse: [] } }) });

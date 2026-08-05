@@ -361,7 +361,7 @@ struct SettingsView: View {
             bid = user.businessId?.uuidString.lowercased() ?? ""
         }
         guard !bid.isEmpty else { return nil }
-        return URL(string: "https://mowgo.pages.dev/#/book/\(bid)")
+        return URL(string: "https://mowgoapp.com/#/book/\(bid)")
     }
 
     // MARK: - Helpers

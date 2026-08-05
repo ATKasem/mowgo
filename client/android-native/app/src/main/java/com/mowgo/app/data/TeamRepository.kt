@@ -109,7 +109,7 @@ class TeamRepository(
         val token = authRepository.currentSession?.accessToken
             ?: throw IllegalStateException("Not authenticated")
         val request = Request.Builder()
-            .url("https://mowgo.pages.dev/api/team/${member.id}")
+            .url("https://mowgoapp.com/api/team/${member.id}")
             .header("Authorization", "Bearer $token")
             .header("Content-Type", "application/json")
             .delete()

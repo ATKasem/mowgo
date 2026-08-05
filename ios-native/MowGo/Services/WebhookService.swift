@@ -12,7 +12,7 @@ import Foundation
 actor WebhookService {
     static let shared = WebhookService()
 
-    private static let dispatchURL = URL(string: "https://mowgo.pages.dev/api/webhook-dispatch")!
+    private static let dispatchURL = URL(string: "https://mowgoapp.com/api/webhook-dispatch")!
 
     /// Fire a webhook event via the /api/webhook-dispatch Pages Function.
     /// Requires a Supabase access token on SupabaseService.shared.token.

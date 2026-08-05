@@ -163,7 +163,7 @@ export async function onRequestPost({ request, env }) {
         );
         if (!updateRes.ok) {
           const err = await updateRes.text();
-          return Response.json({ error: `Failed to update profile: ${err}` }, { status: 500, headers: corsHeaders });
+          return Response.json({ error: 'Failed to update profile' }, { status: 500, headers: corsHeaders });
         }
         const [updated] = await updateRes.json();
         return Response.json({
@@ -194,7 +194,7 @@ export async function onRequestPost({ request, env }) {
         );
         if (!insertRes.ok) {
           const err = await insertRes.text();
-          return Response.json({ error: `Failed to create profile: ${err}` }, { status: 500, headers: corsHeaders });
+          return Response.json({ error: 'Failed to create profile' }, { status: 500, headers: corsHeaders });
         }
         const [created] = await insertRes.json();
         return Response.json({
@@ -227,7 +227,7 @@ export async function onRequestPost({ request, env }) {
 
       if (!createUserRes.ok) {
         const err = await createUserRes.text();
-        return Response.json({ error: `Failed to create user: ${err}` }, { status: 500, headers: corsHeaders });
+        return Response.json({ error: 'Failed to create user' }, { status: 500, headers: corsHeaders });
       }
 
       const newUser = await createUserRes.json();
@@ -256,7 +256,7 @@ export async function onRequestPost({ request, env }) {
 
       if (!insertRes.ok) {
         const err = await insertRes.text();
-        return Response.json({ error: `Created user but failed profile: ${err}` }, { status: 500, headers: corsHeaders });
+        return Response.json({ error: 'Account created but profile setup failed' }, { status: 500, headers: corsHeaders });
       }
 
       const [profile] = await insertRes.json();
@@ -302,7 +302,7 @@ export async function onRequestPost({ request, env }) {
       }, { status: 201, headers: corsHeaders });
     }
   } catch (err) {
-    return Response.json({ error: `Server error: ${err.message}` }, { status: 500, headers: corsHeaders });
+    return Response.json({ error: 'Internal server error' }, { status: 500, headers: corsHeaders });
   }
 }
 

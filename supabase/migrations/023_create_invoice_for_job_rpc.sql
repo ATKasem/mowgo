@@ -24,18 +24,12 @@ as $$
 declare
   v_job_user uuid;
   v_client uuid;
+  v_rate numeric;
   v_caller uuid := auth.uid();
   v_created uuid;
 begin
   if v_caller is null then
     raise exception 'not authenticated';
-  end if;
-
-  -- Amount is client-supplied; never trust a non-positive value across the
-  -- definer boundary. NaN is not <= 0 in Postgres (comparison is NULL), so
-  -- reject it explicitly.
-  if p_amount is null or p_amount <= 0 or p_amount <> p_amount then
-    raise exception 'invalid amount';
   end if;
 
   select user_id, client_id into v_job_user, v_client
@@ -56,8 +50,18 @@ begin
     end if;
   end if;
 
+  -- Server-side truth: the invoice amount is the client's stored rate, NOT
+  -- the client-supplied p_amount. A modified client cannot inflate invoices.
+  select rate into v_rate
+  from public.clients
+  where id = v_client;
+
+  if v_rate is null or v_rate <= 0 or v_rate <> v_rate then
+    raise exception 'invalid amount';
+  end if;
+
   insert into public.invoices (user_id, client_id, job_id, amount, status)
-  values (v_job_user, v_client, p_job_id, p_amount, 'unpaid')
+  values (v_job_user, v_client, p_job_id, v_rate, 'unpaid')
   on conflict (job_id) where job_id is not null do nothing
   returning id into v_created;
 
