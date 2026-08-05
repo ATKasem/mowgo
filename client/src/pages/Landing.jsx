@@ -122,10 +122,10 @@ export default function Landing() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        sessionStorage.setItem('mowgo_plan_intent', plan);
-        sessionStorage.setItem('mowgo_interval_intent', interval);
-        sessionStorage.setItem('mowgo_intent_time', String(Date.now()));
-        navigate('/login?mode=signup');
+        localStorage.setItem('mowgo_plan_intent', plan);
+        localStorage.setItem('mowgo_interval_intent', interval);
+        localStorage.setItem('mowgo_intent_time', String(Date.now()));
+        navigate(`/login?mode=signup&plan=${plan}&interval=${interval}`);
         return;
       }
       const r = await startCheckout(plan, interval);

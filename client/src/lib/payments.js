@@ -31,7 +31,63 @@ export async function startCheckout(plan, interval = 'month') {
     return { error: data.error || 'Failed to start checkout' };
   } catch (err) {
     console.error('Checkout error:', err);
-    return { error: 'Connection failed. Check your internet and try again.' };
+    // Transport-level failure (offline/timeout/network) — callers that resume an
+    // intent must NOT treat this as a deterministic config error.
+    return { error: 'Connection failed. Check your internet and try again.', retryable: true };
+  }
+}
+
+/**
+ * Resume a paid-plan checkout from a stored intent (localStorage, shared across tabs).
+ * Used at app root (email-confirmation return) and after login/signup submit.
+ * Protections: plan/interval whitelist + 30-min TTL; intent cleared on deterministic
+ * errors, kept on transport errors so the user can retry.
+ * @returns {{status: 'started'|'none'|'error', message?: string}}
+ */
+let resumeInFlight = false;
+export async function resumeCheckoutIntent() {
+  if (resumeInFlight) return { status: 'started' };
+  const intent = localStorage.getItem('mowgo_plan_intent');
+  if (!intent) return { status: 'none' };
+  const interval = localStorage.getItem('mowgo_interval_intent');
+  const intentTime = Number(localStorage.getItem('mowgo_intent_time') || 0);
+  const age = Date.now() - intentTime;
+  const valid = ['solo', 'crew', 'premium'].includes(intent)
+    && ['month', 'year'].includes(interval)
+    && age >= 0 && age < 30 * 60 * 1000;
+  if (!valid) {
+    // Stale, malformed, corrupt, or expired intent — never hijack a normal login.
+    localStorage.removeItem('mowgo_plan_intent');
+    localStorage.removeItem('mowgo_interval_intent');
+    localStorage.removeItem('mowgo_intent_time');
+    return { status: 'none' };
+  }
+  resumeInFlight = true;
+  try {
+    const r = await startCheckout(intent, interval);
+    if (r?.error) {
+      if (r.retryable) {
+        // Transport failure — keep the intent so the user can retry.
+        resumeInFlight = false;
+        return { status: 'error', message: r.error, retryable: true };
+      }
+      // Deterministic failure (validation/config) — drop the intent so the next
+      // login goes to /app instead of retrying forever.
+      localStorage.removeItem('mowgo_plan_intent');
+      localStorage.removeItem('mowgo_interval_intent');
+      localStorage.removeItem('mowgo_intent_time');
+      resumeInFlight = false;
+      return { status: 'error', message: r.error };
+    }
+    // startCheckout redirects to Stripe on success — only then drop the intent
+    localStorage.removeItem('mowgo_plan_intent');
+    localStorage.removeItem('mowgo_interval_intent');
+    localStorage.removeItem('mowgo_intent_time');
+    return { status: 'started' };
+  } catch (checkoutError) {
+    // Defensive: any thrown error is transport-like — keep the intent for retry.
+    resumeInFlight = false;
+    return { status: 'error', message: checkoutError.message || 'Payment failed', retryable: true };
   }
 }
 

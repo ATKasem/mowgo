@@ -17,7 +17,26 @@ export default function Login() {
   const [confirmSent, setConfirmSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
+  // Paid-plan checkout intent carried in the URL ("Start Free Trial" → /login?mode=signup&plan=solo&interval=month)
+  const planParam = searchParams.get('plan');
+  const intervalParam = searchParams.get('interval');
+  const hasPaidPlanIntent = (planParam === 'solo' || planParam === 'crew')
+    && (intervalParam === 'month' || intervalParam === 'year');
+
   const demo = isDemoMode();
+
+  // Seed/refresh the checkout intent from the URL (localStorage survives the
+  // email-confirmation new tab). The URL is the freshest signal — a fresh click
+  // wins over any stored intent and always refreshes the 30-min TTL.
+  useEffect(() => {
+    const plan = searchParams.get('plan');
+    const interval = searchParams.get('interval');
+    if ((plan === 'solo' || plan === 'crew') && (interval === 'month' || interval === 'year')) {
+      localStorage.setItem('mowgo_plan_intent', plan);
+      localStorage.setItem('mowgo_interval_intent', interval);
+      localStorage.setItem('mowgo_intent_time', String(Date.now()));
+    }
+  }, [searchParams]);
 
   // Handle password recovery callback or error params from Supabase redirect
   useEffect(() => {
@@ -40,6 +59,7 @@ export default function Login() {
       const friendlyMessages = {
         'otp_expired': tr('This password reset link has expired. Please request a new one.'),
         'access_denied': tr('This password reset link is invalid or has expired. Please request a new one.'),
+        'checkout_failed': tr("Couldn't start checkout. Please try again."),
       };
       const message = friendlyMessages[errorCode] || decodeURIComponent(errorDesc || errorType);
       setError(message);
@@ -105,43 +125,12 @@ export default function Login() {
         }
       }
 
-      const intent = sessionStorage.getItem('mowgo_plan_intent');
-      const clearIntent = () => {
-        sessionStorage.removeItem('mowgo_plan_intent');
-        sessionStorage.removeItem('mowgo_interval_intent');
-        sessionStorage.removeItem('mowgo_intent_time');
-      };
-      if (intent) {
-        const interval = sessionStorage.getItem('mowgo_interval_intent') || 'month';
-        const intentTime = Number(sessionStorage.getItem('mowgo_intent_time') || 0);
-        const valid = ['solo', 'crew', 'premium'].includes(intent)
-          && ['month', 'year'].includes(interval)
-          && Date.now() - intentTime < 30 * 60 * 1000;
-        if (!valid) {
-          // Stale, malformed, or expired intent — never hijack a normal login.
-          clearIntent();
-        } else {
-          try {
-            const { startCheckout } = await import('../lib/payments');
-            const r = await startCheckout(intent, interval);
-            if (r?.error) {
-              // Deterministic failure (validation/config) — drop the intent so
-              // the next login goes to /app instead of retrying forever.
-              clearIntent();
-              setError(r.error);
-              setLoading(false);
-              return;
-            }
-            // startCheckout redirects to Stripe on success — only then drop the intent
-            clearIntent();
-            return;
-          } catch (checkoutError) {
-            // Transport-level failure — keep the intent so the user can retry.
-            setError(checkoutError.message || tr('Payment failed'));
-            setLoading(false);
-            return;
-          }
-        }
+      const { resumeCheckoutIntent } = await import('../lib/payments');
+      const resume = await resumeCheckoutIntent();
+      if (resume.status !== 'none') {
+        if (resume.status === 'error') setError(resume.message || tr('Payment failed'));
+        setLoading(false);
+        return;
       }
       navigate('/app');
     } catch (err) {
@@ -160,7 +149,11 @@ export default function Login() {
             <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">{tr("MowGo")}</h1>
           </Link>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
-          {mode === 'signup' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr("Create your free account — 5 clients, no credit card.")}</p>}
+          {mode === 'signup' && (hasPaidPlanIntent ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr('Start your 14-day {{plan}} trial — unlimited clients, no credit card.', { plan: planParam === 'crew' ? 'Crew' : 'Solo' })}</p>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr("Create your free account — 5 clients, no credit card.")}</p>
+          ))}
         </div>
 
         {confirmSent ? (
@@ -172,6 +165,9 @@ export default function Login() {
             <div>
               <h2 className="font-bold text-gray-900 dark:text-white">{tr("Check your email")}</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("We sent a confirmation link to {{email}}. Click it to activate your account.", { email })}</p>
+              {hasPaidPlanIntent && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{tr("After you confirm, we'll walk you through checkout to start your trial — no charge until it ends.")}</p>
+              )}
             </div>
             <button onClick={() => { setConfirmSent(false); setMode('login'); }} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
               {tr("Back to login")}

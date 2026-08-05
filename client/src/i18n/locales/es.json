@@ -734,6 +734,8 @@
     "already_have_an_account_log_in": "¿Ya tienes una cuenta? Inicia sesión",
     "mowgo": "MowGo",
     "simple_scheduling_for_lawn_care_crews": "Programación sencilla para equipos de jardinería",
+    "start_your_14_day_plan_trial_unlimited_clients_no_credit_card": "Comienza tu prueba gratuita de 14 días de {{plan}}: clientes ilimitados, sin tarjeta de crédito.",
+    "after_you_confirm_we_ll_walk_you_through_checkout_to_start_your_trial_no": "Después de confirmar, te guiaremos al pago para comenzar tu prueba: sin cargos hasta que termine.",
     "check_your_email": "Revisa tu correo",
     "we_sent_a_confirmation_link_to": "Enviamos un enlace de confirmación a",
     "reset_link_sent": "Enlace enviado",

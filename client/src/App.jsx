@@ -115,6 +115,30 @@ class ErrorBoundary extends React.Component {
 // ===== Supabase Error Redirect =====
 // When Supabase redirects back with error params (expired/invalid reset link),
 // the hash may not include a route path (e.g. #error=access_denied&...).
+// Resumes a paid-plan checkout (Start Free Trial) when a signed-in user lands on
+// any route with a stored intent — covers the email-confirmation return, which
+// opens a new tab and lands on the Landing route (localStorage carries the intent).
+function ResumeCheckoutIntent() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const intent = localStorage.getItem('mowgo_plan_intent');
+      if (!intent) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled || !session?.access_token) return;
+      const { resumeCheckoutIntent } = await import('./lib/payments');
+      const resume = await resumeCheckoutIntent();
+      if (!cancelled && resume.status === 'error') {
+        // Surface the failure on the login page (retryable errors keep the intent)
+        navigate(`/login?mode=login&error_code=checkout_failed&error=${encodeURIComponent(resume.message || '')}`);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [navigate]);
+  return null;
+}
+
 // This component detects that and rewrites to /#/login so Login.jsx can show
 // a friendly error message instead of a blank page.
 function SupabaseErrorRedirect() {
@@ -183,6 +207,7 @@ export default function App() {
     <HashRouter>
       <AuthProvider>
         <SupabaseErrorRedirect />
+        <ResumeCheckoutIntent />
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />

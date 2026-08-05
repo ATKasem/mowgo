@@ -102,9 +102,9 @@ export default function Compare() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        sessionStorage.setItem('mowgo_plan_intent', 'premium');
-        sessionStorage.setItem('mowgo_interval_intent', 'month');
-        sessionStorage.setItem('mowgo_intent_time', String(Date.now()));
+        localStorage.setItem('mowgo_plan_intent', 'premium');
+        localStorage.setItem('mowgo_interval_intent', 'month');
+        localStorage.setItem('mowgo_intent_time', String(Date.now()));
         navigate('/login?mode=signup');
         return;
       }
