@@ -223,8 +223,14 @@ class InvoiceRepository {
 
     // ── Demo Data ────────────────────────────────────────────────────────
 
-    @Volatile
-    private var demoInvoicesMutable: List<Invoice> = emptyList()
+    companion object {
+        /**
+         * Shared across repository instances (TodayViewModel auto-creates demo
+         * invoices; InvoicesViewModel must see them).
+         */
+        @Volatile
+        private var demoInvoicesMutable: List<Invoice> = emptyList()
+    }
 
     @Volatile
     private var demoClientsMutable: List<Client>? = null

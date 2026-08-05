@@ -47,6 +47,7 @@ const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
   { value: 'unpaid', label: 'Unpaid' },
   { value: 'paid', label: 'Paid' },
+  { value: 'overdue', label: 'Overdue' },
 ];
 
 export default function Invoices({ invoices = [], setInvoices }) {
@@ -98,6 +99,8 @@ export default function Invoices({ invoices = [], setInvoices }) {
 
   const filtered = useMemo(() => {
     if (statusFilter === 'all') return invoices;
+    // Unpaid includes overdue: both are money owed.
+    if (statusFilter === 'unpaid') return invoices.filter(i => i.status !== 'paid');
     return invoices.filter(i => i.status === statusFilter);
   }, [invoices, statusFilter]);
 

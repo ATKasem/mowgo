@@ -3,6 +3,7 @@ package com.mowgo.app.ui.screens.jobs
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
+import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
@@ -24,6 +25,7 @@ data class JobsUiState(
 
 class JobsViewModel : ViewModel() {
     private val repository = JobRepository()
+    private val invoiceRepository = InvoiceRepository()
     private val photoRepository = JobPhotoRepository(repository)
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState: StateFlow<JobsUiState> = _uiState.asStateFlow()
@@ -61,6 +63,18 @@ class JobsViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.updateJobStatus(jobId, status)
+                // Auto-invoice on completion (mirrors Today screen): idempotent per job, $0 rates skipped.
+                if (status == Job.STATUS_DONE && job.clientRate > 0) {
+                    runCatching {
+                        invoiceRepository.createInvoiceForJob(
+                            jobId = jobId,
+                            clientId = job.job.clientId,
+                            amount = job.clientRate,
+                        )
+                    }.onFailure { e ->
+                        android.util.Log.w("JobsViewModel", "auto-invoice failed", e)
+                    }
+                }
                 load()
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(message = error.message ?: "Failed to update job")

@@ -489,16 +489,15 @@ final class DataStore: ObservableObject {
                 ))
                 invoices.insert(created, at: 0)
             } catch {
-                // Unique violation (a concurrent insert won the race): the
-                // invoice already exists — resolve it so the FIFO queue never
-                // blocks on a permanently-failing mutation.
-                if let existing = try? await sb.fetchInvoices().first(where: { $0.jobId == c.jobId }),
-                   !invoices.contains(where: { $0.id == existing.id }) {
-                    invoices.insert(existing, at: 0)
+                // Unique violation: a concurrent insert won the race — resolve
+                // it so the FIFO queue never blocks on a permanent conflict.
+                if let existing = try? await sb.fetchInvoices().first(where: { $0.jobId == c.jobId }) {
+                    if !invoices.contains(where: { $0.id == existing.id }) {
+                        invoices.insert(existing, at: 0)
+                    }
                 } else {
-                    #if DEBUG
-                    print("[DataStore] invoice:create replay failed: \(error)")
-                    #endif
+                    // Not a duplicate — rethrow so the mutation is retried, never silently lost.
+                    throw error
                 }
             }
 
