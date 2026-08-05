@@ -190,7 +190,7 @@ actor SupabaseService {
             kSecAttrService as String: "com.mowgo.auth",
             kSecAttrAccount as String: key,
             kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
         ]
         SecItemAdd(addQuery as CFDictionary, nil)
     }
@@ -373,9 +373,27 @@ actor SupabaseService {
             )
         }
 
-        // Construct the public URL
-        let publicURL = "\(baseURL)/storage/v1/object/public/job-photo/\(path)"
-        return publicURL
+        guard let signURL = URL(string: "\(baseURL)/storage/v1/object/sign/job-photo/\(path)"),
+              let token else {
+            throw SupabaseError.network
+        }
+        var signRequest = URLRequest(url: signURL)
+        signRequest.httpMethod = "POST"
+        signRequest.setValue(anonKey, forHTTPHeaderField: "apikey")
+        signRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        signRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        signRequest.httpBody = try JSONEncoder().encode(["expiresIn": 3600])
+        let (signedData, signedResponse) = try await URLSession.shared.data(for: signRequest)
+        guard let signedHTTP = signedResponse as? HTTPURLResponse,
+              (200...299).contains(signedHTTP.statusCode) else {
+            throw SupabaseError.httpStatus(
+                (signedResponse as? HTTPURLResponse)?.statusCode ?? 0,
+                detail: Self.extractErrorMessage(from: signedData)
+            )
+        }
+        struct SignedURLResponse: Decodable { let signedURL: String }
+        let signedPath = try JSONDecoder().decode(SignedURLResponse.self, from: signedData).signedURL
+        return signedPath.hasPrefix("http") ? signedPath : "\(baseURL)/storage/v1\(signedPath)"
     }
 
     // MARK: - CRUD (filtered by user_id)
@@ -484,6 +502,19 @@ actor SupabaseService {
     func requestFunction(_ name: String, body: [String: Any]) async throws -> Data {
         let path = "/functions/v1/\(name)"
         return try await request("POST", path, body: body)
+    }
+
+    /// Call a PostgREST RPC function. Scalar JSON returns (e.g. a UUID string)
+    /// decode directly; a JSON `null` return yields nil.
+    func rpc<Params: Encodable, Result: Decodable>(
+        _ function: String,
+        params: Params,
+        _ resultType: Result.Type
+    ) async throws -> Result? {
+        let path = "/rest/v1/rpc/\(function)"
+        let data = try await request("POST", path, body: try JSONSerialization.jsonObject(with: encoder.encode(params)))
+        guard !data.isEmpty, data != Data("null".utf8) else { return nil }
+        return try decoder.decode(Result.self, from: data)
     }
 
     // MARK: - HTTP

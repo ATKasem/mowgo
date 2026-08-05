@@ -706,26 +706,27 @@ export async function createInvoice(invoice) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  // Idempotent: a job that's toggled done->todo->done must not double-invoice.
+  // Auto-invoice path (job-linked): owner-safe RPC. It resolves the OWNER for
+  // crew completions (RLS is owner-only), is atomically idempotent per job
+  // (ON CONFLICT), and returns (invoice_id, created) for both outcomes.
   if (invoice.job_id) {
-    const { data: existing, error: lookupError } = await supabase
-      .from('invoices')
-      .select('id, client_id, amount, status, created_at, job_id')
-      .eq('job_id', invoice.job_id)
-      .maybeSingle();
-    if (lookupError) throw lookupError;
-    if (existing) {
-      return {
-        invoice: {
-          id: existing.id,
-          clients: invoice.clients || null,
-          amount: existing.amount,
-          status: existing.status,
-          created_at: existing.created_at,
-        },
-        created: false,
-      };
-    }
+    const { data, error: rpcError } = await supabase.rpc('create_invoice_for_job', {
+      p_job_id: invoice.job_id,
+      p_amount: amount,
+    });
+    if (rpcError) throw rpcError;
+    const row = data?.[0];
+    if (!row?.invoice_id) throw new Error('Invoice could not be created');
+    return {
+      invoice: {
+        id: row.invoice_id,
+        clients: invoice.clients || null,
+        amount,
+        status: 'unpaid',
+        created_at: new Date().toISOString(),
+      },
+      created: Boolean(row.created),
+    };
   }
 
   let data;
@@ -950,15 +951,15 @@ export async function saveProfile(profile) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { business_name, phone, avatar_url, venmo_handle, cashapp_handle, zelle_handle } = profile;
+  const { business_name, phone, venmo_handle, cashapp_handle, zelle_handle } = profile;
   const { error } = await supabase.from('profiles').upsert({
-    id: user.id, business_name, phone, avatar_url, latitude, longitude,
+    id: user.id, business_name, phone, latitude, longitude,
     venmo_handle: venmo_handle || null,
     cashapp_handle: cashapp_handle || null,
     zelle_handle: zelle_handle || null,
   });
   if (error) throw error;
-  return { ...profile, business_name, phone, avatar_url, latitude, longitude };
+  return { ...profile, business_name, phone, latitude, longitude };
 }
 
 // ===== Team / Crew =====

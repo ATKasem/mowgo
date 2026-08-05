@@ -3,7 +3,14 @@ package com.mowgo.app.data
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -63,8 +70,9 @@ class InvoiceRepository {
     }
 
     /**
-     * Auto-invoice for a completed job (mirrors web). Idempotent per job_id —
-     * callers should skip $0 rates before invoking.
+     * Auto-invoice for a completed job (mirrors web + iOS). Owner-safe RPC:
+     * resolves the OWNER for crew completions (RLS is owner-only) and is
+     * atomically idempotent per job (ON CONFLICT). Callers skip $0 rates.
      */
     suspend fun createInvoiceForJob(jobId: String, clientId: String, amount: Double): Invoice? {
         val existing = loadInvoices().firstOrNull { it.jobId == jobId }
@@ -83,26 +91,45 @@ class InvoiceRepository {
             return newInvoice
         }
 
-        val userId = getCurrentUserId() ?: throw IllegalStateException("Not authenticated")
-        val invoice = Invoice(
-            userId = userId,
-            clientId = clientId,
-            jobId = jobId,
-            amount = amount,
-            status = Invoice.STATUS_UNPAID,
-        )
-        return try {
-            SupabaseClientProvider.client.from("invoices")
-                .insert(invoice) { select() }
-                .decodeSingle<Invoice>()
+        val createdId: String?
+        val created: Boolean
+        try {
+            val rows = SupabaseClientProvider.client.postgrest.rpc(
+                "create_invoice_for_job",
+                buildJsonObject {
+                    put("p_job_id", jobId)
+                    put("p_amount", amount)
+                }
+            ).decodeAs<JsonArray>()
+            val row = rows.firstOrNull() as? JsonObject
+            createdId = row?.get("invoice_id")
+                ?.let { it as? JsonPrimitive }
+                ?.takeIf { it.isString }
+                ?.content
+            created = row?.get("created")
+                ?.let { it as? JsonPrimitive }
+                ?.booleanOrNull ?: false
         } catch (e: Exception) {
-            // Unique job_id violation (23505): a concurrent call created it first.
-            if (e.message?.contains("duplicate key") == true || e.message?.contains("23505") == true) {
-                loadInvoices().firstOrNull { it.jobId == jobId }
-            } else {
-                throw e
-            }
+            // Duplicates are handled server-side (ON CONFLICT → created=false);
+            // every other failure propagates so the caller can surface it.
+            throw e
         }
+
+        if (createdId == null) return null
+        if (created) {
+            return Invoice(
+                id = createdId,
+                userId = "",
+                clientId = clientId,
+                jobId = jobId,
+                amount = amount,
+                status = Invoice.STATUS_UNPAID,
+                createdAt = Instant.now().toString(),
+            )
+        }
+        // Duplicate (another device won the race) — owners reload the existing
+        // row; crew can't see owner invoices by design and gets null.
+        return loadInvoices().firstOrNull { it.jobId == jobId }
     }
 
     /** Mark an invoice as paid with current timestamp. */

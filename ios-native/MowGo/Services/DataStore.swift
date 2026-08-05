@@ -473,32 +473,35 @@ final class DataStore: ObservableObject {
         case "invoice:create":
             struct C: Decodable { let jobId: UUID; let clientId: UUID; let amount: Double }
             let c = try JSONDecoder().decode(C.self, from: mutation.payload)
-            // Idempotent: the unique job_id index rejects duplicates; check first.
+            // Idempotent + owner-safe: the RPC resolves the owner for crew
+            // completions and ON CONFLICT makes duplicates a no-op.
             if invoices.contains(where: { $0.jobId == c.jobId }) { break }
-            guard let userId = currentUserId else { break }
-            struct InvoiceInsert: Encodable {
-                let userId: UUID
-                let clientId: UUID
-                let jobId: UUID
-                let amount: Double
-                let status: String
+            struct Params: Encodable {
+                let pJobId: UUID
+                let pAmount: Double
             }
-            do {
-                let created: Invoice = try await sb.insert("invoices", InvoiceInsert(
-                    userId: userId, clientId: c.clientId, jobId: c.jobId, amount: c.amount, status: "unpaid"
-                ))
+            struct Row: Decodable {
+                let invoiceId: UUID
+                let created: Bool
+            }
+            let rows: [Row]? = try await sb.rpc(
+                "create_invoice_for_job",
+                params: Params(pJobId: c.jobId, pAmount: c.amount),
+                [Row].self
+            )
+            if let row = rows?.first, row.created {
+                let created = Invoice(
+                    id: row.invoiceId, clientId: c.clientId, jobId: c.jobId,
+                    amount: Decimal(string: String(format: "%.2f", c.amount)) ?? 0,
+                    status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
+                    clients: nil
+                )
                 invoices.insert(created, at: 0)
-            } catch {
-                // Unique violation: a concurrent insert won the race — resolve
-                // it so the FIFO queue never blocks on a permanent conflict.
-                if let existing = try? await sb.fetchInvoices().first(where: { $0.jobId == c.jobId }) {
-                    if !invoices.contains(where: { $0.id == existing.id }) {
-                        invoices.insert(existing, at: 0)
-                    }
-                } else {
-                    // Not a duplicate — rethrow so the mutation is retried, never silently lost.
-                    throw error
-                }
+            } else if let existing = try await sb.fetchInvoices().first(where: { $0.jobId == c.jobId }),
+                      !invoices.contains(where: { $0.id == existing.id }) {
+                // Fetch failures propagate so the queued mutation is retried,
+                // not silently dropped (crew gets an empty list, not an error).
+                invoices.insert(existing, at: 0)
             }
 
         case "recurring:create":
@@ -1067,21 +1070,36 @@ final class DataStore: ObservableObject {
     }
 
     private func createInvoice(jobId: UUID, clientId: UUID, amount: Decimal, clientName: String?) async throws {
-        struct InvoiceInsert: Encodable {
-            let userId: UUID
-            let clientId: UUID
-            let jobId: UUID
-            let amount: Double
-            let status: String
+        struct Params: Encodable {
+            let pJobId: UUID
+            let pAmount: Double
         }
-        guard let userId = currentUserId else { return }
-        let inserted: Invoice = try await sb.insert("invoices", InvoiceInsert(
-            userId: userId, clientId: clientId, jobId: jobId,
-            amount: centsDouble(amount), status: "unpaid"
-        ))
-        var created = inserted
-        created.clients = Invoice.ClientRef(name: clientName)
-        invoices.insert(created, at: 0)
+        struct Row: Decodable {
+            let invoiceId: UUID
+            let created: Bool
+        }
+        // Owner-safe RPC: resolves the OWNER for crew completions (RLS is
+        // owner-only), atomically idempotent per job, and reports both
+        // outcomes so we never have to fetch a possibly-invisible row.
+        let rows: [Row]? = try await sb.rpc(
+            "create_invoice_for_job",
+            params: Params(pJobId: jobId, pAmount: centsDouble(amount)),
+            [Row].self
+        )
+        guard let row = rows?.first else { return }
+        if row.created {
+            var created = Invoice(
+                id: row.invoiceId, clientId: clientId, jobId: jobId, amount: amount,
+                status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
+                clients: Invoice.ClientRef(name: clientName)
+            )
+            invoices.insert(created, at: 0)
+        } else if let existing = try await sb.fetchInvoices().first(where: { $0.jobId == jobId }),
+                  !invoices.contains(where: { $0.id == existing.id }) {
+            // Duplicate (another device won) — resolve for owners; crew can't
+            // see owner invoices by design and simply stays quiet.
+            invoices.insert(existing, at: 0)
+        }
     }
 
     // MARK: - Webhook Notifications
