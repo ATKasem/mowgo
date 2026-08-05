@@ -33,7 +33,8 @@ function invoiceNudgeText(invoice, tr, language) {
   const date = invoice.created_at
     ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
     : '';
-  return tr('Hi {{name}} — friendly reminder: ${{amount}} from {{date}} is still due. {{paymentInfo}}. Thanks!', { name, amount, date, paymentInfo: invoicePaymentInfo(tr) });
+  const datePart = date ? `${language === 'es' ? ' del' : ' from'} ${date}` : '';
+  return tr('Hi {{name}} — friendly reminder: ${{amount}}{{datePart}} is still due. {{paymentInfo}}. Thanks!', { name, amount, datePart, paymentInfo: invoicePaymentInfo(tr) });
 }
 
 /** Unpaid/overdue invoices older than 3 days get a Nudge (mirrors estimates). */
@@ -105,8 +106,8 @@ export default function Invoices({ invoices = [], setInvoices }) {
   }, [invoices, statusFilter]);
 
   const unpaid = invoices.filter(i => i.status !== 'paid');
-  const totalUnpaid = unpaid.reduce((s, i) => s + (i.amount || 0), 0);
-  const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0);
+  const totalUnpaid = unpaid.reduce((s, i) => s + (i.amount || 0), 0).toFixed(2);
+  const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0).toFixed(2);
 
   return (
     <div>

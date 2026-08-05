@@ -53,7 +53,9 @@ struct InvoicesView: View {
                 .onTapGesture { selectedInvoiceDetail = inv }
                 .contentShape(Rectangle()) }
             if !paid.isEmpty { sectionHeader("Paid") }
-            ForEach(paid) { inv in InvoiceRow(invoice: inv, showPay: false) {} }
+            ForEach(paid) { inv in InvoiceRow(invoice: inv, showPay: false) {}
+                .onTapGesture { selectedInvoiceDetail = inv }
+                .contentShape(Rectangle()) }
             if unpaid.isEmpty && paid.isEmpty { invoiceEmpty }
         }.padding(16) }
     }

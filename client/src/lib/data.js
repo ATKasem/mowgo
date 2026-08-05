@@ -892,14 +892,15 @@ export async function loadProfile() {
   if (isDemoMode()) {
     const userId = _currentDemoUserId();
     const member = _teamMembers.find(m => m.id === userId);
-    // Demo mode: reset the clipboard-text mirrors so a real account's
-    // payment handles can't leak into demo invoice texts.
-    localStorage.setItem('mf_business_name', 'Green Thumb Lawn Care');
-    localStorage.setItem('mf_business_phone', '405-555-0100');
-    localStorage.setItem('mf_venmo_handle', '');
-    localStorage.setItem('mf_cashapp_handle', '');
-    localStorage.setItem('mf_zelle_handle', '');
-    return member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo', role: 'owner', business_id: null };
+    const base = member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo', role: 'owner', business_id: null };
+    // Hydrate from the demo profile (never real-account data) so demo-saved
+    // payment handles survive Settings visits without leaking real handles.
+    localStorage.setItem('mf_business_name', base.business_name || 'Green Thumb Lawn Care');
+    localStorage.setItem('mf_business_phone', base.phone || '405-555-0100');
+    localStorage.setItem('mf_venmo_handle', base.venmo_handle || '');
+    localStorage.setItem('mf_cashapp_handle', base.cashapp_handle || '');
+    localStorage.setItem('mf_zelle_handle', base.zelle_handle || '');
+    return base;
   }
 
   const { data: { user } } = await supabase.auth.getUser();

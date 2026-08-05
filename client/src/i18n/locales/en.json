@@ -428,7 +428,7 @@
     "pay_via_methods": "Pay via {{methods}}",
     "please_send_payment_at_your_earliest_convenience": "Please send payment at your earliest convenience",
     "hi_name_your_lawn_was_serviced_on_date_amount_due_paymentinfo_thanks": "Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!",
-    "hi_name_friendly_reminder_amount_from_date_is_still_due_paymentinfo_than": "Hi {{name}} — friendly reminder: ${{amount}} from {{date}} is still due. {{paymentInfo}}. Thanks!",
+    "hi_name_friendly_reminder_amount_datepart_is_still_due_paymentinfo_thank": "Hi {{name}} — friendly reminder: ${{amount}}{{datePart}} is still due. {{paymentInfo}}. Thanks!",
     "count_total_one": "{{count}} total",
     "count_total_other": "{{count}} total",
     "amount_outstanding": "${{amount}} outstanding",
