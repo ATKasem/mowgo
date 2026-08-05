@@ -641,6 +641,7 @@ export async function loadInvoices() {
 
   return (data || []).map(inv => ({
     id: inv.id,
+    job_id: inv.job_id ?? null,
     clients: inv.clients ? {
       id: inv.clients.id,
       name: inv.clients.name,

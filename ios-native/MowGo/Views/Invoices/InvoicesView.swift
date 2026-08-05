@@ -13,7 +13,7 @@ struct InvoicesView: View {
     @State private var showNewEstimate = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-    private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid } }
+    private var unpaid: [Invoice] { store.invoices.filter { $0.status != .paid } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
     private var totalUnpaid: Decimal { unpaid.reduce(0) { $0 + $1.amount } }
 
@@ -136,7 +136,7 @@ private struct InvoiceDetailView: View {
     }
 
     private var canNudge: Bool {
-        guard invoice.status == .unpaid,
+        guard invoice.status != .paid,
               let value = invoice.createdAt,
               let date = Self.parseISODate(value) else { return false }
         return date < Calendar.current.date(byAdding: .day, value: -3, to: Date())!

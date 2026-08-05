@@ -333,8 +333,14 @@ struct Invoice: Codable, Identifiable, Equatable {
     var clients: ClientRef?
 
     enum InvoiceStatus: String, Codable {
-        case unpaid, paid
-        var label: String { self == .paid ? "Paid" : "Unpaid" }
+        case unpaid, paid, overdue
+        var label: String {
+            switch self {
+            case .paid: return "Paid"
+            case .unpaid: return "Unpaid"
+            case .overdue: return "Overdue"
+            }
+        }
     }
 
     struct ClientRef: Codable, Equatable {

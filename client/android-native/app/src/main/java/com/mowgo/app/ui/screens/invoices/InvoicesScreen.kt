@@ -651,6 +651,7 @@ private fun InvoiceStatusChip(status: String) {
     val (text, color) = when (status) {
         Invoice.STATUS_PAID -> "Paid" to MowGoColors.SuccessDark
         Invoice.STATUS_UNPAID -> "Unpaid" to MowGoColors.WarningDark
+        Invoice.STATUS_OVERDUE -> "Overdue" to MowGoColors.DangerDark
         else -> status to MowGoColors.TextSecondaryDark
     }
 
