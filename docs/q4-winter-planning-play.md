@@ -83,7 +83,7 @@ One click, five minutes, done before the holidays.
 
 ## Execution notes
 - **Target:** 20% of active users converting (concierge or annual upgrade) — Hormozi's internal-play benchmark.
-- **Send via:** Resend once mowgo.app domain verifies (from `MowGo <invoices@mowgo.app>`).
+- **Send via:** Resend once mowgo.app domain verifies (from `MowGo <invoices@mowgoapp.com>`).
 - **Segment (future):** users with bookings in 2026 → personalized "your 2026: X jobs scheduled"; users with no bookings → different lead (activation).
 - **KPI:** reply/click rate on E1, slot bookings, annual-plan upgrades. 3-email arc, no hard sell before E3.
 - **Optional add:** swap Email 2's generic math for a real case study when the first "12 → 22 jobs/week" proof exists (proof stack per §25).

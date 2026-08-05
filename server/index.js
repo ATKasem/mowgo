@@ -328,7 +328,7 @@ app.post('/api/invoices', auth, async (req, res) => {
   if (client?.email) {
     try {
       await resend.emails.send({
-        from: 'MowGo <invoices@mowgo.app>',
+        from: 'MowGo <invoices@mowgoapp.com>',
         to: client.email,
         subject: `Invoice from MowGo — $${amount}`,
         html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice.id}">Pay online</a></p>`,
@@ -351,7 +351,7 @@ app.post('/api/invoices/send-email', auth, async (req, res) => {
 
   try {
     await resend.emails.send({
-      from: 'MowGo <invoices@mowgo.app>',
+      from: 'MowGo <invoices@mowgoapp.com>',
       to: client.email,
       subject: `Invoice from MowGo — $${amount}`,
       html: `<p>Hi ${escapeHtml(client.name)},</p><p>Here's your lawn care invoice for $${escapeHtml(String(amount))}. <a href="${process.env.APP_URL}/pay/${invoice_id}">Pay online</a></p>`,

@@ -3,7 +3,7 @@
 **Framework:** Hormozi §26 (deprivation grows while waiting, CTA = clear + reason now + real scarcity), §27 (Closer: label problem → past pain → sell the vacation → offer → handle objections → reinforce), hierarchy of proof (anonymize, pull proof pre-purchase), guarantee formula ("if not X by Y, I will Z").
 **Timing (critical):** E1 fires the SAME HOUR as the audit report (speed-to-lead — the report just revealed their loss, that's peak deprivation). E2 at +3 days. E3 at +7 days. No hard sell before E3.
 **Audience:** qualified ICP (10–50 lawns/wk) who completed the route audit. Unqualified branches got redirected at the form — they never see this.
-**From:** `MowGo <invoices@mowgo.app>` (after domain verifies). Personalize with their audit numbers where possible (zip, bucket).
+**From:** `MowGo <invoices@mowgoapp.com>` (after domain verifies). Personalize with their audit numbers where possible (zip, bucket).
 
 **Honesty rule:** No invented testimonials. Email 2 uses anonymized real proof when it exists (proof stack per §25) — until then it carries the math + guarantee, labeled as estimates. Never fabricate case studies.
 
