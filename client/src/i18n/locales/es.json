@@ -717,7 +717,11 @@
       "title": "MowGo — Software de programación, rutas y facturación para jardinería",
       "description": "Reagendado automático por lluvia, programación, rutas y facturación creados para cuadrillas de jardinería en Oklahoma. Gratis para tus primeros 5 clientes. Sin tarjeta de crédito."
     },
-    "mowgo_operator": "Operador de MowGo"
+    "mowgo_operator": "Operador de MowGo",
+    "why_should_i_pay_yearly": "¿Por qué pagar anualmente?",
+    "two_months_free_78_off_solo_158_off_crew_and_one_payment_covers_the_whol": "Dos meses gratis ($78 de descuento en Solo, $158 en Crew) y un solo pago cubre toda la temporada — sin cargos a la tarjeta en invierno. La Garantía Rain-Proof sigue aplicando: se reembolsan los meses no usados.",
+    "what_happens_to_my_data_if_i_cancel": "¿Qué pasa con mis datos si cancelo?",
+    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Sus datos siempre son suyos. Expórtelos cuando quiera. Tras cancelar, los conservamos seguros por 90 días y los eliminamos a petición."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",

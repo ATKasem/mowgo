@@ -71,6 +71,8 @@ const faqs = [
   { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.' },
   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
   { q: "What's the catch?", a: "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full." },
+  { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
+  { q: 'What happens to my data if I cancel?', a: 'Your data stays yours, always. Export it anytime. After cancel, we keep it safe for 90 days and delete on request.' },
 ];
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -397,7 +399,7 @@ export default function Landing() {
                   <div className="mt-5 mb-6 min-h-[72px]">
                     <span className="text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white">{plan.price === '0' ? tr('Free') : `$${billingInterval === 'year' && plan.annualPrice ? plan.annualPrice : plan.price}`}</span>
                     {plan.price !== '0' && <span className="text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] font-medium">/{tr(billingInterval === 'year' && plan.annualPrice ? 'year' : plan.period)}</span>}
-                    {billingInterval === 'year' && plan.annualPrice && plan.price !== '0' && plan.name !== 'Premium' && (
+                    {billingInterval === 'year' && plan.annualPrice && plan.price !== '0' && (
                       <span className="ml-2 inline-block align-middle text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5">{tr('Save ${{savings}}', { savings: String(Number(plan.price) * 12 - Number(plan.annualPrice)) })}</span>
                     )}
                     {billingInterval === 'year' && plan.price !== '0' && (
@@ -450,7 +452,6 @@ export default function Landing() {
                   )}
                   {plan.highlight && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr(plan.scarcity)}</p>}
                   {plan.name === 'Crew' && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr("14-day free trial. Cancel anytime.")}</p>}
-                  {plan.name === 'Premium' && billingInterval === 'year' && <p className="text-[11px] text-[var(--color-text-muted)] mt-2 text-center">{tr("2 months free")}</p>}
                 </div>
               </FadeIn>
             ))}
@@ -518,7 +519,7 @@ export default function Landing() {
             <Link to="/compare" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
             <Link to="/login" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Log In")}</Link>
             <Link to="/privacy" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Privacy")}</Link>
-            <a href="mailto:hello@mowgo.app" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
+            <a href="mailto:hello@mowgoapp.com" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Contact")}</a>
           </div>
         </div>
       </footer>

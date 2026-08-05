@@ -667,7 +667,11 @@
       "title": "MowGo — Lawn Care Scheduling, Routing & Invoicing Software",
       "description": "Rain-delay auto-reschedule, scheduling, routing, and invoicing built for Oklahoma lawn care crews. Free for your first 5 clients. No credit card."
     },
-    "mowgo_operator": "MowGo operator"
+    "mowgo_operator": "MowGo operator",
+    "why_should_i_pay_yearly": "Why should I pay yearly?",
+    "two_months_free_78_off_solo_158_off_crew_and_one_payment_covers_the_whol": "Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.",
+    "what_happens_to_my_data_if_i_cancel": "What happens to my data if I cancel?",
+    "your_data_stays_yours_always_export_it_anytime_after_cancel_we_keep_it_s": "Your data stays yours, always. Export it anytime. After cancel, we keep it safe for 90 days and delete on request."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
