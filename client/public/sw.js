@@ -30,7 +30,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          if (response.ok) {
+          // Only the app shell ('/' or '/index.html') updates the offline fallback.
+          // Other pages (demo, marketing) must never poison the shell cache.
+          if (response.ok && (url.pathname === '/' || url.pathname === '/index.html')) {
             const copy = response.clone();
             caches.open(CACHE).then((cache) => cache.put('/index.html', copy));
           }
