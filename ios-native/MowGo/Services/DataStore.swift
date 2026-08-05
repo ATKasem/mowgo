@@ -483,6 +483,7 @@ final class DataStore: ObservableObject {
             struct Row: Decodable {
                 let invoiceId: UUID
                 let created: Bool
+                let amount: Double?
             }
             let rows: [Row]? = try await sb.rpc(
                 "create_invoice_for_job",
@@ -490,9 +491,12 @@ final class DataStore: ObservableObject {
                 [Row].self
             )
             if let row = rows?.first, row.created {
+                // Prefer the RPC-returned authoritative amount (client rate
+                // may be stale); fall back to the local rate if absent.
+                let resolvedAmount = row.amount.map { Decimal(string: String(format: "%.2f", $0)) ?? 0 } ?? Decimal(string: String(format: "%.2f", c.amount)) ?? 0
                 let created = Invoice(
                     id: row.invoiceId, clientId: c.clientId, jobId: c.jobId,
-                    amount: Decimal(string: String(format: "%.2f", c.amount)) ?? 0,
+                    amount: resolvedAmount,
                     status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
                     clients: nil
                 )
@@ -1077,6 +1081,7 @@ final class DataStore: ObservableObject {
         struct Row: Decodable {
             let invoiceId: UUID
             let created: Bool
+            let amount: Double?
         }
         // Owner-safe RPC: resolves the OWNER for crew completions (RLS is
         // owner-only), atomically idempotent per job, and reports both
@@ -1088,8 +1093,11 @@ final class DataStore: ObservableObject {
         )
         guard let row = rows?.first else { return }
         if row.created {
+            // Prefer the RPC-returned authoritative amount (client rate may
+            // be stale); fall back to the local rate if absent.
+            let resolvedAmount = row.amount.map { Decimal(string: String(format: "%.2f", $0)) ?? 0 } ?? amount
             var created = Invoice(
-                id: row.invoiceId, clientId: clientId, jobId: jobId, amount: amount,
+                id: row.invoiceId, clientId: clientId, jobId: jobId, amount: resolvedAmount,
                 status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
                 clients: Invoice.ClientRef(name: clientName)
             )

@@ -16,7 +16,11 @@ class ExportRepository(
 
     fun clientsCsv(clients: List<Client>): String = csv(
         listOf("ID", "User ID", "Name", "Address", "Phone", "Email", "Rate", "Cleaning Notes", "Key Code", "Alarm Code", "Pet Instructions", "Created At"),
-        clients.map { client -> listOf(client.id, client.userId, client.name, client.address, client.phone, client.email, client.rate, client.cleaningNotes, client.keyCode, client.alarmCode, client.petInstructions, client.createdAt) },
+        clients.map { client -> listOf(client.id, client.userId, client.name, client.address, client.phone, client.email, client.rate, client.cleaningNotes,
+            // Security: physical-access credentials are redacted from exports.
+            if (client.keyCode.isNullOrBlank()) "" else "***",
+            if (client.alarmCode.isNullOrBlank()) "" else "***",
+            client.petInstructions, client.createdAt) },
     )
 
     fun jobsCsv(jobs: List<Job>): String = csv(

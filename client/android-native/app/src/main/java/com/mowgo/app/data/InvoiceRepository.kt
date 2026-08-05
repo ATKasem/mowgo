@@ -93,6 +93,7 @@ class InvoiceRepository {
 
         val createdId: String?
         val created: Boolean
+        var serverAmount: Double? = null
         try {
             val rows = SupabaseClientProvider.client.postgrest.rpc(
                 "create_invoice_for_job",
@@ -109,6 +110,11 @@ class InvoiceRepository {
             created = row?.get("created")
                 ?.let { it as? JsonPrimitive }
                 ?.booleanOrNull ?: false
+            // Prefer the RPC-returned authoritative amount (client rate may
+            // be stale); fall back to the local amount if absent.
+            serverAmount = row?.get("amount")
+                ?.let { it as? JsonPrimitive }
+                ?.doubleOrNull
         } catch (e: Exception) {
             // Duplicates are handled server-side (ON CONFLICT → created=false);
             // every other failure propagates so the caller can surface it.
@@ -122,7 +128,7 @@ class InvoiceRepository {
                 userId = "",
                 clientId = clientId,
                 jobId = jobId,
-                amount = amount,
+                amount = serverAmount ?: amount,
                 status = Invoice.STATUS_UNPAID,
                 createdAt = Instant.now().toString(),
             )

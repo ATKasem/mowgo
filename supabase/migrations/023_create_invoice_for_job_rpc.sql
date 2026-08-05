@@ -16,7 +16,7 @@ create or replace function public.create_invoice_for_job(
   p_job_id uuid,
   p_amount numeric
 )
-returns table (invoice_id uuid, created boolean)
+returns table (invoice_id uuid, created boolean, amount numeric)
 language plpgsql
 security definer
 set search_path = public
@@ -73,6 +73,8 @@ begin
     select id into invoice_id from public.invoices where job_id = p_job_id;
     created := false;
   end if;
+  -- Return the authoritative amount so clients never display a stale rate.
+  amount := v_rate;
   return next;
 end;
 $$;

@@ -23,6 +23,11 @@ const dispatchAttempts = new Map();
 const RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 
+// NOTE: entries are lazily replaced on the same key but never actively
+// evicted — bounded in practice by Workers isolate recycling. For
+// production-grade limits across isolates, enable CF dashboard Rate
+// Limiting rules (same as booking.js / leads/public.js).
+
 function rateLimitKey(userId, request) {
   const ip = request.headers.get('cf-connecting-ip') || 'unknown';
   return `${userId}:${ip}`;

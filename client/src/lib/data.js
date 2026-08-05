@@ -476,7 +476,8 @@ export async function fetchClientsForExport() {
     .eq('user_id', ownerId)
     .order('name');
   if (error) throw new Error('Failed to export clients: ' + (error.message || 'Unknown error'));
-  return data || [];
+  // Redact physical-access credentials from exports (mirrors iOS/Android).
+  return (data || []).map(({ key_code, alarm_code, ...rest }) => rest);
 }
 
 export async function createClient(client) {
@@ -733,11 +734,13 @@ export async function createInvoice(invoice) {
     if (rpcError) throw rpcError;
     const row = data?.[0];
     if (!row?.invoice_id) throw new Error('Invoice could not be created');
+    // Use the RPC-returned authoritative amount (client rate may be stale).
+    const serverAmount = Number(row.amount);
     return {
       invoice: {
         id: row.invoice_id,
         clients: invoice.clients || null,
-        amount,
+        amount: Number.isFinite(serverAmount) ? serverAmount : amount,
         status: 'unpaid',
         created_at: new Date().toISOString(),
       },
