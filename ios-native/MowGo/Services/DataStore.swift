@@ -1102,6 +1102,35 @@ final class DataStore: ObservableObject {
         }
     }
 
+    /// Manual ad-hoc invoice (no job) — mirrors Android's New Invoice dialog.
+    /// Owner-only via RLS; crew sees the RLS error surfaced in the form.
+    func createManualInvoice(clientId: UUID, amount: Decimal, clientName: String?) async throws {
+        let value = centsDouble(amount)
+        guard value > 0 else {
+            throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Amount must be positive"])
+        }
+        if auth?.isDemoMode == true {
+            let demo = Invoice(id: UUID(), clientId: clientId, amount: amount, status: .unpaid,
+                               createdAt: ISO8601DateFormatter().string(from: Date()),
+                               clients: Invoice.ClientRef(name: clientName))
+            invoices.insert(demo, at: 0)
+            return
+        }
+        guard let userId = currentUserId else { return }
+        struct InvoiceInsert: Encodable {
+            let userId: UUID
+            let clientId: UUID
+            let amount: Double
+            let status: String
+        }
+        let inserted: Invoice = try await sb.insert("invoices", InvoiceInsert(
+            userId: userId, clientId: clientId, amount: value, status: "unpaid"
+        ))
+        var created = inserted
+        created.clients = Invoice.ClientRef(name: clientName)
+        invoices.insert(created, at: 0)
+    }
+
     // MARK: - Webhook Notifications
 
     private func fireWebhookJobCompleted(_ job: Job) async {

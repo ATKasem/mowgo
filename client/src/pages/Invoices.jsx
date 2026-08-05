@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { updateInvoiceStatus, invoicePayMethods } from '../lib/data';
-import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { updateInvoiceStatus, invoicePayMethods, createInvoice, loadClients } from '../lib/data';
+import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck, Plus } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 import EstimatesSection from '../components/EstimatesSection';
 
@@ -58,6 +58,12 @@ export default function Invoices({ invoices = [], setInvoices }) {
   const [expandedId, setExpandedId] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [section, setSection] = useState('invoices');
+  const [showNewInvoice, setShowNewInvoice] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [newClientId, setNewClientId] = useState('');
+  const [newAmount, setNewAmount] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
   const filterRef = useRef(null);
 
   // Close filter dropdown on click outside (handles touch devices)
@@ -75,6 +81,46 @@ export default function Invoices({ invoices = [], setInvoices }) {
       document.removeEventListener('touchstart', handler);
     };
   }, [showFilter]);
+
+  // Load the client picker when the New Invoice dialog opens.
+  useEffect(() => {
+    if (!showNewInvoice) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await loadClients();
+        if (!cancelled) setClients(list || []);
+      } catch (err) { console.error('loadClients:', err); }
+    })();
+    return () => { cancelled = true; };
+  }, [showNewInvoice]);
+
+  const createManualInvoice = useCallback(async () => {
+    const amount = Number(newAmount);
+    if (!newClientId || !Number.isFinite(amount) || amount <= 0) {
+      setCreateError(tr('Enter a client and a positive amount'));
+      return;
+    }
+    setCreating(true);
+    setCreateError('');
+    try {
+      const { invoice: inv, created } = await createInvoice({ client_id: newClientId, amount });
+      if (created) {
+        setInvoices(prev => prev.some(i => i.id === inv.id) ? prev : [inv, ...prev]);
+        setShowNewInvoice(false);
+        setNewClientId('');
+        setNewAmount('');
+      } else {
+        // Existing (shouldn't happen for a manual invoice) — surface it.
+        setCreateError(tr('That invoice already exists'));
+      }
+    } catch (err) {
+      console.error('createInvoice:', err);
+      setCreateError(err?.message || tr("Couldn't create invoice"));
+    } finally {
+      setCreating(false);
+    }
+  }, [newClientId, newAmount, setInvoices, tr]);
 
   const copyToClipboard = useCallback(async (invoice) => {
     try {
@@ -116,7 +162,16 @@ export default function Invoices({ invoices = [], setInvoices }) {
       </div>
       {section === 'estimates' ? <EstimatesSection /> : <>
       <div className="mb-5">
-        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Invoices")}</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Invoices")}</h2>
+          <button
+            onClick={() => setShowNewInvoice(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-brand-hover px-3 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" />
+            {tr('New Invoice')}
+          </button>
+        </div>
         <div className="flex items-center gap-3 mt-0.5">
           <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('{{count}} total', { count: invoices.length })}</p>
           <span className="text-gray-300 dark:text-[var(--color-text-secondary)]">&middot;</span>
@@ -124,6 +179,61 @@ export default function Invoices({ invoices = [], setInvoices }) {
           {totalPaid > 0 && <p className="text-sm text-brand-hover dark:text-emerald-400 font-medium">{tr('${{amount}} collected', { amount: totalPaid })}</p>}
         </div>
       </div>
+
+      {showNewInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setShowNewInvoice(false)}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl dark:bg-gray-800" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('New Invoice')}</h3>
+              <button onClick={() => setShowNewInvoice(false)} className="rounded-lg p-1 text-[var(--color-text-secondary)] hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Close">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <label className="block text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-1">{tr('Client')}</label>
+            <select
+              value={newClientId}
+              onChange={e => {
+                setNewClientId(e.target.value);
+                const picked = clients.find(c => c.id === e.target.value);
+                // Always reset: a rate-less client must not inherit the previous amount.
+                setNewAmount(picked?.rate ? String(picked.rate) : '');
+              }}
+              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text-primary)] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="">{tr('Select Client')}</option>
+              {clients.map(c => (
+                <option key={c.id} value={c.id}>{c.name}{c.rate ? ` — $${Number(c.rate).toFixed(2)}` : ''}</option>
+              ))}
+            </select>
+            <label className="block text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-3 mb-1">{tr('Amount')}</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={newAmount}
+              onChange={e => setNewAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text-primary)] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            />
+            {createError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{createError}</p>}
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setShowNewInvoice(false)}
+                className="flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm font-semibold text-[var(--color-text-secondary)] dark:border-gray-600"
+              >
+                {tr('Cancel')}
+              </button>
+              <button
+                onClick={createManualInvoice}
+                disabled={creating}
+                className="flex-1 rounded-lg bg-brand-hover px-3 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                {creating ? tr('Creating…') : tr('Create Invoice')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {unpaid.length > 0 && (
         <div className="card p-4 mb-4 bg-gradient-to-r from-amber-50 to-white dark:from-amber-950/20 dark:to-gray-900 border-amber-200 dark:border-amber-800">

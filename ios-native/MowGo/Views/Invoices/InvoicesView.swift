@@ -10,6 +10,7 @@ struct InvoicesView: View {
     @State private var selectedInvoiceDetail: Invoice?
     @State private var selectedEstimate: Estimate?
     @State private var showPayment = false
+    @State private var showNewInvoice = false
     @State private var showNewEstimate = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -30,6 +31,12 @@ struct InvoicesView: View {
                     else if segment == .invoices { invoiceList }
                     else { estimateList }
                 }
+                if segment == .invoices {
+                    Button { showNewInvoice = true } label: {
+                        Image(systemName: "plus").font(.title2.weight(.semibold)).foregroundColor(MowGoTheme.onAccent)
+                            .frame(width: 56, height: 56).background(MowGoTheme.deepGreen).clipShape(Circle()).shadow(radius: 4)
+                    }.padding(20).accessibilityLabel("New Invoice")
+                }
                 if segment == .estimates {
                     Button { showNewEstimate = true } label: {
                         Image(systemName: "plus").font(.title2.weight(.semibold)).foregroundColor(MowGoTheme.onAccent)
@@ -40,6 +47,7 @@ struct InvoicesView: View {
             .navigationTitle("Invoices").navigationBarTitleDisplayMode(.inline)
             .task { await store.loadEstimates() }
             .sheet(isPresented: $showPayment) { paymentSheet }
+            .sheet(isPresented: $showNewInvoice) { NewInvoiceView() }
             .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
             .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
             .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
@@ -217,6 +225,67 @@ private struct NewEstimateView: View {
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     var body: some View { NavigationStack { Form { Button(client?.name ?? "Select Client") { showClients = true }; TextField("Amount", text: $amount).keyboardType(.decimalPad); TextField("Note (optional)", text: $note); HStack { Button("Save Draft") { save(send: false) }.buttonStyle(.bordered).frame(maxWidth: .infinity); Button("Send") { save(send: true) }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).frame(maxWidth: .infinity) }.disabled(client == nil || Decimal(string: amount) == nil || saving) }.scrollContentBackground(.hidden).background(theme.background).navigationTitle("New Estimate").navigationBarTitleDisplayMode(.inline).toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }.sheet(isPresented: $showClients) { NavigationStack { List(store.clients) { item in Button(item.name) { client = item; amount = NSDecimalNumber(decimal: item.rate).stringValue; showClients = false } }.navigationTitle("Select Client").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showClients = false } } } }.presentationDetents([.medium, .large]) } }.presentationDetents([.medium, .large]) }
     private func save(send: Bool) { guard let client, let value = Decimal(string: amount) else { return }; saving = true; let estimate = Estimate(id: UUID(), clientId: client.id, amount: value, status: send ? .sent : .draft, note: note.isEmpty ? nil : note, createdAt: ISO8601DateFormatter().string(from: Date()), clients: Estimate.ClientRef(name: client.name)); let task: Task<Void, Never> = Task { do { try await store.createEstimate(estimate, send: send); if send { UIPasteboard.general.string = estimateText(estimate) }; dismiss() } catch { saving = false } }; _ = task }
+}
+
+private struct NewInvoiceView: View {
+    @EnvironmentObject var store: DataStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var client: Client?
+    @State private var amount = ""
+    @State private var showClients = false
+    @State private var saving = false
+    @State private var errorMessage: String?
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Button(client?.name ?? "Select Client") { showClients = true }
+                    TextField("Amount", text: $amount).keyboardType(.decimalPad)
+                    if let errorMessage {
+                        Text(errorMessage).foregroundColor(MowGoTheme.danger)
+                    }
+                    Button("Create Invoice") { create() }
+                        .buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).frame(maxWidth: .infinity)
+                        .disabled(client == nil || (Decimal(string: amount) ?? 0) <= 0 || saving)
+                }
+            }
+            .scrollContentBackground(.hidden).background(theme.background)
+            .navigationTitle("New Invoice").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+            .sheet(isPresented: $showClients) {
+                NavigationStack {
+                    List(store.clients) { item in
+                        Button(item.name) {
+                            client = item
+                            amount = NSDecimalNumber(decimal: item.rate).stringValue
+                            showClients = false
+                        }
+                    }.navigationTitle("Select Client")
+                    .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { showClients = false } } }
+                }.presentationDetents([.medium, .large])
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func create() {
+        guard let client, let value = Decimal(string: amount), value > 0 else { return }
+        saving = true
+        errorMessage = nil
+        let task: Task<Void, Never> = Task {
+            do {
+                try await store.createManualInvoice(clientId: client.id, amount: value, clientName: client.name)
+                await MainActor.run { dismiss() }
+            } catch {
+                await MainActor.run { errorMessage = error.localizedDescription; saving = false }
+            }
+        }
+        _ = task
+    }
 }
 
 private struct EstimateDetailView: View {
