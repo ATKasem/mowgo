@@ -3,9 +3,15 @@ const LIMIT = 5;
 const attempts = new Map();
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PHONE_RE = /^(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}$/;
+const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
 
-function json(body, status = 200) {
-  return Response.json(body, { status, headers: { 'Access-Control-Allow-Origin': 'https://mowgo.pages.dev' } });
+function corsOrigin(request) {
+  const origin = request?.headers?.get?.('origin');
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgo.pages.dev';
+}
+
+function jsonHelper(body, status = 200, origin = 'https://mowgo.pages.dev') {
+  return Response.json(body, { status, headers: { 'Access-Control-Allow-Origin': origin } });
 }
 function allowed(ip) {
   const now = Date.now(); const entry = attempts.get(ip);
@@ -30,11 +36,13 @@ async function fireLeadWebhook(env, userId, lead) {
   } catch (error) { console.warn('Public lead webhook failed:', error?.message || error); }
 }
 
-export async function onRequestOptions() {
-  return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': 'https://mowgo.pages.dev', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400' } });
+export async function onRequestOptions(request) {
+  return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': corsOrigin(request), 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400' } });
 }
 
 export async function onRequestPost({ request, env, waitUntil }) {
+  const origin = corsOrigin(request);
+  const json = (body, status = 200) => jsonHelper(body, status, origin);
   const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
   if (!allowed(ip)) return json({ error: 'Too many requests. Please try again later.' }, 429);
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'Quote requests are not configured.' }, 503);

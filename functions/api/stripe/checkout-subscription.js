@@ -5,7 +5,7 @@
  * Returns: { url: 'https://checkout.stripe.com/...' }
  */
 
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgo.app'];
+const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -57,7 +57,7 @@ export async function onRequestPost(context) {
     }
 
     const trialDays = parseInt(env.STRIPE_TRIAL_DAYS || '14', 10) || 14;
-    const appUrl = env.APP_URL || origin || 'https://mowgo.pages.dev';
+    const appUrl = origin || env.APP_URL || 'https://mowgoapp.com';
 
     const profileResponse = await fetch(
       `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=stripe_customer_id`,

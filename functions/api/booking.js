@@ -18,6 +18,12 @@
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const rateLimitMap = new Map();
+const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
+
+function corsOrigin(request) {
+  const origin = request?.headers?.get?.('origin');
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgo.pages.dev';
+}
 
 function checkRateLimit(ip) {
   const now = Date.now();
@@ -54,7 +60,7 @@ export async function onRequestOptions(context) {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': 'https://mowgo.pages.dev',
+      'Access-Control-Allow-Origin': corsOrigin(context.request),
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Max-Age': '86400',
@@ -64,6 +70,8 @@ export async function onRequestOptions(context) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const origin = corsOrigin(request);
+  const json = (data, status = 200) => jsonHelper(data, status, origin);
 
   // Rate limit
   const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
@@ -211,12 +219,12 @@ export async function onRequestPost(context) {
   }
 }
 
-function json(data, status = 200) {
+function jsonHelper(data, status = 200, origin = 'https://mowgo.pages.dev') {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'https://mowgo.pages.dev',
+      'Access-Control-Allow-Origin': origin,
     },
   });
 }

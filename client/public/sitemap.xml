@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mowgo.pages.dev/</loc>
+    <loc>https://mowgoapp.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/compare</loc>
+    <loc>https://mowgoapp.com/compare</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/blog/jobber-price-increase-2026</loc>
+    <loc>https://mowgoapp.com/blog/jobber-price-increase-2026</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/switch-from-lawnpro</loc>
+    <loc>https://mowgoapp.com/switch-from-lawnpro</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/quoteiq-alternative</loc>
+    <loc>https://mowgoapp.com/quoteiq-alternative</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/compare/ruunly</loc>
+    <loc>https://mowgoapp.com/compare/ruunly</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/compare/probase</loc>
+    <loc>https://mowgoapp.com/compare/probase</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/route-audit</loc>
+    <loc>https://mowgoapp.com/route-audit</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://mowgo.pages.dev/privacy</loc>
+    <loc>https://mowgoapp.com/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

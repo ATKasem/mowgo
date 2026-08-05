@@ -395,7 +395,7 @@ export default function Booking() {
 
         {/* Powered by MowGo */}
         <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-6">
-          {t('booking.powered_by')} <a href="https://mowgo.pages.dev" className="hover:text-emerald-500 transition-colors">MowGo</a>
+          {t('booking.powered_by')} <a href="https://mowgoapp.com" className="hover:text-emerald-500 transition-colors">MowGo</a>
         </p>
       </div>
     </div>

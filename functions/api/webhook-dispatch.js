@@ -190,7 +190,7 @@ export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': 'https://mowgo.pages.dev',
+      'Access-Control-Allow-Origin': request.headers.get('origin') || 'https://mowgo.pages.dev',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',

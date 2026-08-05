@@ -3,7 +3,7 @@
 import re
 import os
 
-BASE = "https://mowgo.pages.dev"
+BASE = "https://mowgoapp.com"
 SEO = "public/seo"
 
 PAGES = {
@@ -68,6 +68,9 @@ for path, meta in PAGES.items():
     canonical = f'<link rel="canonical" href="{BASE}/{path}" />'
     html = re.sub(r'<link rel="canonical"[^>]*>', "", html)
     html = html.replace("</head>", f"    {canonical}\n  </head>", 1)
+
+    # any leftover references to the old default domain (og:image, twitter:image, body links)
+    html = html.replace("https://mowgo.pages.dev", BASE)
 
     # per-page OG: replace landing OG values
     html = re.sub(r'<meta property="og:title"[^>]*>', f'<meta property="og:title" content="{meta["title"]}" />', html)

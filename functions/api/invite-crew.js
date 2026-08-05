@@ -230,7 +230,7 @@ export async function onRequestPost({ request, env }) {
                 from: 'MowGo <invoices@mowgoapp.com>',
                 to: [email],
                 subject: "You've been added to a MowGo crew — set your password",
-                html: `<p>${ownerProfile.business_name || 'Your crew lead'} added you to their MowGo crew.</p><p><a href="${resetUrl}">Set your password here</a> — it takes 30 seconds.</p><p>Once set, log in at <a href="https://mowgo.pages.dev">mowgo.pages.dev</a>.</p>`
+                html: `<p>${ownerProfile.business_name || 'Your crew lead'} added you to their MowGo crew.</p><p><a href="${resetUrl}">Set your password here</a> — it takes 30 seconds.</p><p>Once set, log in at <a href="https://mowgoapp.com">mowgoapp.com</a>.</p>`
               })
             });
           }
