@@ -22,8 +22,9 @@ test('Google: origin + destination + | waypoints, commas encoded %2C, pipes %7C'
 
 test('Google: caps at 10 stops (9 waypoints + destination) and reports truncation', () => {
   const many = Array.from({ length: 13 }, (_, i) => ({ id: `s${i}`, address: `A ${i}`, lat: 35.5 + i / 1000, lng: -97.5 }));
-  const { url, truncated } = buildGoogleDirUrl(anchor, many);
+  const { url, truncated, count } = buildGoogleDirUrl(anchor, many);
   assert.equal(truncated, true);
+  assert.equal(count, 10, 'count = stops actually sent at cap');
   const waypointCount = (url.match(/&waypoint=/g) || []).length;
   const wp = url.split('waypoints=')[1];
   assert.equal(wp.split('%7C').length, 9, 'exactly 9 waypoints at cap');
@@ -57,8 +58,9 @@ test('Apple: address with special characters is encoded (spaces, commas, ampersa
 
 test('Apple: caps at 10 stops defensively', () => {
   const many = Array.from({ length: 12 }, (_, i) => ({ id: `s${i}`, address: `A ${i}`, lat: 35.5 + i / 1000, lng: -97.5 }));
-  const { truncated, url } = buildAppleDirUrl(null, many);
+  const { truncated, url, count } = buildAppleDirUrl(null, many);
   assert.equal(truncated, true);
+  assert.equal(count, 10);
   assert.equal((url.match(/&waypoint=/g) || []).length, 9, 'destination + 9 waypoints at cap');
 });
 

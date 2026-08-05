@@ -37,7 +37,7 @@ export function buildGoogleDirUrl(anchor, stops) {
   url += `&destination=${encode(coord(destination.lat, destination.lng))}`;
   const waypoints = capped.slice(0, -1).map(s => coord(s.lat, s.lng));
   if (waypoints.length) url += `&waypoints=${waypoints.map(encode).join('%7C')}`;
-  return { url, skipped, truncated };
+  return { url, skipped, truncated, count: capped.length };
 }
 
 export function buildAppleDirUrl(anchor, stops) {
@@ -54,7 +54,7 @@ export function buildAppleDirUrl(anchor, stops) {
   if (anchor) url += `&source=${coord(anchor.lat, anchor.lng)}`;
   url += `&destination=${encode(destination.address || coord(destination.lat, destination.lng))}`;
   for (const s of middle) url += `&waypoint=${coord(s.lat, s.lng)}`;
-  return { url, skipped, truncated };
+  return { url, skipped, truncated, count: capped.length };
 }
 
 export function buildWazeStopUrl(stop) {

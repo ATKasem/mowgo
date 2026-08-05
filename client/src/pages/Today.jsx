@@ -497,23 +497,23 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     && dateFiltered.length >= 3
     && dateFiltered.filter(j => j.clients?.address).length >= 2;
 
-  // Date-scoped renumber from an ordered id list — same rollback shape as
-  // reorderWithinDate (previousOrder + updates).
+  // Date-scoped reorder from an ordered id list — same rollback shape as
+  // reorderWithinDate (previousOrder + updates). APPLIES the permutation:
+  // physical array order + route_order both follow orderedIds (Claude Code
+  // CRITICAL fix — membership-only renumbering was a no-op).
   function reorderToSequence(prev, orderedIds, currentDate) {
-    const updated = [...prev];
+    const rank = new Map(orderedIds.map((id, i) => [id, i + 1]));
+    const ordered = orderedIds.map(id => prev.find(j => j.id === id)).filter(Boolean);
     const previousOrder = prev
       .filter(j => j.scheduled_date === currentDate)
       .map(j => ({ id: j.id, route_order: j.route_order }));
-    const idSet = new Set(orderedIds);
-    let order = 1;
-    for (let i = 0; i < updated.length; i++) {
-      if (updated[i].scheduled_date === currentDate && idSet.has(updated[i].id)) {
-        updated[i] = { ...updated[i], route_order: order++ };
-      }
-    }
-    const updates = updated
-      .filter(j => j.scheduled_date === currentDate && idSet.has(j.id))
-      .map(j => ({ id: j.id, route_order: j.route_order }));
+    let oi = 0;
+    const updated = prev.map(j => {
+      if (j.scheduled_date !== currentDate) return j;
+      const next = ordered[oi++];
+      return next ? { ...next, route_order: rank.get(next.id) } : j;
+    });
+    const updates = ordered.map(j => ({ id: j.id, route_order: rank.get(j.id) }));
     return { updated, updates, previousOrder };
   }
 
@@ -532,6 +532,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
         lng: j.clients ? (coordsMap[j.clients.id]?.lng ?? null) : null,
       }));
       const orderedIds = optimizeRoute(positioned, anchor);
+      const missingCount = positioned.filter(p => p.lat == null || p.lng == null).length;
 
       setJobs(prev => {
         const result = reorderToSequence(prev, orderedIds, date);
@@ -548,7 +549,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       });
 
       setCompletedToast({
-        name: tr('Route optimized'),
+        name: missingCount > 0 ? tr('Some addresses couldn\'t be mapped') : tr('Route optimized'),
         amount: 0,
         type: 'plain',
         actionLabel: tr('Undo'),
@@ -569,7 +570,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     } catch (err) {
       console.error('Optimize:', err);
       setCompletedToast({ name: tr('Could not optimize route. Try again.'), amount: 0, type: 'error' });
-      setTimeout(() => setCompletedToast(null), 4000);
+      if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+      toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), 4000);
     } finally {
       setOptimizing(false);
     }
@@ -580,7 +582,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       .filter(j => j.scheduled_date === date)
       .sort((a, b) => (a.route_order ?? 0) - (b.route_order ?? 0))
       .map(j => ({
-        id: j.id,
+        id: j.clients?.id ?? j.id, // CLIENT id — ensureClientCoords persists by client id (Claude Code HIGH fix)
+        jobId: j.id,
         address: j.clients?.address || j.title || '',
         lat: j.clients?.latitude ?? null,
         lng: j.clients?.longitude ?? null,
@@ -604,16 +607,26 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     if (mode === 'all') {
       const anchor = profile?.latitude != null && profile?.longitude != null
         ? { lat: profile.latitude, lng: profile.longitude } : null;
-      const { url, skipped, truncated } = buildRouteLink(navApp, anchor, withCoords);
-      if (!url) return;
-      window.open(url, '_blank');
-      if (skipped > 0) {
-        setCompletedToast({ name: tr('Stops without addresses were skipped'), amount: 0, type: 'plain' });
-        setTimeout(() => setCompletedToast(null), 4000);
-      }
-      if (truncated) {
-        setCompletedToast({ name: tr('{{count}} stops sent', { count: 10 }), amount: 0, type: 'plain' });
-        setTimeout(() => setCompletedToast(null), 4000);
+      // Open the tab synchronously — window.open after await gets popup-blocked
+      // on Safari/iOS (Claude Code HIGH fix).
+      const win = window.open('', '_blank');
+      const { url, skipped, truncated, count } = buildRouteLink(navApp, anchor, withCoords);
+      if (!url) { if (win) win.close(); return; }
+      if (win) win.location.href = url; else window.location.href = url;
+
+      const showToast = (name, ms) => {
+        setCompletedToast({ name, amount: 0, type: 'plain' });
+        if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);
+        toggleTimeoutRef.current = setTimeout(() => setCompletedToast(null), ms);
+      };
+      if (skipped > 0 && truncated) {
+        // One toast at a time — chain instead of clobbering (Claude Code MEDIUM fix).
+        showToast(tr('Stops without addresses were skipped'), 4000);
+        setTimeout(() => showToast(tr('{{count}} stops sent', { count }), 4000), 4200);
+      } else if (skipped > 0) {
+        showToast(tr('Stops without addresses were skipped'), 4000);
+      } else if (truncated) {
+        showToast(tr('{{count}} stops sent', { count }), 4000);
       }
     } else {
       setOneByOneStops(withCoords.filter(s => s.lat != null && s.lng != null));
@@ -652,7 +665,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             <button onClick={handleOptimize} disabled={optimizing} className="btn-secondary gap-1.5 text-sm disabled:opacity-50">
               <RouteIcon className="w-4 h-4" />{optimizing ? tr('Optimizing...') : tr('Optimize')}
             </button>
-            <button onClick={() => setShowRouteChooser(true)} className="btn-secondary gap-1.5 text-sm">
+            <button onClick={() => setShowRouteChooser(true)} disabled={optimizing} className="btn-secondary gap-1.5 text-sm disabled:opacity-50">
               <Navigation className="w-4 h-4" />{tr('Send route')}
             </button>
           </>
@@ -882,7 +895,6 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
               <button aria-label={tr('Close')} onClick={() => setShowRouteChooser(false)} className="p-2 -m-2 text-[var(--color-text-muted)]"><X className="w-5 h-5" /></button>
             </div>
             <fieldset className="space-y-2 mb-4">
-              <legend className="label mb-2">{tr('Navigation app')}</legend>
               {[
                 { value: 'google', label: tr('Google Maps') },
                 { value: 'apple', label: tr('Apple Maps') },
@@ -928,7 +940,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             <div className="space-y-2">
               {oneByOneStops.map((stop, i) => (
                 <button
-                  key={stop.id}
+                  key={stop.jobId || stop.id}
                   onClick={() => window.open(buildSingleStopUrl(navApp, stop), '_blank')}
                   className="w-full flex items-center gap-3 rounded-xl border border-[var(--color-border)] dark:border-gray-700 p-3 text-left hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-800 transition-colors"
                 >
