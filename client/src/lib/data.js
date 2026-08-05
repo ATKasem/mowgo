@@ -966,7 +966,7 @@ export async function loadProfile() {
   if (isDemoMode()) {
     const userId = _currentDemoUserId();
     const member = _teamMembers.find(m => m.id === userId);
-    const base = member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo', role: 'owner', business_id: null };
+    const base = member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', latitude: 35.4676, longitude: -97.5164, tier: 'solo', role: 'owner', business_id: null };
     // Hydrate from the demo profile (never real-account data) so demo-saved
     // payment handles survive Settings visits without leaking real handles.
     localStorage.setItem('mf_business_name', base.business_name || 'Green Thumb Lawn Care');
