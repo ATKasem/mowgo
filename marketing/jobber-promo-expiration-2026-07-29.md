@@ -15,9 +15,9 @@
 >
 > I've been tracking what I actually pay vs. what I use. For a 2-person crew doing route-based mowing:
 > - Jobber Connect: $139/mo
-> - Extra user: $20/mo
+> - Extra user: $29/mo
 > - Payment processing: ~3% per transaction
-> - Total: ~$179/mo
+> - Total: ~$188/mo
 >
 > That's a lot for what is essentially scheduling + invoicing. I don't use the CRM, the marketing automation, or the reporting.
 >
@@ -54,7 +54,7 @@
 > - **Pricing:** $39/mo all-in vs. Jobber's $139-179+ with add-ons
 > - **Mobile:** Designed for phone-first use — no dashboard clutter
 >
-> Free tier available (5 clients, no card needed). If you want to test it before the Jobber decision deadline: https://mowgo.app
+> Free tier available (5 clients, no card needed). If you want to test it before the Jobber decision deadline: https://mowgoapp.com
 >
 > Happy to help with the setup if you want to compare side by side.
 >

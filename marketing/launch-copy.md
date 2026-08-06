@@ -10,7 +10,7 @@ MowGo. Scheduling, routes, invoicing. No demo calls. No bloat. Rain delay with o
 
 Free for 5 clients. No credit card. 2 minutes.
 
-→ mowgo.pages.dev
+→ mowgoapp.com
 
 ## Instagram Caption
 Your scheduling app should not need a onboarding call. 🌱
@@ -22,7 +22,7 @@ MowGo is the lawn care app that just works.
 
 Free for 5 clients. No credit card. $39/mo for unlimited.
 
-Link in bio → mowgo.pages.dev
+Link in bio → mowgoapp.com
 
 #lawncare #landscaping #lawncarebusiness #smallbiz #landscaper
 
@@ -37,7 +37,7 @@ It does less than the other apps. That is the point. Scheduling, routes, invoici
 
 If you know a landscaper who is still running on texts and a notebook, send them the link.
 
-→ mowgo.pages.dev
+→ mowgoapp.com
 
 ## Facebook / Group Post
 Hey everyone — I have been in this group for a while watching how small crews actually run their operations. One thing kept coming up: everyone hates their scheduling software.
@@ -50,4 +50,4 @@ Free for 5 clients. $39/mo solo. $79/mo crew. 2 minute setup.
 
 Not here to pitch. Genuinely want feedback from actual lawn guys. If you try it, tell me what is broken.
 
-→ mowgo.pages.dev
+→ mowgoapp.com

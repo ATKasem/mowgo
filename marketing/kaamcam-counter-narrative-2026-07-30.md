@@ -59,7 +59,7 @@ Replace or add a "Why MowGo" section on the pricing page:
 
 > **Flat pricing, not per-seat pricing**
 >
-> Most lawn care software charges you for every person on your team. KaamCam ($12/seat), Jobber ($169+), Service Autopilot ($89+) — they all tax your growth.
+> Most lawn care software charges you for every person on your team. KaamCam ($12/seat), Jobber ($139/mo Connect, or $99/mo billed annually, plus $29/mo per extra user), Service Autopilot ($89+) — they all tax your growth.
 >
 > MowGo is $39/mo for your whole crew. Add five guys tomorrow and your bill stays $39. That's the difference between software that grows with you and software that grows *on* you.
 >

@@ -21,7 +21,7 @@
 
 **Data needed for submission:**
 - Product name: MowGo
-- URL: https://mowgo.app
+- URL: https://mowgoapp.com
 - Tagline: Simple scheduling & invoicing for small lawn care crews
 - Description: MowGo is a mobile-first scheduling and invoicing platform built specifically for 1-3 person lawn care crews. Features include recurring route scheduling, one-tap rain delay rescheduling, auto-invoicing with payment links, offline mode, and drag-and-drop calendar management. Flat $39/mo pricing with no per-user fees.
 - Category: Lawn Care Software

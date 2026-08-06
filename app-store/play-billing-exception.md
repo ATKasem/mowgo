@@ -50,5 +50,5 @@ the tool for arranging and managing it).
 ## Contact
 
 Developer: ATKasem
-Email: hello@mowgo.app
-Website: https://mowgo.pages.dev
+Email: hello@mowgoapp.com
+Website: https://mowgoapp.com

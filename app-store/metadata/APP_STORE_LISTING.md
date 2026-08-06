@@ -10,7 +10,7 @@
 MowGo is the simplest way for solo lawn care crews to manage their business from their phone. Schedule jobs, plan routes, track clients, and send invoices — all in one app built specifically for lawn care.
 
 **WHY MOWGO**
-Jobber and Housecall Pro are built for big crews at $119+/month. Yardbook is "free" but sells your data. MowGo is the only app with free rain delay — tap once when it rains, your whole schedule moves. Built for 1-3 person lawn care crews.
+Jobber runs $139/mo (or $99/mo billed annually) for the tools MowGo includes flat, plus $29/mo per extra crew member. Housecall Pro runs $79–$189/mo. Yardbook's free plan comes with in-app ads and manual recurring invoices. MowGo is the only app with free rain delay — tap once when it rains, your whole schedule moves. Built for 1-3 person lawn care crews.
 
 **FREE TIER: 5 CLIENTS, FOREVER**
 • Rain delay auto-reschedule — one tap, done
@@ -57,7 +57,7 @@ Place screenshots in `screenshots/` folder. Required: 6-8 screenshots.
 | 8 | Comparison page — MowGo vs competitors | Dark |
 
 **How to take screenshots:**
-1. Open Safari on iPhone → mowgo.pages.dev
+1. Open Safari on iPhone → mowgoapp.com
 2. Log in (or use Demo mode)
 3. Take screenshot (side button + volume up)
 4. Save to Photos
@@ -72,14 +72,14 @@ Screen record (Control Center → Screen Recording):
 2. Tap rain delay → confirm jobs moved
 3. Clients tab → expand card → show gate codes
 4. Toggle dark mode
-5. Open AI chat → show "Show today's schedule"
+5. Open the online booking link → show the client-facing self-scheduling page
 
 ---
 
 ## App Store Connect URLs
-- **Privacy Policy:** https://mowgo.pages.dev/privacy
-- **Support:** https://mowgo.pages.dev
-- **Marketing:** https://mowgo.pages.dev/#/compare
+- **Privacy Policy:** https://mowgoapp.com/privacy
+- **Support:** https://mowgoapp.com
+- **Marketing:** https://mowgoapp.com/#/compare
 
 ---
 

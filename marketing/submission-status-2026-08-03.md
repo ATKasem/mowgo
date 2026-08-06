@@ -30,7 +30,7 @@ Capterra (highest ROI — one form = GetApp + Software Advice cross-listed) and 
 5. Re-audit monthly per skill
 
 ## Submission copy (verified, ready)
-- Product: MowGo | URL: https://mowgo.pages.dev | Category: Lawn Care Software
+- Product: MowGo | URL: https://mowgoapp.com | Category: Lawn Care Software
 - Tagline: Simple scheduling & invoicing for small lawn care crews
 - Free tier: 5 clients, rain delay, no card | Solo $39/mo | Crew $79/mo | No per-user fees
 - Full copy: launch-kit/README.md (scrubbed of dead AI Autopilot Aug 3)
