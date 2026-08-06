@@ -69,12 +69,18 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ error: 'Could not create concierge request' }, { status: 500, headers });
     }
 
-    if (env.DISCORD_BOT_TOKEN && env.DISCORD_CHANNEL_ID) {
+    const webhookUrl = env.DISCORD_CONCIERGE_WEBHOOK_URL;
+    const botUrl = (env.DISCORD_BOT_TOKEN && env.DISCORD_CHANNEL_ID)
+      ? `https://discord.com/api/v10/channels/${env.DISCORD_CHANNEL_ID}/messages`
+      : null;
+    const target = webhookUrl || botUrl;
+    if (target) {
       try {
         const prefix = `🧹 New concierge request\n**Business:** ${safeBusinessName}\n**Clients:** ${body.client_count ?? 'Not provided'}\n**User:** ${user.id}\n**At:** ${new Date().toISOString()}\n\`\`\``;
         const suffix = '\n```';
         const preview = csvContent.replace(/`{3,}/g, "'''").slice(0, Math.min(1500, Math.max(0, 1999 - prefix.length - suffix.length)));
-        await fetch(`https://discord.com/api/v10/channels/${env.DISCORD_CHANNEL_ID}/messages`, { method: 'POST', headers: { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ content: `${prefix}${preview}${suffix}`, allowed_mentions: { parse: [] } }) });
+        const res = await fetch(target, { method: 'POST', headers: webhookUrl ? { 'Content-Type': 'application/json' } : { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ content: `${prefix}${preview}${suffix}`, allowed_mentions: { parse: [] } }) });
+        if (!res.ok) console.warn('Concierge Discord notification failed', res.status);
       } catch (error) { console.warn('Concierge Discord notification failed', error); }
     }
     return Response.json({ id: inserted?.[0]?.id }, { status: 201, headers });

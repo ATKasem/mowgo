@@ -11,6 +11,7 @@ const CREWS = new Set(['solo', '2_3', '4_plus']);
 // worth an immediate manual follow-up (excludes hobby-size under_10 and
 // enterprise-size 50_plus/4_plus, which have their own report-page branches).
 const QUALIFIED_LAWNS = new Set(['10_25', '25_50']);
+const CREW_LABELS = { solo: 'solo crew', '2_3': '2-3 person crew', '4_plus': '4+ person crew' };
 const QUALIFIED_CREWS = new Set(['solo', '2_3']);
 const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
 
@@ -67,7 +68,7 @@ async function insertLeadTouches(env, { email, phone, smsConsent }) {
   } catch (error) { console.warn('Route audit lead_touches insert failed:', error?.message || error); }
 }
 
-async function sendLeadAlert(env, { name, lawnsBucket, monthly, email }) {
+async function sendLeadAlert(env, { name, lawnsBucket, crewBucket, monthly, email }) {
   const webhookUrl = env.DISCORD_LEADS_WEBHOOK_URL;
   const botUrl = (env.DISCORD_BOT_TOKEN && env.DISCORD_LEADS_CHANNEL_ID)
     ? `https://discord.com/api/v10/channels/${env.DISCORD_LEADS_CHANNEL_ID}/messages`
@@ -76,11 +77,21 @@ async function sendLeadAlert(env, { name, lawnsBucket, monthly, email }) {
   if (!target) return;
   try {
     // Strip Discord markdown so malicious input can't inject formatting/embeds.
-    // concierge-submit.js strips business_name; apply the same pattern here to both fields.
+    // Email keeps "@" for readability — pings are blocked by allowed_mentions parse: [].
     const safeName = name.replace(/[*_~`|>@#]/g, '').slice(0, 100);
-    const safeEmail = (email || '').replace(/[*_~`|>@#]/g, '');
+    const safeEmail = (email || '').replace(/[*_~`|>#]/g, '').slice(0, 254);
     const bucketLabel = lawnsBucket.replace('_', '-');
-    const content = `🔔 New route audit lead: ${safeName} — ${bucketLabel} lawns/wk · ~$${monthly.toLocaleString()}/mo impact · ${safeEmail}`;
+    const crewLabel = CREW_LABELS[crewBucket] || crewBucket || '';
+    const content = [
+      '🔔 **New route audit lead**',
+      '',
+      `**${safeName}**`,
+      `• ${bucketLabel} lawns/week${crewLabel ? ` · ${crewLabel}` : ''}`,
+      `• ~$${monthly.toLocaleString()}/mo potential impact (est.)`,
+      `• ${safeEmail}`,
+      '',
+      'Ran the free audit on mowgoapp.com — follow up today, book the free setup call.',
+    ].join('\n');
     const res = await fetch(target, {
       method: 'POST',
       headers: webhookUrl
@@ -129,7 +140,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     const delivery = sendEmail(env, name, email, hours, monthly, annual);
     const touches = insertLeadTouches(env, { email, phone, smsConsent: smsConsentRecorded });
     const qualified = QUALIFIED_LAWNS.has(body.lawns_bucket) && QUALIFIED_CREWS.has(body.crew_bucket);
-    const alert = qualified ? sendLeadAlert(env, { name, lawnsBucket: body.lawns_bucket, monthly, email }) : Promise.resolve();
+    const alert = qualified ? sendLeadAlert(env, { name, lawnsBucket: body.lawns_bucket, crewBucket: body.crew_bucket, monthly, email }) : Promise.resolve();
     const background = Promise.all([delivery, touches, alert]);
     if (typeof waitUntil === 'function') waitUntil(background); else background.catch(() => {});
     return json({ success: true, report: { hours_wasted_week: hours, revenue_impact_month: monthly, annual_impact: annual } }, 201, origin);
