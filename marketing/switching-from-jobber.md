@@ -31,7 +31,7 @@
 | **Route optimization** | ✅ | ✅ | ✅ |
 | **Client portal** | ❌ $49 add-on | ✅ | ✅ Included |
 | **SMS notifications** | ❌ | ✅ | ✅ Included |
-| **Per-user fees** | $49/extra user | $139/extra user | **$0 — flat rate** |
+| **Per-user fees** | $29/extra user | $29/extra user | **$0 — flat rate** |
 
 ### 3-Person Crew Math
 - **Jobber Connect:** $139/mo × 3 users × 12 months = **$5,004/yr**
@@ -116,7 +116,7 @@ Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts 
 | Client portal | ❌ ($49 add-on?) | ✅ | ✅ |
 | One-button rain delay | ❌ | ❌ | ✅ |
 | Free tier | ❌ (14-day trial) | ❌ | ✅ (5 clients, no CC) |
-| Per-user fee | $49/user | $139/user | $0 (flat) |
+| Per-user fee | $29/user | $29/user | $0 (flat) |
 | Setup time | Demo call required | Demo call required | 2 minutes, no call |
 | Credit card for trial | ✅ Required | ✅ Required | ❌ Not needed |
 

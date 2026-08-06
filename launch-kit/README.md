@@ -2,6 +2,14 @@
 
 Prepared August 2, 2026. Ready to copy-paste into each platform's submission form.
 
+## Copy fact-lock — 2026-08-06
+Corrected against the live product (client/src/pages/Landing.jsx, Compare.jsx) and verified competitor intel:
+- `mowgo.pages.dev` → `https://mowgoapp.com` (pages.dev is retired; it now shows a "MowGo has moved" stub)
+- Removed "Everything plus AI" from the Solo plan — the AI chat feature was removed from the product and must not be re-added to copy
+- Jobber math updated to verified numbers: Jobber Connect is $139/mo month-to-month or $99/mo billed annually (plus $29/mo per additional user) — this is the tier with the features MowGo includes flat
+- Android corrected from "via PWA" to the native Kotlin app (`com.mowgo.app`)
+- Removed "chemical tracking" — not a MowGo feature (it's a ProBase pool-service feature referenced on the ProBase comparison page)
+
 ---
 
 ## 1. AlternativeTo
@@ -12,8 +20,8 @@ Prepared August 2, 2026. Ready to copy-paste into each platform's submission for
 
 ### Basic Info
 - **App Name:** MowGo
-- **URL:** https://mowgo.pages.dev
-- **Platforms:** Web, iPhone, iPad
+- **URL:** https://mowgoapp.com
+- **Platforms:** Web, iPhone, iPad, Android
 - **Category:** Business & Commerce
 
 ### Description (500 chars)
@@ -22,10 +30,10 @@ MowGo is lawn care scheduling software built for 1-5 person crews. Drag-and-drop
 ```
 
 ### List as Alternative To (submit separately for each):
-1. **ProBase** — "Like ProBase but with rain delay auto-reschedule, native iOS app, and lawn-specific fields (gate codes, mow notes, chemical tracking)."
-2. **Jobber** — "Affordable Jobber alternative for small crews. No per-user fees, rain delay included, $39/mo vs Jobber's $49+."
-3. **Yardbook** — "Modern Yardbook alternative. Same free tier but with rain delay, better invoicing, and no ads."
-4. **LawnPro** — "LawnPro alternative with one-button rain delay vs LawnPro's manual rebuild, plus native apps and offline mode at $39."
+1. **ProBase** — "Like ProBase but with rain delay auto-reschedule, native iOS + Android apps, and lawn-specific fields (gate codes, mow notes, mow height)."
+2. **Jobber** — "Affordable Jobber alternative for small crews. No per-user fees, rain delay included, $39/mo flat vs Jobber Connect's $139/mo ($99/mo billed annually) plus $29/mo per extra user."
+3. **Yardbook** — "Modern Yardbook alternative. Same free tier but with rain delay, better invoicing, and no in-app ads."
+4. **LawnPro** — "LawnPro alternative with one-button rain delay vs LawnPro's manual rebuild, plus native iOS + Android apps and offline mode at $39."
 5. **GreenRoute** — "GreenRoute alternative. MowGo gives you rain delay auto-reschedule, not just weather forecasts."
 
 ---
@@ -38,7 +46,7 @@ MowGo is lawn care scheduling software built for 1-5 person crews. Drag-and-drop
 
 ### Submission
 - **Startup Name:** MowGo
-- **URL:** https://mowgo.pages.dev
+- **URL:** https://mowgoapp.com
 - **Tagline (60 chars):** Lawn care scheduling with one-button rain delay. Free.
 - **Description:**
 ```
@@ -49,8 +57,8 @@ Core features:
 • Drag-and-drop scheduling with route optimization
 • Automated invoicing + Stripe payments
 • Route optimization + offline mode ($39/mo Solo plan)
-• Native iOS app with offline mode
-• Gate codes, pet instructions, mow notes, chemical tracking
+• Native iOS and Android apps with offline mode
+• Gate codes, pet instructions, mow notes — lawn-specific client fields
 
 Free tier: 5 clients, rain delay included. No credit card. Solo: $39/mo unlimited. Crew: $79/mo with team features.
 
@@ -69,7 +77,7 @@ Built for the 600,000+ landscaping businesses in the US who lose a full day's re
 
 ### Affiliate Program Setup
 - **Company:** MowGo
-- **Website:** https://mowgo.pages.dev
+- **Website:** https://mowgoapp.com
 - **Commission Model:** 30% recurring monthly revenue share
 - **Commission Details:** Affiliates earn 30% of the customer's monthly payment for the lifetime of the customer. Solo plan ($39/mo) = $11.70/mo per referral. Crew plan ($79/mo) = $23.70/mo per referral.
 - **Cookie Duration:** 90 days
@@ -100,14 +108,14 @@ Your audience of lawn care operators, landscapers, and field service pros will l
 
 ### Listing Content
 - **Product Name:** MowGo
-- **Website:** https://mowgo.pages.dev
+- **Website:** https://mowgoapp.com
 - **Category:** Lawn Care Software
 
 ### Description
 ```
 MowGo is lawn care scheduling software built specifically for 1-5 person crews. It replaces the patchwork of spreadsheets, texting, and manual invoicing with one app.
 
-Core features include drag-and-drop scheduling, route optimization, automated invoicing with Stripe payments, client CRM with property notes (gate codes, pet instructions, mow notes), chemical tracking, and team management.
+Core features include drag-and-drop scheduling, route optimization, automated invoicing with Stripe payments, client CRM with property notes (gate codes, pet instructions, mow notes), and team management.
 
 MowGo's standout feature is rain delay auto-reschedule: one button moves all today's unfinished jobs to tomorrow. It's the only lawn care software with rain delay on a free tier.
 
@@ -115,7 +123,7 @@ MowGo's standout feature is rain delay auto-reschedule: one button moves all tod
 - Solo ($39/mo): Unlimited clients, routes, reminders, offline mode
 - Crew ($79/mo): Everything in Solo plus multi-user crew, team dashboard, job assignment
 
-No per-user fees. No hidden platform fees. Native iOS app with offline mode. Web app works on any device.
+No per-user fees. No hidden platform fees. Native iOS and Android apps. Web app works on any device.
 ```
 
 ### Key Features (check all that apply)
@@ -142,7 +150,7 @@ No per-user fees. No hidden platform fees. Native iOS app with offline mode. Web
 ### Deployment
 - Web
 - iPhone/iPad
-- Android (via PWA)
+- Android (native app)
 
 ### Typical Users
 - Freelancers
@@ -178,7 +186,7 @@ MowGo handles what no other lawn care software does: rain.
 
 One button moves all today's jobs to tomorrow. Free tier includes it. Nobody else does.
 
-Built for 1-5 person crews: scheduling, routes, invoicing, native iOS with offline mode. Gate codes, mow notes, chemical tracking — lawn-specific fields that generalist apps don't have.
+Built for 1-5 person crews: scheduling, routes, invoicing, native iOS + Android apps with offline mode. Gate codes, mow notes, and other lawn-specific fields that generalist apps don't have.
 
 Launching soon. Get notified.
 ```
@@ -197,20 +205,20 @@ Launching soon. Get notified.
 ```
 Hey Product Hunt! I built MowGo because I kept hearing the same thing from lawn care operators in Oklahoma: "I lose a full day's pay every time it rains."
 
-Here's the problem: most lawn care software is either free but useless when it rains (ProBase, Yardbook), or expensive and overbuilt for small crews (Jobber $49-699/mo). Nobody built the thing operators actually need — one button that moves the whole day's schedule when the weather turns.
+Here's the problem: most lawn care software is either free but useless when it rains (ProBase, Yardbook), or expensive and overbuilt for small crews (Jobber Connect — $139/mo, or $99/mo billed annually, plus $29/mo per extra user, for the tier with the features you actually need). Nobody built the thing operators actually need — one button that moves the whole day's schedule when the weather turns.
 
 So I built it. MowGo has rain delay on the free tier. Five clients. No credit card. One button. All jobs move to tomorrow, route rebuilds, customers get notified.
 
-It also does everything else you'd expect from lawn care software — scheduling, routing, invoicing, a client CRM with gate codes and mow notes — plus route optimization and native iOS with offline mode.
+It also does everything else you'd expect from lawn care software — scheduling, routing, invoicing, a client CRM with gate codes and mow notes — plus route optimization and offline mode, on native iOS and Android.
 
 Pricing:
 • Free: 5 clients, rain delay, scheduling, invoicing
-• Solo $39/mo: Everything plus AI, unlimited clients, offline mode
+• Solo $39/mo: Unlimited clients, route optimization, offline mode, online booking link
 • Crew $79/mo: Multi-crew, team dashboard
 
 No per-user fees. No hidden platform fees. No marketplace model selling your data.
 
-I'm launching on the web at mowgo.pages.dev and native iOS. Android via PWA.
+I'm launching on the web at mowgoapp.com, native iOS, and native Android.
 
 Happy to answer any questions! What else do lawn operators need that current software doesn't do?
 ```

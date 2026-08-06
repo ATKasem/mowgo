@@ -42,4 +42,4 @@
 - Tag relevant groups (search shows "Lawn Care & Landscaping Business Group" has 10K+ members)
 - Respond to all comments within 24 hours
 - Do NOT link MowGo in the OP — only if someone asks "what do you use?"
-- If someone asks directly, respond with: "I've been testing MowGo (mowgo.app) — it's $39 flat, mobile-first, built for small crews specifically. Free tier to try. Happy to compare notes if you check it out."
+- If someone asks directly, respond with: "I've been testing MowGo (mowgoapp.com) — it's $39 flat, mobile-first, built for small crews specifically. Free tier to try. Happy to compare notes if you check it out."

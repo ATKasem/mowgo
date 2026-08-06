@@ -9,9 +9,9 @@
 **Draft response:**
 > Hey — same boat as you. QuoteIQ pulling the free plan caught a lot of people off guard.
 >
-> I switched to MowGo (mowgo.app) a few months back. Free tier is 5 clients forever (no card), and the Solo plan is $39/mo all-in — no per-user fees, no transaction fees on top of Stripe. Rain delay auto-reschedule is a game changer for lawn care specifically. One tap and your whole day shifts.
+> I switched to MowGo (mowgoapp.com) a few months back. Free tier is 5 clients forever (no card), and the Solo plan is $39/mo all-in — no per-user fees, no transaction fees on top of Stripe. Rain delay auto-reschedule is a game changer for lawn care specifically. One tap and your whole day shifts.
 >
-> Full comparison here: https://mowgo.app/#/quoteiq-alternative
+> Full comparison here: https://mowgoapp.com/#/quoteiq-alternative
 >
 > Worth a look. I tried Yardbook (too clunky) and Jobber (way too expensive for what I need). MowGo stuck.
 
@@ -27,7 +27,7 @@
 >
 > Honestly most of my crew learned it in 5 minutes. No sales call, no onboarding meeting.
 >
-> https://mowgo.app
+> https://mowgoapp.com
 
 ---
 
@@ -42,7 +42,7 @@
 > - Auto-invoicing so you don't forget to bill
 > - Rain delay handling (it WILL rain on your busiest day)
 >
-> MowGo (mowgo.app) covers all that. Free tier is genuinely useful (5 clients, no card). Upgrade to $39/mo when you grow. No contract nonsense.
+> MowGo (mowgoapp.com) covers all that. Free tier is genuinely useful (5 clients, no card). Upgrade to $39/mo when you grow. No contract nonsense.
 >
 > Yardbook is also worth a mention for a free option but the ads are annoying.
 >
@@ -54,7 +54,7 @@
 **Context:** OP is a solo operator looking for customer management + payment/invoicing tooling. Exact ICP. Thread ~8 days old (id `1v6ce6e`) — **POST TODAY (Jul 31) or it's dead**. Window 12:00-20:00 UTC. (Draft created Jul 31 by 8am action — was missing from this file.)
 
 **Draft response:**
-> Managing customers and payments is exactly why I switched to MowGo (mowgo.app) — I was losing track of who owed what with a spreadsheet.
+> Managing customers and payments is exactly why I switched to MowGo (mowgoapp.com) — I was losing track of who owed what with a spreadsheet.
 >
 > What sold me:
 > - Auto-invoicing — job marked done, invoice created and emailed to the client automatically
