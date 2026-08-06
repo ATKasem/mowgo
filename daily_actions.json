@@ -1,136 +1,76 @@
 {
-  "run_ts": "2026-08-05T13:50:00Z",
-  "run_label": "8am CST Action — Wed Aug 5",
-  "phase": "2/3",
-  "feed": "Part 3 (9am report)",
-  "scan_source": "daily_scan.json scan_ts 2026-08-05T12:08:00Z (7am scan)",
-
-  "headline": "✅ All 5 bot-actionable quick wins EXECUTED + the Rule-of-100 duplicate bug FIXED, verified against production, and its 12-message damage CLEANED UP before today's 15:00Z cron run (note: the scan said the next run was ~01:17Z tomorrow — wrong; job d37092913d72 is scheduled 0 15 * * 1-5 = 15:00Z TODAY, so the fix landed with ~1.3h to spare). Compare page refresh DEPLOYED and verified LIVE (mowgoapp.com/seo/compare/). Aug 7 Reddit kit finalized (#43 = #1). MX Build profiled — turns out to be a Priority Technology Holdings (NASDAQ: PRTH) payments-first construction platform; $49 unverified, LOW threat, do NOT add to compare page. Concierge: endpoint smoke test 5/5 pass + auto-processor cron healthy; the real-request trigger needs Aaron's logged-in session. Zero human messages anywhere remains the standing issue (Blasian Day 8).",
-
-  "quick_wins": {
-    "executed": [
-      {
-        "task": "Fix Rule of 100 duplicate-post bug (cron d37092913d72) — dedup/state check",
-        "status": "✅ DONE + VERIFIED + DAMAGE CLEANED — 2 files via Codex CLI + 12 messages deleted",
-        "detail": "Codex CLI (codex exec, sandbox workspace-write) modified skills/business/mowgo-leads/scripts/post_sms_batch.py: pre-post dedup against the channel's 100 most recent messages (regex \\*\\*\\[(\\d+)\\]), same-run dedup, --force (deliberate repost only), --dry-run, header suppressed when nothing to post, final re-fetch count. 2 regression tests pass, py_compile OK, mode 755 preserved. REAL production dry-run vs #outreach (1529711006023024680): 'Parsed 21 leads → SKIP lead 1..21 → Nothing to post — all 21 leads already in channel', exit 0. SKILL.md gained a mandatory 🔒 DEDUP GATE section (agent must fetch-and-check before ANY post; raw-curl path included; retry args only after confirming absence). ALSO cleaned the 02:02Z damage: 12 duplicate messages (leads 3/5/6/9/10/12/14/15/17/18/21, incl. OKC Top Choice x3) identified by timestamp+content match against the 01:33Z canonical batch and DELETED; post-cleanup verify: 21 distinct leads, ZERO duplicates, 55 msgs.",
-        "impact": "HIGH — kills the double-text risk before today's 15:00Z run; channel restored to canonical batch only",
-        "time_min": 25
-      },
-      {
-        "task": "Refresh compare page — Service Autopilot note, QuoteIQ top-up, Jobber $29 annual terms, TurfHop update",
-        "status": "✅ DEPLOYED + VERIFIED LIVE (commit 70a2ef4)",
-        "detail": "client/public/seo/compare/index.html: added Service Autopilot amber note ('$49 teaser — signup fee, annual billing, real plans $199-499; MowGo $39-79 flat, month-to-month, no signup fee') next to the existing QuoteIQ note; extended QuoteIQ note with 'top tiers just went up again — Elite $299/Max $699 (verified Aug 5), $29.99 entry frozen'; added Jobber '$29/mo headline = Core billed ANNUALLY, 1-yr commitment, mtm Core $49, +$29/seat' to the Jobber note; updated TurfHop note to '500 since ~Aug 1, still down Aug 5 (10th check)'. Table itself untouched (10 competitor columns already; SA fits the established note pattern). Pushed to GitHub main → CF Pages auto-deploy. VERIFIED LIVE at https://mowgoapp.com/seo/compare/ (all 3 new strings present, old TurfHop string gone; /compare 308-redirects to /seo/compare/ — earlier 'not live' readings were empty redirect bodies).",
-        "impact": "MEDIUM — 3 verified competitor ladders now on the page; switcher-window ammo (closes ~Aug 15)",
-        "time_min": 20
-      },
-      {
-        "task": "Finalize Aug 7 22:21Z Reddit kit — #43 as #1",
-        "status": "✅ DONE (commit ea40424)",
-        "detail": "leads/reddit-threads.md Aug 7 window kit section marked FINALIZED: order = ① #43 1vfyg2j (first-5-customers, fencing OP) → ② #44 1vfyelq (AI-assistant calls) → ③ fallbacks #38/#40/#41 → WATCH 1vg1ltw + 1vfzyn2; fresher <24h Theme A-C thread at the slot outranks banked drafts; TurfHop-outage aside re-validated (10th check). Posting stays gated to Fri Aug 7 22:21Z (96h rule 13); no posting today.",
-        "impact": "MEDIUM — slot run can post instantly without re-drafting",
-        "time_min": 10
-      },
-      {
-        "task": "MX Build profile (owed since Aug 4 lane)",
-        "status": "✅ DONE — intel/mx-build-profile-2026-08-05.md (committed)",
-        "detail": "Research: official site mxbuild.co (live; Wix; NO public pricing page — contact-form model); parent = Priority Technology Holdings (NASDAQ: PRTH), payments processor; features = FSM + estimates/invoicing + SmartPay payments + MX Build Card + 'Theo' AI accountant + AP/AR/compliance (lien waivers). The '$49/mo' claim remains UNVERIFIED from public web (FB page login-walled). READ: payments-first construction/GC platform, NOT a lawn-care SaaS; $49 likely a merchant-acquisition hook; threat LOW-MODERATE; do NOT add to compare page; watch triggers = lawn-specific marketing/case studies. Note: the LawnBoss-lifted '$49' comparison table could not be reproduced from MX Build's own materials — don't inherit their numbers.",
-        "impact": "LOW — completes the competitor matrix at MowGo's price point; saves future re-research",
-        "time_min": 15
-      },
-      {
-        "task": "Concierge e2e — wiring verification (real-request trigger needs Aaron)",
-        "status": "🟡 PARTIAL — bot side verified; real trigger = Aaron (10 min)",
-        "detail": "scripts/smoke-test-concierge.sh: 5/5 PASS (OPTIONS 204, no-token 401, fake-token 401, admin no-code 401, admin wrong-code 401) — concierge-submit function live and auth-gated. Concierge auto-processor cron (0ba4645659a2) last run 12:34Z OK (execution state 'running' — noted, likely stale marker). CF API env-var read blocked (token lacks Pages read permission — 403; the 09:14Z check's env read worked via a different path). To close the loop Aaron needs to submit one real request from his logged-in session (small CSV, 2-3 clients) and confirm the Discord notification + import. Bot cannot fabricate a user JWT.",
-        "impact": "LOW-MED — last unproven link in the concierge pipeline",
-        "time_min": 10
-      }
-    ],
-    "verified_no_action_needed": [
-      "TurfHop 10th consecutive check (13:15Z): /pricing + /features both HTTP 500, outage ~90h+ — ammo line already on compare page, updated note live",
-      "Rule of 100 cron next run confirmed TODAY 15:00Z (0 15 * * 1-5) — dedup fix + cleanup landed ~13:40Z, before the run; scan's 'next run ~01:17Z tomorrow' was based on yesterday's drifted run time, not the schedule",
-      "QuoteIQ top-up was ALREADY reflected in the compare table header ($29.99–$699/mo) from the morning domain commit — only the explanatory note was missing; added",
-      "GitHub Actions: only iOS/Android native CI workflows exist (path-scoped to native dirs) — compare-page push triggered no unrelated builds"
-    ],
-    "flagged_not_changed": [
-      "CF API env-var read: BOTH CLOUDFLARE_API_TOKEN and CF_API_TOKEN return 403/'Authentication error' on /accounts/{id}/pages/projects — token lacks Pages read permission; the Stripe health check's env-var verification path (documented in mowflow-ops skill) should be re-checked next ops run — if it also 403s now, the 09:14Z 'keys valid' claim relied on a different mechanism",
-      "Cowork channel ~127 'Script not found' spam messages still uncleaned (discord tool read-only; bot REST delete only worked on its OWN messages in #outreach — cowork spam was posted by the provider-failover watchdog script which may have a different author; needs Aaron's decision or a bot with manage_messages)",
-      "Concierge auto-processor cron shows 'Execution: running' from 12:34Z — likely a stale marker; next 13:30Z run will confirm it ticks",
-      "MX Build $49: NOT added to the price matrix (unverified pricing; matrix keeps only verified numbers)"
-    ]
-  },
-
-  "research_findings": {
-    "source": "Live web research 13:14Z (hound: 10+ searches across DDG/Brave/Yahoo/Yandex, 15+ fetches: mxbuild.co, LinkedIn, app stores, ZoomInfo, reseller pages) + live probes (TurfHop 13:15Z, concierge smoke test 13:20Z) + channel history analysis (13:30Z)",
-    "key_items": [
-      "MX Build = mxbuild.co, product of Priority Technology Holdings (NASDAQ: PRTH) — payments-first construction/GC financial platform (SmartPay, MX Build Card, Theo AI accountant, lien-waiver compliance); NO public pricing page; '$49/mo' FB claim unverified; threat LOW; not a compare-page competitor; watch triggers: lawn-specific marketing push",
-      "Service Autopilot verified row (from intel run 3/4): $49 + signup fee, annual-only, real plans $199-499 — now on the live compare page",
-      "QuoteIQ top tiers officially Elite $299 / Max $699 (entry frozen $29.99) — 'top tiers went up again' line now on the live compare page",
-      "Jobber '$29/mo' headline = Core billed annually (1-yr lock, 1 user, +$29/seat; mtm Core $49) — now on the live compare page",
-      "TurfHop /pricing + /features HTTP 500 for 10 consecutive checks (~90h+, since ~Aug 1 17:00Z) — longest verified outage in tracker history",
-      "Rule-of-100 channel audit: canonical batch = 21 leads posted 01:33-01:34Z; bug duplicates = exactly 12 messages (02:01-02:06Z) — matches scan's count; all removed; 21/21 canonical intact"
-    ]
-  },
-
-  "tasks_needing_aaron": {
-    "critical_today": [
-      {
-        "priority": "🔴 Day 9 — 5 Day-1 SMS sends + 4+1 follow-ups (0 replies across 5 emails)",
-        "task": "Send 5 Day-1 texts (NG Outdoor / Frankies / A Plus / Mow-Town / Complete) + follow-ups Emerge/Metro Green/Bigfoot/Simply + Campbell & Sons; log all in LEAD_TRACKER.md",
-        "detail": "Scripts in #outreach (canonical 01:33Z batch, 21 leads — channel now de-duplicated and clean). LEAD_TRACKER untouched since Aug 2. 2nd follow-up script due if silent by Fri. 10 min each.",
-        "blocked_days": 9
-      },
-      {
-        "priority": "🔴 Day 8 — human loop dead ~7 days",
-        "task": "Post Blasian reply in #🌱mowgo-leads (draft: leads/blasian-reply-draft-2026-08-01.md)",
-        "detail": "Cheapest restart of the human loop. Zero human messages anywhere since Jul 29 15:39Z.",
-        "blocked_days": 8
-      },
-      {
-        "priority": "🔴 Day 20 — the ONLY unproven Stripe link",
-        "task": "Logged-in end-to-end test checkout (real card, real account)",
-        "detail": "All green at 09:14Z check (functions live, keys valid, no-key-in-bundle by design). 5-min test closes it.",
-        "blocked_days": 20
-      },
-      {
-        "priority": "🔴 Day 24 — highest-leverage 30 min",
-        "task": "SoftwareWorld + Capterra/G2/SoftwareAdvice/GetApp submissions",
-        "detail": "MowGo still absent from every 'best of 2026' listicle; QuoteIQ co-founder self-ranks #1. 10-15 min each.",
-        "blocked_days": 24
-      },
-      {
-        "priority": "🔴 Overdue — Jobber switcher window ~Aug 15",
-        "task": "Post 'Jobber promo just ended' campaign (drafts A/B/D ready)",
-        "detail": "Ammo now on the live compare page: Jobber $29 annual-bait, SA $49 teaser+signup fee, QuoteIQ top tiers $299/$699.",
-        "blocked_days": 8
-      },
-      {
-        "priority": "🟡 Concierge e2e — 10 min",
-        "task": "Submit ONE real concierge request from your logged-in session (small CSV, 2-3 clients); confirm Discord notification + import",
-        "detail": "Bot verified endpoints 5/5 + cron healthy. This is the last unproven link in the pipeline.",
-        "blocked_days": 1
-      }
-    ],
-    "decisions": [
-      "Trial 7 vs 14 days (checkout grants 7, copy says 14) + CF env cleanup (VITE_FORCE_DEMO etc.)",
-      "mowflow.pages.dev CF project deletion — confirm one-click (domain retired regardless; verified 09:14Z)",
-      "Resume friend-poster cron 9b2791494b1b? (Aug 7 slot kit is finalized; posting verified clean since Aug 3)",
-      "Watchdog delivery channel (cowork vs #🌱mowgo vs ops) + cowork ~127 spam messages cleanup (needs manage_messages)",
-      "CF API token lacks Pages read — renew/scope if env-var health checks should keep working from the bot side"
-    ]
-  },
-
-  "blockers": [
-    "None blocking Part 3. All bot-actionable items executed. Two items are genuinely Aaron-only: (1) concierge real-request trigger (needs his logged-in session — bot cannot mint a user JWT); (2) cowork-channel message deletion (spam was posted by the watchdog script account, not the bot — bot REST delete of own messages only).",
-    "⚠️ Scan correction for Part 3: the 7am scan's 'Rule 100 next run ~01:17Z tomorrow' was WRONG — schedule is 0 15 * * 1-5, so the run was TODAY 15:00Z. Fix landed 13:40Z; no exposure. Future scans should read the cron schedule (hermes cron list) rather than the last-run timestamp."
+  "actions_ts": "2026-08-06T13:45:00Z",
+  "action_label": "8am CST action — Thu Aug 6 (fed by daily_scan.json from Part 1)",
+  "quick_wins": [
+    {
+      "id": "compare_page_refresh_2",
+      "status": "DONE + DEPLOYED",
+      "detail": "Compare.jsx + en.json + static SEO page (public/seo/compare/index.html) updated: Jobber 3-mo promo mechanic + triple-loaded $29 (Core $24-40/mo first term, 1-yr lock, $29/seat); QuoteIQ 1% processing fee on top of Stripe + Price-Lock Guarantee after July hike (amber note); Service Autopilot $49 = ONE mobile license (2-person crew $199+, signup fee, annual-only); TurfHop recovery note ('pricing down Aug 1-6, features still 500'); new Planado footnote (per-user $12-29, no invoicing/payments). Straight-talk Jobber unselle block updated to promo terms. Build passed (npm run build, 780ms). Committed f022da6 + pushed to main (CF Pages auto-deploy). Verification: curl check after deploy completes.",
+      "evidence": "git f022da6; strings verified in public+dist SEO html; i18n keys added (3 new, 4 updated)"
+    },
+    {
+      "id": "reddit_kit_finalize",
+      "status": "DONE (verified already-finalized + one stale note fixed)",
+      "detail": "Kit was finalized overnight: #43 v2 already carries the Nextdoor-frustration nod (verified in leads/reddit-threads.md), #48 promoted to kit #2 (swap rule documented). Remaining stale item fixed: TurfHop-outage kit note now time-stamped ('pricing recovered Aug 6 11:16Z after ~114h; /features still 500 — use only as factual aside, never current-outage claim'). Slot TOMORROW Fri Aug 7 22:21Z; verify thread liveness in the Fri sweep before posting.",
+      "evidence": "leads/reddit-threads.md lines 335-341, 457-461, 473-479"
+    },
+    {
+      "id": "copy_flags_bank",
+      "status": "DONE",
+      "detail": "8 copy flags banked into vault/2026-08-06_daily-sync.md (new section '💰 Copy flags banked (8am action)') — Jobber promo math, QuoteIQ 1%+Price-Lock, SA one-license, QuoteIQ bug wall, 49.4% onboarding-blocker, TurfHop outage, Planado wedge, cancel-anytime line. All 7 scan flags + 1 extra.",
+      "evidence": "vault/2026-08-06_daily-sync.md (committed)"
+    },
+    {
+      "id": "cowork_cleanup",
+      "status": "DONE",
+      "detail": "128 watchdog-failure spam messages DELETED from #🤝mowgo-cowork (channel now 0 messages, verified by re-fetch). All were bot posts (author HeremesV2, 'Provider failover watchdog ... Script not found', Aug 4 04:00-13:45Z) — zero human messages touched. New tool .bi_tools/clean_cowork.py (Discord API v10, bot UA per the 403 diagnosis doc, Retry-After backoff). Day-5 hygiene item CLOSED. Watchdog delivery-channel proposal: move watchdog cron deliveries OUT of #cowork to #🌱mowgo (or a dedicated ops channel) so this never recurs — decision for Aaron.",
+      "evidence": "DRY_RUN fetch after cleanup: 'FETCHED 0 messages | spam matches: 0'"
+    },
+    {
+      "id": "mxbuild_profile",
+      "status": "DONE (was already complete)",
+      "detail": "intel/mx-build-profile-2026-08-05.md exists and is complete: MX Build = payments-first construction-finance play (Priority Holdings/NASDAQ PRTH), no public pricing, NOT lawn-first; verdict = no compare-page column, watch triggers documented. Quick win was already banked yesterday.",
+      "evidence": "intel/mx-build-profile-2026-08-05.md"
+    },
+    {
+      "id": "concierge_e2e",
+      "status": "BLOCKED — needs a real user",
+      "detail": "Pipeline is wired but has never carried a real concierge request; triggering one requires a signed-in business submitting the in-app concierge form. No test account available to the bot. Suggest Aaron fires one request from his own account (10 min) or accept as-is until first real lead.",
+      "owner": "Aaron/Bot"
+    }
   ],
-
-  "key_items": [
-    "RULE 100 BUG: dedup fix shipped via Codex + SKILL.md DEDUP GATE; real dry-run = all 21 SKIP; 12 duplicate messages deleted; channel verified 21/21 clean",
-    "COMPARE PAGE: deployed + verified live — SA teaser note, QuoteIQ $299/$699 top-up, Jobber $29 annual terms, TurfHop 500 ~90h+ (10th check)",
-    "REDDIT: Aug 7 kit finalized — #43 #1, #44 backup, fallbacks + watch list; gate holds until Fri 22:21Z",
-    "MX BUILD: profiled — PRTH payments platform, $49 unverified, LOW threat, no compare-page addition",
-    "CONCIERGE: endpoints 5/5 + cron healthy; real trigger = Aaron (10 min)",
-    "AARON's plate (priority): 5 Day-1 SMS + 4+1 follow-ups → Blasian reply → Stripe logged-in checkout → SoftwareWorld → Jobber promo posts → concierge real request",
-    "STANDING: zero human messages anywhere since Jul 29 (Blasian Day 8) — everything else is waiting on one reply"
-  ]
+  "bug_fix_lane": {
+    "status": "hormozi batch HIGH blocker ALREADY FIXED (verified)",
+    "detail": "Review r2 (02:46Z) marked hormozi-fixes batch NO-SHIP on one HIGH: win-back email #2 silently zeroed by a resubscribe-detection bug. Verified in /opt/data/.hermes/scripts/mowgo_activation_emails.py winback_candidates(): the filter now excludes tier ''/'free' events (cancellation's own tier='free' log no longer counts as resubscribe) — fix landed post-review (presumably by the 4h bug-hunt cron). py_compile passes. Batch remains UNCOMMITTED/UNSHIPPED (correct — needs final re-review + Aaron applies migrations 20260806140000/20260806140500 via supabase db query, and cron registration).",
+    "remaining": [
+      "Final adversarial re-review of the hormozi batch (r3) before commit/ship — recommend next 4h bug-hunt cycle (eaa76d30f06f) or Aaron's call",
+      "mowgo_activation_emails.py NOT registered in cron ('Active Crons.md' has no entry) — day-0/3/7 + win-back #2 emails will NOT send until scheduled (review LOW, non-blocking for code ship but blocking for feature value)",
+      "LOW: dead-code ternary in OnboardingChecklist.jsx ownerId (crew branch) — non-blocking",
+      "Copy-truth flag: repo has conflicting Jobber plan naming (en.json blog keys say 'Grow plan at $349/mo' AND Landing fix says 'Jobber Grow is $139/mo'; compare page says 'Jobber Connect $139'). Overnight session verified $139 = Grow 1-user + $29/user (2026-08-06). Recommend a naming audit pass before the Jobber switcher wave."
+    ]
+  },
+  "research_lane": {
+    "status": "NOT NEEDED this cycle",
+    "detail": "All three intel runs (pricing 02:35Z, features 06:48Z, competitor 11:16Z) already produced the research; this action cycle only applied it. Watch items carried: Servinix beta Aug 17, Werx, QuoteIQ content machine + 1% fee, LawnBoss 305/mo, TurfHop /features 500, Yardbook /pricing move."
+  },
+  "aaron_plate": [
+    {"id": "sms_day1_sends", "status": "🔴 DAY-2 TEXTS DUE TODAY if Wave 1 goes out", "detail": "10 Day-1 SMS queued across 2 waves, ZERO sends logged (tracker untouched since Aug 2). Scripts: wave 1 in #outreach, wave 2 in #leads. Never pitch app in msg 1; log 🔴→🟡 in LEAD_TRACKER.md."},
+    {"id": "emerge_followup", "status": "🔴 Day 11, 0 replies", "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). 2nd follow-up script fires Fri if silent. Highest-ROI 10 min."},
+    {"id": "blasian_reply", "status": "🔴 Day 10, ✅ reaction but no reply", "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md — reply FIRST, restarts the dead human loop (Blasian silent since Jul 29)."},
+    {"id": "stripe_e2e_verify", "status": "🟡 Day 22", "detail": "Logged-in test checkout with a real card = the ONLY unproven Stripe link. Everything else green; mowflow retirement fully closed (redirects)."},
+    {"id": "softwareworld_submit", "status": "❌ Day 26", "detail": "SoftwareWorld + Capterra/G2/SoftwareAdvice/GetApp — 10-15 min each; brand query #1-ish but zero listicle presence."},
+    {"id": "one_click_decisions", "status": "⏳", "detail": "Trial 7 vs 14 days · mowflow CF deletion confirm (retirement achieved via redirect — deletion is cosmetic now) · friend-poster cron resume (9b2791494b1b) · Jobber promo posts (drafts A/B/D ready; switcher window ~Aug 15) · watchdog delivery channel (proposal above) · activation-emails cron registration."}
+  ],
+  "blockers": [
+    "NONE for the bot lane this cycle — all 4 bot quick wins executed (compare refresh, kit finalize, copy bank, cowork cleanup).",
+    "Concierge e2e needs a human (no test account).",
+    "hormozi batch ship awaits: r3 re-review + Aaron applies 2 migrations + cron registration."
+  ],
+  "deployment": {
+    "commit": "f022da6",
+    "pushed": true,
+    "cf_build": "in progress (auto-deploy on push)",
+    "verify_after": "curl https://mowgoapp.com/compare — expect 'Planado (new in the band)' + '3-month promo' text"
+  },
+  "summary": "4/4 bot quick wins executed. Compare page refreshed with all 3 intel runs' ammo and pushed to prod. Cowork channel fully cleaned (128 spam deleted — Day-5 item CLOSED). Reddit kit confirmed final + TurfHop note fixed. Copy flags banked. MX Build already profiled. Concierge e2e blocked on a human. Bug lane: hormozi HIGH blocker verified fixed post-review; batch still unshipped awaiting r3 + Aaron's migration apply + cron registration. Aaron's plate: 8 items unchanged (SMS, follow-ups, Blasian, Stripe e2e, directories, 6 one-click decisions)."
 }
