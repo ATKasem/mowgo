@@ -65,18 +65,24 @@ export async function onRequestPost({ request, env }) {
             if (profileRes.ok) {
               const [prof] = await profileRes.json();
               if (prof?.referred_by) {
-                // Atomic cap+earn via service-role RPC (webhook already has dedup guard)
-                await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/rpc/earn_referral_credit`, {
+                // Atomic cap+earn via service-role RPC (webhook already has dedup guard).
+                // RPC returns JSON boolean: true = earned, false = cap reached / no pending row.
+                const earnRes = await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/rpc/earn_referral_credit`, {
                   method: 'POST',
                   headers: {
-                    apikey: ***
+                    apikey: serviceKey,
                     Authorization: `Bearer ${serviceKey}`,
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({ p_referred_user_id: prof.id }),
                 }));
-                // Notify referrer via email (best-effort)
-                await sendReferralEarnEmail(env, serviceKey, prof.referred_by);
+                if (earnRes.ok) {
+                  const earned = await earnRes.json();
+                  // Only notify on an actual earn — cap hit leaves the row pending, no email.
+                  if (earned === true) {
+                    await sendReferralEarnEmail(env, serviceKey, prof.referred_by);
+                  }
+                }
               }
             }
           }
@@ -112,7 +118,7 @@ async function isDuplicateEvent(eventId, env) {
     const response = await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/webhook_events`, {
       method: 'POST',
       headers: {
-        apikey: ***
+        apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
         Prefer: 'resolution=ignore-duplicates,return=representation',
@@ -233,7 +239,7 @@ async function logTierChange(env, serviceKey, resolvedUserId, newTier) {
     await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/tier_events`, {
       method: 'POST',
       headers: {
-        apikey: ***
+        apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
         Prefer: 'return=minimal',
@@ -250,7 +256,7 @@ async function fetchProfile(env, serviceKey, filter) {
   try {
     const res = await withTimeout(fetch(
       `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=id,tier`,
-      { headers: { apikey: *** Authorization: `Bearer ${serviceKey}` } }
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
     ));
     if (!res.ok) return null;
     const [row] = await res.json();
@@ -329,7 +335,7 @@ async function fetchUserEmail(env, serviceKey, userId) {
   try {
     const res = await withTimeout(fetch(
       `${env.SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(userId)}`,
-      { headers: { apikey: *** Authorization: `Bearer ${serviceKey}` } }
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
     ));
     if (!res.ok) return null;
     const data = await res.json();
@@ -424,7 +430,7 @@ async function patchProfile(env, filter, profile) {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${serviceKey}`,
-      apikey: ***
+      apikey: serviceKey,
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
     },
