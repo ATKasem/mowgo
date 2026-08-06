@@ -24,6 +24,51 @@ function SubscribeNav({ tr }) {
   );
 }
 
+// Moment of purchase (spec §4A): ask placed under the post-checkout success
+// card. Code + counts come from the referral_status() RPC in one call.
+// Silent if the RPC fails or the user has no code yet — never blocks the
+// success screen.
+function ReferralAsk({ tr }) {
+  const [ref, setRef] = useState(null); // { code, total_count, earned_count }
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data, error } = await supabase.rpc('referral_status');
+      if (active && !error && data?.code) setRef(data);
+    })().catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  if (!ref?.code) return null;
+
+  const shareUrl = `${window.location.origin}/#/login?mode=signup&ref=${encodeURIComponent(ref.code)}`;
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(ref.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (e) {
+      // Clipboard unavailable — nothing to show, code is still visible on screen.
+    }
+  }
+
+  return (
+    <div className="card p-6">
+      <h2 className="font-bold text-gray-900 dark:text-white">{tr("Your next month is on us")}</h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Give this code to one crew you know:")}</p>
+      <div className="flex items-center gap-3 mt-4">
+        <code className="font-mono text-2xl font-bold tracking-[0.2em] text-emerald-600 dark:text-emerald-400">{ref.code}</code>
+        <button type="button" onClick={copyCode} className="btn-secondary text-sm px-4 py-2">{copied ? tr("Copied!") : tr("Copy")}</button>
+      </div>
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 break-all">{shareUrl}</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{tr("They get a free trial, you get a free month when they subscribe.")}</p>
+    </div>
+  );
+}
+
 export default function Subscribe() {
   const { tr, t, i18n } = useLocalizedText('subscribe');
   const { tr: conciergeTr } = useLocalizedText('concierge');
@@ -133,6 +178,7 @@ export default function Subscribe() {
             {tr("Log In")} <ArrowRight className="w-4 h-4" />
           </Link>
           </div>
+          {user && <ReferralAsk tr={tr} />}
           {user && conciergeClaimed === false && <ConciergeSetup onDone={() => setConciergeClaimed(true)} />}
           {user && conciergeClaimed === true && <p className="text-sm text-gray-600 dark:text-gray-300">{conciergeTr("Your setup request is in — we'll be in touch within 48 hours.")}</p>}
         </div>

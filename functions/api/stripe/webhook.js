@@ -79,8 +79,10 @@ export async function onRequestPost({ request, env }) {
                 if (earnRes.ok) {
                   const earned = await earnRes.json();
                   // Only notify on an actual earn — cap hit leaves the row pending, no email.
+                  // Pass BOTH ids: referrerId is the email recipient, referredUserId is
+                  // the person who subscribed (their name goes in the copy).
                   if (earned === true) {
-                    await sendReferralEarnEmail(env, serviceKey, prof.referred_by);
+                    await sendReferralEarnEmail(env, serviceKey, prof.referred_by, prof.id);
                   }
                 }
               }
@@ -386,16 +388,29 @@ async function sendWinbackEmail(env, serviceKey, userId, previousTier) {
   }
 }
 
+// Minimal HTML escaping for user-controlled strings interpolated into emails.
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Referral earn notification — emailed to referrer when their referred user pays.
 // Best-effort, never fails the webhook. Uses existing fetchUserEmail + Resend helpers.
-async function sendReferralEarnEmail(env, serviceKey, referrerId) {
+// referrerId = email recipient; referredUserId = the user who subscribed (their
+// business_name personalizes the copy — MEDIUM-3: the spec's "{referred business}
+// just subscribed to MowGo." means the REFERRED user's name, not the recipient's).
+async function sendReferralEarnEmail(env, serviceKey, referrerId, referredUserId) {
   if (!env.RESEND_API_KEY || !referrerId) return;
   try {
     const email = await fetchUserEmail(env, serviceKey, referrerId);
     if (!email) return;
-    const referrerName = await getReferrerName(env, serviceKey, referrerId);
+    const referredName = await getReferredName(env, serviceKey, referredUserId);
     const subject = 'You earned a free month on MowGo';
-    const html = `<p>You just earned a **free month** on MowGo!</p><p>${referrerName || 'A crew'} subscribed using your referral code.</p><p>Your credit will be applied to your next renewal automatically.</p>`;
+    const html = `<p>You just earned a <strong>free month</strong> on MowGo!</p><p>${escapeHtml(referredName || 'A crew')} subscribed using your referral code.</p><p>Your credit will be applied to your next renewal automatically.</p>`;
     await withTimeout(fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -409,11 +424,11 @@ async function sendReferralEarnEmail(env, serviceKey, referrerId) {
   }
 }
 
-// Fetch referrer's business_name (for email personalization)
-async function getReferrerName(env, serviceKey, referrerId) {
+// Fetch a user's business_name (for email personalization).
+async function getReferredName(env, serviceKey, userId) {
   try {
     const res = await withTimeout(fetch(
-      `${env.SUPABASE_URL}/rest/v1/profiles?select=business_name&id=eq.${encodeURIComponent(referrerId)}`,
+      `${env.SUPABASE_URL}/rest/v1/profiles?select=business_name&id=eq.${encodeURIComponent(userId)}`,
       { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
     ));
     if (!res.ok) return null;

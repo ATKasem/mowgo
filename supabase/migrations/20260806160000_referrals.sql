@@ -14,16 +14,20 @@ ALTER TABLE profiles ADD CONSTRAINT u_profiles_referral_code UNIQUE (referral_co
 
 -- Code generation trigger — NEW pattern (no repo precedent for code-gen).
 -- 6-char uppercase codes, unambiguous alphabet (exclude I,O,0,1).
+-- AFTER INSERT (not BEFORE): assigns the code via a real UPDATE so a code
+-- collision raises a genuine unique_violation that the per-attempt exception
+-- block can catch and retry — a BEFORE INSERT trigger can only pre-check
+-- (TOCTOU race: two concurrent signups could pass the check and the second
+-- INSERT would fail the whole row with an unhandled constraint error).
 CREATE OR REPLACE FUNCTION ensure_referral_code() RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   letter_alpha TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; -- 32 chars, no I/O/0/1
-  code TEXT; ok BOOLEAN;
+  code TEXT;
 BEGIN
   IF COALESCE(NEW.referral_code, '') != '' THEN
-    RETURN NEW; -- already set, skip (idempotent re-trigger guard)
+    RETURN NEW; -- already set (client-supplied), skip
   END IF;
 
-  ok := FALSE;
   FOR _attempt IN 1..10 LOOP
     code := '';
     FOR j IN 1..6 LOOP
@@ -32,26 +36,23 @@ BEGIN
     code := UPPER(TRIM(code));
 
     BEGIN
-      INSERT INTO profiles (referral_code) VALUES (code) WHERE id = NEW.id;
-      ok := TRUE;
-      EXIT;
+      UPDATE profiles SET referral_code = code WHERE id = NEW.id AND referral_code IS NULL;
+      IF FOUND THEN
+        RETURN NEW;
+      END IF;
     EXCEPTION WHEN unique_violation THEN
-      -- retry with different random code (only aborts this attempt, not the row insert)
+      CONTINUE; -- collision — try a fresh code (aborts only this attempt)
     END;
   END LOOP;
 
-  IF NOT ok THEN
-    RAISE NOTICE 'ensure_referral_code: failed to generate code for user % after 10 attempts', NEW.id;
-  END IF;
-
-  RETURN NEW;
+  RAISE NOTICE 'ensure_referral_code: failed to generate code for user % after 10 attempts', NEW.id;
+  RETURN NEW; -- code stays NULL (UNIQUE allows multiple NULLs); backfill can retry later
 END; $$;
 
 REVOKE ALL ON FUNCTION ensure_referral_code() FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION ensure_referral_code() TO authenticated;
 
 DROP TRIGGER IF EXISTS ref_code_generate_trigger ON profiles;
-CREATE TRIGGER ref_code_generate_trigger BEFORE INSERT ON profiles
+CREATE TRIGGER ref_code_generate_trigger AFTER INSERT ON profiles
   FOR EACH ROW EXECUTE FUNCTION ensure_referral_code();
 
 -- Backfill existing users with referral codes (safe multi-row)
@@ -108,13 +109,16 @@ REVOKE ALL ON TABLE referrals FROM anon, authenticated;
 -- All functions revoke from PUBLIC first (027 rule), then grant to specific roles.
 
 -- profile_is_referred(p_uid): helper used inside apply_referral_code.
+-- SECURITY DEFINER owner-call only — NOT granted to any client role: the
+-- internal call from apply_referral_code runs as the function owner regardless
+-- of client-facing grants, and a public grant would let any logged-in user
+-- probe whether ANY uuid has ever been referred (no product justification).
 CREATE OR REPLACE FUNCTION profile_is_referred(p_uid UUID) RETURNS boolean
 LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
   SELECT COUNT(*) > 0 FROM referrals WHERE referred_user_id = p_uid;
 $$;
 
 REVOKE ALL ON FUNCTION profile_is_referred(uuid) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION profile_is_referred(uuid) TO authenticated;
 
 -- apply_referral_code(p_code text): client calls to redeem a referral link.
 -- Grants: authenticated (with auth.uid() guard).
@@ -134,12 +138,9 @@ BEGIN
 
   -- Get caller's own referral code
   SELECT referral_code INTO my_code FROM profiles WHERE id = auth.uid();
-  IF my_code IS NULL OR my_code != p_norm THEN
-    RETURN null; -- unknown or invalid code
-  END IF;
 
-  -- Self-referral check: if what they typed equals their OWN code, reject
-  IF my_code = p_norm THEN
+  -- Self-referral check: typed code == caller's OWN code → reject
+  IF my_code IS NOT NULL AND my_code = p_norm THEN
     RAISE EXCEPTION 'cannot refer yourself';
   END IF;
 
@@ -148,12 +149,12 @@ BEGIN
     RETURN 'already_referred';
   END IF;
 
-  -- Find referrer by the typed code (which != caller's own code)
+  -- Find referrer by the typed code
   SELECT id, business_name INTO v_referrer_id, v_referrer_name
     FROM profiles WHERE referral_code = p_norm;
 
   IF v_referrer_id IS NULL OR v_referrer_name IS NULL THEN
-    RETURN null; -- stale/corrupt code
+    RETURN null; -- unknown/invalid code
   END IF;
 
   -- Mark as referred (update WHERE not yet set; atomic even under race)
@@ -219,6 +220,13 @@ BEGIN
 
   IF v_referrer_id IS NULL THEN
     RETURN false; -- no pending referral found (already earned / never had one)
+  END IF;
+
+  -- Explicit self-referral backstop (spec: referred_by != id): if a future
+  -- writer ever inserts a self-referral row, this blocks the credit even
+  -- though apply_referral_code already guards the normal path.
+  IF v_referrer_id = p_referred_user_id THEN
+    RETURN false;
   END IF;
 
   -- Fraud cap: atomic count-and-update inside advisory lock

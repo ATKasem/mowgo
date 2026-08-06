@@ -101,6 +101,63 @@ function LeadTouchPing() {
   return null;
 }
 
+// Moment of satisfaction (spec §4C): dismissible banner shown when the user
+// has never referred anyone (total_count = 0), has ≥1 invoice, and is on the
+// free tier. Duplicates the repo's defensive free-tier literal — data.js:540
+// is a local const inside createClient(), not exported, so Dashboard inlines
+// the check. total_count (not earned_count) hides it once a referral is in
+// flight. Never blocks the dashboard — silent on any fetch failure.
+const REFERRAL_BANNER_DISMISS_KEY = 'mf_referral_banner_dismissed';
+
+function ReferralSatisfactionBanner() {
+  const { tr } = useLocalizedText('dashboard');
+  const [show, setShow] = useState(null); // null = loading, true/false = verdict
+  const [dismissed, setDismissed] = useState(
+    () => localStorage.getItem(REFERRAL_BANNER_DISMISS_KEY) === '1'
+  );
+
+  useEffect(() => {
+    if (dismissed || isDemoMode()) return;
+    let active = true;
+    (async () => {
+      const [profile, invoices, ref] = await Promise.all([
+        loadProfile().catch(() => null),
+        loadInvoices().catch(() => []),
+        supabase.rpc('referral_status').then(r => r.data).catch(() => null),
+      ]);
+      if (!active) return;
+      const freeTier = [undefined, null, '', 'free'].includes(profile?.tier);
+      const hasInvoice = (invoices?.length || 0) > 0;
+      const neverReferred = !ref || (ref.total_count || 0) === 0;
+      setShow(freeTier && hasInvoice && neverReferred);
+    })();
+    return () => { active = false; };
+  }, [dismissed]);
+
+  if (dismissed || show !== true) return null;
+
+  function dismiss() {
+    localStorage.setItem(REFERRAL_BANNER_DISMISS_KEY, '1');
+    setDismissed(true);
+  }
+
+  return (
+    <div className="card p-4 mb-5 flex items-center justify-between gap-4 border-brand/30">
+      <div>
+        <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">
+          {tr('Refer a crew, earn a free month when they subscribe.')}
+        </p>
+        <Link to="/subscribe" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1 inline-block">
+          {tr('Get your referral code')}
+        </Link>
+      </div>
+      <button onClick={dismiss} aria-label={tr('Dismiss')} className="min-w-10 min-h-10 flex items-center justify-center text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors flex-shrink-0">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
 /** Get local date string (YYYY-MM-DD) accounting for timezone */
 function localDate(offsetDays = 0) {
   const d = new Date();
@@ -282,6 +339,7 @@ export default function Dashboard() {
       <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
       <ConciergeBookingPrompt />
         <LeadTouchPing />
+      <ReferralSatisfactionBanner />
       <OnboardingChecklist />
       <div className="grid grid-cols-2 gap-3">
         {cards.map((card, i) => (

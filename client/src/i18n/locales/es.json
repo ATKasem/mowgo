@@ -168,7 +168,11 @@
     "a_lead_or_client_already_uses_this_phone_number": "Un prospecto o cliente ya usa este número de teléfono.",
     "client": "Cliente",
     "amount": "Monto",
-    "note_optional": "Nota (opcional)"
+    "note_optional": "Nota (opcional)",
+    "invite_a_crew_get_a_free_month": "Invita a una cuadrilla — gana un mes gratis",
+    "share_your_code": "Comparte tu código:",
+    "copy": "Copiar",
+    "copied": "¡Copiado!"
   },
   "compare": {
     "compare_mowgo_plans": "Compara los planes de MowGo",
@@ -768,7 +772,9 @@
     "we_sent_a_confirmation_link_to_email_click_it_to_activate_your_account": "Enviamos un enlace de confirmación a {{email}}. Ábrelo para activar tu cuenta.",
     "if_an_account_exists_for_email_you_ll_receive_a_password_reset_link_shor": "Si existe una cuenta para {{email}}, pronto recibirás un enlace para restablecer tu contraseña.",
     "create_your_free_account_5_clients_no_credit_card": "Crea tu cuenta gratuita: 5 clientes, sin tarjeta de crédito.",
-    "payment_failed": "Pago fallido"
+    "payment_failed": "Pago fallido",
+    "referral_code_optional": "Código de referencia (opcional)",
+    "e_g_7km2qp": "p. ej. 7KM2QP"
   },
   "privacy": {
     "back_to_mowgo": "Volver a MowGo",
@@ -1044,7 +1050,12 @@
     "back_home": "Volver al inicio",
     "we_couldn_t_verify_your_payment_please_try_again": "No pudimos verificar su pago. Por favor, inténtelo de nuevo.",
     "compare": "Comparar",
-    "log_in": "Iniciar sesión"
+    "log_in": "Iniciar sesión",
+    "your_next_month_is_on_us": "Tu próximo mes es gratis",
+    "give_this_code_to_one_crew_you_know": "Dale este código a una cuadrilla que conozcas:",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "Ellos obtienen una prueba gratis; tú ganas un mes gratis cuando se suscriban."
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Reportes de pérdida de datos",
@@ -1226,7 +1237,10 @@
     "dashboard": "Panel",
     "done": "hecho",
     "no_jobs_today": "Sin trabajos hoy",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "refer_a_crew_earn_a_free_month_when_they_subscribe": "Recomienda a una cuadrilla y gana un mes gratis cuando se suscriban.",
+    "get_your_referral_code": "Obtén tu código de referencia",
+    "dismiss": "Cerrar"
   },
   "reviewPrompt": {
     "leave_a_review": "Dejar una reseña",

@@ -141,6 +141,25 @@ function ResumeCheckoutIntent() {
   return null;
 }
 
+// Applies a stashed referral code after the email-confirmation round trip.
+// INDEPENDENT, UNGATED sibling of ResumeCheckoutIntent — a referral-only
+// signup never sets mowgo_plan_intent, so wiring this inside that effect
+// would silently never fire (round-3 CRIT-2). Fires on any route mount once
+// a session exists; applyStashedRefCode is idempotent and clears the stash.
+function ApplyStashedRefCode() {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled || !session?.access_token) return;
+      const { applyStashedRefCode } = await import('./lib/referrals');
+      if (!cancelled) await applyStashedRefCode();
+    })();
+    return () => { cancelled = true; };
+  }, []);
+  return null;
+}
+
 // This component detects that and rewrites to /#/login so Login.jsx can show
 // a friendly error message instead of a blank page.
 function SupabaseErrorRedirect() {
@@ -210,6 +229,7 @@ export default function App() {
       <AuthProvider>
         <SupabaseErrorRedirect />
         <ResumeCheckoutIntent />
+        <ApplyStashedRefCode />
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />
