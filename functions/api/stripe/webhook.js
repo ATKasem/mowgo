@@ -3,8 +3,16 @@
  * POST /api/stripe/webhook
  */
 
+import { dispatchWebhookEvent } from '../_shared/dispatch-webhook.js';
+
 const STRIPE_API = 'https://api.stripe.com/v1';
 const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
+// Monthly price in cents per tier — sourced from client/src/pages/Landing.jsx
+// plans array (Solo $39, Crew $79, Premium $199). A referral always earns
+// ONE MONTHLY month of credit regardless of whether the referred user chose
+// monthly or annual billing (the promise is "a free month", not "a free
+// billing cycle").
+const REFERRAL_CREDIT_CENTS = { solo: 3900, crew: 7900, premium: 19900 };
 const withTimeout = (promise, ms = 4000) =>
   Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('Supabase timeout')), ms))]);
 
@@ -28,11 +36,19 @@ export async function onRequestPost({ request, env }) {
     'checkout.session.completed',
     'customer.subscription.updated',
     'customer.subscription.deleted',
+    'invoice.payment_failed',
   ].includes(event.type)) {
     return ok();
   }
 
-  if (await isDuplicateEvent(event.id, env)) return ok();
+  // Fast-path check ONLY — do not mark the event seen yet. Marking it before
+  // processing means any transient failure AFTER this point (e.g. a
+  // Supabase timeout mid-handler) would leave the dedup row inserted while
+  // the actual tier update never happened; Stripe's retry would then see
+  // "already processed" and the user would be stuck on the wrong tier
+  // forever (HIGH-2). markEventProcessed() only runs after processing
+  // succeeds, below.
+  if (await wasEventProcessed(event.id, env)) return ok();
 
   try {
     requireConfiguration(env);
@@ -77,11 +93,18 @@ export async function onRequestPost({ request, env }) {
                   body: JSON.stringify({ p_referred_user_id: prof.id }),
                 }));
                 if (earnRes.ok) {
-                  const earned = await earnRes.json();
-                  // Only notify on an actual earn — cap hit leaves the row pending, no email.
-                  // Pass BOTH ids: referrerId is the email recipient, referredUserId is
-                  // the person who subscribed (their name goes in the copy).
-                  if (earned === true) {
+                  // Don't gate on this call's `earned` return value: a PRIOR
+                  // delivery may have already flipped status to 'earned' and
+                  // then crashed before the Stripe credit was applied.
+                  // applyReferralCredit re-checks (status='earned' AND
+                  // credit_applied=false) via claim_referral_credit itself,
+                  // so calling it unconditionally here also recovers that
+                  // crash case instead of losing the credit silently.
+                  const applied = await applyReferralCredit(env, serviceKey, prof.referred_by, tier, prof.id);
+                  // Only notify once a REAL Stripe credit has been applied —
+                  // the email promises "you earned a free month"; it must not
+                  // go out before that's actually true (CRITICAL fix).
+                  if (applied) {
                     await sendReferralEarnEmail(env, serviceKey, prof.referred_by, prof.id);
                   }
                 }
@@ -102,9 +125,16 @@ export async function onRequestPost({ request, env }) {
           tier,
         });
       }
-    } else {
+    } else if (event.type === 'customer.subscription.deleted') {
       await handleSubscriptionDeleted(object, env);
+    } else if (event.type === 'invoice.payment_failed') {
+      await handlePaymentFailed(object, env);
     }
+
+    // Mark AFTER successful processing (see comment above the fast-path
+    // check). ON CONFLICT DO NOTHING makes this safe if two deliveries of
+    // the same event both make it this far — the row already exists.
+    await markEventProcessed(event.id, env);
 
     return ok();
   } catch (error) {
@@ -113,9 +143,28 @@ export async function onRequestPost({ request, env }) {
   }
 }
 
-async function isDuplicateEvent(eventId, env) {
+async function wasEventProcessed(eventId, env) {
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
   if (!eventId || !env.SUPABASE_URL || !serviceKey) return false;
+  try {
+    const response = await withTimeout(fetch(
+      `${env.SUPABASE_URL}/rest/v1/webhook_events?event_id=eq.${encodeURIComponent(eventId)}&select=event_id&limit=1`,
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
+    ));
+    if (!response.ok) throw new Error(`dedup select returned ${response.status}`);
+    const rows = await response.json();
+    return Array.isArray(rows) && rows.length > 0;
+  } catch (error) {
+    // Fail OPEN on the check itself (matches prior behavior) — an
+    // unreachable dedup table must not block real payment processing.
+    console.error('Stripe webhook dedup check failed; continuing processing:', error);
+    return false;
+  }
+}
+
+async function markEventProcessed(eventId, env) {
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
+  if (!eventId || !env.SUPABASE_URL || !serviceKey) return;
   try {
     const response = await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/webhook_events`, {
       method: 'POST',
@@ -123,16 +172,15 @@ async function isDuplicateEvent(eventId, env) {
         apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
-        Prefer: 'resolution=ignore-duplicates,return=representation',
+        Prefer: 'resolution=ignore-duplicates,return=minimal',
       },
       body: JSON.stringify({ event_id: eventId }),
     }));
-    if (!response.ok) throw new Error(`dedup insert returned ${response.status}`);
-    const inserted = await response.json();
-    return Array.isArray(inserted) && inserted.length === 0;
+    if (!response.ok) console.error('Stripe webhook dedup insert failed:', response.status);
   } catch (error) {
-    console.error('Stripe webhook dedup failed; continuing processing:', error);
-    return false;
+    // Best-effort — processing already succeeded; don't turn this into a
+    // 500 that makes Stripe retry an already-completed event.
+    console.error('Stripe webhook dedup insert failed:', error);
   }
 }
 
@@ -254,10 +302,10 @@ async function logTierChange(env, serviceKey, resolvedUserId, newTier) {
 }
 
 // Fetch the PREVIOUS profile state BEFORE patching (change detection must read pre-state).
-async function fetchProfile(env, serviceKey, filter) {
+async function fetchProfile(env, serviceKey, filter, select = 'id,tier') {
   try {
     const res = await withTimeout(fetch(
-      `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=id,tier`,
+      `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=${select}`,
       { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
     ));
     if (!res.ok) return null;
@@ -274,6 +322,10 @@ async function updateProfile({ env, userId, customerId, tier }) {
   const profile = {
     tier,
     ...(customerId ? { stripe_customer_id: customerId } : {}),
+    // Becoming paid again clears the win-back marker so a FUTURE
+    // cancellation still earns its own win-back email (see
+    // 20260806200000_referral_credit_claim.sql).
+    ...(tier !== 'free' ? { winback_sent_at: null } : {}),
   };
 
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
@@ -327,8 +379,62 @@ async function handleSubscriptionDeleted(object, env) {
     await logTierChange(env, serviceKey, resolvedUserId, 'free');
   }
 
-  if (before && ['solo', 'crew', 'premium'].includes(before.tier)) {
-    await sendWinbackEmail(env, serviceKey, resolvedUserId, before.tier);
+  if (resolvedUserId && before && ['solo', 'crew', 'premium'].includes(before.tier)) {
+    // Atomic claim: only the delivery that wins this compare-and-swap sends
+    // the email, so a concurrent/duplicate cancellation delivery can't send
+    // it twice (HIGH-2 — dedup no longer blocks re-processing up front).
+    const claimed = await claimWinback(env, serviceKey, resolvedUserId);
+    if (claimed) {
+      await sendWinbackEmail(env, serviceKey, resolvedUserId, before.tier);
+    }
+  }
+}
+
+// Atomically claims the right to send this user's win-back email
+// (winback_sent_at IS NULL -> now()). Returns false if another delivery
+// already claimed it. Cleared by updateProfile whenever the user pays again.
+async function claimWinback(env, serviceKey, userId) {
+  try {
+    const res = await withTimeout(fetch(
+      `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&winback_sent_at=is.null`,
+      {
+        method: 'PATCH',
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({ winback_sent_at: new Date().toISOString() }),
+      },
+    ));
+    if (!res.ok) return false;
+    const updated = await res.json();
+    return Array.isArray(updated) && updated.length > 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Payment-failure webhook fan-out (MEDIUM-3: dead 'payment.failed' event).
+// Fires the user's configured outbound webhooks — best-effort, never fails
+// the Stripe webhook itself.
+async function handlePaymentFailed(invoice, env) {
+  try {
+    const customerId = customerIdOf(invoice.customer);
+    if (!customerId) return;
+    const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
+    if (!serviceKey) return;
+    const profile = await fetchProfile(env, serviceKey, `stripe_customer_id=eq.${encodeURIComponent(customerId)}`, 'id,business_name');
+    if (!profile) return;
+    await dispatchWebhookEvent(env, profile.id, 'payment.failed', {
+      invoice_id: invoice.id,
+      amount: typeof invoice.amount_due === 'number' ? invoice.amount_due / 100 : null,
+      currency: invoice.currency || 'usd',
+      business_name: profile.business_name || null,
+    });
+  } catch (e) {
+    // best-effort — never fail the webhook over outbound dispatch
   }
 }
 
@@ -396,6 +502,115 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+// Applies a REAL Stripe customer-balance credit for an earned referral
+// (CRITICAL fix — previously earn_referral_credit only flipped DB rows,
+// no money ever moved). Returns true only once the Stripe credit has
+// actually been applied.
+async function applyReferralCredit(env, serviceKey, referrerId, tier, referredUserId) {
+  const amountCents = REFERRAL_CREDIT_CENTS[tier];
+  if (!amountCents || !referrerId || !env.STRIPE_SECRET_KEY) return false;
+
+  // Reserve first (atomic DB claim), THEN call Stripe. The Stripe call is an
+  // external side effect that can't share a transaction with the claim, so
+  // claiming before calling Stripe is the only way to guarantee no
+  // double-credit under concurrent/duplicate webhook delivery.
+  let claimed;
+  try {
+    const claimRes = await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/rpc/claim_referral_credit`, {
+      method: 'POST',
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_referred_user_id: referredUserId }),
+    }));
+    if (!claimRes.ok) return false;
+    claimed = await claimRes.json();
+  } catch (e) {
+    return false;
+  }
+  if (claimed !== true) return false; // already applied by another delivery, or nothing pending
+
+  try {
+    const customerId = await resolveOrCreateStripeCustomer(env, serviceKey, referrerId);
+    if (!customerId) {
+      console.error(`Referral credit: could not resolve Stripe customer for referrer ${referrerId} — credit CLAIMED but NOT applied, needs manual reconciliation`);
+      return false;
+    }
+
+    const txRes = await fetch(`${STRIPE_API}/customers/${encodeURIComponent(customerId)}/balance_transactions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        // Negative amount = credit in the customer's favor (Stripe convention).
+        amount: String(-amountCents),
+        currency: 'usd',
+        description: 'MowGo referral credit — one free month',
+      }).toString(),
+    });
+    const tx = await txRes.json();
+    if (!txRes.ok || tx.error) {
+      console.error(
+        `Referral credit: Stripe balance_transaction failed for referrer ${referrerId} (customer ${customerId}) — credit CLAIMED but NOT applied, needs manual reconciliation:`,
+        tx?.error?.message || txRes.status,
+      );
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    console.error(
+      `Referral credit: unexpected error applying credit for referrer ${referrerId} — credit CLAIMED but NOT applied, needs manual reconciliation:`,
+      e?.message || e,
+    );
+    return false;
+  }
+}
+
+// Resolve the referrer's Stripe customer id, creating one if they've never
+// checked out (mirrors the customer-creation + rollback-on-save-failure
+// pattern in stripe/checkout-subscription.js).
+async function resolveOrCreateStripeCustomer(env, serviceKey, userId) {
+  const profRes = await withTimeout(fetch(
+    `${env.SUPABASE_URL}/rest/v1/profiles?select=id,stripe_customer_id&id=eq.${encodeURIComponent(userId)}`,
+    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
+  ));
+  if (!profRes.ok) return null;
+  const [prof] = await profRes.json();
+  if (!prof) return null;
+  if (prof.stripe_customer_id) return prof.stripe_customer_id;
+
+  const email = await fetchUserEmail(env, serviceKey, userId);
+  if (!email) return null;
+
+  const customerRes = await fetch(`${STRIPE_API}/customers`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ email, 'metadata[supabase_user_id]': userId }).toString(),
+  });
+  const customer = await customerRes.json();
+  if (!customerRes.ok || customer.error) return null;
+
+  const saveRes = await withTimeout(fetch(
+    `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}`,
+    {
+      method: 'PATCH',
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stripe_customer_id: customer.id }),
+    },
+  ));
+  if (!saveRes.ok) {
+    const del = await fetch(`${STRIPE_API}/customers/${encodeURIComponent(customer.id)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+    });
+    if (!del.ok) console.error('Referral credit: could not clean up orphan Stripe customer', customer.id);
+    return null;
+  }
+
+  return customer.id;
 }
 
 // Referral earn notification — emailed to referrer when their referred user pays.

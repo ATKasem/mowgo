@@ -7,6 +7,17 @@
  * private IPs returned by DNS resolution (DNS rebinding), so a webhook URL
  * pointing at a host that resolves to 169.254.169.254 / 10.x / etc. is
  * rejected before fetch() is ever called.
+ *
+ * The real guarantee is "reject before fetch() ever tries" — NOT "DNS can't
+ * change between this check and the fetch() that follows it." A classic
+ * rebinding attacker returns a public IP to whichever resolver we ask and a
+ * private IP to the runtime's own resolution moments later (TOCTOU). We
+ * narrow that window by resolving independently through two different DoH
+ * providers (Cloudflare + Google) and requiring BOTH to answer with only
+ * public IPs; an attacker has to win the race against two resolvers instead
+ * of one. It is still not airtight against a well-timed rebind — the
+ * Workers-platform block on outbound private-IP fetches is the actual
+ * backstop for that.
  */
 
 /** Private / link-local / metadata ranges (IPv4). */
@@ -75,31 +86,43 @@ export async function isSafeWebhookUrl(rawUrl) {
     return { ok: false, reason: 'invalid hostname' };
   }
 
-  // DNS-rebinding defense: resolve A records via Cloudflare DoH (JSON).
+  // DNS-rebinding defense: resolve A records via two independent DoH
+  // resolvers and require BOTH to agree the host is public.
   try {
-    const dohUrl =
-      'https://cloudflare-dns.com/dns-query?name=' +
-      encodeURIComponent(host) +
-      '&type=A';
-    const resp = await fetch(dohUrl, {
-      headers: { accept: 'application/dns-json' },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (!resp.ok) return { ok: false, reason: 'dns check failed' };
-    const data = await resp.json();
-    const answers = Array.isArray(data?.Answer) ? data.Answer : [];
-    const addresses = answers
-      .filter((a) => a.type === 1 && typeof a.data === 'string')
-      .map((a) => a.data);
-    if (addresses.length === 0) {
-      // No A records (NXDOMAIN / only-AAAA). Reject — nothing safe to call.
+    const encoded = encodeURIComponent(host);
+    const [cf, google] = await Promise.all([
+      resolveARecords(`https://cloudflare-dns.com/dns-query?name=${encoded}&type=A`),
+      resolveARecords(`https://dns.google/resolve?name=${encoded}&type=A`),
+    ]);
+    if (cf === null || google === null) return { ok: false, reason: 'dns check failed' };
+    if (cf.length === 0 || google.length === 0) {
+      // No A records (NXDOMAIN / only-AAAA) from either resolver. Reject —
+      // nothing safe to call.
       return { ok: false, reason: 'no a records' };
     }
-    for (const ip of addresses) {
+    for (const ip of [...cf, ...google]) {
       if (isPrivateIPv4(ip)) return { ok: false, reason: 'private ip blocked' };
     }
     return { ok: true };
   } catch {
     return { ok: false, reason: 'dns check failed' };
+  }
+}
+
+/** Resolve A records from a DoH JSON endpoint. Returns null on failure (caller fails closed). */
+async function resolveARecords(dohUrl) {
+  try {
+    const resp = await fetch(dohUrl, {
+      headers: { accept: 'application/dns-json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const answers = Array.isArray(data?.Answer) ? data.Answer : [];
+    return answers
+      .filter((a) => a.type === 1 && typeof a.data === 'string')
+      .map((a) => a.data);
+  } catch {
+    return null;
   }
 }

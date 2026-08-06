@@ -14,7 +14,7 @@
  *   SUPABASE_SERVICE_ROLE_KEY — service role key (config lookup)
  */
 
-import { isSafeWebhookUrl } from './_shared/safe-webhook-url.js';
+import { dispatchWebhookEvent } from './_shared/dispatch-webhook.js';
 
 const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
 
@@ -52,22 +52,6 @@ function corsHeaders(request) {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
-}
-
-/** Compute HMAC-SHA256 hex digest */
-async function hmacSha256(secret, message) {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
-  return Array.from(new Uint8Array(sig))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
 }
 
 /** Verify a Supabase access token and return the user id */
@@ -119,84 +103,13 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  // --- Look up webhook configs ---
-  const supabaseUrl = env.SUPABASE_URL;
-  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) {
+  // --- Look up configs + dispatch (shared with server-triggered events, e.g. Stripe) ---
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
     return Response.json({ error: 'Server misconfigured' }, { status: 500, headers });
   }
-  const configsRes = await fetch(
-    `${supabaseUrl}/rest/v1/webhook_configs?user_id=eq.${userId}&is_active=eq.true&select=id,url,secret,events,label`,
-    {
-      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
-      signal: AbortSignal.timeout(5_000),
-    },
-  );
 
-  if (!configsRes.ok) {
-    return Response.json(
-      { error: 'Failed to fetch webhook configs' },
-      { status: 500, headers },
-    );
-  }
-
-  const configs = await configsRes.json();
-
-  // Filter to configs that subscribed to this event
-  // Empty events array = subscribed to nothing (must pick events explicitly)
-  const matching = configs.filter((c) => {
-    const events = c.events || [];
-    return events.length > 0 && events.includes(event);
-  });
-
-  if (matching.length === 0) {
-    return Response.json({ delivered: 0, failures: 0, skipped: true }, { headers });
-  }
-
-  // --- Dispatch to each endpoint ---
-  const timestamp = new Date().toISOString();
-  const bodyStr = JSON.stringify({ event, payload, timestamp });
-
-  let delivered = 0;
-  let failures = 0;
-
-  await Promise.all(
-    matching.map(async (config) => {
-      try {
-        const check = await isSafeWebhookUrl(config.url);
-        if (!check.ok) {
-          console.warn(`webhook dispatch: blocked unsafe URL for ${config.id}: ${check.reason}`);
-          failures++;
-          return;
-        }
-        const signature = await hmacSha256(config.secret, bodyStr);
-        const res = await fetch(config.url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-MowGo-Signature': `sha256=${signature}`,
-            'X-MowGo-Event': event,
-            'X-MowGo-Delivery': `${userId}:${config.id}`,
-            'User-Agent': 'MowGo-Webhook/1.0',
-          },
-          body: bodyStr,
-          // 10-second timeout for webhook delivery
-          signal: AbortSignal.timeout(10_000),
-        });
-        if (res.ok) {
-          delivered++;
-        } else {
-          console.warn(`webhook dispatch: ${config.id} returned ${res.status}`);
-          failures++;
-        }
-      } catch (err) {
-        console.warn(`webhook dispatch: ${config.id} failed:`, err?.message || err);
-        failures++;
-      }
-    }),
-  );
-
-  return Response.json({ delivered, failures }, { headers });
+  const result = await dispatchWebhookEvent(env, userId, event, payload);
+  return Response.json(result, { headers });
 }
 
 export async function onRequestOptions({ request }) {

@@ -53,6 +53,9 @@ export async function onRequestPost(context) {
     };
     const priceId = priceIds[plan];
     if (!priceId) {
+      // Config-guard: makes a missing CF dashboard env var visible in logs
+      // instead of a silent 500 someone has to reverse-engineer later.
+      console.error(`Stripe price ID not configured for plan=${plan} interval=${interval} (missing env var STRIPE_PRICE_${plan.toUpperCase()}${annual ? '_ANNUAL' : ''})`);
       return json({ error: 'Price ID not configured' }, 500, origin);
     }
 
