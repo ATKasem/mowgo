@@ -1,8 +1,10 @@
 const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
 
-// In-memory rate limit: 30 reorders / 15 min per user (per-isolate, same
-// pattern as sms-optin.js / webhook-dispatch.js — Claude Code LOW-2 fix).
-const REORDER_RATE_LIMIT_MAX = 30;
+// In-memory rate limit: 60 reorders / 15 min per user (per-isolate, same
+// pattern as sms-optin.js / webhook-dispatch.js — Claude Code LOW-2 fix;
+// raised 30→60: drag-drop fires one call per move, a heavy re-sort of a
+// 25-job day twice could otherwise hit the cap).
+const REORDER_RATE_LIMIT_MAX = 60;
 const REORDER_RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const reorderAttempts = new Map();
 
