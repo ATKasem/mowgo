@@ -17,13 +17,31 @@ CREATE TABLE IF NOT EXISTS recurring_jobs (
 );
 
 -- Index for fast lookup by user + active status (used by auto-generation)
-CREATE INDEX idx_recurring_jobs_user_active
+CREATE INDEX IF NOT EXISTS idx_recurring_jobs_user_active
   ON recurring_jobs (user_id, is_active)
   WHERE is_active = true;
 
--- RLS
+-- RLS — recurring templates belong to the business owner. Crew members can
+-- read their business's templates but cannot create or modify them.
 ALTER TABLE recurring_jobs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can CRUD own recurring jobs"
-  ON recurring_jobs FOR ALL
-  USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can CRUD own recurring jobs" ON recurring_jobs;
+DROP POLICY IF EXISTS "Recurring jobs: owner full access" ON recurring_jobs;
+DROP POLICY IF EXISTS "Recurring jobs: crew read" ON recurring_jobs;
+
+CREATE POLICY "Recurring jobs: owner full access" ON recurring_jobs
+  FOR ALL
+  USING (
+    auth.uid() = user_id
+    AND auth.uid() = current_business_id()
+  )
+  WITH CHECK (
+    auth.uid() = user_id
+    AND auth.uid() = current_business_id()
+  );
+
+CREATE POLICY "Recurring jobs: crew read" ON recurring_jobs
+  FOR SELECT USING (
+    user_id = current_business_id()
+    AND auth.uid() <> current_business_id()
+  );
