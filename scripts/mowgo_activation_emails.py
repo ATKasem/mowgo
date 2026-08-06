@@ -154,10 +154,41 @@ def fetch_touches(user_ids, kind):
     return {row["user_id"]: row for row in data}
 
 
+def admin_emails():
+    """id -> email for every auth user (GoTrue admin API, service role).
+    profiles has no email column (001 schema); owner emails live in auth.users."""
+    out = {}
+    page = 1
+    while True:
+        url = f"{SUPABASE_URL}/auth/v1/admin/users?per_page=200&page={page}"
+        req = urllib.request.Request(url)
+        req.add_header("apikey", SERVICE_KEY)
+        req.add_header("Authorization", f"Bearer {SERVICE_KEY}")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                payload = json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            print(f"admin users fetch failed (page {page}): {e.read().decode()[:300]}", file=sys.stderr)
+            return out
+        except urllib.error.URLError as e:
+            print(f"admin users fetch failed (page {page}): {e}", file=sys.stderr)
+            return out
+        rows = payload.get("users", []) if isinstance(payload, dict) else payload
+        if not isinstance(rows, list):
+            rows = []
+        for row in rows:
+            if row.get("id") and row.get("email"):
+                out[row["id"]] = row["email"]
+        if len(rows) < 200:
+            break
+        page += 1
+    return out
+
+
 def candidates_for_kind(kind, now):
     if kind == "t1":
         params = [
-            ("select", "id,email,business_name,created_at"),
+            ("select", "id,business_name,created_at"),
             ("created_at", f"lte.{iso(now - dt.timedelta(hours=24))}"),
             ("created_at", f"gte.{iso(now - dt.timedelta(days=14))}"),
             ("cancelled_at", "is.null"),
@@ -165,7 +196,7 @@ def candidates_for_kind(kind, now):
         ]
     elif kind == "t2":
         params = [
-            ("select", "id,email,business_name,created_at"),
+            ("select", "id,business_name,created_at"),
             ("created_at", f"lte.{iso(now - dt.timedelta(hours=72))}"),
             ("created_at", f"gte.{iso(now - dt.timedelta(days=14))}"),
             ("cancelled_at", "is.null"),
@@ -173,7 +204,7 @@ def candidates_for_kind(kind, now):
         ]
     else:  # winback2 — window is on cancelled_at, NOT created_at (cancellations happen 14-30+ days after signup)
         params = [
-            ("select", "id,email,business_name,cancelled_at"),
+            ("select", "id,business_name,cancelled_at"),
             ("cancelled_at", f"lte.{iso(now - dt.timedelta(days=7))}"),
             ("cancelled_at", f"gte.{iso(now - dt.timedelta(days=14))}"),
         ]
@@ -181,12 +212,14 @@ def candidates_for_kind(kind, now):
     if not ok:
         print(f"profiles query failed ({kind}): {profiles}", file=sys.stderr)
         return []
+    emails = admin_emails() if profiles else {}
     touches = fetch_touches([p["id"] for p in profiles], kind)
     out = []
     for p in profiles:
         existing = touches.get(p["id"])
         if existing and (existing["status"] == "sent" or existing["attempt_count"] >= MAX_ATTEMPTS):
             continue  # already sent, or exhausted retries — never re-attempt
+        p["email"] = emails.get(p["id"], "")
         out.append((p, existing))
     return out
 
