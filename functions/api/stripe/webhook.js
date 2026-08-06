@@ -63,12 +63,7 @@ export async function onRequestPost({ request, env }) {
         });
       }
     } else {
-      await updateProfile({
-        env,
-        userId: object.metadata?.user_id,
-        customerId: customerIdOf(object.customer),
-        tier: 'free',
-      });
+      await handleSubscriptionDeleted(object, env);
     }
 
     return ok();
@@ -198,6 +193,41 @@ function customerIdOf(customer) {
   return typeof customer === 'string' ? customer : customer?.id;
 }
 
+// Best-effort tier-change logging for churn-by-tier tracking.
+// Never breaks the payment flow: any failure here is swallowed.
+async function logTierChange(env, serviceKey, resolvedUserId, newTier) {
+  if (!resolvedUserId) return;
+  try {
+    await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/tier_events`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({ user_id: resolvedUserId, tier: newTier, source: 'webhook' }),
+    }));
+  } catch (e) {
+    // logging is best-effort — never fail the webhook over it
+  }
+}
+
+// Fetch the PREVIOUS profile state BEFORE patching (change detection must read pre-state).
+async function fetchProfile(env, serviceKey, filter) {
+  try {
+    const res = await withTimeout(fetch(
+      `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=id,tier`,
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+    ));
+    if (!res.ok) return null;
+    const [row] = await res.json();
+    return row || null;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function updateProfile({ env, userId, customerId, tier }) {
   if (!userId && !customerId) throw new Error('Event has no profile identity');
 
@@ -208,59 +238,114 @@ async function updateProfile({ env, userId, customerId, tier }) {
 
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
 
-  // Best-effort tier-change logging for churn-by-tier tracking.
-  // Never breaks the payment flow: any failure here is swallowed.
-  async function logTierChange(resolvedUserId, newTier) {
-    if (!resolvedUserId) return;
-    try {
-      await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/tier_events`, {
-        method: 'POST',
-        headers: {
-          apikey: serviceKey,
-          Authorization: `Bearer ${serviceKey}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal',
-        },
-        body: JSON.stringify({ user_id: resolvedUserId, tier: newTier, source: 'webhook' }),
-      }));
-    } catch (e) {
-      // logging is best-effort — never fail the webhook over it
-    }
-  }
-
-  // Fetch the PREVIOUS tier BEFORE patching (change detection must read pre-state).
-  async function previousTier(filter) {
-    try {
-      const res = await withTimeout(fetch(
-        `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=id,tier`,
-        { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
-      ));
-      if (!res.ok) return null;
-      const [row] = await res.json();
-      return row || null;
-    } catch (e) {
-      return null;
-    }
-  }
-
   if (userId) {
-    const before = await previousTier(`id=eq.${encodeURIComponent(userId)}`);
+    const before = await fetchProfile(env, serviceKey, `id=eq.${encodeURIComponent(userId)}`);
     const matched = await patchProfile(env, `id=eq.${encodeURIComponent(userId)}`, profile);
     if (matched || !customerId) {
-      if (before && before.tier !== tier) await logTierChange(userId, tier);
+      if (before && before.tier !== tier) await logTierChange(env, serviceKey, userId, tier);
       return;
     }
   }
 
   // Fallback: identify by customer id — read pre-state first, then patch, then log
-  const before = await previousTier(`stripe_customer_id=eq.${encodeURIComponent(customerId)}`);
+  const before = await fetchProfile(env, serviceKey, `stripe_customer_id=eq.${encodeURIComponent(customerId)}`);
   const matchedByCustomer = await patchProfile(
     env,
     `stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
     profile,
   );
   if (matchedByCustomer && before && before.tier !== tier) {
-    await logTierChange(before.id, tier);
+    await logTierChange(env, serviceKey, before.id, tier);
+  }
+}
+
+// Cancellation win-back/downsell flow (customer.subscription.deleted).
+// Reads the PRE-STATE tier before flipping to free (same ordering-bug pattern
+// as updateProfile's tier-change logging) so the win-back email can be framed
+// correctly, and so a stray/duplicate cancel event (already free) sends nothing.
+async function handleSubscriptionDeleted(object, env) {
+  const userId = object.metadata?.user_id;
+  const customerId = customerIdOf(object.customer);
+  if (!userId && !customerId) return;
+
+  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
+  const filter = userId
+    ? `id=eq.${encodeURIComponent(userId)}`
+    : `stripe_customer_id=eq.${encodeURIComponent(customerId)}`;
+
+  const before = await fetchProfile(env, serviceKey, filter);
+
+  const patch = {
+    tier: 'free',
+    cancelled_at: new Date().toISOString(),
+    ...(customerId ? { stripe_customer_id: customerId } : {}),
+  };
+  const matched = await patchProfile(env, filter, patch);
+  if (!matched) return;
+
+  const resolvedUserId = before?.id || userId;
+  if (before && before.tier !== 'free') {
+    await logTierChange(env, serviceKey, resolvedUserId, 'free');
+  }
+
+  if (before && ['solo', 'crew', 'premium'].includes(before.tier)) {
+    await sendWinbackEmail(env, serviceKey, resolvedUserId, before.tier);
+  }
+}
+
+async function fetchUserEmail(env, serviceKey, userId) {
+  if (!userId) return null;
+  try {
+    const res = await withTimeout(fetch(
+      `${env.SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(userId)}`,
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+    ));
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.email || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function winbackContent(previousTier, appUrl) {
+  const subscribeUrl = `${appUrl}/subscribe`;
+  if (previousTier === 'crew') {
+    return {
+      subject: "Don't lose your crew setup — Solo keeps you running at $39/mo",
+      html: `<p>You cancelled Crew. Your clients, schedule and invoices are all still here. Solo keeps scheduling, invoicing, routes and rain delay running at $39/mo (no per-user fees).</p><p><a href="${subscribeUrl}">Switch in one click</a></p>`,
+    };
+  }
+  if (previousTier === 'premium') {
+    return {
+      subject: 'Your premium setup is waiting',
+      html: `<p>Your data is still here. Re-activate anytime in one click: <a href="${subscribeUrl}">${subscribeUrl}</a>. 30-day money-back guarantee still applies.</p>`,
+    };
+  }
+  return {
+    subject: 'We made it easy to come back',
+    html: `<p>Your data is still here. Re-activate anytime in one click: <a href="${subscribeUrl}">${subscribeUrl}</a>. 30-day money-back guarantee still applies.</p>`,
+  };
+}
+
+// Best-effort, bounded, never fails the webhook (repo convention — see logTierChange above).
+async function sendWinbackEmail(env, serviceKey, userId, previousTier) {
+  if (!env.RESEND_API_KEY) return;
+  try {
+    const email = await fetchUserEmail(env, serviceKey, userId);
+    if (!email) return;
+    const appUrl = (env.APP_URL || 'https://mowgoapp.com').replace(/\/$/, '');
+    const { subject, html } = winbackContent(previousTier, appUrl);
+    await withTimeout(fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', to: email, subject, html }),
+    }));
+  } catch (e) {
+    // win-back email is best-effort — never fail the webhook over it
   }
 }
 

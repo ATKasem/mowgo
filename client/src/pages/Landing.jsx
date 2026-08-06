@@ -60,7 +60,7 @@ const plans = [
 const stats = [
   { value: '1,020+', label: 'Landscaping businesses in OK', suffix: 'Census County Business Patterns 2023' },
   { value: '0', label: 'per-user fees on any plan', suffix: 'Solo is $39 flat. Crew is $79 flat. Premium is $199 flat.' },
-  { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job.' },
+  { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job. Solo is $39/mo — under 1% for any crew billing over $3,900/mo.' },
 ];
 
 // Testimonials are fetched from the approved queue (users submit in-app at the 10th job).
@@ -70,7 +70,7 @@ const faqs = [
   { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
   { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.' },
   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
-  { q: "What's the catch?", a: "No catch. Cancel anytime. If Solo does not make you more organized in 30 days, we refund your first month in full." },
+  { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full." },
   { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
   { q: 'What happens to my data if I cancel?', a: 'Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request.' },
 ];
@@ -284,7 +284,7 @@ export default function Landing() {
                       <span className="block text-xs text-[var(--color-text-secondary)] font-normal">{tr("$39/mo")}</span>
                     </th>
                     <th className="text-center py-2.5 px-3">
-                      <span className="text-gray-300 font-semibold">{tr("Jobber Connect")}</span>
+                      <span className="text-gray-300 font-semibold">{tr("Jobber Grow")}</span>
                       <span className="block text-xs text-[var(--color-text-secondary)] font-normal">{tr("$139/mo")}</span>
                     </th>
                     <th className="text-center py-2.5 pl-3">
@@ -321,7 +321,7 @@ export default function Landing() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("Jobber Connect is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.")}</p>
+            <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("Jobber Grow is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.")}</p>
           </div>
         </FadeIn>
       </section>

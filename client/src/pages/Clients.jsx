@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Calendar, ChevronRight, FileText, Filter, Loader2, Mail, MapPin, Navigation, Pencil, Phone, Plus, Search, StickyNote, Tag, Trash2, X } from 'lucide-react';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { CLIENT_TAGS, INITIAL_CLIENT_FORM } from '../lib/constants';
@@ -28,6 +29,7 @@ export default function Clients({ jobs = [] }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -46,7 +48,11 @@ export default function Clients({ jobs = [] }) {
       const row = editId ? await updateClient(editId, clientForm) : await createClient(clientForm);
       setClients(old => editId ? old.map(c => c.id === editId ? row : c) : [...old, row]);
       setClientForm(null); setEditId(null);
-    } catch (err) { setError(err.message || tr('Failed to save client. Please try again.')); } finally { setSaving(false); }
+    } catch (err) {
+      const msg = err.message || '';
+      if (!editId && msg.includes('Free plan is limited to')) { setUpgradeOpen(true); }
+      else { setError(msg || tr('Failed to save client. Please try again.')); }
+    } finally { setSaving(false); }
   }
   async function saveLead(e) {
     e.preventDefault(); setSaving(true); setError('');
@@ -63,7 +69,11 @@ export default function Clients({ jobs = [] }) {
       const result = await convertLeadToClient({ ...convertLead.lead, ...convertLead.form });
       setClients(old => [...old, result.client]); setLeads(old => old.map(l => l.id === result.lead.id ? result.lead : l));
       setConvertLead(null); setEstimateClient(result.client); toast(tr('Lead converted to client.'));
-    } catch (err) { setError(err.message || tr('Could not convert lead.')); } finally { setSaving(false); }
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('Free plan is limited to')) { setConvertLead(null); setUpgradeOpen(true); }
+      else { setError(msg || tr('Could not convert lead.')); }
+    } finally { setSaving(false); }
   }
   async function removeLead(lead) {
     if (lead.status !== 'lost') return toast(tr('Only lost leads can be deleted.'));
@@ -93,6 +103,7 @@ export default function Clients({ jobs = [] }) {
     {leadForm && <Modal title={tr('New Lead')} close={() => setLeadForm(null)}><form onSubmit={saveLead} className="space-y-3"><ContactFields form={leadForm} setForm={setLeadForm} tr={tr} phoneRequired={false} />{duplicatePhone(leadForm.phone) && <Warning text={tr('A lead or client already uses this phone number.')} />}<label className="label">{tr('Source')}</label><select className="input" value={leadForm.source} onChange={e => setLeadForm({ ...leadForm, source: e.target.value })}>{SOURCES.map(s => <option key={s} value={s}>{tr(sourceLabel(s))}</option>)}</select><label className="label">{tr('Notes')}</label><textarea className="input" value={leadForm.notes} onChange={e => setLeadForm({ ...leadForm, notes: e.target.value })} /><Actions saving={saving} cancel={() => setLeadForm(null)} tr={tr} /></form></Modal>}
     {convertLead && <Modal title={tr('Convert to Client')} close={() => setConvertLead(null)}><form onSubmit={finishConversion} className="space-y-3"><ContactFields form={convertLead.form} setForm={form => setConvertLead({ ...convertLead, form })} tr={tr} />{duplicatePhone(convertLead.form.phone, convertLead.lead.id) && <Warning text={tr('A lead or client already uses this phone number.')} />}<Actions saving={saving} cancel={() => setConvertLead(null)} tr={tr} saveLabel="Convert" /></form></Modal>}
     {estimateClient && <Modal title={tr('Create Estimate')} close={() => setEstimateClient(null)}><form onSubmit={saveEstimate} className="space-y-3"><p className="text-sm text-[var(--color-text-secondary)]">{tr('Client')}: <b>{estimateClient.name}</b></p><label className="label">{tr('Amount')}</label><input required min="0.01" step="0.01" type="number" className="input" value={estimate.amount} onChange={e => setEstimate({ ...estimate, amount: e.target.value })} /><label className="label">{tr('Note (optional)')}</label><textarea className="input" value={estimate.note} onChange={e => setEstimate({ ...estimate, note: e.target.value })} /><Actions saving={saving} cancel={() => setEstimateClient(null)} tr={tr} saveLabel="Create Estimate" /></form></Modal>}
+    {upgradeOpen && <Modal title={tr("You've hit the free limit (5 clients)")} close={() => setUpgradeOpen(false)}><p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-4">{tr('Unlimited clients, recurring jobs and offline mode start at $39/mo.')}</p><div className="flex gap-2"><Link to="/subscribe" className="btn-primary flex-1 text-center" onClick={() => setUpgradeOpen(false)}>{tr('See plans')}</Link><button type="button" className="btn-secondary flex-1" onClick={() => setUpgradeOpen(false)}>{tr('Not now')}</button></div></Modal>}
   </div>;
 }
 

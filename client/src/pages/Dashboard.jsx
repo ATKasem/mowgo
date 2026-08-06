@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from 'react';
 import { loadJobs, loadInvoices, loadProfile } from '../lib/data';
 import { AuthContext } from '../App';
 import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle } from 'lucide-react';
+import OnboardingChecklist from '../components/OnboardingChecklist';
 
 /** Get local date string (YYYY-MM-DD) accounting for timezone */
 function localDate(offsetDays = 0) {
@@ -121,6 +122,7 @@ export default function Dashboard() {
     return (
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
+        <OnboardingChecklist />
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-4">
             <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-2.5">
@@ -180,6 +182,7 @@ export default function Dashboard() {
   return (
     <div>
       <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
+      <OnboardingChecklist />
       <div className="grid grid-cols-2 gap-3">
         {cards.map((card, i) => (
           <div key={i} className="card p-4">
