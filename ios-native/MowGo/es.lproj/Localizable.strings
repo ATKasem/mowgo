@@ -1,0 +1,385 @@
+/*
+  Localizable.strings (es)
+  MowGo
+
+  Spanish translations. English string literals in the Swift source are the
+  lookup keys — SwiftUI's Text/Button/Label/etc. (LocalizedStringKey) look up
+  the exact literal here; if a key is missing, the English literal is shown
+  verbatim, so a missing translation never breaks the UI.
+*/
+
+// MARK: - Common / shared across screens
+
+"Cancel" = "Cancelar";
+"OK" = "Aceptar";
+"Close" = "Cerrar";
+"Save" = "Guardar";
+"Done" = "Hecho";
+"Delete" = "Eliminar";
+"Edit" = "Editar";
+"Today" = "Hoy";
+"Client" = "Cliente";
+"Notes" = "Notas";
+"Address" = "Dirección";
+"Phone" = "Teléfono";
+"Email" = "Correo electrónico";
+"Name" = "Nombre";
+
+// MARK: - Today (TodayView)
+
+"Undo" = "Deshacer";
+"New Job" = "Nuevo trabajo";
+"Add Client" = "Agregar cliente";
+"View Invoices" = "Ver facturas";
+"Actions" = "Acciones";
+"Previous day" = "Día anterior";
+"Next day" = "Día siguiente";
+"Calendar view" = "Vista de calendario";
+"Week" = "Semana";
+"Month" = "Mes";
+"Route" = "Ruta";
+"Rain delay history" = "Historial de retrasos por lluvia";
+"Rain Delay" = "Retraso por lluvia";
+"No jobs scheduled" = "No hay trabajos programados";
+"Tap + to add your first job" = "Toca + para agregar tu primer trabajo";
+"Good morning 👋" = "¡Buenos días! 👋";
+"Good afternoon 👋" = "¡Buenas tardes! 👋";
+"Good evening 👋" = "¡Buenas noches! 👋";
+"Drag jobs to reorder your driving route" = "Arrastra los trabajos para reordenar tu ruta";
+"Job marked done — client notified ✅" = "Trabajo marcado como hecho — cliente notificado ✅";
+"Job skipped — client notified ✅" = "Trabajo omitido — cliente notificado ✅";
+"Rain delay undone" = "Retraso por lluvia deshecho";
+"Rain delay applied to %lld job%@" = "Retraso por lluvia aplicado a %lld trabajo%@";
+"Scheduled" = "Programados";
+"Revenue" = "Ingresos";
+"All" = "Todos";
+"Unknown" = "Desconocido";
+
+// MARK: - Job card (JobCardView)
+
+"Complete" = "Completar";
+"Start" = "Iniciar";
+"Undo job completion" = "Deshacer trabajo completado";
+"Mark job complete" = "Marcar trabajo como completo";
+"Start job" = "Iniciar trabajo";
+"Recurring job" = "Trabajo recurrente";
+"Job photo" = "Foto del trabajo";
+"Add job photo" = "Agregar foto del trabajo";
+"Navigate" = "Navegar";
+"Apple Maps" = "Apple Maps";
+"Google Maps" = "Google Maps";
+"Waze" = "Waze";
+"Skip Job" = "Omitir trabajo";
+"Unskip Job" = "Deshacer omisión";
+"Skip this job?" = "¿Omitir este trabajo?";
+"This job will be marked as skipped and won't appear in your active route." = "Este trabajo se marcará como omitido y no aparecerá en tu ruta activa.";
+"Pets: %@" = "Mascotas: %@";
+"Key: %@" = "Llave: %@";
+"Call %@" = "Llamar a %@";
+"Navigate to %@" = "Navegar a %@";
+
+// MARK: - Rain Delay Sheet
+
+"Tomorrow" = "Mañana";
+"Pick a date" = "Elegir una fecha";
+"Move to" = "Mover a";
+"Only today's jobs move. Your schedule stays intact." = "Solo se mueven los trabajos de hoy. Tu calendario permanece intacto.";
+"Confirm Rain Delay" = "Confirmar retraso por lluvia";
+"Rain Delay History" = "Historial de retrasos por lluvia";
+"No rain delays yet" = "Aún no hay retrasos por lluvia";
+
+// MARK: - New Job Form
+
+"Job Details" = "Detalles del trabajo";
+"Client, required" = "Cliente, obligatorio";
+"Time" = "Hora";
+"Duration" = "Duración";
+"30 min" = "30 min";
+"45 min" = "45 min";
+"60 min" = "60 min";
+"90 min" = "90 min";
+"120 min" = "120 min";
+"Assign To" = "Asignar a";
+"Unassigned" = "Sin asignar";
+"Notes (optional)" = "Notas (opcional)";
+"Repeat" = "Repetir";
+"Schedule" = "Horario";
+"Does not repeat" = "No se repite";
+"On which days?" = "¿Qué días?";
+"Every week" = "Cada semana";
+"Every 2 weeks" = "Cada 2 semanas";
+"Monthly" = "Mensual";
+"Couldn't Save Job" = "No se pudo guardar el trabajo";
+"Please check the form and try again." = "Revisa el formulario e inténtalo de nuevo.";
+"Mon" = "Lun";
+"Tue" = "Mar";
+"Wed" = "Mié";
+"Thu" = "Jue";
+"Fri" = "Vie";
+"Sat" = "Sáb";
+
+// MARK: - Clients (ClientsView)
+
+"Clients" = "Clientes";
+"Leads" = "Prospectos";
+"No clients yet" = "Aún no hay clientes";
+"Add your first client to get started" = "Agrega tu primer cliente para comenzar";
+"Add client" = "Agregar cliente";
+"Add lead" = "Agregar prospecto";
+"Search clients..." = "Buscar clientes...";
+"No leads yet" = "Aún no hay prospectos";
+"Add a lead to start building your pipeline" = "Agrega un prospecto para empezar tu cartera";
+"Convert" = "Convertir";
+"Status" = "Estado";
+"New" = "Nuevo";
+"Contacted" = "Contactado";
+"Quoted" = "Cotizado";
+"Won" = "Ganado";
+"Lost" = "Perdido";
+
+// MARK: - New Client Form
+
+"Client Info" = "Información del cliente";
+"Rate ($)" = "Tarifa ($)";
+"Access" = "Acceso";
+"Gate/Key Code" = "Código de portón/llave";
+"Has Pets" = "Tiene mascotas";
+"Number of Pets: %lld" = "Cantidad de mascotas: %lld";
+"Pet Notes" = "Notas sobre mascotas";
+"Service Notes" = "Notas del servicio";
+"New Client" = "Nuevo cliente";
+"Edit Client" = "Editar cliente";
+"Couldn’t Save Client" = "No se pudo guardar el cliente";
+"Client Limit Reached" = "Límite de clientes alcanzado";
+"The Free plan includes up to 5 clients. Upgrade to Solo ($39/mo) for unlimited clients." = "El plan Gratis incluye hasta 5 clientes. Mejora a Solo ($39/mes) para clientes ilimitados.";
+"View Plans" = "Ver planes";
+"Not Now" = "Ahora no";
+
+// MARK: - New Lead Form
+
+"Lead Info" = "Información del prospecto";
+"Optional notes" = "Notas opcionales";
+"New Lead" = "Nuevo prospecto";
+"Referral" = "Referencia";
+"Website" = "Sitio web";
+"Yard Sign" = "Letrero de jardín";
+"Other" = "Otro";
+"Source" = "Origen";
+
+// MARK: - Invoices (InvoicesView)
+
+"Invoices" = "Facturas";
+"Estimates" = "Presupuestos";
+"Unpaid" = "Pendiente";
+"Paid" = "Pagada";
+"Overdue" = "Vencida";
+"Voided" = "Anulada";
+"Due" = "Pendiente";
+"New Invoice" = "Nueva factura";
+"New Estimate" = "Nuevo presupuesto";
+"No invoices yet" = "Aún no hay facturas";
+"Complete a job to create one" = "Completa un trabajo para crear una";
+"No estimates yet" = "Aún no hay presupuestos";
+"Pick a client and send one in 10 seconds" = "Elige un cliente y envíalo en 10 segundos";
+"Invoice" = "Factura";
+"Amount" = "Monto";
+"Created" = "Creada";
+"Copy payment text" = "Copiar texto de pago";
+"Nudge" = "Recordatorio";
+"Pay via Stripe" = "Pagar con Stripe";
+"Mark Paid" = "Marcar como pagada";
+"Void invoice" = "Anular factura";
+"Void this invoice?" = "¿Anular esta factura?";
+"This can't be undone. The invoice will no longer be collectible." = "Esto no se puede deshacer. La factura ya no será cobrable.";
+"Payment" = "Pago";
+"Select Client" = "Seleccionar cliente";
+"Create Invoice" = "Crear factura";
+"Estimate" = "Presupuesto";
+"Note (optional)" = "Nota (opcional)";
+"Save Draft" = "Guardar borrador";
+"Send" = "Enviar";
+"Converted ✓" = "Convertido ✓";
+"Draft" = "Borrador";
+"Sent" = "Enviado";
+"Approved" = "Aprobado";
+"Declined" = "Rechazado";
+"Mark Approved" = "Marcar como aprobado";
+"Mark Declined" = "Marcar como rechazado";
+"Convert to Job" = "Convertir en trabajo";
+"Job created" = "Trabajo creado";
+
+// MARK: - Payment / Subscription
+
+"Pay Now" = "Pagar ahora";
+"Current" = "Actual";
+"Billing interval changes via Manage Billing" = "Los cambios de intervalo de facturación se hacen en Gestionar facturación";
+"Upgrade" = "Mejorar plan";
+"Free Plan" = "Plan Gratis";
+"Cancel your %@ subscription? You'll lose access at the end of your billing period." = "¿Cancelar tu suscripción %@? Perderás el acceso al final de tu período de facturación.";
+
+// MARK: - Settings (SettingsView)
+
+"More" = "Más";
+"Business" = "Negocio";
+"Booking" = "Reservas";
+"Data" = "Datos";
+"About" = "Acerca de";
+"Business Profile" = "Perfil del negocio";
+"Business name and phone" = "Nombre del negocio y teléfono";
+"Notifications" = "Notificaciones";
+"Job completion and rain alerts" = "Alertas de trabajos completados y lluvia";
+"Appearance" = "Apariencia";
+"Billing" = "Facturación";
+"Free" = "Gratis";
+"Integrations" = "Integraciones";
+"Zapier, Make, n8n webhooks" = "Webhooks de Zapier, Make, n8n";
+"Export Clients" = "Exportar clientes";
+"Export Jobs" = "Exportar trabajos";
+"Export Invoices" = "Exportar facturas";
+"Export Leads" = "Exportar prospectos";
+"Export Failed" = "Error al exportar";
+"Could not create the export file." = "No se pudo crear el archivo de exportación.";
+"Sign Out" = "Cerrar sesión";
+"You'll need to sign in again." = "Tendrás que iniciar sesión de nuevo.";
+"Cancel Subscription" = "Cancelar suscripción";
+"Keep Subscription" = "Mantener suscripción";
+"System" = "Sistema";
+"Light" = "Claro";
+"Dark" = "Oscuro";
+"Theme" = "Tema";
+"Version" = "Versión";
+"Bundle" = "Paquete";
+"Made in" = "Hecho en";
+"Current plan" = "Plan actual";
+"Billed monthly or annually" = "Facturado mensual o anualmente";
+"Manage Subscription" = "Gestionar suscripción";
+"Plans" = "Planes";
+"Save Changes" = "Guardar cambios";
+"Changes saved" = "Cambios guardados";
+"This information appears on customer-facing messages and invoices." = "Esta información aparece en los mensajes y facturas que ven los clientes.";
+"How clients pay you" = "Cómo te pagan los clientes";
+"These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see." = "Esto aparece en los mensajes de factura. Zelle se muestra primero — los clientes suelen pagar con la primera opción que ven.";
+"Job activity" = "Actividad de trabajos";
+"Weather" = "Clima";
+"Job completion alerts" = "Alertas de trabajos completados";
+"When a job is marked complete" = "Cuando un trabajo se marca como completo";
+"Rain delay alerts" = "Alertas de retraso por lluvia";
+"When rain may affect tomorrow's jobs" = "Cuando la lluvia pueda afectar los trabajos de mañana";
+"Share" = "Compartir";
+"Copy" = "Copiar";
+"Copied!" = "¡Copiado!";
+"Business name" = "Nombre del negocio";
+"Phone number" = "Número de teléfono";
+"Email address" = "Correo electrónico";
+"Zelle (phone or email)" = "Zelle (teléfono o correo)";
+"Venmo (@handle)" = "Venmo (@usuario)";
+"Cash App ($handle)" = "Cash App ($usuario)";
+
+// MARK: - Integrations
+
+"Send MowGo events to Zapier, Make, n8n, or any HTTPS endpoint that accepts POST JSON." = "Envía eventos de MowGo a Zapier, Make, n8n o cualquier endpoint HTTPS que acepte POST JSON.";
+"Add Endpoint" = "Agregar endpoint";
+"No webhook endpoints yet." = "Aún no hay endpoints de webhook.";
+"Untitled endpoint" = "Endpoint sin título";
+"Active" = "Activo";
+"Delete Endpoint?" = "¿Eliminar endpoint?";
+"This endpoint will stop receiving MowGo events." = "Este endpoint dejará de recibir eventos de MowGo.";
+"%lld event%@" = "%lld evento%@";
+"Couldn’t Update Integrations" = "No se pudieron actualizar las integraciones";
+"Unknown error" = "Error desconocido";
+"Label (optional)" = "Etiqueta (opcional)";
+"Enter a valid HTTPS URL." = "Ingresa una URL HTTPS válida.";
+"Signing Secret" = "Secreto de firma";
+"Deliveries include an HMAC-SHA256 signature. Regenerating immediately invalidates the old secret." = "Las entregas incluyen una firma HMAC-SHA256. Regenerar invalida el secreto anterior de inmediato.";
+"Regenerate Secret" = "Regenerar secreto";
+"Deselect All" = "Deseleccionar todo";
+"Select All" = "Seleccionar todo";
+"Events" = "Eventos";
+"Edit Endpoint" = "Editar endpoint";
+"Saving…" = "Guardando…";
+"Generate a new secret?" = "¿Generar un nuevo secreto?";
+"Regenerate" = "Regenerar";
+"Your old secret will stop working after you save." = "Tu secreto anterior dejará de funcionar después de guardar.";
+"Job Created" = "Trabajo creado";
+"New job scheduled" = "Nuevo trabajo programado";
+"Job Updated" = "Trabajo actualizado";
+"Status, date, or details change" = "Cambio de estado, fecha o detalles";
+"Job Completed" = "Trabajo completado";
+"Status changes to done" = "El estado cambia a hecho";
+"Invoice Paid" = "Factura pagada";
+"Invoice is marked paid" = "La factura se marca como pagada";
+"Customer Created" = "Cliente creado";
+"New client added" = "Nuevo cliente agregado";
+"Payment Failed" = "Pago fallido";
+"Payment attempt failed" = "El intento de pago falló";
+"Rain Delay Applied" = "Retraso por lluvia aplicado";
+"Scheduled jobs moved" = "Trabajos programados movidos";
+"Job Skipped" = "Trabajo omitido";
+"Job is skipped" = "El trabajo se omite";
+"Lead Created" = "Prospecto creado";
+"New lead added" = "Nuevo prospecto agregado";
+"Lead Status Updated" = "Estado del prospecto actualizado";
+"Lead status changes" = "Cambia el estado del prospecto";
+
+// MARK: - Login / Auth
+
+"MowGo" = "MowGo";
+"Lawn Care Scheduling" = "Programación de cuidado de césped";
+"Password" = "Contraseña";
+"Create Account" = "Crear cuenta";
+"Sign In" = "Iniciar sesión";
+"Forgot Password?" = "¿Olvidaste tu contraseña?";
+"Already have an account? Sign in" = "¿Ya tienes una cuenta? Inicia sesión";
+"Don't have an account? Sign up" = "¿No tienes una cuenta? Regístrate";
+"Continue with Demo" = "Continuar con la demo";
+"Reset Password" = "Restablecer contraseña";
+"Enter your email and we'll send you a reset link." = "Ingresa tu correo y te enviaremos un enlace para restablecerla.";
+"Send Reset Link" = "Enviar enlace";
+
+// MARK: - Session / App-level
+
+"Session Expired" = "Sesión expirada";
+"Your session has expired. Please sign in again." = "Tu sesión ha expirado. Vuelve a iniciar sesión.";
+"Upgrade Successful!" = "¡Mejora exitosa!";
+"Your subscription has been upgraded. Enjoy your new features!" = "Tu suscripción se actualizó. ¡Disfruta tus nuevas funciones!";
+
+// MARK: - Dashboard (DashboardView)
+
+"Dashboard" = "Panel";
+"Revenue Today" = "Ingresos de hoy";
+"No jobs today" = "Sin trabajos hoy";
+"Outstanding" = "Pendiente de cobro";
+"Unpaid invoices" = "Facturas pendientes";
+"Jobs This Week" = "Trabajos esta semana";
+"Active Clients" = "Clientes activos";
+"Add Job" = "Agregar trabajo";
+"See all" = "Ver todo";
+"No jobs scheduled for today" = "No hay trabajos programados para hoy";
+"Team" = "Equipo";
+"Crew" = "Equipo";
+"Invite" = "Invitar";
+"No crew members yet" = "Aún no hay miembros del equipo";
+"Owner" = "Propietario";
+"Crew Member" = "Miembro del equipo";
+"Invite a crew member to join your team." = "Invita a un miembro del equipo a unirse.";
+"Send Invite" = "Enviar invitación";
+"Invite Crew" = "Invitar al equipo";
+"Remove Crew Member" = "Quitar miembro del equipo";
+"%@ will be removed from your team. Their jobs will be unassigned." = "%@ será eliminado de tu equipo. Sus trabajos quedarán sin asignar.";
+"This member" = "Este miembro";
+"Remove" = "Quitar";
+"Could Not Remove Crew Member" = "No se pudo quitar al miembro del equipo";
+"An unknown error occurred." = "Ocurrió un error desconocido.";
+
+// MARK: - Job Photo Picker
+
+"Select a photo for this job" = "Selecciona una foto para este trabajo";
+"Add Photo" = "Agregar foto";
+"Upload Photo" = "Subir foto";
+"Job Photo" = "Foto del trabajo";
+"Take Photo" = "Tomar foto";
+"Choose from Library" = "Elegir de la biblioteca";
+
+// MARK: - Camera
+
+"Try Again" = "Intentar de nuevo";

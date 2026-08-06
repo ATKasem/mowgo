@@ -25,7 +25,7 @@ struct NewJobFormView: View {
     @State private var repeatFrequency: RecurringJob.Frequency? = nil
     @State private var selectedDays: Set<Int> = [] // 1=Mon, 2=Tue, ..., 6=Sat
 
-    private static let dayLabels = [
+    private static let dayLabels: [(Int, LocalizedStringKey)] = [
         (1, "Mon"), (2, "Tue"), (3, "Wed"),
         (4, "Thu"), (5, "Fri"), (6, "Sat")
     ]
@@ -131,7 +131,7 @@ struct NewJobFormView: View {
             )) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text(error ?? "Please check the form and try again.")
+                Text(error ?? NSLocalizedString("Please check the form and try again.", comment: "Job save failure fallback message"))
             }
         }
     }
@@ -212,7 +212,7 @@ struct NewJobFormView: View {
 
 struct DayToggleButton: View {
     @Environment(\.colorScheme) private var colorScheme
-    let label: String
+    let label: LocalizedStringKey
     let isSelected: Bool
     let theme: MowGoTheme
     let action: () -> Void

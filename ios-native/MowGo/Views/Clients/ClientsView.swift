@@ -240,12 +240,18 @@ struct ClientsView: View {
 
 struct ClientCard: View {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var auth: AuthService
     let client: Client
     let isExpanded: Bool
     let onTap: () -> Void
     let onEdit: () -> Void
+    @State private var fetchedKeyCode: String?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    /// Gate code isn't kept in the general client list or its offline cache —
+    /// fetched on demand the moment this card expands. Demo mode has no
+    /// backend to call, so it reads straight off the (already-local) demo client.
+    private var displayKeyCode: String? { auth.isDemoMode ? client.keyCode : fetchedKeyCode }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -295,7 +301,7 @@ struct ClientCard: View {
                         }
                         .accessibilityLabel("Call \(phone)")
                     }
-                    if let key = client.keyCode, !key.isEmpty {
+                    if let key = displayKeyCode, !key.isEmpty {
                         DetailRow(icon: "lock", text: "Gate: \(key)")
                     }
                     if let pets = client.petInstructions, !pets.isEmpty {
@@ -371,6 +377,11 @@ struct ClientCard: View {
             }
         }
         .background(theme.surface).cornerRadius(12)
+        .task(id: isExpanded) {
+            guard isExpanded, !auth.isDemoMode else { return }
+            let codes = try? await SupabaseService.shared.fetchClientCode(clientId: client.id)
+            fetchedKeyCode = codes?.keyCode
+        }
     }
 
     private func openMaps(_ address: String) {

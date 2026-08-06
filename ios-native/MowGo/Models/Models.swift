@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 // MARK: - Recurring Job Template
 
@@ -33,7 +34,7 @@ struct RecurringJob: Codable, Identifiable, Equatable {
     enum Frequency: String, Codable, CaseIterable {
         case weekly, biweekly, monthly
 
-        var label: String {
+        var label: LocalizedStringKey {
             switch self {
             case .weekly:   "Every week"
             case .biweekly: "Every 2 weeks"
@@ -127,7 +128,17 @@ struct Job: Codable, Identifiable, Equatable {
 
     enum JobStatus: String, Codable, CaseIterable {
         case scheduled, inProgress = "in_progress", done, skipped
-        var label: String {
+        var label: LocalizedStringKey {
+            switch self {
+            case .scheduled: "Scheduled"
+            case .inProgress: "In Progress"
+            case .done: "Done"
+            case .skipped: "Skipped"
+            }
+        }
+        /// Locale-independent label for CSV exports (records should read the
+        /// same regardless of device language).
+        var csvLabel: String {
             switch self {
             case .scheduled: "Scheduled"
             case .inProgress: "In Progress"
@@ -180,7 +191,15 @@ struct Client: Codable, Identifiable, Equatable {
 enum LeadStatus: String, Codable, CaseIterable {
     case new, contacted, quoted, won, lost
 
-    var displayName: String { rawValue.capitalized }
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .new: return "New"
+        case .contacted: return "Contacted"
+        case .quoted: return "Quoted"
+        case .won: return "Won"
+        case .lost: return "Lost"
+        }
+    }
 }
 
 struct Lead: Codable, Identifiable, Equatable {
@@ -333,12 +352,22 @@ struct Invoice: Codable, Identifiable, Equatable {
     var clients: ClientRef?
 
     enum InvoiceStatus: String, Codable {
-        case unpaid, paid, overdue
-        var label: String {
+        case unpaid, paid, overdue, voided
+        var label: LocalizedStringKey {
             switch self {
             case .paid: return "Paid"
             case .unpaid: return "Unpaid"
             case .overdue: return "Overdue"
+            case .voided: return "Voided"
+            }
+        }
+        /// Locale-independent label for CSV exports.
+        var csvLabel: String {
+            switch self {
+            case .paid: return "Paid"
+            case .unpaid: return "Unpaid"
+            case .overdue: return "Overdue"
+            case .voided: return "Voided"
             }
         }
     }
@@ -366,7 +395,14 @@ struct Estimate: Codable, Identifiable, Equatable {
 
     enum EstimateStatus: String, Codable {
         case draft, sent, approved, declined
-        var label: String { rawValue.capitalized }
+        var label: LocalizedStringKey {
+            switch self {
+            case .draft: return "Draft"
+            case .sent: return "Sent"
+            case .approved: return "Approved"
+            case .declined: return "Declined"
+            }
+        }
     }
 
     struct ClientRef: Codable, Equatable { let name: String? }
@@ -389,13 +425,15 @@ struct UserProfile: Codable, Identifiable {
     var zelleHandle: String?
     var createdAt: String?
 
+    /// Solo/Crew/Premium are product tier names (kept in English, like a
+    /// brand name); "Free" is a plain adjective and has a Spanish entry.
     var tierLabel: String {
         switch tier {
-        case "free": "Free"
+        case "free": NSLocalizedString("Free", comment: "Subscription tier name: free plan")
         case "solo": "Solo"
         case "crew": "Crew"
         case "premium": "Premium"
-        default: tier ?? "Free"
+        default: tier ?? NSLocalizedString("Free", comment: "Subscription tier name: free plan")
         }
     }
 }
@@ -472,12 +510,12 @@ final class ClientCache {
     var email: String?
     var rate: Double
     var cleaningNotes: String?
-    var keyCode: String?
-    var alarmCode: String?
     var petInstructions: String?
     var jsonData: Data
     var cachedAt: Date
 
+    /// Gate/alarm codes are sensitive and never written to the on-disk cache
+    /// (neither as columns nor inside `jsonData`) — fetched on demand instead.
     init(client: Client, userId: UUID) {
         self.id = client.id
         self.userId = userId
@@ -487,12 +525,13 @@ final class ClientCache {
         self.email = client.email
         self.rate = NSDecimalNumber(decimal: client.rate).doubleValue
         self.cleaningNotes = client.cleaningNotes
-        self.keyCode = client.keyCode
-        self.alarmCode = client.alarmCode
         self.petInstructions = client.petInstructions
         self.cachedAt = Date()
 
-        if let data = try? JSONEncoder().encode(client) {
+        var sanitized = client
+        sanitized.keyCode = nil
+        sanitized.alarmCode = nil
+        if let data = try? JSONEncoder().encode(sanitized) {
             self.jsonData = data
         } else {
             self.jsonData = Data()

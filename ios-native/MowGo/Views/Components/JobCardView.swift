@@ -60,11 +60,11 @@ struct JobCardView: View {
         job.status == .done ? MowGoTheme.deepGreen : job.status == .inProgress ? .cyan : .gray
     }
 
-    private var statusLabelText: String {
+    private var statusLabelText: LocalizedStringKey {
         job.status == .done ? "Undo" : job.status == .inProgress ? "Complete" : "Start"
     }
 
-    private var statusAccessibilityLabel: String {
+    private var statusAccessibilityLabel: LocalizedStringKey {
         job.status == .done ? "Undo job completion" : job.status == .inProgress ? "Mark job complete" : "Start job"
     }
 

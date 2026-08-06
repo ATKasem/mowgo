@@ -483,6 +483,22 @@ actor SupabaseService {
         return try decoder.decode([Job].self, from: data)
     }
 
+    /// On-demand fetch of one client's gate/alarm codes. Kept out of the
+    /// general clients list and its offline cache — codes are only pulled
+    /// when the client detail view actually needs them.
+    func fetchClientCode(clientId: UUID) async throws -> (keyCode: String?, alarmCode: String?) {
+        guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
+        let profile = try await fetchProfile()
+        let ownerId = profile?.role == "crew" ? profile?.businessId : uid
+        guard let ownerId else { return (nil, nil) }
+        struct Row: Decodable { let keyCode: String?; let alarmCode: String? }
+        let path = "/rest/v1/clients?select=key_code,alarm_code&id=eq.\(clientId.uuidString)&user_id=eq.\(ownerId.uuidString)"
+        let data = try await request("GET", path)
+        let rows = try decoder.decode([Row].self, from: data)
+        guard let row = rows.first else { return (nil, nil) }
+        return (row.keyCode, row.alarmCode)
+    }
+
     func fetchExportClients() async throws -> [Client] {
         guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
         let profile = try await fetchProfile()

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct TodayView: View {
     @EnvironmentObject var store: DataStore
@@ -22,7 +23,9 @@ struct TodayView: View {
     @State private var operationError: String?
     @State private var selectedCrewFilter: UUID? = nil
     @State private var routeMode = false
-    @State private var notificationMessage: String?
+    @State private var routeOrderIds: [UUID] = []
+    @State private var draggingJobId: UUID?
+    @State private var notificationMessage: LocalizedStringKey?
     @State private var showNotificationBanner = false
     @State private var calendarMode: CalendarMode = .week
     @State private var isOperating = false
@@ -54,6 +57,16 @@ struct TodayView: View {
             }
         }
         return filtered
+    }
+
+    /// Route mode's live drag order. Falls back to `todayJobs` order for any
+    /// job not yet tracked locally (e.g. one added while route mode is on).
+    private var routeOrderedJobs: [Job] {
+        guard routeMode else { return todayJobs }
+        let known = Set(routeOrderIds)
+        let ordered = routeOrderIds.compactMap { id in todayJobs.first(where: { $0.id == id }) }
+        let extras = todayJobs.filter { !known.contains($0.id) }
+        return ordered + extras
     }
 
     private var scheduledCount: Int {
@@ -120,37 +133,22 @@ struct TodayView: View {
                                 emptyState
                             } else {
                                 LazyVStack(spacing: 8) {
-                                    ForEach(todayJobs) { job in
-                                        JobCardView(job: job, teamMembers: store.teamMembers,
-                                            onToggle: {
-                                                guard !isOperating else { return }
-                                                isOperating = true
-                                                defer { isOperating = false }
-                                                do {
-                                                    operationError = nil
-                                                    let wasDone = job.status == .inProgress
-                                                    try await store.toggleJobStatus(job)
-                                                    if wasDone {
-                                                        showBanner("Job marked done — client notified ✅")
-                                                    }
-                                                } catch {
-                                                    operationError = error.localizedDescription
+                                    ForEach(routeOrderedJobs) { job in
+                                        if routeMode {
+                                            jobCard(job)
+                                                .onDrag {
+                                                    draggingJobId = job.id
+                                                    return NSItemProvider(object: job.id.uuidString as NSString)
                                                 }
-                                            },
-                                            onSkip: {
-                                                guard !isOperating else { return }
-                                                isOperating = true
-                                                defer { isOperating = false }
-                                                do {
-                                                    operationError = nil
-                                                    try await store.skipJob(job)
-                                                    showBanner("Job skipped — client notified ✅")
-                                                } catch {
-                                                    operationError = error.localizedDescription
-                                                }
-                                            },
-                                            showDate: !isToday
-                                        )
+                                                .onDrop(of: [.text], delegate: RouteDropDelegate(
+                                                    item: job,
+                                                    routeOrderIds: $routeOrderIds,
+                                                    draggingJobId: $draggingJobId,
+                                                    onReorder: persistRouteOrder
+                                                ))
+                                        } else {
+                                            jobCard(job)
+                                        }
                                     }
                                 }
                                 .padding(.horizontal, 4)
@@ -244,7 +242,7 @@ struct TodayView: View {
     private var headerRow: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Good \(greeting) 👋")
+                Text(greeting)
                     .font(.subheadline)
                     .foregroundColor(theme.textMuted)
             }
@@ -252,12 +250,14 @@ struct TodayView: View {
         }
     }
 
-    private var greeting: String {
+    /// Returns the full phrase (not just the time-of-day word) so Spanish can
+    /// use correct grammar/gender agreement instead of a %@ substitution.
+    private var greeting: LocalizedStringKey {
         let h = Calendar.current.component(.hour, from: Date())
         switch h {
-        case 0..<12: return "morning"
-        case 12..<17: return "afternoon"
-        default: return "evening"
+        case 0..<12: return "Good morning 👋"
+        case 12..<17: return "Good afternoon 👋"
+        default: return "Good evening 👋"
         }
     }
 
@@ -317,6 +317,13 @@ struct TodayView: View {
     private enum CalendarMode: String, CaseIterable {
         case week = "Week"
         case month = "Month"
+
+        var label: LocalizedStringKey {
+            switch self {
+            case .week: return "Week"
+            case .month: return "Month"
+            }
+        }
     }
 
     private struct DayCell: Identifiable {
@@ -396,7 +403,7 @@ struct TodayView: View {
                 Spacer()
                 Picker("Calendar view", selection: $calendarMode) {
                     ForEach(CalendarMode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.label).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -456,7 +463,7 @@ struct TodayView: View {
             if canManageCrew && store.teamMembers.count >= 2 {
                 HStack(spacing: 8) {
                     CrewFilterChip(
-                        label: "All",
+                        label: NSLocalizedString("All", comment: "Crew filter: show all crew members' jobs"),
                         isSelected: selectedCrewFilter == nil,
                         color: MowGoTheme.success
                     ) {
@@ -464,7 +471,7 @@ struct TodayView: View {
                     }
                     ForEach(Array(store.teamMembers.enumerated()), id: \.element.id) { index, member in
                         CrewFilterChip(
-                            label: member.businessName?.components(separatedBy: " ").first ?? "Unknown",
+                            label: member.businessName?.components(separatedBy: " ").first ?? NSLocalizedString("Unknown", comment: "Crew filter: crew member with no business name set"),
                             isSelected: selectedCrewFilter == member.id,
                             color: crewChipColors[index % crewChipColors.count]
                         ) {
@@ -519,8 +526,13 @@ struct TodayView: View {
                 if routeMode {
                     showBanner("Drag jobs to reorder your driving route")
                     if todayJobs.contains(where: { $0.routeOrder == nil }) {
+                        routeOrderIds = todayJobs.sorted { (a, b) in (a.address ?? "") < (b.address ?? "") }.map(\.id)
                         reorderJobsByRoute()
+                    } else {
+                        routeOrderIds = todayJobs.map(\.id)
                     }
+                } else {
+                    routeOrderIds = []
                 }
             } label: {
                 HStack(spacing: 4) {
@@ -569,6 +581,39 @@ struct TodayView: View {
         .padding(.vertical, 4)
     }
 
+    private func jobCard(_ job: Job) -> some View {
+        JobCardView(job: job, teamMembers: store.teamMembers,
+            onToggle: {
+                guard !isOperating else { return }
+                isOperating = true
+                defer { isOperating = false }
+                do {
+                    operationError = nil
+                    let wasDone = job.status == .inProgress
+                    try await store.toggleJobStatus(job)
+                    if wasDone {
+                        showBanner("Job marked done — client notified ✅")
+                    }
+                } catch {
+                    operationError = error.localizedDescription
+                }
+            },
+            onSkip: {
+                guard !isOperating else { return }
+                isOperating = true
+                defer { isOperating = false }
+                do {
+                    operationError = nil
+                    try await store.skipJob(job)
+                    showBanner("Job skipped — client notified ✅")
+                } catch {
+                    operationError = error.localizedDescription
+                }
+            },
+            showDate: !isToday
+        )
+    }
+
     // MARK: - Empty State
 
     private var emptyState: some View {
@@ -596,7 +641,7 @@ struct TodayView: View {
         }
     }
 
-    private func showBanner(_ message: String) {
+    private func showBanner(_ message: LocalizedStringKey) {
         bannerDismissTask?.cancel()
         notificationMessage = message
         withAnimation { showNotificationBanner = true }
@@ -658,6 +703,60 @@ struct TodayView: View {
             }
             isOperating = false
         }
+    }
+
+    /// Persists the current `routeOrderIds` drag order to the server. Called
+    /// once a drag gesture ends so mid-drag reordering doesn't spam writes.
+    private func persistRouteOrder() {
+        guard !isOperating else { return }
+        let jobsToPersist = routeOrderIds.compactMap { id in todayJobs.first(where: { $0.id == id }) }
+        guard !jobsToPersist.isEmpty else { return }
+
+        isOperating = true
+        Task {
+            do {
+                operationError = nil
+                for (index, job) in jobsToPersist.enumerated() where job.routeOrder != index {
+                    try await store.updateRouteOrder(job, order: index)
+                }
+            } catch {
+                operationError = error.localizedDescription
+            }
+            isOperating = false
+        }
+    }
+}
+
+/// Drives live drag reordering for Route mode's job list. `dropEntered`
+/// moves the dragged job within `routeOrderIds` as it crosses another card's
+/// drop zone; `performDrop` fires once the gesture ends to persist the order.
+private struct RouteDropDelegate: DropDelegate {
+    let item: Job
+    @Binding var routeOrderIds: [UUID]
+    @Binding var draggingJobId: UUID?
+    let onReorder: () -> Void
+
+    func dropEntered(info: DropInfo) {
+        guard let draggingJobId, draggingJobId != item.id,
+              let fromIndex = routeOrderIds.firstIndex(of: draggingJobId),
+              let toIndex = routeOrderIds.firstIndex(of: item.id) else { return }
+        guard routeOrderIds[toIndex] != draggingJobId else { return }
+        withAnimation(.default) {
+            routeOrderIds.move(
+                fromOffsets: IndexSet(integer: fromIndex),
+                toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+            )
+        }
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        draggingJobId = nil
+        onReorder()
+        return true
     }
 }
 

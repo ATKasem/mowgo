@@ -152,7 +152,7 @@ struct DashboardView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("\(memberToRemove?.businessName ?? "This member") will be removed from your team. Their jobs will be unassigned.")
+            Text("\(memberToRemove?.businessName ?? NSLocalizedString("This member", comment: "Crew removal confirmation fallback when member has no name")) will be removed from your team. Their jobs will be unassigned.")
         }
         .alert("Could Not Remove Crew Member", isPresented: Binding(
             get: { crewRemovalError != nil },
@@ -160,7 +160,7 @@ struct DashboardView: View {
         )) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(crewRemovalError ?? "An unknown error occurred.")
+            Text(crewRemovalError ?? NSLocalizedString("An unknown error occurred.", comment: "Crew member removal failure fallback message"))
         }
     }
 
@@ -617,8 +617,8 @@ private struct DashboardCard: View {
     let icon: String
     let color: Color
     let value: String
-    let label: String
-    let sub: String?
+    let label: LocalizedStringKey
+    let sub: LocalizedStringKey?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 

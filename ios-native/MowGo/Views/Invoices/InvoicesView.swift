@@ -2,7 +2,16 @@ import SwiftUI
 import UIKit
 
 struct InvoicesView: View {
-    enum Segment: String, CaseIterable { case invoices = "Invoices", estimates = "Estimates" }
+    enum Segment: String, CaseIterable {
+        case invoices = "Invoices"
+        case estimates = "Estimates"
+        var label: LocalizedStringKey {
+            switch self {
+            case .invoices: return "Invoices"
+            case .estimates: return "Estimates"
+            }
+        }
+    }
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
     @State private var segment = Segment.invoices
@@ -14,7 +23,7 @@ struct InvoicesView: View {
     @State private var showNewEstimate = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-    private var unpaid: [Invoice] { store.invoices.filter { $0.status != .paid } }
+    private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid || $0.status == .overdue } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
     private var totalUnpaid: Decimal { unpaid.reduce(0) { $0 + $1.amount } }
 
@@ -24,7 +33,7 @@ struct InvoicesView: View {
                 theme.background.ignoresSafeArea()
                 VStack(spacing: 0) {
                     Picker("View", selection: $segment) {
-                        ForEach(Segment.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                        ForEach(Segment.allCases, id: \.self) { Text($0.label).tag($0) }
                     }
                     .pickerStyle(.segmented).tint(MowGoTheme.deepGreen).padding(.horizontal, 16).padding(.vertical, 10)
                     if store.isLoading { Spacer(); ProgressView().tint(MowGoTheme.deepGreen); Spacer() }
@@ -98,7 +107,7 @@ struct InvoiceRow: View {
     @Environment(\.colorScheme) private var colorScheme
     let invoice: Invoice; var showPay: Bool; var onPay: () -> Void
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-    var body: some View { HStack(spacing: 12) { VStack(alignment: .leading) { Text(invoice.clientName ?? "Invoice").font(.subheadline.weight(.medium)); if let date = invoice.createdAt { Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted) } }; Spacer(); status; Text(invoice.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold)); if showPay { Button("Pay") { UIImpactFeedbackGenerator(style: .medium).impactOccurred(); onPay() }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small) } }.foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12) }
+    var body: some View { HStack(spacing: 12) { VStack(alignment: .leading) { Text(invoice.clientName ?? NSLocalizedString("Invoice", comment: "Invoice row fallback when no client name")).font(.subheadline.weight(.medium)); if let date = invoice.createdAt { Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted) } }; Spacer(); status; Text(invoice.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold)); if showPay { Button("Pay") { UIImpactFeedbackGenerator(style: .medium).impactOccurred(); onPay() }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small) } }.foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12) }
     private var status: some View { Text(showPay ? "Due" : "Paid").font(.caption2.weight(.medium)).foregroundColor(showPay ? MowGoTheme.warning : MowGoTheme.success).padding(.horizontal, 8).padding(.vertical, 3).background((showPay ? MowGoTheme.warning : MowGoTheme.success).opacity(0.12)).clipShape(Capsule()) }
 }
 
@@ -106,6 +115,9 @@ private struct InvoiceDetailView: View {
     @EnvironmentObject var store: DataStore
     @Environment(\.dismiss) private var dismiss
     @State private var showPayment = false
+    @State private var showVoidConfirm = false
+    @State private var voidError: String?
+    @State private var voiding = false
     let invoice: Invoice
     @Environment(\.colorScheme) private var colorScheme
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -114,7 +126,7 @@ private struct InvoiceDetailView: View {
         NavigationStack {
             Form {
                 Section {
-                    HStack { Text("Client").foregroundColor(theme.textMuted); Spacer(); Text(invoice.clientName ?? "Unknown") }
+                    HStack { Text("Client").foregroundColor(theme.textMuted); Spacer(); Text(invoice.clientName ?? NSLocalizedString("Unknown", comment: "Invoice detail fallback when no client name")) }
                     HStack { Text("Amount").foregroundColor(theme.textMuted); Spacer(); Text(invoice.amount.formatted(.currency(code: "USD"))) }
                     if let date = invoice.createdAt {
                         HStack { Text("Created").foregroundColor(theme.textMuted); Spacer(); Text(String(date.prefix(10))) }
@@ -128,6 +140,15 @@ private struct InvoiceDetailView: View {
                     Button("Pay via Stripe") { showPayment = true }
                     Button("Mark Paid") { markPaid() }
                 }
+                if invoice.status == .unpaid {
+                    Section {
+                        Button("Void invoice", role: .destructive) { showVoidConfirm = true }
+                            .disabled(voiding)
+                        if let voidError {
+                            Text(voidError).foregroundColor(MowGoTheme.danger)
+                        }
+                    }
+                }
             }
             .scrollContentBackground(.hidden)
             .background(theme.background)
@@ -138,6 +159,12 @@ private struct InvoiceDetailView: View {
                     PaymentView(invoice: invoice).navigationTitle("Payment")
                         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { showPayment = false } } }
                 }
+            }
+            .confirmationDialog("Void this invoice?", isPresented: $showVoidConfirm, titleVisibility: .visible) {
+                Button("Void Invoice", role: .destructive) { voidInvoice() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This can't be undone. The invoice will no longer be collectible.")
             }
         }
         .presentationDetents([.medium, .large])
@@ -168,6 +195,19 @@ private struct InvoiceDetailView: View {
         Task {
             try? await store.markInvoicePaid(invoice)
             dismiss()
+        }
+    }
+
+    private func voidInvoice() {
+        voiding = true
+        voidError = nil
+        Task {
+            do {
+                try await store.voidInvoice(invoice)
+                await MainActor.run { dismiss() }
+            } catch {
+                await MainActor.run { voidError = error.localizedDescription; voiding = false }
+            }
         }
     }
 

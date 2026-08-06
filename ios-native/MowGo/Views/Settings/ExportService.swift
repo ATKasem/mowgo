@@ -27,7 +27,7 @@ enum ExportService {
             rows: jobs.map { job in
                 [job.id.uuidString, job.userId?.uuidString, job.clientId?.uuidString, job.clientName,
                  job.assignedTo?.uuidString, job.title, job.scheduledDate, job.scheduledTime,
-                 job.durationMinutes.map { String($0) }, job.status.label, job.notes, job.photoUrl,
+                 job.durationMinutes.map { String($0) }, job.status.csvLabel, job.notes, job.photoUrl,
                  job.routeOrder.map { String($0) }, job.isRecurring.map { String($0) }, job.recurrenceRule,
                  job.createdAt]
             }
@@ -40,7 +40,7 @@ enum ExportService {
             rows: invoices.map { invoice in
                 [invoice.id.uuidString, invoice.userId?.uuidString, invoice.clientId?.uuidString,
                  invoice.clientName, invoice.jobId?.uuidString, String(describing: invoice.amount),
-                 invoice.status.label, invoice.stripeInvoiceId, invoice.stripePaymentIntentId,
+                 invoice.status.csvLabel, invoice.stripeInvoiceId, invoice.stripePaymentIntentId,
                  invoice.sentAt, invoice.paidAt, invoice.createdAt]
             }
         )

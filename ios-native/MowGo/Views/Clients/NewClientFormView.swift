@@ -208,13 +208,13 @@ struct NewClientFormView: View {
             )) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text(error ?? "Please check the form and try again.")
+                Text(error ?? NSLocalizedString("Please check the form and try again.", comment: "Client save failure fallback message"))
             }
             .alert("Client Limit Reached", isPresented: $showUpgradePrompt) {
                 Button("View Plans") { showSubscription = true }
                 Button("Not Now", role: .cancel) {}
             } message: {
-                Text("The Free plan includes up to 5 clients. Upgrade to Solo ($39/mo) for 15 clients, or Crew ($79/mo) for unlimited.")
+                Text("The Free plan includes up to 5 clients. Upgrade to Solo ($39/mo) for unlimited clients.")
             }
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView(currentTier: auth.user?.tier ?? "free")
@@ -289,7 +289,7 @@ struct NewClientFormView: View {
         // Check free tier client limit
         if client == nil {
             let tier = auth.user?.tier ?? "free"
-            let limits: [String: Int] = ["free": 5, "solo": 15]
+            let limits: [String: Int] = ["free": 5]
             let maxClients = limits[tier] ?? Int.max
             if store.clients.count >= maxClients {
                 showUpgradePrompt = true

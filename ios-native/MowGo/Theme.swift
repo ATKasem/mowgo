@@ -102,11 +102,13 @@ enum AppearancePreference: String, CaseIterable, Identifiable {
 
     var id: Self { self }
 
+    /// A resolved `String` (not `LocalizedStringKey`) since this feeds both
+    /// `Label` and plain-`String` UI (e.g. `SettingsLinkRow.subtitle`).
     var label: String {
         switch self {
-        case .system: "System"
-        case .light: "Light"
-        case .dark: "Dark"
+        case .system: return NSLocalizedString("System", comment: "Appearance option: follow device setting")
+        case .light: return NSLocalizedString("Light", comment: "Appearance option: always light")
+        case .dark: return NSLocalizedString("Dark", comment: "Appearance option: always dark")
         }
     }
 
