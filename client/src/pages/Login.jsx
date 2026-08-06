@@ -2,6 +2,7 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, isDemoMode } from '../lib/supabase';
+import { resumeCheckoutIntent } from '../lib/payments';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import Logo from '../components/Logo';
 
@@ -158,7 +159,6 @@ export default function Login() {
         }
       }
 
-      const { resumeCheckoutIntent } = await import('../lib/payments');
       const resume = await resumeCheckoutIntent();
       if (resume.status !== 'none') {
         if (resume.status === 'error') setError(resume.message || tr('Payment failed'));
