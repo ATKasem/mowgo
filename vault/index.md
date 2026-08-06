@@ -1,12 +1,16 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-08-05
+> **Last updated:** 2026-08-06
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
+| 2026-08-06 | `2026-08-06_daily-sync.md` | **Main sync note** — Rule of 100 dedup bug RESOLVED (gate + delivery moved to leads channel), booking link = named P0, missed-call text-back free win, market sizing double-confirmed ($62.91B→$79.68B), 49.4% onboarding-blocker wedge, TurfHop 101h+ outage, brand query #1, Reddit slot TOMORROW (Aug 7 22:21Z) | 
+| 2026-08-06 | `2026-08-06_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 11 new — Intel Runs 2/4–6/6, Stripe check, invoice reminders; ALL bot) |
+| 2026-08-06 | `2026-08-06_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (55 messages, 0 new; 12-msg duplicate batch cleaned from history) |
+| 2026-08-06 | `2026-08-06_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (100 messages, 0 new; **CLEANED Aug 6 13:30Z — 128 watchdog spam messages deleted, channel now empty**) |
 | 2026-08-05 | `2026-08-05_daily-sync.md` | **Main sync note** — Jobber "$29" verified as annual-bait (CLOSED), collection-loop gate proof 5-competitor, rain-delay shift #1 feature, SMS Batch 1 + Rule of 100 cron live (duplicate-post bug), outreach channel reactivated (44 msgs) | 
 | 2026-08-05 | `2026-08-05_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 6 new) |
 | 2026-08-05 | `2026-08-05_channel-outreach-raw.md` | Raw dump from #🌱mowgo-outreach (67 messages, **44 new — first activity since Jul 26**) |
@@ -64,4 +68,4 @@
 
 ---
 
-*Index updated by MowGo nightly vault sync — 2026-08-05 02:00 UTC*
+*Index updated by MowGo nightly vault sync — 2026-08-06 02:00 UTC*
