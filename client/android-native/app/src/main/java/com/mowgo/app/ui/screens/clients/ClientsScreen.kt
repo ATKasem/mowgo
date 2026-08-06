@@ -53,7 +53,19 @@ fun ClientsScreen(viewModel: ClientsViewModel = viewModel(), onViewPlans: () -> 
         )
     }
 
-    if (state.showNewClientDialog) ClientFormDialog(stringResource(R.string.clients_new_client_title), onDismiss = viewModel::dismissNewClientDialog, onSave = viewModel::createClient)
+    val clientCreatedMsg = stringResource(R.string.clients_created_ok)
+    val clientCreateFailedFormat = stringResource(R.string.clients_create_failed)
+    if (state.showNewClientDialog) ClientFormDialog(
+        stringResource(R.string.clients_new_client_title),
+        onDismiss = viewModel::dismissNewClientDialog,
+        onSave = { name, address, phone, rate, keyCode, petInstructions ->
+            viewModel.createClient(
+                name, address, phone, rate, keyCode, petInstructions,
+                successMessage = clientCreatedMsg,
+                failureFormat = clientCreateFailedFormat,
+            )
+        },
+    )
     if (state.showNewLeadDialog) NewLeadDialog(state.isMutating, viewModel::dismissNewLeadDialog, viewModel::createLead)
     state.editingClient?.let { editing ->
         ClientFormDialog(stringResource(R.string.clients_edit_client_title), editing, viewModel::dismissEditClientDialog) { name, address, phone, rate, keyCode, pets ->

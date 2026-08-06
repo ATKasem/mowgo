@@ -383,3 +383,12 @@
 // MARK: - Camera
 
 "Try Again" = "Intentar de nuevo";
+
+// Verification-pass additions (2026-08-06): keys the first localization pass missed
+"Void Invoice" = "Anular factura";
+"Pay" = "Pagar";
+"Annual" = "Anual";
+"2 months free" = "2 meses gratis";
+"Add client photo" = "Añadir foto del cliente";
+"Copy estimate text" = "Copiar texto del presupuesto";
+"✓ Done" = "✓ Hecho";

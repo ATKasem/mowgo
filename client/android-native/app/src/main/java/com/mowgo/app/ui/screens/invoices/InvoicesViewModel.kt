@@ -290,7 +290,8 @@ class InvoicesViewModel : ViewModel() {
             runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
         }
         return if (date != null) {
-            String.format(withDateFormat, name, date, amount, payLine)
+            // Resource order: %1$s=name, %2$s=amount, %3$s=date, %4$s=payLine
+            String.format(withDateFormat, name, amount, date, payLine)
         } else {
             String.format(noDateFormat, name, amount, payLine)
         }

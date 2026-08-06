@@ -470,6 +470,18 @@ final class DataStore: ObservableObject {
                 await fireWebhookInvoicePaid(updated)
             }
 
+        case "invoice:void":
+            struct V: Decodable { let invoiceId: UUID }
+            let v = try JSONDecoder().decode(V.self, from: mutation.payload)
+            // Idempotent: RPC no-ops on already-voided invoices; local guard
+            // skips replay if the invoice is already gone.
+            if !invoices.contains(where: { $0.id == v.invoiceId }) { break }
+            struct VoidParams: Encodable { let pInvoiceId: UUID }
+            let voided = try await sb.rpc("void_invoice", params: VoidParams(pInvoiceId: v.invoiceId), Bool.self)
+            if voided == true {
+                invoices.removeAll { $0.id == v.invoiceId }
+            }
+
         case "invoice:create":
             struct C: Decodable { let jobId: UUID; let clientId: UUID; let amount: Double }
             let c = try JSONDecoder().decode(C.self, from: mutation.payload)
@@ -1078,6 +1090,17 @@ final class DataStore: ObservableObject {
     /// the client already paid — never touch it.
     private func handleUndoneJob(_ job: Job) async {
         guard let invoice = invoices.first(where: { $0.jobId == job.id && $0.status == .unpaid }) else { return }
+        if auth?.isDemoMode == true {
+            invoices.removeAll { $0.id == invoice.id }
+            return
+        }
+        // Mirror the invoice:create queue pattern: offline undos queue the
+        // void for replay so the stray invoice never survives silently.
+        guard await canSync() else {
+            struct P: Encodable { let invoiceId: UUID }
+            _ = safeEnqueue("invoice:void", id: invoice.id, payload: P(invoiceId: invoice.id))
+            return
+        }
         do {
             try await voidInvoice(invoice)
         } catch {

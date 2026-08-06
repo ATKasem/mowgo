@@ -348,4 +348,8 @@
     <!-- FCM push notifications -->
     <string name="fcm_channel_name">MowGo alerts</string>
     <string name="fcm_channel_description">Job updates and important MowGo alerts</string>
+
+    <!-- Clients snackbar messages -->
+    <string name="clients_created_ok">Client created</string>
+    <string name="clients_create_failed">Failed: %1$s</string>
 </resources>

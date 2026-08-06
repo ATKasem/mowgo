@@ -77,7 +77,16 @@ class ClientsViewModel : ViewModel() {
     fun dismissSnackbar() { _uiState.value = _uiState.value.copy(showSnackbar = null) }
     fun dismissUpgradePrompt() { _uiState.value = _uiState.value.copy(showUpgradePrompt = false) }
 
-    fun createClient(name: String, address: String?, phone: String?, rate: Double, keyCode: String?, petInstructions: String?) {
+    fun createClient(
+        name: String,
+        address: String?,
+        phone: String?,
+        rate: Double,
+        keyCode: String?,
+        petInstructions: String?,
+        successMessage: String = "Client created",
+        failureFormat: String = "Failed: %1\$s",
+    ) {
         if (_uiState.value.isMutating) return
         _uiState.value = _uiState.value.copy(isMutating = true)
         viewModelScope.launch {
@@ -89,10 +98,10 @@ class ClientsViewModel : ViewModel() {
                     return@launch
                 }
                 invoiceRepository.createClient(Client(name = name, address = address, phone = phone, rate = rate, keyCode = keyCode, petInstructions = petInstructions))
-                _uiState.value = _uiState.value.copy(showNewClientDialog = false, showSnackbar = "Client created")
+                _uiState.value = _uiState.value.copy(showNewClientDialog = false, showSnackbar = successMessage)
                 loadData()
             } catch (error: Exception) {
-                _uiState.value = _uiState.value.copy(showSnackbar = "Failed: ${error.message}")
+                _uiState.value = _uiState.value.copy(showSnackbar = String.format(failureFormat, error.message))
             } finally {
                 _uiState.value = _uiState.value.copy(isMutating = false)
             }
