@@ -606,7 +606,13 @@ export async function updateClient(id, updates) {
     notify();
     return _clients.find(c => c.id === id);
   }
-  const { id: _excludeId, ...supabaseUpdates } = { ...updates };
+  // Defense-in-depth: only client-editable columns reach Supabase (RLS is
+  // the real gate; this prevents mass-assignment of user_id/created_at/etc.).
+  const ALLOWED_CLIENT_FIELDS = ['name', 'address', 'phone', 'email', 'rate', 'cleaning_notes', 'key_code', 'alarm_code', 'pet_instructions', 'tags', 'latitude', 'longitude', 'service_notes'];
+  const supabaseUpdates = {};
+  for (const key of Object.keys(updates)) {
+    if (ALLOWED_CLIENT_FIELDS.includes(key)) supabaseUpdates[key] = updates[key];
+  }
   if (updates.service_notes !== undefined) { supabaseUpdates.cleaning_notes = updates.service_notes; delete supabaseUpdates.service_notes; }
   const { data, error } = await supabase.from('clients').update(supabaseUpdates).eq('id', id).select().single();
   if (error) throw error;
@@ -655,8 +661,13 @@ export async function createLead(lead) {
 }
 
 export async function updateLead(id, patch) {
-  const safePatch = { ...patch, updated_at: new Date().toISOString() };
-  delete safePatch.id; delete safePatch.user_id; delete safePatch.created_at;
+  // Defense-in-depth: only lead-editable columns reach Supabase (RLS is the
+  // real gate; prevents mass-assignment of user_id/created_at/etc.).
+  const ALLOWED_LEAD_FIELDS = ['name', 'phone', 'email', 'address', 'source', 'notes', 'status', 'client_id'];
+  const safePatch = { updated_at: new Date().toISOString() };
+  for (const key of Object.keys(patch)) {
+    if (ALLOWED_LEAD_FIELDS.includes(key)) safePatch[key] = patch[key];
+  }
   if (isDemoMode()) {
     _leads = _leads.map(lead => lead.id === id ? { ...lead, ...safePatch } : lead); notify();
     return _leads.find(lead => lead.id === id);

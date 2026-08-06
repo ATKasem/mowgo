@@ -316,7 +316,7 @@ app.get('/api/invoices', auth, async (req, res) => {
 app.post('/api/invoices', auth, async (req, res) => {
   const { client_id, job_id, amount } = req.body;
   if (!client_id) return res.status(400).json({ error: 'Missing client_id' });
-  if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+  if (!amount || amount <= 0 || amount > 100000) return res.status(400).json({ error: 'Invalid amount' });
 
   const { data: invoice, error } = await supabase.from('invoices').insert({ user_id: req.user.id, client_id, job_id, amount, status: 'unpaid' }).select().single();
   if (error) return res.status(500).json({ error: error.message });
