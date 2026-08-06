@@ -50,6 +50,10 @@ BEGIN
 END; $$;
 
 REVOKE ALL ON FUNCTION ensure_referral_code() FROM PUBLIC;
+-- Supabase default privileges grant EXECUTE to anon/authenticated/service_role
+-- explicitly at creation — PUBLIC revoke alone does NOT clear those. Trigger
+-- functions need no direct callers: revoke from anon + authenticated too.
+REVOKE ALL ON FUNCTION ensure_referral_code() FROM anon, authenticated;
 
 DROP TRIGGER IF EXISTS ref_code_generate_trigger ON profiles;
 CREATE TRIGGER ref_code_generate_trigger AFTER INSERT ON profiles
@@ -119,6 +123,9 @@ LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
 $$;
 
 REVOKE ALL ON FUNCTION profile_is_referred(uuid) FROM PUBLIC;
+-- (Supabase default privileges: explicit anon/authenticated grants survive a
+-- PUBLIC revoke — clear them here too; owner-call only via SECURITY DEFINER.)
+REVOKE ALL ON FUNCTION profile_is_referred(uuid) FROM anon, authenticated;
 
 -- apply_referral_code(p_code text): client calls to redeem a referral link.
 -- Grants: authenticated (with auth.uid() guard).
@@ -174,6 +181,9 @@ BEGIN
 END; $$;
 
 REVOKE ALL ON FUNCTION apply_referral_code(text) FROM PUBLIC;
+-- (Supabase default privileges: clear the explicit anon grant too — this RPC
+-- is authenticated-only; anon must not reach it.)
+REVOKE ALL ON FUNCTION apply_referral_code(text) FROM anon;
 GRANT EXECUTE ON FUNCTION apply_referral_code(text) TO authenticated;
 
 -- referral_status(): client reads their own referral code + counts.
@@ -200,6 +210,8 @@ BEGIN
 END; $$;
 
 REVOKE ALL ON FUNCTION referral_status() FROM PUBLIC;
+-- (Supabase default privileges: clear the explicit anon grant too.)
+REVOKE ALL ON FUNCTION referral_status() FROM anon;
 GRANT EXECUTE ON FUNCTION referral_status() TO authenticated;
 
 -- earn_referral_credit(p_referred_user_id uuid): atomic cap+earn, SERVICE-ROLE ONLY.
@@ -248,4 +260,7 @@ END; $$;
 
 -- service_role only — webhook is the sole caller
 REVOKE ALL ON FUNCTION earn_referral_credit(uuid) FROM PUBLIC;
+-- (Supabase default privileges: explicit anon/authenticated grants survive a
+-- PUBLIC revoke — clear them. This RPC is service-role ONLY.)
+REVOKE ALL ON FUNCTION earn_referral_credit(uuid) FROM anon, authenticated;
 GRANT EXECUTE ON FUNCTION earn_referral_credit(uuid) TO service_role;
