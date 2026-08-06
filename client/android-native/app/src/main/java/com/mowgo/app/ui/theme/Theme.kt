@@ -6,7 +6,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
@@ -125,6 +127,37 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = MowGoColors.ElevatedLight,
 )
 
+// ─── Extended Colors ─────────────────────────────────────────────────────
+// Material3's ColorScheme has no slots for these semantic tokens (success/
+// warning/info status colors, inverse text) — they're theme-aware here so
+// Light mode picks up the correct (non-Dark) value instead of a hardcoded one.
+
+data class MowGoExtendedColors(
+    val success: Color,
+    val warning: Color,
+    val info: Color,
+    val textInverse: Color,
+)
+
+private val DarkExtendedColors = MowGoExtendedColors(
+    success = MowGoColors.SuccessDark,
+    warning = MowGoColors.WarningDark,
+    info = MowGoColors.InfoDark,
+    textInverse = MowGoColors.TextInverseDark,
+)
+
+private val LightExtendedColors = MowGoExtendedColors(
+    success = MowGoColors.SuccessLight,
+    warning = MowGoColors.WarningLight,
+    info = MowGoColors.InfoLight,
+    textInverse = MowGoColors.TextInverseLight,
+)
+
+val LocalMowGoExtendedColors = staticCompositionLocalOf { DarkExtendedColors }
+
+val MaterialTheme.extendedColors: MowGoExtendedColors
+    @Composable get() = LocalMowGoExtendedColors.current
+
 // ─── Composable Theme ──────────────────────────────────────────────────
 
 @Composable
@@ -133,6 +166,7 @@ fun MowGoTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -145,8 +179,10 @@ fun MowGoTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
+    CompositionLocalProvider(LocalMowGoExtendedColors provides extendedColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
+    }
 }

@@ -11,13 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.mowgo.app.R
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
-import com.mowgo.app.ui.theme.MowGoColors
 
 /**
  * Dialog for editing an existing job.
@@ -54,7 +55,7 @@ fun EditJobDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MowGoColors.SurfaceDark),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
@@ -62,73 +63,73 @@ fun EditJobDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
-                    text = "Edit Job",
+                    text = stringResource(R.string.editjob_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = MowGoColors.TextPrimaryDark,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
 
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Job Title") },
+                    label = { Text(stringResource(R.string.label_job_title)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MowGoColors.DeepGreenDark,
-                        unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                        focusedLabelColor = MowGoColors.DeepGreenDark,
-                        cursorColor = MowGoColors.DeepGreenDark,
-                        focusedTextColor = MowGoColors.TextPrimaryDark,
-                        unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                        cursorColor = MaterialTheme.colorScheme.secondary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
 
                 OutlinedTextField(
                     value = selectedClient?.name ?: "",
                     onValueChange = {},
-                    label = { Text("Client") },
+                    label = { Text(stringResource(R.string.label_client)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { showClientPicker = true },
                     readOnly = true,
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = MowGoColors.TextSecondaryDark,
-                        disabledLabelColor = MowGoColors.TextSecondaryDark,
-                        disabledTextColor = MowGoColors.TextPrimaryDark,
+                        disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
 
                 OutlinedTextField(
                     value = routeOrderText,
                     onValueChange = { routeOrderText = it.filter { c -> c.isDigit() } },
-                    label = { Text("Route Order") },
+                    label = { Text(stringResource(R.string.editjob_route_order)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MowGoColors.DeepGreenDark,
-                        unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                        focusedLabelColor = MowGoColors.DeepGreenDark,
-                        cursorColor = MowGoColors.DeepGreenDark,
-                        focusedTextColor = MowGoColors.TextPrimaryDark,
-                        unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                        cursorColor = MaterialTheme.colorScheme.secondary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
 
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    label = { Text("Notes") },
+                    label = { Text(stringResource(R.string.editjob_notes)) },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MowGoColors.DeepGreenDark,
-                        unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                        focusedLabelColor = MowGoColors.DeepGreenDark,
-                        cursorColor = MowGoColors.DeepGreenDark,
-                        focusedTextColor = MowGoColors.TextPrimaryDark,
-                        unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                        cursorColor = MaterialTheme.colorScheme.secondary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
 
@@ -137,7 +138,7 @@ fun EditJobDialog(
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                        Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -152,10 +153,10 @@ fun EditJobDialog(
                         },
                         enabled = title.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MowGoColors.DeepGreenDark,
+                            containerColor = MaterialTheme.colorScheme.secondary,
                         ),
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.action_save))
                     }
                 }
             }

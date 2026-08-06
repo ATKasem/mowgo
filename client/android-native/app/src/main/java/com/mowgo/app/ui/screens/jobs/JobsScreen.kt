@@ -12,11 +12,13 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mowgo.app.R
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.ui.screens.today.EditJobDialog
@@ -48,20 +50,20 @@ fun JobsScreen(viewModel: JobsViewModel = viewModel()) {
     pendingDelete?.let { job ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("Delete job?") },
-            text = { Text("Delete ${job.clientName}'s ${job.title} job?") },
+            title = { Text(stringResource(R.string.jobs_delete_title)) },
+            text = { Text(stringResource(R.string.jobs_delete_body, job.clientName, job.title)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.delete(job.id)
                     pendingDelete = null
-                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Jobs", style = MaterialTheme.typography.titleLarge) }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.jobs_title), style = MaterialTheme.typography.titleLarge) }) },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         PullToRefreshBox(
@@ -92,7 +94,7 @@ fun JobsScreen(viewModel: JobsViewModel = viewModel()) {
 
                 when {
                     state.isLoading && state.jobs.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-                    state.error != null && state.jobs.isEmpty() -> JobsError(state.error ?: "Failed to load jobs", viewModel::load)
+                    state.error != null && state.jobs.isEmpty() -> JobsError(state.error ?: stringResource(R.string.jobs_load_error), viewModel::load)
                     filtered.isEmpty() -> JobsEmpty()
                     else -> LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
                         filtered.groupBy { it.scheduledDate }.forEach { (date, jobs) ->
@@ -120,8 +122,8 @@ fun JobsScreen(viewModel: JobsViewModel = viewModel()) {
 private fun DateHeader(value: String) {
     val date = runCatching { LocalDate.parse(value) }.getOrNull()
     val text = when (date) {
-        LocalDate.now() -> "Today"
-        LocalDate.now().plusDays(1) -> "Tomorrow"
+        LocalDate.now() -> stringResource(R.string.common_today)
+        LocalDate.now().plusDays(1) -> stringResource(R.string.common_tomorrow)
         null -> value
         else -> date.format(DateTimeFormatter.ofPattern("EEE, MMM d", Locale.US))
     }
@@ -159,10 +161,10 @@ private fun JobsCard(
                 )
                 JobStatusChip(job.status)
                 Box {
-                    IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "Job options") }
+                    IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, stringResource(R.string.jobs_options_cd)) }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                        DropdownMenuItem(text = { Text("Edit") }, leadingIcon = { Icon(Icons.Default.Edit, null) }, onClick = { menu = false; onEdit() })
-                        DropdownMenuItem(text = { Text("Delete") }, leadingIcon = { Icon(Icons.Default.Delete, null) }, onClick = { menu = false; onDelete() })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.action_edit)) }, leadingIcon = { Icon(Icons.Default.Edit, null) }, onClick = { menu = false; onEdit() })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.action_delete)) }, leadingIcon = { Icon(Icons.Default.Delete, null) }, onClick = { menu = false; onDelete() })
                     }
                 }
             }
@@ -174,7 +176,7 @@ private fun JobsCard(
                 TextButton(onClick = onToggle) {
                     Icon(if (done) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(if (done) "Completed" else "Complete")
+                    Text(if (done) stringResource(R.string.jobs_completed) else stringResource(R.string.jobs_complete))
                 }
             }
         }
@@ -183,7 +185,7 @@ private fun JobsCard(
 
 @Composable
 private fun JobStatusChip(status: String) {
-    val label = when (status) { Job.STATUS_DONE -> "Done"; Job.STATUS_IN_PROGRESS -> "In Progress"; else -> "Scheduled" }
+    val label = when (status) { Job.STATUS_DONE -> stringResource(R.string.status_done); Job.STATUS_IN_PROGRESS -> stringResource(R.string.status_in_progress); else -> stringResource(R.string.status_scheduled) }
     Surface(color = MaterialTheme.colorScheme.primary.copy(alpha = .14f), shape = RoundedCornerShape(8.dp)) {
         Text(label, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
     }
@@ -193,8 +195,8 @@ private fun JobStatusChip(status: String) {
 private fun JobsEmpty() = Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(Icons.Default.EventAvailable, null, Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = .3f))
-        Spacer(Modifier.height(16.dp)); Text("No jobs yet", style = MaterialTheme.typography.titleMedium)
-        Text("Jobs will appear here.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(16.dp)); Text(stringResource(R.string.jobs_empty_title), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.jobs_empty_detail), color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -202,8 +204,8 @@ private fun JobsEmpty() = Box(Modifier.fillMaxSize(), contentAlignment = Alignme
 private fun JobsError(message: String, retry: () -> Unit) = Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(Icons.Default.ErrorOutline, null, Modifier.size(64.dp), tint = MaterialTheme.colorScheme.error.copy(alpha = .5f))
-        Spacer(Modifier.height(16.dp)); Text("Something went wrong", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(16.dp)); Text(stringResource(R.string.error_generic_title), style = MaterialTheme.typography.titleMedium)
         Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(16.dp)); Button(onClick = retry) { Text("Retry") }
+        Spacer(Modifier.height(16.dp)); Button(onClick = retry) { Text(stringResource(R.string.action_retry)) }
     }
 }

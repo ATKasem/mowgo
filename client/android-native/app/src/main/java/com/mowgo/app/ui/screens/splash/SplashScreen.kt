@@ -11,14 +11,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.ui.theme.MowGoColors
+import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 
 @Composable
 fun SplashScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToMain: () -> Unit,
+    authRepository: AuthRepository = remember { AuthRepository() },
 ) {
     val alpha = remember { Animatable(0f) }
+    var isCheckingSession by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         // Fade in
@@ -28,8 +34,24 @@ fun SplashScreen(
         )
         // Hold
         kotlinx.coroutines.delay(800L)
-        // Determine destination (for now always go to login — auth check comes in Batch 2)
-        onNavigateToLogin()
+
+        // Restore an existing session if one was persisted by EncryptedSessionManager.
+        // The Auth plugin auto-loads/refreshes from the session manager on client init and
+        // starts at SessionStatus.Initializing until that resolves.
+        isCheckingSession = true
+        val isAuthenticated = try {
+            withTimeoutOrNull(5_000L) {
+                authRepository.sessionState.first { it !is SessionStatus.Initializing }
+            } is SessionStatus.Authenticated
+        } catch (e: Exception) {
+            false
+        }
+
+        if (isAuthenticated) {
+            onNavigateToMain()
+        } else {
+            onNavigateToLogin()
+        }
     }
 
     Box(
@@ -54,6 +76,14 @@ fun SplashScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 color = MowGoColors.TextPrimaryDark,
             )
+            if (isCheckingSession) {
+                Spacer(modifier = Modifier.height(24.dp))
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MowGoColors.DeepGreenDark,
+                    strokeWidth = 2.dp,
+                )
+            }
         }
     }
 }

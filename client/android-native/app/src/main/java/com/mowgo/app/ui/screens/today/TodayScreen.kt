@@ -17,16 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mowgo.app.R
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.ui.components.JobPhotoButton
 import com.mowgo.app.ui.components.JobPhotoThumbnail
 import com.mowgo.app.ui.theme.MowGoColors
+import com.mowgo.app.ui.theme.extendedColors
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -81,7 +84,7 @@ fun TodayScreen(
             SnackbarHost(snackbarHostState) { data ->
                 Snackbar(
                     snackbarData = data,
-                    containerColor = MowGoColors.DeepGreenDark,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MowGoColors.OnAccent,
                 )
             }
@@ -89,13 +92,13 @@ fun TodayScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.showNewJobDialog() },
-                containerColor = MowGoColors.DeepGreenDark,
+                containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MowGoColors.OnAccent,
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "New Job")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.today_new_job_cd))
             }
         },
-        containerColor = MowGoColors.BackgroundDark,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = state.isLoading,
@@ -111,7 +114,7 @@ fun TodayScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(
-                        color = MowGoColors.DeepGreenDark,
+                        color = MaterialTheme.colorScheme.secondary,
                     )
                 }
             } else if (state.error != null && state.jobs.isEmpty()) {
@@ -155,7 +158,7 @@ fun TodayScreen(
                     state.weatherAlert?.let { forecast ->
                         item {
                             Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MowGoColors.RainBlue)) {
-                                Text("Rain chance ${forecast.precipitationProbability}% on ${forecast.date}", Modifier.padding(12.dp), color = MowGoColors.OnAccent, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.today_rain_chance, forecast.precipitationProbability, forecast.date), Modifier.padding(12.dp), color = MowGoColors.OnAccent, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -173,9 +176,9 @@ fun TodayScreen(
                     // Job list header
                     item {
                         Text(
-                            text = "Today's Jobs",
+                            text = stringResource(R.string.today_jobs_header),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MowGoColors.TextPrimaryDark,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                         )
@@ -223,19 +226,19 @@ private fun TodayHeader(
         Text(
             text = date,
             style = MaterialTheme.typography.headlineSmall,
-            color = MowGoColors.TextPrimaryDark,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
         )
         Text(
             text = weekday,
             style = MaterialTheme.typography.bodyLarge,
-            color = MowGoColors.TextSecondaryDark,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = businessName,
             style = MaterialTheme.typography.bodyMedium,
-            color = MowGoColors.DeepGreenDark,
+            color = MaterialTheme.colorScheme.secondary,
             fontWeight = FontWeight.Medium,
         )
 
@@ -261,13 +264,13 @@ private fun TodayHeader(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Rain Delay",
+                text = stringResource(R.string.today_rain_delay),
                 fontWeight = FontWeight.SemiBold,
             )
         }
         if (hasHistory) {
             TextButton(onClick = onHistory, modifier = Modifier.align(Alignment.End)) {
-                Icon(Icons.Filled.History, null); Spacer(Modifier.width(4.dp)); Text("Rain Delay History")
+                Icon(Icons.Filled.History, null); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.today_rain_delay_history))
             }
         }
     }
@@ -283,28 +286,28 @@ private fun RainDelayDialog(count: Int, applying: Boolean, dismiss: () -> Unit, 
     if (showPicker) {
         val minimum = tomorrow.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
         val picker = rememberDatePickerState(initialSelectedDateMillis = target.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(), selectableDates = object : SelectableDates { override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis >= minimum })
-        DatePickerDialog({ showPicker = false }, confirmButton = { TextButton({ picker.selectedDateMillis?.let { target = Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate() }; showPicker = false }) { Text("OK") } }, dismissButton = { TextButton({ showPicker = false }) { Text("Cancel") } }) { DatePicker(picker) }
+        DatePickerDialog({ showPicker = false }, confirmButton = { TextButton({ picker.selectedDateMillis?.let { target = Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate() }; showPicker = false }) { Text(stringResource(R.string.action_ok)) } }, dismissButton = { TextButton({ showPicker = false }) { Text(stringResource(R.string.action_cancel)) } }) { DatePicker(picker) }
     }
     AlertDialog(
-        onDismissRequest = { if (!applying) dismiss() }, title = { Text("Rain Delay") }, containerColor = MowGoColors.SurfaceDark,
+        onDismissRequest = { if (!applying) dismiss() }, title = { Text(stringResource(R.string.today_rain_delay)) }, containerColor = MaterialTheme.colorScheme.surface,
         text = { Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Text("$count scheduled jobs will move", color = MowGoColors.TextPrimaryDark)
+            Text(stringResource(R.string.today_scheduled_jobs_move, count), color = MaterialTheme.colorScheme.onSurface)
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                listOf("Tomorrow", "Pick a date").forEachIndexed { index, label -> SegmentedButton(selected = custom == (index == 1), onClick = { custom = index == 1; if (!custom) target = tomorrow }, shape = SegmentedButtonDefaults.itemShape(index, 2), label = { Text(label) }) }
+                listOf(stringResource(R.string.common_tomorrow), stringResource(R.string.today_pick_a_date)).forEachIndexed { index, label -> SegmentedButton(selected = custom == (index == 1), onClick = { custom = index == 1; if (!custom) target = tomorrow }, shape = SegmentedButtonDefaults.itemShape(index, 2), label = { Text(label) }) }
             }
             if (custom) OutlinedButton({ showPicker = true }, Modifier.fillMaxWidth()) { Icon(Icons.Filled.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(target.toString()) }
-            Text("Only today's scheduled jobs move.", color = MowGoColors.TextSecondaryDark)
+            Text(stringResource(R.string.today_rain_delay_note), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } },
-        confirmButton = { Button({ confirm(target.toString()) }, enabled = !applying && count > 0, colors = ButtonDefaults.buttonColors(containerColor = MowGoColors.RainBlue)) { if (applying) CircularProgressIndicator(Modifier.size(18.dp)) else Text("Confirm Rain Delay") } },
-        dismissButton = { TextButton(dismiss, enabled = !applying) { Text("Cancel") } },
+        confirmButton = { Button({ confirm(target.toString()) }, enabled = !applying && count > 0, colors = ButtonDefaults.buttonColors(containerColor = MowGoColors.RainBlue)) { if (applying) CircularProgressIndicator(Modifier.size(18.dp)) else Text(stringResource(R.string.today_confirm_rain_delay)) } },
+        dismissButton = { TextButton(dismiss, enabled = !applying) { Text(stringResource(R.string.action_cancel)) } },
     )
 }
 
 @Composable
 private fun RainDelayHistoryDialog(history: List<com.mowgo.app.data.model.RainDelayEntry>, undoing: Boolean, dismiss: () -> Unit, undo: (com.mowgo.app.data.model.RainDelayEntry) -> Unit) {
-    AlertDialog(onDismissRequest = { if (!undoing) dismiss() }, title = { Text("Rain Delay History") }, containerColor = MowGoColors.SurfaceDark,
-        text = { if (history.isEmpty()) Text("No rain delays yet") else LazyColumn(Modifier.heightIn(max = 420.dp)) { items(history, key = { it.createdAt }) { entry -> Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text("${entry.date} → ${entry.targetDate}", color = MowGoColors.TextPrimaryDark); Text("${entry.jobCount} job(s)", color = MowGoColors.TextSecondaryDark) }; OutlinedButton({ undo(entry) }, enabled = !undoing) { Text("Undo") } } } } },
-        confirmButton = { TextButton(dismiss, enabled = !undoing) { Text("Done") } })
+    AlertDialog(onDismissRequest = { if (!undoing) dismiss() }, title = { Text(stringResource(R.string.today_rain_delay_history)) }, containerColor = MaterialTheme.colorScheme.surface,
+        text = { if (history.isEmpty()) Text(stringResource(R.string.today_no_rain_delays)) else LazyColumn(Modifier.heightIn(max = 420.dp)) { items(history, key = { it.createdAt }) { entry -> Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text("${entry.date} → ${entry.targetDate}", color = MaterialTheme.colorScheme.onSurface); Text(stringResource(R.string.today_job_count, entry.jobCount), color = MaterialTheme.colorScheme.onSurfaceVariant) }; OutlinedButton({ undo(entry) }, enabled = !undoing) { Text(stringResource(R.string.today_undo)) } } } } },
+        confirmButton = { TextButton(dismiss, enabled = !undoing) { Text(stringResource(R.string.status_done)) } })
 }
 
 // ── Stats Row ───────────────────────────────────────────────────────────
@@ -323,15 +326,15 @@ private fun StatsRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         StatCard(
-            label = "Today's Jobs",
+            label = stringResource(R.string.today_jobs_header),
             value = totalJobs.toString(),
-            color = MowGoColors.DeepGreenDark,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f),
         )
         StatCard(
-            label = "Completed",
+            label = stringResource(R.string.today_stat_completed),
             value = completed.toString(),
-            color = MowGoColors.SuccessDark,
+            color = MaterialTheme.extendedColors.success,
             modifier = Modifier.weight(1f),
         )
     }
@@ -343,15 +346,15 @@ private fun StatsRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         StatCard(
-            label = "Revenue",
+            label = stringResource(R.string.today_stat_revenue),
             value = "$${String.format("%.0f", revenue)}",
-            color = MowGoColors.DeepGreenDark,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f),
         )
         StatCard(
-            label = "Scheduled",
+            label = stringResource(R.string.status_scheduled),
             value = scheduled.toString(),
-            color = MowGoColors.InfoDark,
+            color = MaterialTheme.extendedColors.info,
             modifier = Modifier.weight(1f),
         )
     }
@@ -367,7 +370,7 @@ private fun StatCard(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MowGoColors.SurfaceDark,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         shape = RoundedCornerShape(12.dp),
     ) {
@@ -386,7 +389,7 @@ private fun StatCard(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = MowGoColors.TextSecondaryDark,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
         }
@@ -414,7 +417,7 @@ private fun JobCard(
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable { expanded = !expanded },
         colors = CardDefaults.cardColors(
-            containerColor = MowGoColors.SurfaceDark,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         shape = RoundedCornerShape(12.dp),
     ) {
@@ -429,13 +432,13 @@ private fun JobCard(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(MowGoColors.BackgroundDark),
+                            .background(MaterialTheme.colorScheme.background),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "${order + 1}",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MowGoColors.TextSecondaryDark,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
@@ -446,13 +449,13 @@ private fun JobCard(
                     Text(
                         text = jobWithClient.title,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MowGoColors.TextPrimaryDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = jobWithClient.clientName,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MowGoColors.TextSecondaryDark,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
@@ -474,7 +477,7 @@ private fun JobCard(
                         Text(
                             text = time,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MowGoColors.TextSecondaryDark,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
@@ -492,33 +495,33 @@ private fun JobCard(
                 ) {
                     if (jobWithClient.status != Job.STATUS_DONE) {
                         ActionButton(
-                            label = "Mark Done",
+                            label = stringResource(R.string.today_action_mark_done),
                             icon = Icons.Filled.CheckCircle,
-                            color = MowGoColors.SuccessDark,
+                            color = MaterialTheme.extendedColors.success,
                             onClick = onMarkDone,
                             modifier = Modifier.weight(1f),
                         )
                     }
                     if (jobWithClient.status != Job.STATUS_SKIPPED && jobWithClient.status != Job.STATUS_DONE) {
                         ActionButton(
-                            label = "Skip",
+                            label = stringResource(R.string.today_action_skip),
                             icon = Icons.Filled.SkipNext,
-                            color = MowGoColors.DangerDark,
+                            color = MaterialTheme.colorScheme.error,
                             onClick = onSkip,
                             modifier = Modifier.weight(1f),
                         )
                     }
                     ActionButton(
-                        label = "Edit",
+                        label = stringResource(R.string.action_edit),
                         icon = Icons.Filled.Edit,
-                        color = MowGoColors.InfoDark,
+                        color = MaterialTheme.extendedColors.info,
                         onClick = onEdit,
                         modifier = Modifier.weight(1f),
                     )
                     ActionButton(
-                        label = "Delete",
+                        label = stringResource(R.string.action_delete),
                         icon = Icons.Filled.Delete,
-                        color = MowGoColors.DangerDark,
+                        color = MaterialTheme.colorScheme.error,
                         onClick = onDelete,
                         modifier = Modifier.weight(1f),
                     )
@@ -566,11 +569,11 @@ private fun ActionButton(
 @Composable
 private fun StatusChip(status: String) {
     val (text, color) = when (status) {
-        Job.STATUS_SCHEDULED -> "Scheduled" to MowGoColors.InfoDark
-        Job.STATUS_IN_PROGRESS -> "In Progress" to MowGoColors.WarningDark
-        Job.STATUS_DONE -> "Done" to MowGoColors.SuccessDark
-        Job.STATUS_SKIPPED -> "Skipped" to MowGoColors.DangerDark
-        else -> status to MowGoColors.TextSecondaryDark
+        Job.STATUS_SCHEDULED -> stringResource(R.string.status_scheduled) to MaterialTheme.extendedColors.info
+        Job.STATUS_IN_PROGRESS -> stringResource(R.string.status_in_progress) to MaterialTheme.extendedColors.warning
+        Job.STATUS_DONE -> stringResource(R.string.status_done) to MaterialTheme.extendedColors.success
+        Job.STATUS_SKIPPED -> stringResource(R.string.status_skipped) to MaterialTheme.colorScheme.error
+        else -> status to MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Surface(
@@ -600,18 +603,18 @@ private fun EmptyContent() {
             imageVector = Icons.Filled.EventAvailable,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MowGoColors.DeepGreenDark.copy(alpha = 0.3f),
+            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No jobs today",
+            text = stringResource(R.string.today_empty_title),
             style = MaterialTheme.typography.titleMedium,
-            color = MowGoColors.TextPrimaryDark,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = "Your schedule will appear here.",
+            text = stringResource(R.string.today_empty_detail),
             style = MaterialTheme.typography.bodyMedium,
-            color = MowGoColors.TextSecondaryDark,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -632,18 +635,18 @@ private fun ErrorContent(
             imageVector = Icons.Filled.ErrorOutline,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MowGoColors.DangerDark.copy(alpha = 0.5f),
+            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Something went wrong",
+            text = stringResource(R.string.error_generic_title),
             style = MaterialTheme.typography.titleMedium,
-            color = MowGoColors.TextPrimaryDark,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
             text = error,
             style = MaterialTheme.typography.bodyMedium,
-            color = MowGoColors.TextSecondaryDark,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 32.dp),
         )
@@ -651,10 +654,10 @@ private fun ErrorContent(
         Button(
             onClick = onRetry,
             colors = ButtonDefaults.buttonColors(
-                containerColor = MowGoColors.DeepGreenDark,
+                containerColor = MaterialTheme.colorScheme.secondary,
             ),
         ) {
-            Text("Retry")
+            Text(stringResource(R.string.action_retry))
         }
     }
 }

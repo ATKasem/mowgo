@@ -11,11 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.mowgo.app.R
 import com.mowgo.app.data.model.Client
-import com.mowgo.app.ui.theme.MowGoColors
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -72,24 +73,24 @@ fun NewJobDialog(
                     }
                     showDatePicker = false
                 }) {
-                    Text("OK", color = MowGoColors.DeepGreenDark)
+                    Text(stringResource(R.string.action_ok), color = MaterialTheme.colorScheme.secondary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             colors = DatePickerDefaults.colors(
-                containerColor = MowGoColors.SurfaceDark,
+                containerColor = MaterialTheme.colorScheme.surface,
             ),
         ) {
             DatePicker(
                 state = datePickerState,
                 colors = DatePickerDefaults.colors(
-                    containerColor = MowGoColors.SurfaceDark,
-                    selectedDayContainerColor = MowGoColors.DeepGreenDark,
-                    todayDateBorderColor = MowGoColors.DeepGreenDark,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    selectedDayContainerColor = MaterialTheme.colorScheme.secondary,
+                    todayDateBorderColor = MaterialTheme.colorScheme.secondary,
                 ),
             )
         }
@@ -98,8 +99,8 @@ fun NewJobDialog(
     if (showTimePicker) {
         AlertDialog(
             onDismissRequest = { showTimePicker = false },
-            title = { Text("Select Time", color = MowGoColors.TextPrimaryDark) },
-            containerColor = MowGoColors.SurfaceDark,
+            title = { Text(stringResource(R.string.newjob_select_time_title), color = MaterialTheme.colorScheme.onSurface) },
+            containerColor = MaterialTheme.colorScheme.surface,
             text = {
                 LazyColumn {
                     items(timeSlots) { slot ->
@@ -109,8 +110,8 @@ fun NewJobDialog(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(
-                                    if (isSelected) MowGoColors.DeepGreenDark.copy(alpha = 0.2f)
-                                    else MowGoColors.BackgroundDark
+                                    if (isSelected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)
+                                    else MaterialTheme.colorScheme.background
                                 )
                                 .clickable {
                                     selectedTime = slot
@@ -121,8 +122,8 @@ fun NewJobDialog(
                         ) {
                             Text(
                                 text = slot,
-                                color = if (isSelected) MowGoColors.DeepGreenDark
-                                else MowGoColors.TextPrimaryDark,
+                                color = if (isSelected) MaterialTheme.colorScheme.secondary
+                                else MaterialTheme.colorScheme.onSurface,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             )
                         }
@@ -132,7 +133,7 @@ fun NewJobDialog(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) {
-                    Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
         )
@@ -143,7 +144,7 @@ fun NewJobDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MowGoColors.SurfaceDark),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(16.dp),
         ) {
             LazyColumn(
@@ -152,9 +153,9 @@ fun NewJobDialog(
             ) {
                 item {
                     Text(
-                        text = "New Job",
+                        text = stringResource(R.string.label_new_job),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MowGoColors.TextPrimaryDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -164,16 +165,16 @@ fun NewJobDialog(
                     OutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
-                        label = { Text("Job Title") },
+                        label = { Text(stringResource(R.string.label_job_title)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MowGoColors.DeepGreenDark,
-                            unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                            focusedLabelColor = MowGoColors.DeepGreenDark,
-                            cursorColor = MowGoColors.DeepGreenDark,
-                            focusedTextColor = MowGoColors.TextPrimaryDark,
-                            unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                            cursorColor = MaterialTheme.colorScheme.secondary,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )
                 }
@@ -183,16 +184,16 @@ fun NewJobDialog(
                     OutlinedTextField(
                         value = selectedClient?.name ?: "",
                         onValueChange = {},
-                        label = { Text("Client") },
+                        label = { Text(stringResource(R.string.label_client)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showClientPicker = true },
                         readOnly = true,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            disabledBorderColor = MowGoColors.TextSecondaryDark,
-                            disabledLabelColor = MowGoColors.TextSecondaryDark,
-                            disabledTextColor = MowGoColors.TextPrimaryDark,
+                            disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )
                 }
@@ -202,16 +203,16 @@ fun NewJobDialog(
                     OutlinedTextField(
                         value = selectedDate,
                         onValueChange = {},
-                        label = { Text("Date") },
+                        label = { Text(stringResource(R.string.newjob_date_label)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showDatePicker = true },
                         readOnly = true,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            disabledBorderColor = MowGoColors.TextSecondaryDark,
-                            disabledLabelColor = MowGoColors.TextSecondaryDark,
-                            disabledTextColor = MowGoColors.TextPrimaryDark,
+                            disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )
                 }
@@ -219,18 +220,18 @@ fun NewJobDialog(
                 // Time
                 item {
                     OutlinedTextField(
-                        value = selectedTime ?: "Tap to select",
+                        value = selectedTime ?: stringResource(R.string.newjob_tap_to_select),
                         onValueChange = {},
-                        label = { Text("Time") },
+                        label = { Text(stringResource(R.string.newjob_time_label)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showTimePicker = true },
                         readOnly = true,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            disabledBorderColor = MowGoColors.TextSecondaryDark,
-                            disabledLabelColor = if (selectedTime != null) MowGoColors.TextSecondaryDark else MowGoColors.TextSecondaryDark,
-                            disabledTextColor = MowGoColors.TextPrimaryDark,
+                            disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = if (selectedTime != null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )
                 }
@@ -240,16 +241,16 @@ fun NewJobDialog(
                     OutlinedTextField(
                         value = routeOrderText,
                         onValueChange = { routeOrderText = it.filter { c -> c.isDigit() } },
-                        label = { Text("Route Order (optional)") },
+                        label = { Text(stringResource(R.string.newjob_route_order_optional)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MowGoColors.DeepGreenDark,
-                            unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                            focusedLabelColor = MowGoColors.DeepGreenDark,
-                            cursorColor = MowGoColors.DeepGreenDark,
-                            focusedTextColor = MowGoColors.TextPrimaryDark,
-                            unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                            cursorColor = MaterialTheme.colorScheme.secondary,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )
                 }
@@ -259,16 +260,16 @@ fun NewJobDialog(
                     OutlinedTextField(
                         value = notes,
                         onValueChange = { notes = it },
-                        label = { Text("Notes (optional)") },
+                        label = { Text(stringResource(R.string.newjob_notes_optional)) },
                         modifier = Modifier.fillMaxWidth(),
                         maxLines = 3,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MowGoColors.DeepGreenDark,
-                            unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                            focusedLabelColor = MowGoColors.DeepGreenDark,
-                            cursorColor = MowGoColors.DeepGreenDark,
-                            focusedTextColor = MowGoColors.TextPrimaryDark,
-                            unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                            cursorColor = MaterialTheme.colorScheme.secondary,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     )
                 }
@@ -281,7 +282,7 @@ fun NewJobDialog(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         TextButton(onClick = onDismiss) {
-                            Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                            Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
@@ -294,10 +295,10 @@ fun NewJobDialog(
                             },
                             enabled = title.isNotBlank() && selectedClient != null,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MowGoColors.DeepGreenDark,
+                                containerColor = MaterialTheme.colorScheme.secondary,
                             ),
                         ) {
-                            Text("Create")
+                            Text(stringResource(R.string.action_create))
                         }
                     }
                 }
@@ -314,8 +315,8 @@ fun ClientPickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select Client", color = MowGoColors.TextPrimaryDark) },
-        containerColor = MowGoColors.SurfaceDark,
+        title = { Text(stringResource(R.string.newjob_select_client_title), color = MaterialTheme.colorScheme.onSurface) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             LazyColumn {
                 items(clients) { client ->
@@ -330,20 +331,20 @@ fun ClientPickerDialog(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = client.name,
-                                color = MowGoColors.TextPrimaryDark,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Medium,
                             )
                             if (client.address != null) {
                                 Text(
                                     text = client.address,
-                                    color = MowGoColors.TextSecondaryDark,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
                         }
                         Text(
                             text = "$${String.format("%.0f", client.rate)}",
-                            color = MowGoColors.DeepGreenDark,
+                            color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -353,7 +354,7 @@ fun ClientPickerDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
     )
