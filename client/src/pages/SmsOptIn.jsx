@@ -33,8 +33,8 @@ export default function SmsOptIn() {
         </div>
         <h1 className="text-2xl font-bold text-center mb-2">Get lawn pricing reports by text</h1>
         <p className="text-gray-400 text-center text-sm mb-6">
-          MowGo sends lawn care owners in Oklahoma real market-rate reports and occasional
-          product updates by SMS. No spam — usually 1–2 messages a month.
+          MowGo sends Oklahoma lawn care owners real market-rate reports and occasional
+          offers by SMS. Marketing messages only — usually 1–2 a month.
         </p>
 
         {state === 'ok' ? (
@@ -56,9 +56,11 @@ export default function SmsOptIn() {
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
                 className="mt-0.5 accent-green-500" />
               <span>
-                I agree to receive SMS text messages from MowGo about lawn pricing reports and
-                product updates. Message &amp; data rates may apply. Reply <b>STOP</b> to opt out
-                anytime. See our <Link to="/privacy" className="text-green-400 underline">Privacy Policy</Link>{' '}
+                I agree to receive <b>marketing</b> text messages from MowGo about lawn
+                care pricing reports and offers. This consent is separate from any
+                informational or transactional messages. Message &amp; data rates may apply.
+                Reply <b>STOP</b> to opt out. Consent applies only to MowGo and this
+                campaign. See our <Link to="/privacy" className="text-green-400 underline">Privacy Policy</Link>{' '}
                 and <Link to="/terms" className="text-green-400 underline">Terms</Link>.
               </span>
             </label>
