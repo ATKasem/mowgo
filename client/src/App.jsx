@@ -1,34 +1,40 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, Suspense, lazy } from 'react';
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
+// Landing + Login stay statically imported — they're the initial-paint routes
+// for cold traffic (site root and /login) and must render with no extra chunk fetch.
 import Landing from './pages/Landing';
-import Privacy from './pages/Privacy';
 import Login from './pages/Login';
-import ResetPassword from './pages/ResetPassword';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Today from './pages/Today';
-import Clients from './pages/Clients';
-import Invoices from './pages/Invoices';
-import Settings from './pages/Settings';
 import { supabase, isDemoMode } from './lib/supabase';
 import { loadJobs, loadInvoices, onDataChange } from './lib/data';
-import Subscribe from './pages/Subscribe';
-import Compare from './pages/Compare';
-import SwitchingFromLawnPro from './pages/SwitchingFromLawnPro';
-import JobberPriceIncrease from './pages/JobberPriceIncrease';
-import QuoteIQAlternative from './pages/QuoteIQAlternative';
-import RuunlyComparison from './pages/RuunlyComparison';
-import ProBaseComparison from './pages/ProBaseComparison';
-import Booking from './pages/Booking';
-import PortalReturn from './pages/PortalReturn';
-import AdminConcierge from './pages/AdminConcierge';
-import RouteAudit from './pages/RouteAudit';
-import SmsOptIn from './pages/SmsOptIn';
-import Terms from './pages/Terms';
+import { resumeCheckoutIntent } from './lib/payments';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
+
+// Everything else is route-level code-split — none of it is needed for the
+// initial paint, so it shouldn't cost cold traffic a 1MB+ download.
+const Privacy = lazy(() => import('./pages/Privacy'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Home = lazy(() => import('./pages/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Today = lazy(() => import('./pages/Today'));
+const Clients = lazy(() => import('./pages/Clients'));
+const Invoices = lazy(() => import('./pages/Invoices'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Subscribe = lazy(() => import('./pages/Subscribe'));
+const Compare = lazy(() => import('./pages/Compare'));
+const SwitchingFromLawnPro = lazy(() => import('./pages/SwitchingFromLawnPro'));
+const JobberPriceIncrease = lazy(() => import('./pages/JobberPriceIncrease'));
+const QuoteIQAlternative = lazy(() => import('./pages/QuoteIQAlternative'));
+const RuunlyComparison = lazy(() => import('./pages/RuunlyComparison'));
+const ProBaseComparison = lazy(() => import('./pages/ProBaseComparison'));
+const Booking = lazy(() => import('./pages/Booking'));
+const PortalReturn = lazy(() => import('./pages/PortalReturn'));
+const AdminConcierge = lazy(() => import('./pages/AdminConcierge'));
+const RouteAudit = lazy(() => import('./pages/RouteAudit'));
+const SmsOptIn = lazy(() => import('./pages/SmsOptIn'));
+const Terms = lazy(() => import('./pages/Terms'));
 
 // ===== Auth Context =====
 export const AuthContext = createContext(null);
@@ -90,6 +96,15 @@ function RequireAuth({ children }) {
   return children;
 }
 
+// ===== Route chunk loading fallback (for React.lazy pages) =====
+function PageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
 // ===== Error Boundary =====
 class ErrorBoundary extends React.Component {
   state = { error: null };
@@ -129,7 +144,6 @@ function ResumeCheckoutIntent() {
       if (!intent) return;
       const { data: { session } } = await supabase.auth.getSession();
       if (cancelled || !session?.access_token) return;
-      const { resumeCheckoutIntent } = await import('./lib/payments');
       const resume = await resumeCheckoutIntent();
       if (!cancelled && resume.status === 'error') {
         // Surface the failure on the login page (retryable errors keep the intent)
@@ -230,6 +244,7 @@ export default function App() {
         <SupabaseErrorRedirect />
         <ResumeCheckoutIntent />
         <ApplyStashedRefCode />
+        <Suspense fallback={<PageLoading />}>
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />
@@ -265,6 +280,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/app" />} />
           </Route>
         </Routes>
+        </Suspense>
       </AuthProvider>
     </HashRouter>
     </ErrorBoundary>

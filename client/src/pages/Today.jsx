@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, ensureClientCoords, saveProfile } from '../lib/data';
+import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
 import { buildRouteLink, buildSingleStopUrl } from '../lib/navLinks';
 import { optimizeRoute } from '../lib/optimizeRoute';
 import { useSearchParams } from 'react-router-dom';
@@ -187,6 +187,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       await rainDelayJobs(entry.jobIds, targetDate);
       // Text affected clients (fire-and-forget — never blocks the UI).
       sendRainDelaySms(entry.jobIds, targetDate);
+      fireWebhook('rain.delay.applied', { job_count: entry.jobCount, target_date: targetDate });
       setJobs(prev => prev.map(job => entry.jobIds.includes(job.id) ? { ...job, scheduled_date: targetDate } : job));
       const next = await saveRainDelayEntry(entry);
       setRainHistory(next);
