@@ -68,7 +68,12 @@ async function insertLeadTouches(env, { email, phone, smsConsent }) {
 }
 
 async function sendLeadAlert(env, { name, lawnsBucket, monthly, email }) {
-  if (!env.DISCORD_BOT_TOKEN || !env.DISCORD_LEADS_CHANNEL_ID) return;
+  const webhookUrl = env.DISCORD_LEADS_WEBHOOK_URL;
+  const botUrl = (env.DISCORD_BOT_TOKEN && env.DISCORD_LEADS_CHANNEL_ID)
+    ? `https://discord.com/api/v10/channels/${env.DISCORD_LEADS_CHANNEL_ID}/messages`
+    : null;
+  const target = webhookUrl || botUrl;
+  if (!target) return;
   try {
     // Strip Discord markdown so malicious input can't inject formatting/embeds.
     // concierge-submit.js strips business_name; apply the same pattern here to both fields.
@@ -76,11 +81,14 @@ async function sendLeadAlert(env, { name, lawnsBucket, monthly, email }) {
     const safeEmail = (email || '').replace(/[*_~`|>@#]/g, '');
     const bucketLabel = lawnsBucket.replace('_', '-');
     const content = `🔔 New route audit lead: ${safeName} — ${bucketLabel} lawns/wk · ~$${monthly.toLocaleString()}/mo impact · ${safeEmail}`;
-    await fetch(`https://discord.com/api/v10/channels/${env.DISCORD_LEADS_CHANNEL_ID}/messages`, {
+    const res = await fetch(target, {
       method: 'POST',
-      headers: { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: webhookUrl
+        ? { 'Content-Type': 'application/json' }
+        : { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
     });
+    if (!res.ok) console.warn('Route audit lead alert failed:', res.status, await res.text().catch(() => ''));
   } catch (error) { console.warn('Route audit lead alert failed:', error?.message || error); }
 }
 
