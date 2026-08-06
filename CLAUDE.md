@@ -28,7 +28,7 @@ MowGo is a lawn-care scheduling SaaS (owner: Aaron). Three client platforms + Su
 
 ## Deployment
 - Web + CF functions: `git push origin main` → Cloudflare Pages auto-deploy.
-- Supabase migrations: applied via `npx supabase db query --linked --file <migration>` (CLI history is out of sync with prod — 007-018 applied out-of-band; do NOT run `supabase db push` blindly).
+- Supabase migrations: applied via `npx supabase db query --linked --file <migration>` (CLI history is out of sync with prod — 007-018 applied out-of-band; do NOT run `supabase db push` blindly). **NEW migrations use timestamp names** (`YYYYMMDDHHMMSS_description.sql`, e.g. `20260805193000_client_coords.sql`) — the numeric `007_`/`012_` prefixes already have duplicates and must not be extended.
 - Edge functions: `npx supabase functions deploy <name>`.
 - Mobile: manual app builds (Xcode/Gradle via GitHub Actions workflows).
 
