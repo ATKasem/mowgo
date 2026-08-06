@@ -57,10 +57,10 @@ export default function SmsOptIn() {
                 className="mt-0.5 accent-green-500" />
               <span>
                 I agree to receive <b>marketing</b> text messages from MowGo about lawn
-                care pricing reports and offers. This consent is separate from any
-                informational or transactional messages. Message &amp; data rates may apply.
-                Reply <b>STOP</b> to opt out. Consent applies only to MowGo and this
-                campaign. See our <Link to="/privacy" className="text-green-400 underline">Privacy Policy</Link>{' '}
+                care pricing reports and offers (about 1–2 messages a month). This consent
+                is separate from any informational or transactional messages. Message &amp;
+                data rates may apply. Reply <b>STOP</b> to opt out. Consent applies only to
+                MowGo and this campaign. See our <Link to="/privacy" className="text-green-400 underline">Privacy Policy</Link>{' '}
                 and <Link to="/terms" className="text-green-400 underline">Terms</Link>.
               </span>
             </label>

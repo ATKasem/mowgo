@@ -63,7 +63,12 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("5. Contact")}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("6. SMS Text Messaging")}</h2>
+            <p>{tr("MowGo sends SMS marketing messages (lawn pricing reports and offers) only to numbers that have opted in. Your mobile number is never shared with, sold to, or used by third parties for marketing. Message and data rates may apply. You can opt out at any time by replying STOP, or by contacting privacy@mowgoapp.com.")}</p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("7. Contact")}</h2>
             <p>{tr("For privacy questions, contact us at")} <a href="mailto:privacy@mowgoapp.com" className="text-sky-600 dark:text-sky-400">privacy@mowgoapp.com</a>.</p>
           </section>
         </div>
