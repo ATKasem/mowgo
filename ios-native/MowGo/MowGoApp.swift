@@ -22,12 +22,15 @@ struct MowGoApp: App {
     /// offline durability, so both failures are logged as launch-critical.
     private static let modelContainer: ModelContainer = {
         let logger = Logger(subsystem: "com.mowgo.app", category: "Persistence")
-        let diskConfig = ModelConfiguration(isStoredInMemoryOnly: false)
+        let storeURL = URL.applicationSupportDirectory.appending(path: "MowGo.sqlite")
+        let diskConfig = ModelConfiguration(url: storeURL)
         do {
-            return try ModelContainer(
+            let container = try ModelContainer(
                 for: JobCache.self, ClientCache.self, InvoiceCache.self, PendingMutation.self,
                 configurations: diskConfig
             )
+            applyStrongestFileProtection(at: storeURL, logger: logger)
+            return container
         } catch {
             logger.fault("Persistent ModelContainer creation failed: \(String(describing: error), privacy: .public)")
         }
@@ -44,6 +47,22 @@ struct MowGoApp: App {
             fatalError("MowGo cannot initialize its data store: \(error)")
         }
     }()
+
+    /// The offline cache holds client PII (names, addresses, phone numbers) —
+    /// lock it to NSFileProtectionComplete (inaccessible while the device is
+    /// locked) instead of the iOS default (accessible after first unlock).
+    private static func applyStrongestFileProtection(at storeURL: URL, logger: Logger) {
+        let fm = FileManager.default
+        for suffix in ["", "-wal", "-shm"] {
+            let path = storeURL.path + suffix
+            guard fm.fileExists(atPath: path) else { continue }
+            do {
+                try fm.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: path)
+            } catch {
+                logger.error("Failed to set file protection on cache store: \(String(describing: error), privacy: .public)")
+            }
+        }
+    }
 
     init() {
         _store = StateObject(wrappedValue: DataStore(modelContainer: Self.modelContainer))

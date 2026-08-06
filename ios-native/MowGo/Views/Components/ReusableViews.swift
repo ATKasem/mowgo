@@ -57,7 +57,7 @@ struct StatChip: View {
 
 struct StatCard: View {
     @Environment(\.colorScheme) private var colorScheme
-    let title: String
+    let title: LocalizedStringKey
     let value: String
     let icon: String
     let color: String
@@ -135,7 +135,7 @@ struct QuickActionRow: View {
 
 struct InfoRow: View {
     @Environment(\.colorScheme) private var colorScheme
-    let label: String
+    let label: LocalizedStringKey
     let value: String
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }

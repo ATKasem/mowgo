@@ -92,7 +92,7 @@ struct SettingsView: View {
             )) {
                 Button("OK", role: .cancel) { exportError = nil }
             } message: {
-                Text(exportError ?? "Could not create the export file.")
+                Text(exportError ?? NSLocalizedString("Could not create the export file.", comment: "Export failure fallback message"))
             }
             .alert("Sign Out", isPresented: $showingSignOut) {
                 Button("Sign Out", role: .destructive) { Task { await auth.signOut() } }
@@ -148,11 +148,11 @@ struct SettingsView: View {
     private var settingsLinks: some View {
         VStack(spacing: 0) {
             NavigationLink(value: SettingsDestination.businessProfile) {
-                SettingsLinkRow(title: "Business Profile", subtitle: businessName.isEmpty ? "Business name and phone" : businessName, icon: "storefront.fill")
+                SettingsLinkRow(title: "Business Profile", subtitle: businessName.isEmpty ? NSLocalizedString("Business name and phone", comment: "") : businessName, icon: "storefront.fill")
             }
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.notifications) {
-                SettingsLinkRow(title: "Notifications", subtitle: "Job completion and rain alerts", icon: "bell.fill")
+                SettingsLinkRow(title: "Notifications", subtitle: NSLocalizedString("Job completion and rain alerts", comment: ""), icon: "bell.fill")
             }
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.appearance) {
@@ -160,12 +160,12 @@ struct SettingsView: View {
             }
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.billing) {
-                SettingsLinkRow(title: "Billing", subtitle: auth.user?.tierLabel ?? "Free", icon: "creditcard.fill")
+                SettingsLinkRow(title: "Billing", subtitle: auth.user?.tierLabel ?? NSLocalizedString("Free", comment: "Subscription tier name: free plan"), icon: "creditcard.fill")
             }
             if isPaidTier {
                 Divider().padding(.leading, 52)
                 NavigationLink(value: SettingsDestination.integrations) {
-                    SettingsLinkRow(title: "Integrations", subtitle: "Zapier, Make, n8n webhooks", icon: "link.circle.fill")
+                    SettingsLinkRow(title: "Integrations", subtitle: NSLocalizedString("Zapier, Make, n8n webhooks", comment: ""), icon: "link.circle.fill")
                 }
             }
         }
@@ -296,7 +296,7 @@ struct SettingsView: View {
             VStack(spacing: 2) {
                 Text(auth.user?.businessName ?? "MowGo")
                     .font(.headline).foregroundColor(theme.textPrimary)
-                Text(auth.user?.tierLabel ?? "Free Plan")
+                Text(auth.user?.tierLabel ?? NSLocalizedString("Free Plan", comment: "Profile card subtitle when signed out"))
                     .font(.caption).foregroundColor(theme.textMuted)
             }
         }
@@ -366,7 +366,7 @@ struct SettingsView: View {
 
     // MARK: - Helpers
 
-    private var tierDescription: String {
+    private var tierDescription: LocalizedStringKey {
         switch auth.user?.tier {
         case "solo": "Unlimited clients & jobs · Recurring jobs"
         case "crew": "Unlimited clients · Full team access"
@@ -380,7 +380,7 @@ struct SettingsView: View {
 
 private struct SettingsLinkRow: View {
     @Environment(\.colorScheme) private var colorScheme
-    let title: String
+    let title: LocalizedStringKey
     let subtitle: String
     let icon: String
 
@@ -412,7 +412,7 @@ private struct ExportFile: Identifiable {
 
 private struct ExportRow: View {
     @Environment(\.colorScheme) private var colorScheme
-    let title: String
+    let title: LocalizedStringKey
     let loading: Bool
     let action: () -> Void
 
@@ -578,7 +578,7 @@ private struct NotificationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func settingsLabel(_ title: String, _ subtitle: String) -> some View {
+    private func settingsLabel(_ title: LocalizedStringKey, _ subtitle: LocalizedStringKey) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title).foregroundColor(theme.textPrimary)
             Text(subtitle).font(.caption).foregroundColor(theme.textMuted)
@@ -627,7 +627,7 @@ private struct AppearanceSettingsView: View {
 private struct BillingSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     let tierLabel: String
-    let tierDescription: String
+    let tierDescription: LocalizedStringKey
     let isPaidTier: Bool
     let errorMessage: String?
     let onManageSubscription: () -> Void
@@ -793,10 +793,11 @@ struct SubscriptionView: View {
 }
 
 private struct SectionHeader: View {
-    let title: String
-    init(_ title: String) { self.title = title }
+    let title: LocalizedStringKey
+    init(_ title: LocalizedStringKey) { self.title = title }
     var body: some View {
-        Text(title.uppercased())
+        Text(title)
+            .textCase(.uppercase)
             .font(.caption.weight(.semibold))
             .foregroundColor(.gray)
             .padding(.top, 12)

@@ -17,6 +17,19 @@ struct NewLeadFormView: View {
     private let sources = ["Referral", "Website", "Google", "Facebook", "Yard Sign", "Other"]
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
+    /// Stored lead-source values stay English (matches the lowercased DB
+    /// column); only the on-screen label is localized.
+    private static func sourceLabel(_ raw: String) -> LocalizedStringKey {
+        switch raw {
+        case "Referral": return "Referral"
+        case "Website": return "Website"
+        case "Google": return "Google"
+        case "Facebook": return "Facebook"
+        case "Yard Sign": return "Yard Sign"
+        default: return "Other"
+        }
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -26,7 +39,7 @@ struct NewLeadFormView: View {
                     TextField("Email", text: $email).keyboardType(.emailAddress).textContentType(.emailAddress)
                     TextField("Address", text: $address).textContentType(.fullStreetAddress)
                     Picker("Source", selection: $source) {
-                        ForEach(sources, id: \.self) { Text($0).tag($0) }
+                        ForEach(sources, id: \.self) { Text(Self.sourceLabel($0)).tag($0) }
                     }
                 }
                 .listRowBackground(theme.surface)

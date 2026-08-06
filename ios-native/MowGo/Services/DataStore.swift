@@ -852,6 +852,8 @@ final class DataStore: ObservableObject {
             // replay order can't create an invoice for a job that isn't done.
             if status == .done {
                 await handleCompletedJob(updated)
+            } else if job.status == .done {
+                await handleUndoneJob(updated)
             }
             return
         }
@@ -864,6 +866,10 @@ final class DataStore: ObservableObject {
             // invoices when the update fails).
             if status == .done {
                 await handleCompletedJob(updated)
+            } else if job.status == .done {
+                // Undo out of .done: void any unpaid auto-created invoice so
+                // it doesn't linger as a stray uncollectible invoice.
+                await handleUndoneJob(updated)
             }
             await fireWebhookJobUpdated(updated)
             switch status {
@@ -886,6 +892,8 @@ final class DataStore: ObservableObject {
             // so replay produces the same result as the happy path.
             if status == .done {
                 await handleCompletedJob(updated)
+            } else if job.status == .done {
+                await handleUndoneJob(updated)
             }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
@@ -1061,6 +1069,20 @@ final class DataStore: ObservableObject {
         } catch {
             #if DEBUG
             print("[DataStore] auto-invoice failed: \(error)")
+            #endif
+        }
+    }
+
+    /// Undo out of .done: void the job's unpaid auto-created invoice so it
+    /// doesn't linger as a stray, uncollectible invoice. A paid invoice means
+    /// the client already paid — never touch it.
+    private func handleUndoneJob(_ job: Job) async {
+        guard let invoice = invoices.first(where: { $0.jobId == job.id && $0.status == .unpaid }) else { return }
+        do {
+            try await voidInvoice(invoice)
+        } catch {
+            #if DEBUG
+            print("[DataStore] auto-void on undo failed: \(error)")
             #endif
         }
     }
@@ -1923,6 +1945,25 @@ final class DataStore: ObservableObject {
             self.error = "Saved offline — will sync when connected"
             throw error
         }
+    }
+
+    /// Owner-only: voids an unpaid invoice via the `void_invoice` RPC and
+    /// drops it from the list. Only unpaid invoices can be voided — paid
+    /// invoices reflect money already collected.
+    func voidInvoice(_ invoice: Invoice) async throws {
+        guard invoice.status == .unpaid else {
+            throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Only unpaid invoices can be voided"])
+        }
+        if auth?.isDemoMode == true {
+            invoices.removeAll { $0.id == invoice.id }
+            return
+        }
+        struct Params: Encodable { let pInvoiceId: UUID }
+        let voided = try await sb.rpc("void_invoice", params: Params(pInvoiceId: invoice.id), Bool.self)
+        guard voided == true else {
+            throw NSError(domain: "MowGo", code: 409, userInfo: [NSLocalizedDescriptionKey: "Invoice could not be voided"])
+        }
+        invoices.removeAll { $0.id == invoice.id }
     }
 
     // MARK: - Team

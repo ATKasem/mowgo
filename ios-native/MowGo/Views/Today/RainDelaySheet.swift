@@ -68,7 +68,6 @@ struct RainDelaySheet: View {
             .navigationTitle("Rain Delay").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
-        .preferredColorScheme(.dark)
     }
 
     private func apply() {

@@ -3,8 +3,8 @@ import UIKit
 
 private struct WebhookEventOption: Identifiable {
     let id: String
-    let title: String
-    let detail: String
+    let title: LocalizedStringKey
+    let detail: LocalizedStringKey
 }
 
 private let webhookEventOptions = [
@@ -74,14 +74,14 @@ struct IntegrationsView: View {
         } message: { Text("This endpoint will stop receiving MowGo events.") }
         .alert("Couldn’t Update Integrations", isPresented: Binding(
             get: { store.errorMessage != nil }, set: { if !$0 { store.clearError() } }
-        )) { Button("OK") { store.clearError() } } message: { Text(store.errorMessage ?? "Unknown error") }
+        )) { Button("OK") { store.clearError() } } message: { Text(store.errorMessage ?? NSLocalizedString("Unknown error", comment: "Integrations save failure fallback message")) }
     }
 
     private func endpointCard(_ config: WebhookConfig) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: "bolt.fill").foregroundColor(.purple)
-                Text(config.label?.isEmpty == false ? config.label! : "Untitled endpoint")
+                Text(config.label?.isEmpty == false ? config.label! : NSLocalizedString("Untitled endpoint", comment: "Webhook endpoint with no label set"))
                     .font(.headline).lineLimit(1)
                 Spacer()
                 Toggle("Active", isOn: Binding(

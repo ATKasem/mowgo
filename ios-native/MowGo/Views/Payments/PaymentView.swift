@@ -219,7 +219,7 @@ struct SubscriptionPlanCard: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.caption)
                         .foregroundColor(MowGoTheme.deepGreen)
-                    Text(feature)
+                    Text(LocalizedStringKey(feature))
                         .font(.caption)
                         .foregroundColor(theme.textSecondary)
                 }
