@@ -36,7 +36,7 @@ for (const f of files) {
     // Deno edge functions import 'https://deno.land/...' / npm: URLs that
     // Node can't resolve — those are expected failures; skip them.
     const msg = String(err?.message || err);
-    if (msg.includes('https://') || msg.startsWith('npm:')) {
+    if (msg.includes('https://') || msg.includes("protocol 'https:'") || msg.startsWith('npm:')) {
       continue;
     }
     failed++;
