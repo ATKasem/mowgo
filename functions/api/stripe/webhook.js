@@ -51,6 +51,38 @@ export async function onRequestPost({ request, env }) {
           customerId: customerIdOf(object.customer) || customerIdOf(subscription.customer),
           tier,
         });
+
+        // Referral earn (service-role only, never fails the webhook)
+        try {
+          const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
+          const customerId = customerIdOf(object.customer) || customerIdOf(subscription.customer);
+          if (customerId && serviceKey) {
+            // Fetch profile by customer id (scoped fetch, not widening fetchProfile's hardcoded select)
+            const profileRes = await withTimeout(fetch(
+              `${env.SUPABASE_URL}/rest/v1/profiles?select=id,referred_by&stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
+              { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY}` } }
+            ));
+            if (profileRes.ok) {
+              const [prof] = await profileRes.json();
+              if (prof?.referred_by) {
+                // Atomic cap+earn via service-role RPC (webhook already has dedup guard)
+                await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/rpc/earn_referral_credit`, {
+                  method: 'POST',
+                  headers: {
+                    apikey: ***
+                    Authorization: `Bearer ${serviceKey}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ p_referred_user_id: prof.id }),
+                }));
+                // Notify referrer via email (best-effort)
+                await sendReferralEarnEmail(env, serviceKey, prof.referred_by);
+              }
+            }
+          }
+        } catch (e) {
+          // best-effort — never fail the webhook over referrals
+        }
       }
     } else if (event.type === 'customer.subscription.updated') {
       const tier = tierForSubscription(object, env);
@@ -80,7 +112,7 @@ async function isDuplicateEvent(eventId, env) {
     const response = await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/webhook_events`, {
       method: 'POST',
       headers: {
-        apikey: serviceKey,
+        apikey: ***
         Authorization: `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
         Prefer: 'resolution=ignore-duplicates,return=representation',
@@ -201,7 +233,7 @@ async function logTierChange(env, serviceKey, resolvedUserId, newTier) {
     await withTimeout(fetch(`${env.SUPABASE_URL}/rest/v1/tier_events`, {
       method: 'POST',
       headers: {
-        apikey: serviceKey,
+        apikey: ***
         Authorization: `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
         Prefer: 'return=minimal',
@@ -218,7 +250,7 @@ async function fetchProfile(env, serviceKey, filter) {
   try {
     const res = await withTimeout(fetch(
       `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=id,tier`,
-      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+      { headers: { apikey: *** Authorization: `Bearer ${serviceKey}` } }
     ));
     if (!res.ok) return null;
     const [row] = await res.json();
@@ -260,8 +292,7 @@ async function updateProfile({ env, userId, customerId, tier }) {
 }
 
 // Cancellation win-back/downsell flow (customer.subscription.deleted).
-// Reads the PRE-STATE tier before flipping to free (same ordering-bug pattern
-// as updateProfile's tier-change logging) so the win-back email can be framed
+// Reads the PRE-STATE tier before flipping to free so the win-back email can be framed
 // correctly, and so a stray/duplicate cancel event (already free) sends nothing.
 async function handleSubscriptionDeleted(object, env) {
   const userId = object.metadata?.user_id;
@@ -298,7 +329,7 @@ async function fetchUserEmail(env, serviceKey, userId) {
   try {
     const res = await withTimeout(fetch(
       `${env.SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(userId)}`,
-      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+      { headers: { apikey: *** Authorization: `Bearer ${serviceKey}` } }
     ));
     if (!res.ok) return null;
     const data = await res.json();
@@ -349,13 +380,51 @@ async function sendWinbackEmail(env, serviceKey, userId, previousTier) {
   }
 }
 
+// Referral earn notification — emailed to referrer when their referred user pays.
+// Best-effort, never fails the webhook. Uses existing fetchUserEmail + Resend helpers.
+async function sendReferralEarnEmail(env, serviceKey, referrerId) {
+  if (!env.RESEND_API_KEY || !referrerId) return;
+  try {
+    const email = await fetchUserEmail(env, serviceKey, referrerId);
+    if (!email) return;
+    const referrerName = await getReferrerName(env, serviceKey, referrerId);
+    const subject = 'You earned a free month on MowGo';
+    const html = `<p>You just earned a **free month** on MowGo!</p><p>${referrerName || 'A crew'} subscribed using your referral code.</p><p>Your credit will be applied to your next renewal automatically.</p>`;
+    await withTimeout(fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', to: email, subject, html }),
+    }));
+  } catch (e) {
+    // best-effort — never fail the webhook over referrals
+  }
+}
+
+// Fetch referrer's business_name (for email personalization)
+async function getReferrerName(env, serviceKey, referrerId) {
+  try {
+    const res = await withTimeout(fetch(
+      `${env.SUPABASE_URL}/rest/v1/profiles?select=business_name&id=eq.${encodeURIComponent(referrerId)}`,
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+    ));
+    if (!res.ok) return null;
+    const [row] = await res.json();
+    return row?.business_name || null;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function patchProfile(env, filter, profile) {
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
   const response = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?${filter}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${serviceKey}`,
-      apikey: serviceKey,
+      apikey: ***
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
     },
