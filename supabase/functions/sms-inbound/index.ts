@@ -160,6 +160,10 @@ serve(async (req) => {
       if (owners.length > 1) {
         console.warn(`sms-inbound: ${owners.length} profiles match phone ${from}; using first`);
       }
+      // Already scoped to this owner's OWN business (user_id = owner.id is
+      // the business_id) — no cross-tenant risk here regardless of which
+      // thread is "most recent"; the ambiguity risk in this path is entirely
+      // in picking `owner` above when multiple profiles share a phone.
       const { data: thread } = await supabaseAdmin
         .from("sms_threads")
         .select("id, client_phone")
@@ -186,13 +190,65 @@ serve(async (req) => {
 
     // ---- Case 2: a CLIENT is texting ----
     // Threads are written with E.164 client_phone, so the raw inbound From matches.
-    const { data: thread, error: threadError } = await supabaseAdmin
-      .from("sms_threads")
-      .select("id, user_id, client_id, client_phone")
-      .eq("client_phone", from)
-      .order("last_activity", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    //
+    // Cross-tenant guard: a phone number can have an sms_threads row under
+    // MORE THAN ONE business (e.g. a homeowner who is a client of two
+    // different lawn businesses, or a reused/ported number). Picking the
+    // globally most-recent thread by client_phone alone could forward a
+    // client's message to the WRONG owner. Narrow candidates to businesses
+    // that actually have a `clients` row for this phone number first; only
+    // fall back to the unscoped global lookup if none do.
+    //
+    // clients.phone is stored in whatever format the owner typed it in (not
+    // normalized), so match both the raw inbound number and its E.164 form —
+    // same two-variant approach as the owner-phone lookup above.
+    const { data: matchingClients, error: clientLookupError } = await supabaseAdmin
+      .from("clients")
+      .select("user_id")
+      .in("phone", [from, fromNorm]);
+
+    if (clientLookupError) {
+      console.error("sms-inbound client lookup error:", clientLookupError.message);
+    }
+
+    const candidateBusinessIds = [
+      ...new Set((matchingClients ?? []).map((c) => c.user_id).filter(Boolean)),
+    ];
+
+    let thread: { id: string; user_id: string; client_id: string | null; client_phone: string } | null = null;
+    let threadError: { message: string } | null = null;
+
+    if (candidateBusinessIds.length > 0) {
+      const res = await supabaseAdmin
+        .from("sms_threads")
+        .select("id, user_id, client_id, client_phone")
+        .eq("client_phone", from)
+        .in("user_id", candidateBusinessIds)
+        .order("last_activity", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      thread = res.data;
+      threadError = res.error;
+    }
+
+    if (!thread && !threadError) {
+      // No clients-table match (client record deleted, or the number was
+      // never saved) — fall back to the most-recent thread for this phone
+      // across ALL businesses. Documented limitation: this can still
+      // cross tenants if the same phone texted more than one business and
+      // neither has a surviving clients row. Logged so it's visible, not
+      // silent.
+      console.warn(`sms-inbound: no clients-table match for ${from}; falling back to most-recent thread across all businesses`);
+      const res = await supabaseAdmin
+        .from("sms_threads")
+        .select("id, user_id, client_id, client_phone")
+        .eq("client_phone", from)
+        .order("last_activity", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      thread = res.data;
+      threadError = res.error;
+    }
 
     if (threadError) {
       console.error("sms-inbound thread lookup error:", threadError.message);
