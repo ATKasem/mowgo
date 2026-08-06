@@ -187,8 +187,10 @@ struct JobCardView: View {
                     .accessibilityLabel("Job photo")
                     .task(id: job.photoUrl) {
                         // DB stores the storage PATH (signed URLs expire) —
-                        // resolve a fresh signed URL at render time.
-                        if photoUrl.hasPrefix("http") || photoUrl.hasPrefix("demo://") {
+                        // resolve a fresh signed URL at render time. Absolute
+                        // URLs pass through only if host == Supabase host
+                        // (checked inside signedPhotoURL).
+                        if photoUrl.hasPrefix("demo://") {
                             resolvedPhotoURL = URL(string: photoUrl)
                         } else {
                             resolvedPhotoURL = await SupabaseService.shared.signedPhotoURL(for: photoUrl)

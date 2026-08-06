@@ -387,10 +387,22 @@ actor SupabaseService {
     }
 
     /// Resolve a stored photo path to a fresh 1-hour signed URL.
-    /// Absolute URLs (legacy rows) pass through unchanged; nil on failure.
+    /// Absolute URLs pass through ONLY if the host matches this project's
+    /// Supabase storage domain (legacy rows); anything else → nil.
     func signedPhotoURL(for pathOrURL: String?) async -> String? {
         guard let pathOrURL, !pathOrURL.isEmpty else { return nil }
-        if pathOrURL.hasPrefix("http") || pathOrURL.hasPrefix("demo://") { return pathOrURL }
+        if pathOrURL.hasPrefix("demo://") { return pathOrURL }
+        if pathOrURL.hasPrefix("http") {
+            // Host allowlist: only the project's own Supabase host is trusted
+            // (crew can write photo_url via row-level RLS; an arbitrary host
+            // would make owner/crew devices GET attacker URLs — IP leak).
+            guard let url = URL(string: pathOrURL),
+                  let base = URL(string: baseURL),
+                  url.host == base.host else {
+                return nil
+            }
+            return pathOrURL
+        }
         // Path-traversal defense-in-depth: only accept plain storage paths
         // (bucket keys are UUID-segmented). Reject any traversal/absolute
         // attempts — Supabase storage RLS already gates reads, this is a

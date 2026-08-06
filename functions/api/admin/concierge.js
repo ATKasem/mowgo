@@ -40,7 +40,7 @@ export async function onRequestGet(context) {
   if(!auth(context))return response({error:'Unauthorized'},401,context.request);
   if(!context.env.SUPABASE_URL||!context.env.SUPABASE_SERVICE_ROLE_KEY)return response({error:'Server misconfigured'},500,context.request);
   const url=new URL(context.request.url); if(url.searchParams.get('action')!=='list')return response({error:'Invalid action'},400,context.request);
-  try { const result=await fetch(`${context.env.SUPABASE_URL}/rest/v1/concierge_requests?select=*&order=created_at.asc`,{headers:service(context.env)}); const requests=await result.json(); if(!result.ok)throw new Error('Failed to list requests'); return response({requests},200,context.request); } catch(error){return response({error:error.message},500,context.request);}
+  try { const result=await fetch(`${context.env.SUPABASE_URL}/rest/v1/concierge_requests?select=*&order=created_at.asc`,{headers:service(context.env)}); const requests=await result.json(); if(!result.ok)throw new Error('Failed to list requests'); return response({requests},200,context.request); } catch(error){console.error('Concierge admin list failed',error);return response({error:'Something went wrong'},500,context.request);}
 }
 export async function onRequestPost(context) {
   if(!allowed(context.request))return response({error:'Too many requests. Please try again later.'},429,context.request);
@@ -71,5 +71,5 @@ export async function onRequestPost(context) {
     }
     if(body.action==='done'){const result=await fetch(`${env.SUPABASE_URL}/rest/v1/concierge_requests?id=eq.${item.id}`,{method:'PATCH',headers:service(env),body:JSON.stringify({status:'done',done_at:new Date().toISOString()})});if(!result.ok)throw new Error('Failed to mark request done');return response({success:true},200,request);}
     return response({error:'Invalid action'},400,request);
-  } catch(error){console.error('Concierge admin failed',error);return response({error:error.message||'Something went wrong'},500,request);}
+  } catch(error){console.error('Concierge admin failed',error);return response({error:'Something went wrong'},500,request);}
 }

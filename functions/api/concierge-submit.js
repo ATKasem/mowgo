@@ -34,6 +34,17 @@ export async function onRequestPost({ request, env }) {
     const userResponse = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, { headers: { Authorization: `Bearer ${token}`, apikey: env.SUPABASE_ANON_KEY || env.SUPABASE_SERVICE_ROLE_KEY } });
     if (!userResponse.ok) return Response.json({ error: 'Invalid token' }, { status: 401, headers });
     const user = await userResponse.json();
+
+    // Per-user+IP rate limit: 20 submits per 15 min (after auth, in-memory
+    // per-isolate — same pattern as booking/webhook-dispatch).
+    const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+    const now = Date.now();
+    const attempts = (globalThis.__conciergeSubmitRl ||= new Map());
+    const key = `${user.id}:${ip}`;
+    const hits = (attempts.get(key) || []).filter((t) => now - t < 15 * 60 * 1000);
+    if (hits.length >= 20) return Response.json({ error: 'Too many requests — try again later.' }, { status: 429, headers });
+    hits.push(now); attempts.set(key, hits);
+
     const serviceHeaders = { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };
     let profileResponse;
     try {

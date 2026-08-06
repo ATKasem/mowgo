@@ -63,12 +63,22 @@ class JobPhotoRepository(
 
     /**
      * Resolve a storage path to a fresh 1-hour signed URL for display.
-     * Accepts already-absolute URLs (legacy rows) and returns them unchanged.
+     * Absolute URLs (legacy rows) pass through ONLY if the host matches this
+     * project's Supabase host; anything else → null. Mirrors the guard in
+     * JobPhotoThumbnail.
      */
     suspend fun signedUrl(pathOrUrl: String?): String? {
         if (pathOrUrl.isNullOrBlank()) return null
-        if (pathOrUrl.startsWith("http")) return pathOrUrl
         if (pathOrUrl.startsWith("demo://")) return pathOrUrl
+        if (pathOrUrl.startsWith("http")) {
+            val allowed = runCatching {
+                val baseHost = java.net.URI(BuildConfig.SUPABASE_URL).host
+                java.net.URI(pathOrUrl).host == baseHost
+            }.getOrDefault(false)
+            return if (allowed) pathOrUrl else null
+        }
+        // Path-traversal defense-in-depth (mirrors JobPhotoThumbnail).
+        if (pathOrUrl.startsWith("/") || pathOrUrl.contains("..") || pathOrUrl.contains("\\")) return null
 
         val session = SupabaseClientProvider.client.auth.currentSessionOrNull()
             ?: return null

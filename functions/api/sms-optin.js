@@ -38,8 +38,14 @@ export async function onRequestPost(context) {
 }
 
 function json(obj, status = 200) {
+  // Public unauthenticated endpoint, but follow the allowlist convention
+  // (origin echo/`*` banned elsewhere; opt-in page lives on mowgoapp.com).
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "https://mowgoapp.com",
+      "Vary": "Origin",
+    },
   });
 }

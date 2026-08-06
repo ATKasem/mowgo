@@ -113,7 +113,7 @@ export async function onRequestDelete({ request, env, params }) {
     return jsonResponse(request, { success: true }, 200);
   } catch (error) {
     console.error('remove-team: unexpected error', error);
-    return jsonResponse(request, { error: `Server error: ${error.message}` }, 500);
+    return jsonResponse(request, { error: 'Something went wrong' }, 500);
   }
 }
 

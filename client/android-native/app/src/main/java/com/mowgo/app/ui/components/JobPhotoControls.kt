@@ -143,10 +143,18 @@ fun JobPhotoButton(
 fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
     val displayUrl = photoUrl?.takeIf { it.isNotBlank() && !it.startsWith("demo://") } ?: return
     // DB stores the storage PATH (signed URLs expire). Resolve a fresh signed
-    // URL at render time; legacy absolute URLs pass through unchanged.
+    // URL at render time; legacy absolute URLs pass through ONLY if the host
+    // matches this project's Supabase host (crew can write photo_url via
+    // row-level RLS; an arbitrary host would leak owner/crew IPs).
     var resolved by remember(displayUrl) { mutableStateOf<String?>(null) }
     LaunchedEffect(displayUrl) {
-        resolved = if (displayUrl.startsWith("http")) displayUrl
+        resolved = if (displayUrl.startsWith("http")) {
+            val allowed = runCatching {
+                val baseHost = java.net.URI(BuildConfig.SUPABASE_URL).host
+                java.net.URI(displayUrl).host == baseHost
+            }.getOrDefault(false)
+            if (allowed) displayUrl else null
+        }
         // Path-traversal defense-in-depth: storage keys are UUID-segmented;
         // reject anything that isn't a plain relative path.
         else if (displayUrl.startsWith("/") || displayUrl.contains("..") || displayUrl.contains("\\")) null
