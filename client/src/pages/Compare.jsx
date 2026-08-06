@@ -248,7 +248,7 @@ export default function Compare() {
       <section className="max-w-4xl mx-auto px-4 pb-16">
         <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl p-6 md:p-10">
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-3">{tr("Jobber looks cheaper. Look closer.")}</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("Straight talk: if you only need a calendar for your jobs, Jobber Core at $29/mo (annual billing) is a fair deal. This page isn't here to convince you otherwise.")}</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("Straight talk: if you only need a calendar for your jobs, Jobber Core on promo (as low as $24–40/mo first term, annual billing, 1-year commitment) is a fair deal. This page isn't here to convince you otherwise.")}</p>
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
@@ -333,10 +333,16 @@ export default function Compare() {
             {tr("Six apps now offer a permanent free tier — Grassly, MowStack, Yardbook, ProBase, LawnPro Solo, and SoloOp. Grassly skims 2% of every card payment. MowGo's free plan takes nothing.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("TurfHop's own pricing and features pages were down (500 errors) on Aug 3, 2026 — verify current features with them before you buy.")}
+            {tr("TurfHop's pricing page was down for 5 days (Aug 1–6, 2026, 500 errors) — its features page is still down. Verify current features with them before you buy.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Jobber Connect is $139/mo month-to-month or $99/mo billed annually, plus $29/mo for each additional user. MowGo is $39–$79 flat.")}
+            {tr("Jobber Connect is $139/mo month-to-month or $99/mo billed annually, plus $29/mo for each additional user. Right now every Jobber plan also carries 3-month promo pricing (Core $24–40/mo first term) — and their $29/mo headline still needs a 1-year lock, the promo, and $29 per extra seat. MowGo is $39–$79 flat, month-to-month, whole crew included.")}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("Service Autopilot's $49/mo is ONE mobile license — a 2-person crew runs $199+/mo with a signup fee and annual-only billing. MowGo Crew is $79 flat, whole crew included.")}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("Planado (new in the band) charges per user — $12–$29/user/mo — and has no invoicing or payments at all. MowGo's auto-invoice + SMS pay link is included at $39 flat.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Some competitors charge a sign-up fee and hide their top tier behind a sales call — MowGo publishes $39/$79 and takes a card.")}
@@ -345,7 +351,7 @@ export default function Compare() {
 
         <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            <strong>{tr("QuoteIQ note:")}</strong> {tr('QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge, MowGo is purpose-built for you.')}
+            <strong>{tr("QuoteIQ note:")}</strong> {tr('QuoteIQ is a solid product — 4.7★ across 4,100+ reviews, native iOS/Android apps, AI features on every tier. If you run multiple trades or need AI estimates, QuoteIQ is the better fit. For lawn-only crews who want rain delay, offline mode, and no platform surcharge — QuoteIQ adds its own 1% processing fee on top of Stripe, and its Price-Lock Guarantee arrived right after July\u2019s hike — MowGo is purpose-built for you.')}
           </p>
         </div>
 
