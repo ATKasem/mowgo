@@ -504,14 +504,18 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   // deleted mid-geocode can't leave gaps (Mimo LOW fix); jobs created during
   // the geocode await are appended contiguously (Claude Code LOW-1 fix).
   function reorderToSequence(prev, orderedIds, currentDate) {
-    const presentIds = orderedIds.filter(id => prev.some(j => j.id === id));
+    // Date-scoped membership: a job whose scheduled_date changed away during
+    // the geocode await must NOT be reordered — reorder_jobs RPC has no date
+    // scoping, so including it would overwrite its route_order on the OTHER
+    // day (Claude Code verification HIGH fix).
+    const presentIds = orderedIds.filter(id => prev.some(j => j.id === id && j.scheduled_date === currentDate));
     const presentSet = new Set(presentIds);
     const extras = prev
       .filter(j => j.scheduled_date === currentDate && !presentSet.has(j.id))
       .map(j => j.id);
     const allIds = [...presentIds, ...extras];
     const rank = new Map(allIds.map((id, i) => [id, i + 1]));
-    const ordered = allIds.map(id => prev.find(j => j.id === id));
+    const ordered = allIds.map(id => prev.find(j => j.id === id && j.scheduled_date === currentDate));
     const previousOrder = prev
       .filter(j => j.scheduled_date === currentDate)
       .map(j => ({ id: j.id, route_order: j.route_order }));
@@ -530,7 +534,11 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   // so patching route_order alone would leave it visually stuck in the
   // optimized order (Claude Code HIGH-1 fix).
   function restoreDaySequence(prev, dateIds, orderById, currentDate) {
-    const ordered = dateIds.map(id => prev.find(j => j.id === id)).filter(Boolean);
+    // Same date-scoping as reorderToSequence: a job moved to another date
+    // since the snapshot is excluded (its slot no longer exists in this day).
+    const ordered = dateIds
+      .map(id => prev.find(j => j.id === id && j.scheduled_date === currentDate))
+      .filter(Boolean);
     let oi = 0;
     return prev.map(j => {
       if (j.scheduled_date !== currentDate) return j;
@@ -548,7 +556,12 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const anchor = profile?.latitude != null && profile?.longitude != null
         ? { lat: profile.latitude, lng: profile.longitude }
         : null;
-      const positioned = dayJobs.map(j => ({
+      // Re-read AFTER the geocode await — jobs may have changed (drag reorder,
+      // date move, new job) while we were network-waiting. Applying + snapshot
+      // must come from THIS state, or Undo/rollback would discard the
+      // interleaved change (Claude Code verification MEDIUM fix).
+      const currentDay = jobsRef.current.filter(j => j.scheduled_date === date);
+      const positioned = currentDay.map(j => ({
         id: j.id,
         lat: j.clients ? (coordsMap[j.clients.id]?.lat ?? null) : null,
         lng: j.clients ? (coordsMap[j.clients.id]?.lng ?? null) : null,
@@ -562,8 +575,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       // second optimize mid-flight can't mis-route the rollback.
       const snap = {
         date,
-        dateIds: dayJobs.map(j => j.id),
-        previousOrder: dayJobs.map(j => ({ id: j.id, route_order: j.route_order })),
+        dateIds: currentDay.map(j => j.id),
+        previousOrder: currentDay.map(j => ({ id: j.id, route_order: j.route_order })),
       };
       routeUndoRef.current = snap;
 
