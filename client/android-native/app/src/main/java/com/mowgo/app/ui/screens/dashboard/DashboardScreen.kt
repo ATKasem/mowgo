@@ -61,12 +61,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mowgo.app.R
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.data.model.UserProfile
@@ -112,7 +114,7 @@ fun DashboardScreen(
     }
     if (showAddClient) {
         ClientFormDialog(
-            title = "New Client",
+            title = stringResource(R.string.clients_new_client_title),
             onDismiss = { showAddClient = false },
             onSave = { name, address, phone, rate, keyCode, petInstructions ->
                 viewModel.createClient(name, address, phone, rate, keyCode, petInstructions) {
@@ -137,8 +139,8 @@ fun DashboardScreen(
     memberToRemove?.let { member ->
         AlertDialog(
             onDismissRequest = { memberToRemove = null },
-            title = { Text("Remove Crew Member") },
-            text = { Text("${member.businessName.ifBlank { "This member" }} will be removed from your team. Their jobs will be unassigned.") },
+            title = { Text(stringResource(R.string.dashboard_remove_crew_title)) },
+            text = { Text(stringResource(R.string.dashboard_remove_crew_body, member.businessName.ifBlank { stringResource(R.string.dashboard_remove_crew_default) })) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -147,14 +149,14 @@ fun DashboardScreen(
                         if (selectedMember != null) viewModel.removeMember(selectedMember)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                ) { Text("Remove") }
+                ) { Text(stringResource(R.string.dashboard_remove)) }
             },
-            dismissButton = { TextButton(onClick = { memberToRemove = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { memberToRemove = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
     loaded?.removeError?.let { message ->
         ErrorAlert(
-            title = "Could Not Remove Crew Member",
+            title = stringResource(R.string.dashboard_remove_error_title),
             message = message,
             onDismiss = viewModel::dismissRemoveError,
         )
@@ -167,7 +169,7 @@ fun DashboardScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Dashboard", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.dashboard_title), fontWeight = FontWeight.Bold)
                         Text(
                             LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.ENGLISH)),
                             style = MaterialTheme.typography.labelSmall,
@@ -238,13 +240,13 @@ private data class StatDefinition(
 @Composable
 private fun StatsGrid(state: DashboardUiState.Loaded, onNavigateToTab: (String) -> Unit) {
     val stats = if (state.isOwner) listOf(
-        StatDefinition(Icons.Filled.TrendingUp, Color(0xFF22C55E), currency(state.todayRevenue), "Revenue Today", if (state.todayJobs.isEmpty()) "No jobs today" else "${state.todayDoneCount}/${state.todayJobs.size} jobs done", NavRoutes.TODAY),
-        StatDefinition(Icons.Filled.Receipt, Color(0xFFF59E0B), currency(state.outstanding), "Outstanding", "Unpaid invoices", NavRoutes.INVOICES),
-        StatDefinition(Icons.Filled.CheckCircle, Color(0xFFA855F7), state.weeklyJobs.size.toString(), "Jobs This Week", "${currency(state.weeklyRevenue)} revenue", NavRoutes.TODAY),
-        StatDefinition(Icons.Filled.Groups, Color(0xFF3B82F6), state.activeClients.toString(), "Active Clients", "${state.recurringClients} recurring", NavRoutes.CLIENTS),
+        StatDefinition(Icons.Filled.TrendingUp, Color(0xFF22C55E), currency(state.todayRevenue), stringResource(R.string.dashboard_stat_revenue_today), if (state.todayJobs.isEmpty()) stringResource(R.string.dashboard_stat_no_jobs) else stringResource(R.string.dashboard_stat_jobs_done, state.todayDoneCount, state.todayJobs.size), NavRoutes.TODAY),
+        StatDefinition(Icons.Filled.Receipt, Color(0xFFF59E0B), currency(state.outstanding), stringResource(R.string.dashboard_stat_outstanding), stringResource(R.string.dashboard_stat_unpaid_invoices), NavRoutes.INVOICES),
+        StatDefinition(Icons.Filled.CheckCircle, Color(0xFFA855F7), state.weeklyJobs.size.toString(), stringResource(R.string.dashboard_stat_jobs_week), stringResource(R.string.dashboard_stat_revenue_amount, currency(state.weeklyRevenue)), NavRoutes.TODAY),
+        StatDefinition(Icons.Filled.Groups, Color(0xFF3B82F6), state.activeClients.toString(), stringResource(R.string.dashboard_stat_active_clients), stringResource(R.string.dashboard_stat_recurring, state.recurringClients), NavRoutes.CLIENTS),
     ) else listOf(
-        StatDefinition(Icons.Filled.CheckCircle, Color(0xFF22C55E), state.weeklyJobs.size.toString(), "Jobs This Week", "${state.weeklyDoneCount} done", NavRoutes.TODAY),
-        StatDefinition(Icons.Filled.Groups, Color(0xFF3B82F6), state.activeClients.toString(), "Active Clients", null, NavRoutes.CLIENTS),
+        StatDefinition(Icons.Filled.CheckCircle, Color(0xFF22C55E), state.weeklyJobs.size.toString(), stringResource(R.string.dashboard_stat_jobs_week), stringResource(R.string.dashboard_stat_done_count, state.weeklyDoneCount), NavRoutes.TODAY),
+        StatDefinition(Icons.Filled.Groups, Color(0xFF3B82F6), state.activeClients.toString(), stringResource(R.string.dashboard_stat_active_clients), null, NavRoutes.CLIENTS),
     )
 
     LazyVerticalGrid(
@@ -274,8 +276,8 @@ private fun StatsGrid(state: DashboardUiState.Loaded, onNavigateToTab: (String) 
 @Composable
 private fun QuickActions(onAddJob: () -> Unit, onAddClient: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        QuickAction(Icons.Filled.AddCircle, "Add Job", onAddJob, Modifier.weight(1f))
-        QuickAction(Icons.Filled.PersonAdd, "Add Client", onAddClient, Modifier.weight(1f))
+        QuickAction(Icons.Filled.AddCircle, stringResource(R.string.dashboard_add_job), onAddJob, Modifier.weight(1f))
+        QuickAction(Icons.Filled.PersonAdd, stringResource(R.string.dashboard_add_client), onAddClient, Modifier.weight(1f))
     }
 }
 
@@ -298,14 +300,14 @@ private fun QuickAction(icon: ImageVector, label: String, onClick: () -> Unit, m
 private fun TodayPreview(jobs: List<JobWithClient>, onNavigateToTab: (String) -> Unit) {
     DashboardSection {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Today", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            if (jobs.isNotEmpty()) TextButton(onClick = { onNavigateToTab(NavRoutes.TODAY) }) { Text("See all") }
+            Text(stringResource(R.string.common_today), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            if (jobs.isNotEmpty()) TextButton(onClick = { onNavigateToTab(NavRoutes.TODAY) }) { Text(stringResource(R.string.dashboard_see_all)) }
         }
         if (jobs.isEmpty()) {
             Column(Modifier.fillMaxWidth().padding(vertical = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Filled.Schedule, null, tint = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.size(32.dp))
                 Spacer(Modifier.height(8.dp))
-                Text("No jobs scheduled for today", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.dashboard_no_jobs_today), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             jobs.sortedBy { it.routeOrder ?: Int.MAX_VALUE }.take(3).forEach { TodayJobRow(it) }
@@ -329,14 +331,22 @@ private fun TodayJobRow(job: JobWithClient) {
             Text(job.clientName.ifBlank { job.title }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
             job.scheduledTime?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
-        Text(statusLabel(job.status), style = MaterialTheme.typography.labelSmall, color = statusColor)
+        Text(
+            when (job.status) {
+                Job.STATUS_DONE -> stringResource(R.string.status_done)
+                Job.STATUS_IN_PROGRESS -> stringResource(R.string.status_in_progress)
+                Job.STATUS_SKIPPED -> stringResource(R.string.status_skipped)
+                else -> stringResource(R.string.status_scheduled)
+            },
+            style = MaterialTheme.typography.labelSmall, color = statusColor,
+        )
     }
 }
 
 @Composable
 private fun TeamCard(rows: List<TeamProgressRow>) {
     DashboardSection {
-        Text("Team", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.dashboard_team), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(10.dp))
         rows.forEach { row ->
             val completed = row.done + row.inProgress
@@ -349,7 +359,7 @@ private fun TeamCard(rows: List<TeamProgressRow>) {
                 Text("$completed/${row.total}", style = MaterialTheme.typography.labelSmall)
                 if (row.done > 0) {
                     Spacer(Modifier.width(6.dp))
-                    Text("✓ Done", color = Color(0xFF22C55E), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.dashboard_done_check), color = Color(0xFF22C55E), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(Modifier.height(6.dp))
@@ -368,26 +378,26 @@ private fun TeamCard(rows: List<TeamProgressRow>) {
 private fun CrewRoster(members: List<UserProfile>, onInvite: () -> Unit, onRemove: (UserProfile) -> Unit) {
     DashboardSection {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Crew", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.dashboard_crew), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             TextButton(onClick = onInvite) {
                 Icon(Icons.Filled.PersonAdd, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Invite")
+                Text(stringResource(R.string.dashboard_invite))
             }
         }
         if (members.isEmpty()) {
-            Text("No crew members yet", modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.dashboard_no_crew), modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else members.forEach { member ->
             Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 val owner = member.role == "owner"
                 Box(Modifier.size(8.dp).background(if (owner) Color(0xFF22C55E) else Color(0xFF3B82F6), CircleShape))
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(member.businessName.ifBlank { "Crew Member" }, fontWeight = FontWeight.Medium)
-                    Text(if (owner) "Owner" else "Crew", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(member.businessName.ifBlank { stringResource(R.string.dashboard_crew_member_default) }, fontWeight = FontWeight.Medium)
+                    Text(if (owner) stringResource(R.string.dashboard_owner) else stringResource(R.string.dashboard_crew), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (member.role == "crew") IconButton(onClick = { onRemove(member) }) {
-                    Icon(Icons.Filled.Delete, "Remove ${member.businessName}", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Filled.Delete, stringResource(R.string.dashboard_remove_member_cd, member.businessName), tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                 }
             }
         }
@@ -413,14 +423,14 @@ private fun InviteCrewDialog(
     var email by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Invite Crew") },
+        title = { Text(stringResource(R.string.dashboard_invite_crew_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Invite a crew member to join your team.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.dashboard_invite_crew_body), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email address") },
+                    label = { Text(stringResource(R.string.dashboard_email_address)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth(),
@@ -434,10 +444,10 @@ private fun InviteCrewDialog(
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
                 }
-                Text("Send Invite")
+                Text(stringResource(R.string.dashboard_send_invite))
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
 }
 
@@ -447,7 +457,7 @@ private fun ErrorAlert(title: String, message: String, onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = { Text(message) },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("OK") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_ok)) } },
     )
 }
 
@@ -463,15 +473,8 @@ private fun DashboardErrorContent(message: String, onRetry: () -> Unit, modifier
         Spacer(Modifier.height(12.dp))
         Text(message, color = MaterialTheme.colorScheme.error)
         Spacer(Modifier.height(12.dp))
-        Button(onClick = onRetry) { Text("Retry") }
+        Button(onClick = onRetry) { Text(stringResource(R.string.action_retry)) }
     }
 }
 
 private fun currency(amount: Double): String = "$${String.format(Locale.US, "%.0f", amount)}"
-
-private fun statusLabel(status: String): String = when (status) {
-    Job.STATUS_DONE -> "Done"
-    Job.STATUS_IN_PROGRESS -> "In Progress"
-    Job.STATUS_SKIPPED -> "Skipped"
-    else -> "Scheduled"
-}

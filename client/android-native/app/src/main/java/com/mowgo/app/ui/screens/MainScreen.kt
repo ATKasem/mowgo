@@ -3,7 +3,9 @@ package com.mowgo.app.ui.screens
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +29,7 @@ fun MainScreen(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    var viewPlansEvent by rememberSaveable { mutableStateOf(0L) }
 
     LaunchedEffect(settingsDeepLinkEvent) {
         if (settingsDeepLinkEvent > 0L) {
@@ -47,16 +50,17 @@ fun MainScreen(
             ) {
                 BottomNavItem.entries.forEach { item ->
                     val selected = currentRoute == item.route
+                    val label = stringResource(item.labelRes)
                     NavigationBarItem(
                         icon = {
                             Icon(
                                 imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                                contentDescription = item.label,
+                                contentDescription = label,
                             )
                         },
                         label = {
                             Text(
-                                text = item.label,
+                                text = label,
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         },
@@ -102,11 +106,24 @@ fun MainScreen(
             }
             composable(NavRoutes.TODAY) { TodayScreen() }
             composable(NavRoutes.JOBS) { JobsScreen() }
-            composable(NavRoutes.CLIENTS) { ClientsScreen() }
+            composable(NavRoutes.CLIENTS) {
+                ClientsScreen(
+                    onViewPlans = {
+                        viewPlansEvent += 1
+                        navController.navigate(NavRoutes.MORE) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
             composable(NavRoutes.INVOICES) { InvoicesScreen() }
             composable(NavRoutes.MORE) {
                 MoreScreen(
-                    openBillingEvent = settingsDeepLinkEvent,
+                    openBillingEvent = settingsDeepLinkEvent + viewPlansEvent,
                     onSignedOut = onSignedOut,
                 )
             }

@@ -1,5 +1,6 @@
 package com.mowgo.app.ui.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
@@ -14,46 +15,47 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.mowgo.app.R
 
 enum class BottomNavItem(
     val route: String,
-    val label: String,
+    @StringRes val labelRes: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 ) {
     DASHBOARD(
         route = NavRoutes.DASHBOARD,
-        label = "Dashboard",
+        labelRes = R.string.nav_dashboard,
         selectedIcon = Icons.Filled.Dashboard,
         unselectedIcon = Icons.Outlined.Dashboard,
     ),
     TODAY(
         route = NavRoutes.TODAY,
-        label = "Today",
+        labelRes = R.string.nav_today,
         selectedIcon = Icons.Filled.CheckCircle,
         unselectedIcon = Icons.Outlined.CheckCircle,
     ),
     JOBS(
         route = NavRoutes.JOBS,
-        label = "Jobs",
+        labelRes = R.string.nav_jobs,
         selectedIcon = Icons.Filled.Assignment,
         unselectedIcon = Icons.Outlined.Assignment,
     ),
     CLIENTS(
         route = NavRoutes.CLIENTS,
-        label = "Clients",
+        labelRes = R.string.nav_clients,
         selectedIcon = Icons.Filled.Groups,
         unselectedIcon = Icons.Outlined.Groups,
     ),
     INVOICES(
         route = NavRoutes.INVOICES,
-        label = "Invoices",
+        labelRes = R.string.nav_invoices,
         selectedIcon = Icons.Filled.Receipt,
         unselectedIcon = Icons.Outlined.Receipt,
     ),
     MORE(
         route = NavRoutes.MORE,
-        label = "More",
+        labelRes = R.string.nav_more,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings,
     ),

@@ -247,31 +247,53 @@ class InvoicesViewModel : ViewModel() {
         return parts
     }
 
-    fun invoicePayLine(): String {
+    fun invoicePayLine(noMethodsText: String, methodsFormat: String): String {
         val methods = payMethods(_uiState.value.profile)
         return if (methods.isEmpty()) {
-            "Please send payment at your earliest convenience"
+            noMethodsText
         } else {
-            "Pay via ${methods.joinToString(" · ")}"
+            String.format(methodsFormat, methods.joinToString(" · "))
         }
     }
 
-    fun invoiceText(invoice: Invoice, clientName: String?): String {
-        val name = clientName?.takeIf { it.isNotBlank() } ?: "there"
+    fun invoiceText(
+        invoice: Invoice,
+        clientName: String?,
+        defaultName: String,
+        withDateFormat: String,
+        noDateFormat: String,
+        payLine: String,
+    ): String {
+        val name = clientName?.takeIf { it.isNotBlank() } ?: defaultName
         val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
         val date = invoice.createdAt?.take(10)?.let { raw ->
             runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
-        } ?: ""
-        return "Hi $name — your lawn was serviced${if (date.isNotEmpty()) " on $date" else ""}. $$amount due. ${invoicePayLine()}. Thanks!"
+        }
+        return if (date != null) {
+            String.format(withDateFormat, name, date, amount, payLine)
+        } else {
+            String.format(noDateFormat, name, amount, payLine)
+        }
     }
 
-    fun invoiceNudgeText(invoice: Invoice, clientName: String?): String {
-        val name = clientName?.takeIf { it.isNotBlank() } ?: "there"
+    fun invoiceNudgeText(
+        invoice: Invoice,
+        clientName: String?,
+        defaultName: String,
+        withDateFormat: String,
+        noDateFormat: String,
+        payLine: String,
+    ): String {
+        val name = clientName?.takeIf { it.isNotBlank() } ?: defaultName
         val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
         val date = invoice.createdAt?.take(10)?.let { raw ->
             runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
-        } ?: ""
-        return "Hi $name — friendly reminder: $$amount${if (date.isNotEmpty()) " from $date" else ""} is still due. ${invoicePayLine()}. Thanks!"
+        }
+        return if (date != null) {
+            String.format(withDateFormat, name, date, amount, payLine)
+        } else {
+            String.format(noDateFormat, name, amount, payLine)
+        }
     }
 
     fun createInvoice(

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobRepository
 import com.mowgo.app.data.LeadRepository
+import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Lead
 import com.mowgo.app.data.model.LeadStatus
@@ -29,12 +30,17 @@ data class ClientsUiState(
     val leadToConvert: Lead? = null,
     val isMutating: Boolean = false,
     val showSnackbar: String? = null,
+    val showUpgradePrompt: Boolean = false,
 )
+
+/** Mirrors the free-tier client cap enforced by the DB trigger (web/iOS use the same limit). */
+private const val FREE_CLIENT_LIMIT = 5
 
 class ClientsViewModel : ViewModel() {
     private val jobRepository = JobRepository()
     private val invoiceRepository = InvoiceRepository()
     private val leadRepository = LeadRepository(invoiceRepository)
+    private val profileRepository = ProfileRepository()
     private val _uiState = MutableStateFlow(ClientsUiState())
     val uiState: StateFlow<ClientsUiState> = _uiState.asStateFlow()
     private var loadGeneration = 0
@@ -69,10 +75,28 @@ class ClientsViewModel : ViewModel() {
     fun confirmConvertLead(lead: Lead) { _uiState.value = _uiState.value.copy(leadToConvert = lead) }
     fun dismissConvertLead() { _uiState.value = _uiState.value.copy(leadToConvert = null) }
     fun dismissSnackbar() { _uiState.value = _uiState.value.copy(showSnackbar = null) }
+    fun dismissUpgradePrompt() { _uiState.value = _uiState.value.copy(showUpgradePrompt = false) }
 
-    fun createClient(name: String, address: String?, phone: String?, rate: Double, keyCode: String?, petInstructions: String?) = mutate("Client created") {
-        invoiceRepository.createClient(Client(name = name, address = address, phone = phone, rate = rate, keyCode = keyCode, petInstructions = petInstructions))
-        _uiState.value = _uiState.value.copy(showNewClientDialog = false)
+    fun createClient(name: String, address: String?, phone: String?, rate: Double, keyCode: String?, petInstructions: String?) {
+        if (_uiState.value.isMutating) return
+        _uiState.value = _uiState.value.copy(isMutating = true)
+        viewModelScope.launch {
+            try {
+                val profile = profileRepository.loadProfile()
+                val isFreeTier = profile == null || profile.tier.isBlank() || profile.tier == "free"
+                if (isFreeTier && _uiState.value.clients.size >= FREE_CLIENT_LIMIT) {
+                    _uiState.value = _uiState.value.copy(showNewClientDialog = false, showUpgradePrompt = true)
+                    return@launch
+                }
+                invoiceRepository.createClient(Client(name = name, address = address, phone = phone, rate = rate, keyCode = keyCode, petInstructions = petInstructions))
+                _uiState.value = _uiState.value.copy(showNewClientDialog = false, showSnackbar = "Client created")
+                loadData()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(showSnackbar = "Failed: ${error.message}")
+            } finally {
+                _uiState.value = _uiState.value.copy(isMutating = false)
+            }
+        }
     }
 
     fun updateClient(client: Client) = mutate("Client updated") {

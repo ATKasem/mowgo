@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,12 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import com.mowgo.app.R
 import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.data.model.Estimate
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
 import com.mowgo.app.ui.theme.MowGoColors
+import com.mowgo.app.ui.theme.extendedColors
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import java.time.Instant
@@ -51,6 +54,18 @@ fun InvoicesScreen(
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
+    val paymentRecoverErrorText = stringResource(R.string.invoices_payment_recover_error)
+    val paymentFailedGenericText = stringResource(R.string.invoices_payment_failed_generic)
+    val paymentSheetErrorText = stringResource(R.string.invoices_payment_sheet_error)
+    val paymentTextCopiedText = stringResource(R.string.invoices_payment_text_copied)
+    val reminderCopiedText = stringResource(R.string.invoices_reminder_copied)
+    val invoiceDefaultClientName = stringResource(R.string.invoices_default_client_name)
+    val payLineNoMethodsText = stringResource(R.string.invoices_pay_line_no_methods)
+    val payLineMethodsFormat = stringResource(R.string.invoices_pay_line_methods_format)
+    val invoiceMsgServicedWithDate = stringResource(R.string.invoices_msg_serviced_with_date)
+    val invoiceMsgServicedNoDate = stringResource(R.string.invoices_msg_serviced_no_date)
+    val invoiceMsgNudgeWithDate = stringResource(R.string.invoices_msg_nudge_with_date)
+    val invoiceMsgNudgeNoDate = stringResource(R.string.invoices_msg_nudge_no_date)
     val paymentSheet = activity?.let { hostActivity ->
         remember(hostActivity) {
             PaymentSheet.Builder { result ->
@@ -60,12 +75,12 @@ fun InvoicesScreen(
                         if (payment != null) {
                             viewModel.paymentCompleted(payment)
                         } else {
-                            viewModel.paymentFailed("Could not recover payment confirmation details.")
+                            viewModel.paymentFailed(paymentRecoverErrorText)
                         }
                     }
                     is PaymentSheetResult.Canceled -> viewModel.paymentCanceled()
                     is PaymentSheetResult.Failed -> viewModel.paymentFailed(
-                        result.error.localizedMessage ?: "Payment failed.",
+                        result.error.localizedMessage ?: paymentFailedGenericText,
                     )
                 }
             }.build(hostActivity)
@@ -92,7 +107,7 @@ fun InvoicesScreen(
         val payment = state.pendingPayment
         if (payment != null && !state.isPaymentSheetPresenting && !state.isPaymentConfirmationPending) {
             if (paymentSheet == null) {
-                viewModel.paymentFailed("Could not present payment sheet.")
+                viewModel.paymentFailed(paymentSheetErrorText)
             } else {
                 viewModel.paymentSheetPresented()
                 paymentSheet.presentWithPaymentIntent(
@@ -106,16 +121,16 @@ fun InvoicesScreen(
     if (state.isPaymentConfirmationPending && state.paymentError != null) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissPendingPayment() },
-            title = { Text("Confirm Payment") },
+            title = { Text(stringResource(R.string.invoices_confirm_payment_title)) },
             text = { Text(state.paymentError!!) },
             confirmButton = {
                 TextButton(onClick = { viewModel.retryConfirmPayment() }) {
-                    Text("Retry")
+                    Text(stringResource(R.string.action_retry))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.dismissPendingPayment() }) {
-                    Text("Dismiss")
+                    Text(stringResource(R.string.action_dismiss))
                 }
             },
         )
@@ -125,27 +140,27 @@ fun InvoicesScreen(
     state.showDeleteConfirmation?.let { invoice ->
         AlertDialog(
             onDismissRequest = { viewModel.dismissDeleteConfirmation() },
-            title = { Text("Delete Invoice", color = MowGoColors.TextPrimaryDark) },
+            title = { Text(stringResource(R.string.invoices_delete_title), color = MaterialTheme.colorScheme.onSurface) },
             text = {
                 Text(
-                    text = "Delete this invoice for $${String.format("%.2f", invoice.amount)}? This cannot be undone.",
-                    color = MowGoColors.TextSecondaryDark,
+                    text = stringResource(R.string.invoices_delete_body, String.format("%.2f", invoice.amount)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            containerColor = MowGoColors.SurfaceDark,
+            containerColor = MaterialTheme.colorScheme.surface,
             confirmButton = {
                 Button(
                     onClick = { viewModel.deleteInvoice(invoice.id) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MowGoColors.DangerDark,
+                        containerColor = MaterialTheme.colorScheme.error,
                     ),
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.action_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.dismissDeleteConfirmation() }) {
-                    Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
         )
@@ -155,27 +170,27 @@ fun InvoicesScreen(
     state.showMarkPaidConfirmation?.let { invoice ->
         AlertDialog(
             onDismissRequest = { viewModel.dismissMarkPaidConfirmation() },
-            title = { Text("Mark as Paid", color = MowGoColors.TextPrimaryDark) },
+            title = { Text(stringResource(R.string.invoices_mark_paid_title), color = MaterialTheme.colorScheme.onSurface) },
             text = {
                 Text(
-                    text = "Mark invoice for $${String.format("%.2f", invoice.amount)} as paid?",
-                    color = MowGoColors.TextSecondaryDark,
+                    text = stringResource(R.string.invoices_mark_paid_body, String.format("%.2f", invoice.amount)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            containerColor = MowGoColors.SurfaceDark,
+            containerColor = MaterialTheme.colorScheme.surface,
             confirmButton = {
                 Button(
                     onClick = { viewModel.markInvoicePaid(invoice.id) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MowGoColors.DeepGreenDark,
+                        containerColor = MaterialTheme.colorScheme.secondary,
                     ),
                 ) {
-                    Text("Mark Paid")
+                    Text(stringResource(R.string.invoices_mark_paid))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.dismissMarkPaidConfirmation() }) {
-                    Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
         )
@@ -215,7 +230,7 @@ fun InvoicesScreen(
             SnackbarHost(snackbarHostState) { data ->
                 Snackbar(
                     snackbarData = data,
-                    containerColor = MowGoColors.DeepGreenDark,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MowGoColors.OnAccent,
                 )
             }
@@ -223,18 +238,18 @@ fun InvoicesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { if (showingEstimates) viewModel.showNewEstimateDialog() else viewModel.showNewInvoiceDialog() },
-                containerColor = MowGoColors.DeepGreenDark,
+                containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MowGoColors.OnAccent,
             ) {
-                Icon(Icons.Filled.Add, contentDescription = if (showingEstimates) "New Estimate" else "New Invoice")
+                Icon(Icons.Filled.Add, contentDescription = if (showingEstimates) stringResource(R.string.invoices_new_estimate_cd) else stringResource(R.string.invoices_new_invoice_cd))
             }
         },
-        containerColor = MowGoColors.BackgroundDark,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = !showingEstimates, onClick = { showingEstimates = false }, label = { Text("Invoices") }, modifier = Modifier.weight(1f))
-                FilterChip(selected = showingEstimates, onClick = { showingEstimates = true }, label = { Text("Estimates") }, modifier = Modifier.weight(1f))
+                FilterChip(selected = !showingEstimates, onClick = { showingEstimates = false }, label = { Text(stringResource(R.string.invoices_tab_invoices)) }, modifier = Modifier.weight(1f))
+                FilterChip(selected = showingEstimates, onClick = { showingEstimates = true }, label = { Text(stringResource(R.string.invoices_tab_estimates)) }, modifier = Modifier.weight(1f))
             }
         PullToRefreshBox(
             isRefreshing = state.isLoading,
@@ -248,7 +263,7 @@ fun InvoicesScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = MowGoColors.DeepGreenDark)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
                 }
             } else if (state.error != null && state.invoices.isEmpty() && state.estimates.isEmpty()) {
                 ErrorContent(
@@ -290,12 +305,14 @@ fun InvoicesScreen(
                             onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
                             onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
                             onCopyText = {
-                                clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName)))
-                                scope.launch { snackbarHostState.showSnackbar("Payment text copied — paste it into a text to the client") }
+                                val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
+                                clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgServicedWithDate, invoiceMsgServicedNoDate, payLine)))
+                                scope.launch { snackbarHostState.showSnackbar(paymentTextCopiedText) }
                             },
                             onNudge = {
-                                clipboard.setText(AnnotatedString(viewModel.invoiceNudgeText(item.invoice, item.clientName)))
-                                scope.launch { snackbarHostState.showSnackbar("Reminder copied — paste it into a text") }
+                                val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
+                                clipboard.setText(AnnotatedString(viewModel.invoiceNudgeText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgNudgeWithDate, invoiceMsgNudgeNoDate, payLine)))
+                                scope.launch { snackbarHostState.showSnackbar(reminderCopiedText) }
                             },
                         )
                     }
@@ -308,24 +325,24 @@ fun InvoicesScreen(
 
 @Composable
 private fun EstimateCard(estimate: Estimate, clientName: String?, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clickable(onClick = onClick), colors = CardDefaults.cardColors(containerColor = MowGoColors.SurfaceDark), shape = RoundedCornerShape(12.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clickable(onClick = onClick), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), shape = RoundedCornerShape(12.dp)) {
         Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(clientName ?: "Unknown Client", color = MowGoColors.TextPrimaryDark, fontWeight = FontWeight.SemiBold)
-                estimate.createdAt?.let { Text(it.take(10), style = MaterialTheme.typography.bodySmall, color = MowGoColors.TextSecondaryDark) }
-                estimate.note?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MowGoColors.TextSecondaryDark, maxLines = 1) }
-                if (estimate.jobId != null) Text("Converted ✓", style = MaterialTheme.typography.labelSmall, color = MowGoColors.SuccessDark)
+                Text(clientName ?: stringResource(R.string.label_unknown_client), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+                estimate.createdAt?.let { Text(it.take(10), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                estimate.note?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1) }
+                if (estimate.jobId != null) Text(stringResource(R.string.invoices_converted), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.extendedColors.success)
             }
             EstimateStatusChip(estimate.status)
             Spacer(Modifier.width(10.dp))
-            Text("$${String.format("%.2f", estimate.amount)}", color = MowGoColors.TextPrimaryDark, fontWeight = FontWeight.Bold)
+            Text("$${String.format("%.2f", estimate.amount)}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
 private fun EstimateStatusChip(status: String) {
-    val color = when (status) { Estimate.STATUS_SENT -> MowGoColors.InfoDark; Estimate.STATUS_APPROVED -> MowGoColors.SuccessDark; Estimate.STATUS_DECLINED -> MowGoColors.DangerDark; else -> MowGoColors.TextSecondaryDark }
+    val color = when (status) { Estimate.STATUS_SENT -> MaterialTheme.extendedColors.info; Estimate.STATUS_APPROVED -> MaterialTheme.extendedColors.success; Estimate.STATUS_DECLINED -> MaterialTheme.colorScheme.error; else -> MaterialTheme.colorScheme.onSurfaceVariant }
     Surface(shape = RoundedCornerShape(8.dp), color = color.copy(alpha = .15f)) { Text(status.replaceFirstChar { it.uppercase() }, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = color) }
 }
 
@@ -333,38 +350,43 @@ private fun EstimateStatusChip(status: String) {
 @Composable
 private fun NewEstimateDialog(clients: List<Client>, onDismiss: () -> Unit, onSave: (String, Double, String?, Boolean) -> Unit) {
     val context = LocalContext.current
+    val estimateMsgFormat = stringResource(R.string.invoices_estimate_msg_format)
     var selected by remember { mutableStateOf<Client?>(null) }; var amount by remember { mutableStateOf("") }; var note by remember { mutableStateOf("") }; var picker by remember { mutableStateOf(false) }
     if (picker) ClientPickerDialog(clients = clients, onSelect = { selected = it; amount = it.rate.toString(); picker = false }, onDismiss = { picker = false })
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("New Estimate", color = MowGoColors.TextPrimaryDark) }, containerColor = MowGoColors.SurfaceDark,
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.invoices_new_estimate_title), color = MaterialTheme.colorScheme.onSurface) }, containerColor = MaterialTheme.colorScheme.surface,
         text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(value = selected?.name ?: "", onValueChange = {}, label = { Text("Client *") }, readOnly = true, enabled = false, modifier = Modifier.fillMaxWidth().clickable { picker = true }, colors = OutlinedTextFieldDefaults.colors(disabledTextColor = MowGoColors.TextPrimaryDark, disabledBorderColor = MowGoColors.TextSecondaryDark))
-            OutlinedTextField(value = amount, onValueChange = { amount = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text("Amount ($) *") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = note, onValueChange = { note = it }, label = { Text("Note (optional)") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = selected?.name ?: "", onValueChange = {}, label = { Text(stringResource(R.string.label_client_required)) }, readOnly = true, enabled = false, modifier = Modifier.fillMaxWidth().clickable { picker = true }, colors = OutlinedTextFieldDefaults.colors(disabledTextColor = MaterialTheme.colorScheme.onSurface, disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant))
+            OutlinedTextField(value = amount, onValueChange = { amount = it.filter { c -> c.isDigit() || c == '.' } }, label = { Text(stringResource(R.string.label_amount_required)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = note, onValueChange = { note = it }, label = { Text(stringResource(R.string.invoices_note_optional)) }, modifier = Modifier.fillMaxWidth())
         } },
-        confirmButton = { Button(onClick = { val client = selected; val value = amount.toDoubleOrNull(); if (client != null && value != null) { val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("Estimate", "Hi ${client.name}, here's your estimate: $${String.format("%.2f", value)} for lawn care. Valid for 30 days. Thanks!")); onSave(client.id, value, note.ifBlank { null }, true) } }, enabled = selected != null && amount.toDoubleOrNull() != null) { Text("Send") } },
-        dismissButton = { Row { TextButton(onClick = onDismiss) { Text("Cancel") }; TextButton(onClick = { val client = selected; val value = amount.toDoubleOrNull(); if (client != null && value != null) onSave(client.id, value, note.ifBlank { null }, false) }, enabled = selected != null && amount.toDoubleOrNull() != null) { Text("Save Draft") } } })
+        confirmButton = { Button(onClick = { val client = selected; val value = amount.toDoubleOrNull(); if (client != null && value != null) { val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("Estimate", String.format(estimateMsgFormat, client.name, String.format("%.2f", value)))); onSave(client.id, value, note.ifBlank { null }, true) } }, enabled = selected != null && amount.toDoubleOrNull() != null) { Text(stringResource(R.string.invoices_send)) } },
+        dismissButton = { Row { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }; TextButton(onClick = { val client = selected; val value = amount.toDoubleOrNull(); if (client != null && value != null) onSave(client.id, value, note.ifBlank { null }, false) }, enabled = selected != null && amount.toDoubleOrNull() != null) { Text(stringResource(R.string.invoices_save_draft)) } } })
 }
 
 @Composable
 private fun EstimateDetailDialog(estimate: Estimate, clientName: String?, onDismiss: () -> Unit, onStatus: (String) -> Unit, onConvert: () -> Unit) {
     val context = LocalContext.current
-    val copy: (String) -> Unit = { value -> val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("Estimate", value)); Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show() }
-    val name = clientName ?: "there"; val amount = "$${String.format("%.2f", estimate.amount)}"
-    val estimateMessage = "Hi $name, here's your estimate: $amount for lawn care. Valid for 30 days. Thanks!"
+    val copiedText = stringResource(R.string.action_copied)
+    val copy: (String) -> Unit = { value -> val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("Estimate", value)); Toast.makeText(context, copiedText, Toast.LENGTH_SHORT).show() }
+    val estimateMsgFormat = stringResource(R.string.invoices_estimate_msg_format)
+    val estimateNudgeFormat = stringResource(R.string.invoices_estimate_nudge_format)
+    val defaultClientName = stringResource(R.string.invoices_default_client_name)
+    val name = clientName ?: defaultClientName; val amount = String.format("%.2f", estimate.amount)
+    val estimateMessage = String.format(estimateMsgFormat, name, amount)
     val canNudge = estimate.status == Estimate.STATUS_SENT && estimate.sentAt?.let { runCatching { Instant.parse(it).isBefore(Instant.now().minusSeconds(3 * 86400)) }.getOrDefault(false) } == true
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Estimate", color = MowGoColors.TextPrimaryDark) }, containerColor = MowGoColors.SurfaceDark,
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.invoices_estimate_title), color = MaterialTheme.colorScheme.onSurface) }, containerColor = MaterialTheme.colorScheme.surface,
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             EstimateCard(estimate, clientName, onClick = {})
-            TextButton(onClick = { copy(estimateMessage) }) { Text("Copy estimate text") }
-            if (canNudge) TextButton(onClick = { copy("Hi $name, just checking in on your estimate for $amount from ${estimate.sentAt?.take(10)} — still want me to hold the spot? Happy to adjust anything. Thanks!") }) { Text("Nudge", color = MowGoColors.WarningDark) }
-            if (estimate.status == Estimate.STATUS_DRAFT || estimate.status == Estimate.STATUS_SENT) { TextButton(onClick = { onStatus(Estimate.STATUS_APPROVED) }) { Text("Mark Approved") }; TextButton(onClick = { onStatus(Estimate.STATUS_DECLINED) }) { Text("Mark Declined", color = MowGoColors.DangerDark) } }
-            if (estimate.status == Estimate.STATUS_APPROVED && estimate.jobId == null) Button(onClick = onConvert) { Text("Convert to Job") }
-            if (estimate.jobId != null) Text("Converted ✓", color = MowGoColors.SuccessDark)
-        } }, confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } })
+            TextButton(onClick = { copy(estimateMessage) }) { Text(stringResource(R.string.invoices_copy_estimate_text)) }
+            if (canNudge) TextButton(onClick = { copy(String.format(estimateNudgeFormat, name, amount, estimate.sentAt?.take(10) ?: "")) }) { Text(stringResource(R.string.invoices_nudge), color = MaterialTheme.extendedColors.warning) }
+            if (estimate.status == Estimate.STATUS_DRAFT || estimate.status == Estimate.STATUS_SENT) { TextButton(onClick = { onStatus(Estimate.STATUS_APPROVED) }) { Text(stringResource(R.string.invoices_mark_approved)) }; TextButton(onClick = { onStatus(Estimate.STATUS_DECLINED) }) { Text(stringResource(R.string.invoices_mark_declined), color = MaterialTheme.colorScheme.error) } }
+            if (estimate.status == Estimate.STATUS_APPROVED && estimate.jobId == null) Button(onClick = onConvert) { Text(stringResource(R.string.invoices_convert_to_job)) }
+            if (estimate.jobId != null) Text(stringResource(R.string.invoices_converted), color = MaterialTheme.extendedColors.success)
+        } }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } })
 }
 
 @Composable
-private fun EstimateEmptyContent() { Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) { Icon(Icons.Filled.Description, null, modifier = Modifier.size(64.dp), tint = MowGoColors.DeepGreenDark.copy(alpha = .3f)); Text("No estimates yet", color = MowGoColors.TextPrimaryDark, style = MaterialTheme.typography.titleMedium); Text("Pick a client and send one in 10 seconds", color = MowGoColors.TextSecondaryDark) } }
+private fun EstimateEmptyContent() { Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) { Icon(Icons.Filled.Description, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.secondary.copy(alpha = .3f)); Text(stringResource(R.string.invoices_estimates_empty_title), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium); Text(stringResource(R.string.invoices_estimates_empty_detail), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
 
 // ── Summary Header ──────────────────────────────────────────────────────
 
@@ -378,7 +400,7 @@ private fun InvoiceSummaryHeader(
             .fillMaxWidth()
             .padding(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MowGoColors.SurfaceDark,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         shape = RoundedCornerShape(12.dp),
     ) {
@@ -391,27 +413,27 @@ private fun InvoiceSummaryHeader(
         ) {
             Column {
                 Text(
-                    text = "Outstanding",
+                    text = stringResource(R.string.invoices_outstanding),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MowGoColors.TextSecondaryDark,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = "$unpaidCount unpaid",
+                    text = stringResource(R.string.invoices_unpaid_count, unpaidCount),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MowGoColors.TextPrimaryDark,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "Total Due",
+                    text = stringResource(R.string.invoices_total_due),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MowGoColors.TextSecondaryDark,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = "$${String.format("%.2f", totalUnpaid)}",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MowGoColors.WarningDark,
+                    color = MaterialTheme.extendedColors.warning,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -449,7 +471,7 @@ private fun InvoiceCard(
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable { expanded = !expanded },
         colors = CardDefaults.cardColors(
-            containerColor = MowGoColors.SurfaceDark,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         shape = RoundedCornerShape(12.dp),
     ) {
@@ -463,7 +485,7 @@ private fun InvoiceCard(
                     imageVector = Icons.Filled.Receipt,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    tint = if (isPaid) MowGoColors.SuccessDark else MowGoColors.WarningDark,
+                    tint = if (isPaid) MaterialTheme.extendedColors.success else MaterialTheme.extendedColors.warning,
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -471,16 +493,16 @@ private fun InvoiceCard(
                 // Client + date info
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = clientName ?: "Unknown Client",
+                        text = clientName ?: stringResource(R.string.label_unknown_client),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MowGoColors.TextPrimaryDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold,
                     )
                     invoice.createdAt?.let { date ->
                         Text(
                             text = formatDate(date),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MowGoColors.TextSecondaryDark,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -490,7 +512,7 @@ private fun InvoiceCard(
                     Text(
                         text = "$${String.format("%.2f", invoice.amount)}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = MowGoColors.TextPrimaryDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -501,7 +523,7 @@ private fun InvoiceCard(
             // Expandable actions
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(color = MowGoColors.ElevatedDark)
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Paid-at info
@@ -514,13 +536,13 @@ private fun InvoiceCard(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = MowGoColors.SuccessDark,
+                            tint = MaterialTheme.extendedColors.success,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Paid ${formatDate(invoice.paidAt)}",
+                            text = stringResource(R.string.invoices_paid_on, formatDate(invoice.paidAt)),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MowGoColors.SuccessDark,
+                            color = MaterialTheme.extendedColors.success,
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -537,11 +559,11 @@ private fun InvoiceCard(
                                 onClick = copyText,
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = MowGoColors.DeepGreenDark,
+                                    contentColor = MaterialTheme.colorScheme.secondary,
                                 ),
                                 border = ButtonDefaults.outlinedButtonBorder.copy(
                                     brush = androidx.compose.ui.graphics.SolidColor(
-                                        MowGoColors.DeepGreenDark.copy(alpha = 0.5f),
+                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
                                     ),
                                 ),
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
@@ -549,7 +571,7 @@ private fun InvoiceCard(
                             ) {
                                 Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Copy text", style = MaterialTheme.typography.labelSmall)
+                                Text(stringResource(R.string.invoices_copy_text), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                         if (canNudge) {
@@ -557,17 +579,17 @@ private fun InvoiceCard(
                                 onClick = { onNudge?.invoke() },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = MowGoColors.WarningDark,
+                                    contentColor = MaterialTheme.extendedColors.warning,
                                 ),
                                 border = ButtonDefaults.outlinedButtonBorder.copy(
                                     brush = androidx.compose.ui.graphics.SolidColor(
-                                        MowGoColors.WarningDark.copy(alpha = 0.5f),
+                                        MaterialTheme.extendedColors.warning.copy(alpha = 0.5f),
                                     ),
                                 ),
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                                 shape = RoundedCornerShape(8.dp),
                             ) {
-                                Text("Nudge", style = MaterialTheme.typography.labelSmall)
+                                Text(stringResource(R.string.invoices_nudge), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                         if (showPay) {
@@ -576,7 +598,7 @@ private fun InvoiceCard(
                                 enabled = payEnabled,
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = MowGoColors.DeepGreenDark,
+                                    containerColor = MaterialTheme.colorScheme.secondary,
                                     contentColor = MowGoColors.OnAccent,
                                 ),
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
@@ -591,7 +613,7 @@ private fun InvoiceCard(
                                 } else {
                                     Icon(Icons.Filled.CreditCard, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Pay", style = MaterialTheme.typography.labelSmall)
+                                    Text(stringResource(R.string.invoices_pay), style = MaterialTheme.typography.labelSmall)
                                 }
                             }
                         }
@@ -599,11 +621,11 @@ private fun InvoiceCard(
                             onClick = onMarkPaid,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MowGoColors.DeepGreenDark,
+                                contentColor = MaterialTheme.colorScheme.secondary,
                             ),
                             border = ButtonDefaults.outlinedButtonBorder.copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(
-                                    MowGoColors.DeepGreenDark.copy(alpha = 0.5f),
+                                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
                                 ),
                             ),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
@@ -611,18 +633,18 @@ private fun InvoiceCard(
                         ) {
                             Icon(Icons.Filled.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Mark Paid", style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.invoices_mark_paid), style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     OutlinedButton(
                         onClick = onDelete,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MowGoColors.DangerDark,
+                            contentColor = MaterialTheme.colorScheme.error,
                         ),
                         border = ButtonDefaults.outlinedButtonBorder.copy(
                             brush = androidx.compose.ui.graphics.SolidColor(
-                                MowGoColors.DangerDark.copy(alpha = 0.5f),
+                                MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
                             ),
                         ),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
@@ -630,7 +652,7 @@ private fun InvoiceCard(
                     ) {
                         Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Delete", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.action_delete), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -649,10 +671,10 @@ private tailrec fun Context.findActivity(): ComponentActivity? = when (this) {
 @Composable
 private fun InvoiceStatusChip(status: String) {
     val (text, color) = when (status) {
-        Invoice.STATUS_PAID -> "Paid" to MowGoColors.SuccessDark
-        Invoice.STATUS_UNPAID -> "Unpaid" to MowGoColors.WarningDark
-        Invoice.STATUS_OVERDUE -> "Overdue" to MowGoColors.DangerDark
-        else -> status to MowGoColors.TextSecondaryDark
+        Invoice.STATUS_PAID -> stringResource(R.string.invoices_status_paid) to MaterialTheme.extendedColors.success
+        Invoice.STATUS_UNPAID -> stringResource(R.string.invoices_status_unpaid) to MaterialTheme.extendedColors.warning
+        Invoice.STATUS_OVERDUE -> stringResource(R.string.invoices_status_overdue) to MaterialTheme.colorScheme.error
+        else -> status to MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Surface(
@@ -697,12 +719,12 @@ private fun NewInvoiceDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "New Invoice",
-                color = MowGoColors.TextPrimaryDark,
+                text = stringResource(R.string.invoices_new_invoice_title),
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
             )
         },
-        containerColor = MowGoColors.SurfaceDark,
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -711,16 +733,16 @@ private fun NewInvoiceDialog(
                 OutlinedTextField(
                     value = selectedClient?.name ?: "",
                     onValueChange = {},
-                    label = { Text("Client *") },
+                    label = { Text(stringResource(R.string.label_client_required)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { showClientPicker = true },
                     readOnly = true,
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = MowGoColors.TextSecondaryDark,
-                        disabledLabelColor = MowGoColors.TextSecondaryDark,
-                        disabledTextColor = MowGoColors.TextPrimaryDark,
+                        disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
 
@@ -728,16 +750,16 @@ private fun NewInvoiceDialog(
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = { amountText = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text("Amount ($) *") },
+                    label = { Text(stringResource(R.string.label_amount_required)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MowGoColors.DeepGreenDark,
-                        unfocusedBorderColor = MowGoColors.TextSecondaryDark,
-                        focusedLabelColor = MowGoColors.DeepGreenDark,
-                        cursorColor = MowGoColors.DeepGreenDark,
-                        focusedTextColor = MowGoColors.TextPrimaryDark,
-                        unfocusedTextColor = MowGoColors.TextPrimaryDark,
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                        cursorColor = MaterialTheme.colorScheme.secondary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
             }
@@ -753,15 +775,15 @@ private fun NewInvoiceDialog(
                 },
                 enabled = selectedClient != null && amountText.toDoubleOrNull() != null,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MowGoColors.DeepGreenDark,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                 ),
             ) {
-                Text("Create")
+                Text(stringResource(R.string.action_create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = MowGoColors.TextSecondaryDark)
+                Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
     )
@@ -793,18 +815,18 @@ private fun EmptyContent() {
             imageVector = Icons.Filled.Receipt,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MowGoColors.DeepGreenDark.copy(alpha = 0.3f),
+            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No invoices yet",
+            text = stringResource(R.string.invoices_empty_title),
             style = MaterialTheme.typography.titleMedium,
-            color = MowGoColors.TextPrimaryDark,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = "Create an invoice to start tracking payments.",
+            text = stringResource(R.string.invoices_empty_detail),
             style = MaterialTheme.typography.bodyMedium,
-            color = MowGoColors.TextSecondaryDark,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -825,18 +847,18 @@ private fun ErrorContent(
             imageVector = Icons.Filled.ErrorOutline,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MowGoColors.DangerDark.copy(alpha = 0.5f),
+            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Something went wrong",
+            text = stringResource(R.string.error_generic_title),
             style = MaterialTheme.typography.titleMedium,
-            color = MowGoColors.TextPrimaryDark,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
             text = error,
             style = MaterialTheme.typography.bodyMedium,
-            color = MowGoColors.TextSecondaryDark,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 32.dp),
         )
@@ -844,10 +866,10 @@ private fun ErrorContent(
         Button(
             onClick = onRetry,
             colors = ButtonDefaults.buttonColors(
-                containerColor = MowGoColors.DeepGreenDark,
+                containerColor = MaterialTheme.colorScheme.secondary,
             ),
         ) {
-            Text("Retry")
+            Text(stringResource(R.string.action_retry))
         }
     }
 }

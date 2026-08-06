@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mowgo.app.R
 import com.mowgo.app.ui.theme.MowGoColors
+import com.mowgo.app.ui.theme.extendedColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,23 +65,23 @@ fun LoginScreen(
             // Logo - green leaf icon
             Icon(
                 painter = androidx.compose.ui.res.painterResource(com.mowgo.app.R.drawable.ic_leaf),
-                contentDescription = "MowGo Logo",
+                contentDescription = stringResource(R.string.login_logo_cd),
                 modifier = Modifier.size(56.dp),
-                tint = MowGoColors.DeepGreenDark,
+                tint = MaterialTheme.colorScheme.secondary,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Title
             Text(
-                text = "MowGo",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
 
             // Tagline
             Text(
-                text = "Lawn Care Scheduling",
+                text = stringResource(R.string.login_tagline),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -90,7 +92,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChange,
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.label_email)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
@@ -117,7 +119,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.login_password_label)) },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) {
                     VisualTransformation.None
@@ -139,8 +141,8 @@ fun LoginScreen(
                         Icon(
                             imageVector = if (passwordVisible) Icons.Filled.VisibilityOff
                             else Icons.Filled.Visibility,
-                            contentDescription = if (passwordVisible) "Hide password"
-                            else "Show password",
+                            contentDescription = if (passwordVisible) stringResource(R.string.login_hide_password_cd)
+                            else stringResource(R.string.login_show_password_cd),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
@@ -175,7 +177,7 @@ fun LoginScreen(
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MowGoColors.DeepGreenDark,
+                    color = MaterialTheme.colorScheme.secondary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -191,7 +193,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MowGoColors.DeepGreenDark,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MowGoColors.OnAccent,
                 ),
                 shape = RoundedCornerShape(12.dp),
@@ -204,7 +206,7 @@ fun LoginScreen(
                     )
                 } else {
                     Text(
-                        text = if (uiState.isSignUp) "Create Account" else "Sign In",
+                        text = if (uiState.isSignUp) stringResource(R.string.login_create_account) else stringResource(R.string.login_sign_in),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
@@ -217,7 +219,7 @@ fun LoginScreen(
                     onClick = { viewModel.resetPassword(uiState.email) },
                 ) {
                     Text(
-                        text = "Forgot Password?",
+                        text = stringResource(R.string.login_forgot_password),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -230,10 +232,10 @@ fun LoginScreen(
                 onClick = viewModel::onToggleSignUp,
             ) {
                 Text(
-                    text = if (uiState.isSignUp) "Already have an account? Sign in"
-                    else "Don't have an account? Sign up",
+                    text = if (uiState.isSignUp) stringResource(R.string.login_toggle_to_signin)
+                    else stringResource(R.string.login_toggle_to_signup),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MowGoColors.TextInverseDark,
+                    color = MaterialTheme.extendedColors.textInverse,
                 )
             }
 

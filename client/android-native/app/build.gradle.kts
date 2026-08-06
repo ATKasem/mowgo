@@ -19,15 +19,22 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Supabase/Stripe config — overridable via local.properties (gitignored).
-        // Defaults fall back to the committed values so CI builds still work.
+        // Supabase/Stripe config — overridable via local.properties (gitignored) or CI env vars.
+        // SUPABASE_URL/SUPABASE_ANON_KEY are PUBLIC (anon key is RLS-protected, ships in every
+        // client) so a committed prod default is fine. STRIPE_PUBLISHABLE_KEY is NOT defaulted —
+        // shipping a live key as a silent fallback would let any local/CI debug build process
+        // real charges. If it's missing, MowGoActivity.onCreate() fails loudly at app launch
+        // (build still compiles, so CI's assembleDebug step is unaffected) instead of using it.
         val props = java.util.Properties().apply {
             val f = rootProject.file("local.properties")
             if (f.exists()) f.inputStream().use { load(it) }
         }
         buildConfigField("String", "SUPABASE_URL", "\"${props.getProperty("SUPABASE_URL", "https://vqgiynfrpsqddjrayczc.supabase.co")}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${props.getProperty("SUPABASE_ANON_KEY", "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz")}\"")
-        buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"${props.getProperty("STRIPE_PUBLISHABLE_KEY", "pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj")}\"")
+        val stripeKey = props.getProperty("STRIPE_PUBLISHABLE_KEY")
+            ?: System.getenv("STRIPE_PUBLISHABLE_KEY")
+            ?: ""
+        buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"$stripeKey\"")
     }
 
     signingConfigs {

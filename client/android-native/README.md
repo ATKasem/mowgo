@@ -18,7 +18,10 @@ Native Android app built with Kotlin + Jetpack Compose for MowGo lawn care sched
 
 1. Open `client/android-native/` in Android Studio
 2. Sync Gradle
-3. Create `local.properties` with your `sdk.dir` path
+3. Create `local.properties` with your `sdk.dir` path. Also add `STRIPE_PUBLISHABLE_KEY=pk_test_...`
+   (a Stripe **test** key — there is no committed default, so the app fails loudly at launch if
+   it's missing). `SUPABASE_URL`/`SUPABASE_ANON_KEY` are optional overrides; they default to the
+   MowGo project's public values.
 4. Run on emulator or device
 
 ## Structure

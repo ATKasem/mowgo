@@ -1,6 +1,5 @@
 package com.mowgo.app.ui.components
 
-import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -41,9 +40,11 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
+import com.mowgo.app.R
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.UUID
@@ -61,15 +62,18 @@ fun JobPhotoButton(
     var showSources by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
+    val prepareFailedMessage = stringResource(R.string.jobphoto_error_prepare_failed)
+    val cameraUnavailableMessage = stringResource(R.string.jobphoto_error_camera_unavailable)
+
     fun prepare(uri: Uri) {
         scope.launch {
             try {
                 val bytes = withContext(Dispatchers.IO) {
-                    compressJpeg(context.contentResolver, uri)
+                    compressJpeg(context, uri)
                 }
                 onImageReady(bytes)
             } catch (error: Exception) {
-                onError(error.message ?: "Failed to prepare photo")
+                onError(error.message ?: prepareFailedMessage)
             }
         }
     }
@@ -89,7 +93,7 @@ fun JobPhotoButton(
             if (isUploading) {
                 CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
             } else {
-                Icon(Icons.Default.CameraAlt, contentDescription = "Add job photo")
+                Icon(Icons.Default.CameraAlt, contentDescription = stringResource(R.string.jobphoto_add_cd))
             }
         }
     }
@@ -97,11 +101,11 @@ fun JobPhotoButton(
     if (showSources) {
         AlertDialog(
             onDismissRequest = { showSources = false },
-            title = { Text("Add Photo") },
+            title = { Text(stringResource(R.string.jobphoto_add_title)) },
             text = {
                 androidx.compose.foundation.layout.Column {
                     DropdownMenuItem(
-                        text = { Text("Take Photo") },
+                        text = { Text(stringResource(R.string.jobphoto_take_photo)) },
                         leadingIcon = { Icon(Icons.Default.CameraAlt, null) },
                         onClick = {
                             showSources = false
@@ -115,12 +119,12 @@ fun JobPhotoButton(
                                 )
                                 cameraLauncher.launch(cameraUri!!)
                             } catch (error: Exception) {
-                                onError(error.message ?: "Camera could not be opened")
+                                onError(error.message ?: cameraUnavailableMessage)
                             }
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Choose from Library") },
+                        text = { Text(stringResource(R.string.jobphoto_choose_library)) },
                         leadingIcon = { Icon(Icons.Default.PhotoLibrary, null) },
                         onClick = {
                             showSources = false
@@ -133,7 +137,7 @@ fun JobPhotoButton(
             },
             confirmButton = {},
             dismissButton = {
-                TextButton(onClick = { showSources = false }) { Text("Cancel") }
+                TextButton(onClick = { showSources = false }) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }
@@ -182,7 +186,7 @@ fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
     val finalUrl = resolved ?: return
     AsyncImage(
         model = finalUrl,
-        contentDescription = "Job photo",
+        contentDescription = stringResource(R.string.jobphoto_cd),
         contentScale = ContentScale.Crop,
         modifier = modifier
             .size(width = 64.dp, height = 48.dp)
@@ -193,15 +197,16 @@ fun JobPhotoThumbnail(photoUrl: String?, modifier: Modifier = Modifier) {
 @Serializable
 private data class SignedUrlResponse(val signedURL: String)
 
-private fun compressJpeg(contentResolver: ContentResolver, uri: Uri): ByteArray {
+private fun compressJpeg(context: android.content.Context, uri: Uri): ByteArray {
+    val contentResolver = context.contentResolver
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     val boundsStream = contentResolver.openInputStream(uri)
-        ?: throw IllegalStateException("The selected photo could not be opened")
+        ?: throw IllegalStateException(context.getString(R.string.jobphoto_error_open_failed))
     boundsStream.use { stream ->
         BitmapFactory.decodeStream(stream, null, bounds)
     }
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
-        throw IllegalArgumentException("The selected file is not a valid image")
+        throw IllegalArgumentException(context.getString(R.string.jobphoto_error_invalid_image))
     }
 
     var sampleSize = 1
@@ -214,7 +219,7 @@ private fun compressJpeg(contentResolver: ContentResolver, uri: Uri): ByteArray 
             null,
             BitmapFactory.Options().apply { inSampleSize = sampleSize },
         )
-    } ?: throw IllegalArgumentException("The selected image could not be decoded")
+    } ?: throw IllegalArgumentException(context.getString(R.string.jobphoto_error_decode_failed))
 
     val scale = minOf(1f, 1600f / maxOf(bitmap.width, bitmap.height).toFloat())
     val resized = if (scale < 1f) {
@@ -230,7 +235,7 @@ private fun compressJpeg(contentResolver: ContentResolver, uri: Uri): ByteArray 
 
     return ByteArrayOutputStream().use { output ->
         if (!resized.compress(Bitmap.CompressFormat.JPEG, 85, output)) {
-            throw IllegalStateException("The image could not be compressed")
+            throw IllegalStateException(context.getString(R.string.jobphoto_error_compress_failed))
         }
         if (resized !== bitmap) resized.recycle()
         bitmap.recycle()

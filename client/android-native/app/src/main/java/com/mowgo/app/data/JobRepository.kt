@@ -6,6 +6,7 @@ import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.data.model.RainDelayEntry
 import com.mowgo.app.data.model.RainDelayUndoResult
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import java.time.LocalDate
 import java.time.Instant
@@ -13,6 +14,8 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 /**
  * Repository for Job and Client data.
@@ -224,43 +227,39 @@ class JobRepository {
 
         val userId = getCurrentUserId() ?: return null
         val profile = ProfileRepository().loadProfile()
+        val businessId = if (profile?.role == "crew") profile.businessId else userId
+        if (businessId == null) return null
 
-        // Fetch all jobs for today and filter client-side (avoids complex OR filter DSL)
-        val allJobs = SupabaseClientProvider.client.from("jobs")
+        // Snapshot the jobs the RPC will move (read-only) so we can build the Undo
+        // history entry — the RPC itself only returns a moved-row count.
+        val jobsToMove = SupabaseClientProvider.client.from("jobs")
             .select {
                 filter {
-                    if (profile?.role == "crew") eq("assigned_to", userId)
-                    else eq("user_id", userId)
+                    eq("user_id", businessId)
+                    eq("scheduled_date", date)
+                    eq("status", Job.STATUS_SCHEDULED)
                 }
             }
             .decodeList<Job>()
+        if (jobsToMove.isEmpty()) return null
 
-        val jobsToMove = allJobs.filter {
-            it.scheduledDate == date && it.status == Job.STATUS_SCHEDULED
-        }
+        // apply_rain_delay(p_business_id, p_from_date, p_to_date) moves every matching
+        // job and writes its history row inside a single DB transaction — either all
+        // jobs move or none do, so there's no partial/rollback state to manage here.
+        val movedCount = SupabaseClientProvider.client.postgrest.rpc(
+            "apply_rain_delay",
+            buildJsonObject {
+                put("p_business_id", businessId)
+                put("p_from_date", date)
+                put("p_to_date", targetDate)
+            }
+        ).decodeAs<Int>()
+        if (movedCount <= 0) return null
 
-        val moved = mutableListOf<Job>()
-        try {
-            for (job in jobsToMove) {
-                updateJobDate(job.id, targetDate)
-                moved += job
-            }
-        } catch (error: Exception) {
-            var rollbackFailed = false
-            for (job in moved) {
-                try { updateJobDate(job.id, job.scheduledDate) } catch (_: Exception) { rollbackFailed = true }
-            }
-            if (rollbackFailed) throw RuntimeException(
-                "Rain delay rollback incomplete — verify your schedule (original: ${error.message})",
-                error,
-            )
-            throw error
-        }
-        if (moved.isEmpty()) return null
-        val entry = RainDelayEntry(date, targetDate, moved.map { it.id }, moved.size,
-            Instant.now().toString(), moved.associate { it.id to it.scheduledDate })
+        val entry = RainDelayEntry(date, targetDate, jobsToMove.map { it.id }, movedCount,
+            Instant.now().toString(), jobsToMove.associate { it.id to it.scheduledDate })
         WebhookService.fire("rain.delay.applied", mapOf(
-            "count" to moved.size.toString(), "date" to date, "target_date" to targetDate,
+            "count" to movedCount.toString(), "date" to date, "target_date" to targetDate,
         ))
         return entry
     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -29,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.BuildConfig
+import com.mowgo.app.R
 import com.mowgo.app.data.SettingsRepository
 import com.mowgo.app.data.model.Profile
 
@@ -114,13 +116,13 @@ private fun MoreRootScreen(
     if (confirmSignOut) {
         AlertDialog(
             onDismissRequest = { confirmSignOut = false },
-            title = { Text("Sign Out") },
-            text = { Text("You'll need to sign in again.") },
-            confirmButton = { TextButton(onClick = { confirmSignOut = false; viewModel.signOut(onSignedOut) }) { Text("Sign Out", color = MaterialTheme.colorScheme.error) } },
-            dismissButton = { TextButton(onClick = { confirmSignOut = false }) { Text("Cancel") } },
+            title = { Text(stringResource(R.string.more_sign_out_title)) },
+            text = { Text(stringResource(R.string.more_sign_out_body)) },
+            confirmButton = { TextButton(onClick = { confirmSignOut = false; viewModel.signOut(onSignedOut) }) { Text(stringResource(R.string.more_sign_out_title), color = MaterialTheme.colorScheme.error) } },
+            dismissButton = { TextButton(onClick = { confirmSignOut = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
-    Scaffold(topBar = { TopAppBar(title = { Text("More", style = MaterialTheme.typography.titleLarge) }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.more_title), style = MaterialTheme.typography.titleLarge) }) }) { padding ->
         PullToRefreshBox(
             isRefreshing = state.isLoading,
             onRefresh = refresh,
@@ -131,42 +133,42 @@ private fun MoreRootScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 ProfileCard(state.profile)
-                SectionLabel("Business")
+                SectionLabel(stringResource(R.string.more_business_section))
                 Card {
-                    SettingsRow(Icons.Default.Storefront, "Business Profile", state.profile?.businessName?.takeIf { it.isNotBlank() } ?: "Business name and phone") { navigate(MoreDestination.PROFILE) }
+                    SettingsRow(Icons.Default.Storefront, stringResource(R.string.more_business_profile), state.profile?.businessName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.more_business_profile_default_subtitle)) { navigate(MoreDestination.PROFILE) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
-                    SettingsRow(Icons.Default.Notifications, "Notifications", "Job completion and rain alerts") { navigate(MoreDestination.NOTIFICATIONS) }
+                    SettingsRow(Icons.Default.Notifications, stringResource(R.string.more_notifications), stringResource(R.string.more_notifications_subtitle)) { navigate(MoreDestination.NOTIFICATIONS) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
-                    SettingsRow(Icons.Default.Contrast, "Appearance", appearance.replaceFirstChar { it.titlecase() }) { navigate(MoreDestination.APPEARANCE) }
+                    SettingsRow(Icons.Default.Contrast, stringResource(R.string.more_appearance), appearance.replaceFirstChar { it.titlecase() }) { navigate(MoreDestination.APPEARANCE) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
-                    SettingsRow(Icons.Default.CreditCard, "Billing", tierLabel(state.profile?.tier)) { navigate(MoreDestination.BILLING) }
+                    SettingsRow(Icons.Default.CreditCard, stringResource(R.string.more_billing), tierLabel(state.profile?.tier)) { navigate(MoreDestination.BILLING) }
                     if (state.profile?.tier == "solo" || state.profile?.tier == "crew" || state.profile?.tier == "premium") {
                         HorizontalDivider(Modifier.padding(start = 56.dp))
-                        SettingsRow(Icons.Default.Link, "Integrations", "Zapier, Make, n8n webhooks") { navigate(MoreDestination.INTEGRATIONS) }
+                        SettingsRow(Icons.Default.Link, stringResource(R.string.more_integrations), stringResource(R.string.more_integrations_subtitle)) { navigate(MoreDestination.INTEGRATIONS) }
                     }
                 }
-                SectionLabel("Export data")
+                SectionLabel(stringResource(R.string.more_export_section))
                 Card {
-                    ExportRow(Icons.Default.People, "Export Clients", state.exportLoadingAction == "clients", state.exportLoadingAction == null) { clientsExport.launch("mowgo-clients.csv") }
+                    ExportRow(Icons.Default.People, stringResource(R.string.more_export_clients), state.exportLoadingAction == "clients", state.exportLoadingAction == null) { clientsExport.launch("mowgo-clients.csv") }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
-                    ExportRow(Icons.Default.Work, "Export Jobs", state.exportLoadingAction == "jobs", state.exportLoadingAction == null) { jobsExport.launch("mowgo-jobs.csv") }
+                    ExportRow(Icons.Default.Work, stringResource(R.string.more_export_jobs), state.exportLoadingAction == "jobs", state.exportLoadingAction == null) { jobsExport.launch("mowgo-jobs.csv") }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
-                    ExportRow(Icons.Default.ReceiptLong, "Export Invoices", state.exportLoadingAction == "invoices", state.exportLoadingAction == null) { invoicesExport.launch("mowgo-invoices.csv") }
+                    ExportRow(Icons.Default.ReceiptLong, stringResource(R.string.more_export_invoices), state.exportLoadingAction == "invoices", state.exportLoadingAction == null) { invoicesExport.launch("mowgo-invoices.csv") }
                 }
-                SectionLabel("About")
+                SectionLabel(stringResource(R.string.more_about_section))
                 Card { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    InfoRow("Version", BuildConfig.VERSION_NAME)
-                    InfoRow("Package", BuildConfig.APPLICATION_ID)
-                    InfoRow("Made in", "OKC 🌾")
+                    InfoRow(stringResource(R.string.more_version), BuildConfig.VERSION_NAME)
+                    InfoRow(stringResource(R.string.more_package), BuildConfig.APPLICATION_ID)
+                    InfoRow(stringResource(R.string.more_made_in), stringResource(R.string.more_made_in_value))
                 } }
                 Card(Modifier.fillMaxWidth().clickable(enabled = !state.isSigningOut) { confirmSignOut = true }) {
                     if (state.isSigningOut) {
                         Row(Modifier.align(Alignment.CenterHorizontally).padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
-                            Text("Signing out…", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.more_signing_out), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium)
                         }
                     } else {
-                        Text("Sign Out", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium, modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp))
+                        Text(stringResource(R.string.more_sign_out_title), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium, modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp))
                     }
                 }
                 state.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) }
@@ -181,7 +183,7 @@ private fun ProfileCard(profile: Profile?) = Card(Modifier.fillMaxWidth()) {
     Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(Icons.Default.AccountCircle, null, Modifier.size(52.dp), tint = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.height(8.dp))
-        Text(profile?.businessName?.takeIf { it.isNotBlank() } ?: "MowGo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(profile?.businessName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.more_default_business_name), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Text(tierLabel(profile?.tier), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -216,7 +218,7 @@ private fun InfoRow(label: String, value: String) = Row(Modifier.fillMaxWidth())
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailScaffold(title: String, back: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-    Scaffold(topBar = { TopAppBar(title = { Text(title) }, navigationIcon = { IconButton(onClick = back) { Icon(Icons.Default.ArrowBack, "Back") } }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(title) }, navigationIcon = { IconButton(onClick = back) { Icon(Icons.Default.ArrowBack, stringResource(R.string.more_back_cd)) } }) }) { padding ->
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
     }
 }
@@ -231,28 +233,28 @@ private fun BusinessProfileScreen(state: MoreUiState, back: () -> Unit, save: (S
     var cashapp by remember(state.profile) { mutableStateOf(state.profile?.cashappHandle ?: "") }
     var zelle by remember(state.profile) { mutableStateOf(state.profile?.zelleHandle ?: "") }
     LaunchedEffect(state.saveMessage) { state.saveMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show(); dismissMessage() } }
-    DetailScaffold("Business Profile", back) {
-        OutlinedTextField(name, { name = it }, label = { Text("Business name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(phone, { phone = it }, label = { Text("Phone") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(email, { email = it }, label = { Text("Email") }, singleLine = true, enabled = false, modifier = Modifier.fillMaxWidth())
+    DetailScaffold(stringResource(R.string.more_business_profile), back) {
+        OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.more_business_name_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(phone, { phone = it }, label = { Text(stringResource(R.string.label_phone)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(email, { email = it }, label = { Text(stringResource(R.string.label_email)) }, singleLine = true, enabled = false, modifier = Modifier.fillMaxWidth())
         HorizontalDivider()
-        Text("How clients pay you", style = MaterialTheme.typography.titleSmall)
-        OutlinedTextField(zelle, { zelle = it }, label = { Text("Zelle (phone or email)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(venmo, { venmo = it }, label = { Text("Venmo (@handle)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(cashapp, { cashapp = it }, label = { Text("Cash App (\$handle)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        Text("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.", style = MaterialTheme.typography.bodySmall, color = MowGoColors.TextSecondaryDark)
+        Text(stringResource(R.string.more_payment_methods_header), style = MaterialTheme.typography.titleSmall)
+        OutlinedTextField(zelle, { zelle = it }, label = { Text(stringResource(R.string.more_zelle_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(venmo, { venmo = it }, label = { Text(stringResource(R.string.more_venmo_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(cashapp, { cashapp = it }, label = { Text(stringResource(R.string.more_cashapp_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        Text(stringResource(R.string.more_payment_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(onClick = { if (name.isNotBlank()) save(name.trim(), phone.trim(), email.trim(), venmo.trim(), cashapp.trim(), zelle.trim()) }, enabled = name.isNotBlank() && !state.isSaving, modifier = Modifier.fillMaxWidth()) {
-            if (state.isSaving) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text("Save Changes")
+            if (state.isSaving) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text(stringResource(R.string.more_save_changes))
         }
     }
 }
 
 @Composable
 private fun NotificationSettingsScreen(completion: Boolean, rain: Boolean, back: () -> Unit, setCompletion: (Boolean) -> Unit, setRain: (Boolean) -> Unit) {
-    DetailScaffold("Notifications", back) {
-        Card { SettingsSwitchRow("Job completion alerts", "When a job is marked complete", completion, setCompletion) }
-        Card { SettingsSwitchRow("Rain delay alerts", "When rain may affect tomorrow's jobs", rain, setRain) }
+    DetailScaffold(stringResource(R.string.more_notifications), back) {
+        Card { SettingsSwitchRow(stringResource(R.string.more_notif_completion_title), stringResource(R.string.more_notif_completion_subtitle), completion, setCompletion) }
+        Card { SettingsSwitchRow(stringResource(R.string.more_notif_rain_title), stringResource(R.string.more_notif_rain_subtitle), rain, setRain) }
     }
 }
 
@@ -263,11 +265,15 @@ private fun SettingsSwitchRow(title: String, subtitle: String, checked: Boolean,
 
 @Composable
 private fun AppearanceSettingsScreen(mode: String, back: () -> Unit, select: (String) -> Unit) {
-    DetailScaffold("Appearance", back) {
-        Card { Column { listOf("system" to "System", "light" to "Light", "dark" to "Dark").forEachIndexed { index, option ->
+    DetailScaffold(stringResource(R.string.more_appearance), back) {
+        val systemLabel = stringResource(R.string.more_appearance_system)
+        val lightLabel = stringResource(R.string.more_appearance_light)
+        val darkLabel = stringResource(R.string.more_appearance_dark)
+        val selectedCd = stringResource(R.string.more_selected_cd)
+        Card { Column { listOf("system" to systemLabel, "light" to lightLabel, "dark" to darkLabel).forEachIndexed { index, option ->
             ListItem(
                 headlineContent = { Text(option.second) },
-                trailingContent = { if (mode == option.first) Icon(Icons.Default.Check, "Selected", tint = MaterialTheme.colorScheme.primary) },
+                trailingContent = { if (mode == option.first) Icon(Icons.Default.Check, selectedCd, tint = MaterialTheme.colorScheme.primary) },
                 modifier = Modifier.clickable { select(option.first) },
             )
             if (index < 2) HorizontalDivider(Modifier.padding(start = 16.dp))
@@ -290,10 +296,10 @@ private fun BillingSettingsScreen(
     val tier = state.profile?.tier?.lowercase() ?: "free"
     val billingInterval = state.billingInterval
     val description = when (tier) {
-        "solo" -> "Unlimited clients & jobs"
-        "crew" -> "Everything in Solo · Unlimited clients · Team"
-        "premium" -> "Everything in Crew"
-        else -> "5 clients · Rain delay · Invoicing"
+        "solo" -> stringResource(R.string.more_plan_solo_features)
+        "crew" -> stringResource(R.string.more_plan_crew_features)
+        "premium" -> stringResource(R.string.more_plan_premium_feature1)
+        else -> stringResource(R.string.more_plan_free_features)
     }
     val isPaid = tier == "solo" || tier == "crew" || tier == "premium"
     var showCancelConfirmation by remember { mutableStateOf(false) }
@@ -311,8 +317,8 @@ private fun BillingSettingsScreen(
     if (showCancelConfirmation) {
         AlertDialog(
             onDismissRequest = { showCancelConfirmation = false },
-            title = { Text("Cancel Subscription") },
-            text = { Text("Cancel your current subscription? Your plan access may change at the end of the billing period.") },
+            title = { Text(stringResource(R.string.more_cancel_subscription_title)) },
+            text = { Text(stringResource(R.string.more_cancel_subscription_body)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -320,18 +326,26 @@ private fun BillingSettingsScreen(
                         cancelSubscription()
                     },
                     enabled = state.billingLoadingAction == null,
-                ) { Text("Cancel Subscription", color = MaterialTheme.colorScheme.error) }
+                ) { Text(stringResource(R.string.more_cancel_subscription_title), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showCancelConfirmation = false }) { Text("Keep Plan") }
+                TextButton(onClick = { showCancelConfirmation = false }) { Text(stringResource(R.string.more_keep_plan)) }
             },
         )
     }
 
-    DetailScaffold("Billing", back) {
+    DetailScaffold(stringResource(R.string.more_billing), back) {
         Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text("Current Plan", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(planName(tier), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.more_current_plan), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                when (tier) {
+                    "solo" -> stringResource(R.string.more_plan_name_solo)
+                    "crew" -> stringResource(R.string.more_plan_name_crew)
+                    "premium" -> stringResource(R.string.more_plan_name_premium)
+                    else -> stringResource(R.string.more_plan_name_free)
+                },
+                style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
+            )
             Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (isPaid) {
                 Spacer(Modifier.height(8.dp))
@@ -344,15 +358,17 @@ private fun BillingSettingsScreen(
                     if (state.billingLoadingAction == "cancel") {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                     } else {
-                        Text("Cancel Subscription")
+                        Text(stringResource(R.string.more_cancel_subscription_title))
                     }
                 }
             }
         } }
 
-        SectionLabel("Plans")
+        SectionLabel(stringResource(R.string.more_plans_section))
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            listOf("month" to "Month", "year" to "Annual").forEachIndexed { index, option ->
+            val monthLabel = stringResource(R.string.more_month)
+            val annualLabel = stringResource(R.string.more_annual)
+            listOf("month" to monthLabel, "year" to annualLabel).forEachIndexed { index, option ->
                 SegmentedButton(
                     selected = billingInterval == option.first,
                     onClick = { setBillingInterval(option.first) },
@@ -363,15 +379,15 @@ private fun BillingSettingsScreen(
         }
         if (billingInterval == "year") {
             Text(
-                "2 months free",
+                stringResource(R.string.more_two_months_free),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }
         BillingPlanCard(
-            name = "Free",
-            features = listOf("5 clients · Rain delay · Invoicing"),
+            name = stringResource(R.string.more_plan_free_name),
+            features = listOf(stringResource(R.string.more_plan_free_features)),
             tier = "free",
             currentTier = tier,
             billingInterval = billingInterval,
@@ -379,8 +395,8 @@ private fun BillingSettingsScreen(
             subscribe = startCheckout,
         )
         BillingPlanCard(
-            name = "Solo",
-            features = listOf("Unlimited clients & jobs"),
+            name = stringResource(R.string.more_plan_solo_name),
+            features = listOf(stringResource(R.string.more_plan_solo_features)),
             tier = "solo",
             currentTier = tier,
             billingInterval = billingInterval,
@@ -388,8 +404,8 @@ private fun BillingSettingsScreen(
             subscribe = startCheckout,
         )
         BillingPlanCard(
-            name = "Crew",
-            features = listOf("Everything in Solo · Unlimited clients · Team"),
+            name = stringResource(R.string.more_plan_crew_name),
+            features = listOf(stringResource(R.string.more_plan_crew_features)),
             tier = "crew",
             currentTier = tier,
             billingInterval = billingInterval,
@@ -397,12 +413,12 @@ private fun BillingSettingsScreen(
             subscribe = startCheckout,
         )
         BillingPlanCard(
-            name = "Premium",
+            name = stringResource(R.string.more_plan_premium_name),
             features = listOf(
-                "Everything in Crew",
-                "Priority concierge setup — clients imported + first 30 days pre-scheduled in 48h",
-                "Seasonal packs: spring pricing benchmarks, route templates",
-                "Priority text-first support",
+                stringResource(R.string.more_plan_premium_feature1),
+                stringResource(R.string.more_plan_premium_feature2),
+                stringResource(R.string.more_plan_premium_feature3),
+                stringResource(R.string.more_plan_premium_feature4),
             ),
             tier = "premium",
             currentTier = tier,
@@ -424,8 +440,8 @@ private fun BillingSettingsScreen(
                     Icon(Icons.Default.CreditCard, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Manage Billing", fontWeight = FontWeight.Medium)
-                        Text("Payment methods and invoices", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.more_manage_billing), fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.more_manage_billing_subtitle), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (state.billingLoadingAction == "portal") {
                         CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
@@ -459,17 +475,18 @@ private fun BillingPlanCard(
     val isCurrent = tier == currentTier
     val canUpgrade = (order[tier] ?: 0) > (order[currentTier] ?: 0)
     val isAnnual = billingInterval == "year"
+    val priceRes = if (isAnnual) R.string.more_price_per_year else R.string.more_price_per_month
     val price = when (tier) {
-        "solo" -> if (isAnnual) "$390/yr" else "$39/mo"
-        "crew" -> if (isAnnual) "$790/yr" else "$79/mo"
-        "premium" -> if (isAnnual) "$1,990/yr" else "$199/mo"
-        else -> "$0/mo"
+        "solo" -> stringResource(priceRes, if (isAnnual) "$390" else "$39")
+        "crew" -> stringResource(priceRes, if (isAnnual) "$790" else "$79")
+        "premium" -> stringResource(priceRes, if (isAnnual) "$1,990" else "$199")
+        else -> stringResource(R.string.more_price_per_month, "$0")
     }
     val savings = when {
         !isAnnual -> null
-        tier == "solo" -> "Save $78"
-        tier == "crew" -> "Save $158"
-        tier == "premium" -> "Save $398"
+        tier == "solo" -> stringResource(R.string.more_savings_format, "$78")
+        tier == "crew" -> stringResource(R.string.more_savings_format, "$158")
+        tier == "premium" -> stringResource(R.string.more_savings_format, "$398")
         else -> null
     }
     Card(Modifier.fillMaxWidth()) {
@@ -489,14 +506,14 @@ private fun BillingPlanCard(
                             shape = MaterialTheme.shapes.small,
                         ) {
                             Text(
-                                "Current",
+                                stringResource(R.string.more_current_badge),
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.labelMedium,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             )
                         }
                         Text(
-                            "Billing interval changes via Manage Billing",
+                            stringResource(R.string.more_billing_interval_note),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -520,7 +537,7 @@ private fun BillingPlanCard(
                     if (loadingAction == action) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                     } else {
-                        Text(if (currentTier == "free") "Subscribe" else "Upgrade")
+                        Text(if (currentTier == "free") stringResource(R.string.more_subscribe) else stringResource(R.string.more_upgrade))
                     }
                 }
             }
@@ -528,18 +545,14 @@ private fun BillingPlanCard(
     }
 }
 
-private fun tierLabel(tier: String?, billingInterval: String = "month"): String = when (tier) {
-    "solo" -> if (billingInterval == "year") "Solo · $390/yr" else "Solo · $39/mo"
-    "crew" -> if (billingInterval == "year") "Crew · $790/yr" else "Crew · $79/mo"
-    "premium" -> if (billingInterval == "year") "Premium · $1,990/yr" else "Premium · $199/mo"
-    else -> "Free Plan"
-}
-
-/** Cadence-neutral plan name for the Current Plan card — the user's actual
- *  billing interval is not stored in the profile, so never claim one. */
-private fun planName(tier: String?): String = when (tier) {
-    "solo" -> "Solo Plan"
-    "crew" -> "Crew Plan"
-    "premium" -> "Premium Plan"
-    else -> "Free Plan"
+@Composable
+private fun tierLabel(tier: String?, billingInterval: String = "month"): String {
+    val isAnnual = billingInterval == "year"
+    val priceRes = if (isAnnual) R.string.more_price_per_year else R.string.more_price_per_month
+    return when (tier) {
+        "solo" -> stringResource(R.string.more_plan_solo_name) + " · " + stringResource(priceRes, if (isAnnual) "$390" else "$39")
+        "crew" -> stringResource(R.string.more_plan_crew_name) + " · " + stringResource(priceRes, if (isAnnual) "$790" else "$79")
+        "premium" -> stringResource(R.string.more_plan_premium_name) + " · " + stringResource(priceRes, if (isAnnual) "$1,990" else "$199")
+        else -> stringResource(R.string.more_plan_name_free)
+    }
 }

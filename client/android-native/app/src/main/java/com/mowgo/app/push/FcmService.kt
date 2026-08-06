@@ -67,10 +67,10 @@ class FcmService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "MowGo alerts",
+                getString(R.string.fcm_channel_name),
                 NotificationManager.IMPORTANCE_HIGH,
             ).apply {
-                description = "Job updates and important MowGo alerts"
+                description = getString(R.string.fcm_channel_description)
             }
             getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }

@@ -34,6 +34,11 @@ class MowGoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleDeepLink(intent)
+        check(BuildConfig.STRIPE_PUBLISHABLE_KEY.isNotBlank()) {
+            "STRIPE_PUBLISHABLE_KEY is not configured. Add it to local.properties " +
+                "(client/android-native/local.properties, gitignored) or provide it via a " +
+                "STRIPE_PUBLISHABLE_KEY CI environment variable before building."
+        }
         PaymentConfiguration.init(applicationContext, BuildConfig.STRIPE_PUBLISHABLE_KEY)
         enableEdgeToEdge()
         setContent {
