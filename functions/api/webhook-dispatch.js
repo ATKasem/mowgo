@@ -109,6 +109,11 @@ export async function onRequestPost({ request, env }) {
   }
 
   const result = await dispatchWebhookEvent(env, userId, event, payload);
+  // Preserve the pre-refactor behavior: a failed config lookup is a server
+  // failure (HTTP 500), not an empty-success — monitoring relies on the code.
+  if (result.error) {
+    return Response.json({ error: result.error }, { status: 500, headers });
+  }
   return Response.json(result, { headers });
 }
 

@@ -24,7 +24,7 @@
 |---|---|---|---|
 | **Monthly price** | $49/mo | $139/mo | **$39/mo** |
 | **Annual price (solo)** | $588/yr | $1,668/yr | **$468/yr** |
-| **3-person crew annual** | — | $1,788/yr | **$588/yr** |
+| **3-person crew annual** | — | $2,364/yr | **$588/yr** |
 | **Rain delay (one-button)** | ❌ | ❌ | ✅ |
 | **Auto-scheduling** | ✅ | ✅ | ✅ |
 | **Invoicing** | ✅ | ✅ | ✅ |
@@ -34,7 +34,7 @@
 | **Per-user fees** | $29/extra user | $29/extra user | **$0 — flat rate** |
 
 ### 3-Person Crew Math
-- **Jobber Grow (1-user base + 2 extra users):** ($139 + 2 × $29) × 12 months = **$2,364/yr**
+- **Jobber Connect:** ($139 + 2 × $29) × 12 months = **$2,364/yr**
 - **MowGo:** $79/mo Crew × 12 months = **$948/yr**
 - **Savings: $1,416/yr (60%)**
 

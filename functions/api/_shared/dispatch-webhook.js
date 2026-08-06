@@ -56,7 +56,7 @@ export async function dispatchWebhookEvent(env, userId, event, payload = {}) {
 
   if (!configsRes.ok) {
     console.error(`webhook dispatch: config lookup failed (${configsRes.status})`);
-    return { delivered: 0, failures: 1, skipped: false };
+    return { delivered: 0, failures: 1, skipped: false, error: 'Failed to fetch webhook configs' };
   }
 
   const configs = await configsRes.json();
