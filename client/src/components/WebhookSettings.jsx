@@ -339,10 +339,10 @@ export default function WebhookSettings() {
   if (loading) {
     return (
       <div className="card p-5 space-y-3">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+        <h4 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
           <Webhook className="w-4 h-4 text-violet-500" />
           {tr('Outgoing Webhooks')}
-        </h3>
+        </h4>
         <div className="flex items-center justify-center py-6">
           <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
         </div>
@@ -353,10 +353,10 @@ export default function WebhookSettings() {
   return (
     <div className="card p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+        <h4 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
           <Webhook className="w-4 h-4 text-violet-500" />
           {tr('Outgoing Webhooks')}
-        </h3>
+        </h4>
         <button
           type="button"
           onClick={addEndpoint}

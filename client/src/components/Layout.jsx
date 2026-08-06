@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import i18n from '../i18n';
-import { Calendar, Users, FileText, Settings, LogOut, WifiOff, LayoutDashboard } from 'lucide-react';
+import { Calendar, Users, FileText, MoreHorizontal, LogOut, WifiOff, LayoutDashboard } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import Logo from './Logo';
 import { isCurrentlyOffline } from '../lib/offlineStorage';
@@ -13,7 +13,7 @@ const navItems = [
   { to: '/app/today', icon: Calendar, title: 'Today' },
   { to: '/app/clients', icon: Users, title: 'Clients' },
   { to: '/app/invoices', icon: FileText, title: 'Invoices' },
-  { to: '/app/settings', icon: Settings, title: 'Settings' },
+  { to: '/app/settings', icon: MoreHorizontal, title: 'More' },
 ];
 
 export default function Layout() {

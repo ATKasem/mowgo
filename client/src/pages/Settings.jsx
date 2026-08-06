@@ -11,6 +11,14 @@ import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 import ConciergeSetup from '../components/ConciergeSetup';
 
+function SectionHeader({ children }) {
+  return (
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] px-1 pt-1">
+      {children}
+    </h3>
+  );
+}
+
 export default function Settings() {
   const { tr, t, i18n } = useLocalizedText('settings');
   const { tr: conciergeTr } = useLocalizedText('concierge');
@@ -243,15 +251,17 @@ export default function Settings() {
   return (
     <div>
       <div className="mb-5">
-        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("Settings")}</h2>
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr("More")}</h2>
         <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-0.5">{tr("Manage your business profile and preferences")}</p>
       </div>
 
       <div className="space-y-5">
 
+        <SectionHeader>{tr("Business")}</SectionHeader>
+
         {/* Business Profile */}
         <form onSubmit={save} className="card p-5 space-y-4">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-brand" />{tr("Business Profile")}</h3>
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Store className="w-4 h-4 text-brand" />{tr("Business Profile")}</h4>
           {profileLoading ? (
             <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 text-brand animate-spin" /></div>
           ) : (
@@ -336,9 +346,38 @@ export default function Settings() {
           )
         )}
 
+        {/* Booking Link */}
+        <div className="card p-5 space-y-3">
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><LinkIcon className="w-4 h-4 text-brand" />{tr("Booking Link")}</h4>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Share this link so customers can book online — no login needed.")}</p>
+          <div className="flex items-center gap-2">
+            <input
+              readOnly
+              value={bookingUrl}
+              className="input flex-1 text-xs font-mono bg-[var(--color-surface-bg)] dark:bg-gray-800/50"
+              onClick={e => e.target.select()}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(bookingUrl).then(() => {
+                  setBookingCopied(true);
+                  if (bookingCopyTimer.current) clearTimeout(bookingCopyTimer.current);
+                  bookingCopyTimer.current = setTimeout(() => setBookingCopied(false), 2000);
+                });
+              }}
+              className="btn-secondary whitespace-nowrap"
+            >
+              {bookingCopied ? <><CheckCircle className="w-4 h-4" />{tr("Copied!")}</> : <><Copy className="w-4 h-4" />{tr("Copy")}</>}
+            </button>
+          </div>
+        </div>
+
+        <SectionHeader>{tr("Billing & Plan")}</SectionHeader>
+
         {/* Plan Info */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-violet-500" />{tr("Plan")}</h3>
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-violet-500" />{tr("Plan")}</h4>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-[var(--color-text-primary)] dark:text-white capitalize">{tr(profile?.tier === 'solo' ? 'Solo Plan' : profile?.tier === 'crew' ? 'Crew Plan' : 'Free Plan')}</p>
@@ -365,9 +404,11 @@ export default function Settings() {
           )}
         </div>
 
+        <SectionHeader>{tr("Preferences")}</SectionHeader>
+
         {/* Notifications */}
         <div className="card p-5 space-y-4">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Bell className="w-4 h-4 text-amber-500" />{tr("Notifications")}</h3>
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Bell className="w-4 h-4 text-amber-500" />{tr("Notifications")}</h4>
           <label className="flex items-center justify-between cursor-pointer">
             <div>
               <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Job completion alerts")}</p>
@@ -415,9 +456,11 @@ export default function Settings() {
           </label>
         </div>
 
+        <SectionHeader>{tr("Team")}</SectionHeader>
+
         {/* Team */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-brand" />{tr("Team")}</h3>
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-brand" />{tr("Team")}</h4>
           {profile?.tier !== 'crew' && (
             <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.")}</p>
           )}
@@ -487,39 +530,18 @@ export default function Settings() {
           )}
         </div>
 
-        {/* Zapier Webhooks */}
-        {(profile?.tier === 'solo' || profile?.tier === 'crew') && <WebhookSettings />}
+        {(profile?.tier === 'solo' || profile?.tier === 'crew') && (
+          <>
+            <SectionHeader>{tr("Integrations")}</SectionHeader>
+            <WebhookSettings />
+          </>
+        )}
 
-        {/* Booking Link */}
-        <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><LinkIcon className="w-4 h-4 text-brand" />{tr("Booking Link")}</h3>
-          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Share this link so customers can book online — no login needed.")}</p>
-          <div className="flex items-center gap-2">
-            <input
-              readOnly
-              value={bookingUrl}
-              className="input flex-1 text-xs font-mono bg-[var(--color-surface-bg)] dark:bg-gray-800/50"
-              onClick={e => e.target.select()}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(bookingUrl).then(() => {
-                  setBookingCopied(true);
-                  if (bookingCopyTimer.current) clearTimeout(bookingCopyTimer.current);
-                  bookingCopyTimer.current = setTimeout(() => setBookingCopied(false), 2000);
-                });
-              }}
-              className="btn-secondary whitespace-nowrap"
-            >
-              {bookingCopied ? <><CheckCircle className="w-4 h-4" />{tr("Copied!")}</> : <><Copy className="w-4 h-4" />{tr("Copy")}</>}
-            </button>
-          </div>
-        </div>
+        <SectionHeader>{tr("Data")}</SectionHeader>
 
         {/* Data Export */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Download className="w-4 h-4 text-brand" />{tr('Export data')}</h3>
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Download className="w-4 h-4 text-brand" />{tr('Export data')}</h4>
           <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('Download your business data as CSV. Your data, yours to keep.')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[
@@ -546,9 +568,11 @@ export default function Settings() {
           {exportError && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{exportError}</p>}
         </div>
 
+        <SectionHeader>{tr("Support")}</SectionHeader>
+
         {/* Help */}
         <div className="card p-5 space-y-3">
-          <h3 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-[var(--color-text-muted)]" />{tr("Help & Support")}</h3>
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><HelpCircle className="w-4 h-4 text-[var(--color-text-muted)]" />{tr("Help & Support")}</h4>
           <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Need help? Email us at")} <a href="mailto:hello@mowgoapp.com" className="text-brand-hover dark:text-emerald-400 hover:underline">hello@mowgoapp.com</a></p>
           <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("MowGo v1.0 · Built for lawn care crews ·")} <a href="https://mowgoapp.com" className="hover:text-brand transition-colors">mowgoapp.com</a></p>
         </div>
