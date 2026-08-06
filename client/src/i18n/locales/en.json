@@ -1204,7 +1204,12 @@
     "claim_it": "Claim it",
     "tell_us_about_your_business_we_import_your_clients_within_48_hours": "Tell us about your business: we import your clients within 48 hours.",
     "free_setup_we_import_your_clients_and_pre_schedule_your_first_30_days": "Free setup: we import your clients and pre-schedule your first 30 days.",
-    "you_re_already_in_the_concierge_queue": "You're already in the concierge queue."
+    "you_re_already_in_the_concierge_queue": "You're already in the concierge queue.",
+    "concierge_setup_is_a_solo_crew_perk_upgrade_to_claim_it": "Concierge setup is a Solo/Crew perk. Upgrade to claim it.",
+    "see_plans": "See plans",
+    "maybe_later": "Maybe later",
+    "close": "Close",
+    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled."
   },
   "booking": {
     "book_a_service": "Book a lawn care service",
@@ -1328,6 +1333,17 @@
       "emailPlaceholder": "you@example.com",
       "zip": "ZIP code",
       "zipPlaceholder": "73102",
+      "phone": "Phone",
+      "optional": "optional",
+      "phonePlaceholder": "405-555-0100",
+      "consentPrefix": "I agree to receive ",
+      "consentMarketing": "marketing",
+      "consentMiddle": " text messages from MowGo about lawn care pricing reports and offers (about 1–2 messages a month). This consent is separate from any informational or transactional messages. Message & data rates may apply. Reply ",
+      "consentStop": "STOP",
+      "consentSuffix": " to opt out. Consent applies only to MowGo and this campaign. See our",
+      "consentPrivacyPolicy": "Privacy Policy",
+      "consentAnd": "and",
+      "consentTerms": "Terms",
       "lawns": "Lawns per week",
       "crew": "Crew size",
       "select": "Select one",
@@ -1348,6 +1364,7 @@
       "name": "Enter your first name.",
       "email": "Enter a valid email address.",
       "zip": "Enter a valid 5-digit ZIP code.",
+      "phone": "Enter a valid US phone number.",
       "lawns": "Select your lawns per week.",
       "crew": "Select your crew size."
     },
@@ -1386,6 +1403,7 @@
     "add_your_first_client": "Add your first client",
     "schedule_your_first_job": "Schedule your first job",
     "mark_a_job_complete": "Mark a job complete",
-    "get_set_up_for_you_free_concierge": "Get set up for you — free concierge"
+    "get_set_up_for_you_free_concierge": "Get set up for you — free concierge",
+    "you_re_rolling_want_a_review_call": "You're rolling. Want a review call?"
   }
 }

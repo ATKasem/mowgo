@@ -1,9 +1,105 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { loadJobs, loadInvoices, loadProfile } from '../lib/data';
+import { isDemoMode, supabase } from '../lib/supabase';
 import { AuthContext } from '../App';
-import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle } from 'lucide-react';
+import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X } from 'lucide-react';
 import OnboardingChecklist from '../components/OnboardingChecklist';
+
+const CONCIERGE_PROMPT_DISMISS_KEY = 'mf_concierge_prompt_dismissed';
+const CONCIERGE_PROMPT_TIERS = ['solo', 'crew', 'premium'];
+
+// Setup-call booking step (activation spec §2). Fires on Dashboard mount —
+// not just post-signup — so it also covers the email-confirm login path
+// (Login.jsx's confirmSent branch never gets a session for those users) and
+// returning logins. Free tier is skipped entirely here; the only place a
+// free-tier user sees an upgrade prompt is ConciergeSetup.jsx itself.
+function ConciergeBookingPrompt() {
+  const { tr } = useLocalizedText('concierge');
+  const [profile, setProfile] = useState(null);
+  const [dismissed, setDismissed] = useState(() => localStorage.getItem(CONCIERGE_PROMPT_DISMISS_KEY) === '1');
+  const [hasClaim, setHasClaim] = useState(null); // null = loading, true/false = result
+
+  useEffect(() => {
+    if (isDemoMode()) return;
+    let active = true;
+    loadProfile().then(result => { if (active) setProfile(result); }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!profile || !profile.id || profile.tier === 'free' || dismissed) return;
+    let active = true;
+    (async () => {
+      const res = await supabase
+        .from('concierge_requests')
+        .select('id', { count: 'exact' })
+        .eq('user_id', profile.id)
+        .in('status', ['pending', 'importing', 'done']);
+      if (!active) return;
+      // RLS policy (014): FOR SELECT USING (auth.uid() = user_id).
+      // Postgres enforces RLS before counting — count reflects only rows
+      // the current user can see. Zero = no claim, >0 = has an active one.
+      setHasClaim(res.count > 0);
+    })().catch(() => { if (active) setHasClaim(false); });
+    return () => { active = false; };
+  }, [profile?.id, profile?.tier, dismissed]);
+
+  if (dismissed || hasClaim === true || !profile || profile.role === 'crew') return null;
+  if (!CONCIERGE_PROMPT_TIERS.includes(profile.tier)) return null;
+  if (hasClaim === false) return null; // loaded, no claim — show prompt
+
+  function dismiss() {
+    localStorage.setItem(CONCIERGE_PROMPT_DISMISS_KEY, '1');
+    setDismissed(true);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={dismiss} aria-hidden="true" />
+      <div className="relative bg-[var(--color-surface)] dark:bg-gray-900 rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4">
+        <button onClick={dismiss} aria-label={tr('Close')} className="absolute top-3 right-3 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors min-w-10 min-h-10 flex items-center justify-center">
+          <X className="w-5 h-5" />
+        </button>
+        <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white pr-6">
+          {tr('Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled.')}
+        </h3>
+        <Link to="/app/settings" onClick={dismiss} className="btn-primary w-full">{tr('Claim it')}</Link>
+        <button onClick={dismiss} className="block w-full text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors">
+          {tr('Maybe later')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Speed-to-lead catch-all (spec B §3): fires for accounts created in the
+// last 7 days — covers the email-confirm path (Login.jsx's signup branch
+// never sees a session for those users). Server-side idempotent, so a
+// double-fire (direct signup + confirm login) is a harmless no-op.
+function LeadTouchPing() {
+  const { user } = useContext(AuthContext);
+  useEffect(() => {
+    if (isDemoMode() || !user?.email) return;
+    const created = Date.parse(user.created_at || '');
+    if (!Number.isFinite(created) || Date.now() - created > 7 * 24 * 60 * 60 * 1000) return;
+    let active = true;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const token = data?.session?.access_token;
+      if (!token) return;
+      const res = await fetch('/api/lead-touch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ email: user.email }),
+      });
+      if (!res.ok && active) console.warn('lead-touch ping failed', res.status);
+    })().catch(() => {});
+    return () => { active = false; };
+  }, [user?.id, user?.email]);
+  return null;
+}
 
 /** Get local date string (YYYY-MM-DD) accounting for timezone */
 function localDate(offsetDays = 0) {
@@ -122,6 +218,8 @@ export default function Dashboard() {
     return (
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
+        <ConciergeBookingPrompt />
+        <LeadTouchPing />
         <OnboardingChecklist />
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-4">
@@ -182,6 +280,8 @@ export default function Dashboard() {
   return (
     <div>
       <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
+      <ConciergeBookingPrompt />
+        <LeadTouchPing />
       <OnboardingChecklist />
       <div className="grid grid-cols-2 gap-3">
         {cards.map((card, i) => (

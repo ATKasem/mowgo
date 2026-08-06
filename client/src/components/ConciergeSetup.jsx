@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Loader2, Upload } from 'lucide-react';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useAuth } from '../App';
 import { loadProfile } from '../lib/data';
 import { cleanClientRows, parseClientCsv } from '../lib/csv-import';
+
+// Concierge setup is a paid-plan perk. Gate lives HERE (not in callers) so
+// every entry point (Settings, Subscribe, the dashboard booking prompt) is
+// protected — a free-tier user can no longer type real client PII into the
+// form before discovering they're ineligible.
+const ALLOWED_TIERS = ['solo', 'crew', 'premium'];
 
 export default function ConciergeSetup({ onDone }) {
   const { tr } = useLocalizedText('concierge');
@@ -17,9 +24,14 @@ export default function ConciergeSetup({ onDone }) {
   const [success, setSuccess] = useState(false);
   const [alreadyExists, setAlreadyExists] = useState(false);
   const [error, setError] = useState('');
+  const [tier, setTier] = useState(undefined); // undefined = loading; null = unknown/unverifiable (fail closed)
   const timer = useRef(null);
 
-  useEffect(() => { loadProfile().then(profile => setBusinessName(profile?.business_name || '')).catch(() => {}); }, []);
+  useEffect(() => {
+    loadProfile()
+      .then(profile => { setBusinessName(profile?.business_name || ''); setTier(profile?.tier ?? null); })
+      .catch(() => setTier(null));
+  }, []);
   useEffect(() => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setParsedText(rawText), 400);
@@ -58,6 +70,17 @@ export default function ConciergeSetup({ onDone }) {
   }
 
   if (success) return <div className="card p-6 text-center text-sm font-semibold text-brand">{alreadyExists ? tr("You're already in the concierge queue.") : tr("Request received — we'll set you up within 48 hours.")}</div>;
+
+  if (tier === undefined) return null; // loading — avoid a flash of the wrong gate state
+
+  if (!ALLOWED_TIERS.includes(tier)) {
+    return (
+      <div className="card p-6 text-center space-y-3">
+        <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Concierge setup is a Solo/Crew perk. Upgrade to claim it.')}</p>
+        <Link to="/compare" className="btn-primary inline-flex">{tr('See plans')}</Link>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={submit} className="card p-5 space-y-5 text-left">

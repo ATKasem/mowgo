@@ -23,6 +23,22 @@ export default function Login() {
   const hasPaidPlanIntent = (planParam === 'solo' || planParam === 'crew')
     && (intervalParam === 'month' || intervalParam === 'year');
 
+  // Referral code from URL or pre-stash (survives email-confirm round trip)
+  const refParam = searchParams.get('ref');
+  const [refCode, setRefCode] = useState('');
+
+  useEffect(() => {
+    if (refParam) setRefCode(refParam.toUpperCase().trim());
+    else {
+      const stash = localStorage.getItem('mowgo_ref_code');
+      if (stash) {
+        const ts = Number(localStorage.getItem('mowgo_ref_ts') || 0);
+        if (Date.now() - ts < 7 * 24 * 60 * 60 * 1000) setRefCode(stash);
+        else localStorage.removeItem('mowgo_ref_code');
+      }
+    }
+  }, [refParam]);
+
   const demo = isDemoMode();
 
   // Seed/refresh the checkout intent from the URL (localStorage survives the
@@ -71,6 +87,13 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Stash referral code BEFORE signUp() so it survives the email-confirmation
+    // round trip (new tab has no ?ref param; applyStashedRefCode reads the stash).
+    if (mode === 'signup' && refCode) {
+      localStorage.setItem('mowgo_ref_code', refCode);
+      localStorage.setItem('mowgo_ref_ts', String(Date.now()));
+    }
 
     if (demo) {
       setLoading(false);
@@ -123,6 +146,16 @@ export default function Login() {
           setLoading(false);
           return;
         }
+        // Speed-to-lead (spec: signup instant touch). Fire-and-forget —
+        // idempotent server-side (lead_touches UNIQUE(lead_email, kind)).
+        // The Dashboard-mount catch-all covers the email-confirm path.
+        if (result.data?.session?.access_token) {
+          fetch('/api/lead-touch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${result.data.session.access_token}` },
+            body: JSON.stringify({ email }),
+          }).catch(() => {});
+        }
       }
 
       const { resumeCheckoutIntent } = await import('../lib/payments');
@@ -132,6 +165,12 @@ export default function Login() {
         setLoading(false);
         return;
       }
+
+      // Call site 2: apply a stashed referral code (login after email confirm,
+      // or signup that returned a session directly). Silent on failure.
+      const { applyStashedRefCode } = await import('../lib/referrals');
+      await applyStashedRefCode();
+
       navigate('/app');
     } catch (err) {
       setError(tr('Connection failed. Check your internet and try again.'));
@@ -251,6 +290,22 @@ export default function Login() {
               >
                 {tr("Forgot your password?")}
               </button>
+            )}
+
+            {/* Referral code — optional, signup mode only. ?ref=CODE prefills. */}
+            {mode === 'signup' && (
+              <div>
+                <label className="label">{tr("Referral code (optional)")}</label>
+                <input
+                  type="text"
+                  placeholder={tr("e.g. 7KM2QP")}
+                  value={refCode}
+                  onChange={e => setRefCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
+                  className="input"
+                  autoComplete="off"
+                  maxLength={6}
+                />
+              </div>
             )}
 
             {/* Submit */}

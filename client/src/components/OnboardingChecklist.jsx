@@ -5,8 +5,9 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { supabase, isDemoMode } from '../lib/supabase';
 
 const DISMISS_KEY = 'mf_onboarding_dismissed';
+const CONCIERGE_TIERS = ['solo', 'crew', 'premium'];
 
-async function fetchActivationCounts() {
+async function fetchActivationProfile() {
   if (isDemoMode()) return null;
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -14,58 +15,67 @@ async function fetchActivationCounts() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, business_id, tier')
+    .select('role, tier, first_client_at, first_job_at, first_invoice_at')
     .eq('id', user.id)
     .single();
 
   if (!profile || profile.role === 'crew') return null;
   // Onboarding is the OWNER's job — never show this to crew members.
-  const ownerId = user.id;
-
-  const [clientResult, jobResult, doneJobResult] = await Promise.all([
-    supabase.from('clients').select('id', { count: 'exact', head: true }).eq('user_id', ownerId),
-    supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('user_id', ownerId),
-    supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('user_id', ownerId).eq('status', 'done'),
-  ]);
-
-  return {
-    clients: clientResult.count || 0,
-    jobs: jobResult.count || 0,
-    doneJobs: doneJobResult.count || 0,
-    tier: profile?.tier,
-  };
+  return profile;
 }
 
 export default function OnboardingChecklist() {
   const { tr } = useLocalizedText('onboarding');
-  const [counts, setCounts] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [dismissed, setDismissed] = useState(() => localStorage.getItem(DISMISS_KEY) === '1');
 
   useEffect(() => {
     let active = true;
-    fetchActivationCounts().then(result => { if (active) setCounts(result); }).catch(() => {});
+    fetchActivationProfile().then(result => { if (active) setProfile(result); }).catch(() => {});
     const timer = setTimeout(() => {
-      fetchActivationCounts().then(result => { if (active) setCounts(result); }).catch(() => {});
+      fetchActivationProfile().then(result => { if (active) setProfile(result); }).catch(() => {});
     }, 5000);
     return () => { active = false; clearTimeout(timer); };
   }, []);
 
-  if (dismissed || !counts) return null;
-  // Fully activated (client added and a job scheduled) — nudge is no longer useful.
-  if (counts.clients > 0 && counts.jobs > 0) return null;
-
-  const rows = [
-    { label: tr('Add your first client'), to: '/app/clients', done: counts.clients > 0 },
-    { label: tr('Schedule your first job'), to: '/app/today', done: counts.jobs > 0 },
-    { label: tr('Mark a job complete'), to: '/app/today', done: counts.doneJobs > 0 },
-  ];
-  if (['solo', 'crew', 'premium'].includes(counts.tier)) {
-    rows.push({ label: tr('Get set up for you — free concierge'), to: '/app/settings', done: false });
-  }
+  if (dismissed || !profile) return null;
 
   function dismiss() {
     localStorage.setItem(DISMISS_KEY, '1');
     setDismissed(true);
+  }
+
+  const allDone = Boolean(profile.first_client_at && profile.first_job_at && profile.first_invoice_at);
+  const conciergeEligible = CONCIERGE_TIERS.includes(profile.tier);
+
+  // Fully activated (ever activated — timestamps are set once and never
+  // cleared, so this doesn't re-nag after a client/job/invoice is deleted):
+  // drop the step list. Eligible tiers get a one-line concierge nudge
+  // instead of vanishing outright; free tier gets nothing further — no
+  // forced upsell, concierge access stays gated in ConciergeSetup.jsx.
+  if (allDone) {
+    if (!conciergeEligible) return null;
+    return (
+      <div className="card rounded-2xl p-4 mb-4 border-brand/30">
+        <div className="flex items-start justify-between gap-3">
+          <Link to="/app/settings" className="text-sm font-medium text-[var(--color-text-primary)] dark:text-gray-200 no-underline hover:underline">
+            {tr("You're rolling. Want a review call?")}
+          </Link>
+          <button onClick={dismiss} aria-label={tr('Maybe later')} className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] dark:hover:text-white flex-shrink-0">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const rows = [
+    { label: tr('Add your first client'), to: '/app/clients', done: Boolean(profile.first_client_at) },
+    { label: tr('Schedule your first job'), to: '/app/today', done: Boolean(profile.first_job_at) },
+    { label: tr('Mark a job complete'), to: '/app/today', done: Boolean(profile.first_invoice_at) },
+  ];
+  if (conciergeEligible) {
+    rows.push({ label: tr('Get set up for you — free concierge'), to: '/app/settings', done: false });
   }
 
   return (

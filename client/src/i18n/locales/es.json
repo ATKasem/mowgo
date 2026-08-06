@@ -1269,7 +1269,12 @@
     "claim_it": "Actívalo",
     "tell_us_about_your_business_we_import_your_clients_within_48_hours": "Cuéntanos sobre tu negocio: importamos tus clientes en 48 horas.",
     "free_setup_we_import_your_clients_and_pre_schedule_your_first_30_days": "Configuración gratis: importamos tus clientes y programamos tus primeros 30 días.",
-    "you_re_already_in_the_concierge_queue": "Ya estás en la cola de configuración asistida."
+    "you_re_already_in_the_concierge_queue": "Ya estás en la cola de configuración asistida.",
+    "concierge_setup_is_a_solo_crew_perk_upgrade_to_claim_it": "La configuración asistida es un beneficio de los planes Solo/Crew. Mejora tu plan para reclamarlo.",
+    "see_plans": "Ver planes",
+    "maybe_later": "Más tarde",
+    "close": "Cerrar",
+    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y programamos tus primeros 30 días."
   },
   "booking": {
     "book_a_service": "Agenda un servicio de jardinería",
@@ -1414,6 +1419,17 @@
       "emailPlaceholder": "tu@ejemplo.com",
       "zip": "Código postal",
       "zipPlaceholder": "73102",
+      "phone": "Teléfono",
+      "optional": "opcional",
+      "phonePlaceholder": "405-555-0100",
+      "consentPrefix": "Acepto recibir mensajes de texto de ",
+      "consentMarketing": "marketing",
+      "consentMiddle": " de MowGo sobre reportes de precios de jardinería y ofertas (aproximadamente 1–2 mensajes al mes). Este consentimiento es independiente de cualquier mensaje informativo o transaccional. Pueden aplicarse tarifas de mensajes y datos. Responde ",
+      "consentStop": "STOP",
+      "consentSuffix": " para cancelar. El consentimiento aplica solo a MowGo y esta campaña. Consulta nuestra",
+      "consentPrivacyPolicy": "Política de Privacidad",
+      "consentAnd": "y",
+      "consentTerms": "los Términos",
       "lawns": "Céspedes por semana",
       "crew": "Tamaño de la cuadrilla",
       "select": "Selecciona una opción",
@@ -1434,6 +1450,7 @@
       "name": "Ingresa tu nombre.",
       "email": "Ingresa un correo electrónico válido.",
       "zip": "Ingresa un código postal válido de 5 dígitos.",
+      "phone": "Ingresa un número de teléfono válido de EE. UU.",
       "lawns": "Selecciona cuántos céspedes atiendes por semana.",
       "crew": "Selecciona el tamaño de tu cuadrilla."
     },
@@ -1465,5 +1482,14 @@
   },
   "portalReturn": {
     "app_not_installed": "¿App no instalada?"
+  },
+  "onboarding": {
+    "start_in_3_steps": "Empieza en 3 pasos",
+    "maybe_later": "Más tarde",
+    "add_your_first_client": "Agrega tu primer cliente",
+    "schedule_your_first_job": "Programa tu primer trabajo",
+    "mark_a_job_complete": "Marca un trabajo como completado",
+    "get_set_up_for_you_free_concierge": "Configuración asistida gratis para ti",
+    "you_re_rolling_want_a_review_call": "Vas viento en popa. ¿Quieres una llamada de seguimiento?"
   }
 }

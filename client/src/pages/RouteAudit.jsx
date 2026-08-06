@@ -6,6 +6,8 @@ import Logo from '../components/Logo';
 import usePageTitle from '../hooks/usePageTitle';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Shared with functions/api/leads/public.js:8 / functions/api/route-audit.js — do not invent a new phone regex.
+const PHONE_RE = /^(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}$/;
 const MIDPOINTS = { under_10: 7, '10_25': 17, '25_50': 37, '50_plus': 60 };
 
 function reportFor(bucket) {
@@ -17,14 +19,17 @@ function reportFor(bucket) {
 
 export default function RouteAudit() {
   const { t } = useTranslation();
-  const [form, setForm] = useState({ name: '', email: '', zip: '', lawns_bucket: '', crew_bucket: '' });
+  const [form, setForm] = useState({ name: '', email: '', zip: '', lawns_bucket: '', crew_bucket: '', phone: '', sms_consent: false });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [serverError, setServerError] = useState('');
   usePageTitle(t('routeAudit.seo_title'), t('routeAudit.seo_description'));
 
-  const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  const update = (event) => {
+    const { name, type, checked, value } = event.target;
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+  };
 
   async function submit(event) {
     event.preventDefault();
@@ -32,6 +37,7 @@ export default function RouteAudit() {
     if (!form.name.trim()) next.name = t('routeAudit.validation.name');
     if (!EMAIL_RE.test(form.email.trim()) || form.email.trim().length > 254) next.email = t('routeAudit.validation.email');
     if (!/^\d{5}$/.test(form.zip)) next.zip = t('routeAudit.validation.zip');
+    if (form.phone.trim() && !PHONE_RE.test(form.phone.trim())) next.phone = t('routeAudit.validation.phone');
     if (!MIDPOINTS[form.lawns_bucket]) next.lawns_bucket = t('routeAudit.validation.lawns');
     if (!['solo', '2_3', '4_plus'].includes(form.crew_bucket)) next.crew_bucket = t('routeAudit.validation.crew');
     setErrors(next);
@@ -45,7 +51,7 @@ export default function RouteAudit() {
       const response = await fetch('/api/route-audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, name: form.name.trim(), email: form.email.trim() }),
+        body: JSON.stringify({ ...form, name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), sms_consent: Boolean(form.phone.trim()) && form.sms_consent }),
       });
       if (!response.ok) {
         await response.json().catch(() => ({}));
@@ -90,6 +96,16 @@ export default function RouteAudit() {
                 ].map(([name, type, translation]) => <label key={name} className="block text-sm font-semibold">{t(`routeAudit.form.${translation}`)}<input className={fieldClass} name={name} type={type} value={form[name]} onChange={update} placeholder={t(`routeAudit.form.${translation}Placeholder`)} maxLength={name === 'email' ? 254 : name === 'zip' ? 5 : 100} inputMode={name === 'zip' ? 'numeric' : undefined} disabled={submitting} aria-invalid={Boolean(errors[name])} />{errors[name] && <span className="mt-1 block text-sm font-normal text-red-600">{errors[name]}</span>}</label>)}
                 <label className="block text-sm font-semibold">{t('routeAudit.form.lawns')}<select className={fieldClass} name="lawns_bucket" value={form.lawns_bucket} onChange={update} disabled={submitting}><option value="">{t('routeAudit.form.select')}</option><option value="under_10">{t('routeAudit.options.under10')}</option><option value="10_25">{t('routeAudit.options.10to25')}</option><option value="25_50">{t('routeAudit.options.25to50')}</option><option value="50_plus">{t('routeAudit.options.50plus')}</option></select>{errors.lawns_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.lawns_bucket}</span>}</label>
                 <label className="block text-sm font-semibold">{t('routeAudit.form.crew')}<select className={fieldClass} name="crew_bucket" value={form.crew_bucket} onChange={update} disabled={submitting}><option value="">{t('routeAudit.form.select')}</option><option value="solo">{t('routeAudit.options.solo')}</option><option value="2_3">{t('routeAudit.options.2to3')}</option><option value="4_plus">{t('routeAudit.options.4plus')}</option></select>{errors.crew_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.crew_bucket}</span>}</label>
+                <label className="block text-sm font-semibold">{t('routeAudit.form.phone')} <span className="font-normal text-gray-400">({t('routeAudit.form.optional')})</span><input className={fieldClass} name="phone" type="tel" value={form.phone} onChange={update} placeholder={t('routeAudit.form.phonePlaceholder')} maxLength={20} disabled={submitting} aria-invalid={Boolean(errors.phone)} />{errors.phone && <span className="mt-1 block text-sm font-normal text-red-600">{errors.phone}</span>}</label>
+                <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
+                  <input type="checkbox" name="sms_consent" checked={form.sms_consent} onChange={update} disabled={submitting} className="mt-0.5 accent-emerald-600" />
+                  <span>
+                    {t('routeAudit.form.consentPrefix')}<b>{t('routeAudit.form.consentMarketing')}</b>{t('routeAudit.form.consentMiddle')}<b>{t('routeAudit.form.consentStop')}</b>{t('routeAudit.form.consentSuffix')}{' '}
+                    <Link to="/privacy" className="text-emerald-700 underline">{t('routeAudit.form.consentPrivacyPolicy')}</Link>{' '}
+                    {t('routeAudit.form.consentAnd')}{' '}
+                    <Link to="/terms" className="text-emerald-700 underline">{t('routeAudit.form.consentTerms')}</Link>.
+                  </span>
+                </label>
               </div>
               {serverError && <p className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{serverError}</p>}
               <button disabled={submitting} className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 font-bold text-white transition hover:bg-emerald-700 disabled:opacity-60">{submitting ? t('routeAudit.form.submitting') : t('routeAudit.form.submit')}</button>
