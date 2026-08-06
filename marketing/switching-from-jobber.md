@@ -34,9 +34,9 @@
 | **Per-user fees** | $29/extra user | $29/extra user | **$0 — flat rate** |
 
 ### 3-Person Crew Math
-- **Jobber Connect:** $139/mo × 3 users × 12 months = **$5,004/yr**
+- **Jobber Grow (1-user base + 2 extra users):** ($139 + 2 × $29) × 12 months = **$2,364/yr**
 - **MowGo:** $79/mo Crew × 12 months = **$948/yr**
-- **Savings: $4,056/yr (81%)**
+- **Savings: $1,416/yr (60%)**
 
 Even after Jobber's promo: 40% off first 3 months of Core ($30/mo) then reverts to $49/mo.
 - Year 1 with Jobber: ($30 × 3) + ($49 × 9) = **$531**
