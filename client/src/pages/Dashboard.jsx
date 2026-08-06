@@ -46,9 +46,12 @@ function ConciergeBookingPrompt() {
     return () => { active = false; };
   }, [profile?.id, profile?.tier, dismissed]);
 
-  if (dismissed || hasClaim === true || !profile || profile.role === 'crew') return null;
+  if (dismissed || !profile || profile.role === 'crew') return null;
   if (!CONCIERGE_PROMPT_TIERS.includes(profile.tier)) return null;
-  if (hasClaim === false) return null; // loaded, no claim — show prompt
+  // hasClaim: null = still loading (never flash), true = already has a claim,
+  // false = confirmed no claim → this is the ONLY state that should show the
+  // prompt. (Was inverted: === false hid it exactly when it should appear.)
+  if (hasClaim !== false) return null;
 
   function dismiss() {
     localStorage.setItem(CONCIERGE_PROMPT_DISMISS_KEY, '1');

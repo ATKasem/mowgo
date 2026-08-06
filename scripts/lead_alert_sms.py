@@ -35,9 +35,17 @@ BUCKET_LABELS = {"under_10": "Under 10", "10_25": "10-25", "25_50": "25-50", "50
 
 def load_state():
     try:
-        return json.loads(STATE_FILE.read_text())
+        state = json.loads(STATE_FILE.read_text())
     except Exception:
-        return {"last_id": None}
+        return {"last_created_at": None}
+    # Legacy schema migration: an old file may hold {"last_id": <uuid>} from
+    # the broken UUID watermark. A uuid has no ordering relation to created_at,
+    # so it cannot seed the new watermark. Treat it as "start from now" (only
+    # alert leads created after this migration) — NOT "start from epoch",
+    # which would re-blast every historical qualified lead once.
+    if "last_id" in state and "last_created_at" not in state:
+        state = {"last_created_at": dt.datetime.now(dt.timezone.utc).isoformat()}
+    return state
 
 
 def save_state(state):
@@ -45,13 +53,16 @@ def save_state(state):
     STATE_FILE.write_text(json.dumps(state))
 
 
-def fetch_new_qualified(after_id):
+def fetch_new_qualified(after_created_at):
     params = [
         ("select", "id,name,email,zip,lawns_bucket,crew_bucket,revenue_impact_month,created_at"),
         ("order", "created_at.asc"),
     ]
-    if after_id:
-        params.append(("id", f"gt.{after_id}"))
+    if after_created_at:
+        # Watermark by created_at (NOT id — route_audits.id is a random UUID
+        # with no relation to insertion order; a UUID gt-filter silently drops
+        # ~half of new rows forever). created_at is monotonic per insert.
+        params.append(("created_at", f"gt.{after_created_at}"))
     qs = "&".join(
         f"{urllib.parse.quote(k, safe='')}={urllib.parse.quote(str(v), safe='(),.:*')}" for k, v in params
     )
@@ -92,8 +103,8 @@ def main():
     if not TO:
         print("BLASIAN_PHONE not set in /opt/data/.env", file=sys.stderr)
         sys.exit(1)
-    state = load_state() if not force else {"last_id": None}
-    rows = fetch_new_qualified(state.get("last_id"))
+    state = load_state() if not force else {"last_created_at": None}
+    rows = fetch_new_qualified(state.get("last_created_at"))
     if not rows:
         return  # silent — nothing new
     sent = 0
@@ -107,9 +118,16 @@ def main():
         if ok:
             sent += 1
             print(f"📲 SMS sent → {TO}: {row['name']} ({info})")
+            # Advance the watermark ONLY past a confirmed send.
+            state["last_created_at"] = row["created_at"]
         else:
+            # STOP at the first failure: advancing past it (via a later row's
+            # success) would permanently skip the failed row — created_at >
+            # watermark would never re-fetch it. Breaking keeps it (and all
+            # rows after it) in the next poll's window. A transient Twilio
+            # error must not permanently drop the alert.
             print(f"❌ SMS failed for {row['name']}: {info}", file=sys.stderr)
-        state["last_id"] = row["id"]
+            break
     save_state(state)
     if sent == 0:
         sys.exit(1)  # failed sends shouldn't silently pass

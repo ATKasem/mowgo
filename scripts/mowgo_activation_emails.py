@@ -87,7 +87,20 @@ def send_resend_email(to, subject, html):
 
 
 def _greeting(name):
-    return f", {name}" if name else ""
+    if not name:
+        return ""
+    # HTML-escape user-supplied business_name before it lands in an email body
+    # (self-only impact today — recipient == account that set the name — but
+    # normalize with the rest of the batch, which escapes user input).
+    escaped = (
+        str(name)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
+    return f", {escaped}"
 
 
 def t1_html(name):
@@ -185,7 +198,10 @@ def admin_emails():
     return out
 
 
-def candidates_for_kind(kind, now):
+def candidates_for_kind(kind, now, emails_cache):
+    """emails_cache: mutable dict shared across the 3 kinds in one run so the
+    paginated GoTrue admin-users scan happens at most once per run, not 3x
+    (the user list can't change mid-run)."""
     if kind == "t1":
         params = [
             ("select", "id,business_name,created_at"),
@@ -212,7 +228,7 @@ def candidates_for_kind(kind, now):
     if not ok:
         print(f"profiles query failed ({kind}): {profiles}", file=sys.stderr)
         return []
-    emails = admin_emails() if profiles else {}
+    emails = emails_cache if profiles else {}
     touches = fetch_touches([p["id"] for p in profiles], kind)
     out = []
     for p in profiles:
@@ -244,8 +260,11 @@ def run_send(dry_run):
     sent, failed, skipped_cap = 0, 0, 0
     lines = []
     budget = CAP
+    # Resolve the id→email map ONCE per run (GoTrue admin scan is paginated and
+    # expensive; the user list can't change mid-run) instead of per-kind.
+    emails_cache = admin_emails()
     for kind in ("t1", "t2", "winback2"):
-        for profile, existing in candidates_for_kind(kind, now):
+        for profile, existing in candidates_for_kind(kind, now, emails_cache):
             if budget <= 0:
                 skipped_cap += 1
                 continue

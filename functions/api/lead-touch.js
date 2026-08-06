@@ -19,18 +19,14 @@ function json(body, status = 200, origin = 'https://mowgo.pages.dev') {
   return Response.json(body, { status, headers: { 'Access-Control-Allow-Origin': origin } });
 }
 
-function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-}
-
-function welcomeHtml(email) {
+function welcomeHtml() {
   return `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#17201b;line-height:1.6"><h1>Welcome to MowGo</h1><p>3 steps to your first scheduled job:</p><ol><li>Add your first client.</li><li>Schedule their first job.</li><li>Mark it complete — the invoice is created automatically.</li></ol><p>Want us to set you up? Reply and we'll import your clients (Solo, Crew &amp; Premium — 48h setup).</p><p><a href="https://mowgoapp.com/#/app">Open MowGo</a></p></body></html>`;
 }
 
 async function sendWelcomeEmail(env, email) {
   if (!env.RESEND_API_KEY) { console.warn('Welcome email skipped: RESEND_API_KEY is not configured'); return; }
   try {
-    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', to: email, subject: 'Welcome to MowGo — 3 steps to your first scheduled job', html: welcomeHtml(escapeHtml(email)) }) });
+    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', to: email, subject: 'Welcome to MowGo — 3 steps to your first scheduled job', html: welcomeHtml() }) });
     if (!response.ok) console.warn('Welcome email failed:', response.status, await response.text());
   } catch (error) { console.warn('Welcome email failed:', error?.message || error); }
 }
