@@ -27,6 +27,10 @@ data class MoreUiState(
     val billingMessage: String? = null,
     val billingInterval: String = "month",
     val pendingBillingUrl: String? = null,
+    /// Set when a trial was just granted, before the async profile reload lands.
+    /// Guards the double-tap window: a second grant_trial call would return
+    /// false (server-side one-shot) and show a misleading error.
+    val trialJustGranted: Boolean = false,
     val exportLoadingAction: String? = null,
     val exportMessage: String? = null,
     val exportError: String? = null,
@@ -48,7 +52,15 @@ class MoreViewModel(
     // Guards against a stale profile load overwriting a just-saved profile.
     private var profileLoadGeneration = 0
 
-    init { loadProfile() }
+    init {
+        loadProfile()
+        // Trial-first no-card flow: converge expired trials on app open
+        // (idempotent; cron is the backstop). Best-effort, non-blocking.
+        viewModelScope.launch {
+            runCatching { profileRepository.expireTrial() }
+            loadProfile()
+        }
+    }
 
     fun loadProfile() {
         val generation = ++profileLoadGeneration
@@ -118,6 +130,45 @@ class MoreViewModel(
                 _uiState.value = _uiState.value.copy(
                     billingLoadingAction = null,
                     billingError = error.message ?: "Could not create checkout session.",
+                )
+            }
+        }
+    }
+
+    /**
+     * Trial-first no-card flow: grant the 14-day no-card trial for a plan.
+     * One-shot per human (email-normalized, enforced server-side) — repeated
+     * calls return false. Returns true if granted.
+     */
+    fun grantTrial(plan: String) {
+        if (_uiState.value.billingLoadingAction != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                billingLoadingAction = "trial:$plan",
+                billingError = null,
+                billingMessage = null,
+            )
+            try {
+                val granted = profileRepository.grantTrial(plan)
+                if (granted) {
+                    // Set the flag BEFORE the profile reload lands so the button
+                    // doesn't re-enable as "Start Free Trial" (stale hasUsedTrial)
+                    // and let a second tap hit the one-shot RPC → false → error.
+                    _uiState.value = _uiState.value.copy(
+                        trialJustGranted = true,
+                        billingLoadingAction = null,
+                    )
+                    loadProfile()
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        billingLoadingAction = null,
+                        billingError = "Could not start your trial. Please try again.",
+                    )
+                }
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    billingError = error.message ?: "Could not start your trial.",
                 )
             }
         }

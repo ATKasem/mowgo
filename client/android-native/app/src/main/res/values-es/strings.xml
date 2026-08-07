@@ -359,4 +359,11 @@
     <!-- Clients snackbar messages -->
     <string name="clients_created_ok">Cliente creado</string>
     <string name="clients_create_failed">Error: %1$s</string>
+
+    <!-- Trial-first no-card flow -->
+    <string name="trial_active_banner">%1$d días restantes de tu prueba de %2$s</string>
+    <string name="trial_active_subscribe">Suscríbete para mantener clientes y trabajos ilimitados</string>
+    <string name="trial_ended_title">Tu prueba terminó</string>
+    <string name="trial_ended_body">Tus clientes están a salvo — suscríbete para seguir programando más allá de 5.</string>
+    <string name="trial_start_button">Comenzar prueba gratuita</string>
 </resources>

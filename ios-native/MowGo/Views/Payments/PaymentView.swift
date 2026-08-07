@@ -162,12 +162,14 @@ struct SubscriptionPlanCard: View {
     /// True when this user already used their 14-day app trial (server-side
     /// one-shot) — flips the button between trial-start and checkout.
     var userHasUsedTrial: Bool = false
-    /// Called after a trial is granted so the parent can refresh plan state.
-    var onTrialStarted: (() -> Void)? = nil
 
     private let stripe = StripeService.shared
     @State private var isPurchasing = false
     @State private var error: String?
+    /// Set when a trial was just granted, before the async profile reload lands.
+    /// Guards the double-tap window: a second grant_trial call would return
+    /// false (server-side one-shot) and show a misleading error.
+    @State private var trialJustGranted = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var tierOrder: Int {
@@ -235,7 +237,7 @@ struct SubscriptionPlanCard: View {
                 // Trial-first no-card flow: a FREE user without an active trial
                 // starts the 14-day trial (no card). Users in/after a trial go
                 // straight to checkout (Stripe trial skipped — see edge function).
-                let isTrialStart = userTier.lowercased() == "free" && !userHasUsedTrial
+                let isTrialStart = userTier.lowercased() == "free" && !userHasUsedTrial && !trialJustGranted
                 Button {
                     Task { await subscribe() }
                 } label: {
@@ -271,12 +273,12 @@ struct SubscriptionPlanCard: View {
         // Trial-first no-card flow: free user without a used trial → grant the
         // 14-day trial via RPC (idempotent, one-shot per human server-side).
         // No card, no Stripe. Otherwise → normal checkout.
-        if userTier.lowercased() == "free" && !userHasUsedTrial {
+        if userTier.lowercased() == "free" && !userHasUsedTrial && !trialJustGranted {
             let granted = await auth.grantTrial(plan: tier)
             isPurchasing = false
             if granted {
+                trialJustGranted = true
                 error = nil
-                onTrialStarted?()
             } else {
                 error = NSLocalizedString("Could not start your trial. Please try again.", comment: "Trial grant error")
             }

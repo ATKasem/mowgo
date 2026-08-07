@@ -762,8 +762,7 @@ struct SubscriptionView: View {
                             isCurrent: normalizedCurrentTier == "free",
                             userTier: normalizedCurrentTier,
                             billingInterval: billingInterval,
-                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
-                            onTrialStarted: { Task { await auth.loadProfile() } }
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false
                         )
                         }
 
@@ -781,8 +780,7 @@ struct SubscriptionView: View {
                             isCurrent: normalizedCurrentTier == "solo",
                             userTier: normalizedCurrentTier,
                             billingInterval: billingInterval,
-                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
-                            onTrialStarted: { Task { await auth.loadProfile() } }
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false
                         )
 
                         SubscriptionPlanCard(
@@ -798,8 +796,7 @@ struct SubscriptionView: View {
                             isCurrent: normalizedCurrentTier == "crew",
                             userTier: normalizedCurrentTier,
                             billingInterval: billingInterval,
-                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
-                            onTrialStarted: { Task { await auth.loadProfile() } }
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false
                         )
 
                         SubscriptionPlanCard(
@@ -815,8 +812,7 @@ struct SubscriptionView: View {
                             isCurrent: normalizedCurrentTier == "premium",
                             userTier: normalizedCurrentTier,
                             billingInterval: billingInterval,
-                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
-                            onTrialStarted: { Task { await auth.loadProfile() } }
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false
                         )
                     }
                     .padding(16)

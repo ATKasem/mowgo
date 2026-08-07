@@ -359,4 +359,11 @@
     <!-- Clients snackbar messages -->
     <string name="clients_created_ok">Client created</string>
     <string name="clients_create_failed">Failed: %1$s</string>
+
+    <!-- Trial-first no-card flow -->
+    <string name="trial_active_banner">%1$d days left in your %2$s trial</string>
+    <string name="trial_active_subscribe">Subscribe to keep unlimited clients &amp; jobs</string>
+    <string name="trial_ended_title">Your trial ended</string>
+    <string name="trial_ended_body">Your clients are safe — subscribe to keep scheduling beyond 5.</string>
+    <string name="trial_start_button">Start Free Trial</string>
 </resources>

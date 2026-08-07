@@ -412,6 +412,10 @@ struct Estimate: Codable, Identifiable, Equatable {
 // MARK: - User Profile
 
 struct UserProfile: Codable, Identifiable {
+    /// Shared formatter — allocating one per computed-property access is wasteful
+    /// on SwiftUI re-renders (same pattern as Lead).
+    private static let isoFormatter = ISO8601DateFormatter()
+
     var id: UUID?
     var businessName: String?
     var phone: String?
@@ -432,14 +436,14 @@ struct UserProfile: Codable, Identifiable {
     /// True while a 14-day app trial is active (trialTier set, not expired).
     var hasActiveTrial: Bool {
         guard let trialTier, let endRaw = trialEndsAt,
-              let end = ISO8601DateFormatter().date(from: endRaw) else { return false }
+              let end = Self.isoFormatter.date(from: endRaw) else { return false }
         return Date() < end
     }
 
     /// Whole days left in an active trial (1...14).
     var trialDaysLeft: Int? {
         guard let endRaw = trialEndsAt,
-              let end = ISO8601DateFormatter().date(from: endRaw) else { return nil }
+              let end = Self.isoFormatter.date(from: endRaw) else { return nil }
         return max(1, Int(ceil(end.timeIntervalSinceNow / 86400)))
     }
 

@@ -2,6 +2,9 @@ package com.mowgo.app.data
 
 import com.mowgo.app.data.model.Profile
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class ProfileRepository {
     suspend fun loadProfile(): Profile? {
@@ -52,6 +55,35 @@ class ProfileRepository {
                 "zelle_handle" to zelleHandle,
             )
         ) { filter { eq("id", userId) } }
+    }
+
+    // MARK: - Trial-first no-card flow (spec 2026-08-07)
+
+    /**
+     * Grant the 14-day no-card trial for a plan. Returns true if granted.
+     * One-shot per human (email-normalized, enforced server-side) — repeated
+     * calls return false.
+     */
+    suspend fun grantTrial(plan: String): Boolean {
+        if (!SupabaseClientProvider.isConfigured) return false
+        val granted: Boolean = SupabaseClientProvider.client.postgrest.rpc(
+            "grant_trial",
+            buildJsonObject { put("p_plan", plan) },
+        ).decodeAs()
+        return granted
+    }
+
+    /**
+     * Expire any past app trial (idempotent, cheap). Call on app open / after
+     * sign-in so the UI converges even if the daily cron hasn't run yet.
+     */
+    suspend fun expireTrial(): Boolean {
+        if (!SupabaseClientProvider.isConfigured) return false
+        val expired: Boolean = SupabaseClientProvider.client.postgrest.rpc(
+            "expire_trial",
+            buildJsonObject {},
+        ).decodeAs()
+        return expired
     }
 
     private fun demoProfile(): Profile {

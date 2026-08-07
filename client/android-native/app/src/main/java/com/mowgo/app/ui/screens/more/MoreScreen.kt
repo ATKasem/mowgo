@@ -75,6 +75,7 @@ fun MoreScreen(
             state = state,
             back = { destination = MoreDestination.ROOT },
             startCheckout = viewModel::startCheckout,
+            grantTrial = viewModel::grantTrial,
             setBillingInterval = viewModel::setBillingInterval,
             openCustomerPortal = viewModel::openCustomerPortal,
             cancelSubscription = viewModel::cancelSubscription,
@@ -132,6 +133,58 @@ private fun MoreRootScreen(
                 Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
+                // Trial-first no-card flow: active trial or trial-ended banner.
+                val profile = state.profile
+                if (profile != null && profile.hasActiveTrial) {
+                    Card(
+                        Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f),
+                        ),
+                    ) {
+                        Column(Modifier.padding(14.dp)) {
+                            Text(
+                                stringResource(
+                                    R.string.trial_active_banner,
+                                    profile.trialDaysLeft ?: 1,
+                                    profile.trialPlanLabel ?: "Plan",
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                stringResource(R.string.trial_active_subscribe),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                } else if (profile != null && profile.hasUsedTrial && (profile.tier.lowercase() == "free")) {
+                    Card(
+                        Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.12f),
+                        ),
+                    ) {
+                        Column(Modifier.padding(14.dp)) {
+                            Text(
+                                stringResource(R.string.trial_ended_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                stringResource(R.string.trial_ended_body),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+
                 ProfileCard(state.profile)
                 SectionLabel(stringResource(R.string.more_business_section))
                 Card {
@@ -286,6 +339,7 @@ private fun BillingSettingsScreen(
     state: MoreUiState,
     back: () -> Unit,
     startCheckout: (String, String) -> Unit,
+    grantTrial: (String) -> Unit,
     setBillingInterval: (String) -> Unit,
     openCustomerPortal: () -> Unit,
     cancelSubscription: () -> Unit,
@@ -385,6 +439,61 @@ private fun BillingSettingsScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }
+
+        // Trial-first no-card flow: countdown or trial-ended banner in plans section.
+        val profile = state.profile
+        if (profile != null && profile.hasActiveTrial) {
+            Card(
+                Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f),
+                ),
+            ) {
+                Column(Modifier.padding(14.dp)) {
+                    Text(
+                        stringResource(
+                            R.string.trial_active_banner,
+                            profile.trialDaysLeft ?: 1,
+                            profile.trialPlanLabel ?: "Plan",
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        stringResource(R.string.trial_active_subscribe),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        } else if (profile != null && profile.hasUsedTrial && tier == "free") {
+            Card(
+                Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.12f),
+                ),
+            ) {
+                Column(Modifier.padding(14.dp)) {
+                    Text(
+                        stringResource(R.string.trial_ended_title),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        stringResource(R.string.trial_ended_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
+        val hasUsedTrial = profile?.hasUsedTrial == true
+        val trialJustGranted = state.trialJustGranted
         BillingPlanCard(
             name = stringResource(R.string.more_plan_free_name),
             features = listOf(stringResource(R.string.more_plan_free_features)),
@@ -393,6 +502,9 @@ private fun BillingSettingsScreen(
             billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
+            hasUsedTrial = hasUsedTrial,
+            trialJustGranted = trialJustGranted,
+            grantTrial = grantTrial,
         )
         BillingPlanCard(
             name = stringResource(R.string.more_plan_solo_name),
@@ -402,6 +514,9 @@ private fun BillingSettingsScreen(
             billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
+            hasUsedTrial = hasUsedTrial,
+            trialJustGranted = trialJustGranted,
+            grantTrial = grantTrial,
         )
         BillingPlanCard(
             name = stringResource(R.string.more_plan_crew_name),
@@ -411,6 +526,9 @@ private fun BillingSettingsScreen(
             billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
+            hasUsedTrial = hasUsedTrial,
+            trialJustGranted = trialJustGranted,
+            grantTrial = grantTrial,
         )
         BillingPlanCard(
             name = stringResource(R.string.more_plan_premium_name),
@@ -425,6 +543,9 @@ private fun BillingSettingsScreen(
             billingInterval = billingInterval,
             loadingAction = state.billingLoadingAction,
             subscribe = startCheckout,
+            hasUsedTrial = hasUsedTrial,
+            trialJustGranted = trialJustGranted,
+            grantTrial = grantTrial,
         )
 
         if (isPaid) {
@@ -470,6 +591,9 @@ private fun BillingPlanCard(
     billingInterval: String,
     loadingAction: String?,
     subscribe: (String, String) -> Unit,
+    hasUsedTrial: Boolean = false,
+    trialJustGranted: Boolean = false,
+    grantTrial: (String) -> Unit = {},
 ) {
     val order = mapOf("free" to 0, "solo" to 1, "crew" to 2, "premium" to 3)
     val isCurrent = tier == currentTier
@@ -528,16 +652,26 @@ private fun BillingPlanCard(
                 }
             }
             if (canUpgrade) {
-                val action = "checkout:$tier"
+                // Trial-first no-card flow: a FREE user without an active trial
+                // starts the 14-day trial (no card). Users in/after a trial go
+                // straight to checkout (Stripe trial skipped — see edge function).
+                val isTrialStart = currentTier == "free" && !hasUsedTrial && !trialJustGranted
+                val action = if (isTrialStart) "trial:$tier" else "checkout:$tier"
                 Button(
-                    onClick = { subscribe(tier, billingInterval) },
+                    onClick = {
+                        if (isTrialStart) grantTrial(tier) else subscribe(tier, billingInterval)
+                    },
                     enabled = loadingAction == null,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     if (loadingAction == action) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
                     } else {
-                        Text(if (currentTier == "free") stringResource(R.string.more_subscribe) else stringResource(R.string.more_upgrade))
+                        Text(
+                            if (isTrialStart) stringResource(R.string.trial_start_button)
+                            else if (currentTier == "free") stringResource(R.string.more_subscribe)
+                            else stringResource(R.string.more_upgrade),
+                        )
                     }
                 }
             }
