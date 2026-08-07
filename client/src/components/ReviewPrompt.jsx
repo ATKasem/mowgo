@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { X, Star, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+// TODO(re-enable): Capterra listing is NOT live yet (review link 404s, verified Aug 7 2026).
+// Submit the launch-kit listing first, then restore the "Review on Capterra" link with the
+// real profile URL (launch-kit/README.md has the submission content ready).
 const REVIEW_LINK = 'https://www.capterra.com/p/268981/MowGo/reviews/';
 
 export default function ReviewPrompt({ show, onClose }) {
@@ -63,23 +66,11 @@ export default function ReviewPrompt({ show, onClose }) {
             <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">
               {tr('Thanks — that helps other crews.')}
             </h3>
-            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">
-              {tr('Want to leave a public review too?')}
-            </p>
-            <a
-              href={REVIEW_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onClose}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand text-white font-semibold text-sm hover:bg-brand-hover transition-colors shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/20"
-            >
-              {tr('Review on Capterra')} →
-            </a>
             <button
               onClick={onClose}
               className="block w-full text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors mt-1"
             >
-              {tr('Maybe Later')}
+              {tr('Done')}
             </button>
           </div>
         ) : (

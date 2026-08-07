@@ -1,7 +1,9 @@
 {
   "app": {
     "something_went_wrong": "Something went wrong",
-    "reload_app": "Reload App"
+    "reload_app": "Reload App",
+    "new_lead_request": "New lead request",
+    "booking_link": "Booking link"
   },
   "installPrompt": {
     "dismiss_install_prompt": "Dismiss install prompt",
@@ -129,6 +131,7 @@
     "cancel": "Cancel",
     "delete_name_and_all_their_jobs_this_cannot_be_undone": "Delete {{name}} and all their jobs? This cannot be undone.",
     "count_total": "{{count}} total",
+    "count_new_leads": "{{count}} new leads",
     "recent_service_count_total_jobs": "Recent service ({{count}} total jobs)",
     "key": "Key",
     "alarm": "Alarm",
@@ -299,7 +302,8 @@
     "seo_title": "MowGo vs Jobber, LawnPro, QuoteIQ & more — Honest Comparison (2026)",
     "seo_description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing.",
     "route_optimization": "Route Optimization",
-    "one_tap_optimized_routes_send_stops_to_your_maps_app": "One-tap optimized routes + send stops to your maps app"
+    "one_tap_optimized_routes_send_stops_to_your_maps_app": "One-tap optimized routes + send stops to your maps app",
+    "start_free_trial": "Start Free Trial"
   },
   "ruunlyComparison": {
     "route_optimization": "Route Optimization",
@@ -479,7 +483,11 @@
     "select_a_client": "Select a client",
     "note_optional": "Note (optional)",
     "save_draft": "Save Draft",
-    "send": "Send"
+    "send": "Send",
+    "Voided": "Voided",
+    "voided": "Voided",
+    "Void": "Void",
+    "Void this invoice? It will no longer be collectible. This cannot be undone.": "Void this invoice? It will no longer be collectible. This cannot be undone."
   },
   "jobberPriceIncrease": {
     "core": "Core",
@@ -854,6 +862,8 @@
     "unlimited_clients_full_team_access": "Unlimited clients · Full team access",
     "unlimited_clients_all_features": "Unlimited clients · All features",
     "up_to_5_clients_all_core_features": "Up to 5 clients · All core features",
+    "lead_alerts": "Lead alerts",
+    "get_notified_instantly_when_a_new_lead_comes_in": "Get notified instantly when a new lead comes in",
     "job_completion_alerts": "Job completion alerts",
     "rain_delay_notifications": "Rain delay notifications",
     "loading_team_members": "Loading team members",
@@ -1196,7 +1206,8 @@
     "thanks_that_helps_other_crews": "Thanks — that helps other crews.",
     "want_to_leave_a_public_review_too": "Want to leave a public review too?",
     "review_on_capterra": "Review on Capterra",
-    "could_not_save_try_again": "Could not save. Try again."
+    "could_not_save_try_again": "Could not save. Try again.",
+    "done": "Done"
   },
   "concierge": {
     "your_done_for_you_setup_is_included": "Your done-for-you setup is included",
@@ -1417,7 +1428,8 @@
     "seo_description": "Get a free route audit for your lawn care business. See how much drive time and gas you can save with MowGo routing."
   },
   "portalReturn": {
-    "app_not_installed": "App not installed?"
+    "app_not_installed": "App not installed?",
+    "continue_in_your_browser": "Continue in your browser"
   },
   "onboarding": {
     "start_in_3_steps": "Start in 3 steps",

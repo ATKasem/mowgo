@@ -7,7 +7,7 @@ import { startCheckout } from '../lib/payments';
 import { supabase } from '../lib/supabase';
 
 const competitors = [
-  { name: 'MowGo', price: 'Free – $199', highlight: true },
+  { name: 'MowGo', price: '$0–$199/mo', highlight: true },
   { name: 'QuoteIQ', price: '$29.99–$699/mo' },
   { name: 'Jobber', price: '$139/mo Connect' },
   { name: 'Yardbook', price: 'Free (ads)' },
@@ -58,8 +58,8 @@ const data = {
 };
 
 const mowgoTiers = [
-  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'] },
-  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'] },
+  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
+  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
   {
     name: 'Premium',
     price: '$199/mo',
@@ -70,6 +70,7 @@ const mowgoTiers = [
       'Seasonal packs: spring pricing benchmarks, route templates',
       'Priority text-first support',
     ],
+    cta: 'Start Premium',
   },
 ];
 
@@ -100,18 +101,18 @@ export default function Compare() {
     requestAnimationFrame(() => tryScroll());
   }
 
-  async function handlePremiumCheckout() {
+  async function handleTierCheckout(plan) {
     setCheckoutError('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        localStorage.setItem('mowgo_plan_intent', 'premium');
+        localStorage.setItem('mowgo_plan_intent', plan.toLowerCase());
         localStorage.setItem('mowgo_interval_intent', 'month');
         localStorage.setItem('mowgo_intent_time', String(Date.now()));
-        navigate('/login?mode=signup');
+        navigate(`/login?mode=signup&plan=${plan.toLowerCase()}&interval=month`);
         return;
       }
-      const result = await startCheckout('premium', 'month');
+      const result = await startCheckout(plan.toLowerCase(), 'month');
       if (result?.error) setCheckoutError(result.error);
     } catch (error) {
       setCheckoutError(error.message || tr('Payment failed'));
@@ -238,7 +239,7 @@ export default function Compare() {
               <ul className="space-y-3 mt-5 flex-1">
                 {tier.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
               </ul>
-              {tier.name === 'Premium' && <button type="button" onClick={handlePremiumCheckout} className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">{tr('Start Premium')} <ArrowRight className="w-4 h-4" /></button>}
+              {tier.cta && <button type="button" onClick={() => handleTierCheckout(tier.name)} className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">{tr(tier.cta)} <ArrowRight className="w-4 h-4" /></button>}
             </div>
           ))}
         </div>

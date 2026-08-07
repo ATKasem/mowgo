@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { ArrowUpRight, CheckCircle2 } from 'lucide-react';
 
@@ -59,14 +60,12 @@ export default function PortalReturn() {
             <p className="text-sm text-gray-400 dark:text-gray-500 mb-2">
               {tr("App not installed?")}
             </p>
-            <a
-              href="https://apps.apple.com/app/mowgo/id6738985002"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-500 hover:text-emerald-600 text-sm font-medium underline underline-offset-2"
+            <Link
+              to="/login"
+              className="text-emerald-500 hover:text-emerald-400 text-sm font-medium underline underline-offset-2"
             >
-              {tr('Download from App Store')}
-            </a>
+              {tr('Continue in your browser')}
+            </Link>
           </div>
         )}
       </div>

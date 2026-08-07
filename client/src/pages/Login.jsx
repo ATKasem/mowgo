@@ -48,7 +48,7 @@ export default function Login() {
   useEffect(() => {
     const plan = searchParams.get('plan');
     const interval = searchParams.get('interval');
-    if ((plan === 'solo' || plan === 'crew') && (interval === 'month' || interval === 'year')) {
+    if ((plan === 'solo' || plan === 'crew' || plan === 'premium') && (interval === 'month' || interval === 'year')) {
       localStorage.setItem('mowgo_plan_intent', plan);
       localStorage.setItem('mowgo_interval_intent', interval);
       localStorage.setItem('mowgo_intent_time', String(Date.now()));

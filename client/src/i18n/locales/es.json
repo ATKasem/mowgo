@@ -1,7 +1,9 @@
 {
   "app": {
     "something_went_wrong": "Algo salió mal",
-    "reload_app": "Volver a cargar la app"
+    "reload_app": "Volver a cargar la app",
+    "new_lead_request": "Nueva solicitud de prospecto",
+    "booking_link": "Enlace de reserva"
   },
   "installPrompt": {
     "dismiss_install_prompt": "Cerrar aviso de instalación",
@@ -129,6 +131,7 @@
     "cancel": "Cancelar",
     "delete_name_and_all_their_jobs_this_cannot_be_undone": "¿Quieres eliminar a {{name}} y todos sus trabajos? Esta acción no se puede deshacer.",
     "count_total": "{{count}} total",
+    "count_new_leads": "{{count}} prospectos nuevos",
     "recent_service_count_total_jobs": "Servicio reciente ({{count}} trabajos en total)",
     "key": "Llave",
     "alarm": "Alarma",
@@ -309,7 +312,8 @@
     "seo_title": "MowGo vs Jobber, LawnPro, QuoteIQ y más — Comparación honesta (2026)",
     "seo_description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales.",
     "route_optimization": "Optimización de rutas",
-    "one_tap_optimized_routes_send_stops_to_your_maps_app": "Rutas optimizadas con un solo toque + envía paradas a tu aplicación de mapas"
+    "one_tap_optimized_routes_send_stops_to_your_maps_app": "Rutas optimizadas con un solo toque + envía paradas a tu aplicación de mapas",
+    "start_free_trial": "Inicia la prueba gratis"
   },
   "ruunlyComparison": {
     "route_optimization": "Optimización de rutas",
@@ -495,7 +499,11 @@
     "select_a_client": "Selecciona un cliente",
     "note_optional": "Nota (opcional)",
     "save_draft": "Guardar borrador",
-    "send": "Enviar"
+    "send": "Enviar",
+    "Voided": "Anulada",
+    "voided": "Anulada",
+    "Void": "Anular",
+    "Void this invoice? It will no longer be collectible. This cannot be undone.": "¿Anular esta factura? Ya no será cobrable. Esto no se puede deshacer."
   },
   "jobberPriceIncrease": {
     "core": "Core",
@@ -910,6 +918,8 @@
     "unlimited_clients_all_features": "Clientes ilimitados · Todas las funciones",
     "up_to_5_clients_all_core_features": "Hasta 5 clientes · Todas las funciones esenciales",
     "job_completion_alerts": "Alertas de trabajos completados",
+    "lead_alerts": "Alertas de prospectos",
+    "get_notified_instantly_when_a_new_lead_comes_in": "Recibe una notificación al instante cuando entra un nuevo prospecto",
     "rain_delay_notifications": "Notificaciones por lluvia",
     "loading_team_members": "Cargando miembros del equipo",
     "email_to_invite": "Correo de la persona que quieres invitar...",
@@ -1261,7 +1271,8 @@
     "thanks_that_helps_other_crews": "Gracias: eso ayuda a otras cuadrillas.",
     "want_to_leave_a_public_review_too": "¿Quieres dejar también una reseña pública?",
     "review_on_capterra": "Reseña en Capterra",
-    "could_not_save_try_again": "No se pudo guardar. Inténtalo de nuevo."
+    "could_not_save_try_again": "No se pudo guardar. Inténtalo de nuevo.",
+    "done": "Listo"
   },
   "concierge": {
     "your_done_for_you_setup_is_included": "Tu configuración hecha por nosotros está incluida",
@@ -1503,7 +1514,8 @@
     "seo_description": "Obtenga una auditoría de rutas gratuita para su negocio de jardinería. Vea cuánto tiempo de manejo y gasolina puede ahorrar con el enrutamiento de MowGo."
   },
   "portalReturn": {
-    "app_not_installed": "¿App no instalada?"
+    "app_not_installed": "¿App no instalada?",
+    "continue_in_your_browser": "Continúa en tu navegador"
   },
   "onboarding": {
     "start_in_3_steps": "Empieza en 3 pasos",
