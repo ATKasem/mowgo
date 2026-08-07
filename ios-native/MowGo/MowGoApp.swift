@@ -113,6 +113,9 @@ struct MowGoApp: App {
                     store.loadDemoData()
                 } else if auth.isAuthenticated {
                     await store.loadAll()
+                    // Trial-first no-card flow: converge expired trials on app
+                    // open (idempotent; cron is the backstop).
+                    await auth.expireTrialIfNeeded()
                     // Register for push notifications after authentication
                     await MainActor.run {
                         push.setCurrentUserId(store.currentUserId)

@@ -136,6 +136,33 @@ final class AuthService: ObservableObject {
         }
     }
 
+    // MARK: - Trial-first no-card flow (spec 2026-08-07)
+
+    /// Expire any past app trial (idempotent, cheap). Call on app open / after
+    /// sign-in so the UI converges even if the daily cron hasn't run yet.
+    func expireTrialIfNeeded() async {
+        guard !isDemoMode, await sb.isConfigured else { return }
+        struct EmptyParams: Encodable {}
+        _ = try? await sb.rpc("expire_trial", params: EmptyParams(), Bool.self)
+        // Re-fetch profile so trial state in the UI is current.
+        await loadProfile()
+    }
+
+    /// Grant the 14-day no-card trial for a plan. Returns true if granted.
+    /// One-shot per human (email-normalized, enforced server-side) — repeated
+    /// calls return false.
+    func grantTrial(plan: String) async -> Bool {
+        guard !isDemoMode, await sb.isConfigured else { return false }
+        struct TrialParams: Encodable { let p_plan: String }
+        do {
+            let granted = try await sb.rpc("grant_trial", params: TrialParams(p_plan: plan), Bool.self) ?? false
+            if granted { await loadProfile() }
+            return granted
+        } catch {
+            return false
+        }
+    }
+
     func updateProfile(businessName: String, phone: String, email: String, venmoHandle: String = "", cashappHandle: String = "", zelleHandle: String = "") async throws {
         let name = businessName.trimmingCharacters(in: .whitespacesAndNewlines)
         let normalizedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)

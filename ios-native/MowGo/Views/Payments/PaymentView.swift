@@ -151,6 +151,7 @@ struct PaymentView: View {
 
 struct SubscriptionPlanCard: View {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var auth: AuthService
     let name: String
     let price: String
     let features: [String]
@@ -158,6 +159,11 @@ struct SubscriptionPlanCard: View {
     let isCurrent: Bool
     var userTier: String = "free"
     var billingInterval: String = "month"
+    /// True when this user already used their 14-day app trial (server-side
+    /// one-shot) — flips the button between trial-start and checkout.
+    var userHasUsedTrial: Bool = false
+    /// Called after a trial is granted so the parent can refresh plan state.
+    var onTrialStarted: (() -> Void)? = nil
 
     private let stripe = StripeService.shared
     @State private var isPurchasing = false
@@ -226,13 +232,17 @@ struct SubscriptionPlanCard: View {
             }
 
             if canUpgrade {
+                // Trial-first no-card flow: a FREE user without an active trial
+                // starts the 14-day trial (no card). Users in/after a trial go
+                // straight to checkout (Stripe trial skipped — see edge function).
+                let isTrialStart = userTier.lowercased() == "free" && !userHasUsedTrial
                 Button {
                     Task { await subscribe() }
                 } label: {
                     if isPurchasing {
                         ProgressView().tint(MowGoTheme.onAccent)
                     } else {
-                        Text("Upgrade")
+                        Text(isTrialStart ? "Start Free Trial" : "Upgrade")
                             .fontWeight(.semibold)
                     }
                 }
@@ -256,12 +266,27 @@ struct SubscriptionPlanCard: View {
     }
 
     private func subscribe() async {
-        guard stripe.isConfigured else {
-            error = "Stripe not configured."
-            return
-        }
         isPurchasing = true
         error = nil
+        // Trial-first no-card flow: free user without a used trial → grant the
+        // 14-day trial via RPC (idempotent, one-shot per human server-side).
+        // No card, no Stripe. Otherwise → normal checkout.
+        if userTier.lowercased() == "free" && !userHasUsedTrial {
+            let granted = await auth.grantTrial(plan: tier)
+            isPurchasing = false
+            if granted {
+                error = nil
+                onTrialStarted?()
+            } else {
+                error = NSLocalizedString("Could not start your trial. Please try again.", comment: "Trial grant error")
+            }
+            return
+        }
+        guard stripe.isConfigured else {
+            error = "Stripe not configured."
+            isPurchasing = false
+            return
+        }
         do {
             let url = try await stripe.createCheckoutSession(tier: tier, interval: billingInterval)
             // Open in Safari

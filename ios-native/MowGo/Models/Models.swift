@@ -424,6 +424,38 @@ struct UserProfile: Codable, Identifiable {
     var cashappHandle: String?
     var zelleHandle: String?
     var createdAt: String?
+    /// Trial-first no-card flow: plan granted during trial + expiry.
+    /// `select=*` in fetchProfile picks these up automatically.
+    var trialTier: String?
+    var trialEndsAt: String?
+
+    /// True while a 14-day app trial is active (trialTier set, not expired).
+    var hasActiveTrial: Bool {
+        guard let trialTier, let endRaw = trialEndsAt,
+              let end = ISO8601DateFormatter().date(from: endRaw) else { return false }
+        return Date() < end
+    }
+
+    /// Whole days left in an active trial (1...14).
+    var trialDaysLeft: Int? {
+        guard let endRaw = trialEndsAt,
+              let end = ISO8601DateFormatter().date(from: endRaw) else { return nil }
+        return max(1, Int(ceil(end.timeIntervalSinceNow / 86400)))
+    }
+
+    /// True when this user already used their app trial (active OR expired).
+    var hasUsedTrial: Bool { trialTier != nil }
+
+    /// Plan label for the trial banner (trialTier or current tier).
+    var trialPlanLabel: String? {
+        guard let t = trialTier else { return nil }
+        switch t {
+        case "solo": "Solo"
+        case "crew": "Crew"
+        case "premium": "Premium"
+        default: t
+        }
+    }
 
     /// Solo/Crew/Premium are product tier names (kept in English, like a
     /// brand name); "Free" is a plain adjective and has a Spanish entry.

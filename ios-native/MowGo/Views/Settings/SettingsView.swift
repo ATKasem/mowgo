@@ -677,6 +677,7 @@ private struct BillingSettingsView: View {
 struct SubscriptionView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var auth: AuthService
     @State private var billingInterval = "month"
     let currentTier: String
 
@@ -696,6 +697,38 @@ struct SubscriptionView: View {
 
                 ScrollView {
                     VStack(spacing: 16) {
+                        // Trial-first no-card flow: countdown or trial-ended banner.
+                        if let profile = auth.user, profile.hasActiveTrial {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text("\(profile.trialDaysLeft ?? 1) days left in your \(profile.trialPlanLabel ?? "Free") trial")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor(MowGoTheme.deepGreen)
+                                    Spacer()
+                                }
+                                Text("Subscribe to keep unlimited clients & jobs")
+                                    .font(.caption)
+                                    .foregroundColor(theme.textMuted)
+                            }
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(MowGoTheme.deepGreen.opacity(MowGoTheme.accentOpacity))
+                            .cornerRadius(12)
+                        } else if let profile = auth.user, profile.hasUsedTrial && profile.tier?.lowercased() == "free" {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Your trial ended")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.orange)
+                                Text("Your clients are safe — subscribe to keep scheduling beyond 5.")
+                                    .font(.caption)
+                                    .foregroundColor(theme.textMuted)
+                            }
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.orange.opacity(MowGoTheme.accentOpacity))
+                            .cornerRadius(12)
+                        }
+
                         VStack(spacing: 4) {
                             Picker("Billing interval", selection: $billingInterval) {
                                 Text("Month").tag("month")
@@ -728,7 +761,9 @@ struct SubscriptionView: View {
                             tier: "free",
                             isCurrent: normalizedCurrentTier == "free",
                             userTier: normalizedCurrentTier,
-                            billingInterval: billingInterval
+                            billingInterval: billingInterval,
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
+                            onTrialStarted: { Task { await auth.loadProfile() } }
                         )
                         }
 
@@ -745,7 +780,9 @@ struct SubscriptionView: View {
                             tier: "solo",
                             isCurrent: normalizedCurrentTier == "solo",
                             userTier: normalizedCurrentTier,
-                            billingInterval: billingInterval
+                            billingInterval: billingInterval,
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
+                            onTrialStarted: { Task { await auth.loadProfile() } }
                         )
 
                         SubscriptionPlanCard(
@@ -760,7 +797,9 @@ struct SubscriptionView: View {
                             tier: "crew",
                             isCurrent: normalizedCurrentTier == "crew",
                             userTier: normalizedCurrentTier,
-                            billingInterval: billingInterval
+                            billingInterval: billingInterval,
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
+                            onTrialStarted: { Task { await auth.loadProfile() } }
                         )
 
                         SubscriptionPlanCard(
@@ -775,7 +814,9 @@ struct SubscriptionView: View {
                             tier: "premium",
                             isCurrent: normalizedCurrentTier == "premium",
                             userTier: normalizedCurrentTier,
-                            billingInterval: billingInterval
+                            billingInterval: billingInterval,
+                            userHasUsedTrial: auth.user?.hasUsedTrial ?? false,
+                            onTrialStarted: { Task { await auth.loadProfile() } }
                         )
                     }
                     .padding(16)
