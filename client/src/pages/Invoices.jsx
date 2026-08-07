@@ -50,6 +50,7 @@ const STATUS_FILTERS = [
   { value: 'unpaid', label: 'Unpaid' },
   { value: 'paid', label: 'Paid' },
   { value: 'overdue', label: 'Overdue' },
+  { value: 'voided', label: 'Voided' },
 ];
 
 export default function Invoices({ invoices = [], setInvoices }) {
@@ -293,13 +294,14 @@ export default function Invoices({ invoices = [], setInvoices }) {
           const isPaid = invoice.status === 'paid';
           const isVoided = invoice.status === 'voided';
           const isExpanded = expandedId === invoice.id;
+          const toggleExpanded = () => { if (!isExpanded) setVoidError(null); setExpandedId(isExpanded ? null : invoice.id); };
           return (
             <div key={invoice.id}>
               <div className="card hover:border-emerald-200 dark:hover:border-emerald-800 transition-all cursor-pointer"
                    role="button" tabIndex={0}
                    aria-expanded={isExpanded}
-                   onClick={() => setExpandedId(isExpanded ? null : invoice.id)}
-                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : invoice.id); } }}>
+                   onClick={toggleExpanded}
+                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpanded(); } }}>
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl ${statusInfo.bg} flex items-center justify-center`}><Icon className={`w-5 h-5 ${statusInfo.text}`} /></div>

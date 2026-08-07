@@ -218,7 +218,11 @@ fun InvoicesScreen(
                         containerColor = MaterialTheme.colorScheme.error,
                     ),
                 ) {
-                    Text(stringResource(R.string.invoices_void), color = MaterialTheme.colorScheme.onError)
+                    Text(
+                        if (state.voidingInvoiceId != null) stringResource(R.string.invoices_voiding)
+                        else stringResource(R.string.invoices_void),
+                        color = MaterialTheme.colorScheme.onError,
+                    )
                 }
             },
             dismissButton = {

@@ -169,6 +169,7 @@
     <string name="invoices_void_body">Void invoice for $%1$s? This cannot be undone.</string>
     <string name="invoices_void_snackbar">Invoice voided</string>
     <string name="invoices_void_failed">Failed to void: %1$s</string>
+    <string name="invoices_voiding">Voiding…</string>
     <string name="invoices_void">Void</string>
     <string name="invoices_status_voided">Voided</string>
     <string name="invoices_status_paid">Paid</string>
