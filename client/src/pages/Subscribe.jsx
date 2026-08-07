@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Check, CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle, Sprout, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { startCheckout } from '../lib/payments';
@@ -74,6 +74,7 @@ export default function Subscribe() {
   const { tr: conciergeTr } = useLocalizedText('concierge');
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
   const [status, setStatus] = useState(sessionId ? 'verifying' : 'cancelled');
   const [error, setError] = useState('');
@@ -101,6 +102,17 @@ export default function Subscribe() {
 
   async function handleCheckout(plan) {
     setCheckoutError('');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      // Logged out — send them to signup with the plan preselected (same
+      // pattern as Landing/Compare). Without this, startCheckout just
+      // returns an error line and the button appears dead.
+      localStorage.setItem('mowgo_plan_intent', plan.toLowerCase());
+      localStorage.setItem('mowgo_interval_intent', billingInterval);
+      localStorage.setItem('mowgo_intent_time', String(Date.now()));
+      navigate(`/login?mode=signup&plan=${plan.toLowerCase()}&interval=${billingInterval}`);
+      return;
+    }
     const result = await startCheckout(plan.toLowerCase(), billingInterval);
     if (result?.error) setCheckoutError(result.error);
   }
