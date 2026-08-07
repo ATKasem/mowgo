@@ -48,7 +48,7 @@ export async function onRequestPost({ request, env }) {
     const serviceHeaders = { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };
     let profileResponse;
     try {
-      profileResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?select=tier&id=eq.${user.id}`, { headers: serviceHeaders });
+      profileResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?select=tier,trial_ends_at&id=eq.${user.id}`, { headers: serviceHeaders });
     } catch {
       return Response.json({ error: 'Could not verify your plan. Please try again.' }, { status: 500, headers });
     }
@@ -56,7 +56,14 @@ export async function onRequestPost({ request, env }) {
     const profile = await profileResponse.json().catch(() => null);
     if (!Array.isArray(profile)) return Response.json({ error: 'Could not verify your plan. Please try again.' }, { status: 500, headers });
     // Premium includes concierge setup too (Compare.jsx:69 headline feature) — solo/crew/premium all allowed.
-    if (!['solo', 'crew', 'premium'].includes(profile[0]?.tier)) return Response.json({ error: 'Concierge setup is a Solo/Crew perk. Upgrade to claim it.' }, { status: 403, headers });
+    // An EXPIRED trial counts as free tier even if tier hasn't been reverted yet
+    // (expire_trial runs on app mount; cron is the backstop — gate must not wait
+    // for either, or an expired-trial user could claim real setup work for free).
+    const p = profile[0] || {};
+    const trialExpired = p.trial_ends_at && new Date(p.trial_ends_at).getTime() < Date.now();
+    if (!['solo', 'crew', 'premium'].includes(p.tier) || trialExpired) {
+      return Response.json({ error: 'Concierge setup is a Solo/Crew perk. Upgrade to claim it.' }, { status: 403, headers });
+    }
     const insertResponse = await fetch(`${env.SUPABASE_URL}/rest/v1/concierge_requests`, { method: 'POST', headers: serviceHeaders, body: JSON.stringify({ user_id: user.id, business_name: businessName, client_count: body.client_count ?? null, csv_content: csvContent, status: 'pending' }) });
     const inserted = await insertResponse.json().catch(() => null);
     if (!insertResponse.ok) {

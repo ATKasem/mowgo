@@ -30,6 +30,11 @@ BEGIN
          trial_started_at = now(),
          trial_ends_at = now() + interval '14 days'
    WHERE id = auth.uid();
+  -- Audit trail: log the trial grant so churn/abuse analytics can see it
+  -- (tier_events powers churn-by-tier tracking; trial grants were invisible).
+  INSERT INTO public.tier_events (user_id, tier, source)
+  VALUES (auth.uid(), p_plan, 'trial_grant')
+  ON CONFLICT DO NOTHING;
   RETURN true;
 END $$;
 REVOKE ALL ON FUNCTION public.grant_trial(text) FROM PUBLIC;
