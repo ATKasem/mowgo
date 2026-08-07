@@ -419,6 +419,7 @@ export default function Settings() {
         {/* Notifications */}
         <div className="card p-5 space-y-4">
           <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Bell className="w-4 h-4 text-amber-500" />{tr("Notifications")}</h4>
+          {!isDemoMode() && ['solo', 'crew', 'premium'].includes(profile?.tier) && (
           <label className="flex items-center justify-between cursor-pointer">
             <div>
               <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Lead alerts")}</p>
@@ -434,6 +435,7 @@ export default function Settings() {
               <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${profile.lead_alerts_enabled !== false ? 'translate-x-[18px]' : ''}`} />
             </button>
           </label>
+          )}
           <label className="flex items-center justify-between cursor-pointer">
             <div>
               <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Job completion alerts")}</p>

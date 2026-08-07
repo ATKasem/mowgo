@@ -1192,7 +1192,6 @@
     "job_already_scheduled": "trabajo ya programado",
     "completed": "completado",
     "count_completed": "{{count}} completados",
-    "rain_pct_day_rain_delay": "Lluvia {{pct}}% {{day}} — ¿Retraso por lluvia?",
     "tomorrow": "Mañana",
     "rain_delay": "Retraso por lluvia",
     "add_your_business_location_in_settings_to_see_local_rain_forecasts": "Agregue la ubicación de su empresa en Configuración para ver los pronósticos de lluvia locales.",
@@ -1243,7 +1242,9 @@
     "stops_without_addresses_were_skipped": "Se omitieron paradas sin dirección.",
     "stops_are_in_optimized_order_tap_one_to_open_it_in_your_navigation_app": "Las paradas están en orden optimizado. Toque uno para abrirlo en su aplicación de navegación.",
     "no_stops_with_addresses_on_this_day": "No hay paradas con direcciones en este día.",
-    "could_not_optimize_route_try_again": "No se pudo optimizar la ruta. Inténtalo de nuevo."
+    "could_not_optimize_route_try_again": "No se pudo optimizar la ruta. Inténtalo de nuevo.",
+    "rain_day_count_jobs_affected": "Lluvia {{day}} — {{count}} trabajos afectados",
+    "one_tap_moves_them_and_texts_every_client": "Un toque los mueve y les envía un mensaje a cada cliente."
   },
   "dashboard": {
     "revenue_today": "Ingresos Hoy",

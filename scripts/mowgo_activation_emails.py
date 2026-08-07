@@ -76,6 +76,8 @@ def send_resend_email(to, subject, html):
     req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
     req.add_header("Authorization", f"Bearer {RESEND_API_KEY}")
     req.add_header("Content-Type", "application/json")
+    # Cloudflare blocks urllib's default Python-urllib UA with error 1010
+    req.add_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             r.read()

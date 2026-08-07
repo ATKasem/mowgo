@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { AlertCircle, Check, CloudRain } from 'lucide-react';
 
-export default function InvoiceToast({ toast }) {
+export default function InvoiceToast({ toast, position = 'top' }) {
   const { tr } = useLocalizedText('invoiceToast');
   if (!toast) return null;
 
@@ -18,7 +18,9 @@ export default function InvoiceToast({ toast }) {
   const subColor = isError ? 'text-red-600 dark:text-red-400' : isRain ? 'text-amber-600 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-300';
 
   return (
-    <div role="status" aria-live="polite" className="fixed inset-x-0 z-30 flex justify-center pointer-events-none" style={{ animation: 'slideDown 0.3s ease-out', top: 'calc(4rem + env(safe-area-inset-top, 0px) + 8px)' }}>
+    <div role="status" aria-live="polite" className="fixed inset-x-0 z-30 flex justify-center pointer-events-none" style={position === 'bottom'
+      ? { animation: 'slideUp 0.3s ease-out', bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }
+      : { animation: 'slideDown 0.3s ease-out', top: 'calc(4rem + env(safe-area-inset-top, 0px) + 8px)' }}>
       <div className={`${bg} px-4 py-3 mx-4 flex items-center gap-2 pointer-events-auto shadow-lg max-w-sm`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <div className="min-w-0">

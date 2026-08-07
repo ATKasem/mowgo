@@ -697,6 +697,69 @@ export async function convertLeadToClient(lead) {
   return { client, lead: updated };
 }
 
+/**
+ * Watches for new leads landing for `userId` — Supabase Realtime (INSERT on
+ * `leads`, owner-only via existing RLS select policy) with a 60s poll fallback
+ * of loadLeads() if the realtime channel never reaches SUBSCRIBED. No-op in
+ * demo mode (alerts are demo no-ops). Returns an unsubscribe function.
+ */
+export function subscribeToNewLeads(userId, onNewLead) {
+  if (isDemoMode() || !userId) return () => {};
+
+  let realtimeConnected = false;
+  let pollTimer = null;
+  let knownIds = null;
+  // Shared dedupe across the Realtime and poll delivery paths so a lead that
+  // arrives during a channel reconnect can't double-toast / double-badge.
+  const delivered = new Set();
+
+  function deliver(row) {
+    if (!row || !row.id || delivered.has(row.id)) return;
+    delivered.add(row.id);
+    onNewLead(row);
+  }
+
+  async function poll() {
+    try {
+      const rows = await loadLeads();
+      if (knownIds) {
+        // Only booking-link leads are alert-worthy — manual adds must not
+        // self-trigger the toast/badge (review round 2).
+        rows.filter(row => row.source === 'booking_link' && !knownIds.has(row.id)).forEach(deliver);
+      }
+      knownIds = new Set(rows.map(row => row.id));
+    } catch (err) {
+      console.error('subscribeToNewLeads poll fallback:', err);
+    }
+  }
+
+  function startPollFallback() {
+    if (pollTimer) return;
+    poll(); // seed knownIds immediately, then poll every 60s
+    pollTimer = setInterval(poll, 60000);
+  }
+
+  const channel = supabase
+    .channel(`leads-insert-${userId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'leads', filter: `user_id=eq.${userId} and source=eq.booking_link` }, payload => {
+      deliver(payload?.new);
+    })
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED') {
+        realtimeConnected = true;
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        realtimeConnected = false;
+        startPollFallback();
+      }
+    });
+
+  return () => {
+    supabase.removeChannel(channel);
+    if (pollTimer) clearInterval(pollTimer);
+  };
+}
+
 // ===== Invoices =====
 
 export async function loadInvoices() {
@@ -1069,6 +1132,15 @@ export async function saveProfile(profile) {
   return { ...profile, business_name, phone, latitude, longitude };
 }
 
+export async function updateLeadAlertsEnabled(enabled) {
+  if (isDemoMode()) return { lead_alerts_enabled: enabled };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await supabase.from('profiles').update({ lead_alerts_enabled: enabled }).eq('id', user.id).select('lead_alerts_enabled').single();
+  if (error) throw error;
+  return data;
+}
+
 // ===== Team / Crew =====
 
 let _demoCurrentUserId = 'demo-owner-001';
@@ -1362,7 +1434,7 @@ export async function uploadJobPhoto(jobId, file, type) {
   // Store URL on the job record if photo_before/photo_after columns exist
   const colName = type === 'before' ? 'photo_before' : 'photo_after';
   try {
-    await supabase.from('jobs').update({ [colName]: urlData.signedUrl }).eq('id', jobId);
+    await supabase.from('jobs').update({ [colName]: storagePath }).eq('id', jobId);
   } catch {
     // Column may not exist yet — storage is the source of truth
   }

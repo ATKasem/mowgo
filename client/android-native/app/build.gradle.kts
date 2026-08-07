@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -25,7 +27,7 @@ android {
         // shipping a live key as a silent fallback would let any local/CI debug build process
         // real charges. If it's missing, MowGoActivity.onCreate() fails loudly at app launch
         // (build still compiles, so CI's assembleDebug step is unaffected) instead of using it.
-        val props = java.util.Properties().apply {
+        val props = Properties().apply {
             val f = rootProject.file("local.properties")
             if (f.exists()) f.inputStream().use { load(it) }
         }
@@ -40,7 +42,7 @@ android {
     signingConfigs {
         create("release") {
             // Populated from keystore.properties (gitignored) — see app/keystore.properties.example
-            val ks = java.util.Properties().apply {
+            val ks = Properties().apply {
                 val f = rootProject.file("keystore.properties")
                 if (f.exists()) f.inputStream().use { load(it) }
             }

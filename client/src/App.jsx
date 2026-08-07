@@ -276,7 +276,7 @@ export default function App() {
         <ResumeCheckoutIntent />
         <ApplyStashedRefCode />
         <LeadAlertListener onNewLead={handleNewLead} />
-        <InvoiceToast toast={leadToast} />
+        <InvoiceToast toast={leadToast} position="bottom" />
         <Suspense fallback={<PageLoading />}>
         <Routes>
           {/* Public */}

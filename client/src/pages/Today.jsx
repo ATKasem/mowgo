@@ -131,6 +131,8 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const bannerWeather = weatherDays.find(item => item.date === todayWeatherDate && item.rain >= 60)
     || weatherDays.find(item => item.date === tomorrowWeatherDate && item.rain >= 60);
   const suggestedDryDate = weatherDays.find(item => item.date >= tomorrow && item.rain < 60)?.date || null;
+  // Hero-card day label (lowercase reads better mid-sentence: "Rain tomorrow — 4 jobs affected").
+  const rainHeroDay = (bannerWeather?.date === tomorrowWeatherDate ? tr('tomorrow') : tr('today')).toLowerCase();
 
   function openRainDelay() {
     const ids = rainDelayCandidates.map(job => job.id);
@@ -738,9 +740,24 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       </div>
 
       {bannerWeather && rainDelayCandidates.length > 0 && (
-        <button onClick={openRainDelay} className="w-full mb-5 flex items-center gap-2 bg-sky-50 dark:bg-sky-950/20 border border-sky-200/60 dark:border-sky-800/40 text-sky-800 dark:text-sky-300 rounded-xl px-3 py-2.5 text-xs font-medium hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors min-h-[44px]">
-          <CloudRain className="w-4 h-4 flex-shrink-0" />
-          <span className="flex-1 text-left">{tr('Rain {{pct}}% {{day}} — Rain delay?', { pct: bannerWeather.rain, day: bannerWeather.date === tomorrowWeatherDate ? tr('tomorrow') : tr('today') })}</span>
+        <button
+          onClick={openRainDelay}
+          className="w-full mb-5 text-left rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 dark:from-sky-600 dark:to-blue-700 text-white shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.99] transition-all p-4 min-h-[44px]"
+        >
+          <span className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <CloudRain className="w-5 h-5" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-bold leading-snug">
+                {tr('Rain {{day}} — {{count}} jobs affected', { day: rainHeroDay, count: rainDelayCandidates.length })}
+              </span>
+              <span className="block text-xs text-sky-100 mt-0.5">{tr('One tap moves them and texts every client.')}</span>
+            </span>
+            <span className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold bg-white/20 rounded-full px-3 py-1.5">
+              {tr('Rain Delay')}
+            </span>
+          </span>
         </button>
       )}
 

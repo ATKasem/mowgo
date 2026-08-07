@@ -1134,7 +1134,6 @@
     "before": "Before",
     "after": "After",
     "no_photo": "No photo",
-    "rain_pct_day_rain_delay": "Rain {{pct}}% {{day}} — Rain delay?",
     "tomorrow": "Tomorrow",
     "rain_delay": "Rain Delay",
     "add_your_business_location_in_settings_to_see_local_rain_forecasts": "Add your business location in Settings to see local rain forecasts.",
@@ -1178,7 +1177,9 @@
     "stops_without_addresses_were_skipped": "Stops without addresses were skipped",
     "stops_are_in_optimized_order_tap_one_to_open_it_in_your_navigation_app": "Stops are in optimized order. Tap one to open it in your navigation app.",
     "no_stops_with_addresses_on_this_day": "No stops with addresses on this day.",
-    "could_not_optimize_route_try_again": "Could not optimize route. Try again."
+    "could_not_optimize_route_try_again": "Could not optimize route. Try again.",
+    "rain_day_count_jobs_affected": "Rain {{day}} — {{count}} jobs affected",
+    "one_tap_moves_them_and_texts_every_client": "One tap moves them and texts every client."
   },
   "dashboard": {
     "revenue_today": "Revenue Today",
