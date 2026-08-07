@@ -78,20 +78,19 @@ def main():
 
     # Titles for new messages (update per run). None = footer-only trailer, skip.
     TITLES = {
-        '1532955784017744164': 'Intel Engine — Industry Trends (Run 1, 03:35 UTC)',
-        '1532955785615773837': 'Intel Engine — Industry Trends (2/2)',
-        '1533017251660169388': 'Intel Engine — Pricing Intelligence (Run 2, 07:39 UTC)',
-        '1533017252662612088': 'Intel Engine — Pricing Intelligence (2/2)',
-        '1533038416931848243': 'Stripe Health Check (1/2)',
-        '1533038417615650960': 'Stripe Health Check (2/2)',
-        '1533078647244853401': 'Intel Engine — Feature Ideas (Run 3, 11:43 UTC)',
-        '1533078648117006498': 'Intel Engine — Feature Ideas (2/2)',
-        '1533140107454976040': 'Intel Engine — Competitor Monitoring (Run 4, 15:47 UTC)',
-        '1533140108423860244': 'Intel Engine — Competitor Monitoring (2/2)',
-        '1533201476388782311': 'Intel Engine — Industry Trends (Run 5, 19:51 UTC)',
-        '1533201476959076507': 'Intel Engine — Industry Trends (2/2)',
-        '1533262516074053642': 'Intel Engine — Pricing Intelligence (Run 6, 23:55 UTC)',
-        '1533262517063782491': 'Intel Engine — Pricing Intelligence (2/2)',
+        '1534755028945076414': 'Intel Engine — Pricing (02:48 UTC)',
+        '1534755029670428794': 'Intel Engine — Pricing (2/2)',
+        '1534820161326944386': 'Intel Engine — Features (07:07 UTC)',
+        '1534820162396749885': 'Intel Engine — Features (2/2)',
+        '1534851543029907456': 'Stripe Health Check (1/2)',
+        '1534851544867143791': 'Stripe Health Check (2/2)',
+        '1534883550011195392': 'Intel Engine — Competitor (11:19 UTC)',
+        '1534883551319691365': 'Intel Engine — Competitor (2/2)',
+        '1534901360246653052': 'Invoice Reminders (12:30 UTC)',
+        '1534948443464794162': 'Intel Engine — Daily Summary (15:19 UTC)',
+        '1535013432657707138': 'Intel Engine — Pricing (19:37 UTC)',
+        '1535087415163879515': 'Intel Engine — Features (23:55 UTC)',
+        '1535087416140890132': 'Intel Engine — Features (2/2)',
     }
 
     shown = [m for m in new if TITLES.get(m['id']) is not None]
@@ -134,46 +133,27 @@ def main():
         f.write(body)
     print('mowgo raw written:', out_mowgo, len(body), 'chars')
 
-    # ---------- outreach + cowork (unchanged channels) ----------
+    # ---------- outreach + cowork ----------
+    # NOTE (2026-08-07): #🌱mowgo-outreach returns 404 Unknown Channel —
+    # the channel no longer exists (verified on two fetches this run).
     outreach = f"""# 🌱 mowgo-outreach — Raw Channel Dump
-**{args.sync_ts} | 23 messages (0 new since last sync)**
+**{args.sync_ts} | ⚠️ CHANNEL GONE — fetch returned 404 Unknown Channel (2×)**
 
-No new messages since Jul 26, 14:12 UTC. Outreach channel remains dormant.
+The outreach channel (`1529711006023024680`) **no longer exists** as of this sync
+(was reachable at the Aug 6 12:00Z scan; 404 verified on two fetches Aug 7 02:00Z).
+Likely deleted/renamed-away by Aaron. **0 messages synced this run.**
 
-## Most Recent Activity (from prior sync — unchanged)
+Last known state (from the 2026-08-06 sync): 55 messages fetched, newest Aug 5
+01:48Z (wave-1 SMS scripts for 21 leads); the 12-message duplicate batch was
+cleaned Aug 5; the Rule of 100 cron stopped delivering here Aug 5 15:11Z
+(moved to #🌱mowgo-leads), so no active delivery targets a dead channel.
 
-### Jul 26, 14:12 — Reddit Monitor Summary
-**HeremesV2** — 8 threads found (6 high, 2 medium priority). Templates A-F for engagement across r/LawnCarePros, r/CRM, r/lawncare, r/sweatystartup.
-
-### Jul 26, 14:12 — Reddit Monitor (Threads 7-8)
-**HeremesV2** — r/lawncare "Need advice on tools and software" (Template A), r/sweatystartup "Evaluate 6 figure landscaping plan" (Template E)
-
-### Jul 26, 14:12 — Reddit Monitor (Threads 4-6)
-**HeremesV2** — r/LawnCarePros "Current state of lawn care" (Template D), r/CRM "Best CRM for lawn care 2026" (Template A), r/sweatystartup "Scheduling lawn care customers" (Template C)
-
-### Jul 26, 14:12 — Reddit Monitor (Threads 1-3)
-**HeremesV2** — r/LawnCarePros "App features" (Template A), r/LawnCarePros "Best practices for customer payment" (Template C), r/LawnCarePros "New business" (Template B)
-
-### Jul 25, 14:11 — Reddit Monitor Summary
-**HeremesV2** — 10 threads across r/LawnCarePros, r/landscaping, r/sweatystartup
-
-### Jul 24, 15:02 — Daily Outreach Actions
-**HeremesV2** — Top 3 Reddit replies + cold outreach kickoff (3 leads: Mowzilla, Walter's, Aaron's) + Facebook engagement
-
-### Jul 24, 14:07 — Reddit Monitor Summary
-**HeremesV2** — 5 threads found (2 high, 3 medium). Reddit blocks all scraping (403).
-
-### Jul 23, 15:02 — Daily Outreach Actions
-**HeremesV2** — 3 Reddit replies queued + Facebook engagement plan
-
-### Jul 23, 14:07 — Reddit Monitor Summary
-**HeremesV2** — 4 threads found incl. GOLDEN r/landscaping "1-3 person crews" thread. All Reddit access 403-blocked.
-
-### Jul 23, 04:48 — MowFlow Outreach System Setup
-**HeremesV2** — Outreach system status: Reddit Monitor (daily 9am CST) + Daily Actions (10am CST weekdays). System files: facebook-groups.md, reply-templates.md, lead-tracker.md, reddit-monitor.md. First move: 6 warm leads via text/DM.
+**Action:** confirm the deletion was intentional; update vault index +
+daily_scan channel lists accordingly.
 
 ---
 *Raw dump generated by MowGo nightly vault sync — {args.sync_ts}*
+
 """
     out_outreach = f'/opt/data/mowgo/vault/{sync_date}_channel-outreach-raw.md'
     with open(out_outreach, 'w') as f:
@@ -182,10 +162,13 @@ No new messages since Jul 26, 14:12 UTC. Outreach channel remains dormant.
     cowork = f"""# 🤝 mowgo-cowork — Raw Channel Dump
 **{args.sync_ts} | 0 messages (0 new since last sync)**
 
-This channel remains empty. No coworking sessions have taken place yet.
+Channel is empty — **cleaned Aug 6 13:30Z** (128 watchdog-failure spam messages
+deleted by the 8am action; see `2026-08-06_daily-sync.md`). Watchdog has held
+with 0 new failures since Aug 4 13:50Z. No coworking sessions have taken place.
 
 ---
 *Raw dump generated by MowGo nightly vault sync — {args.sync_ts}*
+
 """
     out_cowork = f'/opt/data/mowgo/vault/{sync_date}_channel-cowork-raw.md'
     with open(out_cowork, 'w') as f:
