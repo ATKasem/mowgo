@@ -38,24 +38,24 @@ export async function startCheckout(plan, interval = 'month') {
 }
 
 /**
- * Resume a paid-plan checkout from a stored intent (localStorage, shared across tabs).
+ * Resume a stored plan intent by granting a 14-day trial via Supabase RPC.
  * Used at app root (email-confirmation return) and after login/signup submit.
- * Protections: plan/interval whitelist + 30-min TTL; intent cleared on deterministic
- * errors, kept on transport errors so the user can retry.
- * @returns {{status: 'started'|'none'|'error', message?: string}}
+ * 7-day intent TTL (no more 30-min bug); idempotent grant_trial RPC; intent
+ * cleared on success or no-op; kept on transport errors so the user can retry.
+ * @returns {{status: 'granted'|'none'|'error', message?: string, retryable?: boolean}}
  */
 let resumeInFlight = false;
 export async function resumeCheckoutIntent() {
-  if (resumeInFlight) return { status: 'started' };
+  if (resumeInFlight) return { status: 'granted' };
   const intent = localStorage.getItem('mowgo_plan_intent');
   if (!intent) return { status: 'none' };
   const interval = localStorage.getItem('mowgo_interval_intent');
   const intentTime = Number(localStorage.getItem('mowgo_intent_time') || 0);
   const age = Date.now() - intentTime;
-  const valid = ['solo', 'crew', 'premium'].includes(intent)
-    && ['month', 'year'].includes(interval)
-    && age >= 0 && age < 30 * 60 * 1000;
-  if (!valid) {
+  const validPlan = ['solo', 'crew', 'premium'].includes(intent);
+  const validInterval = ['month', 'year'].includes(interval);
+  const validAge = age >= 0 && age < 7 * 24 * 60 * 60 * 1000; // 7-day TTL
+  if (!validPlan || !validInterval || !validAge) {
     // Stale, malformed, corrupt, or expired intent — never hijack a normal login.
     localStorage.removeItem('mowgo_plan_intent');
     localStorage.removeItem('mowgo_interval_intent');
@@ -64,30 +64,39 @@ export async function resumeCheckoutIntent() {
   }
   resumeInFlight = true;
   try {
-    const r = await startCheckout(intent, interval);
-    if (r?.error) {
-      if (r.retryable) {
-        // Transport failure — keep the intent so the user can retry.
-        resumeInFlight = false;
-        return { status: 'error', message: r.error, retryable: true };
-      }
-      // Deterministic failure (validation/config) — drop the intent so the next
-      // login goes to /app instead of retrying forever.
+    // Expire any past trial first so tier reverts to free (grant can then re-grant).
+    // Best-effort — RPC failure does not block the grant attempt.
+    try { await supabase.rpc('expire_trial'); } catch { /* non-fatal */ }
+
+    // Check if user already has a real paid tier (not from a trial).
+    const { data: profile, error: profileErr } = await supabase
+      .from('profiles')
+      .select('tier, trial_ends_at')
+      .single();
+    if (!profileErr && profile?.tier && profile.tier !== 'free' && !profile.trial_ends_at) {
+      // Already a real paid subscriber — clear the intent.
       localStorage.removeItem('mowgo_plan_intent');
       localStorage.removeItem('mowgo_interval_intent');
       localStorage.removeItem('mowgo_intent_time');
-      resumeInFlight = false;
-      return { status: 'error', message: r.error };
+      return { status: 'none' };
     }
-    // startCheckout redirects to Stripe on success — only then drop the intent
+
+    // Grant the trial via RPC (idempotent — no-ops if already active or tier != free).
+    const { error: rpcErr } = await supabase.rpc('grant_trial', { p_plan: intent });
+    if (rpcErr) {
+      // Transport / RPC failure — keep intent so the user can retry on next mount.
+      return { status: 'error', message: rpcErr.message || 'Trial grant failed', retryable: true };
+    }
+    // Granted (or no-op for active trial) — intent consumed either way.
     localStorage.removeItem('mowgo_plan_intent');
     localStorage.removeItem('mowgo_interval_intent');
     localStorage.removeItem('mowgo_intent_time');
-    return { status: 'started' };
-  } catch (checkoutError) {
+    return { status: 'granted' };
+  } catch (err) {
     // Defensive: any thrown error is transport-like — keep the intent for retry.
+    return { status: 'error', message: err.message || 'Trial grant failed', retryable: true };
+  } finally {
     resumeInFlight = false;
-    return { status: 'error', message: checkoutError.message || 'Payment failed', retryable: true };
   }
 }
 

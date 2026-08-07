@@ -774,7 +774,6 @@
     "mowgo": "MowGo",
     "simple_scheduling_for_lawn_care_crews": "Programación sencilla para equipos de jardinería",
     "start_your_14_day_plan_trial_unlimited_clients_no_credit_card": "Comienza tu prueba gratuita de 14 días de {{plan}}: clientes ilimitados, sin tarjeta de crédito.",
-    "after_you_confirm_we_ll_walk_you_through_checkout_to_start_your_trial_no": "Después de confirmar, te guiaremos al pago para comenzar tu prueba: sin cargos hasta que termine.",
     "check_your_email": "Revisa tu correo",
     "we_sent_a_confirmation_link_to": "Enviamos un enlace de confirmación a",
     "reset_link_sent": "Enlace enviado",
@@ -795,7 +794,8 @@
     "create_your_free_account_5_clients_no_credit_card": "Crea tu cuenta gratuita: 5 clientes, sin tarjeta de crédito.",
     "payment_failed": "Pago fallido",
     "referral_code_optional": "Código de referencia (opcional)",
-    "e_g_7km2qp": "p. ej. 7KM2QP"
+    "e_g_7km2qp": "p. ej. 7KM2QP",
+    "after_you_confirm_we_ll_start_your_14_day_trial_no_card_needed": "Después de confirmar, iniciaremos tu prueba de 14 días — sin tarjeta de crédito."
   },
   "privacy": {
     "back_to_mowgo": "Volver a MowGo",
@@ -1540,5 +1540,12 @@
     "mark_a_job_complete": "Marca un trabajo como completado",
     "get_set_up_for_you_free_concierge": "Configuración asistida gratis para ti",
     "you_re_rolling_want_a_review_call": "Vas viento en popa. ¿Quieres una llamada de seguimiento?"
+  },
+  "trialBanner": {
+    "days_left_in_your_plan_trial": "Quedan {{days}} días de tu prueba de {{plan}}",
+    "subscribe_to_keep_unlimited_clients_jobs": "Suscríbete para mantener clientes y trabajos ilimitados",
+    "your_trial_ended": "Tu prueba terminó",
+    "your_clients_are_safe_subscribe_to_keep_scheduling_beyond_5": "Tus clientes están a salvo — suscríbete para seguir programando más de 5.",
+    "subscribe": "Suscribirse"
   }
 }

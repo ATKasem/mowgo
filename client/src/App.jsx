@@ -142,6 +142,8 @@ function ResumeCheckoutIntent() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // Expire any past trial on mount (cheap, idempotent, best-effort).
+      try { if (!cancelled) await supabase.rpc('expire_trial'); } catch { /* non-fatal */ }
       const intent = localStorage.getItem('mowgo_plan_intent');
       if (!intent) return;
       const { data: { session } } = await supabase.auth.getSession();

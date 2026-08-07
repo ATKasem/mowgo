@@ -326,6 +326,13 @@ async function updateProfile({ env, userId, customerId, tier }) {
     // cancellation still earns its own win-back email (see
     // 20260806200000_referral_credit_claim.sql).
     ...(tier !== 'free' ? { winback_sent_at: null } : {}),
+    // A real Stripe subscription event means the app trial is consumed —
+    // clear the trial row so TrialBanner hides for paying (or formerly
+    // paying) users and grant_trial can never re-grant after conversion
+    // or cancellation (trial-first no-card flow, spec 2026-08-07).
+    trial_tier: null,
+    trial_started_at: null,
+    trial_ends_at: null,
   };
 
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;

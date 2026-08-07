@@ -7,6 +7,7 @@ import { Calendar, Users, FileText, MoreHorizontal, LogOut, WifiOff, LayoutDashb
 import ThemeToggle from './ThemeToggle';
 import Logo from './Logo';
 import { isCurrentlyOffline } from '../lib/offlineStorage';
+import TrialBanner from './TrialBanner';
 
 const navItems = [
   { to: '/app', icon: LayoutDashboard, title: 'Dashboard', exact: true },
@@ -52,6 +53,8 @@ export default function Layout() {
           {tr("You're offline — changes will sync when reconnected")}
         </div>
       )}
+
+      <TrialBanner />
 
       {/* Header */}
       <header className="bg-[var(--color-surface)] dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20 backdrop-blur-sm bg-[var(--color-surface)]/95 dark:bg-gray-900/95" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>

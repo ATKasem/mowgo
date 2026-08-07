@@ -63,7 +63,7 @@ export async function onRequestPost(context) {
     const appUrl = origin || env.APP_URL || 'https://mowgoapp.com';
 
     const profileResponse = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=stripe_customer_id`,
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=stripe_customer_id,trial_ends_at`,
       {
         headers: {
           Authorization: `Bearer ${supabaseServiceKey}`,
@@ -74,6 +74,8 @@ export async function onRequestPost(context) {
     if (!profileResponse.ok) throw new Error('Could not load billing profile');
     const [profile] = await profileResponse.json();
     if (!profile) return json({ error: 'Profile not found' }, 404, origin);
+
+    const hasAppTrial = Boolean(profile.trial_ends_at);
 
     let customerId = profile.stripe_customer_id;
     if (!customerId) {
@@ -130,7 +132,8 @@ export async function onRequestPost(context) {
         'line_items[0][price]': priceId,
         'line_items[0][quantity]': '1',
         mode: 'subscription',
-        'subscription_data[trial_period_days]': String(trialDays),
+        ...(!hasAppTrial && { 'subscription_data[trial_period_days]': String(trialDays) }),
+        ...(hasAppTrial && { 'metadata[trial_used]': 'true' }),
         'metadata[user_id]': user.id,
         'metadata[tier]': plan,
         'metadata[interval]': interval,

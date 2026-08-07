@@ -10,6 +10,7 @@ import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle,
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 import ConciergeSetup from '../components/ConciergeSetup';
+import TrialBanner from '../components/TrialBanner';
 
 function SectionHeader({ children }) {
   return (
@@ -388,6 +389,7 @@ export default function Settings() {
         {/* Plan Info */}
         <div className="card p-5 space-y-3">
           <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-violet-500" />{tr("Plan")}</h4>
+          <TrialBanner />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-[var(--color-text-primary)] dark:text-white capitalize">{tr(profile?.tier === 'solo' ? 'Solo Plan' : profile?.tier === 'crew' ? 'Crew Plan' : 'Free Plan')}</p>

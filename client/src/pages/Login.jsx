@@ -159,9 +159,12 @@ export default function Login() {
         }
       }
 
+      // Expire any past trial before resuming intent (best-effort, covers expired-trial re-login).
+      try { await supabase.rpc('expire_trial'); } catch { /* non-fatal */ }
+
       const resume = await resumeCheckoutIntent();
-      if (resume.status !== 'none') {
-        if (resume.status === 'error') setError(resume.message || tr('Payment failed'));
+      if (resume.status === 'error') {
+        setError(resume.message || tr('Payment failed'));
         setLoading(false);
         return;
       }
@@ -205,7 +208,7 @@ export default function Login() {
               <h2 className="font-bold text-gray-900 dark:text-white">{tr("Check your email")}</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("We sent a confirmation link to {{email}}. Click it to activate your account.", { email })}</p>
               {hasPaidPlanIntent && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{tr("After you confirm, we'll walk you through checkout to start your trial — no charge until it ends.")}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{tr("After you confirm, we'll start your 14-day trial — no card needed.")}</p>
               )}
             </div>
             <button onClick={() => { setConfirmSent(false); setMode('login'); }} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
