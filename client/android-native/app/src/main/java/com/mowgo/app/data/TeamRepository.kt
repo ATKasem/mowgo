@@ -42,7 +42,7 @@ class TeamRepository(
             order("business_name", Order.ASCENDING)
         }.decodeList<UserProfile>()
 
-        return (owner + crew).distinctBy { it.id }.sortedBy { it.businessName.lowercase() }
+        return (owner + crew).distinctBy { it.id }.sortedBy { it.businessName?.lowercase() ?: "" }
     }
 
     suspend fun inviteTeamMember(email: String): UserProfile {

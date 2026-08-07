@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserProfile(
     val id: String = "",
-    @SerialName("business_name") val businessName: String = "",
+    @SerialName("business_name") val businessName: String? = null,
     val phone: String? = null,
     val tier: String? = null,
     val role: String? = null,

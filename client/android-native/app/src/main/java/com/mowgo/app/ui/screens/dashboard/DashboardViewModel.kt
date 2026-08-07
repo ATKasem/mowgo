@@ -241,7 +241,7 @@ class DashboardViewModel : ViewModel() {
             val assignedJobs = todayJobs.filter { it.assignedTo == member.id }
             if (assignedJobs.isEmpty()) null else TeamProgressRow(
                 id = member.id,
-                label = member.businessName.ifBlank { "Crew" },
+                label = member.businessName?.ifBlank { null } ?: "Crew",
                 done = assignedJobs.count { it.status == Job.STATUS_DONE },
                 inProgress = assignedJobs.count { it.status == Job.STATUS_IN_PROGRESS },
                 total = assignedJobs.size,

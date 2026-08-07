@@ -161,7 +161,7 @@ private fun MoreRootScreen(
                             )
                         }
                     }
-                } else if (profile != null && profile.hasUsedTrial && (profile.tier.lowercase() == "free")) {
+                } else if (profile != null && profile.hasUsedTrial && (profile.tier?.lowercase() == "free")) {
                     Card(
                         Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(

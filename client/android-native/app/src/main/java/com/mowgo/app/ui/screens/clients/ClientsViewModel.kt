@@ -92,7 +92,7 @@ class ClientsViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val profile = profileRepository.loadProfile()
-                val isFreeTier = profile == null || profile.tier.isBlank() || profile.tier == "free"
+                val isFreeTier = profile == null || profile.tier.isNullOrBlank() || profile.tier == "free"
                 if (isFreeTier && _uiState.value.clients.size >= FREE_CLIENT_LIMIT) {
                     _uiState.value = _uiState.value.copy(showNewClientDialog = false, showUpgradePrompt = true)
                     return@launch

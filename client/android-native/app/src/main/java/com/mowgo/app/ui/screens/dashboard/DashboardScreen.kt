@@ -140,7 +140,7 @@ fun DashboardScreen(
         AlertDialog(
             onDismissRequest = { memberToRemove = null },
             title = { Text(stringResource(R.string.dashboard_remove_crew_title)) },
-            text = { Text(stringResource(R.string.dashboard_remove_crew_body, member.businessName.ifBlank { stringResource(R.string.dashboard_remove_crew_default) })) },
+            text = { Text(stringResource(R.string.dashboard_remove_crew_body, member.businessName?.ifBlank { null } ?: stringResource(R.string.dashboard_remove_crew_default))) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -393,11 +393,11 @@ private fun CrewRoster(members: List<UserProfile>, onInvite: () -> Unit, onRemov
                 Box(Modifier.size(8.dp).background(if (owner) Color(0xFF22C55E) else Color(0xFF3B82F6), CircleShape))
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(member.businessName.ifBlank { stringResource(R.string.dashboard_crew_member_default) }, fontWeight = FontWeight.Medium)
+                    Text(member.businessName?.ifBlank { null } ?: stringResource(R.string.dashboard_crew_member_default), fontWeight = FontWeight.Medium)
                     Text(if (owner) stringResource(R.string.dashboard_owner) else stringResource(R.string.dashboard_crew), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (member.role == "crew") IconButton(onClick = { onRemove(member) }) {
-                    Icon(Icons.Filled.Delete, stringResource(R.string.dashboard_remove_member_cd, member.businessName), tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Filled.Delete, stringResource(R.string.dashboard_remove_member_cd, member.businessName ?: ""), tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                 }
             }
         }

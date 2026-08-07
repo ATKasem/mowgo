@@ -241,12 +241,14 @@ class InvoicesViewModel : ViewModel() {
     private fun payMethods(profile: Profile?): List<String> {
         if (profile == null) return emptyList()
         val parts = mutableListOf<String>()
-        if (profile.zelleHandle.isNotBlank()) parts += "Zelle: ${profile.zelleHandle.trim()}"
-        if (profile.venmoHandle.isNotBlank()) {
-            parts += "Venmo: @${profile.venmoHandle.trim().removePrefix("@")}"
+        profile.zelleHandle?.trim()?.takeIf { it.isNotBlank() }?.let {
+            parts += "Zelle: $it"
         }
-        if (profile.cashappHandle.isNotBlank()) {
-            parts += "Cash App: ${'$'}${profile.cashappHandle.trim().removePrefix("$")}"
+        profile.venmoHandle?.trim()?.removePrefix("@")?.takeIf { it.isNotBlank() }?.let {
+            parts += "Venmo: @$it"
+        }
+        profile.cashappHandle?.trim()?.removePrefix("$")?.takeIf { it.isNotBlank() }?.let {
+            parts += "Cash App: $$it"
         }
         return parts
     }

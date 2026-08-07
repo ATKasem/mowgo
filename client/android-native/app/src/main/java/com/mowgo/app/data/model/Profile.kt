@@ -9,13 +9,13 @@ import kotlin.math.max
 
 @Serializable
 data class Profile(
-    @SerialName("business_name") val businessName: String = "",
-    val phone: String = "",
-    val email: String = "",
-    @SerialName("venmo_handle") val venmoHandle: String = "",
-    @SerialName("cashapp_handle") val cashappHandle: String = "",
-    @SerialName("zelle_handle") val zelleHandle: String = "",
-    val tier: String = "free",
+    @SerialName("business_name") val businessName: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    @SerialName("venmo_handle") val venmoHandle: String? = null,
+    @SerialName("cashapp_handle") val cashappHandle: String? = null,
+    @SerialName("zelle_handle") val zelleHandle: String? = null,
+    val tier: String? = null,
     @SerialName("role") val role: String? = null,
     @SerialName("business_id") val businessId: String? = null,
     /// Trial-first no-card flow: plan granted during trial + expiry.
