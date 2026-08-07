@@ -117,7 +117,7 @@ serve(async (req) => {
     // Look up or create Stripe customer
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, trial_ends_at")
       .eq("id", user.id)
       .single();
 
@@ -131,6 +131,12 @@ serve(async (req) => {
         }
       );
     }
+
+    // Trial-first no-card flow (spec 2026-08-07): if the user has EVER had an
+    // app trial (trial_ends_at set — active or expired), they already used
+    // their free period. Skip the Stripe trial so conversion bills immediately
+    // (no double trial). Mirrors functions/api/stripe/checkout-subscription.js.
+    const hasAppTrial = Boolean(profile?.trial_ends_at);
 
     let customerId = profile?.stripe_customer_id;
 
@@ -188,6 +194,27 @@ serve(async (req) => {
 
     // Create Checkout Session
     const trialDays = Number.parseInt(Deno.env.get("STRIPE_TRIAL_DAYS") ?? "14", 10) || 14;
+    const sessionParams = new URLSearchParams({
+      customer: customerId,
+      mode: "subscription",
+      "line_items[0][price]": priceId,
+      "line_items[0][quantity]": "1",
+      success_url: "mowgo://settings?upgraded=true",
+      cancel_url: "mowgo://settings",
+      "metadata[user_id]": user.id,
+      "metadata[tier]": tier,
+      "metadata[interval]": interval,
+      "subscription_data[metadata][user_id]": user.id,
+      "subscription_data[metadata][tier]": tier,
+      "subscription_data[metadata][interval]": interval,
+    });
+    // Only grant the Stripe trial when the user has NOT already used their app
+    // trial — conversion after an app trial bills immediately (no double trial).
+    if (!hasAppTrial) {
+      sessionParams.set("subscription_data[trial_period_days]", String(trialDays));
+    } else {
+      sessionParams.set("metadata[trial_used]", "true");
+    }
     const sessionResp = await fetch(
       "https://api.stripe.com/v1/checkout/sessions",
       {
@@ -196,21 +223,7 @@ serve(async (req) => {
           Authorization: `Bearer ${stripeKey}`,
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({
-          customer: customerId,
-          mode: "subscription",
-          "line_items[0][price]": priceId,
-          "line_items[0][quantity]": "1",
-          success_url: "mowgo://settings?upgraded=true",
-          cancel_url: "mowgo://settings",
-          "metadata[user_id]": user.id,
-          "metadata[tier]": tier,
-          "metadata[interval]": interval,
-          "subscription_data[trial_period_days]": String(trialDays),
-          "subscription_data[metadata][user_id]": user.id,
-          "subscription_data[metadata][tier]": tier,
-          "subscription_data[metadata][interval]": interval,
-        }).toString(),
+        body: sessionParams.toString(),
       }
     );
 
