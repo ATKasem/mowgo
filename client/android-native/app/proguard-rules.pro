@@ -21,6 +21,11 @@
 -keep class io.github.jan.supabase.** { *; }
 -keep class io.github.jan.tennert.supabase.** { *; }
 
+# Ktor HTTP engine (service-loader discovery — REQUIRED or release builds crash
+# at startup: "Failed to find HTTP client engine implementation in the classpath")
+-keep class io.ktor.client.engine.okhttp.** { *; }
+-keep class io.ktor.client.HttpClientEngineContainer { *; }
+
 # Retrofit
 -keepattributes Signature, InnerClasses, EnclosingMethod
 -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations

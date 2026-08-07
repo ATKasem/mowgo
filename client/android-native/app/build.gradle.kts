@@ -125,6 +125,8 @@ dependencies {
     implementation(libs.supabase.auth)
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.realtime)
+    // Ktor HTTP engine — REQUIRED by Ktor 3 / supabase-kt at runtime
+    implementation(libs.ktor.client.okhttp)
 
     // Image loading
     implementation(libs.coil.compose)

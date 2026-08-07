@@ -13,6 +13,7 @@ coroutines = "1.9.0"
 datastore = "1.1.1"
 securityCrypto = "1.1.0"
 supabase = "3.0.1"
+ktor = "3.0.3"
 coil = "2.7.0"
 stripe = "21.19.0"
 firebaseBom = "33.7.0"
@@ -61,6 +62,11 @@ supabase-core = { group = "io.github.jan-tennert.supabase", name = "supabase-kt"
 supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt", version.ref = "supabase" }
 supabase-postgrest = { group = "io.github.jan-tennert.supabase", name = "postgrest-kt", version.ref = "supabase" }
 supabase-realtime = { group = "io.github.jan-tennert.supabase", name = "realtime-kt", version.ref = "supabase" }
+
+# Ktor HTTP engine — supabase-kt 3.x runs on Ktor 3, which REQUIRES an explicit
+# engine dependency (Ktor 3 no longer bundles one). Without it the app crashes
+# at startup: "Failed to find HTTP client engine implementation in the classpath".
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 
 # Image loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
