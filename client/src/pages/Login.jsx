@@ -21,7 +21,7 @@ export default function Login() {
   // Paid-plan checkout intent carried in the URL ("Start Free Trial" → /login?mode=signup&plan=solo&interval=month)
   const planParam = searchParams.get('plan');
   const intervalParam = searchParams.get('interval');
-  const hasPaidPlanIntent = (planParam === 'solo' || planParam === 'crew')
+  const hasPaidPlanIntent = (planParam === 'solo' || planParam === 'crew' || planParam === 'premium')
     && (intervalParam === 'month' || intervalParam === 'year');
 
   // Referral code from URL or pre-stash (survives email-confirm round trip)
@@ -189,7 +189,7 @@ export default function Login() {
           </Link>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tr("Simple scheduling for lawn care crews")}</p>
           {mode === 'signup' && (hasPaidPlanIntent ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr('Start your 14-day {{plan}} trial — unlimited clients, no credit card.', { plan: planParam === 'crew' ? 'Crew' : 'Solo' })}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr('Start your 14-day {{plan}} trial — unlimited clients, no credit card.', { plan: planParam === 'crew' ? 'Crew' : planParam === 'premium' ? 'Premium' : 'Solo' })}</p>
           ) : (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-4 text-center">{tr("Create your free account — 5 clients, no credit card.")}</p>
           ))}
