@@ -1,0 +1,1484 @@
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/data/InvoiceRepository.kt b/client/android-native/app/src/main/java/com/mowgo/app/data/InvoiceRepository.kt
+index 123df62..e7fcaea 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/data/InvoiceRepository.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/data/InvoiceRepository.kt
+@@ -62,6 +62,49 @@ class InvoiceRepository {
+             .insert(invoiceWithUser)
+     }
+ 
++    /**
++     * Auto-invoice for a completed job (mirrors web). Idempotent per job_id —
++     * callers should skip $0 rates before invoking.
++     */
++    suspend fun createInvoiceForJob(jobId: String, clientId: String, amount: Double): Invoice? {
++        val existing = loadInvoices().firstOrNull { it.jobId == jobId }
++        if (existing != null) return existing
++
++        if (!SupabaseClientProvider.isConfigured) {
++            val newInvoice = Invoice(
++                id = "demo-inv-${System.currentTimeMillis()}",
++                clientId = clientId,
++                jobId = jobId,
++                amount = amount,
++                status = Invoice.STATUS_UNPAID,
++                createdAt = Instant.now().toString(),
++            )
++            demoInvoicesMutable = listOf(newInvoice) + demoInvoicesMutable
++            return newInvoice
++        }
++
++        val userId = getCurrentUserId() ?: throw IllegalStateException("Not authenticated")
++        val invoice = Invoice(
++            userId = userId,
++            clientId = clientId,
++            jobId = jobId,
++            amount = amount,
++            status = Invoice.STATUS_UNPAID,
++        )
++        return try {
++            SupabaseClientProvider.client.from("invoices")
++                .insert(invoice) { select() }
++                .decodeSingle<Invoice>()
++        } catch (e: Exception) {
++            // Unique job_id violation (23505): a concurrent call created it first.
++            if (e.message?.contains("duplicate key") == true || e.message?.contains("23505") == true) {
++                loadInvoices().firstOrNull { it.jobId == jobId }
++            } else {
++                throw e
++            }
++        }
++    }
++
+     /** Mark an invoice as paid with current timestamp. */
+     suspend fun markInvoicePaid(invoiceId: String) {
+         if (!SupabaseClientProvider.isConfigured) {
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/data/ProfileRepository.kt b/client/android-native/app/src/main/java/com/mowgo/app/data/ProfileRepository.kt
+index d9d007d..278fbe3 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/data/ProfileRepository.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/data/ProfileRepository.kt
+@@ -15,13 +15,23 @@ class ProfileRepository {
+         return profiles.firstOrNull()
+     }
+ 
+-    suspend fun updateProfile(businessName: String, phone: String, email: String) {
++    suspend fun updateProfile(
++        businessName: String,
++        phone: String,
++        email: String,
++        venmoHandle: String = "",
++        cashappHandle: String = "",
++        zelleHandle: String = "",
++    ) {
+         if (!SupabaseClientProvider.isConfigured) {
+             val current = demoProfile()
+             demoProfileMutable = Profile(
+                 businessName = businessName,
+                 phone = phone,
+                 email = email,
++                venmoHandle = venmoHandle,
++                cashappHandle = cashappHandle,
++                zelleHandle = zelleHandle,
+                 tier = current.tier,
+                 role = current.role,
+                 businessId = current.businessId,
+@@ -30,10 +40,17 @@ class ProfileRepository {
+         }
+         val userId = SupabaseClientProvider.auth.currentSessionOrNull()?.user?.id
+             ?: throw IllegalStateException("Not authenticated")
+-        // RLS only grants authenticated updates to business_name + phone — email is
+-        // auth-managed and must NOT be included or the whole update is rejected.
++        // RLS grants authenticated updates to business_name, phone, and the
++        // payment handles (019) — email is auth-managed and must NOT be
++        // included or the whole update is rejected.
+         SupabaseClientProvider.client.from("profiles").update(
+-            mapOf("business_name" to businessName, "phone" to phone)
++            mapOf(
++                "business_name" to businessName,
++                "phone" to phone,
++                "venmo_handle" to venmoHandle,
++                "cashapp_handle" to cashappHandle,
++                "zelle_handle" to zelleHandle,
++            )
+         ) { filter { eq("id", userId) } }
+     }
+ 
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt b/client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt
+index 3bd36ec..a0d46dc 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt
+@@ -8,6 +8,9 @@ data class Profile(
+     @SerialName("business_name") val businessName: String = "",
+     val phone: String = "",
+     val email: String = "",
++    @SerialName("venmo_handle") val venmoHandle: String = "",
++    @SerialName("cashapp_handle") val cashappHandle: String = "",
++    @SerialName("zelle_handle") val zelleHandle: String = "",
+     val tier: String = "free",
+     @SerialName("role") val role: String? = null,
+     @SerialName("business_id") val businessId: String? = null,
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesScreen.kt b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesScreen.kt
+index b0b8976..969ac60 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesScreen.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesScreen.kt
+@@ -20,12 +20,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.platform.LocalClipboardManager
+ import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.text.AnnotatedString
+ import androidx.compose.ui.text.font.FontWeight
+ import androidx.compose.ui.text.style.TextAlign
+ import androidx.compose.ui.unit.dp
+ import androidx.lifecycle.compose.collectAsStateWithLifecycle
+ import androidx.lifecycle.viewmodel.compose.viewModel
++import kotlinx.coroutines.launch
+ import com.mowgo.app.data.SupabaseClientProvider
+ import com.mowgo.app.data.model.Client
+ import com.mowgo.app.data.model.Invoice
+@@ -44,6 +47,8 @@ fun InvoicesScreen(
+     val state by viewModel.uiState.collectAsStateWithLifecycle()
+     var showingEstimates by rememberSaveable { mutableStateOf(false) }
+     val snackbarHostState = remember { SnackbarHostState() }
++    val scope = rememberCoroutineScope()
++    val clipboard = LocalClipboardManager.current
+     val context = LocalContext.current
+     val activity = remember(context) { context.findActivity() }
+     val paymentSheet = activity?.let { hostActivity ->
+@@ -284,6 +289,14 @@ fun InvoicesScreen(
+                             onPay = { viewModel.payInvoice(item) },
+                             onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
+                             onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
++                            onCopyText = {
++                                clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName)))
++                                scope.launch { snackbarHostState.showSnackbar("Payment text copied — paste it into a text to the client") }
++                            },
++                            onNudge = {
++                                clipboard.setText(AnnotatedString(viewModel.invoiceNudgeText(item.invoice, item.clientName)))
++                                scope.launch { snackbarHostState.showSnackbar("Reminder copied — paste it into a text") }
++                            },
+                         )
+                     }
+                 }
+@@ -418,9 +431,17 @@ private fun InvoiceCard(
+     onPay: () -> Unit,
+     onMarkPaid: () -> Unit,
+     onDelete: () -> Unit,
++    onCopyText: (() -> Unit)? = null,
++    onNudge: (() -> Unit)? = null,
+ ) {
+     var expanded by remember { mutableStateOf(false) }
+     val isPaid = invoice.status == Invoice.STATUS_PAID
++    val canNudge = !isPaid && onNudge != null && (invoice.createdAt?.let { raw ->
++        runCatching {
++            java.time.Instant.parse(raw)
++                .isBefore(java.time.Instant.now().minus(java.time.Duration.ofDays(3)))
++        }.getOrDefault(false)
++    } ?: false)
+ 
+     Card(
+         modifier = Modifier
+@@ -511,6 +532,44 @@ private fun InvoiceCard(
+                     horizontalArrangement = Arrangement.spacedBy(8.dp),
+                 ) {
+                     if (!isPaid) {
++                        onCopyText?.let { copyText ->
++                            OutlinedButton(
++                                onClick = copyText,
++                                modifier = Modifier.weight(1f),
++                                colors = ButtonDefaults.outlinedButtonColors(
++                                    contentColor = MowGoColors.DeepGreenDark,
++                                ),
++                                border = ButtonDefaults.outlinedButtonBorder.copy(
++                                    brush = androidx.compose.ui.graphics.SolidColor(
++                                        MowGoColors.DeepGreenDark.copy(alpha = 0.5f),
++                                    ),
++                                ),
++                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
++                                shape = RoundedCornerShape(8.dp),
++                            ) {
++                                Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
++                                Spacer(modifier = Modifier.width(4.dp))
++                                Text("Copy text", style = MaterialTheme.typography.labelSmall)
++                            }
++                        }
++                        if (canNudge) {
++                            OutlinedButton(
++                                onClick = { onNudge?.invoke() },
++                                modifier = Modifier.weight(1f),
++                                colors = ButtonDefaults.outlinedButtonColors(
++                                    contentColor = MowGoColors.WarningDark,
++                                ),
++                                border = ButtonDefaults.outlinedButtonBorder.copy(
++                                    brush = androidx.compose.ui.graphics.SolidColor(
++                                        MowGoColors.WarningDark.copy(alpha = 0.5f),
++                                    ),
++                                ),
++                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
++                                shape = RoundedCornerShape(8.dp),
++                            ) {
++                                Text("Nudge", style = MaterialTheme.typography.labelSmall)
++                            }
++                        }
+                         if (showPay) {
+                             Button(
+                                 onClick = onPay,
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesViewModel.kt b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesViewModel.kt
+index 24ad7bb..15a29a5 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesViewModel.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/invoices/InvoicesViewModel.kt
+@@ -6,9 +6,11 @@ import com.mowgo.app.data.InvoiceRepository
+ import com.mowgo.app.data.EstimateRepository
+ import com.mowgo.app.data.JobRepository
+ import com.mowgo.app.data.PaymentRepository
++import com.mowgo.app.data.ProfileRepository
+ import com.mowgo.app.data.model.Client
+ import com.mowgo.app.data.model.Invoice
+ import com.mowgo.app.data.model.Estimate
++import com.mowgo.app.data.model.Profile
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.StateFlow
+ import kotlinx.coroutines.flow.asStateFlow
+@@ -25,6 +27,7 @@ data class InvoicesUiState(
+     val invoices: List<Invoice> = emptyList(),
+     val estimates: List<Estimate> = emptyList(),
+     val clients: List<Client> = emptyList(),
++    val profile: Profile? = null,
+     val showNewInvoiceDialog: Boolean = false,
+     val showNewEstimateDialog: Boolean = false,
+     val selectedEstimate: Estimate? = null,
+@@ -94,11 +97,13 @@ class InvoicesViewModel : ViewModel() {
+                 val invoices = invoiceRepository.loadInvoices()
+                 val clients = jobRepository.loadClients()
+                 val estimates = estimateRepository.loadEstimates()
++                val profile = ProfileRepository().loadProfile()
+                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
+                     isLoading = false,
+                     invoices = invoices,
+                     clients = clients,
+                     estimates = estimates,
++                    profile = profile,
+                 )
+             } catch (e: Exception) {
+                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
+@@ -226,6 +231,49 @@ class InvoicesViewModel : ViewModel() {
+         _uiState.value = _uiState.value.copy(showNewInvoiceDialog = false)
+     }
+ 
++    // ── Payment request texts (mirror web: Zelle first — clients default to
++    // the first option listed; only configured methods appear) ───────────
++
++    private fun payMethods(profile: Profile?): List<String> {
++        if (profile == null) return emptyList()
++        val parts = mutableListOf<String>()
++        if (profile.zelleHandle.isNotBlank()) parts += "Zelle: ${profile.zelleHandle.trim()}"
++        if (profile.venmoHandle.isNotBlank()) {
++            parts += "Venmo: @${profile.venmoHandle.trim().removePrefix("@")}"
++        }
++        if (profile.cashappHandle.isNotBlank()) {
++            parts += "Cash App: ${'$'}${profile.cashappHandle.trim().removePrefix("$")}"
++        }
++        return parts
++    }
++
++    fun invoicePayLine(): String {
++        val methods = payMethods(_uiState.value.profile)
++        return if (methods.isEmpty()) {
++            "Please send payment at your earliest convenience"
++        } else {
++            "Pay via ${methods.joinToString(" · ")}"
++        }
++    }
++
++    fun invoiceText(invoice: Invoice, clientName: String?): String {
++        val name = clientName?.takeIf { it.isNotBlank() } ?: "there"
++        val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
++        val date = invoice.createdAt?.take(10)?.let { raw ->
++            runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
++        } ?: ""
++        return "Hi $name — your lawn was serviced${if (date.isNotEmpty()) " on $date" else ""}. $$amount due. ${invoicePayLine()}. Thanks!"
++    }
++
++    fun invoiceNudgeText(invoice: Invoice, clientName: String?): String {
++        val name = clientName?.takeIf { it.isNotBlank() } ?: "there"
++        val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
++        val date = invoice.createdAt?.take(10)?.let { raw ->
++            runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
++        } ?: ""
++        return "Hi $name — friendly reminder: $$amount${if (date.isNotEmpty()) " from $date" else ""} is still due. ${invoicePayLine()}. Thanks!"
++    }
++
+     fun createInvoice(
+         clientId: String,
+         amount: Double,
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt
+index 67e3fbe..6fbfd6e 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt
+@@ -222,18 +222,27 @@ private fun DetailScaffold(title: String, back: () -> Unit, content: @Composable
+ }
+ 
+ @Composable
+-private fun BusinessProfileScreen(state: MoreUiState, back: () -> Unit, save: (String, String, String) -> Unit, dismissMessage: () -> Unit) {
++private fun BusinessProfileScreen(state: MoreUiState, back: () -> Unit, save: (String, String, String, String, String, String) -> Unit, dismissMessage: () -> Unit) {
+     val context = LocalContext.current
+     var name by remember(state.profile) { mutableStateOf(state.profile?.businessName ?: "") }
+     var phone by remember(state.profile) { mutableStateOf(state.profile?.phone ?: "") }
+     var email by remember(state.profile) { mutableStateOf(state.profile?.email ?: "") }
++    var venmo by remember(state.profile) { mutableStateOf(state.profile?.venmoHandle ?: "") }
++    var cashapp by remember(state.profile) { mutableStateOf(state.profile?.cashappHandle ?: "") }
++    var zelle by remember(state.profile) { mutableStateOf(state.profile?.zelleHandle ?: "") }
+     LaunchedEffect(state.saveMessage) { state.saveMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show(); dismissMessage() } }
+     DetailScaffold("Business Profile", back) {
+         OutlinedTextField(name, { name = it }, label = { Text("Business name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+         OutlinedTextField(phone, { phone = it }, label = { Text("Phone") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+         OutlinedTextField(email, { email = it }, label = { Text("Email") }, singleLine = true, enabled = false, modifier = Modifier.fillMaxWidth())
++        HorizontalDivider()
++        Text("How clients pay you", style = MaterialTheme.typography.titleSmall)
++        OutlinedTextField(zelle, { zelle = it }, label = { Text("Zelle (phone or email)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
++        OutlinedTextField(venmo, { venmo = it }, label = { Text("Venmo (@handle)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
++        OutlinedTextField(cashapp, { cashapp = it }, label = { Text("Cash App (\$handle)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
++        Text("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.", style = MaterialTheme.typography.bodySmall, color = MowGoColors.TextSecondaryDark)
+         state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+-        Button(onClick = { if (name.isNotBlank()) save(name.trim(), phone.trim(), email.trim()) }, enabled = name.isNotBlank() && !state.isSaving, modifier = Modifier.fillMaxWidth()) {
++        Button(onClick = { if (name.isNotBlank()) save(name.trim(), phone.trim(), email.trim(), venmo.trim(), cashapp.trim(), zelle.trim()) }, enabled = name.isNotBlank() && !state.isSaving, modifier = Modifier.fillMaxWidth()) {
+             if (state.isSaving) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text("Save Changes")
+         }
+     }
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt
+index 6b15f87..7d52197 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt
+@@ -71,16 +71,19 @@ class MoreViewModel(
+         loadProfile()
+     }
+ 
+-    fun updateProfile(name: String, phone: String, email: String) {
++    fun updateProfile(name: String, phone: String, email: String, venmoHandle: String = "", cashappHandle: String = "", zelleHandle: String = "") {
+         // Invalidate any in-flight load so it can't clobber the saved profile.
+         profileLoadGeneration++
+         viewModelScope.launch {
+             _uiState.value = _uiState.value.copy(isSaving = true, error = null, saveMessage = null)
+             try {
+-                profileRepository.updateProfile(name, phone, email)
++                profileRepository.updateProfile(name, phone, email, venmoHandle, cashappHandle, zelleHandle)
+                 _uiState.value = _uiState.value.copy(
+                     isSaving = false,
+-                    profile = (_uiState.value.profile ?: Profile()).copy(businessName = name, phone = phone, email = email),
++                    profile = (_uiState.value.profile ?: Profile()).copy(
++                        businessName = name, phone = phone, email = email,
++                        venmoHandle = venmoHandle, cashappHandle = cashappHandle, zelleHandle = zelleHandle,
++                    ),
+                     saveMessage = "Changes saved",
+                 )
+             } catch (error: Exception) {
+diff --git a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt
+index 6b34385..bcd3d6d 100644
+--- a/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt
++++ b/client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt
+@@ -4,6 +4,7 @@ import android.app.Application
+ import androidx.lifecycle.AndroidViewModel
+ import androidx.lifecycle.viewModelScope
+ import com.mowgo.app.data.JobRepository
++import com.mowgo.app.data.InvoiceRepository
+ import com.mowgo.app.data.JobPhotoRepository
+ import com.mowgo.app.data.RainDelayHistoryStore
+ import com.mowgo.app.data.WeatherForecast
+@@ -77,6 +78,7 @@ data class TodayUiState(
+ class TodayViewModel(application: Application) : AndroidViewModel(application) {
+ 
+     private val repository = JobRepository()
++    private val invoiceRepository = InvoiceRepository()
+     private val photoRepository = JobPhotoRepository(repository)
+     private val historyStore = RainDelayHistoryStore(application.applicationContext)
+     private val weatherRepository = WeatherRepository()
+@@ -122,6 +124,22 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
+         viewModelScope.launch {
+             try {
+                 repository.updateJobStatus(jobId, newStatus)
++                // Auto-invoice on completion (mirrors web): idempotent per job, $0 rates skipped.
++                if (newStatus == Job.STATUS_DONE) {
++                    _uiState.value.jobs.firstOrNull { it.id == jobId }?.let { jobWithClient ->
++                        if (jobWithClient.clientRate > 0) {
++                            runCatching {
++                                invoiceRepository.createInvoiceForJob(
++                                    jobId = jobId,
++                                    clientId = jobWithClient.job.clientId,
++                                    amount = jobWithClient.clientRate,
++                                )
++                            }.onFailure { e ->
++                                android.util.Log.w("TodayViewModel", "auto-invoice failed", e)
++                            }
++                        }
++                    }
++                }
+                 // Reload to get fresh state
+                 loadData()
+             } catch (e: Exception) {
+diff --git a/client/src/components/InvoiceToast.jsx b/client/src/components/InvoiceToast.jsx
+index bc92d71..cc60f33 100644
+--- a/client/src/components/InvoiceToast.jsx
++++ b/client/src/components/InvoiceToast.jsx
+@@ -23,11 +23,9 @@ export default function InvoiceToast({ toast }) {
+         <Icon className={`w-4 h-4 ${iconColor}`} />
+         <div className="min-w-0">
+           <p className={`text-sm font-semibold ${textColor}`}>
+-            {isRain || isError || toast.type === 'recurring'
+-              ? toast.name
+-              : tr('Invoice created for {{name}}', { name: toast.name })}
++            {toast.name}
+           </p>
+-          {!isRain && !isError && <p className={`text-xs ${subColor}`}>${toast.amount ?? '0'} — {tr('unpaid')}</p>}
++          {toast.type === 'invoice' && <p className={`text-xs ${subColor}`}>${toast.amount ?? '0'} — {tr('unpaid')}</p>}
+         </div>
+         {toast.actionLabel && toast.onAction && (
+           <button type="button" onClick={toast.onAction} className={`ml-2 text-xs font-bold underline underline-offset-2 ${textColor}`}>
+diff --git a/client/src/i18n/locales/en.json b/client/src/i18n/locales/en.json
+index e47d066..9085886 100644
+--- a/client/src/i18n/locales/en.json
++++ b/client/src/i18n/locales/en.json
+@@ -425,8 +425,10 @@
+     "overdue": "Overdue",
+     "today": "today",
+     "pay_via_venmo_business_or_zelle_phone": "Pay via Venmo @{{business}} or Zelle: {{phone}}",
+-    "please_send_payment_at_your_earliest_convenience": "Please send payment at your earliest convenience.",
+-    "hi_name_your_lawn_was_serviced_on_date_amount_due_paymentinfo_thanks": "Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}} Thanks!",
++    "pay_via_methods": "Pay via {{methods}}",
++    "please_send_payment_at_your_earliest_convenience": "Please send payment at your earliest convenience",
++    "hi_name_your_lawn_was_serviced_on_date_amount_due_paymentinfo_thanks": "Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!",
++    "hi_name_friendly_reminder_amount_from_date_is_still_due_paymentinfo_than": "Hi {{name}} — friendly reminder: ${{amount}} from {{date}} is still due. {{paymentInfo}}. Thanks!",
+     "count_total_one": "{{count}} total",
+     "count_total_other": "{{count}} total",
+     "amount_outstanding": "${{amount}} outstanding",
+@@ -627,6 +629,7 @@
+     "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "We built MowGo for Oklahoma crews. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.",
+     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime.",
+     "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.",
++    "card_checkout_is_live_route_optimization_ships_next_oklahoma_early_adopt": "Card checkout is live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.",
+     "rain_on_tuesday_eight_clients_to_rebook": "Rain on Tuesday. Eight clients to rebook.",
+     "one_tap_fixes_it": "One tap fixes it.",
+     "when_oklahoma_rain_hits_mowgo_moves_your_whole_schedule_forward_and_text": "When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place.",
+diff --git a/client/src/i18n/locales/es.json b/client/src/i18n/locales/es.json
+index 535c42a..6dc43cd 100644
+--- a/client/src/i18n/locales/es.json
++++ b/client/src/i18n/locales/es.json
+@@ -448,8 +448,10 @@
+     "overdue": "Vencida",
+     "today": "hoy",
+     "pay_via_venmo_business_or_zelle_phone": "Paga por Venmo a @{{business}} o por Zelle al {{phone}}",
+-    "please_send_payment_at_your_earliest_convenience": "Por favor, envía el pago cuando te sea posible.",
+-    "hi_name_your_lawn_was_serviced_on_date_amount_due_paymentinfo_thanks": "Hola, {{name}}. Realizamos el servicio de tu césped el {{date}}. Saldo pendiente: ${{amount}}. {{paymentInfo}} ¡Gracias!",
++    "pay_via_methods": "Paga por {{methods}}",
++    "please_send_payment_at_your_earliest_convenience": "Por favor, envía el pago cuando te sea posible",
++    "hi_name_your_lawn_was_serviced_on_date_amount_due_paymentinfo_thanks": "Hola, {{name}}. Realizamos el servicio de tu césped el {{date}}. Saldo pendiente: ${{amount}}. {{paymentInfo}}. ¡Gracias!",
++    "hi_name_friendly_reminder_amount_from_date_is_still_due_paymentinfo_than": "Hola, {{name}} — recordatorio: ${{amount}} del {{date}} sigue pendiente. {{paymentInfo}}. ¡Gracias!",
+     "count_total_one": "{{count}} en total",
+     "count_total_other": "{{count}} en total",
+     "amount_outstanding": "${{amount}} pendientes",
+@@ -662,6 +664,7 @@
+     "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "Creamos MowGo para los equipos de Oklahoma. Usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. Si no te sientes más organizado, te devolvemos el primer mes completo. Sin preguntas, sin trámites. Tus datos siempre son tuyos.",
+     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Aplica para Solo. Sin cargos de configuración. Sin contratos. Cancela cuando quieras.",
+     "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Los pagos con Stripe están activos. La optimización de rutas llega después — los primeros usuarios de Oklahoma reciben funciones nuevas sin aumento de precio.",
++    "card_checkout_is_live_route_optimization_ships_next_oklahoma_early_adopt": "El pago con tarjeta está activo. La optimización de rutas llega después: los primeros usuarios de Oklahoma reciben funciones nuevas sin aumento de precio.",
+     "pricing": "Precios",
+     "coming_soon": "Muy pronto",
+     "mowgo_dashboard_screenshot": "Captura de pantalla del panel de MowGo",
+diff --git a/client/src/lib/data.js b/client/src/lib/data.js
+index 3d63d13..43184dd 100644
+--- a/client/src/lib/data.js
++++ b/client/src/lib/data.js
+@@ -693,37 +693,94 @@ export async function createInvoice(invoice) {
+   }
+ 
+   if (isDemoMode()) {
+-    const newInvoice = { ...invoice, amount, id: uid(), status: 'unpaid' };
++    // Dedupe by job_id and always stamp created_at (Nudge eligibility depends on it).
++    if (invoice.job_id) {
++      const existing = _invoices.find(i => i.job_id === invoice.job_id);
++      if (existing) return { invoice: existing, created: false };
++    }
++    const newInvoice = { ...invoice, amount, id: uid(), status: 'unpaid', created_at: new Date().toISOString() };
+     _invoices = [newInvoice, ..._invoices];
+     notify();
+-    return newInvoice;
++    return { invoice: newInvoice, created: true };
+   }
+   const { data: { user } } = await supabase.auth.getUser();
+   if (!user) throw new Error('Not authenticated');
+ 
+-  const { data, error } = await supabase.from('invoices').insert({
+-    user_id: user.id,
+-    client_id: invoice.client_id || invoice.clients?.id,
+-    amount,
+-    status: 'unpaid',
+-  }).select('*, clients!left(*)').single();
++  // Idempotent: a job that's toggled done->todo->done must not double-invoice.
++  if (invoice.job_id) {
++    const { data: existing, error: lookupError } = await supabase
++      .from('invoices')
++      .select('id, client_id, amount, status, created_at, job_id')
++      .eq('job_id', invoice.job_id)
++      .maybeSingle();
++    if (lookupError) throw lookupError;
++    if (existing) {
++      return {
++        invoice: {
++          id: existing.id,
++          clients: invoice.clients || null,
++          amount: existing.amount,
++          status: existing.status,
++          created_at: existing.created_at,
++        },
++        created: false,
++      };
++    }
++  }
+ 
+-  if (error) throw error;
++  let data;
++  try {
++    const { data: inserted, error } = await supabase.from('invoices').insert({
++      user_id: user.id,
++      client_id: invoice.client_id || invoice.clients?.id,
++      amount,
++      status: 'unpaid',
++      job_id: invoice.job_id || null,
++    }).select('*, clients!left(*)').single();
++    if (error) throw error;
++    data = inserted;
++  } catch (insertError) {
++    // Unique-violation race (23505): another call created it first — return the existing row.
++    if (insertError?.code === '23505' && invoice.job_id) {
++      const { data: raced, error: raceError } = await supabase
++        .from('invoices')
++        .select('id, client_id, amount, status, created_at, job_id')
++        .eq('job_id', invoice.job_id)
++        .maybeSingle();
++      if (raceError) throw raceError;
++      if (raced) {
++        return {
++          invoice: {
++            id: raced.id,
++            clients: invoice.clients || null,
++            amount: raced.amount,
++            status: raced.status,
++            created_at: raced.created_at,
++          },
++          created: false,
++        };
++      }
++    }
++    throw insertError;
++  }
+ 
+   return {
+-    id: data.id,
+-    clients: data.clients ? {
+-      id: data.clients.id,
+-      name: data.clients.name,
+-      address: data.clients.address,
+-      phone: data.clients.phone,
+-      email: data.clients.email,
+-      rate: data.clients.rate,
+-      service_notes: data.clients.cleaning_notes,
+-    } : null,
+-    amount: data.amount,
+-    status: data.status,
+-    created_at: data.created_at,
++    invoice: {
++      id: data.id,
++      clients: data.clients ? {
++        id: data.clients.id,
++        name: data.clients.name,
++        address: data.clients.address,
++        phone: data.clients.phone,
++        email: data.clients.email,
++        rate: data.clients.rate,
++        service_notes: data.clients.cleaning_notes,
++      } : null,
++      amount: data.amount,
++      status: data.status,
++      created_at: data.created_at,
++    },
++    created: true,
+   };
+ }
+ 
+@@ -813,12 +870,35 @@ export function estimateNudgeText(estimate) {
+   return `Hi ${estimate.clients?.name || 'there'}, just checking in on your estimate for $${Number(estimate.amount).toFixed(2)} from ${date} — still want me to hold the spot? Happy to adjust anything. Thanks!`;
+ }
+ 
++/**
++ * Payment methods the operator configured for invoice texts, in preference
++ * order (research: clients default to the first option listed — Zelle is the
++ * most-used free rail, so it leads).
++ */
++export function invoicePayMethods() {
++  const zelle = (localStorage.getItem('mf_zelle_handle') || '').trim();
++  const venmo = (localStorage.getItem('mf_venmo_handle') || '').trim();
++  const cashapp = (localStorage.getItem('mf_cashapp_handle') || '').trim();
++  const parts = [];
++  if (zelle) parts.push(`Zelle: ${zelle}`);
++  if (venmo) parts.push(`Venmo: @${venmo.replace(/^@/, '')}`);
++  if (cashapp) parts.push(`Cash App: $${cashapp.replace(/^\$/, '')}`);
++  return parts;
++}
++
+ // ===== Profile =====
+ 
+ export async function loadProfile() {
+   if (isDemoMode()) {
+     const userId = _currentDemoUserId();
+     const member = _teamMembers.find(m => m.id === userId);
++    // Demo mode: reset the clipboard-text mirrors so a real account's
++    // payment handles can't leak into demo invoice texts.
++    localStorage.setItem('mf_business_name', 'Green Thumb Lawn Care');
++    localStorage.setItem('mf_business_phone', '405-555-0100');
++    localStorage.setItem('mf_venmo_handle', '');
++    localStorage.setItem('mf_cashapp_handle', '');
++    localStorage.setItem('mf_zelle_handle', '');
+     return member || { business_name: 'Green Thumb Lawn Care', phone: '405-555-0100', tier: 'solo', role: 'owner', business_id: null };
+   }
+ 
+@@ -826,7 +906,22 @@ export async function loadProfile() {
+   if (!user) return null;
+ 
+   const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+-  if (error) { console.error('loadProfile:', error); return null; }
++  if (error) {
++    console.error('loadProfile:', error);
++    // Don't leave a previous account's payment handles in the clipboard mirrors.
++    ['mf_business_name', 'mf_business_phone', 'mf_venmo_handle', 'mf_cashapp_handle', 'mf_zelle_handle']
++      .forEach(k => localStorage.removeItem(k));
++    return null;
++  }
++  // Hydrate the clipboard-text mirrors so invoice texts work on any device
++  // the operator signs into (cleared on a fresh profile/account).
++  if (data) {
++    localStorage.setItem('mf_business_name', data.business_name || '');
++    localStorage.setItem('mf_business_phone', data.phone || '');
++    localStorage.setItem('mf_venmo_handle', data.venmo_handle || '');
++    localStorage.setItem('mf_cashapp_handle', data.cashapp_handle || '');
++    localStorage.setItem('mf_zelle_handle', data.zelle_handle || '');
++  }
+   return data;
+ }
+ 
+@@ -854,9 +949,12 @@ export async function saveProfile(profile) {
+   const { data: { user } } = await supabase.auth.getUser();
+   if (!user) throw new Error('Not authenticated');
+ 
+-  const { business_name, phone, avatar_url } = profile;
++  const { business_name, phone, avatar_url, venmo_handle, cashapp_handle, zelle_handle } = profile;
+   const { error } = await supabase.from('profiles').upsert({
+     id: user.id, business_name, phone, avatar_url, latitude, longitude,
++    venmo_handle: venmo_handle || null,
++    cashapp_handle: cashapp_handle || null,
++    zelle_handle: zelle_handle || null,
+   });
+   if (error) throw error;
+   return { ...profile, business_name, phone, avatar_url, latitude, longitude };
+@@ -987,7 +1085,7 @@ export async function inviteTeamMember(email) {
+     return member;
+   }
+ 
+-  return authenticatedApiRequest('/api/team/invite', {
++  return authenticatedApiRequest('/api/invite-crew', {
+     method: 'POST',
+     body: JSON.stringify({ email: normalizedEmail }),
+   });
+@@ -1122,7 +1220,7 @@ const _demoPhotos = new Map();
+  * @param {string} jobId
+  * @param {File} file - image file from input/camera
+  * @param {'before'|'after'} type
+- * @returns {Promise<string>} public URL of the uploaded photo
++ * @returns {Promise<string>} one-hour signed URL of the uploaded photo
+  */
+ export async function uploadJobPhoto(jobId, file, type) {
+   const timestamp = Date.now();
+@@ -1146,19 +1244,21 @@ export async function uploadJobPhoto(jobId, file, type) {
+ 
+   if (uploadError) throw uploadError;
+ 
+-  const { data: urlData } = supabase.storage
++  const { data: urlData, error: signedUrlError } = await supabase.storage
+     .from('job-photo')
+-    .getPublicUrl(storagePath);
++    .createSignedUrl(storagePath, 3600);
++
++  if (signedUrlError) throw signedUrlError;
+ 
+   // Store URL on the job record if photo_before/photo_after columns exist
+   const colName = type === 'before' ? 'photo_before' : 'photo_after';
+   try {
+-    await supabase.from('jobs').update({ [colName]: urlData.publicUrl }).eq('id', jobId);
++    await supabase.from('jobs').update({ [colName]: urlData.signedUrl }).eq('id', jobId);
+   } catch {
+     // Column may not exist yet — storage is the source of truth
+   }
+ 
+-  return urlData.publicUrl;
++  return urlData.signedUrl;
+ }
+ 
+ /**
+@@ -1187,11 +1287,12 @@ export async function getJobPhotos(jobId) {
+   const result = { before: null, after: null };
+   for (const f of files) {
+     const filePath = `${folderPath}/${f.name}`;
+-    const { data: urlData } = supabase.storage
++    const { data: urlData, error: signedUrlError } = await supabase.storage
+       .from('job-photo')
+-      .getPublicUrl(filePath);
+-    if (f.name.startsWith('before-')) result.before = urlData.publicUrl;
+-    if (f.name.startsWith('after-')) result.after = urlData.publicUrl;
++      .createSignedUrl(filePath, 3600);
++    if (signedUrlError) continue;
++    if (f.name.startsWith('before-')) result.before = urlData.signedUrl;
++    if (f.name.startsWith('after-')) result.after = urlData.signedUrl;
+   }
+   return result;
+ }
+diff --git a/client/src/pages/Compare.jsx b/client/src/pages/Compare.jsx
+index afe2d69..e58ae09 100644
+--- a/client/src/pages/Compare.jsx
++++ b/client/src/pages/Compare.jsx
+@@ -32,7 +32,7 @@ const features = [
+   { label: 'Recurring Jobs', key: 'recurring', desc: 'Weekly/biweekly/monthly auto-schedule' },
+   { label: 'Installable Web App', key: 'pwa', desc: 'Works on iPhone, Android, and desktop as a PWA' },
+   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
+-  { label: 'Stripe Payments', key: 'stripe', desc: 'Accept cards online' },
++  { label: 'Zero-Fee Payments', key: 'stripe', desc: 'Venmo, Zelle, Cash App — no card processing fees' },
+   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
+ ];
+ 
+@@ -50,7 +50,7 @@ const data = {
+   recurring:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
+   pwa:          [ true,   true,  true,  false, false, true,  false, false, false, false ],
+   privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
+-  stripe:       [ true,  true,  true,  false, true,  true,  false, false, true,  true  ],
++  stripe:       [ true,  false, false, false, false, false, false, false, false, false ],
+   gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
+ };
+ 
+diff --git a/client/src/pages/Invoices.jsx b/client/src/pages/Invoices.jsx
+index 0878805..95eaf78 100644
+--- a/client/src/pages/Invoices.jsx
++++ b/client/src/pages/Invoices.jsx
+@@ -1,27 +1,46 @@
+ import useLocalizedText from '../i18n/useLocalizedText';
+ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+-import { updateInvoiceStatus } from '../lib/data';
++import { updateInvoiceStatus, invoicePayMethods } from '../lib/data';
+ import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck } from 'lucide-react';
+ import { INVOICE_STATUS } from '../lib/constants';
+ import EstimatesSection from '../components/EstimatesSection';
+ 
+ const iconMap = { CheckCircle, AlertCircle };
+ 
++/** Localized payment line (methods are data; the wrapper is translated). */
++function invoicePaymentInfo(tr) {
++  const methods = invoicePayMethods();
++  return methods.length
++    ? tr('Pay via {{methods}}', { methods: methods.join(' · ') })
++    : tr('Please send payment at your earliest convenience');
++}
++
+ /** Generate invoice text for clipboard */
+ function invoiceText(invoice, tr, language) {
+   const name = invoice.clients?.name || tr('Client');
+-  const amount = invoice.amount || 0;
++  const amount = Number(invoice.amount || 0).toFixed(2);
+   const date = invoice.created_at
+     ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
+     : tr('today');
+-  const phone = localStorage.getItem('mf_business_phone') || '';
+-  const bizName = localStorage.getItem('mf_business_name') || '';
+ 
+-  const payInfo = phone
+-    ? tr('Pay via Venmo @{{business}} or Zelle: {{phone}}', { business: bizName || 'YourBiz', phone })
+-    : tr('Please send payment at your earliest convenience.');
++  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!', { name, date, amount, paymentInfo: invoicePaymentInfo(tr) });
++}
++
++/** Friendly reminder text for stale unpaid invoices. */
++function invoiceNudgeText(invoice, tr, language) {
++  const name = invoice.clients?.name || tr('Client');
++  const amount = Number(invoice.amount || 0).toFixed(2);
++  const date = invoice.created_at
++    ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
++    : '';
++  return tr('Hi {{name}} — friendly reminder: ${{amount}} from {{date}} is still due. {{paymentInfo}}. Thanks!', { name, amount, date, paymentInfo: invoicePaymentInfo(tr) });
++}
+ 
+-  return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}} Thanks!', { name, date, amount, paymentInfo: payInfo });
++/** Unpaid/overdue invoices older than 3 days get a Nudge (mirrors estimates). */
++function isStaleInvoice(invoice) {
++  return invoice.status !== 'paid'
++    && invoice.created_at
++    && Date.now() - new Date(invoice.created_at).getTime() > 3 * 24 * 60 * 60 * 1000;
+ }
+ 
+ const STATUS_FILTERS = [
+@@ -198,6 +217,21 @@ export default function Invoices({ invoices = [], setInvoices }) {
+                           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-[var(--color-surface)] rotate-45" />
+                         </span>
+                       </button>
++                      {isStaleInvoice(invoice) && (
++                        <button
++                          onClick={async e => {
++                            e.stopPropagation();
++                            try {
++                              await navigator.clipboard.writeText(invoiceNudgeText(invoice, tr, i18n.resolvedLanguage));
++                              setCopiedIds(prev => new Set([...prev, `nudge-${invoice.id}`]));
++                              setTimeout(() => setCopiedIds(prev => { const n = new Set(prev); n.delete(`nudge-${invoice.id}`); return n; }), 2500);
++                            } catch { /* clipboard denied */ }
++                          }}
++                          className="btn-secondary text-xs text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
++                        >
++                          {copiedIds.has(`nudge-${invoice.id}`) ? tr('Copied!') : tr('Nudge')}
++                        </button>
++                      )}
+                     </div>
+                     <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
+                       <p className="text-xs font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2">{tr("Change status")}</p>
+diff --git a/client/src/pages/Landing.jsx b/client/src/pages/Landing.jsx
+index d9111b7..0aa44e3 100644
+--- a/client/src/pages/Landing.jsx
++++ b/client/src/pages/Landing.jsx
+@@ -11,7 +11,7 @@ const features = [
+   { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
+   { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500', soon: true },
+   { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
+-  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice sends automatically. Client pays via Stripe link. Track paid vs unpaid at a glance.', color: 'from-amber-500 to-orange-500' },
++  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. An invoice is created automatically — one tap copies a payment text. Clients pay via Venmo, Zelle, or Cash App. No processing fees.', color: 'from-amber-500 to-orange-500' },
+ ];
+ 
+ const differentiators = [
+@@ -465,7 +465,7 @@ export default function Landing() {
+             </div>
+           </FadeIn>
+           <FadeIn delay={400}>
+-            <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Stripe payments are live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.")}</p>
++            <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Card checkout is live. Route optimization ships next — Oklahoma early adopters get new features at no price increase.")}</p>
+           </FadeIn>
+         </div>
+       </section>
+diff --git a/client/src/pages/Settings.jsx b/client/src/pages/Settings.jsx
+index 7f2616d..7a3c3f3 100644
+--- a/client/src/pages/Settings.jsx
++++ b/client/src/pages/Settings.jsx
+@@ -6,7 +6,7 @@ import { TEAM_MEMBER_COLORS } from '../lib/constants';
+ import { isDemoMode, supabase } from '../lib/supabase';
+ import { useAuth } from '../App';
+ import { openCustomerPortal } from '../lib/payments';
+-import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download } from 'lucide-react';
++import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, DollarSign } from 'lucide-react';
+ import { Star } from 'lucide-react';
+ import WebhookSettings from '../components/WebhookSettings';
+ import ConciergeSetup from '../components/ConciergeSetup';
+@@ -15,7 +15,7 @@ export default function Settings() {
+   const { tr, t, i18n } = useLocalizedText('settings');
+   const { tr: conciergeTr } = useLocalizedText('concierge');
+   const { user } = useAuth();
+-  const [profile, setProfile] = useState({ business_name: '', phone: '', tier: 'free' });
++  const [profile, setProfile] = useState({ business_name: '', phone: '', tier: 'free', venmo_handle: '', cashapp_handle: '', zelle_handle: '' });
+   const [saved, setSaved] = useState(false);
+   const [error, setError] = useState('');
+   const [isLoading, setIsLoading] = useState(false);
+@@ -109,6 +109,9 @@ export default function Settings() {
+       // Also store locally for clipboard invoice texts
+       localStorage.setItem('mf_business_name', profile.business_name || '');
+       localStorage.setItem('mf_business_phone', profile.phone || '');
++      localStorage.setItem('mf_venmo_handle', profile.venmo_handle || '');
++      localStorage.setItem('mf_cashapp_handle', profile.cashapp_handle || '');
++      localStorage.setItem('mf_zelle_handle', profile.zelle_handle || '');
+       setSaved(true);
+       setTimeout(() => setSaved(false), 2500);
+     } catch (err) {
+@@ -261,6 +264,24 @@ export default function Settings() {
+                 <label className="label">{tr("Phone Number")}</label>
+                 <input value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="405-555-0100" className="input" />
+               </div>
++              <div className="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-4">
++                <div>
++                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white flex items-center gap-2"><DollarSign className="w-4 h-4 text-brand" />{tr("How Clients Pay You")}</h4>
++                  <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-1">{tr("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.")}</p>
++                </div>
++                <div>
++                  <label className="label">Zelle</label>
++                  <input value={profile.zelle_handle || ''} onChange={e => setProfile({ ...profile, zelle_handle: e.target.value })} placeholder={tr("Phone or email clients use to Zelle you")} className="input" />
++                </div>
++                <div>
++                  <label className="label">Venmo</label>
++                  <input value={profile.venmo_handle || ''} onChange={e => setProfile({ ...profile, venmo_handle: e.target.value })} placeholder="@GreenThumb" className="input" />
++                </div>
++                <div>
++                  <label className="label">Cash App</label>
++                  <input value={profile.cashapp_handle || ''} onChange={e => setProfile({ ...profile, cashapp_handle: e.target.value })} placeholder="$GreenThumb" className="input" />
++                </div>
++              </div>
+               <div className="space-y-2">
+                 <p className="text-xs font-medium text-brand-hover dark:text-emerald-400">{tr('Why do we ask? Rain Delay uses your location for accurate local forecasts.')}</p>
+                 <label className="label" htmlFor="business-location">{tr('Business location')}</label>
+diff --git a/client/src/pages/Today.jsx b/client/src/pages/Today.jsx
+index d99fc2b..9881816 100644
+--- a/client/src/pages/Today.jsx
++++ b/client/src/pages/Today.jsx
+@@ -1,7 +1,7 @@
+ import useLocalizedText from '../i18n/useLocalizedText';
+ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+ import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
+-import { createJob, updateJobStatus, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
++import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation } from '../lib/data';
+ import { useSearchParams } from 'react-router-dom';
+ import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw } from 'lucide-react';
+ import JobCard from '../components/JobCard';
+@@ -294,6 +294,20 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices,
+       try {
+         const newStatus = job.status === 'scheduled' ? 'in_progress' : job.status === 'in_progress' ? 'done' : 'scheduled';
+         await updateJobStatus(job.id, newStatus);
++        // Auto-create invoice on completion (idempotent per job; skip $0 rates).
++        let invoiceCreated = false;
++        if (newStatus === 'done' && Number(job.clients?.rate || 0) > 0) {
++          try {
++            const { invoice: inv, created } = await createInvoice({
++              client_id: job.client_id,
++              clients: job.clients,
++              amount: job.clients?.rate,
++              job_id: job.id,
++            });
++            invoiceCreated = created;
++            setInvoices(prev => prev.some(i => i.id === inv.id) ? prev : [inv, ...prev]);
++          } catch (invErr) { console.error('Auto-invoice failed:', invErr); }
++        }
+         // Track completed jobs for review prompt
+         if (newStatus === 'done' && localStorage.getItem('mf_review_prompts') !== 'false' && localStorage.getItem('mf_review_prompt_shown') !== 'true') {
+           const prev = parseInt(localStorage.getItem('mf_completed_jobs') || '0', 10);
+@@ -356,10 +370,15 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices,
+               setCompletedToast({ name: tr('{{client}} · {{label}} job already scheduled', { client: clientName, label: recLabel }), amount: job.clients?.rate || 0, type: 'recurring' });
+             }
+           } else {
+-            setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0, type: 'recurring' });
++            // Done (no recurrence): invoice toast only if one was actually created.
++            setCompletedToast({
++              name: job.clients?.name || tr('Job'),
++              amount: invoiceCreated ? (job.clients?.rate || 0) : 0,
++              type: invoiceCreated ? 'invoice' : 'plain',
++            });
+           }
+         } else if (job.status !== 'done') {
+-          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: job.clients?.rate || 0, type: 'recurring' });
++          setCompletedToast({ name: job.clients?.name || tr('Job'), amount: 0, type: 'plain' });
+         }
+         const toastTimeout = setTimeout(() => setCompletedToast(null), 4000);
+         toggleTimeoutRef.current = toastTimeout;
+diff --git a/ios-native/MowGo/Models/Models.swift b/ios-native/MowGo/Models/Models.swift
+index b330e67..bfa3952 100644
+--- a/ios-native/MowGo/Models/Models.swift
++++ b/ios-native/MowGo/Models/Models.swift
+@@ -378,6 +378,9 @@ struct UserProfile: Codable, Identifiable {
+     var role: String?
+     var businessId: UUID?
+     var stripeCustomerId: String?
++    var venmoHandle: String?
++    var cashappHandle: String?
++    var zelleHandle: String?
+     var createdAt: String?
+ 
+     var tierLabel: String {
+diff --git a/ios-native/MowGo/Services/AuthService.swift b/ios-native/MowGo/Services/AuthService.swift
+index 612beb5..7be3e1c 100644
+--- a/ios-native/MowGo/Services/AuthService.swift
++++ b/ios-native/MowGo/Services/AuthService.swift
+@@ -49,6 +49,15 @@ final class AuthService: ObservableObject {
+                 isDemoMode = true
+                 isAuthenticated = true
+                 isLoading = false
++                // Demo profile so profile edits (incl. payment handles) work in demo.
++                user = UserProfile(
++                    id: DemoData.demoOwnerId,
++                    businessName: "Green Thumb Lawn Care",
++                    phone: "405-555-0100",
++                    email: "owner@mowgo.app",
++                    tier: "solo",
++                    role: "owner"
++                )
+             }
+         }
+     }
+@@ -127,16 +136,22 @@ final class AuthService: ObservableObject {
+         }
+     }
+ 
+-    func updateProfile(businessName: String, phone: String, email: String) async throws {
++    func updateProfile(businessName: String, phone: String, email: String, venmoHandle: String = "", cashappHandle: String = "", zelleHandle: String = "") async throws {
+         let name = businessName.trimmingCharacters(in: .whitespacesAndNewlines)
+         let normalizedPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
+         let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
++        let normalizedVenmo = venmoHandle.trimmingCharacters(in: .whitespacesAndNewlines)
++        let normalizedCashapp = cashappHandle.trimmingCharacters(in: .whitespacesAndNewlines)
++        let normalizedZelle = zelleHandle.trimmingCharacters(in: .whitespacesAndNewlines)
+         guard !name.isEmpty else { throw ProfileUpdateError.businessNameRequired }
+ 
+         if isDemoMode {
+             user?.businessName = name
+             user?.phone = normalizedPhone.isEmpty ? nil : normalizedPhone
+             user?.email = normalizedEmail.isEmpty ? nil : normalizedEmail
++            user?.venmoHandle = normalizedVenmo.isEmpty ? nil : normalizedVenmo
++            user?.cashappHandle = normalizedCashapp.isEmpty ? nil : normalizedCashapp
++            user?.zelleHandle = normalizedZelle.isEmpty ? nil : normalizedZelle
+             return
+         }
+ 
+@@ -144,12 +159,20 @@ final class AuthService: ObservableObject {
+         struct ProfilePatch: Encodable {
+             let businessName: String
+             let phone: String?
+-            let email: String?
++            let venmoHandle: String?
++            let cashappHandle: String?
++            let zelleHandle: String?
+         }
+         try await sb.update(
+             "profiles",
+             id: id,
+-            ProfilePatch(businessName: name, phone: normalizedPhone.isEmpty ? nil : normalizedPhone, email: normalizedEmail.isEmpty ? nil : normalizedEmail)
++            ProfilePatch(
++                businessName: name,
++                phone: normalizedPhone.isEmpty ? nil : normalizedPhone,
++                venmoHandle: normalizedVenmo.isEmpty ? nil : normalizedVenmo,
++                cashappHandle: normalizedCashapp.isEmpty ? nil : normalizedCashapp,
++                zelleHandle: normalizedZelle.isEmpty ? nil : normalizedZelle
++            )
+         )
+         await loadProfile()
+     }
+diff --git a/ios-native/MowGo/Services/DataStore.swift b/ios-native/MowGo/Services/DataStore.swift
+index cc2de38..9854bab 100644
+--- a/ios-native/MowGo/Services/DataStore.swift
++++ b/ios-native/MowGo/Services/DataStore.swift
+@@ -303,7 +303,9 @@ final class DataStore: ObservableObject {
+                 persistence.removeMutation(mutation)
+                 replayedCount += 1
+             } catch {
++                #if DEBUG
+                 print("[DataStore] replay failed for \(mutation.operation) \(mutation.entityId): \(error)")
++                #endif
+                 // Remove permanently broken or already-done mutations
+                 if error is DecodingError || error is PendingMutationError {
+                     persistence.removeMutation(mutation)
+@@ -342,7 +344,9 @@ final class DataStore: ObservableObject {
+                 persistence.saveClients(freshClients, currentUserId: currentUserId)
+                 persistence.saveInvoices(freshInvoices, currentUserId: currentUserId)
+             } catch {
++                #if DEBUG
+                 print("[DataStore] post-replay refresh failed: \(error)")
++                #endif
+             }
+         }
+     }
+@@ -466,6 +470,38 @@ final class DataStore: ObservableObject {
+                 await fireWebhookInvoicePaid(updated)
+             }
+ 
++        case "invoice:create":
++            struct C: Decodable { let jobId: UUID; let clientId: UUID; let amount: Double }
++            let c = try JSONDecoder().decode(C.self, from: mutation.payload)
++            // Idempotent: the unique job_id index rejects duplicates; check first.
++            if invoices.contains(where: { $0.jobId == c.jobId }) { break }
++            guard let userId = currentUserId else { break }
++            struct InvoiceInsert: Encodable {
++                let userId: UUID
++                let clientId: UUID
++                let jobId: UUID
++                let amount: Double
++                let status: String
++            }
++            do {
++                let created: Invoice = try await sb.insert("invoices", InvoiceInsert(
++                    userId: userId, clientId: c.clientId, jobId: c.jobId, amount: c.amount, status: "unpaid"
++                ))
++                invoices.insert(created, at: 0)
++            } catch {
++                // Unique violation (a concurrent insert won the race): the
++                // invoice already exists — resolve it so the FIFO queue never
++                // blocks on a permanently-failing mutation.
++                if let existing = try? await sb.fetchInvoices().first(where: { $0.jobId == c.jobId }),
++                   !invoices.contains(where: { $0.id == existing.id }) {
++                    invoices.insert(existing, at: 0)
++                } else {
++                    #if DEBUG
++                    print("[DataStore] invoice:create replay failed: \(error)")
++                    #endif
++                }
++            }
++
+         case "recurring:create":
+             let template = try JSONDecoder().decode(RecurringJob.self, from: mutation.payload)
+             _ = try await upsertRecurringJob(template)
+@@ -806,6 +842,11 @@ final class DataStore: ObservableObject {
+             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                 jobs[idx] = updated
+             }
++            // Queue the invoice only AFTER the status change is queued, so
++            // replay order can't create an invoice for a job that isn't done.
++            if status == .done {
++                await handleCompletedJob(updated)
++            }
+             return
+         }
+         do {
+@@ -813,6 +854,11 @@ final class DataStore: ObservableObject {
+             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                 jobs[idx] = updated
+             }
++            // Invoice only after the status change persisted (no orphan
++            // invoices when the update fails).
++            if status == .done {
++                await handleCompletedJob(updated)
++            }
+             await fireWebhookJobUpdated(updated)
+             switch status {
+             case .done:
+@@ -830,6 +876,11 @@ final class DataStore: ObservableObject {
+             }
+             struct P: Encodable { let status: String }
+             safeEnqueue("job:status", id: job.id, payload: P(status: status.rawValue))
++            // Network-fallback path: queue the invoice right after the status
++            // so replay produces the same result as the happy path.
++            if status == .done {
++                await handleCompletedJob(updated)
++            }
+             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                 jobs[idx] = updated
+             }
+@@ -972,6 +1023,68 @@ final class DataStore: ObservableObject {
+     func skipJob(_ job: Job) async throws {
+         try await updateJobStatus(job, status: .skipped)
+     }
++
++    // MARK: - Auto-Invoicing
++
++    /// One invoice per completed job, amount = client rate, $0 rates skipped.
++    /// Idempotent: an existing invoice for the same job is never duplicated.
++    private func handleCompletedJob(_ job: Job) async {
++        guard let rate = job.clients?.rate, rate > 0, let clientId = job.clientId else { return }
++        if invoices.contains(where: { $0.jobId == job.id }) { return }
++
++        if auth?.isDemoMode == true {
++            var created = Invoice(
++                id: UUID(), clientId: clientId, jobId: job.id, amount: rate,
++                status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
++                clients: Invoice.ClientRef(name: job.clients?.name)
++            )
++            invoices.insert(created, at: 0)
++            return
++        }
++
++        guard await canSync() else {
++            struct P: Encodable { let jobId: UUID; let clientId: UUID; let amount: Double }
++            _ = safeEnqueue("invoice:create", id: UUID(), payload: P(
++                jobId: job.id, clientId: clientId, amount: centsDouble(rate)
++            ))
++            return
++        }
++
++        do {
++            try await createInvoice(jobId: job.id, clientId: clientId, amount: rate, clientName: job.clients?.name)
++        } catch {
++            #if DEBUG
++            print("[DataStore] auto-invoice failed: \(error)")
++            #endif
++        }
++    }
++
++    /// Money-safe Double: round to cents before encoding so Postgres numeric
++    /// columns never receive binary-float noise (0.1+0.2 artifacts).
++    private func centsDouble(_ amount: Decimal) -> Double {
++        var rounded = Decimal()
++        NSDecimalRound(&rounded, &amount, 2, .plain)
++        return NSDecimalNumber(decimal: rounded).doubleValue
++    }
++
++    private func createInvoice(jobId: UUID, clientId: UUID, amount: Decimal, clientName: String?) async throws {
++        struct InvoiceInsert: Encodable {
++            let userId: UUID
++            let clientId: UUID
++            let jobId: UUID
++            let amount: Double
++            let status: String
++        }
++        guard let userId = currentUserId else { return }
++        let inserted: Invoice = try await sb.insert("invoices", InvoiceInsert(
++            userId: userId, clientId: clientId, jobId: jobId,
++            amount: centsDouble(amount), status: "unpaid"
++        ))
++        var created = inserted
++        created.clients = Invoice.ClientRef(name: clientName)
++        invoices.insert(created, at: 0)
++    }
++
+     // MARK: - Webhook Notifications
+ 
+     private func fireWebhookJobCompleted(_ job: Job) async {
+@@ -1820,7 +1933,7 @@ final class DataStore: ObservableObject {
+         //   1. New user → creates auth user + profile
+         //   2. Existing user → updates their profile to join crew
+         let token = await sb.token ?? ""
+-        let url = URL(string: "https://mowgo.pages.dev/api/invite-crew")!
++        let url = URL(string: "https://mowgoapp.com/api/invite-crew")!
+         var req = URLRequest(url: url)
+         req.httpMethod = "POST"
+         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+diff --git a/ios-native/MowGo/Views/Invoices/InvoicesView.swift b/ios-native/MowGo/Views/Invoices/InvoicesView.swift
+index 6aaa3cb..9331e62 100644
+--- a/ios-native/MowGo/Views/Invoices/InvoicesView.swift
++++ b/ios-native/MowGo/Views/Invoices/InvoicesView.swift
+@@ -7,6 +7,7 @@ struct InvoicesView: View {
+     @Environment(\.colorScheme) private var colorScheme
+     @State private var segment = Segment.invoices
+     @State private var selectedInvoice: Invoice?
++    @State private var selectedInvoiceDetail: Invoice?
+     @State private var selectedEstimate: Estimate?
+     @State private var showPayment = false
+     @State private var showNewEstimate = false
+@@ -40,6 +41,7 @@ struct InvoicesView: View {
+             .task { await store.loadEstimates() }
+             .sheet(isPresented: $showPayment) { paymentSheet }
+             .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
++            .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
+             .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
+         }
+     }
+@@ -47,7 +49,9 @@ struct InvoicesView: View {
+     private var invoiceList: some View {
+         ScrollView { VStack(spacing: 16) {
+             if !unpaid.isEmpty { totalBar; sectionHeader("Unpaid") }
+-            ForEach(unpaid) { inv in InvoiceRow(invoice: inv, showPay: true) { selectedInvoice = inv; showPayment = true } }
++            ForEach(unpaid) { inv in InvoiceRow(invoice: inv, showPay: true) { selectedInvoice = inv; showPayment = true }
++                .onTapGesture { selectedInvoiceDetail = inv }
++                .contentShape(Rectangle()) }
+             if !paid.isEmpty { sectionHeader("Paid") }
+             ForEach(paid) { inv in InvoiceRow(invoice: inv, showPay: false) {} }
+             if unpaid.isEmpty && paid.isEmpty { invoiceEmpty }
+@@ -88,6 +92,115 @@ struct InvoiceRow: View {
+     private var status: some View { Text(showPay ? "Due" : "Paid").font(.caption2.weight(.medium)).foregroundColor(showPay ? MowGoTheme.warning : MowGoTheme.success).padding(.horizontal, 8).padding(.vertical, 3).background((showPay ? MowGoTheme.warning : MowGoTheme.success).opacity(0.12)).clipShape(Capsule()) }
+ }
+ 
++private struct InvoiceDetailView: View {
++    @EnvironmentObject var store: DataStore
++    @Environment(\.dismiss) private var dismiss
++    @State private var showPayment = false
++    let invoice: Invoice
++    @Environment(\.colorScheme) private var colorScheme
++    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
++
++    var body: some View {
++        NavigationStack {
++            Form {
++                Section {
++                    HStack { Text("Client").foregroundColor(theme.textMuted); Spacer(); Text(invoice.clientName ?? "Unknown") }
++                    HStack { Text("Amount").foregroundColor(theme.textMuted); Spacer(); Text(invoice.amount.formatted(.currency(code: "USD"))) }
++                    if let date = invoice.createdAt {
++                        HStack { Text("Created").foregroundColor(theme.textMuted); Spacer(); Text(String(date.prefix(10))) }
++                    }
++                }
++                Section {
++                    Button("Copy payment text") { copy(invoiceText) }
++                    if canNudge {
++                        Button("Nudge") { copy(nudgeText) }.tint(.orange)
++                    }
++                    Button("Pay via Stripe") { showPayment = true }
++                    Button("Mark Paid") { markPaid() }
++                }
++            }
++            .scrollContentBackground(.hidden)
++            .background(theme.background)
++            .navigationTitle("Invoice").navigationBarTitleDisplayMode(.inline)
++            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
++            .sheet(isPresented: $showPayment) {
++                NavigationStack {
++                    PaymentView(invoice: invoice).navigationTitle("Payment")
++                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { showPayment = false } } }
++                }
++            }
++        }
++        .presentationDetents([.medium, .large])
++    }
++
++    private var canNudge: Bool {
++        guard invoice.status == .unpaid,
++              let value = invoice.createdAt,
++              let date = Self.parseISODate(value) else { return false }
++        return date < Calendar.current.date(byAdding: .day, value: -3, to: Date())!
++    }
++
++    /// Tolerant ISO-8601 parser: Supabase timestamps carry fractional seconds,
++    /// which the default ISO8601DateFormatter rejects.
++    private static func parseISODate(_ value: String) -> Date? {
++        let fractional = ISO8601DateFormatter()
++        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
++        if let date = fractional.date(from: value) { return date }
++        return ISO8601DateFormatter().date(from: value)
++    }
++
++    private func copy(_ text: String) {
++        UIPasteboard.general.string = text
++        UINotificationFeedbackGenerator().notificationOccurred(.success)
++    }
++
++    private func markPaid() {
++        Task {
++            try? await store.markInvoicePaid(invoice)
++            dismiss()
++        }
++    }
++
++    /// Payment methods the operator configured, Zelle first (mirrors web —
++    /// clients default to the first option listed).
++    private var payMethods: [String] {
++        guard let profile = store.auth?.user else { return [] }
++        var parts: [String] = []
++        if let zelle = profile.zelleHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !zelle.isEmpty {
++            parts.append("Zelle: \(zelle)")
++        }
++        if let venmo = profile.venmoHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !venmo.isEmpty {
++            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: .regularExpression))")
++        }
++        if let cashapp = profile.cashappHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !cashapp.isEmpty {
++            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: .regularExpression))")
++        }
++        return parts
++    }
++
++    private var payLine: String {
++        let methods = payMethods
++        return methods.isEmpty
++            ? "Please send payment at your earliest convenience"
++            : "Pay via \(methods.joined(separator: " · "))"
++    }
++
++    private var shortDate: String {
++        guard let value = invoice.createdAt, let date = Self.parseISODate(value) else { return "" }
++        return date.formatted(.dateTime.month(.abbreviated).day())
++    }
++
++    private var invoiceText: String {
++        let datePart = shortDate.isEmpty ? "" : " on \(shortDate)"
++        return "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
++    }
++
++    private var nudgeText: String {
++        let datePart = shortDate.isEmpty ? "" : " from \(shortDate)"
++        return "Hi \(invoice.clientName ?? "there") — friendly reminder: \(invoice.amount.formatted(.currency(code: "USD")))\(datePart) is still due. \(payLine). Thanks!"
++    }
++}
++
+ struct EstimateRow: View {
+     @Environment(\.colorScheme) private var colorScheme
+     let estimate: Estimate
+diff --git a/ios-native/MowGo/Views/Settings/SettingsView.swift b/ios-native/MowGo/Views/Settings/SettingsView.swift
+index 2dbc40b..24a68c4 100644
+--- a/ios-native/MowGo/Views/Settings/SettingsView.swift
++++ b/ios-native/MowGo/Views/Settings/SettingsView.swift
+@@ -21,6 +21,9 @@ struct SettingsView: View {
+     @State private var businessName = ""
+     @State private var phone = ""
+     @State private var email = ""
++    @State private var venmoHandle = ""
++    @State private var cashappHandle = ""
++    @State private var zelleHandle = ""
+     @State private var profileSaveError: String?
+     @State private var exportFile: ExportFile?
+     @State private var exportError: String?
+@@ -114,6 +117,9 @@ struct SettingsView: View {
+                 businessName: $businessName,
+                 phone: $phone,
+                 email: $email,
++                venmoHandle: $venmoHandle,
++                cashappHandle: $cashappHandle,
++                zelleHandle: $zelleHandle,
+                 saveError: $profileSaveError,
+                 onSave: saveProfile
+             )
+@@ -266,12 +272,18 @@ struct SettingsView: View {
+         businessName = auth.user?.businessName ?? ""
+         phone = auth.user?.phone ?? ""
+         email = auth.user?.email ?? ""
++        venmoHandle = auth.user?.venmoHandle ?? ""
++        cashappHandle = auth.user?.cashappHandle ?? ""
++        zelleHandle = auth.user?.zelleHandle ?? ""
+     }
+ 
+     private func saveProfile() async {
+         profileSaveError = nil
+         do {
+-            try await auth.updateProfile(businessName: businessName, phone: phone, email: email)
++            try await auth.updateProfile(
++                businessName: businessName, phone: phone, email: email,
++                venmoHandle: venmoHandle, cashappHandle: cashappHandle, zelleHandle: zelleHandle
++            )
+         } catch {
+             profileSaveError = error.localizedDescription
+         }
+@@ -444,6 +456,9 @@ private struct BusinessProfileSettingsView: View {
+     @Binding var businessName: String
+     @Binding var phone: String
+     @Binding var email: String
++    @Binding var venmoHandle: String
++    @Binding var cashappHandle: String
++    @Binding var zelleHandle: String
+     @Binding var saveError: String?
+     let onSave: () async -> Void
+     @State private var isSaving = false
+@@ -467,6 +482,25 @@ private struct BusinessProfileSettingsView: View {
+                 } footer: {
+                     Text("This information appears on customer-facing messages and invoices.")
+                 }
++                Section {
++                    TextField("Zelle (phone or email)", text: $zelleHandle)
++                        .keyboardType(.emailAddress)
++                        .textInputAutocapitalization(.never)
++                        .autocapitalization(.none)
++                        .disableAutocorrection(true)
++                    TextField("Venmo (@handle)", text: $venmoHandle)
++                        .textInputAutocapitalization(.never)
++                        .autocapitalization(.none)
++                        .disableAutocorrection(true)
++                    TextField("Cash App ($handle)", text: $cashappHandle)
++                        .textInputAutocapitalization(.never)
++                        .autocapitalization(.none)
++                        .disableAutocorrection(true)
++                } header: {
++                    Text("How clients pay you")
++                } footer: {
++                    Text("These go in your invoice texts. Zelle is listed first — clients usually pay the first option they see.")
++                }
+                 if let saveError {
+                     Section { Text(saveError).foregroundColor(.red) }
+                 }
+diff --git a/supabase/migrations/022_payment_methods_invoice_job.sql b/supabase/migrations/022_payment_methods_invoice_job.sql
+new file mode 100644
+index 0000000..bf36b4d
+--- /dev/null
++++ b/supabase/migrations/022_payment_methods_invoice_job.sql
+@@ -0,0 +1,18 @@
++-- Payment methods for invoice texts + invoice-job linkage (022)
++alter table public.profiles
++  add column if not exists venmo_handle text,
++  add column if not exists cashapp_handle text,
++  add column if not exists zelle_handle text;
++
++alter table public.invoices
++  add column if not exists job_id uuid;
++
++-- One invoice per completed job (idempotent auto-invoicing)
++create unique index if not exists invoices_job_id_unique on public.invoices (job_id) where job_id is not null;
++
++-- RLS: migration 002 only grants named columns on profiles; the new payment
++-- fields need explicit UPDATE grants for authenticated users.
++grant update (venmo_handle, cashapp_handle, zelle_handle) on public.profiles to authenticated;
++
++-- NOTE: invoices.job_id and its FK to jobs(id) already exist in the base schema;
++-- 022 only adds the unique index above (idempotency guard).

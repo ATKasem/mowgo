@@ -90,3 +90,13 @@ Reddit posting (Day 9, 28 drafts 0 posted) · SoftwareWorld/comparison-site abse
 ---
 
 *State: .bi_state.json v10 → v11 (lanes cycled; seen URLs 82→85; weekly_digest_week → 2026-W32). Intel: intel/2026-08-02_0358.md (feature ideas lane). Leads: leads/LEAD_TRACKER.md (17). Full archive: bi_report_2026-07-28 … bi_report_2026-08-01_2355.md.*
+
+---
+
+## 🕘 Late Sunday addendum (21:04 run — feature_ideas lane)
+
+- **⭐ QuoteIQ live pricing captured** (myquoteiq.com/pricing): 5 tiers $29.99→$699. **InstaQuote (self-quoting) + Route Optimization gated at Elite $299/mo**; QuickBooks at Pro $149.99; AI Virtual Call Team on the $29.99 entry tier; Consumer Financing on every tier; 14-day trial on all plans. → **Quotes v1 escalates to #1 build priority** (3-way convergence: QuoteIQ gate, LawnEstimates weekly shipping — storefront/QR/service-area/PAYG now live, oda.do "AcreAI" $39/mo solo-quoting concept Jul 5 + "lawn care software" search +171%/12mo). Compare-page ammo: "QuoteIQ charges $299 for quotes + route optimization — MowGo includes both." Also: ServiceM8 $29 no per-user fees, Kickserv $60 flat (per QuoteIQ's own listicle); Service Autopilot price discrepancy ($279 vs $49-499) still open.
+- **TurfHop:** /features/ + /pricing/ 500 for 4th consecutive check (~28h+) — reliability ammo verified 4×.
+- **MowStack:** read-only API "coming soon"; inbox roadmap adds payment-failure surfacing. New watch-list competitor: lawnmanage.com (equipment inventory + customer portal).
+- **Reddit:** Day 11 of 403-block; 0 new 48h threads; 3 pre-48h seen-added (105→108). Monday queue unchanged; `1vcr90y` remains the freshest thread.
+- *State v15 (lane cycle complete → competitor_monitoring next). Intel: intel/2026-08-02_2104.md.*

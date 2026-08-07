@@ -1,0 +1,14 @@
+Round-2 verification pass. Review the FIXES made in response to your round-1 findings. Do not re-review the whole feature — just verify these specific changes are correct, complete, and introduce no new issues:
+
+1. supabase/migrations/20260806160000_referrals.sql:
+   - ensure_referral_code trigger changed from BEFORE INSERT (SELECT EXISTS pre-check) to AFTER INSERT doing a real `UPDATE profiles SET referral_code = code WHERE id = NEW.id AND referral_code IS NULL` inside a per-attempt BEGIN/EXCEPTION WHEN unique_violation block (MEDIUM-1 fix). Verify: no recursion risk (UPDATE on profiles does not re-fire an AFTER INSERT trigger), FOUND handling correct, idempotent, and the trigger/function grants correct (REVOKE FROM PUBLIC, no authenticated grant).
+   - profile_is_referred: authenticated grant dropped, only REVOKE ALL FROM PUBLIC remains (MEDIUM-2 fix). Verify the internal call from apply_referral_code (SECURITY DEFINER) still resolves — it must, since owner-level EXECUTE is not affected by PUBLIC revoke.
+   - earn_referral_credit: added explicit `IF v_referrer_id = p_referred_user_id THEN RETURN false; END IF;` self-referral backstop (LOW-3 fix). Verify placement is before the cap count and after the FOR UPDATE lock, and it cannot break the normal path.
+2. functions/api/stripe/webhook.js:
+   - sendReferralEarnEmail now takes (env, serviceKey, referrerId, referredUserId); name lookup uses getReferredName(env, serviceKey, referredUserId) — the REFERRED user's business_name (MEDIUM-3 fix). Verify the call site passes prof.referred_by (recipient) and prof.id (referred) in the right order.
+   - HTML body: `<strong>free month</strong>` replaces markdown `**free month**` (LOW-1), and escapeHtml() wraps the interpolated name (LOW-2). Verify escapeHtml covers &, <, >, ", ' and the replacement is applied exactly once.
+   - getReferredName renamed from getReferrerName; verify no stale referrerId references remain in the function body and no other callers of the old name exist.
+3. client/src/lib/referrals.js:
+   - applyStashedRefCode now checks `res.data === 'already_referred'` FIRST and returns {status:'none'} (LOW-4 fix). Verify ordering is correct (before the generic string check) and the stash is cleared on that path.
+
+Report format: per-fix PASS/FAIL with file:line evidence, any NEW issues introduced by the fixes (severity-ranked), and a final SHIP/NO-SHIP verdict.

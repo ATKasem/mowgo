@@ -1,0 +1,15 @@
+You are the adversarial reviewer for the MowGo referral program v1 changeset. The spec is docs/referral-program-spec-2026-08-06.md (read it). Review scope:
+
+1. supabase/migrations/20260806160000_referrals.sql — committed at 53382e0 but has WORKING-TREE fixes on top (git diff HEAD -- supabase/migrations/20260806160000_referrals.sql). Check the trigger (BEFORE INSERT code-gen), backfill, referrals table, RLS, all 3 SECURITY DEFINER RPCs (apply_referral_code, referral_status, earn_referral_credit), grants (PUBLIC revoke, service_role-only earn), collision handling, self-referral guard, cap enforcement.
+2. functions/api/stripe/webhook.js — committed earn flow + working-tree fixes: literal `apikey: *** placeholders were restored to `apikey: serviceKey,` (5 spots) and the earn-email is now gated on the RPC boolean result. Verify earn only in checkout.session.completed, never subscription.updated, best-effort try/catch, dedup intact.
+3. client/src/lib/referrals.js (untracked) — applyStashedRefCode + stashingReady.
+4. client/src/App.jsx — ApplyStashedRefCode sibling effect (must be INDEPENDENT of ResumeCheckoutIntent per spec round-3 CRIT-2).
+5. client/src/pages/Login.jsx — referral code field (signup only), stash BEFORE signUp, apply call site 2. NOTE: Login.jsx referral edits were swept into commit b740880 — review the committed version too (git show b740880:client/src/pages/Login.jsx).
+6. client/src/pages/Subscribe.jsx — ReferralAsk component (moment of purchase).
+7. client/src/pages/Clients.jsx — free-cap modal third CTA (moment of deprivation).
+8. client/src/pages/Dashboard.jsx — ReferralSatisfactionBanner (moment of satisfaction; free tier + >=1 invoice + total_count=0; dismissible; defensive free-tier literal).
+9. i18n en.json/es.json referral keys.
+
+Adversarial pass: check boundary values (self-referral, double-submit race, cap at exactly 3, empty/NULL codes, email-confirm round trip, free-tier edge cases), authz (client can't call earn RPC, RPCs can't be abused via PUBLIC grants, trigger fn exposure), SQL validity (plpgsql syntax that would fail at apply time — the trigger previously had invalid INSERT...VALUES...WHERE), race conditions, and i18n completeness (en+es both have every key referenced).
+
+Report format: severity-ranked (CRITICAL/HIGH/MEDIUM/LOW), exact file:line, impact, exploit path, remediation. Verify each claim against the actual code — do not guess. End with a SHIP/NO-SHIP verdict per file and overall.

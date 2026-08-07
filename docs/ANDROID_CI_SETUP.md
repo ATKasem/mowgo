@@ -22,7 +22,7 @@ Add to Settings → Secrets and variables → Actions:
 | `ANDROID_KEY_PASSWORD` | Password from step 2 (same as keystore or separate) |
 
 ## 4. Store Listing
-Content is ready in `PLAY_STORE.md` — copy into Play Console.
+Content is ready in `docs/PLAY_STORE.md` — copy into Play Console.
 
 ## 5. That's It
 Push to main → GitHub Action builds → download AAB artifact → upload to Play Console.

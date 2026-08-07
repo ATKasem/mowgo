@@ -4,3 +4,12 @@ dist/
 .DS_Store
 *.log
 certs/distribution/*.p12
+
+# Agent scratch + one-shot reports at repo root (cron noise)
+.tmp-*
+.tmp_*
+.tmp_rss/
+bi_report_*.md
+daily_report_2026-*.md
+weekly_digest_*.md
+monday_plate_*.md

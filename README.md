@@ -1,57 +1,70 @@
-## [fastlane match](https://docs.fastlane.tools/actions/match/)
+# MowGo
 
-> Do not modify this file, as it gets overwritten every time you run _match_.
+Lawn-care scheduling SaaS — **"The lawn care app that just works. Even when it rains."**
 
-This repository contains all your certificates and provisioning profiles needed to build and sign your applications. They are encrypted using OpenSSL via a passphrase.
+Built by Aaron (lawn care business owner) for lawn care businesses. Web app + native iOS (SwiftUI) + native Android (Kotlin), on Supabase + Stripe + Cloudflare Pages.
 
-**Important:** Make sure this repository is set to private and only your team members have access to this repo.
+## Live
 
-### Installation
+| Domain | Purpose |
+|---|---|
+| **mowgoapp.com** | Production — what customers see |
+| mowgo.pages.dev | Secondary Cloudflare Pages deployment (dev/staging parity) |
 
-Make sure you have the latest version of the Xcode command line tools installed:
+> ⚠️ This repo was originally a fastlane `match` certs repo; the old auto-generated README has been replaced. If `fastlane match` runs against this repo it may overwrite `README.md` — the canonical project docs live in `docs/` and `docs/REPO_MAP.md`.
 
-```
-xcode-select --install
-```
+## Stack
 
-Install _fastlane_ using bundler by following instructions here on [fastlane docs](https://docs.fastlane.tools).
+- **Web:** React 19 + Vite 8 + Tailwind v4 + supabase-js + stripe-js (SPA, HashRouter)
+- **API:** Cloudflare Pages Functions (`functions/api/`) — Stripe checkout/webhook, route audit, leads, concierge, autopilot, team invites
+- **Backend:** Supabase (Postgres, RLS = authz ground truth, migrations in `supabase/migrations/`)
+- **iOS:** SwiftUI (`ios-native/MowGo/`), Keychain sessions, Stripe PaymentSheet
+- **Android:** Kotlin (`client/android-native/`), supabase-kt, FCM
+- **Payments:** Stripe (live) — tiers: Free / Solo $39 / Crew $79 / Premium $199, 14-day trial
 
-or alternatively using 
+## Repo layout
 
-`brew install fastlane`
-
-### Usage
-
-Navigate to your project folder and run
-
-```
-fastlane match appstore
-```
+Full map: **`docs/REPO_MAP.md`** · Agent instructions: **`AGENTS.md`** (Codex) · **`CLAUDE.md`** (Claude Code)
 
 ```
-fastlane match adhoc
+client/          Web app (src/ = pages, components, lib, i18n; android-native/ = Kotlin)
+functions/       Cloudflare Pages Functions (the production API)
+supabase/        Migrations + edge functions
+ios-native/      SwiftUI iOS app + edge functions
+server/          Legacy Node server (dev + invoice only; largely superseded by functions/)
+scripts/         Ops/cron backend scripts (called by Hermes cron wrappers)
+docs/            Specs, setup guides, store metadata, repo map
+marketing/       Playbooks + content templates
+ops/             Non-app artifacts: archive of agent scratch + one-shot reports
+certs/, profiles/  fastlane match (CI signing)
+.github/         CI workflows (Android native, iOS)
 ```
 
+## Quickstart (web)
+
+```bash
+cd client
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # → dist/
 ```
-fastlane match development
-```
 
-```
-fastlane match enterprise
-```
+## Deployment
 
-For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
+- **Web + functions:** `git push origin main` → Cloudflare Pages auto-deploy (mowgoapp.com + mowgo.pages.dev). No CI on GitHub for the web app — verify with a prod build + review before pushing.
+- **Supabase migrations:** `npx supabase db query --linked --file <migration>` (history is out of sync with prod — never `supabase db push` blindly).
+- **Edge functions:** `npx supabase functions deploy <name>`.
+- **Mobile:** GitHub Actions workflows (`.github/workflows/android-native-ci.yml`, `ios-ci.yml`) — manual builds.
 
-### Content
+## Key docs
 
-#### certs
+- `AGENTS.md` — hard rules (RLS boundary, no secrets in git, verification discipline)
+- `CLAUDE.md` — Claude Code project context
+- `docs/REPO_MAP.md` — canonical repository map
+- `docs/APP_STORE.md`, `docs/PLAY_STORE.md` — store metadata
+- `docs/IOS_CI_SETUP.md`, `docs/ANDROID_CI_SETUP.md`, `docs/CAPACITOR_SETUP.md` — CI setup guides
 
-This directory contains all your certificates with their private keys
+## Notes
 
-#### profiles
-
-This directory contains all provisioning profiles
-
----
-
-For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
+- Demo mode: `VITE_FORCE_DEMO=true` bypasses auth (used for preview builds only).
+- No secrets in git — only `.env.example` is committed. Real env vars live in the CF Pages dashboard and local `.env` files.

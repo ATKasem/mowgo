@@ -42,7 +42,7 @@ All required sizes are in `public/icon-*.png`. Xcode picks them up automatically
 - `capacitor.config.json` — app ID, name, splash screen config (green background)
 - `public/app-icon-1024.png` — master icon for App Store
 - `public/icon-*.png` — all iOS icon sizes
-- `APP_STORE.md` — App Store metadata, description, keywords
+- `docs/APP_STORE.md` — App Store metadata, description, keywords
 
 ## Notes
 - Live URL: https://mowgo.pages.dev

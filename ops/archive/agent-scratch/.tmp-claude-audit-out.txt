@@ -1,0 +1,41 @@
+# MowGo Security Audit — HEAD `db6d461` (not `2674e6b` as briefed)
+
+**Baseline correction:** the task briefed HEAD `2674e6b`; actual repo HEAD is `db6d461`, 29 commits ahead — includes a full route-optimization feature (drag-drop reorder CF endpoint, 2-opt optimizer, nav-link builders), an SMS opt-in flow, and a prior "Mimo baseline audit" fix commit (`db6d461` itself: client/lead field allowlists, invoice-amount DB constraint, legacy-server cap). I audited the real current state and independently re-verified every claim below (not just presence-checked).
+
+## NEW ISSUES
+
+**MEDIUM-1 — Invoice `client_id`/`job_id` ownership not enforced by RLS**
+`supabase/migrations/002_crew_features.sql:137-146` ("Invoices: owner only") only checks `auth.uid() = user_id AND auth.uid() = current_business_id()` in `WITH CHECK`. It never verifies the referenced `client_id`/`job_id` (`001_initial_schema.sql:50-52`, FK-only, no ownership) belong to the caller's own business.
+*Impact:* an authenticated MowGo owner who obtains another business's `job_id` (UUID leak required — not enumerable) can `INSERT` into `invoices` directly via PostgREST with their own JWT, using that foreign `job_id`. The partial unique index `invoices_job_id_unique` (`022_payment_methods_invoice_job.sql:11`) then makes the row permanent; the real owner's future `create_invoice_for_job` RPC (`023_create_invoice_for_job_rpc.sql:65`, `ON CONFLICT (job_id) DO NOTHING`) silently resolves to the attacker's row, which RLS hides from the real owner — that job can never be legitimately invoiced again.
+*Remediation:* add ownership subqueries to the `WITH CHECK`: `client_id IN (SELECT id FROM clients WHERE user_id = auth.uid())` and `(job_id IS NULL OR EXISTS (SELECT 1 FROM jobs WHERE id = job_id AND user_id = current_business_id()))`.
+
+**MEDIUM-2 — Mobile clients load arbitrary `http(s)` photo URLs with no host check (iOS + Android, matched design)**
+`ios-native/MowGo/Views/Components/JobCardView.swift:191` and `SupabaseService.swift:393`; `client/android-native/.../JobPhotoControls.kt:147-148` — both platforms pass any `photo_url` starting with `"http"` straight to `AsyncImage`/OkHttp, bypassing the signed-URL/storage-domain flow ("legacy rows" comment, intentional on both platforms).
+*Impact:* `jobs.photo_url` is a plain row column; RLS `"Jobs: crew update assigned"` (`002_crew_features.sql:121-132`) is row-level, not column-scoped, so any crew member genuinely assigned to a job can `PATCH` `photo_url` to an attacker-controlled URL via raw REST. The owner's (or other crew's) device then issues a direct, unauthenticated GET to that URL when the job card renders — IP/tracking leak, LAN-probe potential. Requires a malicious/compromised crew account (insider), not an outside attacker.
+*Remediation:* only pass through `http(s)` URLs whose host matches the project's Supabase storage domain; otherwise treat as an invalid path and fall back to `nil`/no image.
+
+**LOW-1 — `functions/api/sms-optin.js:43`** wildcard `Access-Control-Allow-Origin: '*'`, the only endpoint not using the `mowgoapp.com` allowlist convention. Endpoint is intentionally public/unauthenticated and IP-rate-limited (10/15min), so no auth impact — just a convention violation.
+
+**LOW-2 — `functions/api/concierge-submit.js`** has no explicit rate limiter (every comparable mutation endpoint does). Impact is bounded — a per-user `pending`/`importing` uniqueness constraint on `concierge_requests` means a second call 409s before the Discord notification block — but a single account can still repeatedly POST up to 100KB of CSV body with no per-window cap before that 409.
+
+**LOW-3 — Raw `error.message` returned to client** at `functions/api/team/[memberId].js:116` and `functions/api/admin/concierge.js` (GET/POST catch blocks), inconsistent with every other endpoint's deliberate generic-error convention (invite-crew.js, webhook-dispatch.js, jobs/reorder.js). Both gated behind auth, so exposure is to an already-authorized caller only.
+
+**LOW-4 — `create_invoice_for_job`/`current_business_id`/`handle_new_user` are EXECUTE-granted to `anon`** (live-verified: `has_function_privilege('anon', ..., 'EXECUTE') = true` for all three) via default Postgres grant behavior, not an explicit `REVOKE`. Currently neutralized by internal `auth.uid() IS NULL` checks (confirmed in `create_invoice_for_job`), so not exploitable today — it's a fragile backstop rather than an explicit boundary. Recommend `REVOKE EXECUTE ... FROM anon`.
+
+**LOW-5 — `client/android-native/.../JobPhotoRepository.kt:68`** `signedUrl(pathOrUrl)` lacks the path-traversal guard present in the sibling `JobPhotoThumbnail` (`JobPhotoControls.kt:150-152`). Confirmed dead code (zero callers today) — latent risk only if ever wired up.
+
+**Not a finding (documented for completeness):** `functions/api/admin/concierge.js` runs its IP rate limiter before the `x-admin-code` check in both handlers, which looks like it violates the "rate-limit after auth" convention — but for a static-secret-header auth scheme, limiting attempts *before* validating the secret is the correct anti-brute-force pattern (unlike the Bearer-JWT endpoints the convention was written for). Not flagging as an issue.
+
+## VERIFIED CLEAN
+- Web mass assignment: every `.update`/`.insert`/`.upsert` site in `client/src/lib/data.js` and 2 component files audited — all use explicit allowlists or hand-built objects; `updateJob`/`updateClient`/`updateLead` allowlists confirmed to filter (not just document) and exclude privileged columns.
+- Web: no `dangerouslySetInnerHTML`, no i18n injection path, no non-public `VITE_` secrets.
+- Route-optimizer client surface: 30-stop 2-opt cap, 10-stop nav-link truncation, popup-safe `window.open`, reorder IDs sourced only from server-fetched state — no DoS/injection path.
+- CF Functions: auth-before-side-effects on every endpoint; SSRF-safe (`isSafeWebhookUrl` used at both real fetch-from-config sites, all other fetches hit hardcoded hosts); no raw SQL/shell injection; CORS allowlisted elsewhere; Stripe webhook (`functions/api/stripe/webhook.js`) verifies signature before parsing body, dedups via `webhook_events` before mutation; `jobs/reorder.js` rate limit 60/15min after auth, 100-item cap, ownership-scoped RPC.
+- iOS: Keychain accessibility correct, no plaintext token fallback; every `print()` in `#if DEBUG` with `return` statements outside guards; SwiftData access `@MainActor`-isolated, no races; deep link handler only reads two boolean flags, no state-mutating action; $100k invoice cap + server-truth RPC amount used for display; no hardcoded secrets.
+- Android: no plaintext `SharedPreferences` for sessions; `allowBackup=false`; `network_security_config` blocks cleartext, no `http://` literals; `PendingIntent` uses `FLAG_IMMUTABLE`; exported `MowGoActivity` deep link has no injectable extras; upload-path construction uses UUIDs only (not user text); CSV export redacts `keyCode`/`alarmCode`; no hardcoded secrets beyond expected-public anon/publishable keys.
+- Supabase: all 18 public tables RLS-enabled (live-verified); zero `USING (true)` policies; `job-photo` bucket private with folder-scoped access; `testimonials` blocks client self-approval; `preferred_nav_app` CHECK-constrained; new columns get explicit column-level grants; legacy `server/` not reachable in any deploy config, its invoice cap logic (`server/index.js:319`) is correct.
+- Spot-verified known-fixed items still present and correct: invite-crew takeover guard, webhook dedup, `isSafeWebhookUrl`, CSV redaction (all 3 platforms), invoice caps + server-truth RPC, keychain migration atomicity, `EncryptedSharedPreferences`, `network_security_config`, zero `pages.dev` refs, `updateJob` allowlist.
+
+## Verdict: **PASS** (no CRITICAL/HIGH survived verification)
+Two MEDIUM findings (invoice FK-ownership RLS gap; cross-platform photo-URL SSRF-lite) should be fixed before next release per your "fix all findings" policy, but neither blocks shipping — both require an already-authenticated attacker with specific prior knowledge (a foreign job UUID, or legitimate-but-malicious crew access) rather than an unauthenticated bypass.
+EXIT=0

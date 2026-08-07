@@ -2,6 +2,9 @@
 
 Lawn-care scheduling SaaS (owner: Aaron). React web + SwiftUI iOS + Kotlin Android + Supabase + Cloudflare Pages Functions.
 
+## Repository layout
+See `docs/REPO_MAP.md` for the canonical map; `README.md` is the front door.
+
 ## Architecture
 - Web: `client/src/` — React 19 + Vite + supabase-js + stripe-js. Client-only SPA (no RSC). i18n in `client/src/i18n/`.
 - CF Pages Functions: `functions/api/` — webhook dispatcher, Stripe checkout/webhook, booking, route-audit, leads, invite-crew, concierge, team. Env vars in CF dashboard. Deploy = push to `main`.
