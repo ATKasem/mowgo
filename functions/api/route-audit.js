@@ -41,7 +41,7 @@ function emailHtml(name, hours, monthly, annual) {
 async function sendEmail(env, name, email, hours, monthly, annual) {
   if (!env.RESEND_API_KEY) { console.warn('Route audit email skipped: RESEND_API_KEY is not configured'); return; }
   try {
-    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', to: email, subject: `Your route audit: ~${hours} hrs/week on the table`, html: emailHtml(name, hours, monthly, annual) }) });
+    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', reply_to: 'Hermes <hermes.assistant.job@gmail.com>', to: email, subject: `Your route audit: ~${hours} hrs/week on the table`, html: emailHtml(name, hours, monthly, annual) }) });
     if (!response.ok) console.warn('Route audit email failed:', response.status, await response.text());
   } catch (error) { console.warn('Route audit email failed:', error?.message || error); }
 }

@@ -26,7 +26,7 @@ function welcomeHtml() {
 async function sendWelcomeEmail(env, email) {
   if (!env.RESEND_API_KEY) { console.warn('Welcome email skipped: RESEND_API_KEY is not configured'); return; }
   try {
-    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', to: email, subject: 'Welcome to MowGo — 3 steps to your first scheduled job', html: welcomeHtml() }) });
+    const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'MowGo <invoices@mowgoapp.com>', reply_to: 'Hermes <hermes.assistant.job@gmail.com>', to: email, subject: 'Welcome to MowGo — 3 steps to your first scheduled job', html: welcomeHtml() }) });
     if (!response.ok) console.warn('Welcome email failed:', response.status, await response.text());
   } catch (error) { console.warn('Welcome email failed:', error?.message || error); }
 }
