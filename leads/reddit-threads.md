@@ -546,3 +546,8 @@
 - `1vhl1lm` r/LawnCarePros "Lawn Care - Grass Aerator" — equipment Q. Log only. `1vhp8ld` + `1vhmcmu` r/lawncare homeowner quote/price Qs — pricing-data log for Sunday digest.
 - **Swept, nothing on-ICP:** r/lawncare 25 homeowner/DIY only · r/landscaping 10 new homeowner/DIY only · r/smallbusiness 24 new (e-commerce, photobooth, drywall marketing `1vhn4tz`, hotel, jewelry, Yelp conversion `1vhgx59` — none lawn/software) · r/Entrepreneur 1 new (generic) · r/sweatystartup all seen · r/CRM all seen (25 entries all previously logged) · r/WhichCRM 6 entries all previously logged (vendor/builder meta).
 - **Sweep result:** 0 new drafts. 39 new URLs logged (seen total 1278). Kit for Fri Aug 7 22:21Z: ① #43 → ② #50 (alive) → ③ #41 → fallbacks #38/#40/#44.
+
+### 52. r/smallbusiness — "$379/mo booking widget + $2,400 dropdown" (POSTED Aug 7)
+- **URL:** https://www.reddit.com/r/smallbusiness/comments/1vhv10k/
+- **Context:** Auto-detailing (uncle's shop) — pays $379/mo for website+email+"SEO"+booking widget; provider quoted $2,400 to add a second-truck dropdown. "Nobody names the middle" wedge.
+- **Action status:** ✅ POSTED 2026-08-07 ~13:18Z (u/Blasianzsz) via Composio, comment t1_p29ceub — VISIBILITY VERIFIED in public comment listing (REDDIT_RETRIEVE_POST_COMMENTS, author Blasianzsz). Permalink: https://www.reddit.com/r/smallbusiness/comments/1vhv10k/comment/p29ceub. Friend-mode, NO product/brand/price mention. Do NOT re-queue. Logged .bi_tools/post_times.log.
