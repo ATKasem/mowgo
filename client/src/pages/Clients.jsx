@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, ChevronRight, FileText, Filter, Loader2, Mail, MapPin, Navigation, Pencil, Phone, Plus, Search, StickyNote, Tag, Trash2, X } from 'lucide-react';
 import useLocalizedText from '../i18n/useLocalizedText';
@@ -13,7 +13,7 @@ const LEAD_FORM = { name: '', phone: '', email: '', address: '', source: 'other'
 const sourceLabel = value => value === 'booking_link' ? 'Booking link' : value === 'walk_in' ? 'Walk-in' : value[0].toUpperCase() + value.slice(1);
 const statusStyle = { new: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300', contacted: 'bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300', quoted: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300', won: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300', lost: 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' };
 
-export default function Clients({ jobs = [] }) {
+export default function Clients({ jobs = [], unreadLeadCount = 0, onLeadsViewed }) {
   const { tr, i18n } = useLocalizedText('clients');
   const [segment, setSegment] = useState('clients');
   const [clients, setClients] = useState([]);
@@ -44,6 +44,21 @@ export default function Clients({ jobs = [] }) {
   const shownLeads = useMemo(() => leads.filter(l => `${l.name} ${l.phone || ''} ${l.email || ''} ${l.address || ''}`.toLowerCase().includes(search.toLowerCase())), [leads, search]);
   const duplicatePhone = (phone, excludeId = editId) => phone && [...clients, ...leads].some(row => row.phone && row.phone.replace(/\D/g, '') === phone.replace(/\D/g, '') && row.id !== excludeId);
   const toast = value => { setMessage(value); setTimeout(() => setMessage(''), 3000); };
+
+  // Live-refresh the leads list when a new-lead alert arrives while this page
+  // is mounted (review finding: badge/toast fired but the list stayed stale).
+  const prevUnread = useRef(unreadLeadCount);
+  useEffect(() => {
+    if (unreadLeadCount > prevUnread.current && unreadLeadCount > 0) {
+      loadLeads()
+        .then(rows => setLeads(prev => {
+          const known = new Set(prev.map(l => l.id));
+          return [...rows.filter(r => !known.has(r.id)), ...prev];
+        }))
+        .catch(err => console.error('live lead refresh failed:', err));
+    }
+    prevUnread.current = unreadLeadCount;
+  }, [unreadLeadCount]);
 
   async function saveClient(e) {
     e.preventDefault(); setSaving(true); setError('');
@@ -93,7 +108,7 @@ export default function Clients({ jobs = [] }) {
   return <div>
     {message && <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm">{message}</div>}
     <div className="flex items-center justify-between mb-4"><div><h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Clients')}</h2><p className="text-sm text-[var(--color-text-secondary)]">{tr('{{count}} total', { count: segment === 'clients' ? clients.length : leads.length })}</p></div><button className="btn-primary gap-1.5" onClick={() => segment === 'clients' ? (setEditId(null), setClientForm({ ...INITIAL_CLIENT_FORM })) : setLeadForm({ ...LEAD_FORM })}><Plus className="w-4 h-4" />{tr(segment === 'clients' ? 'Add Client' : 'Add Lead')}</button></div>
-    <div className="grid grid-cols-2 bg-[var(--color-surface-secondary)] dark:bg-gray-900 rounded-xl p-1 mb-4" role="tablist">{['clients', 'leads'].map(value => <button key={value} onClick={() => { setSegment(value); setSearch(''); setExpandedId(null); }} className={`rounded-lg py-2 text-sm font-semibold transition ${segment === value ? 'bg-white dark:bg-gray-800 text-emerald-600 shadow-sm' : 'text-[var(--color-text-secondary)]'}`}>{tr(value === 'clients' ? 'Clients' : 'Leads')}</button>)}</div>
+    <div className="grid grid-cols-2 bg-[var(--color-surface-secondary)] dark:bg-gray-900 rounded-xl p-1 mb-4" role="tablist">{['clients', 'leads'].map(value => <button key={value} onClick={() => { setSegment(value); setSearch(''); setExpandedId(null); if (value === 'leads' && unreadLeadCount > 0) onLeadsViewed?.(); }} className={`relative rounded-lg py-2 text-sm font-semibold transition ${segment === value ? 'bg-white dark:bg-gray-800 text-emerald-600 shadow-sm' : 'text-[var(--color-text-secondary)]'}`}>{tr(value === 'clients' ? 'Clients' : 'Leads')}{value === 'leads' && unreadLeadCount > 0 && <span aria-label={tr('{{count}} new leads', { count: unreadLeadCount })} className="absolute top-1 right-1/2 translate-x-[26px] -translate-y-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">{unreadLeadCount > 9 ? '9+' : unreadLeadCount}</span>}</button>)}</div>
     <div className="relative mb-4"><Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" /><input className="input pl-10" value={search} onChange={e => setSearch(e.target.value)} placeholder={tr(segment === 'clients' ? 'Search by name or address...' : 'Search leads...')} /></div>
     {error && <div className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 rounded-lg p-3 mb-4">{error}</div>}
 

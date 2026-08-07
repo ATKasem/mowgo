@@ -52,6 +52,24 @@ class InvoiceRepository {
             .decodeList<Invoice>()
     }
 
+    /**
+     * Void an unpaid invoice via the owner-only `void_invoice` RPC (sets
+     * status='voided', idempotent, crew-blocked server-side). Mirrors iOS.
+     */
+    suspend fun voidInvoice(invoiceId: String) {
+        if (!SupabaseClientProvider.isConfigured) {
+            demoInvoicesMutable = demoInvoicesMutable.map {
+                if (it.id == invoiceId) it.copy(status = Invoice.STATUS_VOIDED) else it
+            }
+            return
+        }
+        val ok: Boolean = SupabaseClientProvider.client.postgrest.rpc(
+            "void_invoice",
+            buildJsonObject { put("p_invoice_id", invoiceId) }
+        ).decodeAs()
+        if (!ok) throw IllegalStateException("Invoice cannot be voided")
+    }
+
     /** Create a new invoice. */
     suspend fun createInvoice(invoice: Invoice) {
         if (!SupabaseClientProvider.isConfigured) {

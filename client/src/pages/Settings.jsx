@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { loadProfile, saveProfile, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
+import { loadProfile, saveProfile, updateLeadAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
 import { downloadCsv, toCsv } from '../lib/csv';
 import { TEAM_MEMBER_COLORS } from '../lib/constants';
 import { isDemoMode, supabase } from '../lib/supabase';
@@ -163,6 +163,16 @@ export default function Settings() {
     setLocationError('');
   }
 
+  async function toggleLeadAlerts(val) {
+    const previous = profile.lead_alerts_enabled;
+    setProfile(current => ({ ...current, lead_alerts_enabled: val }));
+    try {
+      await updateLeadAlertsEnabled(val);
+    } catch (err) {
+      console.error('updateLeadAlertsEnabled:', err);
+      setProfile(current => ({ ...current, lead_alerts_enabled: previous }));
+    }
+  }
   function toggleNotifyComplete(val) {
     setNotifyOnComplete(val);
     localStorage.setItem('mf_notify_complete', val);
@@ -409,6 +419,21 @@ export default function Settings() {
         {/* Notifications */}
         <div className="card p-5 space-y-4">
           <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Bell className="w-4 h-4 text-amber-500" />{tr("Notifications")}</h4>
+          <label className="flex items-center justify-between cursor-pointer">
+            <div>
+              <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Lead alerts")}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Get notified instantly when a new lead comes in")}</p>
+            </div>
+            <button
+              role="switch"
+              aria-checked={profile.lead_alerts_enabled !== false}
+              aria-label={tr("Lead alerts")}
+              onClick={() => toggleLeadAlerts(profile.lead_alerts_enabled === false)}
+              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${profile.lead_alerts_enabled !== false ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${profile.lead_alerts_enabled !== false ? 'translate-x-[18px]' : ''}`} />
+            </button>
+          </label>
           <label className="flex items-center justify-between cursor-pointer">
             <div>
               <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Job completion alerts")}</p>

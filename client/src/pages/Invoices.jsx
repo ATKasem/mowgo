@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { updateInvoiceStatus, invoicePayMethods, createInvoice, loadClients } from '../lib/data';
+import { updateInvoiceStatus, invoicePayMethods, createInvoice, loadClients, voidInvoice } from '../lib/data';
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck, Plus } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 import EstimatesSection from '../components/EstimatesSection';
@@ -40,6 +40,7 @@ function invoiceNudgeText(invoice, tr, language) {
 /** Unpaid/overdue invoices older than 3 days get a Nudge (mirrors estimates). */
 function isStaleInvoice(invoice) {
   return invoice.status !== 'paid'
+    && invoice.status !== 'voided'
     && invoice.created_at
     && Date.now() - new Date(invoice.created_at).getTime() > 3 * 24 * 60 * 60 * 1000;
 }
@@ -54,6 +55,8 @@ const STATUS_FILTERS = [
 export default function Invoices({ invoices = [], setInvoices }) {
   const { tr, t, i18n } = useLocalizedText('invoices');
   const [copiedIds, setCopiedIds] = useState(new Set());
+  const [voidError, setVoidError] = useState(null); // { id, message } — keyed to the invoice
+  const [voidingId, setVoidingId] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
@@ -144,14 +147,28 @@ export default function Invoices({ invoices = [], setInvoices }) {
     } catch (err) { console.error('changeStatus:', err); }
   }, [setInvoices]);
 
+  const handleVoid = useCallback(async (id) => {
+    setVoidError(null);
+    setVoidingId(id);
+    try {
+      const updated = await voidInvoice(id);
+      setInvoices(prev => prev.map(i => i.id === id ? { ...i, ...updated } : i));
+    } catch (err) {
+      console.error('voidInvoice:', err);
+      setVoidError({ id, message: err?.message || tr("Couldn't void invoice") });
+    } finally {
+      setVoidingId('');
+    }
+  }, [setInvoices, tr]);
+
   const filtered = useMemo(() => {
     if (statusFilter === 'all') return invoices;
-    // Unpaid includes overdue: both are money owed.
-    if (statusFilter === 'unpaid') return invoices.filter(i => i.status !== 'paid');
+    // Unpaid includes overdue: both are money owed. Voided is not owed.
+    if (statusFilter === 'unpaid') return invoices.filter(i => i.status !== 'paid' && i.status !== 'voided');
     return invoices.filter(i => i.status === statusFilter);
   }, [invoices, statusFilter]);
 
-  const unpaid = invoices.filter(i => i.status !== 'paid');
+  const unpaid = invoices.filter(i => i.status !== 'paid' && i.status !== 'voided');
   const totalUnpaid = unpaid.reduce((s, i) => s + (i.amount || 0), 0).toFixed(2);
   const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0).toFixed(2);
 
@@ -274,6 +291,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
           const Icon = iconMap[statusInfo.icon] || AlertCircle;
           const dateStr = invoice.created_at ? new Date(invoice.created_at).toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' }) : tr('Unknown date');
           const isPaid = invoice.status === 'paid';
+          const isVoided = invoice.status === 'voided';
           const isExpanded = expandedId === invoice.id;
           return (
             <div key={invoice.id}>
@@ -292,7 +310,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={statusInfo.badge}>{tr(statusInfo.label)}</span>
-                    {!isPaid && (
+                    {!isPaid && !isVoided && (
                       <button
                         onClick={e => { e.stopPropagation(); copyToClipboard(invoice); }}
                         className="relative text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 text-brand-hover dark:text-emerald-400 hover:text-emerald-700 group"
@@ -346,9 +364,25 @@ export default function Invoices({ invoices = [], setInvoices }) {
                           {copiedIds.has(`nudge-${invoice.id}`) ? tr('Copied!') : tr('Nudge')}
                         </button>
                       )}
+                      {(invoice.status === 'unpaid' || invoice.status === 'overdue') && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            if (window.confirm(tr('Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.', { amount: `$${Number(invoice.amount || 0).toFixed(2)}` }))) {
+                              handleVoid(invoice.id);
+                            }
+                          }}
+                          disabled={voidingId !== ''}
+                          className="btn-secondary text-xs text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 disabled:opacity-50"
+                        >
+                          {voidingId === invoice.id ? tr('Voiding…') : tr('Void')}
+                        </button>
+                      )}
+                      {voidError && voidError.id === invoice.id && <p className="text-xs text-red-600 dark:text-red-400">{voidError.message}</p>}
                     </div>
-                    <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
-                      <p className="text-xs font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2">{tr("Change status")}</p>
+                    {!isVoided && (
+                      <div className="border-t border-gray-100 dark:border-gray-800 pt-3">
+                        <p className="text-xs font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2">{tr("Change status")}</p>
                       <div className="flex gap-1">
                         {['unpaid', 'paid', 'overdue'].map(s => {
                           const si = INVOICE_STATUS[s];
@@ -369,7 +403,8 @@ export default function Invoices({ invoices = [], setInvoices }) {
                           );
                         })}
                       </div>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

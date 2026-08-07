@@ -869,6 +869,28 @@ export async function createInvoice(invoice) {
   };
 }
 
+/**
+ * Void an invoice via the owner-only `void_invoice` RPC (sets status='voided',
+ * idempotent, crew-blocked server-side). Mirrors iOS DataStore.voidInvoice.
+ */
+export async function voidInvoice(id) {
+  if (isDemoMode()) {
+    _invoices = _invoices.map(inv => inv.id === id ? { ...inv, status: 'voided' } : inv);
+    notify();
+    return _invoices.find(inv => inv.id === id);
+  }
+  const { data: ok, error } = await supabase.rpc('void_invoice', { p_invoice_id: id });
+  if (error) throw error;
+  if (ok !== true) throw new Error('Invoice cannot be voided');
+  const { data, error: refetchError } = await supabase
+    .from('invoices')
+    .select('*, clients!left(name)')
+    .eq('id', id)
+    .single();
+  if (refetchError) throw refetchError;
+  return data;
+}
+
 export async function updateInvoiceStatus(id, status) {
   if (isDemoMode()) {
     _invoices = _invoices.map(inv => inv.id === id ? { ...inv, status, ...(status === 'paid' ? { paid_at: new Date().toISOString() } : {}) } : inv);

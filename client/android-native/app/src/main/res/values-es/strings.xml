@@ -165,6 +165,12 @@
     <string name="invoices_new_invoice_title">Nueva factura</string>
     <string name="invoices_empty_title">Aún no hay facturas</string>
     <string name="invoices_empty_detail">Crea una factura para empezar a rastrear pagos.</string>
+    <string name="invoices_void_title">¿Anular esta factura?</string>
+    <string name="invoices_void_body">¿Anular la factura de $%1$s? Esto no se puede deshacer.</string>
+    <string name="invoices_void_snackbar">Factura anulada</string>
+    <string name="invoices_void_failed">Error al anular: %1$s</string>
+    <string name="invoices_void">Anular</string>
+    <string name="invoices_status_voided">Anulada</string>
     <string name="invoices_status_paid">Pagada</string>
     <string name="invoices_status_unpaid">Sin pagar</string>
     <string name="invoices_status_overdue">Vencida</string>

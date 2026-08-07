@@ -23,6 +23,23 @@ function allowed(ip) {
   entry.count += 1; return true;
 }
 
+async function fireLeadAlert(env, userId, lead) {
+  try {
+    if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    await fetch(`${env.SUPABASE_URL}/functions/v1/send-push`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        title: 'New lead request',
+        body: `${lead.name} · Booking link`,
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+  } catch (error) { console.warn('Lead alert push failed:', error?.message || error); }
+}
+
 async function fireLeadWebhook(env, userId, lead) {
   try {
     const key = env.SUPABASE_SERVICE_ROLE_KEY;
@@ -71,7 +88,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     if (!UUID_RE.test(body.business_id || '')) return json({ error: 'Invalid quote request link.' }, 400);
     const key = env.SUPABASE_SERVICE_ROLE_KEY;
     const headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };
-    const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${body.business_id}&select=id`, { headers });
+    const profileRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${body.business_id}&select=id,tier,lead_alerts_enabled`, { headers });
     const profiles = profileRes.ok ? await profileRes.json() : [];
     if (!profiles.length) return json({ error: 'Business not found.' }, 400);
     const insertRes = await fetch(`${env.SUPABASE_URL}/rest/v1/leads`, { method: 'POST', headers, body: JSON.stringify({ user_id: body.business_id, name, phone: phone || null, email: email || null, address: address || null, source: 'booking_link', status: 'new' }) });
@@ -80,6 +97,11 @@ export async function onRequestPost({ request, env, waitUntil }) {
     if (rows[0]) {
       const delivery = fireLeadWebhook(env, body.business_id, rows[0]);
       if (typeof waitUntil === 'function') waitUntil(delivery); else delivery.catch(() => {});
+      const owner = profiles[0];
+      if (['solo', 'crew', 'premium'].includes(owner.tier) && owner.lead_alerts_enabled === true) {
+        const alert = fireLeadAlert(env, body.business_id, rows[0]);
+        if (typeof waitUntil === 'function') waitUntil(alert); else alert.catch(() => {});
+      }
     }
     return json({ success: true }, 201);
   } catch { return json({ error: 'Could not send request. Please try again.' }, 500); }

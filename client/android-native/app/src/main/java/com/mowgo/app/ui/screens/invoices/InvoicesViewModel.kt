@@ -33,6 +33,10 @@ data class InvoicesUiState(
     val selectedEstimate: Estimate? = null,
     val showDeleteConfirmation: Invoice? = null,
     val showMarkPaidConfirmation: Invoice? = null,
+    val showVoidConfirmation: Invoice? = null,
+    val voidingInvoiceId: String? = null,
+    val voidSuccess: Boolean = false,
+    val voidError: String? = null,
     val showSnackbar: String? = null,
     val payingInvoiceId: String? = null,
     val pendingPayment: PendingInvoicePayment? = null,
@@ -360,6 +364,39 @@ class InvoicesViewModel : ViewModel() {
 
     fun dismissDeleteConfirmation() {
         _uiState.value = _uiState.value.copy(showDeleteConfirmation = null)
+    }
+
+    fun confirmVoidInvoice(invoice: Invoice) {
+        _uiState.value = _uiState.value.copy(showVoidConfirmation = invoice)
+    }
+
+    fun dismissVoidConfirmation() {
+        _uiState.value = _uiState.value.copy(showVoidConfirmation = null)
+    }
+
+    fun voidInvoice(invoiceId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(voidingInvoiceId = invoiceId)
+            try {
+                invoiceRepository.voidInvoice(invoiceId)
+                _uiState.value = _uiState.value.copy(
+                    showVoidConfirmation = null,
+                    voidingInvoiceId = null,
+                    voidSuccess = true,
+                    voidError = null,
+                )
+                loadData()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    voidingInvoiceId = null,
+                    voidError = e.message ?: "unknown",
+                )
+            }
+        }
+    }
+
+    fun dismissVoidFeedback() {
+        _uiState.value = _uiState.value.copy(voidSuccess = false, voidError = null)
     }
 
     fun deleteInvoice(invoiceId: String) {

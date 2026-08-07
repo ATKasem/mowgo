@@ -133,14 +133,18 @@ private struct InvoiceDetailView: View {
                     }
                 }
                 Section {
-                    Button("Copy payment text") { copy(invoiceText) }
+                    if invoice.status != .voided {
+                        Button("Copy payment text") { copy(invoiceText) }
+                    }
                     if canNudge {
                         Button("Nudge") { copy(nudgeText) }.tint(.orange)
                     }
-                    Button("Pay via Stripe") { showPayment = true }
-                    Button("Mark Paid") { markPaid() }
+                    if invoice.status != .voided {
+                        Button("Pay via Stripe") { showPayment = true }
+                        Button("Mark Paid") { markPaid() }
+                    }
                 }
-                if invoice.status == .unpaid {
+                if invoice.status == .unpaid || invoice.status == .overdue {
                     Section {
                         Button("Void invoice", role: .destructive) { showVoidConfirm = true }
                             .disabled(voiding)
@@ -172,6 +176,7 @@ private struct InvoiceDetailView: View {
 
     private var canNudge: Bool {
         guard invoice.status != .paid,
+              invoice.status != .voided,
               let value = invoice.createdAt,
               let date = Self.parseISODate(value) else { return false }
         return date < Calendar.current.date(byAdding: .day, value: -3, to: Date())!

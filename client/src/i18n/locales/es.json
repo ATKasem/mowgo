@@ -503,7 +503,9 @@
     "Voided": "Anulada",
     "voided": "Anulada",
     "Void": "Anular",
-    "Void this invoice? It will no longer be collectible. This cannot be undone.": "¿Anular esta factura? Ya no será cobrable. Esto no se puede deshacer."
+    "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.": "¿Anular esta factura de {{amount}}? Ya no será cobrable. Esto no se puede deshacer.",
+    "Couldn't void invoice": "No se pudo anular la factura",
+    "Voiding…": "Anulando…"
   },
   "jobberPriceIncrease": {
     "core": "Core",

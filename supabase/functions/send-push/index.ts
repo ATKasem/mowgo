@@ -13,6 +13,13 @@
 // Request body:
 //   { userId: string, title: string, body: string }
 //
+// Auth: either a user JWT (self-send only — userId must equal the caller's own
+// id), or the service-role secret (SB_SERVICE_ROLE_KEY, the correctly-set
+// project secret — NOT SUPABASE_SERVICE_ROLE_KEY which is a stale manual value
+// on this project) as a bearer token — the server-triggered path used by CF
+// Pages Functions (e.g. instant lead alerts) to send to any validated userId,
+// rate-limited per user.
+//
 // The function looks up the user's platform tokens and routes delivery through
 // APNs HTTP/2 or FCM HTTP v1 using Web Crypto for provider authentication.
 
@@ -329,6 +336,44 @@ function isInvalidFcmToken(result: PushResult): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Service-role (server-triggered) auth helpers
+// ---------------------------------------------------------------------------
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+// Constant-time-ish string compare: hashes both inputs to a fixed-length
+// digest first (so length differences can't be timed), then XORs every byte.
+async function secretsMatch(a: string, b: string): Promise<boolean> {
+  const enc = new TextEncoder();
+  const [digestA, digestB] = await Promise.all([
+    crypto.subtle.digest("SHA-256", enc.encode(a)),
+    crypto.subtle.digest("SHA-256", enc.encode(b)),
+  ]);
+  const bytesA = new Uint8Array(digestA);
+  const bytesB = new Uint8Array(digestB);
+  let diff = 0;
+  for (let i = 0; i < bytesA.length; i++) diff |= bytesA[i] ^ bytesB[i];
+  return diff === 0;
+}
+
+// Per-user rate limit for the server-triggered alert path (5 sends / 15 min).
+// In-memory per-isolate map — best-effort, matches the CF Pages Functions pattern.
+const ALERT_WINDOW_MS = 15 * 60 * 1000;
+const ALERT_LIMIT = 5;
+const alertAttempts = new Map<string, { count: number; reset: number }>();
+function allowedAlert(userId: string): boolean {
+  const now = Date.now();
+  const entry = alertAttempts.get(userId);
+  if (!entry || now >= entry.reset) {
+    alertAttempts.set(userId, { count: 1, reset: now + ALERT_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= ALERT_LIMIT) return false;
+  entry.count += 1;
+  return true;
+}
+
+// ---------------------------------------------------------------------------
 // Edge function handler
 // ---------------------------------------------------------------------------
 
@@ -350,24 +395,13 @@ serve(async (req) => {
       );
     }
 
+    const serviceRoleKey = Deno.env.get("SB_SERVICE_ROLE_KEY") ?? "";
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SB_SERVICE_ROLE_KEY") ?? "",
+      serviceRoleKey,
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user: caller },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !caller) {
-      return new Response(
-        JSON.stringify({ error: "Invalid token" }),
-        { status: 401, headers: { ...cors, "Content-Type": "application/json" } },
-      );
-    }
-
     const body = await req.json();
     const { userId, title, body: pushBody } = body;
 
@@ -378,13 +412,46 @@ serve(async (req) => {
       );
     }
 
-    // Only allow sending to self (or business owner's team)
-    // For MVP: only allow sending push to your own user id
-    if (userId !== caller.id) {
-      return new Response(
-        JSON.stringify({ error: "Can only send push to your own account" }),
-        { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
-      );
+    // Server-triggered path: bearer token is the service-role secret itself
+    // (auto-injected env var, never sent by clients) — allows alerting any
+    // validated userId, subject to a per-user rate limit. This is the ONLY
+    // server trigger; the user-JWT self-send path below is unchanged.
+    const isServiceRoleCall = Boolean(serviceRoleKey) && await secretsMatch(token, serviceRoleKey);
+
+    if (isServiceRoleCall) {
+      if (typeof userId !== "string" || !UUID_RE.test(userId)) {
+        return new Response(
+          JSON.stringify({ error: "Invalid userId" }),
+          { status: 400, headers: { ...cors, "Content-Type": "application/json" } },
+        );
+      }
+      if (!allowedAlert(userId)) {
+        return new Response(
+          JSON.stringify({ error: "Too many alerts for this user. Please try again later." }),
+          { status: 429, headers: { ...cors, "Content-Type": "application/json" } },
+        );
+      }
+    } else {
+      const {
+        data: { user: caller },
+        error: authError,
+      } = await supabaseAdmin.auth.getUser(token);
+
+      if (authError || !caller) {
+        return new Response(
+          JSON.stringify({ error: "Invalid token" }),
+          { status: 401, headers: { ...cors, "Content-Type": "application/json" } },
+        );
+      }
+
+      // Only allow sending to self (or business owner's team)
+      // For MVP: only allow sending push to your own user id
+      if (userId !== caller.id) {
+        return new Response(
+          JSON.stringify({ error: "Can only send push to your own account" }),
+          { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
+        );
+      }
     }
 
     // Look up device token

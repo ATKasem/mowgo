@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, Suspense, lazy } from 'react';
+import { useState, useEffect, useRef, useCallback, createContext, useContext, Suspense, lazy } from 'react';
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -7,10 +7,12 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import { supabase, isDemoMode } from './lib/supabase';
-import { loadJobs, loadInvoices, onDataChange } from './lib/data';
+import { loadJobs, loadInvoices, onDataChange, subscribeToNewLeads } from './lib/data';
 import { resumeCheckoutIntent } from './lib/payments';
 import { useTranslation } from 'react-i18next';
+import useLocalizedText from './i18n/useLocalizedText';
 import i18n from './i18n';
+import InvoiceToast from './components/InvoiceToast';
 
 // Everything else is route-level code-split — none of it is needed for the
 // initial paint, so it shouldn't cost cold traffic a 1MB+ download.
@@ -174,6 +176,19 @@ function ApplyStashedRefCode() {
   return null;
 }
 
+// Subscribes the signed-in owner to new-lead Realtime events (instant lead
+// alerts, web in-app channel) and forwards each new lead up to App() for the
+// toast + Leads-tab badge. Lives inside AuthProvider so it can read the
+// authenticated user id; subscribeToNewLeads() itself no-ops in demo mode.
+function LeadAlertListener({ onNewLead }) {
+  const { user } = useAuth();
+  useEffect(() => {
+    if (!isDemoMode() && !user?.id) return undefined;
+    return subscribeToNewLeads(user?.id, onNewLead);
+  }, [user?.id, onNewLead]);
+  return null;
+}
+
 // This component detects that and rewrites to /#/login so Login.jsx can show
 // a friendly error message instead of a blank page.
 function SupabaseErrorRedirect() {
@@ -212,9 +227,13 @@ function SupabaseErrorRedirect() {
 // ===== App =====
 export default function App() {
   useTranslation();
+  const { tr } = useLocalizedText('app');
   const [jobs, setJobs] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [leadToast, setLeadToast] = useState(null);
+  const [unreadLeadCount, setUnreadLeadCount] = useState(0);
+  const leadToastTimer = useRef(null);
 
   // Load data on mount + when demo data changes
   useEffect(() => {
@@ -237,6 +256,18 @@ export default function App() {
     return () => { mounted = false; unsub(); };
   }, []);
 
+  useEffect(() => () => { if (leadToastTimer.current) clearTimeout(leadToastTimer.current); }, []);
+
+  // New-lead alert: toast (any page) + increments the Leads-tab badge.
+  const handleNewLead = useCallback((lead) => {
+    setUnreadLeadCount(count => count + 1);
+    setLeadToast({ name: `${tr('New lead request')}: ${lead.name} · ${tr('Booking link')}`, amount: 0, type: 'lead' });
+    if (leadToastTimer.current) clearTimeout(leadToastTimer.current);
+    leadToastTimer.current = setTimeout(() => setLeadToast(null), 5000);
+  }, [tr]);
+
+  const clearUnreadLeads = useCallback(() => setUnreadLeadCount(0), []);
+
   return (
     <ErrorBoundary>
     <HashRouter>
@@ -244,6 +275,8 @@ export default function App() {
         <SupabaseErrorRedirect />
         <ResumeCheckoutIntent />
         <ApplyStashedRefCode />
+        <LeadAlertListener onNewLead={handleNewLead} />
+        <InvoiceToast toast={leadToast} />
         <Suspense fallback={<PageLoading />}>
         <Routes>
           {/* Public */}
@@ -274,7 +307,7 @@ export default function App() {
             <Route path="/app" element={<Dashboard />} />
             <Route path="/app/home" element={<Home jobs={jobs} invoices={invoices} />} />
             <Route path="/app/today" element={<Today jobs={jobs} setJobs={setJobs} invoices={invoices} setInvoices={setInvoices} loading={dataLoading} />} />
-            <Route path="/app/clients" element={<Clients jobs={jobs} />} />
+            <Route path="/app/clients" element={<Clients jobs={jobs} unreadLeadCount={unreadLeadCount} onLeadsViewed={clearUnreadLeads} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/app" />} />

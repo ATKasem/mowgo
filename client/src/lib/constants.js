@@ -48,6 +48,13 @@ export const INVOICE_STATUS = {
     badge: 'badge-danger',
     label: 'Overdue',
   },
+  voided: {
+    icon: 'AlertCircle',
+    bg: 'bg-gray-100 dark:bg-gray-800',
+    text: 'text-gray-500 dark:text-gray-400',
+    badge: 'badge-ghost',
+    label: 'Voided',
+  },
 };
 
 export const ESTIMATE_STATUS = {

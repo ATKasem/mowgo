@@ -36,5 +36,6 @@ data class Invoice(
         const val STATUS_UNPAID = "unpaid"
         const val STATUS_PAID = "paid"
         const val STATUS_OVERDUE = "overdue"
+        const val STATUS_VOIDED = "voided"
     }
 }

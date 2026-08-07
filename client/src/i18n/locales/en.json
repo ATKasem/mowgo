@@ -487,7 +487,9 @@
     "Voided": "Voided",
     "voided": "Voided",
     "Void": "Void",
-    "Void this invoice? It will no longer be collectible. This cannot be undone.": "Void this invoice? It will no longer be collectible. This cannot be undone."
+    "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.": "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.",
+    "Couldn't void invoice": "Couldn't void invoice",
+    "Voiding…": "Voiding…"
   },
   "jobberPriceIncrease": {
     "core": "Core",

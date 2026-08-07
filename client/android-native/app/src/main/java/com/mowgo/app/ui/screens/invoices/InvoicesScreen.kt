@@ -196,6 +196,55 @@ fun InvoicesScreen(
         )
     }
 
+    // Void invoice confirmation dialog
+    state.showVoidConfirmation?.let { invoice ->
+        AlertDialog(
+            onDismissRequest = {
+                if (state.voidingInvoiceId == null) viewModel.dismissVoidConfirmation()
+            },
+            title = { Text(stringResource(R.string.invoices_void_title), color = MaterialTheme.colorScheme.onSurface) },
+            text = {
+                Text(
+                    text = stringResource(R.string.invoices_void_body, String.format(java.util.Locale.US, "%.2f", invoice.amount)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.voidInvoice(invoice.id) },
+                    enabled = state.voidingInvoiceId == null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text(stringResource(R.string.invoices_void), color = MaterialTheme.colorScheme.onError)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.dismissVoidConfirmation() },
+                    enabled = state.voidingInvoiceId == null,
+                ) {
+                    Text(stringResource(R.string.action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            },
+        )
+    }
+
+    val voidSnackbarText = stringResource(R.string.invoices_void_snackbar)
+    val voidFailedText = state.voidError?.let { stringResource(R.string.invoices_void_failed, it) }
+    LaunchedEffect(state.voidSuccess, state.voidError) {
+        if (state.voidSuccess) {
+            snackbarHostState.showSnackbar(voidSnackbarText)
+            viewModel.dismissVoidFeedback()
+        }
+        voidFailedText?.let { msg ->
+            snackbarHostState.showSnackbar(msg)
+            viewModel.dismissVoidFeedback()
+        }
+    }
+
     // New invoice dialog
     if (state.showNewInvoiceDialog) {
         NewInvoiceDialog(
@@ -304,6 +353,7 @@ fun InvoicesScreen(
                             onPay = { viewModel.payInvoice(item) },
                             onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
                             onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
+                            onVoid = { viewModel.confirmVoidInvoice(item.invoice) },
                             onCopyText = {
                                 val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
                                 clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgServicedWithDate, invoiceMsgServicedNoDate, payLine)))
@@ -453,12 +503,14 @@ private fun InvoiceCard(
     onPay: () -> Unit,
     onMarkPaid: () -> Unit,
     onDelete: () -> Unit,
+    onVoid: (() -> Unit)? = null,
     onCopyText: (() -> Unit)? = null,
     onNudge: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val isPaid = invoice.status == Invoice.STATUS_PAID
-    val canNudge = !isPaid && onNudge != null && (invoice.createdAt?.let { raw ->
+    val isVoided = invoice.status == Invoice.STATUS_VOIDED
+    val canNudge = !isPaid && !isVoided && onNudge != null && (invoice.createdAt?.let { raw ->
         runCatching {
             java.time.Instant.parse(raw)
                 .isBefore(java.time.Instant.now().minus(java.time.Duration.ofDays(3)))
@@ -553,7 +605,7 @@ private fun InvoiceCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    if (!isPaid) {
+                    if (!isPaid && !isVoided) {
                         onCopyText?.let { copyText ->
                             OutlinedButton(
                                 onClick = copyText,
@@ -592,6 +644,26 @@ private fun InvoiceCard(
                                 Text(stringResource(R.string.invoices_nudge), style = MaterialTheme.typography.labelSmall)
                             }
                         }
+                        if (invoice.status == Invoice.STATUS_UNPAID || invoice.status == Invoice.STATUS_OVERDUE) {
+                            if (onVoid != null) {
+                                OutlinedButton(
+                                    onClick = onVoid,
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error,
+                                    ),
+                                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                                        brush = androidx.compose.ui.graphics.SolidColor(
+                                            MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                                        ),
+                                    ),
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                ) {
+                                    Text(stringResource(R.string.invoices_void), style = MaterialTheme.typography.labelSmall)
+                                }
+                            }
+                        }
                         if (showPay) {
                             Button(
                                 onClick = onPay,
@@ -617,23 +689,25 @@ private fun InvoiceCard(
                                 }
                             }
                         }
-                        OutlinedButton(
-                            onClick = onMarkPaid,
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.secondary,
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder.copy(
-                                brush = androidx.compose.ui.graphics.SolidColor(
-                                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                        if (!isVoided) {
+                            OutlinedButton(
+                                onClick = onMarkPaid,
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.secondary,
                                 ),
-                            ),
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp),
-                        ) {
-                            Icon(Icons.Filled.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.invoices_mark_paid), style = MaterialTheme.typography.labelSmall)
+                                border = ButtonDefaults.outlinedButtonBorder.copy(
+                                    brush = androidx.compose.ui.graphics.SolidColor(
+                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                                    ),
+                                ),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp),
+                            ) {
+                                Icon(Icons.Filled.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.invoices_mark_paid), style = MaterialTheme.typography.labelSmall)
+                            }
                         }
                     }
                     OutlinedButton(
