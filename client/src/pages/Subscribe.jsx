@@ -82,6 +82,7 @@ export default function Subscribe() {
   const [retry, setRetry] = useState(0);
   const [billingInterval, setBillingInterval] = useState('month');
   const [checkoutError, setCheckoutError] = useState('');
+  const [checkoutPending, setCheckoutPending] = useState(false);
 
   const paidPlans = [
     { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
@@ -101,20 +102,26 @@ export default function Subscribe() {
   ];
 
   async function handleCheckout(plan) {
+    if (checkoutPending) return;
     setCheckoutError('');
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) {
-      // Logged out — send them to signup with the plan preselected (same
-      // pattern as Landing/Compare). Without this, startCheckout just
-      // returns an error line and the button appears dead.
-      localStorage.setItem('mowgo_plan_intent', plan.toLowerCase());
-      localStorage.setItem('mowgo_interval_intent', billingInterval);
-      localStorage.setItem('mowgo_intent_time', String(Date.now()));
-      navigate(`/login?mode=signup&plan=${plan.toLowerCase()}&interval=${billingInterval}`);
-      return;
+    setCheckoutPending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        // Logged out — send them to signup with the plan preselected (same
+        // pattern as Landing/Compare). Without this, startCheckout just
+        // returns an error line and the button appears dead.
+        localStorage.setItem('mowgo_plan_intent', plan.toLowerCase());
+        localStorage.setItem('mowgo_interval_intent', billingInterval);
+        localStorage.setItem('mowgo_intent_time', String(Date.now()));
+        navigate(`/login?mode=signup&plan=${plan.toLowerCase()}&interval=${billingInterval}`);
+        return;
+      }
+      const result = await startCheckout(plan.toLowerCase(), billingInterval);
+      if (result?.error) setCheckoutError(result.error);
+    } finally {
+      setCheckoutPending(false);
     }
-    const result = await startCheckout(plan.toLowerCase(), billingInterval);
-    if (result?.error) setCheckoutError(result.error);
   }
 
   useEffect(() => {
@@ -249,7 +256,7 @@ export default function Subscribe() {
               <ul className="space-y-3 flex-1">
                 {plan.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
               </ul>
-              <button type="button" onClick={() => handleCheckout(plan.name)} className={plan.name === 'Premium' ? 'btn-primary mt-6 justify-center' : 'btn-secondary mt-6 justify-center'}>{tr(plan.cta)} <ArrowRight className="w-4 h-4" /></button>
+              <button type="button" onClick={() => handleCheckout(plan.name)} disabled={checkoutPending} className={plan.name === 'Premium' ? 'btn-primary mt-6 justify-center disabled:opacity-60' : 'btn-secondary mt-6 justify-center disabled:opacity-60'}>{tr(plan.cta)} <ArrowRight className="w-4 h-4" /></button>
             </div>
           ))}
         </div>

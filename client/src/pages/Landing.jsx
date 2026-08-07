@@ -96,6 +96,7 @@ export default function Landing() {
   const [kitOpen, setKitOpen] = useState(false);
   const [testimonials, setTestimonials] = useState([]);
   const errorTimerRef = useRef(null);
+  const checkoutPendingRef = useRef(false);
   usePageTitle(tr('seo.title'), tr('seo.description'));
 
   useEffect(() => {
@@ -121,6 +122,8 @@ export default function Landing() {
   }, []);
 
   async function handleStartCheckout(plan, interval = 'month') {
+    if (checkoutPendingRef.current) return;
+    checkoutPendingRef.current = true;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
@@ -140,6 +143,8 @@ export default function Landing() {
       setPaymentError(e.message || tr('Payment failed'));
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
       errorTimerRef.current = setTimeout(() => setPaymentError(''), 5000);
+    } finally {
+      checkoutPendingRef.current = false;
     }
   }
 

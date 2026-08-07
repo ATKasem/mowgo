@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import usePageTitle from '../hooks/usePageTitle';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Check, X, CloudRain, Shield, Zap, Sprout, ArrowRight, DollarSign } from 'lucide-react';
 import { startCheckout } from '../lib/payments';
@@ -87,6 +87,7 @@ export default function Compare() {
   const { tr, t, i18n } = useLocalizedText('compare');
   const navigate = useNavigate();
   const [checkoutError, setCheckoutError] = useState('');
+  const checkoutPendingRef = useRef(false);
   usePageTitle(tr('seo.title'), tr('seo.description'));
 
   function goToPricing(e) {
@@ -102,6 +103,8 @@ export default function Compare() {
   }
 
   async function handleTierCheckout(plan) {
+    if (checkoutPendingRef.current) return;
+    checkoutPendingRef.current = true;
     setCheckoutError('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -116,6 +119,8 @@ export default function Compare() {
       if (result?.error) setCheckoutError(result.error);
     } catch (error) {
       setCheckoutError(error.message || tr('Payment failed'));
+    } finally {
+      checkoutPendingRef.current = false;
     }
   }
 
