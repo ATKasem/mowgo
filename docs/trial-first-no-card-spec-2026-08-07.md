@@ -145,3 +145,36 @@ GRANT EXECUTE ON FUNCTION public.expire_all_trials() TO service_role;
 ## Out of scope (note for later)
 - Mobile (iOS edge function `create-checkout-session` + Android) parity — keeps card-at-checkout until this lands on web and is proven.
 - Trial for non-signup paths (invite/crew) — owner-only grants for now.
+
+---
+
+## Security appendix (added 2026-08-07, post-Mimo review)
+
+**Question:** can a user trick the system into free service? Audited live (not theorized) — RLS is the authz ground truth; every claim below was verified against the live DB / deployed functions on 2026-08-07.
+
+### Verified protections
+| Vector | Result | Mechanism |
+|---|---|---|
+| Self-upgrade `profiles.tier` via REST PATCH | 🔒 403 | Column-scoped grant: `GRANT UPDATE (business_name, phone)` (002) + later column grants exclude `tier`/`trial_*`. Mixed payload also 403. |
+| Free user >5 clients via API | 🔒 400 | `enforce_free_client_limit()` trigger (20260806140000) + advisory lock against races |
+| Expired trial → unlimited clients | 🔒 Fixed | Trigger now treats expired trial as free **at insert time** (20260807180000) — independent of `expire_trial()`/cron timing |
+| Expired trial → free concierge (human work) | 🔒 Fixed | `concierge-submit.js` reads `trial_ends_at`; expired → 403 |
+| Anonymous force-expiry of ALL trials | 🔒 401 | anon could call `expire_all_trials` (anonymous DoS on conversion funnel) — revoked; now service_role-only (20260807183000) |
+| Anon EXECUTE on sensitive functions | 🔒 0 remain | `reorder_jobs`, `set_first_*`, `enforce_free_client_limit` revoked from anon/authenticated (20260807190000) — Supabase's default grants leak EXECUTE; `REVOKE FROM PUBLIC` doesn't cover them, need explicit role revokes |
+| Referral self-free-month loop | 🔒 Impossible | `earn_referral_credit`/`claim_referral_credit` service_role-only + fire only from real Stripe `checkout.session.completed`; no-card trials never create Stripe subscriptions |
+| Email-alias trial farming (+tags, dots, googlemail) | 🔒 Fixed | `used_trials` table keyed on **normalized email** (lowercase, +alias stripped, gmail dots stripped, googlemail→gmail; non-gmail lowercase only). One trial per human, **survives account deletion** (20260807193000). Verified live: `aaron+1@gmail.com` granted / `aaron+2@googlemail.com` blocked; `trialdot.name+1@gmail.com` granted / `trialdotname+2@gmail.com` blocked; `sara@yahoo.com`/`bob+tag@outlook.com` unaffected |
+| Stripe customer-ID hijack (copy victim's `cus_xxx`) | 🔒 Fixed | Users can write `stripe_customer_id` (004, iOS). PostgREST PATCH matches ALL rows — old webhook fallback would upgrade both. Now resolves customer-ID to exactly ONE profile (1→patch by PK, >1→warn+refuse, 0→silent) in `updateProfile` + `handleSubscriptionDeleted` (7ef941f) |
+| Trial grant audit trail | ✅ | `grant_trial` logs `tier_events` (source=`trial_grant`) |
+
+### RLS / function-grant sweep (Mimo review, all PASS)
+- All 22 tables `ENABLE ROW LEVEL SECURITY`; no cross-user leakage (referrals, webhook_configs, leads, route_audits PII, sms_threads all service-role/owner-scoped)
+- Every SECURITY DEFINER function callable by authenticated users is `auth.uid()`-scoped (grant_trial, expire_trial, current_business_id, create_invoice_for_job, apply_rain_delay, void_invoice, apply_referral_code, referral_status); service-role-only functions guard on `auth.role() <> 'service_role'`
+- Zero anon EXECUTE grants remain (verified live)
+
+### Accepted tradeoffs (by design, not defects)
+1. **Multi-account farming with real distinct inboxes** — bounded by email confirmation + Supabase rate limits (60/hr) + 14-day window. Phone verification is the kill-it-completely upgrade if ever needed.
+2. **Direct-checkout Stripe trial (never had app trial)** — 14 free days with card on file; cancel before charge = free period. Requires a card; not a no-card vector. Kept for annual/mobile parity.
+3. **Admin-deleted users can re-register** — `used_trials` survives deletion (email-keyed), so re-registration does NOT grant a new trial.
+
+### Security principle applied
+Enforcement (cap, concierge, trial expiry) reads `trial_ends_at` **directly at enforcement time** — never waits for `expire_trial()` (app mount) or the cron (daily backstop, silent unless count>0). This closed the "tier still premium after expiry" window at the DB boundary, covering API-only users and all platforms (RLS/triggers are client-agnostic).
