@@ -316,6 +316,21 @@ async function fetchProfile(env, serviceKey, filter, select = 'id,tier') {
   }
 }
 
+// Like fetchProfile but returns ALL matching rows (for count-checking
+// before PATCH — prevents multi-row updates on ambiguous filters).
+async function fetchMatchingProfiles(env, serviceKey, filter, select = 'id,tier') {
+  try {
+    const res = await withTimeout(fetch(
+      `${env.SUPABASE_URL}/rest/v1/profiles?${filter}&select=${select}`,
+      { headers: { apikey: `${serviceKey}`, Authorization: `Bearer ${serviceKey}` } }
+    ));
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (e) {
+    return [];
+  }
+}
+
 async function updateProfile({ env, userId, customerId, tier }) {
   if (!userId && !customerId) throw new Error('Event has no profile identity');
 
@@ -346,15 +361,24 @@ async function updateProfile({ env, userId, customerId, tier }) {
     }
   }
 
-  // Fallback: identify by customer id — read pre-state first, then patch, then log
-  const before = await fetchProfile(env, serviceKey, `stripe_customer_id=eq.${encodeURIComponent(customerId)}`);
-  const matchedByCustomer = await patchProfile(
-    env,
-    `stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
-    profile,
+  // Fallback: identify by customer id — resolve to exactly one profile first
+  // to prevent multi-row patches (PostgREST PATCH matches ALL matching rows).
+  const matchingProfiles = await fetchMatchingProfiles(
+    env, serviceKey, `stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
   );
+  if (!matchingProfiles || matchingProfiles.length === 0) return;
+  if (matchingProfiles.length > 1) {
+    console.warn(
+      `Stripe webhook updateProfile: ambiguous customer id ${customerId} — ${matchingProfiles.length} profiles match, patching none`,
+    );
+    return;
+  }
+  // Exactly one match — patch by primary key, never by customer filter
+  const resolvedId = matchingProfiles[0].id;
+  const before = await fetchProfile(env, serviceKey, `id=eq.${encodeURIComponent(resolvedId)}`);
+  const matchedByCustomer = await patchProfile(env, `id=eq.${encodeURIComponent(resolvedId)}`, profile);
   if (matchedByCustomer && before && before.tier !== tier) {
-    await logTierChange(env, serviceKey, before.id, tier);
+    await logTierChange(env, serviceKey, resolvedId, tier);
   }
 }
 
@@ -367,9 +391,25 @@ async function handleSubscriptionDeleted(object, env) {
   if (!userId && !customerId) return;
 
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_KEY;
-  const filter = userId
-    ? `id=eq.${encodeURIComponent(userId)}`
-    : `stripe_customer_id=eq.${encodeURIComponent(customerId)}`;
+
+  // When identifying by customer id only, resolve to exactly one profile
+  // first to prevent multi-row patches (PostgREST PATCH matches ALL rows).
+  let resolvedId = userId;
+  if (!userId && customerId) {
+    const matchingProfiles = await fetchMatchingProfiles(
+      env, serviceKey, `stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
+    );
+    if (!matchingProfiles || matchingProfiles.length === 0) return;
+    if (matchingProfiles.length > 1) {
+      console.warn(
+        `Stripe webhook handleSubscriptionDeleted: ambiguous customer id ${customerId} — ${matchingProfiles.length} profiles match, patching none`,
+      );
+      return;
+    }
+    resolvedId = matchingProfiles[0].id;
+  }
+
+  const filter = `id=eq.${encodeURIComponent(resolvedId)}`;
 
   const before = await fetchProfile(env, serviceKey, filter);
 
@@ -381,18 +421,17 @@ async function handleSubscriptionDeleted(object, env) {
   const matched = await patchProfile(env, filter, patch);
   if (!matched) return;
 
-  const resolvedUserId = before?.id || userId;
   if (before && before.tier !== 'free') {
-    await logTierChange(env, serviceKey, resolvedUserId, 'free');
+    await logTierChange(env, serviceKey, resolvedId, 'free');
   }
 
-  if (resolvedUserId && before && ['solo', 'crew', 'premium'].includes(before.tier)) {
+  if (resolvedId && before && ['solo', 'crew', 'premium'].includes(before.tier)) {
     // Atomic claim: only the delivery that wins this compare-and-swap sends
     // the email, so a concurrent/duplicate cancellation delivery can't send
     // it twice (HIGH-2 — dedup no longer blocks re-processing up front).
-    const claimed = await claimWinback(env, serviceKey, resolvedUserId);
+    const claimed = await claimWinback(env, serviceKey, resolvedId);
     if (claimed) {
-      await sendWinbackEmail(env, serviceKey, resolvedUserId, before.tier);
+      await sendWinbackEmail(env, serviceKey, resolvedId, before.tier);
     }
   }
 }
