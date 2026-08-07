@@ -176,7 +176,11 @@
     "invite_a_crew_get_a_free_month": "Invita a una cuadrilla — gana un mes gratis",
     "share_your_code": "Comparte tu código:",
     "copy": "Copiar",
-    "copied": "¡Copiado!"
+    "copied": "¡Copiado!",
+    "not_now": "Ahora no",
+    "see_plans": "Ver planes",
+    "unlimited_clients_recurring_jobs_and_offline_mode_start_at_39_mo": "Clientes ilimitados, trabajos recurrentes y modo sin conexión desde $39/mes.",
+    "you_ve_hit_the_free_limit_5_clients": "Alcanzaste el límite gratuito (5 clientes)"
   },
   "compare": {
     "compare_mowgo_plans": "Compara los planes de MowGo",
@@ -313,7 +317,9 @@
     "seo_description": "Comparación lado a lado de precios y funciones de software para jardinería. Actualizado en agosto de 2026 con precios públicos y pruebas reales.",
     "route_optimization": "Optimización de rutas",
     "one_tap_optimized_routes_send_stops_to_your_maps_app": "Rutas optimizadas con un solo toque + envía paradas a tu aplicación de mapas",
-    "start_free_trial": "Inicia la prueba gratis"
+    "start_free_trial": "Inicia la prueba gratis",
+    "planado_new_in_the_band_charges_per_user_12_29_user_mo_and_has_no_invoic": "Planado (nuevo en el mercado) cobra por usuario — $12–$29/usuario/mes — y no tiene facturación ni pagos. La facturación automática de MowGo + enlace de pago por SMS está incluida a $39 fijos.",
+    "service_autopilot_s_49_mo_is_one_mobile_license_a_2_person_crew_runs_199": "Los $49/mes de Service Autopilot son UNA licencia móvil — un equipo de 2 personas paga $199+/mes con tarifa de registro y facturación solo anual. MowGo Crew cuesta $79 fijos, todo el equipo incluido."
   },
   "ruunlyComparison": {
     "route_optimization": "Optimización de rutas",
@@ -746,7 +752,11 @@
     "lawnpro_alternative": "Alternativa a LawnPro",
     "quoteiq_alternative": "Alternativa a QuoteIQ",
     "your_data_stays_yours_always_export_it_anytime_if_you_cancel_we_delete_y": "Sus datos siempre son suyos. Expórtelos cuando quiera. Si cancela, eliminamos sus datos a petición.",
-    "route_optimization_is_live_included_on_solo_crew_and_premium": "La optimización de rutas ya está disponible: incluida en Solo, Crew y Premium."
+    "route_optimization_is_live_included_on_solo_crew_and_premium": "La optimización de rutas ya está disponible: incluida en Solo, Crew y Premium.",
+    "jobber_grow": "Jobber Grow",
+    "jobber_grow_is_139_mo_99_mo_billed_annually_plus_29_mo_per_additional_us": "Jobber Grow cuesta $139/mes ($99/mes facturado anualmente) más $29/mes por cada usuario adicional. Las apps de LawnPro están activas, pero no ofrecen retraso por lluvia, modo sin conexión ni modo oscuro.",
+    "no_catch_cancel_anytime_14_day_free_trial_30_day_money_back_guarantee_if": "Sin trucos. Cancela cuando quieras. Prueba gratuita de 14 días. Garantía de devolución de 30 días. Si Solo no te hace más organizado en 30 días, te reembolsamos el primer mes completo.",
+    "solo_costs_less_than_one_missed_job_solo_is_39_mo_under_1_for_any_crew_b": "Solo cuesta menos que un trabajo perdido. Solo cuesta $39/mes — menos del 1% para cualquier equipo que facture más de $3,900/mes."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",
@@ -1034,8 +1044,8 @@
     "solo": "Solo",
     "crew": "Crew",
     "everything_in_solo": "Todo lo de Solo",
-    "year": "/año",
-    "month": "/mes",
+    "year": "año",
+    "month": "mes",
     "priority_concierge_setup_your_clients_imported_first_30_days_pre_schedul": "Configuración de conserjería prioritaria — importamos tus clientes y pre-programamos tus primeros 30 días en 48h",
     "seasonal_packs_spring_pricing_benchmarks_route_templates": "Paquetes de temporada: referencias de precios de primavera, plantillas de rutas",
     "priority_text_first_support": "Soporte prioritario por texto",
@@ -1243,8 +1253,10 @@
     "stops_are_in_optimized_order_tap_one_to_open_it_in_your_navigation_app": "Las paradas están en orden optimizado. Toque uno para abrirlo en su aplicación de navegación.",
     "no_stops_with_addresses_on_this_day": "No hay paradas con direcciones en este día.",
     "could_not_optimize_route_try_again": "No se pudo optimizar la ruta. Inténtalo de nuevo.",
-    "rain_day_count_jobs_affected": "Lluvia {{day}} — {{count}} trabajos afectados",
-    "one_tap_moves_them_and_texts_every_client": "Un toque los mueve y les envía un mensaje a cada cliente."
+    "one_tap_moves_them_and_texts_every_client": "Un toque los mueve y les envía un mensaje a cada cliente.",
+    "rain_pct_day_count_jobs_affected": "Lluvia {{pct}}% {{day}} — {{count}} trabajos afectados",
+    "rain_pct_day_count_jobs_affected_one": "Lluvia {{pct}}% {{day}} — 1 trabajo afectado",
+    "rain_pct_day_count_jobs_affected_other": "Lluvia {{pct}}% {{day}} — {{count}} trabajos afectados"
   },
   "dashboard": {
     "revenue_today": "Ingresos Hoy",

@@ -979,8 +979,8 @@
     "solo": "Solo",
     "crew": "Crew",
     "everything_in_solo": "Everything in Solo",
-    "year": "/year",
-    "month": "/month",
+    "year": "year",
+    "month": "month",
     "priority_concierge_setup_your_clients_imported_first_30_days_pre_schedul": "Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h",
     "seasonal_packs_spring_pricing_benchmarks_route_templates": "Seasonal packs: spring pricing benchmarks, route templates",
     "priority_text_first_support": "Priority text-first support",
@@ -1178,8 +1178,10 @@
     "stops_are_in_optimized_order_tap_one_to_open_it_in_your_navigation_app": "Stops are in optimized order. Tap one to open it in your navigation app.",
     "no_stops_with_addresses_on_this_day": "No stops with addresses on this day.",
     "could_not_optimize_route_try_again": "Could not optimize route. Try again.",
-    "rain_day_count_jobs_affected": "Rain {{day}} — {{count}} jobs affected",
-    "one_tap_moves_them_and_texts_every_client": "One tap moves them and texts every client."
+    "one_tap_moves_them_and_texts_every_client": "One tap moves them and texts every client.",
+    "rain_pct_day_count_jobs_affected": "Rain {{pct}}% {{day}} — {{count}} jobs affected",
+    "rain_pct_day_count_jobs_affected_one": "Rain {{pct}}% {{day}} — 1 job affected",
+    "rain_pct_day_count_jobs_affected_other": "Rain {{pct}}% {{day}} — {{count}} jobs affected"
   },
   "dashboard": {
     "revenue_today": "Revenue Today",
