@@ -1,11 +1,9 @@
 package com.mowgo.app.ui.screens.invoices
 
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,11 +50,8 @@ fun InvoicesScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
-    val context = LocalContext.current
-    val activity = remember(context) { context.findActivity() }
     val paymentRecoverErrorText = stringResource(R.string.invoices_payment_recover_error)
     val paymentFailedGenericText = stringResource(R.string.invoices_payment_failed_generic)
-    val paymentSheetErrorText = stringResource(R.string.invoices_payment_sheet_error)
     val paymentTextCopiedText = stringResource(R.string.invoices_payment_text_copied)
     val reminderCopiedText = stringResource(R.string.invoices_reminder_copied)
     val invoiceDefaultClientName = stringResource(R.string.invoices_default_client_name)
@@ -66,26 +61,30 @@ fun InvoicesScreen(
     val invoiceMsgServicedNoDate = stringResource(R.string.invoices_msg_serviced_no_date)
     val invoiceMsgNudgeWithDate = stringResource(R.string.invoices_msg_nudge_with_date)
     val invoiceMsgNudgeNoDate = stringResource(R.string.invoices_msg_nudge_no_date)
-    val paymentSheet = activity?.let { hostActivity ->
-        remember(hostActivity) {
-            PaymentSheet.Builder { result ->
-                val payment = viewModel.uiState.value.pendingPayment
-                when (result) {
-                    is PaymentSheetResult.Completed -> {
-                        if (payment != null) {
-                            viewModel.paymentCompleted(payment)
-                        } else {
-                            viewModel.paymentFailed(paymentRecoverErrorText)
-                        }
+    // PaymentSheet must be created via the Compose-safe builder (uses
+    // rememberLauncherForActivityResult internally). Building with
+    // .build(activity) inside remember{} crashed at composition:
+    // registerForActivityResult throws IllegalStateException once the
+    // activity is STARTED/RESUMED (confirmed in stripe-android 21.19.0
+    // bytecode) — this was the Invoices-tab crash.
+    val paymentSheet = remember {
+        PaymentSheet.Builder { result ->
+            val payment = viewModel.uiState.value.pendingPayment
+            when (result) {
+                is PaymentSheetResult.Completed -> {
+                    if (payment != null) {
+                        viewModel.paymentCompleted(payment)
+                    } else {
+                        viewModel.paymentFailed(paymentRecoverErrorText)
                     }
-                    is PaymentSheetResult.Canceled -> viewModel.paymentCanceled()
-                    is PaymentSheetResult.Failed -> viewModel.paymentFailed(
-                        result.error.localizedMessage ?: paymentFailedGenericText,
-                    )
                 }
-            }.build(hostActivity)
+                is PaymentSheetResult.Canceled -> viewModel.paymentCanceled()
+                is PaymentSheetResult.Failed -> viewModel.paymentFailed(
+                    result.error.localizedMessage ?: paymentFailedGenericText,
+                )
+            }
         }
-    }
+    }.build()
 
     LaunchedEffect(state.showSnackbar) {
         state.showSnackbar?.let { message ->
@@ -106,15 +105,11 @@ fun InvoicesScreen(
     LaunchedEffect(state.pendingPayment) {
         val payment = state.pendingPayment
         if (payment != null && !state.isPaymentSheetPresenting && !state.isPaymentConfirmationPending) {
-            if (paymentSheet == null) {
-                viewModel.paymentFailed(paymentSheetErrorText)
-            } else {
-                viewModel.paymentSheetPresented()
-                paymentSheet.presentWithPaymentIntent(
-                    payment.clientSecret,
-                    PaymentSheet.Configuration.Builder(merchantDisplayName = "MowGo").build(),
-                )
-            }
+            viewModel.paymentSheetPresented()
+            paymentSheet.presentWithPaymentIntent(
+                payment.clientSecret,
+                PaymentSheet.Configuration.Builder(merchantDisplayName = "MowGo").build(),
+            )
         }
     }
 
@@ -734,12 +729,6 @@ private fun InvoiceCard(
             }
         }
     }
-}
-
-private tailrec fun Context.findActivity(): ComponentActivity? = when (this) {
-    is ComponentActivity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }
 
 // ── Invoice Status Chip ─────────────────────────────────────────────────
