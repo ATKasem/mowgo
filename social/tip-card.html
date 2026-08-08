@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1350px; overflow: hidden; }
+  .card {
+    width: 1080px; height: 1350px;
+    background: #f6f6f4;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1c1c1c;
+    display: flex; flex-direction: column;
+    padding: 90px 80px 70px 80px;
+    position: relative;
+  }
+  .badge {
+    display: inline-block; align-self: flex-start;
+    background: #22c55e; color: #fff;
+    font-size: 30px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px 26px; border-radius: 8px;
+  }
+  .headline {
+    font-size: 88px; line-height: 1.06; font-weight: 800;
+    margin-top: 50px; letter-spacing: -1.5px;
+  }
+  .headline .green { color: #16a34a; }
+  .math {
+    margin-top: 60px;
+    background: #ffffff;
+    border: 2px solid #e4e4e0;
+    border-radius: 18px;
+    padding: 50px 56px;
+    font-size: 44px; line-height: 1.55; font-weight: 600;
+  }
+  .math .row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #eeeeea; }
+  .math .row:last-child { border-bottom: none; }
+  .math .num { color: #16a34a; font-weight: 800; }
+  .math .dim { color: #6b6b66; }
+  .math .total { font-size: 46px; }
+  .math .total .num { font-size: 52px; }
+  .question {
+    margin-top: 60px;
+    font-size: 50px; font-weight: 800; line-height: 1.25;
+  }
+  .footer {
+    margin-top: auto;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 2px solid #dcdcd6; padding-top: 34px;
+  }
+  .logo { font-size: 40px; font-weight: 800; color: #1c1c1c; }
+  .logo span { color: #22c55e; }
+  .url { font-size: 32px; color: #6b6b66; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">Business Tip</div>
+    <div class="headline">Your hourly rate is <span class="green">lying to you.</span></div>
+    <div class="math">
+      <div class="row"><span class="dim">Cut + trim job</span><span class="num">$85</span></div>
+      <div class="row"><span class="dim">Your time, door to door</span><span class="num">75 min</span></div>
+      <div class="row"><span class="dim">Truck, gas, insurance, taxes</span><span class="num">-$44</span></div>
+      <div class="row total"><span class="dim">You actually made</span><span class="num">$41 / hr</span></div>
+    </div>
+    <div class="question">What's your minimum job price?</div>
+    <div class="footer">
+      <div class="logo">Mow<span>Go</span></div>
+      <div class="url">mowgoapp.com</div>
+    </div>
+  </div>
+</body>
+</html>

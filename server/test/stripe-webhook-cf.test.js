@@ -21,7 +21,7 @@ function signedRequest(event, secret = WEBHOOK_SECRET, timestamp = Math.floor(Da
     .update(`${timestamp}.${body}`)
     .digest('hex');
 
-  return new Request('https://mowgo.app/api/stripe/webhook', {
+  return new Request('https://mowgoapp.com/api/stripe/webhook', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

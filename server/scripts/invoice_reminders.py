@@ -29,7 +29,7 @@ STATE_FILE = os.path.join(REPO, ".invoice_reminder_state.json")
 LOG_FILE = "/opt/data/logs/invoice_reminders.log"
 REMIND_AFTER_DAYS = int(os.environ.get("REMIND_AFTER_DAYS", "7"))
 COOLDOWN_DAYS = int(os.environ.get("COOLDOWN_DAYS", "7"))
-SENDER = "MowGo <invoices@mowgo.app>"
+SENDER = "MowGo <invoices@mowgoapp.com>"
 
 
 def load_env(path):

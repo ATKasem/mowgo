@@ -125,7 +125,7 @@ Rotate from these buckets (15-20 per post):
 
 ## Image Strategy
 
-Facebook: Text posts work fine. Occasional link previews to mowgo.app.
+Facebook: Text posts work fine. Occasional link previews to mowgoapp.com.
 Instagram: Needs images. For now use image_generate to create branded graphics (green on gray, MowGo palette).
 
 Image types:

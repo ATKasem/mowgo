@@ -26,7 +26,7 @@ RLS: `user_id = auth.uid()` for owner CRUD. **Public read**: only `id + total + 
 ## Endpoints (CF Pages Functions — new dir `functions/api/quotes/`)
 1. `POST /api/quotes` (auth) — create quote; body: client_id, title, line_items. Server computes total, generates approve_token, status=draft. Returns quote.
 2. `GET /api/quotes/:id` (auth) — owner view.
-3. `POST /api/quotes/:id/send` (auth) — sets status=sent; emails client via Resend (pattern from `server/index.js` invoice email; sender `invoices@mowgo.app`, subject `Quote from MowGo — $X`). Link: `{APP_URL}/quote/{id}?t={approve_token}`.
+3. `POST /api/quotes/:id/send` (auth) — sets status=sent; emails client via Resend (pattern from `server/index.js` invoice email; sender `invoices@mowgoapp.com`, subject `Quote from MowGo — $X`). Link: `{APP_URL}/quote/{id}?t={approve_token}`.
 4. `POST /api/quotes/:id/approve` (**NO auth** — token in body: `{token}`) — validates token, status approved→converted, **creates job** (title, client_id, status `scheduled`, notes = "From quote"), creates invoice (amount=total, status unpaid) and fires the existing invoice email. Idempotent: second approve returns 200 without duplicating.
 5. `GET /api/quotes/:id/status` (NO auth + token) — for the public page poll.
 

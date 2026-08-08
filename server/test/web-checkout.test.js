@@ -9,9 +9,9 @@ async function loadFunction(relativePath) {
 }
 
 function request(body, token) {
-  const headers = { origin: 'https://mowgo.app', 'content-type': 'application/json' };
+  const headers = { origin: 'https://mowgoapp.com', 'content-type': 'application/json' };
   if (token) headers.authorization = `Bearer ${token}`;
-  return new Request('https://mowgo.app/api/stripe/checkout-subscription', {
+  return new Request('https://mowgoapp.com/api/stripe/checkout-subscription', {
     method: 'POST',
     headers,
     body: JSON.stringify(body),

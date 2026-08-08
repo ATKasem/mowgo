@@ -43,7 +43,7 @@ Supabase's **default SMTP** has a strict limit of **2 auth emails per hour** and
 - Better email deliverability (dedicated transactional email service)
 - No personal Gmail account at risk of being flagged
 - 3,000 emails/month is more than enough for auth flows (password resets, confirmations)
-- Professional sender domain support (e.g., `no-reply@mowgo.app`)
+- Professional sender domain support (e.g., `no-reply@mowgoapp.com`)
 - Resend officially documents the Supabase SMTP integration
 
 ---
@@ -183,9 +183,9 @@ If you want to use Gmail instead (e.g., for testing only):
 - [x] SMTP config updated via Management API:
   - Host: `smtp.resend.com`, Port: `465`, User: `resend`
   - Password: Resend API key (set via PATCH, masked in GET)
-  - Sender: `no-reply@mowgo.app` (MowGo)
-- [x] `site_url` set to `https://mowgo.app`
-- [x] Redirect URLs added: `https://mowgo.app`, `http://localhost:5173`, `http://localhost:3000`
+  - Sender: `no-reply@mowgoapp.com` (MowGo)
+- [x] `site_url` set to `https://mowgoapp.com`
+- [x] Redirect URLs added: `https://mowgoapp.com`, `http://localhost:5173`, `http://localhost:3000`
 - [x] Rate limits raised: `rate_limit_email_sent: 60`, `smtp_max_frequency: 30`
 - [x] SMTP connection test passed (both SSL:465 and STARTTLS:587)
 

@@ -28,8 +28,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const ALLOWED_ORIGINS = [
   "https://mowgoapp.com",
-  "https://mowgoapp.com",
-  "https://mowgo.app",
   "http://localhost:5173",
 ];
 

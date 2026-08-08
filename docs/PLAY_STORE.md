@@ -34,7 +34,7 @@ No per-user fees. No contracts. Cancel anytime. Start free.
 - **Content Rating:** Everyone
 - **Privacy Policy:** https://mowgo.pages.dev/privacy
 - **Website:** https://mowgo.pages.dev
-- **Support Email:** hello@mowgo.app
+- **Support Email:** hello@mowgoapp.com
 
 ## Screenshots (Phone — 1080x1920px)
 Required: 2-8 phone screenshots

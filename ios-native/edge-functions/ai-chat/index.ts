@@ -103,7 +103,7 @@ serve(async (req) => {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://mowgo.app",
+          "HTTP-Referer": "https://mowgoapp.com",
           "X-Title": "MowGo AI",
         },
         body: JSON.stringify({

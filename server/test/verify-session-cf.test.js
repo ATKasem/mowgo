@@ -12,9 +12,9 @@ async function loadFunction() {
 }
 
 function request(token) {
-  const headers = { origin: 'https://mowgo.app' };
+  const headers = { origin: 'https://mowgoapp.com' };
   if (token) headers.authorization = `Bearer ${token}`;
-  return new Request('https://mowgo.app/api/stripe/verify-session?session_id=cs_test_1', {
+  return new Request('https://mowgoapp.com/api/stripe/verify-session?session_id=cs_test_1', {
     headers,
   });
 }

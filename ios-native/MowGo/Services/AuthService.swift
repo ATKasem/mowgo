@@ -54,7 +54,7 @@ final class AuthService: ObservableObject {
                     id: DemoData.demoOwnerId,
                     businessName: "Green Thumb Lawn Care",
                     phone: "405-555-0100",
-                    email: "owner@mowgo.app",
+                    email: "owner@mowgoapp.com",
                     tier: "solo",
                     role: "owner"
                 )
