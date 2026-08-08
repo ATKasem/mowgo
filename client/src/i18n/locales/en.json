@@ -38,7 +38,9 @@
     "before_photo": "Before",
     "after_photo": "After",
     "no_photo": "No photo",
-    "start_work": "Start Work"
+    "start_work": "Start Work",
+    "before": "Before",
+    "after": "After"
   },
   "layout": {
     "home": "Home",
@@ -202,6 +204,7 @@
     "client_notes_codes_pets": "Client notes, codes & pets",
     "job_assignment_tracking": "Job assignment & tracking",
     "team_progress_dashboard": "Team progress dashboard",
+    "payment_failed": "Payment failed",
     "rain_delay": "Rain Delay",
     "one_tap_reschedule_when_rain_hits": "One-tap reschedule when rain hits",
     "offline_mode": "Offline Mode",
@@ -484,12 +487,11 @@
     "note_optional": "Note (optional)",
     "save_draft": "Save Draft",
     "send": "Send",
-    "Voided": "Voided",
     "voided": "Voided",
-    "Void": "Void",
-    "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.": "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.",
-    "Couldn't void invoice": "Couldn't void invoice",
-    "Voiding…": "Voiding…"
+    "void": "Void",
+    "void_this_amount_invoice_it_will_no_longer_be_collectible_this_cannot_be": "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.",
+    "couldn_t_void_invoice": "Couldn't void invoice",
+    "voiding": "Voiding…"
   },
   "jobberPriceIncrease": {
     "core": "Core",
@@ -703,7 +705,8 @@
     "jobber_grow": "Jobber Grow",
     "jobber_grow_is_139_mo_99_mo_billed_annually_plus_29_mo_per_additional_us": "Jobber Grow is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.",
     "solo_costs_less_than_one_missed_job_solo_is_39_mo_under_1_for_any_crew_b": "Solo costs less than one missed job. Solo is $39/mo — under 1% for any crew billing over $3,900/mo.",
-    "no_catch_cancel_anytime_14_day_free_trial_30_day_money_back_guarantee_if": "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full."
+    "no_catch_cancel_anytime_14_day_free_trial_30_day_money_back_guarantee_if": "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full.",
+    "applies_to_solo_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",
@@ -740,7 +743,8 @@
     "if_an_account_exists_for_email_you_ll_receive_a_password_reset_link_shor": "If an account exists for {{email}}, you'll receive a password reset link shortly.",
     "referral_code_optional": "Referral code (optional)",
     "e_g_7km2qp": "e.g. 7KM2QP",
-    "after_you_confirm_we_ll_start_your_14_day_trial_no_card_needed": "After you confirm, we'll start your 14-day trial — no card needed."
+    "after_you_confirm_we_ll_start_your_14_day_trial_no_card_needed": "After you confirm, we'll start your 14-day trial — no card needed.",
+    "payment_failed": "Payment failed"
   },
   "privacy": {
     "back_to_mowgo": "Back to MowGo",
@@ -926,8 +930,8 @@
     "fired_when_a_new_lead_is_captured": "Fired when a new lead is captured",
     "lead_status_updated": "Lead Status Updated",
     "fired_when_a_lead_moves_through_the_pipeline": "Fired when a lead moves through the pipeline",
-    "Regenerate": "Regenerate",
-    "Events": "Events",
+    "regenerate": "Regenerate",
+    "events": "Events",
     "select_all": "Select All",
     "deselect_all": "Deselect All",
     "session_expired_please_sign_in_again": "Session expired. Please sign in again.",
@@ -1130,6 +1134,7 @@
     "add_photo": "Add Photo",
     "take_photo": "Take Photo",
     "upload_photo": "Upload Photo",
+    "failed_to_upload_photo": "Failed to upload photo",
     "photo_added": "Photo added",
     "before": "Before",
     "after": "After",
@@ -1181,7 +1186,9 @@
     "one_tap_moves_them_and_texts_every_client": "One tap moves them and texts every client.",
     "rain_pct_day_count_jobs_affected": "Rain {{pct}}% {{day}} — {{count}} jobs affected",
     "rain_pct_day_count_jobs_affected_one": "Rain {{pct}}% {{day}} — 1 job affected",
-    "rain_pct_day_count_jobs_affected_other": "Rain {{pct}}% {{day}} — {{count}} jobs affected"
+    "rain_pct_day_count_jobs_affected_other": "Rain {{pct}}% {{day}} — {{count}} jobs affected",
+    "client_label_job_already_scheduled": "{{client}} · {{label}} job already scheduled",
+    "done": "Done"
   },
   "dashboard": {
     "revenue_today": "Revenue Today",
@@ -1230,6 +1237,7 @@
     "email": "Email",
     "rate": "Rate",
     "row_row_message_message": "Row {{row}}: {{message}}",
+    "row_row_message": "Row {{row}}: {{message}}",
     "missing_name": "Missing name",
     "missing_address": "Missing address",
     "missing_name_and_address": "Missing name and address",
@@ -1434,7 +1442,10 @@
   },
   "portalReturn": {
     "app_not_installed": "App not installed?",
-    "continue_in_your_browser": "Continue in your browser"
+    "continue_in_your_browser": "Continue in your browser",
+    "return_to_mowgo": "Return to MowGo",
+    "tap_below_to_go_back_to_the_app": "Tap below to go back to the app",
+    "open_mowgo": "Open MowGo"
   },
   "onboarding": {
     "start_in_3_steps": "Start in 3 steps",
@@ -1446,7 +1457,7 @@
     "you_re_rolling_want_a_review_call": "You're rolling. Want a review call?"
   },
   "trialBanner": {
-    "days_left_in_your_plan_trial": "{{days}} days left in your {{plan}} trial",
+    "days_days_left_in_your_plan_trial": "{{days}} days left in your {{plan}} trial",
     "subscribe_to_keep_unlimited_clients_jobs": "Subscribe to keep unlimited clients & jobs",
     "your_trial_ended": "Your trial ended",
     "your_clients_are_safe_subscribe_to_keep_scheduling_beyond_5": "Your clients are safe — subscribe to keep scheduling beyond 5.",

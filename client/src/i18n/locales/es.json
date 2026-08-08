@@ -38,7 +38,9 @@
     "start_work": "Iniciar",
     "after_photo": "Foto después",
     "before_photo": "Foto antes",
-    "no_photo": "Sin foto"
+    "no_photo": "Sin foto",
+    "before": "Antes",
+    "after": "Después"
   },
   "layout": {
     "home": "Inicio",
@@ -202,6 +204,7 @@
     "client_notes_codes_pets": "Notas, códigos y mascotas de clientes",
     "job_assignment_tracking": "Asignación y seguimiento de trabajos",
     "team_progress_dashboard": "Panel de progreso del equipo",
+    "payment_failed": "Pago fallido",
     "rain_delay": "Reprogramación por lluvia",
     "one_tap_reschedule_when_rain_hits": "Reprograma con un toque cuando llueva",
     "offline_mode": "Modo sin conexión",
@@ -506,12 +509,11 @@
     "note_optional": "Nota (opcional)",
     "save_draft": "Guardar borrador",
     "send": "Enviar",
-    "Voided": "Anulada",
     "voided": "Anulada",
-    "Void": "Anular",
-    "Void this {{amount}} invoice? It will no longer be collectible. This cannot be undone.": "¿Anular esta factura de {{amount}}? Ya no será cobrable. Esto no se puede deshacer.",
-    "Couldn't void invoice": "No se pudo anular la factura",
-    "Voiding…": "Anulando…"
+    "void": "Anular",
+    "void_this_amount_invoice_it_will_no_longer_be_collectible_this_cannot_be": "¿Anular esta factura de {{amount}}? Ya no será cobrable. Esto no se puede deshacer.",
+    "couldn_t_void_invoice": "No se pudo anular la factura",
+    "voiding": "Anulando…"
   },
   "jobberPriceIncrease": {
     "core": "Core",
@@ -991,8 +993,8 @@
     "fired_when_a_new_lead_is_captured": "Se activa cuando se captura un nuevo prospecto",
     "lead_status_updated": "Estado del prospecto actualizado",
     "fired_when_a_lead_moves_through_the_pipeline": "Se activa cuando un prospecto avanza por el embudo",
-    "Regenerate": "Regenerar",
-    "Events": "Eventos",
+    "regenerate": "Regenerar",
+    "events": "Eventos",
     "select_all": "Seleccionar Todo",
     "deselect_all": "Deseleccionar Todo",
     "session_expired_please_sign_in_again": "Sesión expirada. Por favor inicia sesión de nuevo.",
@@ -1236,6 +1238,7 @@
     "photo_added": "Foto añadida",
     "take_photo": "Tomar foto",
     "upload_photo": "Subir foto",
+    "failed_to_upload_photo": "No se pudo subir la foto",
     "optimize": "Optimizar",
     "optimizing": "Optimizando...",
     "send_route": "Enviar ruta",
@@ -1256,7 +1259,9 @@
     "one_tap_moves_them_and_texts_every_client": "Un toque los mueve y les envía un mensaje a cada cliente.",
     "rain_pct_day_count_jobs_affected": "Lluvia {{pct}}% {{day}} — {{count}} trabajos afectados",
     "rain_pct_day_count_jobs_affected_one": "Lluvia {{pct}}% {{day}} — 1 trabajo afectado",
-    "rain_pct_day_count_jobs_affected_other": "Lluvia {{pct}}% {{day}} — {{count}} trabajos afectados"
+    "rain_pct_day_count_jobs_affected_other": "Lluvia {{pct}}% {{day}} — {{count}} trabajos afectados",
+    "client_label_job_already_scheduled": "{{client}} · {{label}} trabajo ya programado",
+    "done": "Listo"
   },
   "dashboard": {
     "revenue_today": "Ingresos Hoy",
@@ -1305,6 +1310,7 @@
     "email": "Correo electrónico",
     "rate": "Precio",
     "row_row_message_message": "Fila {{row}}: {{message}}",
+    "row_row_message": "Fila {{row}}: {{message}}",
     "missing_name": "Nombre faltante",
     "missing_address": "Dirección faltante",
     "missing_name_and_address": "Falta nombre y dirección",
@@ -1530,7 +1536,10 @@
   },
   "portalReturn": {
     "app_not_installed": "¿App no instalada?",
-    "continue_in_your_browser": "Continúa en tu navegador"
+    "continue_in_your_browser": "Continúa en tu navegador",
+    "return_to_mowgo": "Volver a MowGo",
+    "tap_below_to_go_back_to_the_app": "Toca abajo para volver a la app",
+    "open_mowgo": "Abrir MowGo"
   },
   "onboarding": {
     "start_in_3_steps": "Empieza en 3 pasos",
@@ -1542,7 +1551,7 @@
     "you_re_rolling_want_a_review_call": "Vas viento en popa. ¿Quieres una llamada de seguimiento?"
   },
   "trialBanner": {
-    "days_left_in_your_plan_trial": "Quedan {{days}} días de tu prueba de {{plan}}",
+    "days_days_left_in_your_plan_trial": "Quedan {{days}} días de tu prueba de {{plan}}",
     "subscribe_to_keep_unlimited_clients_jobs": "Suscríbete para mantener clientes y trabajos ilimitados",
     "your_trial_ended": "Tu prueba terminó",
     "your_clients_are_safe_subscribe_to_keep_scheduling_beyond_5": "Tus clientes están a salvo — suscríbete para seguir programando más de 5.",
