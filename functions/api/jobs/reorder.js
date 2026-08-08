@@ -1,4 +1,4 @@
-const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 // In-memory rate limit: 60 reorders / 15 min per user (per-isolate, same
 // pattern as sms-optin.js / webhook-dispatch.js — Claude Code LOW-2 fix;

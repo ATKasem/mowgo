@@ -6,14 +6,14 @@ const LIMIT = 5;
 const attempts = new Map();
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PHONE_RE = /^(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}$/;
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function corsOrigin(request) {
   const origin = request?.headers?.get?.('origin');
-  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgo.pages.dev';
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgoapp.com';
 }
 
-function jsonHelper(body, status = 200, origin = 'https://mowgo.pages.dev') {
+function jsonHelper(body, status = 200, origin = 'https://mowgoapp.com') {
   return Response.json(body, { status, headers: { 'Access-Control-Allow-Origin': origin } });
 }
 function allowed(ip) {

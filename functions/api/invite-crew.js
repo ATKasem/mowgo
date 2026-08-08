@@ -14,7 +14,7 @@
  *   SUPABASE_SERVICE_ROLE_KEY — service_role key (never exposed to client)
  */
 
-const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
 const inviteAttempts = new Map();

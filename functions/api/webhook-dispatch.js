@@ -16,7 +16,7 @@
 
 import { dispatchWebhookEvent } from './_shared/dispatch-webhook.js';
 
-const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 /** Per-user+IP rate limit: 20 dispatches per 15 min (in-memory, per-isolate). */
 const dispatchAttempts = new Map();

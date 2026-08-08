@@ -1,4 +1,4 @@
-const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function cors(request) {
   const origin = request?.headers?.get?.('origin');

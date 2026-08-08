@@ -13,14 +13,14 @@ const CREWS = new Set(['solo', '2_3', '4_plus']);
 const QUALIFIED_LAWNS = new Set(['10_25', '25_50']);
 const CREW_LABELS = { solo: 'solo crew', '2_3': '2-3 person crew', '4_plus': '4+ person crew' };
 const QUALIFIED_CREWS = new Set(['solo', '2_3']);
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function corsOrigin(request) {
   const origin = request?.headers?.get?.('origin');
-  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgo.pages.dev';
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgoapp.com';
 }
 
-function json(body, status = 200, origin = 'https://mowgo.pages.dev') {
+function json(body, status = 200, origin = 'https://mowgoapp.com') {
   return Response.json(body, { status, headers: { 'Access-Control-Allow-Origin': origin } });
 }
 function allowed(ip) {

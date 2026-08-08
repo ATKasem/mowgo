@@ -5,7 +5,7 @@
  * Returns: { url: 'https://checkout.stripe.com/...' }
  */
 
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 export async function onRequestPost(context) {
   const { request, env } = context;

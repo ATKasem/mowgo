@@ -1,6 +1,6 @@
 const ALIASES = { name: ['name','client name','client_name','customer name','customer','client'], address: ['address','street','location'], phone: ['phone','phone number','phone_number','mobile','cell'], email: ['email','e-mail','email address'], rate: ['rate','price','amount','cost','mow price'] };
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 20;
 const adminAttempts = new Map();

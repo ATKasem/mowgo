@@ -8,7 +8,7 @@
  * business data owned by that profile.
  */
 
-const ALLOWED_ORIGINS = ['https://mowgoapp.com', 'https://mowgo.pages.dev'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function corsHeaders(request) {
   const origin = request?.headers?.get?.('origin');

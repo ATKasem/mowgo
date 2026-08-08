@@ -8,14 +8,14 @@ const WINDOW_MS = 15 * 60 * 1000;
 const LIMIT = 20;
 const attempts = new Map();
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function corsOrigin(request) {
   const origin = request?.headers?.get?.('origin');
-  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgo.pages.dev';
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgoapp.com';
 }
 
-function json(body, status = 200, origin = 'https://mowgo.pages.dev') {
+function json(body, status = 200, origin = 'https://mowgoapp.com') {
   return Response.json(body, { status, headers: { 'Access-Control-Allow-Origin': origin } });
 }
 

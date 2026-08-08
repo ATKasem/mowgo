@@ -18,11 +18,11 @@
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const rateLimitMap = new Map();
-const ALLOWED_ORIGINS = ['https://mowgo.pages.dev', 'https://mowgoapp.com'];
+const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function corsOrigin(request) {
   const origin = request?.headers?.get?.('origin');
-  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgo.pages.dev';
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://mowgoapp.com';
 }
 
 function checkRateLimit(ip) {
@@ -219,7 +219,7 @@ export async function onRequestPost(context) {
   }
 }
 
-function jsonHelper(data, status = 200, origin = 'https://mowgo.pages.dev') {
+function jsonHelper(data, status = 200, origin = 'https://mowgoapp.com') {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
