@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase';
 const competitors = [
   { name: 'MowGo', price: '$0–$199/mo', highlight: true },
   { name: 'QuoteIQ', price: '$29.99–$699/mo' },
-  { name: 'Jobber', price: '$139/mo Connect' },
+  { name: 'Jobber', price: '$49–$249/mo' },
   { name: 'Yardbook', price: 'Free (ads)' },
   { name: 'LawnPro', price: '$0–$39' },
   { name: 'Housecall Pro', price: '$79–$189' },
@@ -254,19 +254,19 @@ export default function Compare() {
       <section className="max-w-4xl mx-auto px-4 pb-16">
         <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl p-6 md:p-10">
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-3">{tr("Jobber looks cheaper. Look closer.")}</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("Straight talk: if you only need a calendar for your jobs, Jobber Core on promo (as low as $24–40/mo first term, annual billing, 1-year commitment) is a fair deal. This page isn't here to convince you otherwise.")}</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("Straight talk: if you only need a calendar for your jobs, Jobber Core at $49/mo (annual billing) is a fair deal. This page isn't here to convince you otherwise.")}</p>
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                 <X className="w-4 h-4 text-red-500 shrink-0" /> {tr("Payments automation isn't in that plan.")}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's own pricing page: automated reminders and collect payments automatically start at Connect — $99/mo billed annually ($1,188/yr). MowGo Solo: $390/yr, both included.")}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's own pricing page: automated reminders and collect payments automatically start at Connect — $129/mo billed annually ($1,548/yr) or $139/mo month-to-month. MowGo Solo: $390/yr, both included.")}</p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                 <X className="w-4 h-4 text-red-500 shrink-0" /> {tr("Every extra crew member costs $29/mo more.")}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,536/yr ($1,188 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.")}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,896/yr ($1,548 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.")}</p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
@@ -276,9 +276,9 @@ export default function Compare() {
             </div>
           </div>
           <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4 mb-6 text-sm text-center font-medium text-gray-700 dark:text-gray-300">
-            {tr("Jobber Core $348/yr (calendar only) · Jobber Connect $1,188/yr (what MowGo does) · MowGo Solo $390/yr (everything, flat)")}
+            {tr("Jobber Core $588/yr (calendar only) · Jobber Connect $1,548/yr (what MowGo does) · MowGo Solo $390/yr (everything, flat)")}
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{tr("The gap between MowGo and Jobber's cheapest is $42 a year — about $3.50 a month. The gap in what you get is the whole difference.")}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{tr("The gap between MowGo and Jobber's cheapest is $198 a year — about $16.50 a month. The gap in what you get is the whole difference.")}</p>
           <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/40 p-5 mb-8">
             <div className="flex items-start gap-2.5">
               <Shield className="w-5 h-5 text-brand shrink-0 mt-0.5" />
@@ -342,7 +342,7 @@ export default function Compare() {
             {tr("TurfHop's pricing page was down for 5 days (Aug 1–6, 2026, 500 errors) — its features page is still down. Verify current features with them before you buy.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Jobber Connect is $139/mo month-to-month or $99/mo billed annually, plus $29/mo for each additional user. Right now every Jobber plan also carries 3-month promo pricing (Core $24–40/mo first term) — and their $29/mo headline still needs a 1-year lock, the promo, and $29 per extra seat. MowGo is $39–$79 flat, month-to-month, whole crew included.")}
+            {tr("Jobber's ladder moved again (verified Aug 8, 2026): Core $49/mo (raised from $39), Connect $129–$139/mo, Grow $249/mo — plus $29/mo for every extra user, and their new AI Receptionist is another $29/mo add-on (free only on Plus $399+). MowGo is $39–$79 flat, month-to-month, whole crew included — and missed-call text-back is on our roadmap, not a paid add-on.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Service Autopilot's $49/mo is ONE mobile license — a 2-person crew runs $199+/mo with a signup fee and annual-only billing. MowGo Crew is $79 flat, whole crew included.")}
@@ -350,6 +350,7 @@ export default function Compare() {
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Planado (new in the band) charges per user — $12–$29/user/mo — and has no invoicing or payments at all. MowGo's auto-invoice + SMS pay link is included at $39 flat.")}
           </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{tr("LMN (design-build estimating) starts around $197/mo for quote-only and runs $297–$697/mo for the design-build band (verified Aug 8, 2026) — built for a different business than a 1–2 person mow crew. MowGo covers scheduling through payment at $39/$79 flat.")}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Some competitors charge a sign-up fee and hide their top tier behind a sales call — MowGo publishes $39/$79 and takes a card.")}
           </p>

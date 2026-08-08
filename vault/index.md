@@ -8,6 +8,7 @@
 | Date | File | Description |
 |------|------|-------------|
 | 2026-08-08 | `2026-08-08_daily-sync.md` | **Main sync note** — Reddit Fri slot LANDED (#54 `1vi045u` posted 22:23Z, visibility-verified; next ≥ Aug 11, kit #55→#57→#56), SMS path FIXED at root (6 wrappers, dry-run verified — cron still PAUSED, 23 texts Day 6), stale client REDEPLOYED same-day (bundle `index-DPMXODzY.js` live), CF API tokens DEAD (10000 — re-auth needed), Codex quota until 05:19Z, LawnPro full profile + Jobber new ladder + LMN $297-697 + signld.ai 4th shill, drafts #55/#56/#57 banked |
+| 2026-08-08 | — | 🗑️ **#🌱mowgo-outreach officially CLOSED** (404 ×3 consecutive syncs + 7am scan = deletion confirmed; last known: 55 msgs, newest Aug 5 01:48Z). Removed from the 7am scan channel list (Part-1 cron prompt); mowgo-leads skill curl example re-pointed to #🌱mowgo-leads `1529707289014042804`. Do NOT re-add. |
 | 2026-08-08 | `2026-08-08_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 13 new — Intel ×5 runs, Stripe check w/ stale-client flag, invoice reminders; ALL bot, Blasian silent Day 11) |
 | 2026-08-08 | `2026-08-08_channel-outreach-raw.md` | ⚠️ **#🌱mowgo-outreach still GONE — 404 ×2 consecutive nightly syncs; deletion effectively confirmed**; 0 synced |
 | 2026-08-08 | `2026-08-08_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; watchdog holding) |

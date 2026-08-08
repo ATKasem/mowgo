@@ -51,3 +51,14 @@ No CRM. No marketing automation. No inventory management. No "fleet tracking." Y
 - **AI estimating went productized overnight:** QuoteIQ ships it on every plan from $29.99, TurfHop launched Orbit AI. Table stakes now — MowGo watches, doesn't build; if ever added, it's a Solo-tier feature.
 - **Labor costs +20% by end of 2029** (NALP/ITR); 28% of maintenance crews earn $21-25/hr — every admin hour is field labor lost. MowGo's one-tap day view + auto-invoice is the counter.
 - **GreenPal pays crews only after timestamped photo confirmation** — photo proof is becoming a homeowner expectation (validates MowGo's photo-checklist roadmap).
+
+## Copy flags — banked Aug 8, 2026 (verified sources)
+- **The $29–39 entry tier is dead — $49 is the new generalist floor** (verified Aug 8): Jobber Core $39→$49, HCP Basic $59 ($79 monthly), GorillaDesk Basic $49, Service Autopilot $49+setup. MowGo Solo $39 flat undercuts the new floor with unlimited clients; Crew $79 = cheapest multi-user entry in the market (vs Jobber Connect+user ~$158–197/mo, HCP $149, QuoteIQ $74.99–149.99, GorillaDesk booking gated $99). Only $29.99 entry left = QuoteIQ Essentials (1 user, no lawn features).
+- **The per-user tax is the industry's pricing engine:** Jobber +$29/user (2-person crew on Connect ≈ $168–197/mo), HCP's second user = a $90/mo jump. Crew $79 flat, whole crew included.
+- **Jobber's AI Receptionist is a $29/mo add-on (free only on Plus $399+)** — the add-on economy is Jobber's new revenue engine. MowGo's counter: missed-call text-back ("Your customers already book themselves — the only leak is the phone"), shipped under Autopilot branding, vs standalone AI receptionists at Rosie $49 / Smith.ai $97.50+ / Goodcall $59–199 / QuoteIQ bundled Virtual Call Team.
+- **Level billing = the drought-season answer** (×4 operators + a homeowner in thread 1vi1hcj): "bill monthly for an averaged price of 42 services for the year" — kills the "charged for a mow that didn't happen" churn driver.
+- **NALP State of Commercial Landscaping 2026:** 67% of contractors already use invoicing software, yet 42% still list improving cash flow as a top goal ("struggling to be paid in a timely manner"). Software isn't the gap — the closed loop is.
+- **Electric transition is now regulatory:** CA gas-equipment sales ban + SF city-contractor ban (Jan 1 2026); electric-first crews skew new-entrant/small = exact ICP.
+- **GorillaDesk Basic $49** = direct crew-tier rival to watch (unlimited users, 25-stop routing; booking gated $99, satellite measurement $149). Yardbook free (1% tx fee, Android-only) = strongest free competitor.
+- **LMN $297–$697/mo design-build band** (quote-only from ~$197/mo) — priced for a different business than a 1–2 person mow crew; MowGo's $39/$79 flat stack is the counter.
+- **welovejoe.com** — new anti-Jobber content player (playbook spreading); watch list.
