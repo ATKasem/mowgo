@@ -33,7 +33,7 @@ export default function SmsOptIn() {
         </div>
         <h1 className="text-2xl font-bold text-center mb-2">Get lawn pricing reports by text</h1>
         <p className="text-gray-400 text-center text-sm mb-6">
-          MowGo sends Oklahoma lawn care owners real market-rate reports and occasional
+          MowGo sends lawn care owners real market-rate reports and occasional
           offers by SMS. Marketing messages only — usually 1–2 a month.
         </p>
 
