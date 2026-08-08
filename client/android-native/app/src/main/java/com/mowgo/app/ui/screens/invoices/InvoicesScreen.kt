@@ -299,80 +299,78 @@ fun InvoicesScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = !showingEstimates, onClick = { showingEstimates = false }, label = { Text(stringResource(R.string.invoices_tab_invoices)) }, modifier = Modifier.weight(1f))
-                FilterChip(selected = showingEstimates, onClick = { showingEstimates = true }, label = { Text(stringResource(R.string.invoices_tab_estimates)) }, modifier = Modifier.weight(1f))
-            }
         PullToRefreshBox(
             isRefreshing = state.isLoading,
             onRefresh = { viewModel.refresh() },
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
         ) {
-            if (state.isLoading && state.invoices.isEmpty() && state.estimates.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(selected = !showingEstimates, onClick = { showingEstimates = false }, label = { Text(stringResource(R.string.invoices_tab_invoices)) }, modifier = Modifier.weight(1f))
+                    FilterChip(selected = showingEstimates, onClick = { showingEstimates = true }, label = { Text(stringResource(R.string.invoices_tab_estimates)) }, modifier = Modifier.weight(1f))
                 }
-            } else if (state.error != null && state.invoices.isEmpty() && state.estimates.isEmpty()) {
-                ErrorContent(
-                    error = state.error!!,
-                    onRetry = { viewModel.refresh() },
-                )
-            } else if (showingEstimates) {
-                if (state.estimates.isEmpty()) EstimateEmptyContent() else LazyColumn(contentPadding = PaddingValues(bottom = 80.dp)) {
-                    items(items = state.estimatesWithClientName, key = { it.estimate.id }) { item ->
-                        EstimateCard(estimate = item.estimate, clientName = item.clientName, onClick = { viewModel.selectEstimate(item.estimate) })
+                if (state.isLoading && state.invoices.isEmpty() && state.estimates.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
                     }
-                }
-            } else if (state.invoices.isEmpty()) {
-                EmptyContent()
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 80.dp),
-                ) {
-                    // Summary header
-                    item {
-                        InvoiceSummaryHeader(
-                            unpaidCount = state.unpaidCount,
-                            totalUnpaid = state.totalUnpaid,
-                        )
+                } else if (state.error != null && state.invoices.isEmpty() && state.estimates.isEmpty()) {
+                    ErrorContent(
+                        error = state.error!!,
+                        onRetry = { viewModel.refresh() },
+                    )
+                } else if (showingEstimates) {
+                    if (state.estimates.isEmpty()) EstimateEmptyContent() else LazyColumn(contentPadding = PaddingValues(bottom = 80.dp)) {
+                        items(items = state.estimatesWithClientName, key = { it.estimate.id }) { item ->
+                            EstimateCard(estimate = item.estimate, clientName = item.clientName, onClick = { viewModel.selectEstimate(item.estimate) })
+                        }
                     }
+                } else if (state.invoices.isEmpty()) {
+                    EmptyContent()
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 80.dp),
+                    ) {
+                        // Summary header
+                        item {
+                            InvoiceSummaryHeader(
+                                unpaidCount = state.unpaidCount,
+                                totalUnpaid = state.totalUnpaid,
+                            )
+                        }
 
-                    items(
-                        items = state.invoicesWithClientName,
-                        key = { it.invoice.id },
-                    ) { item ->
-                        InvoiceCard(
-                            invoice = item.invoice,
-                            clientName = item.clientName,
-                            isPaying = state.payingInvoiceId == item.invoice.id,
-                            payEnabled = state.payingInvoiceId == null,
-                            showPay = SupabaseClientProvider.isConfigured,
-                            onPay = { viewModel.payInvoice(item) },
-                            onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
-                            onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
-                            onVoid = { viewModel.confirmVoidInvoice(item.invoice) },
-                            onCopyText = {
-                                val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
-                                clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgServicedWithDate, invoiceMsgServicedNoDate, payLine)))
-                                scope.launch { snackbarHostState.showSnackbar(paymentTextCopiedText) }
-                            },
-                            onNudge = {
-                                val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
-                                clipboard.setText(AnnotatedString(viewModel.invoiceNudgeText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgNudgeWithDate, invoiceMsgNudgeNoDate, payLine)))
-                                scope.launch { snackbarHostState.showSnackbar(reminderCopiedText) }
-                            },
-                        )
+                        items(
+                            items = state.invoicesWithClientName,
+                            key = { it.invoice.id },
+                        ) { item ->
+                            InvoiceCard(
+                                invoice = item.invoice,
+                                clientName = item.clientName,
+                                isPaying = state.payingInvoiceId == item.invoice.id,
+                                payEnabled = state.payingInvoiceId == null,
+                                showPay = SupabaseClientProvider.isConfigured,
+                                onPay = { viewModel.payInvoice(item) },
+                                onMarkPaid = { viewModel.confirmMarkPaid(item.invoice) },
+                                onDelete = { viewModel.confirmDeleteInvoice(item.invoice) },
+                                onVoid = { viewModel.confirmVoidInvoice(item.invoice) },
+                                onCopyText = {
+                                    val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
+                                    clipboard.setText(AnnotatedString(viewModel.invoiceText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgServicedWithDate, invoiceMsgServicedNoDate, payLine)))
+                                    scope.launch { snackbarHostState.showSnackbar(paymentTextCopiedText) }
+                                },
+                                onNudge = {
+                                    val payLine = viewModel.invoicePayLine(payLineNoMethodsText, payLineMethodsFormat)
+                                    clipboard.setText(AnnotatedString(viewModel.invoiceNudgeText(item.invoice, item.clientName, invoiceDefaultClientName, invoiceMsgNudgeWithDate, invoiceMsgNudgeNoDate, payLine)))
+                                    scope.launch { snackbarHostState.showSnackbar(reminderCopiedText) }
+                                },
+                            )
+                        }
                     }
                 }
             }
-        }
         }
     }
 }
