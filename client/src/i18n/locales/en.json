@@ -1188,7 +1188,18 @@
     "rain_pct_day_count_jobs_affected_one": "Rain {{pct}}% {{day}} — 1 job affected",
     "rain_pct_day_count_jobs_affected_other": "Rain {{pct}}% {{day}} — {{count}} jobs affected",
     "client_label_job_already_scheduled": "{{client}} · {{label}} job already scheduled",
-    "done": "Done"
+    "done": "Done",
+    "day_conditions": "Day Conditions",
+    "weather": "Weather",
+    "wind_value_mph": "Wind {{value}} mph",
+    "soil_temp": "Soil temp",
+    "no_station_within_15_mi": "No station within 15 mi",
+    "7_day_rain": "7-day rain",
+    "good": "GOOD",
+    "hold_off": "HOLD OFF",
+    "spray": "Spray",
+    "temp_f_wind_mph": "≤{{temp}}°F · ≤{{wind}} mph",
+    "set_business_location_to_see_conditions": "Set business location to see conditions"
   },
   "dashboard": {
     "revenue_today": "Revenue Today",

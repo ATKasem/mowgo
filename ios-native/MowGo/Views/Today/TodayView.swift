@@ -113,6 +113,10 @@ struct TodayView: View {
                             // Control bar — date nav + rain delay
                             controlBar
 
+                            if !auth.isDemoMode {
+                                dayConditionsCard
+                            }
+
                             if let rainNotice {
                                 Button { showingRainConfirm = true } label: {
                                     Text("🌧️ Rain \(rainNotice.percent)% \(rainNotice.day) — Rain delay?")
@@ -231,8 +235,10 @@ struct TodayView: View {
             }
             .task {
                 guard !auth.isDemoMode else { return }
-                // Coordinates are intentionally nil until profile location fields exist.
-                weatherForecast = await WeatherService().forecast(latitude: nil, longitude: nil)
+                weatherForecast = await WeatherService().forecast(
+                    latitude: auth.user?.latitude,
+                    longitude: auth.user?.longitude
+                )
             }
         }
     }
@@ -650,6 +656,94 @@ struct TodayView: View {
             guard !Task.isCancelled else { return }
             withAnimation { showNotificationBanner = false }
         }
+    }
+
+    // MARK: - Day Conditions Card
+
+    private var hasBusinessLocation: Bool {
+        auth.user?.latitude != nil && auth.user?.longitude != nil
+    }
+
+    private var dayConditionsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Day Conditions")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(theme.textPrimary)
+
+            if hasBusinessLocation {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    dayConditionMetric(
+                        value: weatherForecast?.currentTempF.map { "\(Int($0.rounded()))°" } ?? "—",
+                        label: "Weather",
+                        subtext: "Wind \(weatherForecast?.windMph.map { "\(Int($0.rounded()))" } ?? "—") mph"
+                    )
+                    dayConditionMetric(
+                        value: weatherForecast?.soilTempF.map { "\(Int($0.rounded()))°" } ?? "—",
+                        label: "Soil temp",
+                        subtext: weatherForecast?.soilTempF == nil ? "No station within 15 mi" : nil
+                    )
+                    dayConditionMetric(
+                        value: weatherForecast?.rain7dInches.map { String(format: "%.2f\"", $0) } ?? "—",
+                        label: "7-day rain",
+                        subtext: nil
+                    )
+                    sprayMetric
+                }
+            } else {
+                Text("Set business location to see conditions")
+                    .font(.caption.weight(.medium))
+                    .foregroundColor(MowGoTheme.deepGreen)
+            }
+        }
+        .padding(12)
+        .background(theme.surface)
+        .cornerRadius(12)
+    }
+
+    private func dayConditionMetric(value: String, label: LocalizedStringKey, subtext: LocalizedStringKey? = nil) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundColor(theme.textPrimary)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(theme.textMuted)
+            if let subtext {
+                Text(subtext)
+                    .font(.system(size: 11))
+                    .foregroundColor(theme.textMuted)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var sprayMetric: some View {
+        let status = weatherForecast?.sprayStatus()
+        let label: LocalizedStringKey
+        let color: Color
+        switch status {
+        case .good:
+            label = "GOOD"
+            color = MowGoTheme.success
+        case .hold:
+            label = "HOLD OFF"
+            color = MowGoTheme.warning
+        case nil:
+            label = "—"
+            color = theme.textPrimary
+        }
+        return VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundColor(color)
+            Text("Spray")
+                .font(.caption2)
+                .foregroundColor(theme.textMuted)
+            Text("≤\(Int(WeatherForecast.sprayRule.maxTempF))°F · ≤\(Int(WeatherForecast.sprayRule.maxWindMph)) mph")
+                .font(.system(size: 11))
+                .foregroundColor(theme.textMuted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var rainNotice: (percent: Int, day: String)? {

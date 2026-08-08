@@ -44,6 +44,17 @@
 
     <!-- Today -->
     <string name="today_rain_chance">%1$d%% de probabilidad de lluvia el %2$s</string>
+    <string name="today_day_conditions">Condiciones del día</string>
+    <string name="today_weather">Clima</string>
+    <string name="today_wind_value_mph">Viento %1$s mph</string>
+    <string name="today_soil_temp">Temp. del suelo</string>
+    <string name="today_no_station">Sin estación en 15 mi</string>
+    <string name="today_7_day_rain">Lluvia de 7 días</string>
+    <string name="today_spray_good">BIEN</string>
+    <string name="today_spray_hold">ESPERAR</string>
+    <string name="today_spray">Fumigación</string>
+    <string name="today_spray_rule">≤%1$d°F · ≤%2$d mph</string>
+    <string name="today_set_business_location">Configura la ubicación del negocio para ver las condiciones</string>
     <string name="today_new_job_cd">Nuevo trabajo</string>
     <string name="today_rain_delay">Retraso por lluvia</string>
     <string name="today_rain_delay_history">Historial de retrasos por lluvia</string>

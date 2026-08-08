@@ -24,15 +24,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.R
+import com.mowgo.app.data.SprayStatus
+import com.mowgo.app.data.WeatherForecast
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.ui.components.JobPhotoButton
 import com.mowgo.app.ui.components.JobPhotoThumbnail
 import com.mowgo.app.ui.theme.MowGoColors
 import com.mowgo.app.ui.theme.extendedColors
+import kotlin.math.roundToInt
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,12 +159,10 @@ fun TodayScreen(
                         )
                     }
 
-                    state.weatherAlert?.let { forecast ->
-                        item {
-                            Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MowGoColors.RainBlue)) {
-                                Text(stringResource(R.string.today_rain_chance, forecast.precipitationProbability, forecast.date), Modifier.padding(12.dp), color = MowGoColors.OnAccent, fontWeight = FontWeight.SemiBold)
-                            }
-                        }
+                    when (state.hasBusinessLocation) {
+                        true -> item { DayConditionsCard(state.weatherForecast) }
+                        false -> item { DayConditionsLocationHint() }
+                        null -> Unit
                     }
 
                     // Stats grid
@@ -391,6 +393,127 @@ private fun StatCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+// ── Day Conditions ──────────────────────────────────────────────────────
+
+@Composable
+private fun DayConditionsCard(forecast: WeatherForecast?) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+            Text(
+                text = stringResource(R.string.today_day_conditions),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(8.dp))
+            // 2x2 grid (matches iOS LazyVGrid + web mobile grid-cols-2) — 4-in-a-row
+            // overflows on narrow screens (<=320dp).
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DayConditionMetric(
+                        modifier = Modifier.weight(1f),
+                        value = forecast?.currentTempF?.let { "${it.roundToInt()}°" } ?: "—",
+                        label = stringResource(R.string.today_weather),
+                        subtext = stringResource(
+                            R.string.today_wind_value_mph,
+                            forecast?.windMph?.roundToInt()?.toString() ?: "—",
+                        ),
+                    )
+                    DayConditionMetric(
+                        modifier = Modifier.weight(1f),
+                        value = forecast?.soilTempF?.let { "${it.roundToInt()}°" } ?: "—",
+                        label = stringResource(R.string.today_soil_temp),
+                        subtext = if (forecast?.soilTempF == null) stringResource(R.string.today_no_station) else null,
+                    )
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DayConditionMetric(
+                        modifier = Modifier.weight(1f),
+                        value = forecast?.rain7dInches?.let { String.format(Locale.US, "%.2f\"", it) } ?: "—",
+                        label = stringResource(R.string.today_7_day_rain),
+                    )
+                    val spray = forecast?.sprayStatus()
+                    DayConditionMetric(
+                        modifier = Modifier.weight(1f),
+                        value = when (spray) {
+                            SprayStatus.GOOD -> stringResource(R.string.today_spray_good)
+                            SprayStatus.HOLD -> stringResource(R.string.today_spray_hold)
+                            null -> "—"
+                        },
+                        valueColor = when (spray) {
+                            SprayStatus.GOOD -> MaterialTheme.extendedColors.success
+                            SprayStatus.HOLD -> MaterialTheme.extendedColors.warning
+                            null -> MaterialTheme.colorScheme.onSurface
+                        },
+                        label = stringResource(R.string.today_spray),
+                        subtext = stringResource(
+                            R.string.today_spray_rule,
+                            WeatherForecast.SPRAY_RULE.maxTempF.roundToInt(),
+                            WeatherForecast.SPRAY_RULE.maxWindMph.roundToInt(),
+                        ),
+                    )
+                }
+            }
+            // Fold the old rain-chance alert into the panel — only surface it when it's actionable (>=60%).
+            val rainChance = forecast?.precipitationProbability ?: 0
+            if (rainChance >= 60) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.today_rain_chance, rainChance, forecast?.date ?: ""),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.extendedColors.info,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DayConditionMetric(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    subtext: String? = null,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    Column(modifier = modifier) {
+        Text(text = value, style = MaterialTheme.typography.titleMedium, color = valueColor, fontWeight = FontWeight.Bold)
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        subtext?.let {
+            Text(text = it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun DayConditionsLocationHint() {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+            Text(
+                text = stringResource(R.string.today_day_conditions),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.today_set_business_location),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

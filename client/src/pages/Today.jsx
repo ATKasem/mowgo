@@ -1,10 +1,10 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
-import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
+import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, getDayConditions, sprayStatus, SPRAY_RULE, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
 import { buildRouteLink, buildSingleStopUrl } from '../lib/navLinks';
 import { optimizeRoute } from '../lib/optimizeRoute';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Plus, Circle, CloudRain, Repeat, Loader2, X, History, RotateCcw, Route as RouteIcon, Navigation } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import NewJobForm from '../components/NewJobForm';
@@ -68,6 +68,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [selectedRainJobIds, setSelectedRainJobIds] = useState([]);
   const [rainHistory, setRainHistory] = useState([]);
   const [weather, setWeather] = useState(null);
+  const [dayConditions, setDayConditions] = useState(null);
   const [hasBusinessLocation, setHasBusinessLocation] = useState(null);
   const [rainDelaySaving, setRainDelaySaving] = useState(false);
   const [rainDelayError, setRainDelayError] = useState('');
@@ -115,6 +116,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       if (profile?.preferred_nav_app) setNavApp(profile.preferred_nav_app);
       if (!hasLocation) return;
       getWeatherForLocation(lat, lng).then(result => { if (active) setWeather(result); });
+      getDayConditions(lat, lng).then(result => { if (active) setDayConditions(result); });
     }).catch(() => {});
     return () => { active = false; };
   }, []);
@@ -779,6 +781,47 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${filtered.length ? (doneCount / filtered.length) * 100 : 0}%` }} />
         </div>
       </div>
+
+      {/* Day Conditions — crew weather card */}
+      {hasBusinessLocation === true && (
+        <div className="card p-4 mb-5">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-3">{tr('Day Conditions')}</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <p className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{Number.isFinite(dayConditions?.currentTemp) ? `${Math.round(dayConditions.currentTemp)}°` : '—'}</p>
+              <p className="text-xs text-[var(--color-text-muted)]">{tr('Weather')}</p>
+              <p className="text-[11px] text-[var(--color-text-muted)]">{tr('Wind {{value}} mph', { value: Number.isFinite(dayConditions?.windMph) ? Math.round(dayConditions.windMph) : '—' })}</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{Number.isFinite(dayConditions?.soilTempF) ? `${Math.round(dayConditions.soilTempF)}°` : '—'}</p>
+              <p className="text-xs text-[var(--color-text-muted)]">{tr('Soil temp')}</p>
+              {!Number.isFinite(dayConditions?.soilTempF) && <p className="text-[11px] text-[var(--color-text-muted)]">{tr('No station within 15 mi')}</p>}
+            </div>
+            <div>
+              <p className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{dayConditions?.rain7dInches != null ? `${dayConditions.rain7dInches.toFixed(2)}"` : '—'}</p>
+              <p className="text-xs text-[var(--color-text-muted)]">{tr('7-day rain')}</p>
+            </div>
+            <div>
+              {(() => {
+                const spray = sprayStatus(dayConditions?.currentTemp ?? null, dayConditions?.windMph ?? null);
+                return (
+                  <p className={`text-lg font-bold ${spray === 'good' ? 'text-emerald-600 dark:text-emerald-400' : spray === 'hold' ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--color-text-primary)] dark:text-white'}`}>
+                    {spray === 'good' ? tr('GOOD') : spray === 'hold' ? tr('HOLD OFF') : '—'}
+                  </p>
+                );
+              })()}
+              <p className="text-xs text-[var(--color-text-muted)]">{tr('Spray')}</p>
+              <p className="text-[11px] text-[var(--color-text-muted)]">{tr('≤{{temp}}°F · ≤{{wind}} mph', { temp: SPRAY_RULE.maxTempF, wind: SPRAY_RULE.maxWindMph })}</p>
+            </div>
+          </div>
+        </div>
+      )}
+      {hasBusinessLocation === false && (
+        <div className="card p-4 mb-5">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-2">{tr('Day Conditions')}</h3>
+          <Link to="/app/settings" className="text-xs font-medium text-brand-hover dark:text-[#4ade80] hover:underline">{tr('Set business location to see conditions')}</Link>
+        </div>
+      )}
 
       {/* Crew filter tabs — only when 2+ members */}
       {teamError && (

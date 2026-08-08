@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
 import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobPhotoRepository
+import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.RainDelayHistoryStore
 import com.mowgo.app.data.WeatherForecast
 import com.mowgo.app.data.WeatherRepository
@@ -38,7 +39,8 @@ data class TodayUiState(
     val showRainDelayHistory: Boolean = false,
     val isApplyingRainDelay: Boolean = false,
     val isUndoingRainDelay: Boolean = false,
-    val weatherAlert: WeatherForecast? = null,
+    val weatherForecast: WeatherForecast? = null,
+    val hasBusinessLocation: Boolean? = null,
     val showSnackbar: String? = null,
     val showNewJobDialog: Boolean = false,
     val editingJob: JobWithClient? = null,
@@ -83,6 +85,7 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
     private val photoRepository = JobPhotoRepository(repository)
     private val historyStore = RainDelayHistoryStore(application.applicationContext)
     private val weatherRepository = WeatherRepository()
+    private val profileRepository = ProfileRepository()
     private var loadGeneration = 0
 
     private val _uiState = MutableStateFlow(TodayUiState())
@@ -100,13 +103,19 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                 val jobs = repository.loadJobs()
                 val clients = repository.loadClients()
                 val history = historyStore.load()
-                val weather = weatherRepository.forecast(null, null)?.firstOrNull { it.precipitationProbability >= 60 }
+                val profile = runCatching { profileRepository.loadProfile() }.getOrNull()
+                val latitude = profile?.latitude
+                val longitude = profile?.longitude
+                val hasLocation = latitude != null && longitude != null
+                val forecasts = if (hasLocation) weatherRepository.forecast(latitude, longitude) else null
+                val todayForecast = forecasts?.firstOrNull { it.date == LocalDate.now().toString() } ?: forecasts?.firstOrNull()
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     jobs = jobs,
                     clients = clients,
                     rainDelayHistory = history,
-                    weatherAlert = weather,
+                    weatherForecast = todayForecast,
+                    hasBusinessLocation = hasLocation,
                 )
             } catch (e: Exception) {
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(

@@ -411,6 +411,57 @@ export async function getWeatherForLocation(lat, lng) {
   }
 }
 
+/** Label-guidance heuristic for spray conditions — always follow the product label. */
+export const SPRAY_RULE = { maxTempF: 85, maxWindMph: 10 };
+
+/** GOOD/HOLD spray-window heuristic from current temp + wind; null when either input is missing. */
+export function sprayStatus(currentTemp, windMph) {
+  if (currentTemp == null || windMph == null) return null;
+  return currentTemp <= SPRAY_RULE.maxTempF && windMph <= SPRAY_RULE.maxWindMph ? 'good' : 'hold';
+}
+
+/** Fetch crew day-conditions (current temp/wind, soil temp, 7-day rain) for a business location. */
+export async function getDayConditions(lat, lng) {
+  if (isDemoMode() || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) return null;
+  try {
+    const params = new URLSearchParams({
+      latitude: String(lat),
+      longitude: String(lng),
+      current: 'temperature_2m,wind_speed_10m',
+      daily: 'precipitation_sum,soil_temperature_0cm,temperature_2m_max',
+      past_days: '7',
+      forecast_days: '1',
+      timezone: 'auto',
+      temperature_unit: 'fahrenheit',
+      wind_speed_unit: 'mph',
+      precipitation_unit: 'inch',
+    });
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    const currentTemp = data?.current?.temperature_2m ?? null;
+    const windMph = data?.current?.wind_speed_10m ?? null;
+    // Locate TODAY by the API's own timeline: past_days=7 + forecast_days=1 means
+    // the last array entry IS today in the business location's timezone (timezone=auto).
+    // Deriving the index from the response length (not the device clock) avoids an
+    // off-by-one when the device and business are in different timezones.
+    const times = data?.daily?.time;
+    const soilTemps = data?.daily?.soil_temperature_0cm;
+    const rainValues = data?.daily?.precipitation_sum;
+    const todayIndex = Array.isArray(times) ? times.length - 1 : -1;
+    const soilTempF = (todayIndex >= 0 && Array.isArray(soilTemps) && soilTemps[todayIndex] != null)
+      ? soilTemps[todayIndex]
+      : null;
+    // Sum past 7 days + today (trailing window, NOT including un-fallen forecast days).
+    const rain7dInches = (todayIndex >= 0 && Array.isArray(rainValues))
+      ? rainValues.slice(0, todayIndex + 1).reduce((sum, value) => sum + (Number.isFinite(value) ? value : 0), 0)
+      : null;
+    return { currentTemp, windMph, soilTempF, rain7dInches };
+  } catch {
+    return null;
+  }
+}
+
 // ===== Clients =====
 
 export async function loadClients() {

@@ -392,3 +392,16 @@
 "Add client photo" = "Añadir foto del cliente";
 "Copy estimate text" = "Copiar texto del presupuesto";
 "✓ Done" = "✓ Hecho";
+
+// Day Conditions card (2026-08-08)
+"Day Conditions" = "Condiciones del día";
+"Weather" = "Clima";
+"Wind %@ mph" = "Viento %@ mph";
+"Soil temp" = "Temp. del suelo";
+"No station within 15 mi" = "Sin estación en 15 mi";
+"7-day rain" = "Lluvia de 7 días";
+"Spray" = "Fumigación";
+"GOOD" = "BIEN";
+"HOLD OFF" = "ESPERAR";
+"≤%lld°F · ≤%lld mph" = "≤%lld°F · ≤%lld mph";
+"Set business location to see conditions" = "Configura la ubicación del negocio para ver las condiciones";

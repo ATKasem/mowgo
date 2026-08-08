@@ -1261,7 +1261,18 @@
     "rain_pct_day_count_jobs_affected_one": "Lluvia {{pct}}% {{day}} — 1 trabajo afectado",
     "rain_pct_day_count_jobs_affected_other": "Lluvia {{pct}}% {{day}} — {{count}} trabajos afectados",
     "client_label_job_already_scheduled": "{{client}} · {{label}} trabajo ya programado",
-    "done": "Listo"
+    "done": "Listo",
+    "day_conditions": "Condiciones del día",
+    "weather": "Clima",
+    "wind_value_mph": "Viento {{value}} mph",
+    "soil_temp": "Temp. del suelo",
+    "no_station_within_15_mi": "Sin estación en 15 mi",
+    "7_day_rain": "Lluvia de 7 días",
+    "good": "BIEN",
+    "hold_off": "ESPERAR",
+    "spray": "Fumigación",
+    "temp_f_wind_mph": "≤{{temp}}°F · ≤{{wind}} mph",
+    "set_business_location_to_see_conditions": "Configura la ubicación del negocio para ver las condiciones"
   },
   "dashboard": {
     "revenue_today": "Ingresos Hoy",

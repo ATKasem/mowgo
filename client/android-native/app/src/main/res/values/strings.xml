@@ -44,6 +44,17 @@
 
     <!-- Today -->
     <string name="today_rain_chance">Rain chance %1$d%% on %2$s</string>
+    <string name="today_day_conditions">Day Conditions</string>
+    <string name="today_weather">Weather</string>
+    <string name="today_wind_value_mph">Wind %1$s mph</string>
+    <string name="today_soil_temp">Soil temp</string>
+    <string name="today_no_station">No station within 15 mi</string>
+    <string name="today_7_day_rain">7-day rain</string>
+    <string name="today_spray_good">GOOD</string>
+    <string name="today_spray_hold">HOLD OFF</string>
+    <string name="today_spray">Spray</string>
+    <string name="today_spray_rule">≤%1$d°F · ≤%2$d mph</string>
+    <string name="today_set_business_location">Set business location to see conditions</string>
     <string name="today_new_job_cd">New Job</string>
     <string name="today_rain_delay">Rain Delay</string>
     <string name="today_rain_delay_history">Rain Delay History</string>

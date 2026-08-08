@@ -11,4 +11,6 @@ data class UserProfile(
     val tier: String? = null,
     val role: String? = null,
     @SerialName("business_id") val businessId: String? = null,
+    @SerialName("latitude") val latitude: Double? = null,
+    @SerialName("longitude") val longitude: Double? = null,
 )

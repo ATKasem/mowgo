@@ -423,6 +423,9 @@ struct UserProfile: Codable, Identifiable {
     var tier: String?
     var role: String?
     var businessId: UUID?
+    /// Business location for the Day Conditions weather card (`profiles.latitude/longitude`).
+    var latitude: Double?
+    var longitude: Double?
     var stripeCustomerId: String?
     var venmoHandle: String?
     var cashappHandle: String?

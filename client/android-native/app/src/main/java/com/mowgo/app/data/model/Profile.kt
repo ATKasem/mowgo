@@ -22,6 +22,8 @@ data class Profile(
     /// `select=*` in fetchProfile picks these up automatically.
     @SerialName("trial_tier") val trialTier: String? = null,
     @SerialName("trial_ends_at") val trialEndsAt: String? = null,
+    @SerialName("latitude") val latitude: Double? = null,
+    @SerialName("longitude") val longitude: Double? = null,
 ) {
     /** True while a 14-day app trial is active (trialTier set, not expired). */
     val hasActiveTrial: Boolean
