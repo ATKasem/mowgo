@@ -742,19 +742,19 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       {bannerWeather && rainDelayCandidates.length > 0 && (
         <button
           onClick={openRainDelay}
-          className="w-full mb-5 text-left rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 dark:from-sky-600 dark:to-blue-700 text-white shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.99] transition-all p-4 min-h-[44px]"
+          className="w-full mb-5 text-left rounded-2xl bg-gradient-to-r from-sky-700 to-blue-700 dark:from-sky-800 dark:to-blue-800 text-white shadow-md hover:shadow-lg hover:brightness-110 active:scale-[0.99] transition-all p-3.5 sm:p-4 min-h-[44px]"
         >
-          <span className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+          <span className="flex items-center gap-2 sm:gap-3">
+            <span className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
               <CloudRain className="w-5 h-5" />
             </span>
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-bold leading-snug">
-                {tr('Rain {{day}} — {{count}} jobs affected', { day: rainHeroDay, count: rainDelayCandidates.length })}
+                {tr('Rain {{pct}}% {{day}} — {{count}} jobs affected', { pct: bannerWeather.rain, day: rainHeroDay, count: rainDelayCandidates.length })}
               </span>
               <span className="block text-xs text-sky-100 mt-0.5">{tr('One tap moves them and texts every client.')}</span>
             </span>
-            <span className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold bg-white/20 rounded-full px-3 py-1.5">
+            <span className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold bg-black/25 rounded-full px-2.5 py-1.5 sm:px-3">
               {tr('Rain Delay')}
             </span>
           </span>
