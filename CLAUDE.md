@@ -2,6 +2,9 @@
 
 MowGo is a lawn-care scheduling SaaS (owner: Aaron). Three client platforms + Supabase + Cloudflare Pages.
 
+## Repository layout
+See `docs/REPO_MAP.md` for the canonical map; `README.md` is the front door.
+
 ## Architecture
 - **Web:** `client/src/` — React 19 + Vite + @supabase/supabase-js + @stripe/stripe-js. Client-only SPA (no RSC). i18n via `client/src/i18n/`.
 - **Cloudflare Pages Functions:** `functions/api/` — webhook dispatcher, Stripe checkout/webhook, booking, route-audit, leads, invite-crew, concierge, team. Env vars set in CF dashboard (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_WEBHOOK_SECRET`, etc.). Deploy = push to `main` (git integration).
