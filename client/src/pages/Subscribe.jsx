@@ -80,7 +80,7 @@ export default function Subscribe() {
   const [error, setError] = useState('');
   const [conciergeClaimed, setConciergeClaimed] = useState(null);
   const [retry, setRetry] = useState(0);
-  const [billingInterval, setBillingInterval] = useState('month');
+  const [billingInterval, setBillingInterval] = useState('year');
   const [checkoutError, setCheckoutError] = useState('');
   const [checkoutPending, setCheckoutPending] = useState(false);
 
@@ -240,7 +240,7 @@ export default function Subscribe() {
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">{tr("No worries")}</h1>
         <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("You can always try the free plan or subscribe when you're ready.")}</p>
         <div className="inline-flex items-center rounded-xl bg-gray-100 dark:bg-gray-800 p-1 mb-6">
-          {['month', 'year'].map(interval => (
+          {['year', 'month'].map(interval => (
             <button key={interval} type="button" onClick={() => { setBillingInterval(interval); setCheckoutError(''); }} className={`px-5 py-2 rounded-lg text-sm font-semibold min-h-[44px] ${billingInterval === interval ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 dark:text-gray-300'}`}>
               {tr(interval === 'month' ? 'Monthly' : 'Annual')}{interval === 'year' && ` · ${tr('2 months free')}`}
             </button>

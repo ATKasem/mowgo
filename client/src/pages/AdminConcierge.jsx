@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { parseClientCsv } from '../lib/csv-import';
+import { supabase } from '../lib/supabase';
 
 export default function AdminConcierge() {
   const [code, setCode] = useState(() => sessionStorage.getItem('conciergeAdminCode') || '');
@@ -10,6 +11,9 @@ export default function AdminConcierge() {
   const [pageError, setPageError] = useState('');
   const [openPreview, setOpenPreview] = useState(null);
   const [actionState, setActionState] = useState({});
+  const [kpi, setKpi] = useState(null);
+  const [kpiLoading, setKpiLoading] = useState(false);
+  const [kpiError, setKpiError] = useState('');
 
   async function api(path, options = {}) {
     const response = await fetch(path, { ...options, headers: { 'Content-Type': 'application/json', 'x-admin-code': code, ...options.headers } });
@@ -26,6 +30,18 @@ export default function AdminConcierge() {
   }
   useEffect(() => { if (code) void load(); }, [code]);
 
+  async function loadKpi() {
+    setKpiLoading(true); setKpiError('');
+    try {
+      const { data, error } = await supabase.functions.invoke('get-conversion-kpi', { headers: { 'x-admin-code': code } });
+      if (error) throw new Error(error.message || 'Failed to load KPI');
+      if (data?.error) throw new Error(data.error);
+      setKpi(data);
+    } catch (error) { setKpiError(error.message); }
+    finally { setKpiLoading(false); }
+  }
+  useEffect(() => { if (code) void loadKpi(); }, [code]);
+
   function enter(event) { event.preventDefault(); const value = draftCode.trim(); if (!value) return; sessionStorage.setItem('conciergeAdminCode', value); setCode(value); }
   async function run(item, action, extra = {}) {
     setActionState(current => ({ ...current, [item.id]: { ...current[item.id], loading: action, error: '' } }));
@@ -41,7 +57,21 @@ export default function AdminConcierge() {
   if (!code) return <main className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4"><form onSubmit={enter} className="card p-6 w-full max-w-sm space-y-4"><h1 className="text-xl font-bold dark:text-white">Concierge admin</h1><input autoFocus type="password" className="input" placeholder="Admin code" value={draftCode} onChange={e => setDraftCode(e.target.value)} /><button className="btn-primary w-full">Enter</button></form></main>;
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 sm:p-8"><div className="max-w-6xl mx-auto space-y-5"><div className="flex items-center justify-between"><h1 className="text-2xl font-bold dark:text-white">Concierge queue</h1><button className="btn-secondary" onClick={() => void load()}>Refresh</button></div>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 sm:p-8"><div className="max-w-6xl mx-auto space-y-5">
+      <section className="card p-5">
+        <div className="flex items-center justify-between mb-3"><h2 className="font-bold dark:text-white">Free→Paid KPI</h2><button className="btn-secondary text-sm" onClick={() => void loadKpi()}>Refresh</button></div>
+        {kpiError && <p className="text-sm text-red-600">{kpiError}</p>}
+        {kpiLoading ? <Loader2 className="w-5 h-5 animate-spin text-brand" /> : kpi && (
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div><p className="text-xs text-gray-500">Total signups</p><p className="text-xl font-bold dark:text-white">{kpi.total_signups}</p></div>
+            <div><p className="text-xs text-gray-500">Trials started</p><p className="text-xl font-bold dark:text-white">{kpi.trials_started}</p></div>
+            <div><p className="text-xs text-gray-500">Trials converted</p><p className="text-xl font-bold dark:text-white">{kpi.trials_converted}</p></div>
+            <div><p className="text-xs text-gray-500">Conversion %</p><p className="text-xl font-bold dark:text-white">{kpi.conversion_pct}%</p></div>
+            <div><p className="text-xs text-gray-500">Trials started (30d)</p><p className="text-xl font-bold dark:text-white">{kpi.trials_started_last_30_days}</p></div>
+          </div>
+        )}
+      </section>
+      <div className="flex items-center justify-between"><h1 className="text-2xl font-bold dark:text-white">Concierge queue</h1><button className="btn-secondary" onClick={() => void load()}>Refresh</button></div>
       {pageError && <p className="text-sm text-red-600">{pageError}</p>}{loading ? <Loader2 className="w-6 h-6 animate-spin text-brand" /> : requests.length === 0 ? <div className="card p-6 text-sm text-gray-500">No concierge requests.</div> : requests.map(item => {
         const state = actionState[item.id] || {}; const parsed = parseClientCsv(item.csv_content); const overdue = item.status === 'pending' && Date.now() > new Date(item.created_at).getTime() + 48 * 60 * 60 * 1000;
         return <section key={item.id} className="card p-5 space-y-4"><div className="flex flex-wrap gap-3 justify-between"><div><h2 className="font-bold dark:text-white">{item.business_name}</h2><p className="text-xs text-gray-500">{item.client_count ?? 'Unknown'} clients · {new Date(item.created_at).toLocaleString()}</p></div><div className="flex items-center gap-2"><span className={item.status === 'done' ? 'badge-success' : 'badge-warning'}>{item.status}</span>{item.status === 'pending' && <span className={`text-xs font-semibold ${overdue ? 'text-red-600' : 'text-gray-500'}`}>{overdue ? '48h deadline overdue' : `Due ${new Date(new Date(item.created_at).getTime() + 172800000).toLocaleString()}`}</span>}</div></div>
