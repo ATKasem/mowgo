@@ -618,8 +618,19 @@
 - **Fetch notes:** 429 storm on 4/8 subs first pass (landscaping/sweatystartup/Entrepreneur/LawnCarePros); all recovered with 12-40s paced retries. 50 new canonical URLs added (1230 → 1280).
 
 ### 60. Skip log — Aug 8 02:38Z sweep (evaluated, do NOT engage) — 0 new bankable drafts; overnight homeowner window
-- **TODAY'S Sat Aug 8 22:21Z KIT — LIVENESS VERIFIED 02:2x-02:3xZ, all three alive, unchanged from 08-07 21:53 lock:** ① **#55 `1vi1hcj`** ALIVE + active — 26 entries (was 40 at capture; RSS shows latest 25), OP engaged (2 replies incl. averaging-yearly-billing discussion), drought-season topic holds → kit #1. ② **#57 `1vi8tr3`** ALIVE — 9 entries, **OP JarToTable replied 4x** (most engaged thread in kit; ~28h old at 22:21Z slot = within 48h freshness + 96h gate). ③ **#56 `1vi4yd1`** ALIVE — 7 entries (OP + 5 commenters). **Poster script for this slot NOT yet generated** — create `post_kit_sat0822.py` from the `post_kit_0822.py` pattern (kit order ①#55 → ②#57 → ③#56, drafts in §55/#57/#56) or hand to Blasian (precedent: #48 manual repost 08-06).
-- `1vie4j1` r/CRM "Excavation/Demolition Contractors: Is There Actually a Good All-in-One CRM?" (21:59Z, 6 entries, OP engaged) — off-ICP trade (not lawn), but same "does one tool do jobs+clients+invoicing" pattern as every trades thread → cross-trade validation of the single-loop pitch. Log only.
-- `1vievq2` r/smallbusiness "What would you guys recommend for gaining local customers?" (22:31Z) — OP + AutoMod only, 0 comments, no lawn/software signal. Revisit Monday if it gains comments.
-- **Swept, nothing on-ICP:** r/lawncare 25 (homeowner/DIY only: St. Augustine, Bermuda ID, overseed prep, spurge — US late-night) · r/landscaping 25 (homeowner/DIY: pavers, gravel, retaining walls, "How much should I charge for removing these?" — pricing-data log only) · r/smallbusiness 25 (nepotism, paystubs, food-home, steel, caulking — none lawn/software) · r/Entrepreneur mostly seen/off-ICP (senior companionship, poop scoop, investment-under-$500) · r/LawnCarePros 5 entries in 48h, only #57 business-related (12th quiet window overall; the one hit is strong ICP) · r/CRM vendor/builder meta + 1vie4j1 · r/WhichCRM med-spa no-shows, vendor meta · r/sweatystartup all seen (#50 kit thread still in feed, 34.9h old).
-- **Fetch notes:** 429 storm on 5/8 subs first pass (lawncare/smallbusiness/landscaping/Entrepreneur/CRM); all recovered with 30-45s paced retries. 67 new canonical URLs added (seen 1280 → 1347 raw; canonical 1161 → 1228).
+- **Sat Aug 8 22:21Z KIT — CANCELLED** (96h gate applies; poster script unwired; do NOT fire Sat). Updated kit ordered below for Mon slot.
+
+### 61. 🎯 MON Aug 11 22:23Z slot — KIT LOCKED
+- **Schedule:** One-shot cron `4c195234eaa9` fires Mon Aug 11 22:23Z → delivers to #mowgo → mowgo-leads skill processes.
+- **Kit order (verified liveness):** ① **#55 `1vi1hcj`** (r/landscaping, TX drought, 40+ cmts, OP unanswered SMS question; draft §55) → ② **#57 `1vi8tr3`** (r/LawnCarePros, brand-new TX lawn biz, OP highly engaged; draft §57) → ③ **#43 `1vfyg2j`** (first-5-customers thread; replace dead #56) → fallback **#50 `1vh7t47`**.
+- **#56 DEAD:** OP `[removed]` the thread content — cannot reply. Replaced with **#43** at position #3.
+- **#55 reply angle:** OP (Accomplished_Edge477) asked "would you text customers first when dry?" — commenters validated honesty play AND discussed averaged billing, but OP's own SMS-platform setup question (how to auto-send at scale) remains unanswered. Friend-mode answer about batching tools (even simple ones like scheduling software with built-in SMS) hits perfectly without product mention.
+- **96h gate confirmed:** Last post was Fri #54 (t1_p2aa3kn, Aug 7 22:23Z) → next ≥ Mon Aug 11 22:23Z. ✅ No earlier posting possible.
+- **Post-times log entry:** Added Mon 2026-08-11 22:23Z → kit #55→#57→#43 (fallback #50), cron 4c195234eaa9.
+
+---
+
+### 62. Skip log — Aug 8 06:39Z sweep (evaluated, do NOT engage) — $49 floor confirmed, zero new bankable drafts
+- **Jobber ladder verified:** Core $24-49 / Connect $80-139 / Grow $120-199 (10 users) / Plus $320-399 (15 users), +$29/user, 3-mo promo on EVERY tier. AI Receptionist = $29/mo add-on (free on Plus $399+). Anchor = "$24/mo".
+- **Competitor-lane note:** Jobber conference "Jobber Now" Sept 25 ($699 tix) → expect tier messaging reset post-conference.
+- **Swept, nothing on-ICP:** all 8 subs returned homeowner/DIY/vendor-only in the Saturday morning window. Next meaningful sweep = Sunday deep-dive.

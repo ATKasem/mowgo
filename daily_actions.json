@@ -1,87 +1,76 @@
 {
-  "actions_ts": "2026-08-07T13:50:00Z",
-  "action_label": "8am CST action — Fri Aug 7 (fed by daily_scan.json from Part 1)",
+  "actions_ts": "2026-08-09T13:45:00Z",
+  "action_label": "8am CST action — Sun Aug 9 (fed by daily_scan.json Part 1)",
   "quick_wins": [
     {
-      "id": "reddit_1vhv10k_reply",
-      "status": "✅ POSTED + VISIBILITY VERIFIED (deadline met)",
-      "detail": "Banked draft posted on 1vhv10k (r/smallbusiness, $379/mo booking widget + $2,400 dropdown) at ~13:18Z via Composio as u/Blasianzsz — comment t1_p29ceub, verified present in public comment listing (REDDIT_RETRIEVE_POST_COMMENTS). Friend-mode, no brand/price (rule 31). Permalink: https://www.reddit.com/r/smallbusiness/comments/1vhv10k/comment/p29ceub. Tracker updated (leads/reddit-threads.md #52), post-times log appended. Well inside the ~14:41Z deadline.",
-      "evidence": "t1_p29ceub visible in comment listing; commit eb52d1f"
+      "id": "servinix_compare_fix",
+      "status": "✅ FIXED + COMMITTED + PUSHED (8739afd → main; CF Pages building)",
+      "detail": "competitor-comparison.md: malformed '||-' line reformat to proper markdown bullet. Compare.jsx: added Servinix ($300/mo AI · $20/tech FSM) to competitors array + footnote block about invoice-coupon switcher hook. Build passed (746ms). Pushed to GitHub.",
+      "evidence": "git commit 8739afd; git push OK"
     },
     {
-      "id": "sms_sender_path_fix",
-      "status": "✅ WRAPPER FIXED + DRY-RUN VERIFIED — cron still PAUSED (Aaron decision)",
-      "detail": "Created /opt/data/scripts/send_sms.py wrapper (runpy → /opt/data/mowgo/scripts/send_sms.py, same pattern as other wrappers). Verified: python3 /opt/data/scripts/send_sms.py --dry-run → '📲 SMS batch: 10 would send (dry-run)' exit 0 (NG Outdoor, Frankies, + 8 more). Cron 3f67268baeb6 (14:00Z weekdays, 10/day cap) remains PAUSED since Aug 6 18:29Z — unpause decision is Aaron's (scan listed it). Also fixed lead_alert_sms.py (cron 88f17cbe35b3, paused) + lead_nurture.py (cron bf343547e81e, 14:30Z today) + mowgo_activation_report.py + mowgo_churn_report.py + testimonial_approver.py (replaced blocked symlink with wrapper) — all path-broken the same way.",
-      "evidence": "dry-run exit 0; all 6 wrappers py_compile OK"
+      "id": "intel_engine_status",
+      "status": "⚠️ FAILED at 09:32Z (HTTP 402) → RECOVERED at 13:34Z — credits restored",
+      "detail": "Intel Engine cron 54982fcbf42e failed at 09:32Z with HTTP 402 Insufficient Balance, then succeeded at 13:34Z. Credits apparently restored automatically. Next run scheduled 17:37Z. ALL downstream BI reports should resume on next cycle. MONITOR for recurring failures.",
+      "evidence": "hermes cron runs 54982fcbf42e: 05:19 completed, 09:32 FAILED HTTP 402, 13:34 completed"
     },
     {
-      "id": "reddit_kit_today",
-      "status": "✅ SLOT CRON CREATED — one-shot 1fb9a6fd0113 at 2026-08-07T22:21:00Z",
-      "detail": "Kit ① #43 1vfyg2j → ② #50 1vh7t47 (liveness-check first) → ③ #41 1vfvq1g → fallbacks #38/#40/#44. One-shot cron with mowgo-leads skill delivers to #🌱mowgo (1529248227394850916); prompt encodes: thread-live check → post → verify visibility (API success != visible, #48 lesson) → update tracker + post-times log. Friend-poster cron 9b2791494b1b NOT in this profile's cron store (vault-only reference) — slot covered by new one-shot regardless.",
-      "evidence": "hermes cron create → 'Created job: 1fb9a6fd0113'"
+      "id": "mon_slot_verify",
+      "status": "✅ ALREADY CREATED yesterday (4c195234eaa9)",
+      "detail": "Mon Aug 11 22:23Z one-shot cron confirmed active in job list. Kit: #55→#57→#43 (fallback #50). No changes needed.",
+      "evidence": "hermes cron list — 4c195234eaa9 visible, schedule once at 2026-08-11 22:23"
     },
     {
-      "id": "compare_page_lawnpro",
-      "status": "✅ DONE + DEPLOYED + VERIFIED LIVE",
-      "detail": "client/public/seo/compare/index.html: (1) TurfHop outage line RETIRED → 'recovered after a 5-day outage (Aug 1–6, 2026) — pricing and features back up, no relaunch discount; Orbit AI credit-based'; (2) LawnPro price cell $0–$39 → $39 / $129 / $249; (3) new LawnPro note: full ladder (Free 25 customers / $39 Startup 3 logins / $129 Grow / $249 Plus), add-on economy below Plus, free-tier 25-vs-5 gap named honestly, Crew $79 vs $129 Grow. Verified live on mowgoapp.com/seo/compare/ (both new strings served).",
-      "evidence": "curl mowgoapp.com/seo/compare/ contains 'LawnPro (closest price rival' + 'TurfHop recovered after a 5-day outage'"
+      "id": "kit_tracker_verify",
+      "status": "✅ ALREADY UPDATED yesterday (commit e23868f)",
+      "detail": "reddit-threads.md §61 shows '🎯 MON Aug 11 22:23Z slot — KIT LOCKED' with #56 DEAD→#43 note and reply angle documented. No additional updates needed.",
+      "evidence": "tail -80 reddit-threads.md confirms §61 section present"
     },
     {
-      "id": "redeploy_main",
-      "status": "✅ COMMITTED + PUSHED + NEW BUNDLE LIVE",
-      "detail": "Reviewed full working-tree diff (lead-alerts realtime flow: subscribeToNewLeads + 60s poll fallback + dedupe + booking_link filter; Settings toggle tier-gated; InvoiceToast position prop; rain-delay hero redesign w/ i18n en+es; uploadJobPhoto storagePath fix per AGENTS.md; guarded realtime publication in migration). Verified migration ALREADY APPLIED in prod (lead_alerts_enabled column + leads in supabase_realtime pub confirmed via live DB query). Client build passed (vite build 622ms). Committed 21cf0a0 + pushed → CF Pages auto-deploy. LIVE: bundle index-DPMXODzY.js (stale index-D_aBBC3d.js gone).",
-      "evidence": "git 21cf0a0 pushed; curl mowgoapp.com → assets/index-DPMXODzY.js; DB query confirmed migration state"
+      "id": "w32_digest_review",
+      "status": "✅ REVIEWED — weekly_digest_2026-08-09.md verified (106 lines)",
+      "detail": "W32 digest compiled 2026-08-09 10:00 UTC. Key items: pricing floor dropped (Jobber $24 anchor, LawnBook FREE/$9.99), drought = national story, 5 leads × 0 replies Day 11+, Servinix $300/mo published, Mon 22:23Z kit locked, lead discovery found 3 new ops (Ponca City/Yukon). Top opportunity: Jobber switcher wave via promo machine. Actionable for Aaron Monday AM.",
+      "evidence": "read_file 106 lines, file integrity OK"
     },
     {
-      "id": "copy_flags_bank",
-      "status": "✅ DONE",
-      "detail": "8 copy flags banked in marketing/competitor-comparison.md (new 'Copy flags — banked Aug 7, 2026' section): LawnPro $39 add-on economy, ServiceTitan $250-500/tech + $5-50k impl thread ('Jobber = cheap option below $1M'), 1vhhu28 verbatim 're-keying the same numbers into three tools', Jobber min-stop-rate + 65% raised prices, 2026 drought sales event, AI estimating $29.99 floor (watch don't build), labor +20% by 2029, GreenPal photo-proof.",
-      "evidence": "marketing/competitor-comparison.md committed"
-    },
-    {
-      "id": "concierge_e2e",
-      "status": "🟡 SMOKE RE-VERIFIED 5/5 — real request still needs Aaron",
-      "detail": "Re-ran scripts/smoke-test-concierge.sh: 5/5 PASS (OPTIONS 204, no-token 401, fake-token 401, admin no-code 401, admin wrong-code 401). Concierge auto-processor cron healthy (13:06Z OK). The real-request trigger needs Aaron's logged-in session — bot can't mint a user JWT (unchanged from Aug 5).",
-      "evidence": "PASS: 5 FAIL: 0"
-    },
-    {
-      "id": "mxbuild_profile",
-      "status": "✅ ALREADY DONE (stale scan item)",
-      "detail": "intel/mx-build-profile-2026-08-05.md is complete (payments-first PRTH platform, no public pricing, LOW threat, no compare-page addition). Quick win was banked Aug 5 — no action needed.",
-      "evidence": "intel/mx-build-profile-2026-08-05.md"
+      "id": "full_backup_diag",
+      "status": "🔴 FULL BACKUP STILL FAILING — delta backup OK",
+      "detail": "Two backup crons: cf89544f9829 (delta, nightly 03:15Z) ✅ running OK after yesterday's fix. a1e75056fa78 / 53de1524bf7d (full-backup.py, weekly Sun 08:30Z) ❌ last run 09:00Z: 'pack-objects died of signal 9' / 'remote fatal early EOF' / 'index-pack failed'. This is a GitHub repo bloat issue — the full backup repo (hermes-backup) is too large. Delta backups work fine. Aaron needs to prune the hermes-backup remote or increase limits.",
+      "evidence": "hermes cron list output: last run error visible"
     }
   ],
   "bug_fix_lane": {
-    "status": "SMS/script path bug class FIXED at root — 6 wrappers + 1 cron delivery re-point",
-    "detail": "Root cause class: crons reference /opt/data/scripts/<name>.py but wrappers only existed in /opt/data/.hermes/scripts/ (or were blocked symlinks). Fixed: send_sms.py (SMS Sender, paused), reply_poller.py (was failing EVERY 15 min + delivering to DELETED #outreach channel → delivery re-pointed to #leads 1529707289014042804; verified next run 13:15Z OK), lead_alert_sms.py (Qualified-Lead Alert, paused), lead_nurture.py (14:30Z today), mowgo_activation_report.py (Mon), mowgo_churn_report.py (Mon), testimonial_approver.py (blocked symlink → real wrapper; next run 14:00Z). NOTE: Codex CLI was QUOTA-BLOCKED (usage limit until Aug 8 05:19Z) — review done manually (diffs small, build passed, migration state DB-verified) instead of the usual codex exec lane. Flag for resumption tomorrow.",
+    "status": "No code bugs found this cycle — all quick wins are content/UI updates.",
     "remaining": [
-      "🔴 Aaron: UNPAUSE SMS Sender cron 3f67268baeb6 (wrapper ready, dry-run verified: 10 would send) — decision: auto-send 10/day at 14:00Z or manual sends (sms_manual_sends quick win). Wave-1 Day-2 texts will then be due.",
-      "🟡 Aaron: UNPAUSE Qualified-Lead SMS Alert 88f17cbe35b3 (wrapper ready) — texts Blasian on qualified route-audit leads.",
-      "🟡 Watch: delta-backup cron cf89544f9829 exited -15 (killed) last run 03:39Z — likely resource contention, not path; monitor next run."
+      "🔴 Aaron: UNPAUSE SMS Sender cron 3f67268baeb6 (Day 8 — 23+6 queued, 0 sent).",
+      "🟡 Cloudflare API tokens dead (Day 3) — blocks cf_check/wrangler.",
+      "🟡 Full backup (weekly) failing — GitHub repo bloat. Monitor."
     ]
   },
   "research_lane": {
-    "status": "NOT NEEDED this cycle — intel engine covered it",
-    "detail": "All research was produced by intel runs (LawnPro full profile 04:49Z, trends + price ladder 09:12Z, ServiceTitan thread). This cycle only APPLIED it (compare page, copy flags). MX Build already profiled Aug 5. Watch list unchanged: LawnPro (closest rival), Servinix beta Aug 17, QuoteIQ 1% fee + AI Estimator, TurfHop recovered (retire outage line), TradeKit/ContractorPlus astroturfing, DeepLawn AI integrations, GreenPal photo-proof, LawnBoss 305/mo decline."
+    "status": "Intel Engine self-recovered — no manual intervention possible beyond monitoring.",
+    "watch": "Servinix launch Sept 14 (invoice-coupon switcher bait) · LawnBook traction check · Jobber Now conf fallout (Sept 25) · QuoteIQ churn post-hike"
   },
   "aaron_plate": [
-    {"id": "sms_unpause", "status": "🔴 DECISION READY — 23 texts queued 6 days, 0 sent", "detail": "Path fixed + dry-run verified (10 would send). One command: hermes cron resume 3f67268baeb6 (14:00Z window = 9am CT) — OR manual sends. Wave-1 Day-2 texts due after."},
-    {"id": "emerge_followup", "status": "🔴 Day 12, 0 replies", "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). 2nd follow-up script overdue ('Fri if silent'). Highest-ROI 10 min; drafts ready."},
-    {"id": "blasian_reply", "status": "🔴 Day 11, ✅ reaction still no reply", "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md. Pair with #48 manual paste — one human session clears both."},
-    {"id": "reddit_48_paste", "status": "🆕 FILTERED — needs manual paste", "detail": "#48 reply (1vgvrg5, t1_p24ihev) AutoMod-filtered; do NOT re-queue via API. Draft in intel/2026-08-06_1937.md. Same session as Blasian reply."},
-    {"id": "stripe_e2e_verify", "status": "🟡 Day 23 — redeploy DONE bot-side", "detail": "Client redeployed (verify-session flow now live, bundle index-DPMXODzY.js). Remaining: ONE logged-in checkout with Aaron's account+card. CF API tokens still dead — re-auth in dashboard (blocks cf_check.py etc.)."},
-    {"id": "softwareworld_submit", "status": "❌ Day 27", "detail": "SoftwareWorld + Capterra/G2/SoftwareAdvice/GetApp — 10-15 min each; zero listicle presence."},
-    {"id": "one_click_decisions", "status": "⏳ 7 items", "detail": "SMS cron unpause · trial 7 vs 14 days · free-tier gap (5 vs 25 clients — LawnPro now visible on compare page) · friend-poster resume (not in this profile's store — may need recreation) · Jobber promo posts (drafts A/B/D; switcher window ~Aug 15) · CF token repair · watchdog delivery channel (re-pointed reply poller already; provider-failover still delivers to #cowork)."}
+    {"id": "sms_unpause", "status": "🔴 Day 8 — 23 texts queued, 0 sent", "detail": "Cron 3f67268baeb6 still PAUSED. One command: hermes cron resume 3f67268baeb6."},
+    {"id": "emerge_followup", "status": "🔴 Day 14 — 0 replies across 5 emails", "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). 2nd follow-up overdue."},
+    {"id": "blasian_reply", "status": "🔴 Day 12 — ✅ reaction still no reply", "detail": "Draft ready in leads/. Pair with #48 manual paste."},
+    {"id": "cf_tokens", "status": "🔴 Day 3 — Both CF API tokens dead (10000)", "detail": "Re-auth in CF dashboard → /opt/data/.env. Git-push deploys unaffected."},
+    {"id": "stripe_e2e_verify", "status": "🟡 Day 25 — bundles converged (Bt0NtHLK.js both domains)", "detail": "One real logged-in checkout closes it."},
+    {"id": "softwareworld_submit", "status": "❌ Day 29 — zero listicle presence", "detail": "Capterra/G2/SoftwareAdvice/GetApp self-serve submissions."},
+    {"id": "reddit_48_paste", "status": "🆕 AutoMod-filtered Aug 6", "detail": "Manual paste only — draft in intel/2026-08-06_1937.md."},
+    {"id": "w32_digest", "status": "🟢 READY for review", "detail": "/opt/data/mowgo/weekly_digest_2026-08-09.md — phone-readable summaries. Key: Jobber switcher window ~Aug 15, drought season billing, 5 lead follow-ups due."}
   ],
   "blockers": [
-    "Codex CLI quota-blocked (usage limit until Aug 8 05:19Z) — code review done manually this cycle; resume codex lane tomorrow.",
-    "Reddit #48 paste + Blasian reply + Stripe checkout + SMS unpause are all Aaron-only (bot cannot bypass AutoMod, mint JWTs, or make unpause calls that send customer texts without the decision).",
-    "SMS cron unpause is the single highest-value decision: 23 leads have waited 6 days."
+    "SMS unpause remains highest-value decision (Day 8): 29 texts queued, sender cron PAUSED.",
+    "Intel Engine credits recovered automatically — monitor for recurrence.",
+    "Full backup (weekly) failing — GitHub repo bloat (not blocking delta backups).",
+    "Reddit #48 paste + Blasian reply + Stripe e2e + CF re-auth are Aaron-only actions.",
+    "Codex sandbox has no outbound DNS (its verification steps fail; code verified from main shell)."
   ],
   "deployment": {
-    "commits": "21cf0a0 (client redeploy: lead alerts, rain-delay hero, storagePath, compare LawnPro) · eb52d1f (1vhv10k log) — both pushed to main",
-    "pushed": true,
-    "cf_build": "VERIFIED LIVE — https://mowgoapp.com serves bundle index-DPMXODzY.js (stale index-D_aBBC3d.js gone); /seo/compare/ serves LawnPro note + retired TurfHop line (HTTP 200)"
+    "commits": "54f40d5 (Servinix reformat competitor-comparison.md) + 8739afd (Servinix add to Compare.jsx competitors + footnote) — pushed; CF Pages building",
+    "pushed": true
   },
-  "summary": "6/6 bot quick wins executed + 1 bonus (1vhv10k posted early, SMS path fixed at root with 6 wrappers + reply-poller delivery re-pointed off the deleted #outreach channel, 22:21Z slot cron created, compare page updated + deployed, redeploy shipped + verified live, copy flags banked). Concierge 5/5 re-verified. Codex CLI quota-blocked → manual review (build + DB-verified). Aaron's top 3: unpause SMS sender (23 texts, 6 days), 5 lead follow-ups Day 12, Blasian reply + #48 paste in one session. Reddit slot fires automatically tonight 22:21Z via new one-shot cron 1fb9a6fd0113."
+  "summary": "Part 2 executed 6 quick-win tasks on Sunday. ✅ Servinix entry fixed in competitor-comparison.md (malformed markdown → proper bullet) + added to Compare.jsx competitors array and footnote (commit 8739afd, pushed). ✅ Mon Reddit cron already created yesterday (4c195234eaa9) — confirmed. ✅ Kit tracker already updated (#56→#43) — confirmed. ✅ W32 digest reviewed (106 lines) — actionable for Aaron Monday. ⚠️ Intel Engine FAILED at 09:32Z (HTTP 402) then RECOVERED at 13:34Z — credits restored automatically; monitor. 🔴 Full backup (weekly) still failing due to GitHub repo bloat; delta backup working fine. Aaron's plate unchanged: SMS unpause Day 8 (29 queued), 5 lead follow-ups Day 14, Blasian reply Day 12, CF tokens Day 3, Stripe e2e Day 25. No new human messages in Discord channels overnight (Blasian silent Day 12)."
 }
