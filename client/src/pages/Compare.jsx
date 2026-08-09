@@ -67,7 +67,7 @@ const mowgoTiers = [
     annualPrice: '$1,990/year · 2 months free',
     features: [
       'Everything in Crew',
-      'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
+      'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
       'Seasonal packs: spring pricing benchmarks, route templates',
       'Priority text-first support',
     ],
@@ -303,7 +303,7 @@ export default function Compare() {
           <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/40 p-5 mb-8">
             <div className="flex items-start gap-2.5">
               <Shield className="w-5 h-5 text-brand shrink-0 mt-0.5" />
-              <p className="text-sm text-gray-700 dark:text-gray-300">{tr("Switching is the risky part — so we made it the safe part. We import your Jobber clients and pre-schedule your first 30 days within 48 hours. And if MowGo doesn't make you more organized in 30 days, we refund you. Jobber doesn't offer that.")}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">{tr("Switching is the risky part — so we made it the safe part. We import your Jobber clients and founder-review your first operating week within 48 hours. And if MowGo doesn't make you more organized in 30 days, we refund you. Jobber doesn't offer that.")}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3">

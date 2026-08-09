@@ -57,7 +57,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 - Yelp: lawn care businesses with < 10 reviews (small, likely no software)
 - Facebook group members who mention scheduling problems
 
-**Script:** "Saw your lawn care business on Google Maps. I built MowGo — dead simple scheduling + invoicing for small lawn care crews. Free tier (10 clients, no credit card). Would you be open to trying it and giving feedback? Happy to hop on a 5-min call."
+**Script:** "Saw your lawn care business on Google Maps. I built MowGo — dead simple scheduling + invoicing for small lawn care crews. Free tier (5 clients, no credit card). Would you be open to trying it and giving feedback? Happy to hop on a 5-min call."
 
 ### Channel 3: SEO (long game)
 **Target keywords:**
@@ -116,7 +116,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
 > "Most lawn care business owners run their schedule from texts, memory, and a notebook. They lose $400+/month in missed appointments. Jobber costs $119/month and is built for 10-person operations. MowGo is $39/month and does exactly what a 1-3 person crew needs."
 
 ### Key differentiators
-1. **Free tier** — 10 clients, no credit card
+1. **Free tier** — 5 clients, no credit card
 2. **Rain delay** — one button reschedules everything (works for any weather/service disruption)
 3. **$39 Solo** — includes what Jobber charges $119 for
 4. **No per-user fees** — Jobber charges $29/extra user

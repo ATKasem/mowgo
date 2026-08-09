@@ -93,7 +93,7 @@ export default function Subscribe() {
       annualPrice: '1990',
       features: [
         'Everything in Crew',
-        'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
+        'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
         'Seasonal packs: spring pricing benchmarks, route templates',
         'Priority text-first support',
       ],

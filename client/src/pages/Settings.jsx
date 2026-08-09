@@ -351,7 +351,7 @@ export default function Settings() {
         {!isDemoMode() && ['solo', 'crew', 'premium'].includes(profile?.tier) && conciergeClaimed === false && (
           showConcierge ? <ConciergeSetup onDone={() => { setConciergeClaimed(true); setShowConcierge(false); }} /> : (
             <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-brand/30">
-              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup: we import your clients and pre-schedule your first 30 days.")}</p>
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup: we import your clients and founder-review your first operating week.")}</p>
               <button type="button" className="btn-primary whitespace-nowrap" onClick={() => setShowConcierge(true)}>{conciergeTr('Claim it')}</button>
             </div>
           )

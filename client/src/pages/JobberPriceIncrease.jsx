@@ -11,7 +11,7 @@ const jobberPlans = [
 
 const whatToLookFor = [
   { icon: DollarSign, title: 'No Per-User Fees', desc: 'Your pricing should not double just because you added a crew member.' },
-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One-tap rescheduling that actually moves your whole schedule. Not just a note field.' },
+  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'MowGo suggests a dry date; you choose which jobs to move and confirm before clients are notified.' },
   { icon: Smartphone, title: 'Mobile-First Design', desc: 'Built for the truck, not the office. Fast, simple, works on any phone.' },
   { icon: Wifi, title: 'Offline Mode', desc: 'Spotty cell service in rural areas? Your app should keep working without internet.' },
   { icon: Gift, title: 'Free Tier That Is Actually Useful', desc: 'Start with real features for free. Not a 14-day trial that requires a credit card.' },
@@ -21,7 +21,7 @@ const comparisonRows = [
   { feature: 'Monthly price (solo operator)', mowgo: '$39/mo', jobber: '$139/mo (Connect)' },
   { feature: 'Per-user fees', mowgo: 'None', jobber: '$29/mo per additional user' },
   { feature: 'Free tier', mowgo: 'Yes — 5 clients, forever', jobber: '14-day trial only' },
-  { feature: 'Rain delay auto-reschedule', mowgo: 'Yes — one tap', jobber: 'No built-in rain delay' },
+  { feature: 'Rain delay owner-confirmed move', mowgo: 'Yes — you confirm the move', jobber: 'No built-in rain delay' },
   { feature: 'Offline mode', mowgo: 'Yes — works without cell service', jobber: 'Limited offline support' },
   { feature: 'Mobile-first design', mowgo: 'Yes — built for the truck', jobber: 'Desktop-first, mobile feels secondary' },
   { feature: 'One-tap invoicing', mowgo: 'Yes — automatic on job complete', jobber: 'Manual invoicing workflow' },

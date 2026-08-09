@@ -24,7 +24,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
 
 // true = MowGo wins this row, false = ProBase wins, 'tie' = both have it
 const features = [
-  { label: 'Rain delay auto-reschedule', desc: 'One tap moves today\u2019s route to tomorrow', mowgo: true, probase: false, star: true },
+  { label: 'Rain delay owner-confirmed move', desc: 'MowGo suggests a dry date; you choose jobs and confirm the move', mowgo: true, probase: false, star: true },
   { label: 'Offline mode', desc: 'Keep working with no cell service, syncs later', mowgo: true, probase: false },
   { label: 'Installable web app (PWA)', desc: 'Works on iPhone, Android, and desktop from the home screen', mowgo: true, probase: true },
   { label: 'QuickBooks / accounting sync', desc: 'Via Zapier webhooks (ProBase: \u201cnot designed for businesses that need accounting sync\u201d)', mowgo: true, probase: false },

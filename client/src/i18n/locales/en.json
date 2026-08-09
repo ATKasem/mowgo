@@ -1222,7 +1222,11 @@
     "retry": "Retry",
     "refer_a_crew_earn_a_free_month_when_they_subscribe": "Refer a crew, earn a free month when they subscribe.",
     "get_your_referral_code": "Get your referral code",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "most_crews_are_set_up_in_48h_your_clients_imported_first_operating_week_": "Most crews are set up in 48h — your clients imported, first operating week founder-reviewed.",
+    "close": "Close",
+    "claim_it": "Claim it",
+    "maybe_later": "Maybe later"
   },
   "reviewPrompt": {
     "leave_a_review": "Leave a Review",
@@ -1272,7 +1276,8 @@
     "see_plans": "See plans",
     "maybe_later": "Maybe later",
     "close": "Close",
-    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled."
+    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled.",
+    "free_setup_we_import_your_clients_and_founder_review_your_first_operating_week": "Free setup: we import your clients and founder-review your first operating week."
   },
   "booking": {
     "book_a_service": "Book a lawn care service",

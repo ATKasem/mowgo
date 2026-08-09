@@ -12,14 +12,14 @@ const painPoints = [
 ];
 
 const solutions = [
-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One tap moves your entire schedule forward when it rains. Clients get notified automatically. Included on every plan — even free.', color: 'from-emerald-500 to-green-500' },
+  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'MowGo suggests a dry date; you choose which jobs to move and confirm before clients are notified. Included on every plan — even free.', color: 'from-emerald-500 to-green-500' },
   { icon: Wifi, title: 'Offline Mode', desc: 'MowGo works without internet. Rural areas, bad signal, doesn\'t matter. Your data syncs when you\'re back online.', color: 'from-teal-500 to-cyan-500' },
   { icon: Shield, title: '$39 Flat Pricing', desc: 'Solo plan: $39/mo. That\'s it. No per-user fees, no hidden charges, no "gotcha" upsells. Unlimited clients and jobs.', color: 'from-amber-500 to-orange-500' },
   { icon: Sprout, title: 'Your Data Is Yours', desc: 'We don\'t sell your customer data to advertisers. You are the customer, not the product. Full data export whenever you want.', color: 'from-violet-500 to-purple-500' },
 ];
 
 const comparisons = [
-  { feature: 'Rain delay auto-reschedule', mowgo: true, lawnpro: false },
+  { feature: 'Rain delay owner-confirmed move', mowgo: true, lawnpro: false },
   { feature: 'Offline mode', mowgo: true, lawnpro: false },
   { feature: 'Unlimited clients on Solo', mowgo: true, lawnpro: false },
   { feature: 'Client notes & gate codes', mowgo: true, lawnpro: true },

@@ -1295,7 +1295,11 @@
     "retry": "Reintentar",
     "refer_a_crew_earn_a_free_month_when_they_subscribe": "Recomienda a una cuadrilla y gana un mes gratis cuando se suscriban.",
     "get_your_referral_code": "Obtén tu código de referencia",
-    "dismiss": "Cerrar"
+    "dismiss": "Cerrar",
+    "most_crews_are_set_up_in_48h_your_clients_imported_first_operating_week_": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y revisamos tu primera semana operativa.",
+    "close": "Cerrar",
+    "claim_it": "Actívalo",
+    "maybe_later": "Más tarde"
   },
   "reviewPrompt": {
     "leave_a_review": "Dejar una reseña",
@@ -1345,7 +1349,8 @@
     "see_plans": "Ver planes",
     "maybe_later": "Más tarde",
     "close": "Cerrar",
-    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y programamos tus primeros 30 días."
+    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y programamos tus primeros 30 días.",
+    "free_setup_we_import_your_clients_and_founder_review_your_first_operating_week": "Configuración gratis: importamos tus clientes y revisamos tu primera semana operativa."
   },
   "booking": {
     "book_a_service": "Agenda un servicio de jardinería",

@@ -17,7 +17,7 @@ I'm a dev, so I built her something. Spent 4 weeks on it. Here's what I learned:
 
 **What I got right:**
 - Mobile-first. She's on her phone all day. The desktop version is an afterthought.
-- Free tier with 10 clients. She wouldn't even look at it if there wasn't a free option.
+- Free tier with 5 clients. She wouldn't even look at it if there wasn't a free option.
 - One-button rain delay. OK weather is unpredictable. Pushing everything to tomorrow with one tap.
 
 **What I got wrong:**
@@ -25,7 +25,7 @@ I'm a dev, so I built her something. Spent 4 weeks on it. Here's what I learned:
 - Built a fancy dashboard. She just wants "who's next and did they pay."
 - Assumed she'd use Stripe. Half her clients pay cash.
 
-**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, $39/mo for unlimited.
+**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, 5 clients; Solo is $39/mo for unlimited.
 
 **What I want to know from you:** If you run a service business, what's your current scheduling system? What would it take for you to switch?
 
@@ -81,7 +81,7 @@ Quick comparison for a 2-person team:
 
 Jobber is great for 5+ person operations with an office manager. For a solo landscaper or 2-person crew, it's overkill and overpriced.
 
-Happy to share more if you're interested — free tier (10 clients, no card needed).
+Happy to share more if you're interested — free tier (5 clients, no card needed).
 ```
 
 ---
@@ -115,7 +115,7 @@ Hi [Name],
 Saw your comment in [Group Name] about [pain point they mentioned]. That exact problem is why I built MowGo.
 
 It's a simple scheduling + invoicing app for small lawn care crews:
-- Free tier (10 clients, no credit card)
+- Free tier (5 clients, no credit card)
 - Mobile-first (works on the phone in your pocket)
 - One-button "day off" for when things go sideways
 
@@ -187,7 +187,7 @@ That's the bar. Not "better than Jobber." Better than a notebook.
 ```
 If you run a small lawn care business and your scheduling system is "texts and memory" —
 
-I built something for you. Free tier, 10 clients, no credit card.
+I built something for you. Free tier, 5 clients, no credit card.
 
 DM me. I want 10 beta users who'll tell me what sucks about it.
 ```
@@ -202,7 +202,7 @@ DM me. I want 10 beta users who'll tell me what sucks about it.
 
 Stop losing $400/month to missed appointments and late payments. MowGo handles scheduling, routing, and invoicing — built for 1-3 person lawn care crews.
 
-[Start Free — 10 Clients, No Card]
+[Start Free — 5 Clients, No Card]
 ```
 
 ### Problem
@@ -231,7 +231,7 @@ There's a better way.
 ```
 | Free | Solo $39/mo | Crew $79/mo |
 |------|-------------|-------------|
-| 10 clients | Unlimited | Unlimited |
+| Free | 5 clients | Unlimited | Unlimited |
 | Scheduling | Everything in Free | Everything in Solo |
 | Routing | + Reminders | + QuickBooks sync |
 | Invoicing | + Client portal | + 3 team members |

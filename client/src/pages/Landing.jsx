@@ -8,7 +8,7 @@ import { startCheckout } from '../lib/payments';
 import { supabase } from '../lib/supabase';
 
 const features = [
-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
+  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'Oklahoma spring storms? MowGo suggests a dry date, you choose which jobs to move, and clients are notified after you confirm. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
   { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500' },
   { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. An invoice is created automatically — one tap copies a payment text. Clients pay via Venmo, Zelle, or Cash App. No processing fees.', color: 'from-amber-500 to-orange-500' },
@@ -22,7 +22,7 @@ const differentiators = [
 ];
 
 const plans = [
-  { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
+  { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay suggestions with owner confirmation', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
   {
     name: 'Solo',
     price: '39',
@@ -31,11 +31,11 @@ const plans = [
     desc: 'For independent landscapers with a full schedule',
     features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
     bonuses: [
-      { text: 'Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.', value: '$150 value' },
+      { text: 'Done-for-you setup: we import your clients and founder-review your first operating week within 48 hours.', value: '$150 value' },
       { text: '"What to Charge in Your City" report: real mow prices from your market.', value: '$49 value' },
       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
     ],
-    scarcity: 'Concierge setup is limited to 20 new businesses per week.',
+    scarcity: 'We personally walk Solo operators through their first operating week.',
     cta: 'Start Free Trial',
     highlight: true,
   },
@@ -48,7 +48,7 @@ const plans = [
     desc: 'Everything in Crew',
     features: [
       'Everything in Crew',
-      'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
+      'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
       'Seasonal packs: spring pricing benchmarks, route templates',
       'Priority text-first support',
     ],
@@ -68,7 +68,7 @@ const stats = [
 
 const faqs = [
   { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
-  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.' },
+  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On eligible paid plans, we import your clients and founder-review your first operating week within 48 hours. We confirm recurring patterns with you instead of changing your schedule automatically.' },
   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
   { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full." },
   { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
@@ -196,12 +196,12 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Rain on Tuesday. Eight clients to rebook.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("One tap fixes it.")}</span>
+              {tr("Rain on Tuesday. Eight clients to rebook.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("You confirm the move.")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place.")}
+              {tr("When Oklahoma rain hits, MowGo suggests a dry date. You choose which jobs to move, confirm once, and clients get notified. Jobs, routes, and invoices in one place.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>

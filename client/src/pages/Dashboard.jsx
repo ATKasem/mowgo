@@ -66,7 +66,7 @@ function ConciergeBookingPrompt() {
           <X className="w-5 h-5" />
         </button>
         <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white pr-6">
-          {tr('Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled.')}
+          {tr('Most crews are set up in 48h — your clients imported, first operating week founder-reviewed.')}
         </h3>
         <Link to="/app/settings" onClick={dismiss} className="btn-primary w-full">{tr('Claim it')}</Link>
         <button onClick={dismiss} className="block w-full text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors">

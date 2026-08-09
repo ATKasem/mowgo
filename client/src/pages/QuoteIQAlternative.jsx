@@ -4,7 +4,7 @@ import { Sprout, ArrowRight, Check, X, DollarSign, Users, CloudRain, Smartphone,
 import { Link } from 'react-router-dom';
 
 const whatToLookFor = [
-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One-tap rescheduling that actually moves your whole schedule. Not just a note field.' },
+  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'MowGo suggests a dry date; you choose which jobs to move and confirm before clients are notified.' },
   { icon: Users, title: 'No Per-User Fees', desc: 'Your pricing should not double just because you added a crew member.' },
   { icon: Gift, title: 'Free Tier That Is Actually Useful', desc: 'Start with real features for free. Not a 14-day trial that requires a credit card.' },
   { icon: Smartphone, title: 'Mobile-First Design', desc: 'Built for the truck, not the office. Fast, simple, works on any phone.' },
@@ -13,7 +13,7 @@ const whatToLookFor = [
 
 const comparisonRows = [
   { feature: 'Free tier', mowgo: 'Yes — 5 clients, forever', quoteiq: 'Discontinued (July 2026)' },
-  { feature: 'Rain delay auto-reschedule', mowgo: 'Yes — one tap', quoteiq: 'Manual reschedule only' },
+  { feature: 'Rain delay owner-confirmed move', mowgo: 'Yes — you confirm the move', quoteiq: 'Manual reschedule only' },
   { feature: 'Offline mode', mowgo: 'Yes — works without cell service', quoteiq: 'Not available' },
   { feature: 'Per-user fees', mowgo: 'None', quoteiq: 'Charges per user on paid plans' },
   { feature: 'Transaction fees', mowgo: 'No platform fee — Stripe\u2019s cut only', quoteiq: 'Payment processing fees apply' },
