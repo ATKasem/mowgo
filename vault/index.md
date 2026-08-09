@@ -1,13 +1,16 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-08-08
+> **Last updated:** 2026-08-09
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
-| 2026-08-08 | `2026-08-08_daily-sync.md` | **Main sync note** — Reddit Fri slot LANDED (#54 `1vi045u` posted 22:23Z, visibility-verified; next ≥ Aug 11, kit #55→#57→#56), SMS path FIXED at root (6 wrappers, dry-run verified — cron still PAUSED, 23 texts Day 6), stale client REDEPLOYED same-day (bundle `index-DPMXODzY.js` live), CF API tokens DEAD (10000 — re-auth needed), Codex quota until 05:19Z, LawnPro full profile + Jobber new ladder + LMN $297-697 + signld.ai 4th shill, drafts #55/#56/#57 banked |
+| 2026-08-09 | `2026-08-09_daily-sync.md` | **Main sync note** — Mon Aug 11 22:23Z Reddit slot LOCKED + ARMED (cron `4c195234eaa9`, kit #55→#57→#43; #56 DEAD; Sat slot correctly CANCELED — 96h gate held), **LawnBook = new #1 WATCH** (Free 15 clients / Pro $9.99 — first to undercut free tier AND price; counters named), $49 = new generalist floor (Solo $39 undercuts; Crew $79 cheapest multi-user), **drought national → level billing = #1 drought feature + missed-call text-back = AI-receptionist wedge**, "quick favors" = industry's August profit leak (copy line banked), Stripe all green + bundles CONVERGED, W32 digest delivered (state v44, seen 1587), QuoteIQ Beginner $74.99 + 1% fee, +3 leads (tracker → 20, 0 replies), astroturf +6 |
+| 2026-08-09 | `2026-08-09_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **17 new** — Intel ×5 runs + Sunday Deep-Dive W32 01:19Z, Stripe check, invoice reminders; ALL bot, Blasian silent Day 12) |
+| 2026-08-09 | `2026-08-09_channel-outreach-raw.md` | ⚠️ **#🌱mowgo-outreach GONE — 404 ×3 consecutive nightly syncs; deletion CONFIRMED**; 0 synced |
+| 2026-08-09 | `2026-08-09_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; watchdog holding Day 9) |
 | 2026-08-08 | — | 🗑️ **#🌱mowgo-outreach officially CLOSED** (404 ×3 consecutive syncs + 7am scan = deletion confirmed; last known: 55 msgs, newest Aug 5 01:48Z). Removed from the 7am scan channel list (Part-1 cron prompt); mowgo-leads skill curl example re-pointed to #🌱mowgo-leads `1529707289014042804`. Do NOT re-add. |
 | 2026-08-08 | `2026-08-08_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 13 new — Intel ×5 runs, Stripe check w/ stale-client flag, invoice reminders; ALL bot, Blasian silent Day 11) |
 | 2026-08-08 | `2026-08-08_channel-outreach-raw.md` | ⚠️ **#🌱mowgo-outreach still GONE — 404 ×2 consecutive nightly syncs; deletion effectively confirmed**; 0 synced |
@@ -69,11 +72,11 @@
 | MowGo iOS repo | `/opt/data/mowgo/ios-native/` |
 | Discord server | Blasian's server (guild: `1520146213750440147`) |
 | Discord #🌱mowgo | `1529248227394850916` |
-| Discord #🌱mowgo-outreach | ~~`1529711006023024680`~~ **⚠️ GONE — 404 Unknown Channel on 2026-08-07 AND 2026-08-08 syncs; deletion effectively confirmed** — references pending cleanup |
+| Discord #🌱mowgo-outreach | ~~`1529711006023024680`~~ **🗑️ GONE — 404 Unknown Channel on 2026-08-07, 08-08 AND 08-09 syncs; deletion CONFIRMED** — references pending cleanup |
 | Discord #🤝mowgo-cowork | `1529736297847980153` |
 | Cron config | `/opt/data/cron/jobs.json` |
 | Documentation | `/opt/data/mowgo/discord-403-and-cron-consolidation-2026-07-27.md` |
 
 ---
 
-*Index updated by MowGo nightly vault sync — 2026-08-08 02:00 UTC*
+*Index updated by MowGo nightly vault sync — 2026-08-09 02:00 UTC*
