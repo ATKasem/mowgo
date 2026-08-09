@@ -701,7 +701,6 @@
     "concierge_setup_is_limited_to_20_new_businesses_per_week": "La configuración asistida está limitada a 20 negocios nuevos por semana.",
     "free_launch_kit_278_value_included_with_solo": "Kit de lanzamiento gratis: valor de $278, incluido con Solo",
     "the_rain_proof_guarantee": "La garantía a prueba de lluvia",
-    "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "Creamos MowGo para los equipos de jardinería. Usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. Si no te sientes más organizado, te devolvemos el primer mes completo. Sin preguntas, sin trámites. Tus datos siempre son tuyos.",
     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Aplica para Solo. Sin cargos de configuración. Sin contratos. Cancela cuando quieras.",
     "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Los pagos con Stripe están activos. La optimización de rutas llega después — los primeros usuarios reciben funciones nuevas sin aumento de precio.",
     "card_checkout_is_live_route_optimization_ships_next_oklahoma_early_adopt": "El pago con tarjeta está activo. La optimización de rutas llega después: los primeros usuarios reciben funciones nuevas sin aumento de precio.",
@@ -748,7 +747,6 @@
     "on_solo_and_up_we_import_your_clients_and_pre_schedule_your_first_30_day": "Con Solo y superiores, importamos tus clientes y pre-agendamos tus primeros 30 días en 48 horas. La configuración está limitada a 20 negocios nuevos por semana.",
     "yes_offline_mode_keeps_working_in_rural_oklahoma_and_syncs_when_you_are_": "Sí. El modo sin conexión sigue funcionando en zonas rurales y se sincroniza cuando vuelves a tener señal.",
     "no_catch_cancel_anytime_if_solo_does_not_make_you_more_organized_in_30_d": "No hay truco. Cancela cuando quieras. Si Solo no te hace sentir más organizado en 30 días, te devolvemos tu primer mes completo.",
-    "solo_costs_price_and_is_built_for_the_1_020_oklahoma_crews_who_don_t_nee": "Solo cuesta {{price}} y está hecho para las más de 1,020 cuadrillas de Oklahoma que no necesitan un sistema empresarial de {{competitorPrice}}.",
     "census_county_business_patterns_2023": "Census County Business Patterns 2023",
     "mowgo_operator": "Operador de MowGo",
     "why_should_i_pay_yearly": "¿Por qué pagar anualmente?",
@@ -764,7 +762,9 @@
     "jobber_grow": "Jobber Grow",
     "jobber_grow_is_139_mo_99_mo_billed_annually_plus_29_mo_per_additional_us": "Jobber Grow cuesta $139/mes ($99/mes facturado anualmente) más $29/mes por cada usuario adicional. Las apps de LawnPro están activas, pero no ofrecen retraso por lluvia, modo sin conexión ni modo oscuro.",
     "no_catch_cancel_anytime_14_day_free_trial_30_day_money_back_guarantee_if": "Sin trucos. Cancela cuando quieras. Prueba gratuita de 14 días. Garantía de devolución de 30 días. Si Solo no te hace más organizado en 30 días, te reembolsamos el primer mes completo.",
-    "solo_costs_less_than_one_missed_job_solo_is_39_mo_under_1_for_any_crew_b": "Solo cuesta menos que un trabajo perdido. Solo cuesta $39/mes — menos del 1% para cualquier equipo que facture más de $3,900/mes."
+    "solo_costs_less_than_one_missed_job_solo_is_39_mo_under_1_for_any_crew_b": "Solo cuesta menos que un trabajo perdido. Solo cuesta $39/mes — menos del 1% para cualquier equipo que facture más de $3,900/mes.",
+    "solo_costs_price_and_is_built_for_crews_who_don_t_need_a_competitorprice": "Solo cuesta {{price}} y está hecho para cuadrillas que no necesitan un sistema empresarial de {{competitorPrice}}.",
+    "we_built_mowgo_for_crews_like_yours_use_solo_for_30_days_send_10_invoice": "Creamos MowGo para cuadrillas como la tuya. Usa Solo durante 30 días, envía 10 facturas y agenda 5 clientes recurrentes. Si no te sientes más organizado, te reembolsamos tu primer mes completo. Sin preguntas, sin vueltas. Tus datos siempre son tuyos."
   },
   "login": {
     "something_went_wrong_please_try_again": "Algo salió mal. Inténtalo de nuevo.",

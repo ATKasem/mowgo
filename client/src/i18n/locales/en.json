@@ -666,7 +666,6 @@
     "concierge_setup_is_limited_to_20_new_businesses_per_week": "Concierge setup is limited to 20 new businesses per week.",
     "free_launch_kit_278_value_included_with_solo": "Free Launch Kit — $278 value, included with Solo",
     "the_rain_proof_guarantee": "The Rain-Proof Guarantee",
-    "we_built_mowgo_for_oklahoma_crews_use_solo_for_30_days_send_10_invoices_": "We built MowGo for lawn crews. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.",
     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime.",
     "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Stripe payments are live. Route optimization ships next — early adopters get new features at no price increase.",
     "card_checkout_is_live_route_optimization_ships_next_oklahoma_early_adopt": "Card checkout is live. Route optimization ships next — early adopters get new features at no price increase.",
@@ -695,7 +694,6 @@
     "free_for_your_first_5_clients_forever_no_credit_card_rain_delay_scheduli": "Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.",
     "on_solo_and_up_we_import_your_clients_and_pre_schedule_your_first_30_day": "On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.",
     "yes_offline_mode_keeps_working_in_rural_oklahoma_and_syncs_when_you_are_": "Yes. Offline mode keeps working in rural areas and syncs when you are back in range.",
-    "solo_costs_price_and_is_built_for_the_1_020_oklahoma_crews_who_don_t_nee": "Solo costs {{price}} and is built for the 1,020+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.",
     "census_county_business_patterns_2023": "Census County Business Patterns 2023",
     "mowgo_operator": "MowGo operator",
     "why_should_i_pay_yearly": "Why should I pay yearly?",
@@ -712,7 +710,9 @@
     "jobber_grow_is_139_mo_99_mo_billed_annually_plus_29_mo_per_additional_us": "Jobber Grow is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.",
     "solo_costs_less_than_one_missed_job_solo_is_39_mo_under_1_for_any_crew_b": "Solo costs less than one missed job. Solo is $39/mo — under 1% for any crew billing over $3,900/mo.",
     "no_catch_cancel_anytime_14_day_free_trial_30_day_money_back_guarantee_if": "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full.",
-    "applies_to_solo_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime."
+    "applies_to_solo_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime.",
+    "solo_costs_price_and_is_built_for_crews_who_don_t_need_a_competitorprice": "Solo costs {{price}} and is built for crews who don't need a {{competitorPrice}} enterprise system.",
+    "we_built_mowgo_for_crews_like_yours_use_solo_for_30_days_send_10_invoice": "We built MowGo for crews like yours. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always."
   },
   "login": {
     "something_went_wrong_please_try_again": "Something went wrong. Please try again.",

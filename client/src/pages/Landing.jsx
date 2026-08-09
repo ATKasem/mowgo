@@ -372,7 +372,7 @@ export default function Landing() {
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Know what you pay every month")}</h2>
             <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Pay only when your client list grows. Cancel anytime.")}</p>
-            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for the 1,020+ Oklahoma crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$200+/month' })}</p>
+            <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$200+/month' })}</p>
             <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
           </FadeIn>
           <div className="flex justify-center mb-6">
@@ -465,7 +465,7 @@ export default function Landing() {
             <div className="mt-10 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700 text-center">
               <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
               <h3 className="text-xl font-bold text-white mb-2">{tr('The Rain-Proof Guarantee')}</h3>
-              <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for Oklahoma crews. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
+              <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for crews like yours. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
               <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}{billingInterval === 'year' && <span> {tr("Annual? Unused months refunded.")}</span>}</p>
             </div>
           </FadeIn>
