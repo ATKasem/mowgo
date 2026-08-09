@@ -1172,14 +1172,15 @@ export async function saveProfile(profile) {
   if (!user) throw new Error('Not authenticated');
 
   const { business_name, phone, venmo_handle, cashapp_handle, zelle_handle, preferred_nav_app } = profile;
-  const { error } = await supabase.from('profiles').upsert({
-    id: user.id, business_name, phone, latitude, longitude,
+  const { data, error } = await supabase.from('profiles').update({
+    business_name, phone, latitude, longitude,
     preferred_nav_app: preferred_nav_app || null,
     venmo_handle: venmo_handle || null,
     cashapp_handle: cashapp_handle || null,
     zelle_handle: zelle_handle || null,
-  });
+  }).eq('id', user.id).select('id').single();
   if (error) throw error;
+  if (!data) throw new Error('Profile was not found');
   return { ...profile, business_name, phone, latitude, longitude };
 }
 

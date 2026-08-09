@@ -340,7 +340,7 @@ export default function Settings() {
                   {error}
                 </div>
               )}
-              <button type="submit" disabled={isLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-brand hover:!bg-brand-hover !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
+              <button type="submit" disabled={isLoading || locationLoading || profileLoading} className={`btn-primary w-full transition-all duration-300 ${saved ? '!bg-brand hover:!bg-brand-hover !shadow-emerald-200 dark:!shadow-emerald-900/30 shadow-lg' : ''}`}>
                 {saved ? <><CheckCircle className="w-4 h-4" />{tr("Saved")}</> : isLoading ? <><Loader2 className="w-4 h-4 animate-spin" />{tr("Saving...")}</> : <><Save className="w-4 h-4" />{tr("Save Changes")}</>}
               </button>
               <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] text-center">{tr("Changes sync across all your devices.")}</p>
