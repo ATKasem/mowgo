@@ -17,6 +17,7 @@ const competitors = [
   { name: 'LawnBoss', price: 'New / TBD' },
   { name: 'SoloOp', price: '$0/mo' },
   { name: 'TurfHop', price: '$49–$129' },
+  { name: 'Servinix', price: '$300/mo (AI) · $20/tech (FSM)' },
 ];
 
 const features = [
@@ -369,6 +370,9 @@ export default function Compare() {
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Planado (new in the band) charges per user — $12–$29/user/mo — and has no invoicing or payments at all. MowGo's auto-invoice + SMS pay link is included at $39 flat.")}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {tr("Servinix ($300/mo AI Service Assistant flat) launches Sept 14 with an invoice-coupon switcher hook — but their entire stack starts above MowGo's total price. Commercial-focused (1–100 tech), not a direct lawn-crew competitor. Still worth noting: $300 for their AI layer alone exceeds MowGo's whole stack.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">{tr("LMN (design-build estimating) starts around $197/mo for quote-only and runs $297–$697/mo for the design-build band (verified Aug 8, 2026) — built for a different business than a 1–2 person mow crew. MowGo covers scheduling through payment at $39/$79 flat.")}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
