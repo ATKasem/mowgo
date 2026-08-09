@@ -231,7 +231,7 @@ There's a better way.
 ```
 | Free | Solo $39/mo | Crew $79/mo |
 |------|-------------|-------------|
-| Free | 5 clients | Unlimited | Unlimited |
+| 5 clients | Unlimited | Unlimited |
 | Scheduling | Everything in Free | Everything in Solo |
 | Routing | + Reminders | + QuickBooks sync |
 | Invoicing | + Client portal | + 3 team members |
