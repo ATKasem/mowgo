@@ -25,7 +25,7 @@ data class MoreUiState(
     val billingLoadingAction: String? = null,
     val billingError: String? = null,
     val billingMessage: String? = null,
-    val billingInterval: String = "month",
+    val billingInterval: String = "year",
     val pendingBillingUrl: String? = null,
     /// Set when a trial was just granted, before the async profile reload lands.
     /// Guards the double-tap window: a second grant_trial call would return

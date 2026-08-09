@@ -197,6 +197,11 @@
     "seasonal_packs_spring_pricing_benchmarks_route_templates": "Paquetes de temporada: referencias de precios de primavera, plantillas de rutas",
     "priority_text_first_support": "Soporte prioritario por texto",
     "1_990_year_2_months_free": "$1,990/año · 2 meses gratis",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "2_months_free": "2 meses gratis",
+    "390_year_2_months_free": "$390/año · 2 meses gratis",
+    "790_year_2_months_free": "$790/año · 2 meses gratis",
     "solo": "Solo",
     "crew": "Equipo",
     "unlimited_clients_jobs": "Clientes y trabajos ilimitados",
@@ -322,7 +327,8 @@
     "one_tap_optimized_routes_send_stops_to_your_maps_app": "Rutas optimizadas con un solo toque + envía paradas a tu aplicación de mapas",
     "start_free_trial": "Inicia la prueba gratis",
     "planado_new_in_the_band_charges_per_user_12_29_user_mo_and_has_no_invoic": "Planado (nuevo en el mercado) cobra por usuario — $12–$29/usuario/mes — y no tiene facturación ni pagos. La facturación automática de MowGo + enlace de pago por SMS está incluida a $39 fijos.",
-    "service_autopilot_s_49_mo_is_one_mobile_license_a_2_person_crew_runs_199": "Los $49/mes de Service Autopilot son UNA licencia móvil — un equipo de 2 personas paga $199+/mes con tarifa de registro y facturación solo anual. MowGo Crew cuesta $79 fijos, todo el equipo incluido."
+    "service_autopilot_s_49_mo_is_one_mobile_license_a_2_person_crew_runs_199": "Los $49/mes de Service Autopilot son UNA licencia móvil — un equipo de 2 personas paga $199+/mes con tarifa de registro y facturación solo anual. MowGo Crew cuesta $79 fijos, todo el equipo incluido.",
+    "billing_interval": "Período de facturación"
   },
   "ruunlyComparison": {
     "route_optimization": "Optimización de rutas",

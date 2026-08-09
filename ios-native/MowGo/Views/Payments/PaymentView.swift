@@ -158,7 +158,7 @@ struct SubscriptionPlanCard: View {
     let tier: String
     let isCurrent: Bool
     var userTier: String = "free"
-    var billingInterval: String = "month"
+    var billingInterval: String = "year"
     /// True when this user already used their 14-day app trial (server-side
     /// one-shot) — flips the button between trial-start and checkout.
     var userHasUsedTrial: Bool = false

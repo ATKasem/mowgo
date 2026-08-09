@@ -92,7 +92,7 @@ export default function Landing() {
   const { tr, t, i18n } = useLocalizedText('landing');
   const navigate = useNavigate();
   const [paymentError, setPaymentError] = useState('');
-  const [billingInterval, setBillingInterval] = useState('month');
+  const [billingInterval, setBillingInterval] = useState('year');
   const [kitOpen, setKitOpen] = useState(false);
   const [testimonials, setTestimonials] = useState([]);
   const errorTimerRef = useRef(null);
@@ -378,16 +378,16 @@ export default function Landing() {
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-1 gap-1">
               <button
-                onClick={() => setBillingInterval('month')}
-                className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'month' ? 'bg-brand text-white shadow' : 'text-[var(--color-text-secondary)] dark:text-gray-300 hover:text-[var(--color-text-primary)]'}`}
-              >
-                {tr("Monthly")}
-              </button>
-              <button
                 onClick={() => setBillingInterval('year')}
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'year' ? 'bg-brand text-white shadow' : 'text-[var(--color-text-secondary)] dark:text-gray-300 hover:text-[var(--color-text-primary)]'}`}
               >
                 {tr("Annual")} <span className={`ml-1 text-[11px] font-bold ${billingInterval === 'year' ? 'text-white/90' : 'text-brand'}`}>{tr("2 months free")}</span>
+              </button>
+              <button
+                onClick={() => setBillingInterval('month')}
+                className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'month' ? 'bg-brand text-white shadow' : 'text-[var(--color-text-secondary)] dark:text-gray-300 hover:text-[var(--color-text-primary)]'}`}
+              >
+                {tr("Monthly")}
               </button>
             </div>
           </div>

@@ -678,7 +678,7 @@ struct SubscriptionView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject var auth: AuthService
-    @State private var billingInterval = "month"
+    @State private var billingInterval = "year"
     let currentTier: String
 
     /// When true, Free card is hidden (user is already above Free).
@@ -731,18 +731,18 @@ struct SubscriptionView: View {
 
                         VStack(spacing: 4) {
                             Picker("Billing interval", selection: $billingInterval) {
-                                Text("Month").tag("month")
                                 Text("Annual").tag("year")
+                                Text("Month").tag("month")
                             }
                             .pickerStyle(.segmented)
                             .tint(MowGoTheme.deepGreen)
 
                             HStack {
-                                Color.clear
-                                    .frame(maxWidth: .infinity)
                                 Text("2 months free")
                                     .font(.caption)
                                     .foregroundColor(MowGoTheme.deepGreen)
+                                    .frame(maxWidth: .infinity)
+                                Color.clear
                                     .frame(maxWidth: .infinity)
                             }
                         }

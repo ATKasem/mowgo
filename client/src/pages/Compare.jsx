@@ -58,8 +58,8 @@ const data = {
 };
 
 const mowgoTiers = [
-  { name: 'Solo', price: '$39/mo', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
-  { name: 'Crew', price: '$79/mo', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
+  { name: 'Solo', price: '$39/mo', annualPrice: '$390/year · 2 months free', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
+  { name: 'Crew', price: '$79/mo', annualPrice: '$790/year · 2 months free', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
   {
     name: 'Premium',
     price: '$199/mo',
@@ -87,6 +87,7 @@ export default function Compare() {
   const { tr, t, i18n } = useLocalizedText('compare');
   const navigate = useNavigate();
   const [checkoutError, setCheckoutError] = useState('');
+  const [billingInterval, setBillingInterval] = useState('year');
   const checkoutPendingRef = useRef(false);
   usePageTitle(tr('seo.title'), tr('seo.description'));
 
@@ -110,12 +111,12 @@ export default function Compare() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         localStorage.setItem('mowgo_plan_intent', plan.toLowerCase());
-        localStorage.setItem('mowgo_interval_intent', 'month');
+        localStorage.setItem('mowgo_interval_intent', billingInterval);
         localStorage.setItem('mowgo_intent_time', String(Date.now()));
-        navigate(`/login?mode=signup&plan=${plan.toLowerCase()}&interval=month`);
+        navigate(`/login?mode=signup&plan=${plan.toLowerCase()}&interval=${billingInterval}`);
         return;
       }
-      const result = await startCheckout(plan.toLowerCase(), 'month');
+      const result = await startCheckout(plan.toLowerCase(), billingInterval);
       if (result?.error) setCheckoutError(result.error);
     } catch (error) {
       setCheckoutError(error.message || tr('Payment failed'));
@@ -235,12 +236,31 @@ export default function Compare() {
       <section className="max-w-4xl mx-auto px-4 pb-20" aria-labelledby="mowgo-tier-heading">
         <h2 id="mowgo-tier-heading" className="text-2xl md:text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-8">{tr('Compare MowGo plans')}</h2>
         {checkoutError && <p role="alert" className="mb-5 text-center text-sm font-medium text-red-600 dark:text-red-400">{checkoutError}</p>}
+        <div className="flex justify-center mb-8">
+          <div role="group" aria-label={tr("Billing interval")} className="inline-flex items-center rounded-xl bg-gray-100 dark:bg-gray-800 p-1 gap-1">
+            <button
+              type="button"
+              aria-pressed={billingInterval === 'year'}
+              onClick={() => setBillingInterval('year')}
+              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'year' ? 'bg-emerald-600 text-white shadow' : 'text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+            >
+              {tr("Annual")} <span className={`ml-1 text-[11px] font-bold ${billingInterval === 'year' ? 'text-white/90' : 'text-emerald-600 dark:text-emerald-400'}`}>{tr("2 months free")}</span>
+            </button>
+            <button
+              type="button"
+              aria-pressed={billingInterval === 'month'}
+              onClick={() => setBillingInterval('month')}
+              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${billingInterval === 'month' ? 'bg-emerald-600 text-white shadow' : 'text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+            >
+              {tr("Monthly")}
+            </button>
+          </div>
+        </div>
         <div className="grid md:grid-cols-3 gap-5">
           {mowgoTiers.map(tier => (
             <div key={tier.name} className={`rounded-2xl border p-6 flex flex-col ${tier.name === 'Premium' ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/10' : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'}`}>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tr(tier.name)}</h3>
-              <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">{tr(tier.price)}</p>
-              {tier.annualPrice && <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">{tr(tier.annualPrice)}</p>}
+              <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">{tr(billingInterval === 'year' && tier.annualPrice ? tier.annualPrice : tier.price)}</p>
               <ul className="space-y-3 mt-5 flex-1">
                 {tier.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
               </ul>

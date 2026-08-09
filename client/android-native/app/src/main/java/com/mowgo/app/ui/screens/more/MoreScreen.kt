@@ -422,7 +422,7 @@ private fun BillingSettingsScreen(
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             val monthLabel = stringResource(R.string.more_month)
             val annualLabel = stringResource(R.string.more_annual)
-            listOf("month" to monthLabel, "year" to annualLabel).forEachIndexed { index, option ->
+            listOf("year" to annualLabel, "month" to monthLabel).forEachIndexed { index, option ->
                 SegmentedButton(
                     selected = billingInterval == option.first,
                     onClick = { setBillingInterval(option.first) },

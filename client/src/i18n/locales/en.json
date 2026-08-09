@@ -197,6 +197,11 @@
     "seasonal_packs_spring_pricing_benchmarks_route_templates": "Seasonal packs: spring pricing benchmarks, route templates",
     "priority_text_first_support": "Priority text-first support",
     "1_990_year_2_months_free": "$1,990/year · 2 months free",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "2_months_free": "2 months free",
+    "390_year_2_months_free": "$390/year · 2 months free",
+    "790_year_2_months_free": "$790/year · 2 months free",
     "solo": "Solo",
     "crew": "Crew",
     "unlimited_clients_jobs": "Unlimited clients & jobs",
@@ -306,7 +311,8 @@
     "seo_description": "Side-by-side pricing and feature comparison of lawn care software. Updated August 2026 from public pricing pages and hands-on testing.",
     "route_optimization": "Route Optimization",
     "one_tap_optimized_routes_send_stops_to_your_maps_app": "One-tap optimized routes + send stops to your maps app",
-    "start_free_trial": "Start Free Trial"
+    "start_free_trial": "Start Free Trial",
+    "billing_interval": "Billing interval"
   },
   "ruunlyComparison": {
     "route_optimization": "Route Optimization",
