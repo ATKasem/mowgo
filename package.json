@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "MowGo monorepo root — build entry for Cloudflare Pages Git integration.",
   "scripts": {
-    "build": "node scripts/check-functions.mjs && npm --prefix client run build"
+    "build": "node scripts/check-functions.mjs && npm --prefix client run build",
+    "test:concierge": "node --test client/src/lib/csv-import.test.js functions/api/_shared/concierge-policy.test.js functions/api/concierge-submit.test.js functions/api/admin/concierge.test.js functions/api/admin/concierge-migration.test.js"
   }
 }

@@ -4,7 +4,7 @@ import { Loader2, Upload } from 'lucide-react';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useAuth } from '../App';
 import { loadProfile } from '../lib/data';
-import { cleanClientRows, parseClientCsv } from '../lib/csv-import';
+import { prepareConciergeCsv } from '../lib/csv-import';
 
 // Concierge setup is a paid-plan perk. Gate lives HERE (not in callers) so
 // every entry point (Settings, Subscribe, the dashboard booking prompt) is
@@ -38,9 +38,9 @@ export default function ConciergeSetup({ onDone }) {
     return () => clearTimeout(timer.current);
   }, [rawText]);
   const parsed = useMemo(() => {
-    const result = parseClientCsv(parsedText);
-    return { ...result, ...cleanClientRows(result.rows) };
+    return prepareConciergeCsv(parsedText);
   }, [parsedText]);
+  const overClientLimit = parsed.rawValidRowCount > 70;
 
   function readFile(file) {
     if (!file) return;
@@ -69,14 +69,14 @@ export default function ConciergeSetup({ onDone }) {
     finally { setSubmitting(false); }
   }
 
-  if (success) return <div className="card p-6 text-center text-sm font-semibold text-brand">{alreadyExists ? tr("You're already in the concierge queue.") : tr("Request received — we'll set you up within 48 hours.")}</div>;
+  if (success) return <div className="card p-6 text-center text-sm font-semibold text-brand">{alreadyExists ? tr("You're already in the concierge queue.") : tr("Request received — we'll prepare your first operating week within 48 hours.")}</div>;
 
   if (tier === undefined) return null; // loading — avoid a flash of the wrong gate state
 
   if (!ALLOWED_TIERS.includes(tier)) {
     return (
       <div className="card p-6 text-center space-y-3">
-        <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Concierge setup is a Solo/Crew perk. Upgrade to claim it.')}</p>
+        <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Concierge setup is a paid-plan perk. Upgrade to claim it.')}</p>
         <Link to="/compare" className="btn-primary inline-flex">{tr('See plans')}</Link>
       </div>
     );
@@ -84,10 +84,10 @@ export default function ConciergeSetup({ onDone }) {
 
   return (
     <form onSubmit={submit} className="card p-5 space-y-5 text-left">
-      <div><h2 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Your done-for-you setup is included')}</h2><p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr('Tell us about your business: we import your clients within 48 hours.')}</p></div>
+      <div><h2 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Your done-for-you setup is included')}</h2><p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1">{tr('We import your clients and prepare your first operating week within 48 hours.')}</p></div>
       <div className="grid sm:grid-cols-2 gap-4">
         <div><label className="label">{tr('Business name')}</label><input className="input" value={businessName} maxLength={200} onChange={e => setBusinessName(e.target.value)} /></div>
-        <div><label className="label">{tr('Client count (optional)')}</label><input className="input" type="number" min="0" step="1" value={clientCount} onChange={e => setClientCount(e.target.value)} /></div>
+        <div><label className="label">{tr('Client count (optional)')}</label><input className="input" type="number" min="0" max="70" step="1" value={clientCount} onChange={e => setClientCount(e.target.value)} /></div>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
         <label onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); readFile(e.dataTransfer.files[0]); }} className={`border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer text-center ${dragging ? 'border-brand bg-emerald-50 dark:bg-emerald-950/20' : 'border-gray-200 dark:border-gray-700'}`}>
@@ -95,9 +95,9 @@ export default function ConciergeSetup({ onDone }) {
         </label>
         <div><label className="label">{tr('Paste')}</label><textarea className="input min-h-32 resize-y" value={rawText} onChange={e => setRawText(e.target.value)} placeholder={tr('Paste your client list (from Excel or CSV)')} /></div>
       </div>
-      {parsedText.trim() && <div className="space-y-3"><p className="text-sm font-semibold">{tr('{{count}} valid clients', { count: parsed.rows.length })}</p>{(parsed.cleaned > 0 || parsed.duplicates > 0) && <p className="text-xs text-emerald-600 dark:text-emerald-400">{tr("We'll organize your list automatically: {{cleaned}} rows tidied up, {{duplicates}} duplicates removed.", { cleaned: parsed.cleaned, duplicates: parsed.duplicates })}</p>}<div className="overflow-x-auto"><table className="w-full text-xs"><thead><tr className="text-left border-b dark:border-gray-700">{['Name','Address','Phone','Email','Rate'].map(h => <th key={h} className="p-2">{tr(h)}</th>)}</tr></thead><tbody>{parsed.rows.slice(0, 5).map((row, index) => <tr key={index} className="border-b dark:border-gray-800">{['name','address','phone','email','rate'].map(field => <td key={field} className="p-2">{row[field]}</td>)}</tr>)}</tbody></table></div>{parsed.errors.map(item => <p key={`${item.row}-${item.message}`} className="text-xs text-red-600 dark:text-red-400">{tr('Row {{row}}: {{message}}', { row: item.row, message: tr(item.message) })}</p>)}</div>}
+      {parsedText.trim() && <div className="space-y-3"><p className="text-sm font-semibold">{tr('{{count}} valid clients', { count: parsed.rawValidRowCount })}</p>{overClientLimit && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{tr('This file has {{count}} valid clients. Concierge setup accepts up to 70 per request.', { count: parsed.rawValidRowCount })}</p>}{(parsed.cleaned > 0 || parsed.duplicates > 0) && <p className="text-xs text-emerald-600 dark:text-emerald-400">{tr("We'll organize your list automatically: {{cleaned}} rows tidied up, {{duplicates}} duplicates removed.", { cleaned: parsed.cleaned, duplicates: parsed.duplicates })}</p>}<div className="overflow-x-auto"><table className="w-full text-xs"><thead><tr className="text-left border-b dark:border-gray-700">{['Name','Address','Phone','Email','Rate'].map(h => <th key={h} className="p-2">{tr(h)}</th>)}</tr></thead><tbody>{parsed.rows.slice(0, 5).map((row, index) => <tr key={index} className="border-b dark:border-gray-800">{['name','address','phone','email','rate'].map(field => <td key={field} className="p-2">{row[field]}</td>)}</tr>)}</tbody></table></div>{parsed.errors.map(item => <p key={`${item.row}-${item.message}`} className="text-xs text-red-600 dark:text-red-400">{tr('Row {{row}}: {{message}}', { row: item.row, message: tr(item.message) })}</p>)}</div>}
       {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-      <button className="btn-primary w-full" disabled={submitting || !businessName.trim() || parsed.rows.length < 1}>{submitting ? <><Loader2 className="w-4 h-4 animate-spin" />{tr('Submitting...')}</> : tr('Submit setup request')}</button>
+      <button className="btn-primary w-full" disabled={submitting || !businessName.trim() || parsed.rawValidRowCount < 1 || overClientLimit}>{submitting ? <><Loader2 className="w-4 h-4 animate-spin" />{tr('Submitting...')}</> : tr('Submit setup request')}</button>
     </form>
   );
 }

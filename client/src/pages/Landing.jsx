@@ -31,11 +31,11 @@ const plans = [
     desc: 'For independent landscapers with a full schedule',
     features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
     bonuses: [
-      { text: 'Done-for-you setup: we import your clients and founder-review your first operating week within 48 hours.', value: '$150 value' },
+      { text: 'We import your clients and prepare your first operating week within 48 hours.', value: '$150 value' },
       { text: '"What to Charge in Your City" report: real mow prices from your market.', value: '$49 value' },
       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
     ],
-    scarcity: 'We personally walk Solo operators through their first operating week.',
+    scarcity: 'Eligible paid plans include hands-on setup support.',
     cta: 'Start Free Trial',
     highlight: true,
   },
@@ -48,9 +48,7 @@ const plans = [
     desc: 'Everything in Crew',
     features: [
       'Everything in Crew',
-      'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
-      'Seasonal packs: spring pricing benchmarks, route templates',
-      'Priority text-first support',
+      'Premium concierge priority — your request moves to the front of the setup queue',
     ],
     cta: 'Start Premium',
     highlight: false,
@@ -68,7 +66,7 @@ const stats = [
 
 const faqs = [
   { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
-  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On eligible paid plans, we import your clients and founder-review your first operating week within 48 hours. We confirm recurring patterns with you instead of changing your schedule automatically.' },
+  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On eligible paid plans, we import your clients and prepare your first operating week within 48 hours.' },
   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
   { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full." },
   { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },

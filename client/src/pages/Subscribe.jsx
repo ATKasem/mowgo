@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabase';
 import { startCheckout } from '../lib/payments';
 import { useAuth } from '../App';
 import ConciergeSetup from '../components/ConciergeSetup';
+import ConciergeStatus from '../components/ConciergeStatus';
+import { isActiveConciergeRequest } from '../lib/concierge-request';
 
 function SubscribeNav({ tr }) {
   return (
@@ -71,18 +73,18 @@ function ReferralAsk({ tr }) {
 
 export default function Subscribe() {
   const { tr, t, i18n } = useLocalizedText('subscribe');
-  const { tr: conciergeTr } = useLocalizedText('concierge');
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
   const [status, setStatus] = useState(sessionId ? 'verifying' : 'cancelled');
   const [error, setError] = useState('');
-  const [conciergeClaimed, setConciergeClaimed] = useState(null);
+  const [conciergeRequest, setConciergeRequest] = useState(undefined);
   const [retry, setRetry] = useState(0);
   const [billingInterval, setBillingInterval] = useState('year');
   const [checkoutError, setCheckoutError] = useState('');
   const [checkoutPending, setCheckoutPending] = useState(false);
+  const activeConciergeRequest = isActiveConciergeRequest(conciergeRequest);
 
   const paidPlans = [
     { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
@@ -93,9 +95,7 @@ export default function Subscribe() {
       annualPrice: '1990',
       features: [
         'Everything in Crew',
-        'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
-        'Seasonal packs: spring pricing benchmarks, route templates',
-        'Priority text-first support',
+        'Premium concierge priority — your request moves to the front of the setup queue',
       ],
       cta: 'Start Premium',
     },
@@ -127,11 +127,11 @@ export default function Subscribe() {
   useEffect(() => {
     if (status !== 'success' || !user) return;
     let active = true;
-    supabase.from('concierge_requests').select('id').eq('user_id', user.id).maybeSingle()
+    supabase.rpc('get_my_concierge_request')
       .then(({ data, error: claimError }) => {
         if (!active) return;
         if (claimError) console.error('Concierge claim check:', claimError);
-        setConciergeClaimed(Boolean(data));
+        setConciergeRequest(data?.[0] || null);
       });
     return () => { active = false; };
   }, [status, user]);
@@ -198,8 +198,12 @@ export default function Subscribe() {
           </Link>
           </div>
           {user && <ReferralAsk tr={tr} />}
-          {user && conciergeClaimed === false && <ConciergeSetup onDone={() => setConciergeClaimed(true)} />}
-          {user && conciergeClaimed === true && <p className="text-sm text-gray-600 dark:text-gray-300">{conciergeTr("Your setup request is in — we'll be in touch within 48 hours.")}</p>}
+          {user && conciergeRequest !== undefined && !activeConciergeRequest && conciergeRequest?.status !== 'done' && (
+            conciergeRequest?.status === 'skipped'
+              ? <ConciergeStatus request={conciergeRequest} onRetry={() => setConciergeRequest(null)} />
+              : <ConciergeSetup onDone={setConciergeRequest} />
+          )}
+          {user && (activeConciergeRequest || conciergeRequest?.status === 'done') && <ConciergeStatus request={conciergeRequest} />}
         </div>
       </div>
     );

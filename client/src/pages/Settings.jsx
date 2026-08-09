@@ -10,7 +10,9 @@ import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle,
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 import ConciergeSetup from '../components/ConciergeSetup';
+import ConciergeStatus from '../components/ConciergeStatus';
 import TrialBanner from '../components/TrialBanner';
+import { isActiveConciergeRequest } from '../lib/concierge-request';
 
 function SectionHeader({ children }) {
   return (
@@ -34,7 +36,7 @@ export default function Settings() {
   const [resolvedLocation, setResolvedLocation] = useState('');
   const [locationError, setLocationError] = useState('');
   const [locationLoading, setLocationLoading] = useState(false);
-  const [conciergeClaimed, setConciergeClaimed] = useState(null);
+  const [conciergeRequest, setConciergeRequest] = useState(undefined);
   const [showConcierge, setShowConcierge] = useState(false);
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
@@ -73,11 +75,11 @@ export default function Settings() {
   useEffect(() => {
     if (isDemoMode() || !user) return;
     let active = true;
-    supabase.from('concierge_requests').select('id').eq('user_id', user.id).maybeSingle()
+    supabase.rpc('get_my_concierge_request')
       .then(({ data, error: claimError }) => {
         if (!active) return;
         if (claimError) console.error('Concierge claim check:', claimError);
-        setConciergeClaimed(Boolean(data));
+        setConciergeRequest(data?.[0] || null);
       });
     return () => { active = false; };
   }, [user]);
@@ -258,6 +260,8 @@ export default function Settings() {
 
   const isTeamOwner = profile?.tier === 'crew' && (profile?.role || 'owner') === 'owner';
   const owner = teamMembers.find(member => member.role === 'owner');
+  const conciergeEligible = ['solo', 'crew', 'premium'].includes(profile?.tier);
+  const activeConciergeRequest = isActiveConciergeRequest(conciergeRequest);
 
   return (
     <div>
@@ -348,14 +352,17 @@ export default function Settings() {
           )}
         </form>
 
-        {!isDemoMode() && ['solo', 'crew', 'premium'].includes(profile?.tier) && conciergeClaimed === false && (
-          showConcierge ? <ConciergeSetup onDone={() => { setConciergeClaimed(true); setShowConcierge(false); }} /> : (
-            <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-brand/30">
-              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup: we import your clients and founder-review your first operating week.")}</p>
-              <button type="button" className="btn-primary whitespace-nowrap" onClick={() => setShowConcierge(true)}>{conciergeTr('Claim it')}</button>
-            </div>
+        {!isDemoMode() && conciergeEligible && conciergeRequest !== undefined && !activeConciergeRequest && conciergeRequest?.status !== 'done' && (
+          showConcierge ? <ConciergeSetup onDone={(request) => { setConciergeRequest(request); setShowConcierge(false); }} /> : (
+            conciergeRequest?.status === 'skipped'
+              ? <ConciergeStatus request={conciergeRequest} onRetry={() => setShowConcierge(true)} />
+              : <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-brand/30">
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr('We import your clients and prepare your first operating week within 48 hours.')}</p>
+                  <button type="button" className="btn-primary whitespace-nowrap" onClick={() => setShowConcierge(true)}>{conciergeTr('Claim it')}</button>
+                </div>
           )
         )}
+        {!isDemoMode() && (activeConciergeRequest || conciergeRequest?.status === 'done') && <ConciergeStatus request={conciergeRequest} />}
 
         {/* Booking Link */}
         <div className="card p-5 space-y-3">

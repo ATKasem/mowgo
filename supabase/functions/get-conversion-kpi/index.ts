@@ -3,12 +3,13 @@
 //
 // Deploy: supabase functions deploy get-conversion-kpi
 //
-// Auth: same shared admin code as functions/api/admin/concierge.js
-// (x-admin-code header, timing-safe compare). Set via:
+// Auth: same layered operator auth as functions/api/admin/concierge.js
+// (shared code + Supabase bearer token + allowlisted user ID). Set via:
 //   supabase secrets set CONCIERGE_ADMIN_CODE=<same value as the CF Pages env var>
 //
 // Required env vars:
 //   CONCIERGE_ADMIN_CODE       — shared admin secret (same value as CF Pages)
+//   CONCIERGE_ADMIN_USER_IDS   — comma-separated Supabase user UUIDs
 // Supabase automatically provides SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -61,6 +62,15 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+    const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+    const allowedIds = (Deno.env.get("CONCIERGE_ADMIN_USER_IDS") ?? "").split(",").map(value => value.trim()).filter(Boolean);
+    const { data: { user }, error: userError } = await admin.auth.getUser(token);
+    if (!token || userError || !user || !allowedIds.includes(user.id)) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
 
     // All four metrics are computed in a single SQL aggregate (RPC
     // get_conversion_kpi, supabase/migrations/20260808120000_conversion_kpi_rpc.sql)

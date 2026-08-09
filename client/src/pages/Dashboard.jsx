@@ -1,4 +1,5 @@
 import useLocalizedText from '../i18n/useLocalizedText';
+import { isActiveOrDoneConciergeRequest } from '../lib/concierge-request';
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { loadJobs, loadInvoices, loadProfile } from '../lib/data';
@@ -32,16 +33,9 @@ function ConciergeBookingPrompt() {
     if (!profile || !profile.id || profile.tier === 'free' || dismissed) return;
     let active = true;
     (async () => {
-      const res = await supabase
-        .from('concierge_requests')
-        .select('id', { count: 'exact' })
-        .eq('user_id', profile.id)
-        .in('status', ['pending', 'importing', 'done']);
+      const res = await supabase.rpc('get_my_concierge_request');
       if (!active) return;
-      // RLS policy (014): FOR SELECT USING (auth.uid() = user_id).
-      // Postgres enforces RLS before counting — count reflects only rows
-      // the current user can see. Zero = no claim, >0 = has an active one.
-      setHasClaim(res.count > 0);
+      setHasClaim(isActiveOrDoneConciergeRequest(res.data?.[0]));
     })().catch(() => { if (active) setHasClaim(false); });
     return () => { active = false; };
   }, [profile?.id, profile?.tier, dismissed]);
@@ -66,7 +60,7 @@ function ConciergeBookingPrompt() {
           <X className="w-5 h-5" />
         </button>
         <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white pr-6">
-          {tr('Most crews are set up in 48h — your clients imported, first operating week founder-reviewed.')}
+          {tr('We import your clients and prepare your first operating week within 48 hours.')}
         </h3>
         <Link to="/app/settings" onClick={dismiss} className="btn-primary w-full">{tr('Claim it')}</Link>
         <button onClick={dismiss} className="block w-full text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors">

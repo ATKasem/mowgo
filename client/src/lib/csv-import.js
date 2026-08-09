@@ -171,3 +171,9 @@ export function parseClientCsv(text) {
   });
   return { rows, errors };
 }
+
+export function prepareConciergeCsv(text) {
+  const parsed = parseClientCsv(text);
+  const organized = cleanClientRows(parsed.rows);
+  return { ...parsed, ...organized, rawValidRowCount: parsed.rows.length };
+}
