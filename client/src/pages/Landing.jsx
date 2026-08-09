@@ -32,7 +32,7 @@ const plans = [
     features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
     bonuses: [
       { text: 'Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.', value: '$150 value' },
-      { text: '"What to Charge in Your City" report: real mow prices from your Oklahoma market.', value: '$49 value' },
+      { text: '"What to Charge in Your City" report: real mow prices from your market.', value: '$49 value' },
       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
     ],
     scarcity: 'Concierge setup is limited to 20 new businesses per week.',
@@ -58,7 +58,7 @@ const plans = [
 ];
 
 const stats = [
-  { value: '1,020+', label: 'Landscaping businesses in OK', suffix: 'Census County Business Patterns 2023' },
+  { value: '556k+', label: 'Landscaping businesses in the US', suffix: 'IBISWorld, 2026' },
   { value: '0', label: 'per-user fees on any plan', suffix: 'Solo is $39 flat. Crew is $79 flat. Premium is $199 flat.' },
   { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job. Solo is $39/mo — under 1% for any crew billing over $3,900/mo.' },
 ];
@@ -238,7 +238,7 @@ export default function Landing() {
       <section className="max-w-4xl mx-auto px-4 py-24">
         <FadeIn>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Built for Oklahoma crews,")} <span className="text-brand">{tr("not office managers")}</span></h2>
-          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built in OKC for the 1,020+ landscaping businesses across Oklahoma.")}</p>
+          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built by a lawn care operator who runs crews — for crews like yours.")}</p>
         </FadeIn>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color, soon }, i) => (
