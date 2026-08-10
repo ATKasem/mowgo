@@ -228,7 +228,7 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
         <div>
           <div className="flex items-baseline gap-2.5">
             <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">
-              {Number.isFinite(currentConditions?.currentTemp) ? `${Math.round(currentConditions.currentTemp)}°` : '—'}
+              {Number.isFinite(currentConditions?.currentTemp) ? `${Math.round(currentConditions.currentTemp)}°` : Number.isFinite(forecastDays[0]?.tempMax) ? `${Math.round(forecastDays[0].tempMax)}° ${tr('today forecast')}` : tr('Weather unavailable')}
             </p>
             {Number.isFinite(currentConditions?.windMph) && (
               <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
@@ -676,24 +676,6 @@ export default function Dashboard() {
             })}
           </div>
         )}
-      </div>
-
-      <div className="card p-4 mb-4">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div>
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr("Today's route")}</h3>
-            <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">{tr('{{count}} stops left · {{hours}} planned', { count: todayRoute.length, hours: `${Math.floor(plannedMinutesRemaining / 60)}h ${plannedMinutesRemaining % 60}m` })}</p>
-          </div>
-          <Link to="/app/today" className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline inline-flex items-center gap-1">{tr('Open route')}<ArrowRight className="w-3.5 h-3.5" /></Link>
-        </div>
-        {todayRoute.length === 0 ? <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('All stops are complete')}</p> : <div className="space-y-2">
-          {todayRoute.slice(0, 3).map((job, index) => <Link key={job.id} to={`/app/today?date=${encodeURIComponent(job.scheduled_date)}`} className="flex items-center gap-3 rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3 min-h-[52px]">
-            <span className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">{index + 1}</span>
-            <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">{job.clients?.name || tr('Next job')}</span><span className="block text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{job.scheduled_time || tr('Time not set')} · {job.duration_minutes || 0} min</span></span>
-            <ArrowRight className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
-          </Link>)}
-          {todayRoute.length > 3 && <Link to="/app/today" className="block text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline pt-1">{tr('View {{count}} more stops', { count: todayRoute.length - 3 })}</Link>}
-        </div>}
       </div>
 
       <div className="card p-4 mb-4">
