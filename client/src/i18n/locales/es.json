@@ -213,7 +213,16 @@
     "check_the_job_notes_for_real_visit_times_consider_travel_distance_and_pr": "Revisa las notas del trabajo para ver los tiempos reales de visita. Considera la distancia de traslado y el tamaño de la propiedad. El tiempo programado es una estimación — no es el tiempo real.",
     "how_is_this_calculated": "¿Cómo se calcula?",
     "mowgo_compares_this_visit_price_and_scheduled_time_with_other_eligible_c": "MowGo compara el precio de visita y el tiempo programado con otros clientes elegibles. Un cliente aparece aquí cuando tiene al menos dos trabajos completados y su tarifa estimada es menor tanto al 75% del promedio como a $50 por hora.",
-    "review_client": "Revisar cliente"
+    "review_client": "Revisar cliente",
+    "public_market_context": "Contexto de precios del mercado",
+    "public_pricing_guidance_varies_by_lawn_size_service_type_region_and_oper": "Las guías de precios públicas varían según el tamaño del césped, el tipo de servicio, la región y los costos operativos.",
+    "these_sources_provide_context_only_not_a_personalized_recommendation_or_": "Estas fuentes son solo de referencia — no son una recomendación personalizada ni una indicación para cambiar tu precio.",
+    "realgreen_pricing_guide": "Guía de precios de RealGreen",
+    "realgreen_pricing_guide_opens_in_new_tab": "Guía de precios de RealGreen (se abre en una pestaña nueva)",
+    "lawnpricing_market_data": "Datos de mercado de LawnPricing",
+    "lawnpricing_market_data_opens_in_new_tab": "Datos de mercado de LawnPricing (se abre en una pestaña nueva)",
+    "hmndp_operator_pricing_research": "Investigación de precios de operadores de HMNDP",
+    "hmndp_operator_pricing_research_opens_in_new_tab": "Investigación de precios de operadores de HMNDP (se abre en una pestaña nueva)"
   },
   "compare": {
     "compare_mowgo_plans": "Compara los planes de MowGo",

@@ -165,6 +165,18 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
             <summary className="cursor-pointer font-semibold select-none hover:text-[var(--color-text-primary)] dark:hover:text-white">{tr('How is this calculated?')}</summary>
             <p className="mt-2 leading-relaxed">{tr('MowGo compares this visit price and scheduled time with other eligible clients. A client appears here when they have at least two completed jobs and their estimated rate is below both 75% of the average and $50 per hour.')}</p>
           </details>
+          <details className="group text-xs text-[var(--color-text-secondary)]">
+            <summary className="cursor-pointer font-semibold select-none hover:text-[var(--color-text-primary)] dark:hover:text-white">{tr('Public market context')}</summary>
+            <div className="mt-2 space-y-2 leading-relaxed">
+              <p>{tr('Public pricing guidance varies by lawn size, service type, region, and operating costs.')}</p>
+              <p>{tr('These sources provide context only — not a personalized recommendation or direction to change your price.')}</p>
+              <ul className="space-y-1">
+                <li><a href="https://www.realgreen.com/blog/lawn-care-pricing-chart" target="_blank" rel="noreferrer" aria-label={tr('RealGreen pricing guide (opens in new tab)')} className="text-emerald-700 dark:text-emerald-300 underline hover:no-underline">{tr('RealGreen pricing guide')}</a></li>
+                <li><a href="https://lawnpricing.com/data/" target="_blank" rel="noreferrer" aria-label={tr('LawnPricing market data (opens in new tab)')} className="text-emerald-700 dark:text-emerald-300 underline hover:no-underline">{tr('LawnPricing market data')}</a></li>
+                <li><a href="https://hmndp.org/lawn-care-pricing-strategy/" target="_blank" rel="noreferrer" aria-label={tr('HMNDP operator pricing research (opens in new tab)')} className="text-emerald-700 dark:text-emerald-300 underline hover:no-underline">{tr('HMNDP operator pricing research')}</a></li>
+              </ul>
+            </div>
+          </details>
         </div>}
       </div>;
     })}
