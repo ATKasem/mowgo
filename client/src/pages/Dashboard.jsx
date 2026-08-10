@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { loadJobs, loadInvoices, loadProfile, loadTeamDashboard, loadLeads, loadClients, getWeatherForLocation, getDayConditions } from '../lib/data';
+import { loadJobs, loadInvoices, loadProfile, saveProfile, loadTeamDashboard, loadLeads, loadClients, getWeatherForLocation, getDayConditions } from '../lib/data';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { AuthContext } from '../App';
 import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X, CalendarDays, CloudRain, RefreshCw, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
@@ -179,7 +179,7 @@ function ReferralSatisfactionBanner() {
 // unavailable, and loaded all render inside the same card so weather context
 // never disappears just because the forecast is clear. Rain-risk content is
 // the only conditional part and always routes to Today's existing rain-delay flow.
-function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDayLabel, affectedCount, onRetry }) {
+function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDayLabel, affectedCount, onRetry, onUseLocation, locationError, locationSaving }) {
   const { tr } = useLocalizedText('dashboard');
   const weatherCode = currentConditions?.weatherCode;
   const condition = weatherCode === 0 ? tr('Clear')
@@ -209,10 +209,15 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
       )}
 
       {state === 'no_location' && (
-        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
-          {tr('Add your business location in Settings to see local weather.')}{' '}
-          <Link to="/app/settings" className="font-semibold text-brand-hover dark:text-emerald-400 hover:underline">{tr('Open Settings')}</Link>
-        </p>
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('See weather for your work area')}</p>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('MowGo asks for your location to show local weather and warn you when rain may affect your route. We use it for your business weather—not continuous tracking.')}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button type="button" onClick={onUseLocation} disabled={locationSaving} className="btn-primary text-sm min-h-[44px]">{locationSaving ? tr('Saving...') : tr('Use my location')}</button>
+            <Link to="/app/settings" className="text-sm font-semibold text-brand-hover dark:text-emerald-400 hover:underline">{tr('Enter location manually')}</Link>
+          </div>
+          {locationError && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{locationError}</p>}
+        </div>
       )}
 
       {state === 'unavailable' && (
@@ -317,6 +322,30 @@ export default function Dashboard() {
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [hasBusinessLocation, setHasBusinessLocation] = useState(null);
   const [weatherRetryKey, setWeatherRetryKey] = useState(0);
+  const [locationSaving, setLocationSaving] = useState(false);
+  const [locationError, setLocationError] = useState('');
+
+  function useMyLocation() {
+    if (!navigator.geolocation) {
+      setLocationError(tr('Location is not available in this browser. Enter it manually in Settings.'));
+      return;
+    }
+    setLocationSaving(true);
+    setLocationError('');
+    navigator.geolocation.getCurrentPosition(async position => {
+      try {
+        const nextProfile = { ...profile, latitude: position.coords.latitude, longitude: position.coords.longitude };
+        await saveProfile(nextProfile);
+        setProfile(nextProfile);
+        setWeatherRetryKey(value => value + 1);
+      } catch (error) {
+        setLocationError(error.message || tr('Could not save your location. Enter it manually in Settings.'));
+      } finally { setLocationSaving(false); }
+    }, () => {
+      setLocationSaving(false);
+      setLocationError(tr('We could not use your location. Enter it manually in Settings instead.'));
+    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -429,6 +458,9 @@ export default function Dashboard() {
       riskDayLabel={riskDayLabel}
       affectedCount={rainAffectedCount}
       onRetry={() => profile ? setWeatherRetryKey(k => k + 1) : setRetryKey(k => k + 1)}
+      onUseLocation={useMyLocation}
+      locationError={locationError}
+      locationSaving={locationSaving}
     />
   );
 
