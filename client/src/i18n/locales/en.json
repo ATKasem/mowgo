@@ -1248,6 +1248,12 @@
     "no_team_assignments_today": "No team assignments today"
   },
   "dashboard": {
+    "todays_route": "Today's route",
+    "count_stops_left_hours_planned": "{{count}} stops left · {{hours}} planned",
+    "open_route": "Open route",
+    "all_stops_are_complete": "All stops are complete",
+    "time_not_set": "Time not set",
+    "view_count_more_stops": "View {{count}} more stops",
     "revenue_today": "Revenue Today",
     "jobs_done": "jobs done",
     "outstanding": "Outstanding",

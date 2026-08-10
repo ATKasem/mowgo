@@ -1321,6 +1321,12 @@
     "no_team_assignments_today": "No hay asignaciones de equipo hoy"
   },
   "dashboard": {
+    "todays_route": "Ruta de hoy",
+    "count_stops_left_hours_planned": "{{count}} paradas pendientes · {{hours}} programadas",
+    "open_route": "Abrir ruta",
+    "all_stops_are_complete": "Todas las paradas están completas",
+    "time_not_set": "Hora no definida",
+    "view_count_more_stops": "Ver {{count}} paradas más",
     "revenue_today": "Ingresos Hoy",
     "jobs_done": "trabajos hechos",
     "outstanding": "Pendiente",
