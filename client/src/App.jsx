@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, createContext, useContext, Suspense, lazy } from 'react';
 import React from 'react';
-import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
 // Landing + Login stay statically imported — they're the initial-paint routes
 // for cold traffic (site root and /login) and must render with no extra chunk fetch.
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import useLocalizedText from './i18n/useLocalizedText';
 import i18n from './i18n';
 import InvoiceToast from './components/InvoiceToast';
+import { applyTheme, themeForRoute } from './lib/theme';
 
 // Everything else is route-level code-split — none of it is needed for the
 // initial paint, so it shouldn't cost cold traffic a 1MB+ download.
@@ -105,6 +106,16 @@ function PageLoading() {
       <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
+}
+
+// Marketing pages are dark-first for visitors with no saved preference.
+// A saved light/dark/system choice always wins, including on public routes.
+function RouteTheme() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    applyTheme(themeForRoute(pathname));
+  }, [pathname]);
+  return null;
 }
 
 // ===== Error Boundary =====
@@ -273,6 +284,7 @@ export default function App() {
   return (
     <ErrorBoundary>
     <HashRouter>
+      <RouteTheme />
       <AuthProvider>
         <SupabaseErrorRedirect />
         <ResumeCheckoutIntent />

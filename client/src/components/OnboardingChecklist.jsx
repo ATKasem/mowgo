@@ -24,7 +24,7 @@ async function fetchActivationProfile() {
   return profile;
 }
 
-export default function OnboardingChecklist() {
+export default function OnboardingChecklist({ showConcierge = true }) {
   const { tr } = useLocalizedText('onboarding');
   const [profile, setProfile] = useState(null);
   const [dismissed, setDismissed] = useState(() => localStorage.getItem(DISMISS_KEY) === '1');
@@ -46,7 +46,7 @@ export default function OnboardingChecklist() {
   }
 
   const allDone = Boolean(profile.first_client_at && profile.first_job_at && profile.first_invoice_at);
-  const conciergeEligible = CONCIERGE_TIERS.includes(profile.tier);
+  const conciergeEligible = showConcierge && CONCIERGE_TIERS.includes(profile.tier);
 
   // Fully activated (ever activated — timestamps are set once and never
   // cleared, so this doesn't re-nag after a client/job/invoice is deleted):

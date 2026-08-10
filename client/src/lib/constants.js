@@ -74,6 +74,11 @@ export const RECURRENCE_OPTIONS = [
 
 /** Default form values for new jobs and clients. */
 export const INITIAL_JOB_FORM = { client_id: '', title: 'Mow + Edge', scheduled_time: '09:00', duration_minutes: 120, recurrence: 'none', assigned_to: null };
+/** Paid tiers that include job assignment and team progress. */
+export const TEAM_ACCESS_TIERS = Object.freeze(['crew', 'premium']);
+export function hasTeamAccess(profile) {
+  return profile?.role === 'owner' && TEAM_ACCESS_TIERS.includes(profile?.tier);
+}
 export const INITIAL_CLIENT_FORM = { name: '', address: '', phone: '', email: '', rate: 0, service_notes: '', key_code: '', alarm_code: '', pet_instructions: '', tags: [] };
 
 /** Pre-built client tags — common labels lawn crews use to flag clients */

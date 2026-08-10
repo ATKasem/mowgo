@@ -894,6 +894,8 @@
     "find": "Find",
     "used_to_show_your_local_weather_so_rain_delay_knows_when_rain_is_coming_": "Used to show your local weather so Rain Delay knows when rain is coming at your location. Never shared with anyone.",
     "location_not_found_try_a_city_state_or_zip": "Location not found. Try a city, state, or ZIP.",
+    "location_changed_while_saving_retry_to_save_your_changes": "Location changed while saving. Retry to save your changes.",
+    "profile_saved_but_the_location_could_not_be_updated_try_finding_it_again": "Profile saved, but the location could not be updated. Try finding it again.",
     "remove_location": "Remove location",
     "saved": "Saved",
     "saving": "Saving...",
@@ -1199,7 +1201,11 @@
     "hold_off": "HOLD OFF",
     "spray": "Spray",
     "temp_f_wind_mph": "≤{{temp}}°F · ≤{{wind}} mph",
-    "set_business_location_to_see_conditions": "Set business location to see conditions"
+    "set_business_location_to_see_conditions": "Set business location to see conditions",
+    "conditions_are_unavailable_right_now": "Conditions are unavailable right now.",
+    "set_a_business_location_to_see_local_conditions": "Set a business location to see local conditions.",
+    "check_location_in_settings": "Check location in Settings",
+    "no_team_assignments_today": "No team assignments today"
   },
   "dashboard": {
     "revenue_today": "Revenue Today",
@@ -1220,7 +1226,20 @@
     "we_import_your_clients_and_prepare_your_first_operating_week_within_48_h": "We import your clients and prepare your first operating week within 48 hours.",
     "close": "Close",
     "claim_it": "Claim it",
-    "maybe_later": "Maybe later"
+    "maybe_later": "Maybe later",
+    "your_assigned_work": "Your assigned work",
+    "assigned_today": "Assigned Today",
+    "in_progress": "in progress",
+    "assigned_last_7_days": "Assigned Last 7 Days",
+    "view_today_s_route": "View today's route",
+    "team_progress_today": "Team Progress Today",
+    "manage_assignments": "Manage assignments",
+    "no_team_assignments_today": "No team assignments today",
+    "in_progress_or_done": "in progress or done",
+    "name_assignment_progress": "{{name}} assignment progress",
+    "team_progress_is_temporarily_unavailable": "Team progress is temporarily unavailable.",
+    "jobs_last_7_days": "Jobs Last 7 Days",
+    "unable_to_load_dashboard_profile": "Unable to load dashboard profile."
   },
   "reviewPrompt": {
     "leave_a_review": "Leave a Review",
@@ -1237,6 +1256,7 @@
     "done": "Done"
   },
   "concierge": {
+    "concierge_setup": "Concierge setup",
     "your_done_for_you_setup_is_included": "Your done-for-you setup is included",
     "business_name": "Business name",
     "client_count_optional": "Client count (optional)",
@@ -1278,6 +1298,8 @@
     "see_plans": "See plans",
     "maybe_later": "Maybe later",
     "close": "Close",
+    "we_could_not_check_your_concierge_status_you_can_still_claim_setup_or": "We could not check your concierge status. You can still claim setup, or try again.",
+    "try_again": "Try again",
     "we_import_your_clients_and_prepare_your_first_operating_week_within_48_h": "We import your clients and prepare your first operating week within 48 hours."
   },
   "booking": {

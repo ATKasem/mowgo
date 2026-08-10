@@ -7,6 +7,7 @@
 
 import { supabase, isDemoMode } from './supabase';
 import { demoJobs, demoClients, demoInvoices, demoTeamMembers, demoLeads } from './demoData';
+import { localDate } from './dashboard-metrics';
 
 // ===== In-memory demo state (shared across pages) =====
 let _jobs = [...demoJobs];
@@ -1348,7 +1349,7 @@ export async function removeTeamMember(memberId) {
  */
 export async function loadTeamDashboard(date) {
   if (isDemoMode()) {
-    const targetDate = date || new Date().toISOString().split('T')[0];
+    const targetDate = date || localDate();
     const currentMember = _teamMembers.find(m => m.id === _currentDemoUserId());
     if (!currentMember) return [];
     const bizId = currentMember.role === 'owner' ? currentMember.id : currentMember.business_id;
@@ -1376,7 +1377,7 @@ export async function loadTeamDashboard(date) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const targetDate = date || new Date().toISOString().split('T')[0];
+  const targetDate = date || localDate();
 
   // Get the business_id for this user
   const { data: profile, error: profileError } = await supabase

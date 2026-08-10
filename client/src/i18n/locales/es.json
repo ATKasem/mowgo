@@ -957,6 +957,8 @@
     "find": "Encontrar",
     "used_to_show_your_local_weather_so_rain_delay_knows_when_rain_is_coming_": "Se utiliza para mostrar el clima local para que Rain Delay sepa cuándo lloverá en su ubicación. Nunca compartido con nadie.",
     "location_not_found_try_a_city_state_or_zip": "Ubicación no encontrada. Pruebe con una ciudad, estado o código postal.",
+    "location_changed_while_saving_retry_to_save_your_changes": "La ubicación cambió mientras se guardaba. Vuelve a intentarlo para guardar tus cambios.",
+    "profile_saved_but_the_location_could_not_be_updated_try_finding_it_again": "El perfil se guardó, pero no se pudo actualizar la ubicación. Intenta buscarla de nuevo.",
     "remove_location": "Quitar ubicación",
     "saved": "Guardado",
     "saving": "Guardando...",
@@ -1272,7 +1274,11 @@
     "hold_off": "ESPERAR",
     "spray": "Fumigación",
     "temp_f_wind_mph": "≤{{temp}}°F · ≤{{wind}} mph",
-    "set_business_location_to_see_conditions": "Configura la ubicación del negocio para ver las condiciones"
+    "set_business_location_to_see_conditions": "Configura la ubicación del negocio para ver las condiciones",
+    "conditions_are_unavailable_right_now": "Las condiciones no están disponibles en este momento.",
+    "set_a_business_location_to_see_local_conditions": "Configura la ubicación del negocio para ver las condiciones locales.",
+    "check_location_in_settings": "Revisar ubicación en Configuración",
+    "no_team_assignments_today": "No hay asignaciones de equipo hoy"
   },
   "dashboard": {
     "revenue_today": "Ingresos Hoy",
@@ -1293,7 +1299,20 @@
     "we_import_your_clients_and_prepare_your_first_operating_week_within_48_h": "Importamos tus clientes y preparamos tu primera semana operativa en un plazo de 48 horas.",
     "close": "Cerrar",
     "claim_it": "Actívalo",
-    "maybe_later": "Más tarde"
+    "maybe_later": "Más tarde",
+    "your_assigned_work": "Tu trabajo asignado",
+    "assigned_today": "Asignados Hoy",
+    "in_progress": "en curso",
+    "assigned_last_7_days": "Asignados en los Últimos 7 Días",
+    "view_today_s_route": "Ver la ruta de hoy",
+    "team_progress_today": "Progreso del Equipo Hoy",
+    "manage_assignments": "Administrar asignaciones",
+    "no_team_assignments_today": "No hay asignaciones de equipo hoy",
+    "in_progress_or_done": "en curso o terminados",
+    "name_assignment_progress": "Progreso de asignaciones de {{name}}",
+    "team_progress_is_temporarily_unavailable": "El progreso del equipo no está disponible por ahora.",
+    "jobs_last_7_days": "Trabajos de los Últimos 7 Días",
+    "unable_to_load_dashboard_profile": "No se pudo cargar el perfil del panel."
   },
   "reviewPrompt": {
     "leave_a_review": "Dejar una reseña",
@@ -1310,6 +1329,7 @@
     "done": "Listo"
   },
   "concierge": {
+    "concierge_setup": "Configuración asistida",
     "your_done_for_you_setup_is_included": "Tu configuración hecha por nosotros está incluida",
     "business_name": "Nombre comercial",
     "client_count_optional": "Número de clientes (opcional)",
@@ -1351,6 +1371,8 @@
     "see_plans": "Ver planes",
     "maybe_later": "Más tarde",
     "close": "Cerrar",
+    "we_could_not_check_your_concierge_status_you_can_still_claim_setup_or": "No pudimos comprobar el estado de tu configuración asistida. Aún puedes solicitarla o intentarlo de nuevo.",
+    "try_again": "Intentar de nuevo",
     "we_import_your_clients_and_prepare_your_first_operating_week_within_48_h": "Importamos tus clientes y preparamos tu primera semana operativa en un plazo de 48 horas."
   },
   "booking": {

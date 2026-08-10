@@ -1,5 +1,7 @@
 // Demo data — lawn care clients, jobs, crew members, and invoices
-const today = new Date().toISOString().split('T')[0];
+import { localDate } from './dashboard-metrics';
+
+const today = localDate();
 
 export const demoClients = [
   { id: '1', name: 'Bill Henderson', address: '123 Oak St, Edmond, OK', latitude: 35.6528, longitude: -97.4787, phone: '405-555-0101', email: 'bill@email.com', rate: 50, service_notes: 'Mow front + back, edge driveway, trim hedges. Use mulching blade.', key_code: '4829', alarm_code: '', pet_instructions: '1 friendly golden retriever. Give treat on counter.', tags: ['vip'] },

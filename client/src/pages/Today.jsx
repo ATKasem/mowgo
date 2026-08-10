@@ -1,6 +1,8 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
+import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS, hasTeamAccess } from '../lib/constants';
+import { localDate } from '../lib/dashboard-metrics';
+import { dayConditionsView, teamProgressView } from '../lib/today-ux';
 import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, getDayConditions, sprayStatus, SPRAY_RULE, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
 import { buildRouteLink, buildSingleStopUrl } from '../lib/navLinks';
 import { optimizeRoute } from '../lib/optimizeRoute';
@@ -41,7 +43,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [searchParams] = useSearchParams();
   const [date, setDate] = useState(() => {
     if (searchParams.get('date')) return searchParams.get('date');
-    const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return localDate();
   });
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
@@ -69,6 +71,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   const [rainHistory, setRainHistory] = useState([]);
   const [weather, setWeather] = useState(null);
   const [dayConditions, setDayConditions] = useState(null);
+  const [conditionsLoading, setConditionsLoading] = useState(true);
   const [hasBusinessLocation, setHasBusinessLocation] = useState(null);
   const [rainDelaySaving, setRainDelaySaving] = useState(false);
   const [rainDelayError, setRainDelayError] = useState('');
@@ -106,6 +109,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
 
   useEffect(() => {
     let active = true;
+    setConditionsLoading(true);
     loadProfile().then(profile => {
       if (!active) return;
       const lat = profile?.latitude ?? profile?.lat;
@@ -114,10 +118,21 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       setHasBusinessLocation(hasLocation);
       setProfile(profile);
       if (profile?.preferred_nav_app) setNavApp(profile.preferred_nav_app);
-      if (!hasLocation) return;
+      if (!hasLocation) {
+        setConditionsLoading(false);
+        return;
+      }
       getWeatherForLocation(lat, lng).then(result => { if (active) setWeather(result); });
-      getDayConditions(lat, lng).then(result => { if (active) setDayConditions(result); });
-    }).catch(() => {});
+      getDayConditions(lat, lng)
+        .then(result => { if (active) setDayConditions(result); })
+        .catch(() => { if (active) setDayConditions(null); })
+        .finally(() => { if (active) setConditionsLoading(false); });
+    }).catch(() => {
+      if (active) {
+        setHasBusinessLocation(false);
+        setConditionsLoading(false);
+      }
+    });
     return () => { active = false; };
   }, []);
 
@@ -128,13 +143,15 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       rain: weather.daily.precipitation_probability_max?.[index] ?? 0,
     }));
   }, [weather]);
-  const todayWeatherDate = new Date().toLocaleDateString('en-CA');
+  const todayWeatherDate = localDate();
   const tomorrowWeatherDate = addDays(todayWeatherDate, 1);
   const bannerWeather = weatherDays.find(item => item.date === todayWeatherDate && item.rain >= 60)
     || weatherDays.find(item => item.date === tomorrowWeatherDate && item.rain >= 60);
   const suggestedDryDate = weatherDays.find(item => item.date >= tomorrow && item.rain < 60)?.date || null;
   // Hero-card day label (lowercase reads better mid-sentence: "Rain tomorrow — 4 jobs affected").
   const rainHeroDay = (bannerWeather?.date === tomorrowWeatherDate ? tr('tomorrow') : tr('today')).toLowerCase();
+  const conditionsView = dayConditionsView(hasBusinessLocation, conditionsLoading, dayConditions);
+  const teamProgress = teamProgressView(teamDashboard);
 
   function openRainDelay() {
     const ids = rainDelayCandidates.map(job => job.id);
@@ -220,18 +237,18 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     return () => { active = false; };
   }, []);
 
-  // Load team members when on crew tier
+  // Load team members on tiers that include team access.
   useEffect(() => {
     let active = true;
     async function loadTeam() {
       try {
         const profile = await loadProfile();
-        if (profile?.tier === 'crew') {
+        setIsCrewMember(profile?.role === 'crew');
+        if (hasTeamAccess(profile)) {
           const members = await loadTeamMembers();
           if (active) {
             setTeamMembers(members);
             setCanManageCrew((profile.role || 'owner') === 'owner');
-            setIsCrewMember(profile.role === 'crew');
           }
         }
       } catch (err) {
@@ -251,7 +268,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     async function loadDashboard() {
       try {
         const profile = await loadProfile();
-        if (profile?.tier === 'crew' && (profile.role || 'owner') === 'owner') {
+        if (hasTeamAccess(profile)) {
           const data = await loadTeamDashboard(date);
           if (active) setTeamDashboard(data);
         }
@@ -783,7 +800,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       </div>
 
       {/* Day Conditions — crew weather card */}
-      {hasBusinessLocation === true && (
+      {conditionsView === 'ready' && (
         <div className="card p-4 mb-5">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-3">{tr('Day Conditions')}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -798,7 +815,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
               {!Number.isFinite(dayConditions?.soilTempF) && <p className="text-[11px] text-[var(--color-text-muted)]">{tr('No station within 15 mi')}</p>}
             </div>
             <div>
-              <p className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{dayConditions?.rain7dInches != null ? `${dayConditions.rain7dInches.toFixed(2)}"` : '—'}</p>
+              <p className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{Number.isFinite(dayConditions?.rain7dInches) ? `${dayConditions.rain7dInches.toFixed(2)}"` : '—'}</p>
               <p className="text-xs text-[var(--color-text-muted)]">{tr('7-day rain')}</p>
             </div>
             <div>
@@ -816,10 +833,11 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
           </div>
         </div>
       )}
-      {hasBusinessLocation === false && (
+      {(conditionsView === 'unavailable' || conditionsView === 'no-location') && (
         <div className="card p-4 mb-5">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-2">{tr('Day Conditions')}</h3>
-          <Link to="/app/settings" className="text-xs font-medium text-brand-hover dark:text-[#4ade80] hover:underline">{tr('Set business location to see conditions')}</Link>
+          <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-1">{conditionsView === 'unavailable' ? tr('Conditions are unavailable right now.') : tr('Set a business location to see local conditions.')}</p>
+          <Link to="/app/settings" className="text-xs font-medium text-brand-hover dark:text-[#4ade80] hover:underline">{tr('Check location in Settings')}</Link>
         </div>
       )}
 
@@ -861,11 +879,13 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       )}
 
       {/* Team Progress Dashboard — crew owners only */}
-      {canManageCrew && teamDashboard.length > 0 && (
+      {canManageCrew && teamProgress.show && (
         <div className="card p-4 mb-5">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-3">{tr("Team Progress")}</h3>
-          <div className="space-y-2">
-            {teamDashboard.map((member, i) => {
+          {teamProgress.empty ? (
+            <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('No team assignments today')}</p>
+          ) : <div className="space-y-2">
+            {teamProgress.rows.map((member, i) => {
               const color = TEAM_MEMBER_COLORS[i % TEAM_MEMBER_COLORS.length];
               const completed = (member.done || 0) + (member.in_progress || 0);
               const pct = member.total > 0 ? Math.round((completed / member.total) * 100) : 0;
@@ -886,7 +906,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
                 </div>
               );
             })}
-          </div>
+          </div>}
         </div>
       )}
 

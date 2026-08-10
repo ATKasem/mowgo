@@ -1,26 +1,14 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
-
-const THEME_KEY = 'mowgo-theme';
-
-export function getStoredTheme() {
-  return localStorage.getItem(THEME_KEY) || 'dark';
-}
-
-export function applyTheme(theme) {
-  const root = document.documentElement;
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  root.classList.toggle('dark', isDark);
-  root.classList.toggle('light', !isDark);
-}
+import { applyTheme, getStoredTheme, storeThemeSelection } from '../lib/theme';
 
 export default function ThemeToggle() {
   const { tr, t, i18n } = useLocalizedText('themeToggle');
-  const [theme, setTheme] = useState(() => getStoredTheme());
+  // Authenticated app behavior remains dark-first when no preference exists.
+  const [theme, setTheme] = useState(() => getStoredTheme() || 'dark');
 
   useEffect(() => {
-    localStorage.setItem(THEME_KEY, theme);
     applyTheme(theme);
   }, [theme]);
 
@@ -34,7 +22,9 @@ export default function ThemeToggle() {
   }, [theme]);
 
   function cycle() {
-    setTheme(prev => prev === 'dark' ? 'light' : prev === 'light' ? 'system' : 'dark');
+    const next = theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark';
+    storeThemeSelection(next);
+    setTheme(next);
   }
 
   const Icon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;

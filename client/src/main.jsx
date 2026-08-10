@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './i18n'
 import App from './App.jsx'
+import { applyTheme, themeForRoute } from './lib/theme.js'
 
 // Global error handlers for uncaught errors and unhandled promise rejections
 // (ErrorBoundary only catches render errors — these catch async/event-handler errors)
@@ -15,9 +16,8 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // Apply theme before React hydration to prevent flash
-const theme = localStorage.getItem('mowgo-theme') || 'system';
-const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-document.documentElement.classList.toggle('dark', isDark);
+const initialRoute = window.location.hash.replace(/^#/, '').split('?')[0] || '/';
+applyTheme(themeForRoute(initialRoute));
 
 // Register the service worker (PWA install + offline app shell).
 // Only in production: dev server hot-reload clashes with SW caching.

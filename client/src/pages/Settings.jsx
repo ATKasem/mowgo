@@ -2,7 +2,7 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
 import { loadProfile, saveProfile, updateLeadAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
 import { downloadCsv, toCsv } from '../lib/csv';
-import { TEAM_MEMBER_COLORS } from '../lib/constants';
+import { TEAM_MEMBER_COLORS, TEAM_ACCESS_TIERS, hasTeamAccess } from '../lib/constants';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
@@ -13,6 +13,7 @@ import ConciergeSetup from '../components/ConciergeSetup';
 import ConciergeStatus from '../components/ConciergeStatus';
 import TrialBanner from '../components/TrialBanner';
 import { isActiveConciergeRequest } from '../lib/concierge-request';
+import { createLocationGeocoder, LocationGeocodeCanceledError, LocationGeocodeError, persistProfileWithResolvedLocation } from '../lib/location-geocoder';
 
 function SectionHeader({ children }) {
   return (
@@ -33,7 +34,7 @@ export default function Settings() {
   const [profileLoading, setProfileLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
   const [locationQuery, setLocationQuery] = useState('');
-  const [resolvedLocation, setResolvedLocation] = useState('');
+  const [resolvedLocation, setResolvedLocation] = useState(null);
   const [locationError, setLocationError] = useState('');
   const [locationLoading, setLocationLoading] = useState(false);
   const [conciergeRequest, setConciergeRequest] = useState(undefined);
@@ -54,6 +55,11 @@ export default function Settings() {
   const [exportError, setExportError] = useState('');
   const bookingCopyTimer = useRef(null);
   const exportTimers = useRef({});
+  const locationGeocoder = useRef(null);
+  const locationUiGeneration = useRef(0);
+  const persistedLocationCoordinates = useRef({ latitude: null, longitude: null });
+  const settingsMounted = useRef(true);
+  if (!locationGeocoder.current) locationGeocoder.current = createLocationGeocoder();
 
   // Booking link — use the live domain. Inside Capacitor (Android/iOS shell),
   // window.location.origin is a local scheme (https://localhost) that customers
@@ -66,9 +72,13 @@ export default function Settings() {
   const bookingUrl = `${bookingBase}/#/book/${user?.id || 'your-business-id'}`;
 
   useEffect(() => {
+    settingsMounted.current = true;
     return () => {
+      settingsMounted.current = false;
       if (bookingCopyTimer.current) clearTimeout(bookingCopyTimer.current);
       Object.values(exportTimers.current).forEach(clearTimeout);
+      locationUiGeneration.current += 1;
+      locationGeocoder.current.cancel();
     };
   }, []);
 
@@ -88,10 +98,16 @@ export default function Settings() {
     let active = true;
     loadProfile().then(data => {
       if (!active) return;
-      if (data) setProfile(data);
+      if (data) {
+        setProfile(data);
+        persistedLocationCoordinates.current = {
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
+        };
+      }
       setProfileLoading(false);
-      // Load team members when on crew tier
-      if (data?.tier === 'crew') {
+      // Crew and Premium both include team access.
+      if (TEAM_ACCESS_TIERS.includes(data?.tier)) {
         setTeamLoading(true);
         loadTeamMembers()
           .then(members => { if (active) setTeamMembers(members); })
@@ -113,56 +129,100 @@ export default function Settings() {
 
   async function save(e) {
     e.preventDefault();
+    const saveLocationGeneration = locationUiGeneration.current;
+    setSaved(false);
     setIsLoading(true);
     setError('');
+    setLocationError('');
     try {
-      await saveProfile(profile);
+      const saveResult = await persistProfileWithResolvedLocation(
+        profile,
+        locationQuery,
+        locationGeocoder.current,
+        saveProfile,
+        {
+          demoMode: isDemoMode(),
+          resolvedLocation,
+          profileOnLocationFailure: { ...profile, ...persistedLocationCoordinates.current },
+        },
+      );
+      const profileToSave = saveResult.profile;
+      persistedLocationCoordinates.current = {
+        latitude: profileToSave.latitude ?? null,
+        longitude: profileToSave.longitude ?? null,
+      };
+      if (!settingsMounted.current) return;
       // Also store locally for clipboard invoice texts
-      localStorage.setItem('mf_business_name', profile.business_name || '');
-      localStorage.setItem('mf_business_phone', profile.phone || '');
-      localStorage.setItem('mf_venmo_handle', profile.venmo_handle || '');
-      localStorage.setItem('mf_cashapp_handle', profile.cashapp_handle || '');
-      localStorage.setItem('mf_zelle_handle', profile.zelle_handle || '');
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      localStorage.setItem('mf_business_name', profileToSave.business_name || '');
+      localStorage.setItem('mf_business_phone', profileToSave.phone || '');
+      localStorage.setItem('mf_venmo_handle', profileToSave.venmo_handle || '');
+      localStorage.setItem('mf_cashapp_handle', profileToSave.cashapp_handle || '');
+      localStorage.setItem('mf_zelle_handle', profileToSave.zelle_handle || '');
+      if (saveLocationGeneration !== locationUiGeneration.current) {
+        setLocationError(tr('Location changed while saving. Retry to save your changes.'));
+      } else {
+        setProfile(profileToSave);
+        if (saveResult.resolved) setResolvedLocation(saveResult.resolved);
+        if (saveResult.locationWarning) {
+          setLocationError(tr('Profile saved, but the location could not be updated. Try finding it again.'));
+        }
+        if (!saveResult.locationWarning) {
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2500);
+        }
+      }
     } catch (err) {
-      if (isDemoMode()) {
-        // Demo mode: treat as success (no backend)
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
+      if (!settingsMounted.current) return;
+      if (err instanceof LocationGeocodeCanceledError) {
+        setLocationError(tr('Location changed while saving. Retry to save your changes.'));
+      } else if (err instanceof LocationGeocodeError) {
+        setLocationError(tr('Location not found. Try a city, state, or ZIP.'));
       } else {
         setError(err.message || tr('Failed to save profile'));
       }
     }
-    setIsLoading(false);
+    if (settingsMounted.current) setIsLoading(false);
   }
 
-  async function geocodeLocation() {
+  function geocodeLocation() {
     const query = locationQuery.trim();
-    if (!query || locationLoading) return;
-    setLocationLoading(true);
-    setLocationError('');
-    try {
-      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`);
-      if (!response.ok) throw new Error('Geocoding request failed');
-      const result = (await response.json()).results?.[0];
-      if (!result || !Number.isFinite(result.latitude) || !Number.isFinite(result.longitude)) {
-        throw new Error('Location not found');
+    if (!query) return;
+    const uiGeneration = ++locationUiGeneration.current;
+    void (async () => {
+      setLocationLoading(true);
+      setLocationError('');
+      try {
+        const resolved = await locationGeocoder.current.resolve(query);
+        setProfile(current => ({ ...current, latitude: resolved.latitude, longitude: resolved.longitude }));
+        setResolvedLocation(resolved);
+      } catch (err) {
+        if (err instanceof LocationGeocodeCanceledError) return;
+        console.error('geocodeLocation:', err);
+        if (uiGeneration === locationUiGeneration.current) {
+          setLocationError(tr('Location not found. Try a city, state, or ZIP.'));
+        }
+      } finally {
+        if (uiGeneration === locationUiGeneration.current) setLocationLoading(false);
       }
-      setProfile(current => ({ ...current, latitude: result.latitude, longitude: result.longitude }));
-      setResolvedLocation([result.name, result.admin1, result.country].filter(Boolean).join(', '));
-    } catch (err) {
-      console.error('geocodeLocation:', err);
-      setLocationError(tr('Location not found. Try a city, state, or ZIP.'));
-    } finally {
-      setLocationLoading(false);
-    }
+    })();
+  }
+
+  function changeLocationQuery(value) {
+    locationUiGeneration.current += 1;
+    locationGeocoder.current.cancel();
+    setLocationLoading(false);
+    setLocationQuery(value);
+    setResolvedLocation(null);
+    setLocationError('');
   }
 
   function removeLocation() {
+    locationUiGeneration.current += 1;
+    locationGeocoder.current.cancel();
+    setLocationLoading(false);
     setProfile(current => ({ ...current, latitude: null, longitude: null }));
     setLocationQuery('');
-    setResolvedLocation('');
+    setResolvedLocation(null);
     setLocationError('');
   }
 
@@ -258,7 +318,7 @@ export default function Settings() {
     }
   }
 
-  const isTeamOwner = profile?.tier === 'crew' && (profile?.role || 'owner') === 'owner';
+  const isTeamOwner = hasTeamAccess(profile);
   const owner = teamMembers.find(member => member.role === 'owner');
   const conciergeEligible = ['solo', 'crew', 'premium'].includes(profile?.tier);
   const activeConciergeRequest = isActiveConciergeRequest(conciergeRequest);
@@ -314,7 +374,7 @@ export default function Settings() {
                   <input
                     id="business-location"
                     value={locationQuery}
-                    onChange={event => { setLocationQuery(event.target.value); setLocationError(''); }}
+                    onChange={event => changeLocationQuery(event.target.value)}
                     onBlur={() => void geocodeLocation()}
                     placeholder={tr('City, State or ZIP — e.g. Oklahoma City, OK')}
                     className="input flex-1 min-w-0"
@@ -330,7 +390,7 @@ export default function Settings() {
                   </button>
                 </div>
                 <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Used to show your local weather so Rain Delay knows when rain is coming at your location. Never shared with anyone.')}</p>
-                {resolvedLocation && <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">📍 {resolvedLocation}</p>}
+                {resolvedLocation && <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">📍 {resolvedLocation.label}</p>}
                 {locationError && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{locationError}</p>}
                 {(profile.latitude != null || profile.longitude != null) && (
                   <button type="button" onClick={removeLocation} className="text-xs font-medium text-[var(--color-text-muted)] hover:text-red-600 dark:hover:text-red-400">
@@ -497,7 +557,7 @@ export default function Settings() {
         {/* Team */}
         <div className="card p-5 space-y-3">
           <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-brand" />{tr("Team")}</h4>
-          {profile?.tier !== 'crew' && (
+          {!TEAM_ACCESS_TIERS.includes(profile?.tier) && (
             <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.")}</p>
           )}
           {teamError && (
@@ -522,8 +582,8 @@ export default function Settings() {
               <Loader2 className="w-5 h-5 text-brand animate-spin" />
             </div>
           )}
-          {/* Crew members — crew tier only */}
-          {profile?.tier === 'crew' && !teamLoading && teamMembers.filter(m => m.role !== 'owner').map((m, i) => {
+          {/* Crew members — team-enabled tiers only */}
+          {TEAM_ACCESS_TIERS.includes(profile?.tier) && !teamLoading && teamMembers.filter(m => m.role !== 'owner').map((m, i) => {
             const color = TEAM_MEMBER_COLORS[(i + 1) % TEAM_MEMBER_COLORS.length];
             return (
               <div key={m.id} className="flex items-center gap-3 p-3 bg-[var(--color-surface-bg)] dark:bg-gray-800/50 rounded-xl">
@@ -547,7 +607,7 @@ export default function Settings() {
               </div>
             );
           })}
-          {/* Invite form — crew tier only */}
+          {/* Invite form — team-enabled owners only */}
           {isTeamOwner && (
             <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2 pt-2">
               <input
