@@ -1364,7 +1364,7 @@
     "unable_to_load_dashboard_profile": "No se pudo cargar el perfil del panel.",
     "weather": "Clima",
     "checking_local_weather": "Consultando el clima local...",
-    "today_forecast": "pronóstico de hoy",
+    "rain_chance": "probabilidad de lluvia",
     "see_weather_for_your_work_area": "Consulta el clima de tu zona de trabajo",
     "mowgo_asks_for_your_location_to_show_local_weather_and_warn_you_when_rai": "MowGo solicita tu ubicación para mostrar el clima local y avisarte cuando la lluvia pueda afectar tu ruta. La usamos para el clima de tu negocio, no para rastrearte continuamente.",
     "use_my_location": "Usar mi ubicación",

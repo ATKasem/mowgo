@@ -221,25 +221,22 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
       )}
 
       {state === 'unavailable' && (
-        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Weather is temporarily unavailable.')}</p>
+        <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]"><AlertCircle className="w-4 h-4 text-amber-500" />{tr('Weather is temporarily unavailable.')}</div>
       )}
 
       {state === 'loaded' && (
         <div>
-          <div className="flex items-baseline gap-2.5">
-            <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">
-              {Number.isFinite(currentConditions?.currentTemp) ? `${Math.round(currentConditions.currentTemp)}°` : Number.isFinite(forecastDays[0]?.tempMax) ? `${Math.round(forecastDays[0].tempMax)}° ${tr('today forecast')}` : tr('Weather unavailable')}
-            </p>
-            {Number.isFinite(currentConditions?.windMph) && (
-              <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
-                {tr('Wind {{value}} mph', { value: Math.round(currentConditions.windMph) })}
-              </p>
-            )}
+          <div className="rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Today')}</p>
+              <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">{Number.isFinite(forecastDays[0]?.tempMax) ? `${Math.round(forecastDays[0].tempMax)}°` : tr('Weather unavailable')}</p>
+            </div>
+            {forecastDays[0] && <p className="text-sm text-[var(--color-text-secondary)] dark:text-gray-300 mt-1">{forecastDays[0].rain}% {tr('rain chance')}</p>}
+            {(Number.isFinite(currentConditions?.currentTemp) || condition || Number.isFinite(currentConditions?.windMph)) && <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-2">{Number.isFinite(currentConditions?.currentTemp) ? `${Math.round(currentConditions.currentTemp)}°` : ''}{condition ? ` · ${condition}` : ''}{Number.isFinite(currentConditions?.windMph) ? ` · ${tr('Wind {{value}} mph', { value: Math.round(currentConditions.windMph) })}` : ''}</p>}
           </div>
-          {condition && <p className="text-sm text-[var(--color-text-secondary)] dark:text-gray-300 mt-0.5">{condition}</p>}
           {forecastDays.length > 0 && (
-            <div className="flex gap-3 mt-2.5 overflow-x-auto">
-              {forecastDays.slice(0, 4).map(day => (
+            <div className="flex gap-3 mt-3 overflow-x-auto">
+              {forecastDays.slice(1, 5).map(day => (
                 <div key={day.date} className="flex-shrink-0 text-center min-w-[44px]">
                   <p className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
                     {new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}
@@ -253,20 +250,7 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
             </div>
           )}
 
-          {riskDay && affectedCount > 0 && (
-            <Link
-              to="/app/today"
-              className="mt-3 flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-sky-700 to-blue-700 dark:from-sky-800 dark:to-blue-800 text-white p-3 hover:brightness-110 active:scale-[0.99] transition-all min-h-[44px]"
-            >
-              <CloudRain className="w-5 h-5 flex-shrink-0" />
-              <span className="flex-1 min-w-0 text-left">
-                <span className="block text-sm font-bold leading-snug">
-                  {tr('Rain {{pct}}% {{day}} — {{count}} jobs affected', { pct: riskDay.rain, day: riskDayLabel, count: affectedCount })}
-                </span>
-                <span className="block text-xs text-sky-100 mt-0.5">{tr('Review rain delay')}</span>
-              </span>
-            </Link>
-          )}
+
         </div>
       )}
     </div>
