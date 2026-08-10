@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { localDate, summarizeDashboard } from './dashboard-metrics.js';
+import {
+  localDate, summarizeDashboard, todayCommand, upcomingJobs, moneyToCollect,
+  unfinishedJobCount, rainRiskDay, rainAffectedJobs, weatherBannerView, attentionItems,
+} from './dashboard-metrics.js';
 import { hasTeamAccess } from './constants.js';
 import { readFileSync } from 'node:fs';
 
@@ -60,4 +63,161 @@ test('localDate uses the local calendar day near UTC midnight', () => {
   } finally {
     process.env.TZ = previousTimezone;
   }
+});
+
+test('todayCommand returns zeroed empty state with no next job', () => {
+  const now = new Date(2026, 7, 9, 12);
+  const result = todayCommand([], now);
+  assert.deepEqual(result, { total: 0, done: 0, inProgress: 0, revenue: 0, nextJob: null });
+});
+
+test('todayCommand orders the next job by route order and skips done jobs', () => {
+  const now = new Date(2026, 7, 9, 12);
+  const jobs = [
+    { id: 'c', scheduled_date: '2026-08-09', status: 'done', route_order: 1, clients: { name: 'A', rate: 40 } },
+    { id: 'a', scheduled_date: '2026-08-09', status: 'scheduled', route_order: 3, scheduled_time: '10:00', clients: { name: 'B', address: '1 Elm St' } },
+    { id: 'b', scheduled_date: '2026-08-09', status: 'scheduled', route_order: 2, scheduled_time: '09:00', clients: { name: 'C', address: '2 Oak St' } },
+  ];
+  const result = todayCommand(jobs, now);
+  assert.equal(result.total, 3);
+  assert.equal(result.done, 1);
+  assert.equal(result.revenue, 40);
+  assert.deepEqual(result.nextJob, { id: 'b', clientName: 'C', address: '2 Oak St', time: '09:00', status: 'scheduled' });
+});
+
+test('upcomingJobs excludes today, done jobs, and orders by date then route order', () => {
+  const now = new Date(2026, 7, 9, 12);
+  const jobs = [
+    { id: 'today', scheduled_date: '2026-08-09', status: 'scheduled', route_order: 1 },
+    { id: 'done-later', scheduled_date: '2026-08-11', status: 'done', route_order: 1 },
+    { id: 'later-2', scheduled_date: '2026-08-11', status: 'scheduled', route_order: 2, clients: { name: 'Z' } },
+    { id: 'later-1', scheduled_date: '2026-08-11', status: 'scheduled', route_order: 1, clients: { name: 'Y' } },
+    { id: 'soonest', scheduled_date: '2026-08-10', status: 'in_progress', route_order: 5, clients: { name: 'X' } },
+  ];
+  const result = upcomingJobs(jobs, now);
+  assert.deepEqual(result.map(job => job.id), ['soonest', 'later-1', 'later-2']);
+});
+
+test('upcomingJobs respects the limit', () => {
+  const now = new Date(2026, 7, 9, 12);
+  const jobs = Array.from({ length: 8 }, (_, i) => ({ id: `j${i}`, scheduled_date: '2026-08-11', status: 'scheduled', route_order: i }));
+  assert.equal(upcomingJobs(jobs, now, 3).length, 3);
+});
+
+test('moneyToCollect excludes paid and voided invoices, isolates overdue', () => {
+  const invoices = [
+    { status: 'unpaid', amount: 30 },
+    { status: 'overdue', amount: '20.5' },
+    { status: 'paid', amount: 100 },
+    { status: 'voided', amount: 60 },
+  ];
+  assert.deepEqual(moneyToCollect(invoices), { unpaidTotal: 50.5, unpaidCount: 2, overdueTotal: 20.5, overdueCount: 1 });
+});
+
+test('moneyToCollect returns zeroes for an empty list', () => {
+  assert.deepEqual(moneyToCollect([]), { unpaidTotal: 0, unpaidCount: 0, overdueTotal: 0, overdueCount: 0 });
+});
+
+test('unfinishedJobCount only counts past-due, not-done jobs', () => {
+  const now = new Date(2026, 7, 9, 12);
+  const jobs = [
+    { scheduled_date: '2026-08-08', status: 'scheduled' },
+    { scheduled_date: '2026-08-08', status: 'done' },
+    { scheduled_date: '2026-08-09', status: 'scheduled' },
+    { scheduled_date: '2026-08-10', status: 'scheduled' },
+  ];
+  assert.equal(unfinishedJobCount(jobs, now), 1);
+});
+
+test('rainRiskDay prefers today over tomorrow and requires the 60% threshold', () => {
+  const now = new Date(2026, 7, 9, 12);
+  assert.equal(rainRiskDay([{ date: '2026-08-09', rain: 59 }, { date: '2026-08-10', rain: 61 }], now).date, '2026-08-10');
+  assert.equal(rainRiskDay([{ date: '2026-08-09', rain: 60 }, { date: '2026-08-10', rain: 90 }], now).date, '2026-08-09');
+  assert.equal(rainRiskDay([{ date: '2026-08-09', rain: 10 }], now), null);
+  assert.equal(rainRiskDay([], now), null);
+});
+
+test('rainAffectedJobs filters to a date and excludes done jobs', () => {
+  const jobs = [
+    { id: 'a', scheduled_date: '2026-08-10', status: 'scheduled' },
+    { id: 'b', scheduled_date: '2026-08-10', status: 'done' },
+    { id: 'c', scheduled_date: '2026-08-11', status: 'scheduled' },
+  ];
+  assert.deepEqual(rainAffectedJobs(jobs, '2026-08-10').map(j => j.id), ['a']);
+  assert.deepEqual(rainAffectedJobs(jobs, null), []);
+});
+
+test('weatherBannerView distinguishes loading, no-location, unavailable, and loaded', () => {
+  assert.equal(weatherBannerView(null, true, false), 'loading');
+  assert.equal(weatherBannerView(true, true, false), 'loading');
+  assert.equal(weatherBannerView(false, false, false), 'no_location');
+  assert.equal(weatherBannerView(true, false, false), 'unavailable');
+  assert.equal(weatherBannerView(true, false, true), 'loaded');
+});
+
+test('attentionItems orders rain, overdue invoices, new leads, unfinished work — and drops zero items', () => {
+  assert.deepEqual(attentionItems({
+    rainRisk: { date: '2026-08-09', rain: 70 },
+    rainAffectedCount: 3,
+    overdueInvoiceCount: 2,
+    overdueInvoiceTotal: 150,
+    newLeadCount: 1,
+    unfinishedJobCount: 4,
+  }), [
+    { type: 'rain', count: 3, rainPercent: 70, date: '2026-08-09' },
+    { type: 'overdue_invoices', count: 2, amount: 150 },
+    { type: 'new_leads', count: 1 },
+    { type: 'unfinished_jobs', count: 4 },
+  ]);
+  assert.deepEqual(attentionItems(), []);
+});
+
+test('attentionItems suppresses the rain item when a risk day exists but no jobs are affected', () => {
+  assert.deepEqual(attentionItems({ rainRisk: { date: '2026-08-09', rain: 70 }, rainAffectedCount: 0 }), []);
+});
+
+test('dashboard helpers normalize null and non-array collections', () => {
+  const now = new Date(2026, 7, 9, 12);
+  assert.equal(summarizeDashboard(null, {}, now).todayJobsTotal, 0);
+  assert.deepEqual(todayCommand('jobs', now), { total: 0, done: 0, inProgress: 0, revenue: 0, nextJob: null });
+  assert.deepEqual(upcomingJobs(null, now), []);
+  assert.deepEqual(moneyToCollect({}), { unpaidTotal: 0, unpaidCount: 0, overdueTotal: 0, overdueCount: 0 });
+  assert.equal(unfinishedJobCount(null, now), 0);
+  assert.equal(rainRiskDay({}, now), null);
+  assert.deepEqual(rainAffectedJobs('jobs', '2026-08-09'), []);
+});
+
+test('dashboard helpers ignore malformed records and fields', () => {
+  const now = new Date(2026, 7, 9, 12);
+  const malformedJobs = [
+    null, {},
+    { scheduled_date: 12, status: 'scheduled' },
+    { scheduled_date: 'bad-date', status: 'scheduled' },
+    { scheduled_date: '2026-08-09', status: 'done', route_order: Symbol('route'), clients: { rate: Symbol('rate') } },
+  ];
+  const malformedInvoices = [
+    null, {},
+    { status: 'overdue', amount: 'not-money' },
+    { status: 'overdue', amount: null },
+    { status: 'overdue', amount: Symbol('amount') },
+  ];
+
+  assert.equal(summarizeDashboard(malformedJobs, malformedInvoices, now).outstanding, 0);
+  assert.deepEqual(todayCommand(malformedJobs, now), { total: 1, done: 1, inProgress: 0, revenue: 0, nextJob: null });
+  assert.deepEqual(upcomingJobs(malformedJobs, now), []);
+  assert.deepEqual(moneyToCollect(malformedInvoices), { unpaidTotal: 0, unpaidCount: 0, overdueTotal: 0, overdueCount: 0 });
+  assert.equal(unfinishedJobCount(malformedJobs, now), 0);
+  assert.equal(rainRiskDay([null, {}, { date: '2026-08-09', rain: '80' }], now), null);
+  assert.deepEqual(rainAffectedJobs(malformedJobs, '2026-08-09'), []);
+  assert.deepEqual(attentionItems(null), []);
+});
+
+test('weather loaders request Fahrenheit and the current weather code', () => {
+  const source = readFileSync(new URL('./data.js', import.meta.url), 'utf8');
+  const forecastLoader = source.slice(source.indexOf('export async function getWeatherForLocation'), source.indexOf('export const SPRAY_RULE'));
+  const conditionsLoader = source.slice(source.indexOf('export async function getDayConditions'), source.indexOf('// ===== Clients ====='));
+
+  assert.match(forecastLoader, /temperature_unit:\s*'fahrenheit'/);
+  assert.match(conditionsLoader, /current:\s*'temperature_2m,wind_speed_10m,weather_code'/);
+  assert.match(conditionsLoader, /weatherCode/);
 });

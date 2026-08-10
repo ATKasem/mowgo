@@ -1,13 +1,16 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { loadJobs, loadInvoices, loadProfile, loadTeamDashboard } from '../lib/data';
+import { loadJobs, loadInvoices, loadProfile, loadTeamDashboard, loadLeads, getWeatherForLocation, getDayConditions } from '../lib/data';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { AuthContext } from '../App';
-import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X, CalendarDays } from 'lucide-react';
+import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X, CalendarDays, CloudRain, RefreshCw, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
 import OnboardingChecklist from '../components/OnboardingChecklist';
 import ConciergeStatus from '../components/ConciergeStatus';
-import { localDate, summarizeDashboard } from '../lib/dashboard-metrics';
+import {
+  localDate, summarizeDashboard, todayCommand, upcomingJobs, moneyToCollect,
+  unfinishedJobCount, rainRiskDay, rainAffectedJobs, weatherBannerView, attentionItems,
+} from '../lib/dashboard-metrics';
 import { hasTeamAccess } from '../lib/constants';
 import { teamProgressView } from '../lib/today-ux';
 import { conciergeRequestRpcState, dashboardConciergeView, isActiveOrDoneConciergeRequest } from '../lib/concierge-request';
@@ -110,7 +113,7 @@ function LeadTouchPing() {
       if (!res.ok && active) console.warn('lead-touch ping failed', res.status);
     })().catch(() => {});
     return () => { active = false; };
-  }, [user?.id, user?.email]);
+  }, [user?.id, user?.email, user?.created_at]);
   return null;
 }
 
@@ -171,16 +174,145 @@ function ReferralSatisfactionBanner() {
   );
 }
 
+// Permanent weather banner (design §2): always visible — loading, no-location,
+// unavailable, and loaded all render inside the same card so weather context
+// never disappears just because the forecast is clear. Rain-risk content is
+// the only conditional part and always routes to Today's existing rain-delay flow.
+function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDayLabel, affectedCount, onRetry }) {
+  const { tr } = useLocalizedText('dashboard');
+  const weatherCode = currentConditions?.weatherCode;
+  const condition = weatherCode === 0 ? tr('Clear')
+    : weatherCode === 1 || weatherCode === 2 ? tr('Partly cloudy')
+      : weatherCode === 3 ? tr('Overcast')
+        : weatherCode === 45 || weatherCode === 48 ? tr('Fog')
+          : weatherCode >= 51 && weatherCode <= 67 ? tr('Rain')
+            : weatherCode >= 71 && weatherCode <= 77 ? tr('Snow')
+              : weatherCode >= 80 && weatherCode <= 82 ? tr('Rain showers')
+                : weatherCode >= 85 && weatherCode <= 86 ? tr('Snow showers')
+                  : weatherCode >= 95 ? tr('Thunderstorm')
+                    : null;
+
+  return (
+    <div className="card p-4 mb-4">
+      <div className="flex items-center justify-between gap-3 mb-1">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr('Weather')}</h3>
+        {state === 'unavailable' && (
+          <button onClick={onRetry} className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
+            <RefreshCw className="w-3.5 h-3.5" />{tr('Retry')}
+          </button>
+        )}
+      </div>
+
+      {state === 'loading' && (
+        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Checking local weather...')}</p>
+      )}
+
+      {state === 'no_location' && (
+        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+          {tr('Add your business location in Settings to see local weather.')}{' '}
+          <Link to="/app/settings" className="font-semibold text-brand-hover dark:text-emerald-400 hover:underline">{tr('Open Settings')}</Link>
+        </p>
+      )}
+
+      {state === 'unavailable' && (
+        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Weather is temporarily unavailable.')}</p>
+      )}
+
+      {state === 'loaded' && (
+        <div>
+          <div className="flex items-baseline gap-2.5">
+            <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">
+              {Number.isFinite(currentConditions?.currentTemp) ? `${Math.round(currentConditions.currentTemp)}°` : '—'}
+            </p>
+            {Number.isFinite(currentConditions?.windMph) && (
+              <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+                {tr('Wind {{value}} mph', { value: Math.round(currentConditions.windMph) })}
+              </p>
+            )}
+          </div>
+          {condition && <p className="text-sm text-[var(--color-text-secondary)] dark:text-gray-300 mt-0.5">{condition}</p>}
+          {forecastDays.length > 0 && (
+            <div className="flex gap-3 mt-2.5 overflow-x-auto">
+              {forecastDays.slice(0, 4).map(day => (
+                <div key={day.date} className="flex-shrink-0 text-center min-w-[44px]">
+                  <p className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+                    {new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}
+                  </p>
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">
+                    {Number.isFinite(day.tempMax) ? `${Math.round(day.tempMax)}°` : '—'}
+                  </p>
+                  <p className="text-[11px] text-sky-600 dark:text-sky-400">{day.rain}%</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {riskDay && affectedCount > 0 && (
+            <Link
+              to="/app/today"
+              className="mt-3 flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-sky-700 to-blue-700 dark:from-sky-800 dark:to-blue-800 text-white p-3 hover:brightness-110 active:scale-[0.99] transition-all min-h-[44px]"
+            >
+              <CloudRain className="w-5 h-5 flex-shrink-0" />
+              <span className="flex-1 min-w-0 text-left">
+                <span className="block text-sm font-bold leading-snug">
+                  {tr('Rain {{pct}}% {{day}} — {{count}} jobs affected', { pct: riskDay.rain, day: riskDayLabel, count: affectedCount })}
+                </span>
+                <span className="block text-xs text-sky-100 mt-0.5">{tr('Review rain delay')}</span>
+              </span>
+            </Link>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Needs Attention row presentation — one visual mapping per attentionItems() type.
+function attentionItemMeta(item, tr) {
+  switch (item.type) {
+    case 'rain':
+      return {
+        icon: CloudRain,
+        text: tr('Rain {{pct}}% {{day}} — {{count}} jobs affected', {
+          pct: item.rainPercent,
+          day: (item.date === localDate(1) ? tr('Tomorrow') : tr('Today')).toLowerCase(),
+          count: item.count,
+        }),
+        href: '/app/today',
+      };
+    case 'overdue_invoices':
+      return {
+        icon: FileText,
+        text: tr('{{count}} overdue invoice · ${{amount}}', { count: item.count, amount: item.amount.toLocaleString() }),
+        href: '/app/invoices',
+      };
+    case 'new_leads':
+      return { icon: Users, text: tr('{{count}} new lead', { count: item.count }), href: '/app/clients' };
+    case 'unfinished_jobs':
+      return { icon: AlertTriangle, text: tr('{{count}} unfinished job from a previous day', { count: item.count }), href: '/app/today' };
+    default:
+      return null;
+  }
+}
+
 export default function Dashboard() {
   const { tr } = useLocalizedText('dashboard');
   const { user } = useContext(AuthContext);
   const [stats, setStats] = useState(null);
+  const [jobsData, setJobsData] = useState([]);
+  const [invoicesData, setInvoicesData] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [profile, setProfile] = useState(null);
   const [teamProgress, setTeamProgress] = useState([]);
   const [teamError, setTeamError] = useState('');
   const [retryKey, setRetryKey] = useState(0);
+  const [weather, setWeather] = useState(null);
+  const [dayConditions, setDayConditions] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+  const [hasBusinessLocation, setHasBusinessLocation] = useState(null);
+  const [weatherRetryKey, setWeatherRetryKey] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -188,20 +320,38 @@ export default function Dashboard() {
     setLoading(true);
     setError('');
     setStats(null);
+    setJobsData([]);
+    setInvoicesData([]);
+    setLeads([]);
     setProfile(null);
     setTeamProgress([]);
     setTeamError('');
+    setWeather(null);
+    setDayConditions(null);
+    setWeatherLoading(true);
+    setHasBusinessLocation(null);
     async function fetchStats() {
       try {
-        const [jobs, invoices, profile] = await Promise.all([
-          loadJobs(), loadInvoices(), loadProfile(),
-        ]);
+        const profile = await loadProfile();
         if (!mounted) return;
         if (!profile) throw new Error(tr('Unable to load dashboard profile.'));
 
         const normalizedProfile = { ...profile, tier: profile.tier || 'free' };
         setProfile(normalizedProfile);
+        const [jobs, invoices] = await Promise.all([
+          loadJobs(),
+          normalizedProfile.role === 'owner' ? loadInvoices() : Promise.resolve([]),
+        ]);
+        if (!mounted) return;
         setStats(summarizeDashboard(jobs, invoices));
+        setJobsData(jobs);
+        setInvoicesData(invoices);
+
+        // Owner-only: leads carry business/revenue-adjacent context that must
+        // never surface on the assigned-work-only crew dashboard.
+        if (normalizedProfile.role === 'owner') {
+          loadLeads().then(rows => { if (mounted) setLeads(rows); }).catch(() => { if (mounted) setLeads([]); });
+        }
 
         if (hasTeamAccess(normalizedProfile)) {
           try {
@@ -223,28 +373,89 @@ export default function Dashboard() {
     return () => { mounted = false; };
   }, [user, retryKey, tr]);
 
+  // Weather is independent of jobs/invoices: it must never block dashboard
+  // stats from rendering, so it runs its own fetch/error lifecycle once the
+  // profile (and its business location) is known.
+  useEffect(() => {
+    if (!profile) return;
+    let active = true;
+    setWeatherLoading(true);
+    const lat = profile.latitude ?? profile.lat;
+    const lng = profile.longitude ?? profile.lng;
+    const hasLocation = lat != null && lng != null;
+    setHasBusinessLocation(hasLocation);
+    if (!hasLocation) {
+      setWeather(null);
+      setDayConditions(null);
+      setWeatherLoading(false);
+      return;
+    }
+    Promise.all([getWeatherForLocation(lat, lng), getDayConditions(lat, lng)])
+      .then(([forecast, conditions]) => {
+        if (!active) return;
+        setWeather(forecast);
+        setDayConditions(conditions);
+      })
+      .finally(() => { if (active) setWeatherLoading(false); });
+    return () => { active = false; };
+  }, [profile, weatherRetryKey]);
+
+  // Weather is shared presentation for owners and crew. Only assigned jobs are
+  // used for crew rain counts; financial and lead data stay in the owner branch.
+  const weatherDays = (weather?.daily?.time || []).map((day, index) => ({
+    date: day,
+    rain: weather.daily.precipitation_probability_max?.[index] ?? 0,
+    tempMax: weather.daily.temperature_2m_max?.[index] ?? null,
+  }));
+  const weatherState = loading ? 'loading'
+    : !profile ? 'unavailable'
+      : weatherBannerView(hasBusinessLocation, weatherLoading, weatherDays.length > 0);
+  const riskDay = rainRiskDay(weatherDays);
+  const riskDayLabel = riskDay ? (riskDay.date === localDate(1) ? tr('Tomorrow') : tr('Today')).toLowerCase() : '';
+  const rainAffectedCount = riskDay ? rainAffectedJobs(jobsData, riskDay.date).length : 0;
+  const weatherBanner = (
+    <WeatherBanner
+      state={weatherState}
+      currentConditions={dayConditions}
+      forecastDays={weatherDays}
+      riskDay={riskDay}
+      riskDayLabel={riskDayLabel}
+      affectedCount={rainAffectedCount}
+      onRetry={() => profile ? setWeatherRetryKey(k => k + 1) : setRetryKey(k => k + 1)}
+    />
+  );
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-brand animate-spin" />
+      <div>
+        {weatherBanner}
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 text-brand animate-spin" />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <AlertCircle className="w-8 h-8 text-amber-500" />
-        <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{error}</p>
-        <button onClick={() => { setError(''); setLoading(true); setRetryKey(k => k + 1); }} className="btn-secondary text-sm">{tr('Retry')}</button>
+      <div>
+        {weatherBanner}
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <AlertCircle className="w-8 h-8 text-amber-500" />
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{error}</p>
+          <button onClick={() => { setError(''); setLoading(true); setRetryKey(k => k + 1); }} className="btn-secondary text-sm">{tr('Retry')}</button>
+        </div>
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <AlertCircle className="w-8 h-8 text-amber-500" />
+      <div>
+        {weatherBanner}
+        <div className="flex items-center justify-center py-20">
+          <AlertCircle className="w-8 h-8 text-amber-500" />
+        </div>
       </div>
     );
   }
@@ -255,6 +466,7 @@ export default function Dashboard() {
       <div>
         <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
         <LeadTouchPing />
+        {weatherBanner}
         <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-4">{tr('Your assigned work')}</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-4">
@@ -315,14 +527,151 @@ export default function Dashboard() {
   ];
   const visibleTeamProgress = teamProgressView(teamProgress);
 
+  const command = todayCommand(jobsData);
+  const money = moneyToCollect(invoicesData);
+  const upcoming = upcomingJobs(jobsData);
+  const unfinished = unfinishedJobCount(jobsData);
+  const newLeadCount = leads.filter(lead => lead.status === 'new').length;
+  const attention = attentionItems({
+    rainRisk: riskDay,
+    rainAffectedCount,
+    overdueInvoiceCount: money.overdueCount,
+    overdueInvoiceTotal: money.overdueTotal,
+    newLeadCount,
+    unfinishedJobCount: unfinished,
+  });
+
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white mb-5">{tr('Dashboard')}</h2>
+      <div className="mb-5">
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Dashboard')}</h2>
+        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">
+          {new Date(`${localDate()}T00:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+      </div>
       <DashboardConcierge profile={profile} />
       <LeadTouchPing />
       <ReferralSatisfactionBanner />
       <OnboardingChecklist showConcierge={false} />
-      <div className="grid grid-cols-2 gap-3">
+
+      {weatherBanner}
+
+      <div className="card p-4 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr("Today's Plan")}</h3>
+          <Link to="/app/today" className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
+            {tr("View today's route")}<ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">
+          {tr('{{done}} of {{total}} jobs done', { count: command.total, done: command.done, total: command.total })}
+        </p>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+          <span>{tr('{{count}} in-progress job', { count: command.inProgress })}</span>
+          <span>{tr('${{amount}} completed revenue', { amount: command.revenue.toLocaleString() })}</span>
+        </div>
+        {command.nextJob ? (
+          <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3">
+            <Clock className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Next job')}</p>
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">
+                {command.nextJob.clientName || tr('Next job')}{command.nextJob.time ? ` · ${command.nextJob.time}` : ''}
+              </p>
+              {command.nextJob.address && (
+                <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] truncate">{command.nextJob.address}</p>
+              )}
+            </div>
+          </div>
+        ) : command.total > 0 ? (
+          <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-3">{tr('No more jobs today')}</p>
+        ) : (
+          <div className="mt-3">
+            <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('No jobs scheduled today')}</p>
+            <Link to="/app/today" className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline mt-1 inline-block">{tr('Add a job')}</Link>
+          </div>
+        )}
+      </div>
+
+      <div className="card p-4 mb-4">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mb-3">{tr('Needs Attention')}</h3>
+        {attention.length === 0 ? (
+          <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Nothing needs attention right now.')}</p>
+        ) : (
+          <div className="space-y-2">
+            {attention.map(item => {
+              const meta = attentionItemMeta(item, tr);
+              if (!meta) return null;
+              const Icon = meta.icon;
+              return (
+                <Link
+                  key={item.type}
+                  to={meta.href}
+                  className="flex items-center gap-2.5 rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3 hover:brightness-95 dark:hover:brightness-110 active:scale-[0.99] transition-all min-h-[44px]"
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                  <span className="flex-1 min-w-0 text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{meta.text}</span>
+                  <ArrowRight className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="card p-4 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-1">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr('Money to Collect')}</h3>
+          <Link to="/app/invoices" className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline">{tr('View Invoices')}</Link>
+        </div>
+        <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">${money.unpaidTotal.toLocaleString()}</p>
+        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">
+          {money.unpaidCount > 0 ? tr('{{count}} unpaid invoice', { count: money.unpaidCount }) : tr('All invoices current')}
+        </p>
+        {money.overdueCount > 0 && (
+          <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 mt-2">
+            {tr('{{count}} overdue invoice · ${{amount}}', { count: money.overdueCount, amount: money.overdueTotal.toLocaleString() })}
+          </p>
+        )}
+      </div>
+
+      {upcoming.length > 0 && (
+        <div className="card p-4 mb-4">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr('Upcoming Jobs')}</h3>
+            <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Next jobs')}</span>
+          </div>
+          <div className="space-y-2">
+            {upcoming.map(job => (
+              <Link
+                key={job.id}
+                to={`/app/today?date=${encodeURIComponent(job.date)}`}
+                className="flex items-center justify-between gap-3 rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3 min-h-[44px]"
+              >
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">
+                    {job.clientName || tr('Next job')}
+                  </span>
+                  <span className="block text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+                    {new Date(`${job.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                    {job.time ? ` · ${job.time}` : ''}
+                  </span>
+                  <span className="block text-xs font-medium text-brand-hover dark:text-emerald-400 mt-0.5">
+                    {tr(job.status === 'in_progress' ? 'In progress' : job.status === 'scheduled' ? 'Scheduled' : 'Pending')}
+                  </span>
+                </span>
+                <ArrowRight className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr('Business snapshot')}</h3>
+        <span className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Static summary')}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-3" aria-label={tr('Static business summary')}>
         {cards.map((card, i) => (
           <div key={i} className="card p-4">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2.5 ${card.iconBg}`}>

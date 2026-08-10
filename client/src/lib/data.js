@@ -402,6 +402,7 @@ export async function getWeatherForLocation(lat, lng) {
       longitude: String(lng),
       daily: 'precipitation_probability_max,temperature_2m_max',
       timezone: 'auto',
+      temperature_unit: 'fahrenheit',
     });
     const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
     if (!response.ok) return null;
@@ -428,7 +429,7 @@ export async function getDayConditions(lat, lng) {
     const params = new URLSearchParams({
       latitude: String(lat),
       longitude: String(lng),
-      current: 'temperature_2m,wind_speed_10m',
+      current: 'temperature_2m,wind_speed_10m,weather_code',
       daily: 'precipitation_sum,soil_temperature_0cm,temperature_2m_max',
       past_days: '7',
       forecast_days: '1',
@@ -442,6 +443,7 @@ export async function getDayConditions(lat, lng) {
     const data = await response.json();
     const currentTemp = data?.current?.temperature_2m ?? null;
     const windMph = data?.current?.wind_speed_10m ?? null;
+    const weatherCode = data?.current?.weather_code ?? null;
     // Locate TODAY by the API's own timeline: past_days=7 + forecast_days=1 means
     // the last array entry IS today in the business location's timezone (timezone=auto).
     // Deriving the index from the response length (not the device clock) avoids an
@@ -457,7 +459,7 @@ export async function getDayConditions(lat, lng) {
     const rain7dInches = (todayIndex >= 0 && Array.isArray(rainValues))
       ? rainValues.slice(0, todayIndex + 1).reduce((sum, value) => sum + (Number.isFinite(value) ? value : 0), 0)
       : null;
-    return { currentTemp, windMph, soilTempF, rain7dInches };
+    return { currentTemp, windMph, weatherCode, soilTempF, rain7dInches };
   } catch {
     return null;
   }
@@ -583,7 +585,11 @@ export async function fetchClientsForExport() {
     .order('name');
   if (error) throw new Error('Failed to export clients: ' + (error.message || 'Unknown error'));
   // Redact physical-access credentials from exports (mirrors iOS/Android).
-  return (data || []).map(({ key_code, alarm_code, ...rest }) => rest);
+  return (data || []).map(({ key_code, alarm_code, ...rest }) => ({
+    ...rest,
+    key_code: key_code ? '***' : '',
+    alarm_code: alarm_code ? '***' : '',
+  }));
 }
 
 export async function createClient(client) {
