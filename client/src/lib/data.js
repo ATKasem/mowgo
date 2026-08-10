@@ -430,7 +430,8 @@ export async function getDayConditions(lat, lng) {
       latitude: String(lat),
       longitude: String(lng),
       current: 'temperature_2m,wind_speed_10m,weather_code',
-      daily: 'precipitation_sum,soil_temperature_0cm,temperature_2m_max',
+      daily: 'precipitation_sum,soil_temperature_0cm,temperature_2m_max,temperature_2m_min',
+      hourly: 'soil_moisture_0_to_1cm',
       past_days: '7',
       forecast_days: '1',
       timezone: 'auto',
@@ -450,7 +451,10 @@ export async function getDayConditions(lat, lng) {
     // off-by-one when the device and business are in different timezones.
     const times = data?.daily?.time;
     const soilTemps = data?.daily?.soil_temperature_0cm;
+    const minTemps = data?.daily?.temperature_2m_min;
     const rainValues = data?.daily?.precipitation_sum;
+    const moistureTimes = data?.hourly?.time;
+    const moistureValues = data?.hourly?.soil_moisture_0_to_1cm;
     const todayIndex = Array.isArray(times) ? times.length - 1 : -1;
     const soilTempF = (todayIndex >= 0 && Array.isArray(soilTemps) && soilTemps[todayIndex] != null)
       ? soilTemps[todayIndex]
@@ -459,7 +463,16 @@ export async function getDayConditions(lat, lng) {
     const rain7dInches = (todayIndex >= 0 && Array.isArray(rainValues))
       ? rainValues.slice(0, todayIndex + 1).reduce((sum, value) => sum + (Number.isFinite(value) ? value : 0), 0)
       : null;
-    return { currentTemp, windMph, weatherCode, soilTempF, rain7dInches };
+    const soilMoisture = Array.isArray(moistureTimes) && Array.isArray(moistureValues)
+      ? moistureValues[moistureTimes.length - 1]
+      : null;
+    const maxTempF = todayIndex >= 0 && Array.isArray(data?.daily?.temperature_2m_max)
+      ? data.daily.temperature_2m_max[todayIndex]
+      : null;
+    const minTempF = todayIndex >= 0 && Array.isArray(minTemps)
+      ? minTemps[todayIndex]
+      : null;
+    return { currentTemp, windMph, weatherCode, soilTempF, maxTempF, minTempF, soilMoisture, rain7dInches };
   } catch {
     return null;
   }

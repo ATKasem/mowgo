@@ -208,6 +208,7 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
   const ConditionIcon = conditionMeta?.Icon || CloudSun;
   const tone = WEATHER_TONE_CLASSES[conditionMeta?.tone || 'sky'];
   const hasCurrentReading = Number.isFinite(currentConditions?.currentTemp) || Number.isFinite(currentConditions?.windMph);
+  const moisturePercent = Number.isFinite(currentConditions?.soilMoisture) ? Math.round(currentConditions.soilMoisture * 100) : null;
 
   return (
     <div className="card p-4 mb-4">
@@ -265,10 +266,12 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
               </p>
             </div>
             {forecastDays[0] && (
-              <p className="flex items-center gap-1.5 text-sm font-medium text-sky-600 dark:text-sky-400 mt-3">
-                <Droplets className="w-3.5 h-3.5 flex-shrink-0" />{forecastDays[0].rain}% {tr('rain chance')}
-              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium mt-3">
+                <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400"><Droplets className="w-3.5 h-3.5 flex-shrink-0" />{forecastDays[0].rain}% {tr('rain chance')}</span>
+                {Number.isFinite(currentConditions?.maxTempF) && Number.isFinite(currentConditions?.minTempF) && <span className="text-[var(--color-text-secondary)] dark:text-gray-300">{tr('High')} {Math.round(currentConditions.maxTempF)}° · {tr('Low')} {Math.round(currentConditions.minTempF)}°</span>}
+              </div>
             )}
+            {(Number.isFinite(currentConditions?.windMph) || moisturePercent !== null) && <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-2"><span>{Number.isFinite(currentConditions?.windMph) ? `${tr('Wind')} ${Math.round(currentConditions.windMph)} mph` : ''}</span>{moisturePercent !== null && <span>{tr('Estimated surface soil moisture')}: {moisturePercent}%</span>}</div>}
             {hasCurrentReading && (
               <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-3 pt-3 border-t border-[var(--color-border)] dark:border-gray-700">
                 <span className="font-semibold text-[var(--color-text-secondary)] dark:text-gray-300">{tr('Now')}</span>
