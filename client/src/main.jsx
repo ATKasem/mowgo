@@ -23,7 +23,7 @@ applyTheme(themeForRoute(initialRoute));
 // Only in production: dev server hot-reload clashes with SW caching.
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    navigator.serviceWorker.register('/sw.js?v=20260810-2').catch((err) => {
       console.error('SW registration failed:', err);
     });
   });

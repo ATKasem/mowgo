@@ -3,7 +3,9 @@
    - Navigations: network-first, fall back to cached app shell when offline
    - API calls (/api/, supabase): NEVER cached
 */
-const CACHE = 'mowgo-v1';
+// Bump this when the app shell/assets change so installed PWAs discard stale
+// bundles instead of rendering a blank page after a deployment.
+const CACHE = 'mowgo-v2';
 const CORE = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/favicon.svg'];
 
 self.addEventListener('install', (event) => {
