@@ -161,10 +161,10 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
 
 function ReviewEmpty({ search, tr }) {
   if (search) return <Empty text={tr('No matching clients')} />;
-  return <div className="card p-5 space-y-2">
-    <p className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Nothing needs your attention right now')}</p>
-    <p className="text-sm text-[var(--color-text-secondary)]">{tr('Clients appear here only when their visit price may be low for the time scheduled. MowGo waits for at least two completed jobs before checking.')}</p>
-    <p className="text-xs text-[var(--color-text-muted)]">{tr('This is an estimate based on scheduled time, not a timer.')}</p>
+  return <div className="card p-5 space-y-2 border-emerald-200 dark:border-emerald-900/60">
+    <p className="font-semibold text-emerald-700 dark:text-emerald-300">{tr('You’re all set')}</p>
+    <p className="text-sm text-[var(--color-text-secondary)]">{tr('No pricing opportunities found. Your eligible clients are within the expected range for their scheduled time.')}</p>
+    <p className="text-xs text-[var(--color-text-muted)]">{tr('MowGo checks again as you complete more jobs. This is an estimate based on scheduled time, not a timer.')}</p>
   </div>;
 }
 
