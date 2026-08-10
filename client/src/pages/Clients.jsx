@@ -136,10 +136,6 @@ export default function Clients({ jobs = [], unreadLeadCount = 0, onLeadsViewed 
 
 function RateReviewList({ items, average, search, expandedId, setExpandedId, editClient, tr }) {
   return <div className="space-y-3">
-    <div className="rounded-xl bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-900 p-3">
-      <p className="text-sm font-semibold text-sky-900 dark:text-sky-200">{tr('Pricing opportunities')}</p>
-      <p className="text-xs text-sky-800 dark:text-sky-300 mt-1">{tr('MowGo looks for clients whose visit price may be low for the scheduled time. We need at least two completed jobs before we show a client here.')}</p>
-    </div>
     {items.length === 0 ? <ReviewEmpty search={search} tr={tr} /> : items.map(item => {
       const client = item.client;
       const open = expandedId === client.id;
@@ -161,8 +157,11 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
 
 function ReviewEmpty({ search, tr }) {
   if (search) return <Empty text={tr('No matching clients')} />;
-  return <div className="card p-5 space-y-2 border-emerald-200 dark:border-emerald-900/60">
-    <p className="font-semibold text-emerald-700 dark:text-emerald-300">{tr('You’re all set')}</p>
+  return <div className="card p-5 space-y-3 border-emerald-200 dark:border-emerald-900/60">
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">{tr('Pricing opportunities')}</p>
+      <p className="font-semibold text-emerald-700 dark:text-emerald-300 mt-1">{tr('You’re all set')}</p>
+    </div>
     <p className="text-sm text-[var(--color-text-secondary)]">{tr('No pricing opportunities found. Your eligible clients are within the expected range for their scheduled time.')}</p>
     <p className="text-xs text-[var(--color-text-muted)]">{tr('MowGo checks again as you complete more jobs. This is an estimate based on scheduled time, not a timer.')}</p>
   </div>;
