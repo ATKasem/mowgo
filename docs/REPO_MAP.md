@@ -59,6 +59,7 @@ client/src/
 | `route-audit.js` | Free route-audit lead magnet (estimate email + lead capture) |
 | `leads/public.js` | Lead intake (shared phone regex with route-audit) |
 | `autopilot.js` | LLM proxy for chat-to-CRM |
+| `weather-alerts.js` | Normalized active NWS alerts for validated coordinates |
 | `concierge/` | Done-for-you setup request handling |
 | `invite-crew.js`, `booking.js`, `team.js` | Crew + booking |
 | `_shared/safe-webhook-url.js` | SSRF validator — returns `{ok, reason}` |
