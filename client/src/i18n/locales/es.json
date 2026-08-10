@@ -185,6 +185,9 @@
     "you_ve_hit_the_free_limit_5_clients": "Alcanzaste el límite gratuito (5 clientes)",
     "needs_review": "Requieren revisión",
     "pricing_opportunities": "Oportunidades de precios",
+    "count_completed_jobs_included": "{{count}} trabajos completados incluidos",
+    "early_estimate_verify_scheduled_time": "Estimación inicial — verifica el tiempo programado",
+    "count_pricing_opportunity_review_client_rate": "{{count}} oportunidad de precios — revisa la tarifa del cliente",
     "mowgo_looks_for_clients_whose_visit_price_may_be_low_for_the_scheduled_time_we_need_at_least_two_completed_jobs_before_we_show_a_client_here": "MowGo busca clientes cuyo precio por visita puede ser bajo para el tiempo programado. Necesitamos al menos dos trabajos completados antes de mostrar un cliente aquí.",
     "nothing_needs_your_attention_right_now": "No hay nada que requiera tu atención ahora",
     "youre_all_set": "Todo está en orden",
@@ -1390,7 +1393,10 @@
     "static_business_summary": "Resumen informativo del negocio",
     "count_client_below_your_estimated_hourly_rate_target": "{{count}} cliente por debajo de tu objetivo de tarifa por hora estimada",
     "count_client_below_your_estimated_hourly_rate_target_one": "{{count}} cliente por debajo de tu objetivo de tarifa por hora estimada",
-    "count_client_below_your_estimated_hourly_rate_target_other": "{{count}} clientes por debajo de tu objetivo de tarifa por hora estimada"
+    "count_client_below_your_estimated_hourly_rate_target_other": "{{count}} clientes por debajo de tu objetivo de tarifa por hora estimada",
+    "count_pricing_opportunity_review_client_rate": "{{count}} oportunidades de precios — revisa las tarifas de los clientes",
+    "count_pricing_opportunity_review_client_rate_one": "{{count}} oportunidad de precios — revisa la tarifa del cliente",
+    "count_pricing_opportunity_review_client_rate_other": "{{count}} oportunidades de precios — revisa las tarifas de los clientes"
   },
   "reviewPrompt": {
     "leave_a_review": "Dejar una reseña",

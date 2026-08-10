@@ -7,7 +7,7 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import { supabase, isDemoMode } from './lib/supabase';
-import { loadJobs, loadInvoices, onDataChange, subscribeToNewLeads } from './lib/data';
+import { loadJobs, loadInvoices, loadProfile, onDataChange, subscribeToNewLeads } from './lib/data';
 import { resumeCheckoutIntent } from './lib/payments';
 import { useTranslation } from 'react-i18next';
 import useLocalizedText from './i18n/useLocalizedText';
@@ -110,6 +110,22 @@ function PageLoading() {
 
 // Marketing pages are dark-first for visitors with no saved preference.
 // A saved light/dark/system choice always wins, including on public routes.
+function ClientsRoute(props) {
+  const { user, loading } = useAuth();
+  const [isOwner, setIsOwner] = useState(null);
+  useEffect(() => {
+    let active = true;
+    if (loading) return undefined;
+    if (!user && !isDemoMode()) { setIsOwner(false); return undefined; }
+    loadProfile()
+      .then(profile => { if (active) setIsOwner(Boolean(profile && profile.role !== 'crew')); })
+      .catch(() => { if (active) setIsOwner(false); });
+    return () => { active = false; };
+  }, [loading, user?.id]);
+  if (loading || isOwner === null) return <PageLoading />;
+  return <Clients {...props} isOwner={isOwner} />;
+}
+
 function RouteTheme() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -321,7 +337,7 @@ export default function App() {
             <Route path="/app" element={<Dashboard />} />
             <Route path="/app/home" element={<Home jobs={jobs} invoices={invoices} />} />
             <Route path="/app/today" element={<Today jobs={jobs} setJobs={setJobs} invoices={invoices} setInvoices={setInvoices} loading={dataLoading} />} />
-            <Route path="/app/clients" element={<Clients jobs={jobs} unreadLeadCount={unreadLeadCount} onLeadsViewed={clearUnreadLeads} />} />
+            <Route path="/app/clients" element={<ClientsRoute jobs={jobs} unreadLeadCount={unreadLeadCount} onLeadsViewed={clearUnreadLeads} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/app" />} />

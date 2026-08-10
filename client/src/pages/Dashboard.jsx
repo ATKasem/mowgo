@@ -290,7 +290,7 @@ function attentionItemMeta(item, tr) {
     case 'new_leads':
       return { icon: Users, text: tr('{{count}} new lead', { count: item.count }), href: '/app/clients' };
     case 'estimated_rate_review':
-      return { icon: AlertTriangle, text: tr('{{count}} client below your estimated hourly-rate target', { count: item.count }), href: '/app/clients?segment=review' };
+      return { icon: DollarSign, text: tr('{{count}} pricing opportunity — review client rate', { count: item.count }), href: '/app/clients?segment=review' };
     case 'unfinished_jobs':
       return { icon: AlertTriangle, text: tr('{{count}} unfinished job from a previous day', { count: item.count }), href: '/app/today' };
     default:

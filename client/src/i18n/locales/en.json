@@ -184,7 +184,10 @@
     "copy": "Copy",
     "copied": "Copied!",
     "needs_review": "Needs Review",
-    "pricing_opportunities": "Pricing opportunities",
+    "pricing_opportunities": "Pricing Opportunities",
+    "count_completed_jobs_included": "{{count}} completed jobs included",
+    "early_estimate_verify_scheduled_time": "Early estimate — verify scheduled time",
+    "count_pricing_opportunity_review_client_rate": "{{count}} pricing opportunity — review client rate",
     "mowgo_looks_for_clients_whose_visit_price_may_be_low_for_the_scheduled_time_we_need_at_least_two_completed_jobs_before_we_show_a_client_here": "MowGo looks for clients whose visit price may be low for the scheduled time. We need at least two completed jobs before we show a client here.",
     "nothing_needs_your_attention_right_now": "Nothing needs your attention right now",
     "youre_all_set": "You’re all set",
@@ -1317,7 +1320,10 @@
     "static_business_summary": "Static business summary",
     "count_client_below_your_estimated_hourly_rate_target": "{{count}} client below your estimated hourly-rate target",
     "count_client_below_your_estimated_hourly_rate_target_one": "{{count}} client below your estimated hourly-rate target",
-    "count_client_below_your_estimated_hourly_rate_target_other": "{{count}} clients below your estimated hourly-rate target"
+    "count_client_below_your_estimated_hourly_rate_target_other": "{{count}} clients below your estimated hourly-rate target",
+    "count_pricing_opportunity_review_client_rate": "{{count}} pricing opportunities — review client rates",
+    "count_pricing_opportunity_review_client_rate_one": "{{count}} pricing opportunity — review client rate",
+    "count_pricing_opportunity_review_client_rate_other": "{{count}} pricing opportunities — review client rates"
   },
   "reviewPrompt": {
     "leave_a_review": "Leave a Review",
