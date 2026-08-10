@@ -203,7 +203,17 @@
     "this_estimate_is_percent_of_the_eligible_client_average_of_average_per_h": "Esta estimación equivale al {{percent}}% del promedio de clientes elegibles de ${{average}} por hora. Los clientes aparecen aquí solo si tienen al menos dos trabajos completados y la estimación es menor tanto al 75% de ese promedio como a $50 por hora.",
     "edit_client_price": "Editar precio del cliente",
     "review_client_details": "Revisar detalles del cliente",
-    "review_scheduled_duration": "Revisar duración programada"
+    "review_scheduled_duration": "Revisar duración programada",
+    "pricing_opportunity": "Oportunidad de precios",
+    "this_client_may_be_priced_too_low_for_the_time_scheduled": "Este cliente podría tener un precio bajo para el tiempo programado",
+    "estimate_based_on_scheduled_time": "estimación según el tiempo programado",
+    "visit_price_rate_avg_scheduled_time_minutes_min_count_completed_jobs": "Precio de visita: ${{rate}} · Tiempo promedio: {{minutes}} min · {{count}} trabajos completados",
+    "other_eligible_clients_average_about_average_hr": "Otros clientes elegibles promedian ${{average}}/h",
+    "before_changing_the_price": "Antes de cambiar el precio",
+    "check_the_job_notes_for_real_visit_times_consider_travel_distance_and_pr": "Revisa las notas del trabajo para ver los tiempos reales de visita. Considera la distancia de traslado y el tamaño de la propiedad. El tiempo programado es una estimación — no es el tiempo real.",
+    "how_is_this_calculated": "¿Cómo se calcula?",
+    "mowgo_compares_this_visit_price_and_scheduled_time_with_other_eligible_c": "MowGo compara el precio de visita y el tiempo programado con otros clientes elegibles. Un cliente aparece aquí cuando tiene al menos dos trabajos completados y su tarifa estimada es menor tanto al 75% del promedio como a $50 por hora.",
+    "review_client": "Revisar cliente"
   },
   "compare": {
     "compare_mowgo_plans": "Compara los planes de MowGo",

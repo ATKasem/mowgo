@@ -203,7 +203,17 @@
     "this_estimate_is_percent_of_the_eligible_client_average_of_average_per_h": "This estimate is {{percent}}% of the eligible client average of ${{average}} per hour. Clients appear here only with at least two completed jobs and when the estimate is below both 75% of that average and $50 per hour.",
     "edit_client_price": "Edit client price",
     "review_client_details": "Review client details",
-    "review_scheduled_duration": "Review scheduled duration"
+    "review_scheduled_duration": "Review scheduled duration",
+    "pricing_opportunity": "Pricing opportunity",
+    "this_client_may_be_priced_too_low_for_the_time_scheduled": "This client may be priced too low for the time scheduled",
+    "estimate_based_on_scheduled_time": "estimate based on scheduled time",
+    "visit_price_rate_avg_scheduled_time_minutes_min_count_completed_jobs": "Visit price: ${{rate}} · Avg scheduled time: {{minutes}} min · {{count}} completed jobs",
+    "other_eligible_clients_average_about_average_hr": "Other eligible clients average about ${{average}}/hr",
+    "before_changing_the_price": "Before changing the price",
+    "check_the_job_notes_for_real_visit_times_consider_travel_distance_and_pr": "Check the job notes for real visit times. Consider travel distance and property size. Scheduled time is an estimate — it is not actual clock time.",
+    "how_is_this_calculated": "How is this calculated?",
+    "mowgo_compares_this_visit_price_and_scheduled_time_with_other_eligible_c": "MowGo compares this visit price and scheduled time with other eligible clients. A client appears here when they have at least two completed jobs and their estimated rate is below both 75% of the average and $50 per hour.",
+    "review_client": "Review client"
   },
   "compare": {
     "compare_mowgo_plans": "Compare MowGo plans",

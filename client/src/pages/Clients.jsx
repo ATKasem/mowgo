@@ -146,11 +146,25 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
           <div className="min-w-0"><p className="font-semibold text-sm">{client.name}</p><p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('{{minutes}} scheduled minutes · ${{rate}} per visit', { minutes: Math.round(item.scheduledMinutes), rate: Number(client.rate).toFixed(2) })}</p><p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('{{count}} completed jobs included', { count: item.completedJobCount })}{item.completedJobCount < 4 && ` · ${tr('Early estimate — verify scheduled time')}`}</p></div>
           <div className="flex items-center gap-2"><span className="badge bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">${item.estimatedHourlyRate.toFixed(2)}/{tr('hr')}</span><ChevronRight className={`w-4 h-4 transition ${open ? 'rotate-90' : ''}`} /></div>
         </button>
-        {open && <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-3 text-sm">
-          <p className="font-semibold">{tr('Estimated rate based on scheduled duration')}</p>
-          <p className="text-[var(--color-text-secondary)]">{tr('This estimate is {{percent}}% of the eligible client average of ${{average}} per hour. Clients appear here only with at least two completed jobs and when the estimate is below both 75% of that average and $50 per hour.', { percent: Math.round(item.comparisonPercent), average: average.toFixed(2) })}</p>
-          <p className="text-[var(--color-text-secondary)]">{tr('Review price, service time, and route value before making changes. This is not actual time tracking.')}</p>
-          <div className="flex flex-wrap gap-2"><button type="button" className="btn-secondary text-xs" onClick={() => editClient(client)}><Pencil className="w-3 h-3" />{tr('Review client details')}</button></div>
+        {open && <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-4 text-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">{tr('Pricing opportunity')}</p>
+          <p className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('This client may be priced too low for the time scheduled')}</p>
+          <p className="text-xl font-bold text-amber-700 dark:text-amber-300">${item.estimatedHourlyRate.toFixed(2)}<span className="text-sm font-normal text-[var(--color-text-muted)]">/hr — {tr('estimate based on scheduled time')}</span></p>
+          <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
+            <p>{tr('Visit price: ${{rate}} · Avg scheduled time: {{minutes}} min · {{count}} completed jobs', { rate: Number(client.rate).toFixed(2), minutes: Math.round(item.scheduledMinutes), count: item.completedJobCount })}</p>
+            <p>{tr('Other eligible clients average about ${{average}}/hr', { average: average.toFixed(2) })}</p>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-800/60 rounded-lg p-3 space-y-1">
+            <p className="text-xs font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Before changing the price')}</p>
+            <p className="text-xs text-[var(--color-text-secondary)]">{tr('Check the job notes for real visit times. Consider travel distance and property size. Scheduled time is an estimate — it is not actual clock time.')}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="btn-primary text-xs" onClick={() => editClient(client)}><Pencil className="w-3 h-3" />{tr('Review client')}</button>
+          </div>
+          <details className="group text-xs text-[var(--color-text-secondary)]">
+            <summary className="cursor-pointer font-semibold select-none hover:text-[var(--color-text-primary)] dark:hover:text-white">{tr('How is this calculated?')}</summary>
+            <p className="mt-2 leading-relaxed">{tr('MowGo compares this visit price and scheduled time with other eligible clients. A client appears here when they have at least two completed jobs and their estimated rate is below both 75% of the average and $50 per hour.')}</p>
+          </details>
         </div>}
       </div>;
     })}
