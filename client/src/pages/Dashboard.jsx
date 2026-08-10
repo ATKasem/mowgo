@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { loadJobs, loadInvoices, loadProfile, saveProfile, loadTeamDashboard, loadLeads, loadClients, getWeatherForLocation, getDayConditions } from '../lib/data';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { AuthContext } from '../App';
-import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X, CalendarDays, CloudRain, RefreshCw, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
+import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X, CalendarDays, CloudRain, RefreshCw, AlertTriangle, ArrowRight, Clock, Sun, CloudSun, Cloud, CloudFog, CloudSnow, CloudLightning, Droplets, MapPin } from 'lucide-react';
 import OnboardingChecklist from '../components/OnboardingChecklist';
 import ConciergeStatus from '../components/ConciergeStatus';
 import {
@@ -175,27 +175,43 @@ function ReferralSatisfactionBanner() {
   );
 }
 
+// Weather condition icon/label/accent-tone, keyed off Open-Meteo's weather_code.
+// Tone classes are spelled out in full (not built dynamically) so Tailwind's
+// scanner picks them up.
+const WEATHER_TONE_CLASSES = {
+  amber: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' },
+  gray: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-500 dark:text-gray-400' },
+  sky: { bg: 'bg-sky-100 dark:bg-sky-900/30', text: 'text-sky-600 dark:text-sky-400' },
+};
+
+function weatherConditionMeta(weatherCode, tr) {
+  if (weatherCode == null) return null;
+  if (weatherCode === 0) return { Icon: Sun, label: tr('Clear'), tone: 'amber' };
+  if (weatherCode === 1 || weatherCode === 2) return { Icon: CloudSun, label: tr('Partly cloudy'), tone: 'amber' };
+  if (weatherCode === 3) return { Icon: Cloud, label: tr('Overcast'), tone: 'gray' };
+  if (weatherCode === 45 || weatherCode === 48) return { Icon: CloudFog, label: tr('Fog'), tone: 'gray' };
+  if (weatherCode >= 51 && weatherCode <= 67) return { Icon: CloudRain, label: tr('Rain'), tone: 'sky' };
+  if (weatherCode >= 71 && weatherCode <= 77) return { Icon: CloudSnow, label: tr('Snow'), tone: 'sky' };
+  if (weatherCode >= 80 && weatherCode <= 82) return { Icon: CloudRain, label: tr('Rain showers'), tone: 'sky' };
+  if (weatherCode >= 85 && weatherCode <= 86) return { Icon: CloudSnow, label: tr('Snow showers'), tone: 'sky' };
+  if (weatherCode >= 95) return { Icon: CloudLightning, label: tr('Thunderstorm'), tone: 'amber' };
+  return null;
+}
+
 // Permanent weather banner (design §2): always visible — loading, no-location,
 // unavailable, and loaded all render inside the same card so weather context
 // never disappears just because the forecast is clear. Rain-risk content is
 // the only conditional part and always routes to Today's existing rain-delay flow.
 function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDayLabel, affectedCount, onRetry, onUseLocation, locationError, locationSaving }) {
   const { tr } = useLocalizedText('dashboard');
-  const weatherCode = currentConditions?.weatherCode;
-  const condition = weatherCode === 0 ? tr('Clear')
-    : weatherCode === 1 || weatherCode === 2 ? tr('Partly cloudy')
-      : weatherCode === 3 ? tr('Overcast')
-        : weatherCode === 45 || weatherCode === 48 ? tr('Fog')
-          : weatherCode >= 51 && weatherCode <= 67 ? tr('Rain')
-            : weatherCode >= 71 && weatherCode <= 77 ? tr('Snow')
-              : weatherCode >= 80 && weatherCode <= 82 ? tr('Rain showers')
-                : weatherCode >= 85 && weatherCode <= 86 ? tr('Snow showers')
-                  : weatherCode >= 95 ? tr('Thunderstorm')
-                    : null;
+  const conditionMeta = weatherConditionMeta(currentConditions?.weatherCode, tr);
+  const ConditionIcon = conditionMeta?.Icon || CloudSun;
+  const tone = WEATHER_TONE_CLASSES[conditionMeta?.tone || 'sky'];
+  const hasCurrentReading = Number.isFinite(currentConditions?.currentTemp) || Number.isFinite(currentConditions?.windMph);
 
   return (
     <div className="card p-4 mb-4">
-      <div className="flex items-center justify-between gap-3 mb-1">
+      <div className="flex items-center justify-between gap-3 mb-3">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr('Weather')}</h3>
         {state === 'unavailable' && (
           <button onClick={onRetry} className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
@@ -205,12 +221,19 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
       </div>
 
       {state === 'loading' && (
-        <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Checking local weather...')}</p>
+        <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />{tr('Checking local weather...')}
+        </div>
       )}
 
       {state === 'no_location' && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('See weather for your work area')}</p>
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+            </div>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white pt-2">{tr('See weather for your work area')}</p>
+          </div>
           <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('MowGo asks for your location to show local weather and warn you when rain may affect your route. We use it for your business weather—not continuous tracking.')}</p>
           <div className="flex flex-wrap items-center gap-3">
             <button type="button" onClick={onUseLocation} disabled={locationSaving} className="btn-primary text-sm min-h-[44px]">{locationSaving ? tr('Saving...') : tr('Use my location')}</button>
@@ -221,36 +244,54 @@ function WeatherBanner({ state, currentConditions, forecastDays, riskDay, riskDa
       )}
 
       {state === 'unavailable' && (
-        <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]"><AlertCircle className="w-4 h-4 text-amber-500" />{tr('Weather is temporarily unavailable.')}</div>
+        <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]"><AlertCircle className="w-4 h-4 flex-shrink-0 text-amber-500" />{tr('Weather is temporarily unavailable.')}</div>
       )}
 
       {state === 'loaded' && (
         <div>
-          <div className="rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3">
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Today')}</p>
-              <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">{Number.isFinite(forecastDays[0]?.tempMax) ? `${Math.round(forecastDays[0].tempMax)}°` : tr('Weather unavailable')}</p>
+          <div className="rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${tone.bg}`}>
+                  <ConditionIcon className={`w-5 h-5 ${tone.text}`} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Today')}</p>
+                  {conditionMeta && <p className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-gray-300 truncate">{conditionMeta.label}</p>}
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-[var(--color-text-primary)] dark:text-white leading-none flex-shrink-0">
+                {Number.isFinite(forecastDays[0]?.tempMax) ? `${Math.round(forecastDays[0].tempMax)}°` : tr('Weather unavailable')}
+              </p>
             </div>
-            {forecastDays[0] && <p className="text-sm text-[var(--color-text-secondary)] dark:text-gray-300 mt-1">{forecastDays[0].rain}% {tr('rain chance')}</p>}
-            {(Number.isFinite(currentConditions?.currentTemp) || condition || Number.isFinite(currentConditions?.windMph)) && <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-2">{Number.isFinite(currentConditions?.currentTemp) ? `${Math.round(currentConditions.currentTemp)}°` : ''}{condition ? ` · ${condition}` : ''}{Number.isFinite(currentConditions?.windMph) ? ` · ${tr('Wind {{value}} mph', { value: Math.round(currentConditions.windMph) })}` : ''}</p>}
+            {forecastDays[0] && (
+              <p className="flex items-center gap-1.5 text-sm font-medium text-sky-600 dark:text-sky-400 mt-3">
+                <Droplets className="w-3.5 h-3.5 flex-shrink-0" />{forecastDays[0].rain}% {tr('rain chance')}
+              </p>
+            )}
+            {hasCurrentReading && (
+              <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-3 pt-3 border-t border-[var(--color-border)] dark:border-gray-700">
+                <span className="font-semibold text-[var(--color-text-secondary)] dark:text-gray-300">{tr('Now')}</span>
+                {Number.isFinite(currentConditions?.currentTemp) ? ` ${Math.round(currentConditions.currentTemp)}°` : ''}
+                {Number.isFinite(currentConditions?.windMph) ? ` · ${tr('Wind {{value}} mph', { value: Math.round(currentConditions.windMph) })}` : ''}
+              </p>
+            )}
           </div>
-          {forecastDays.length > 0 && (
-            <div className="flex gap-3 mt-3 overflow-x-auto">
+          {forecastDays.length > 1 && (
+            <div className="grid grid-cols-4 gap-2 mt-3">
               {forecastDays.slice(1, 5).map(day => (
-                <div key={day.date} className="flex-shrink-0 text-center min-w-[44px]">
-                  <p className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+                <div key={day.date} className="text-center rounded-lg border border-[var(--color-border)] dark:border-gray-700 py-2 px-1">
+                  <p className="text-[11px] font-medium text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
                     {new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}
                   </p>
-                  <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white mt-0.5">
                     {Number.isFinite(day.tempMax) ? `${Math.round(day.tempMax)}°` : '—'}
                   </p>
-                  <p className="text-[11px] text-sky-600 dark:text-sky-400">{day.rain}%</p>
+                  <p className="text-[11px] text-sky-600 dark:text-sky-400 mt-0.5">{day.rain}%</p>
                 </div>
               ))}
             </div>
           )}
-
-
         </div>
       )}
     </div>

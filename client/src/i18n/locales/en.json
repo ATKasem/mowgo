@@ -1292,6 +1292,7 @@
     "weather": "Weather",
     "checking_local_weather": "Checking local weather...",
     "rain_chance": "rain chance",
+    "now": "Now",
     "see_weather_for_your_work_area": "See weather for your work area",
     "mowgo_asks_for_your_location_to_show_local_weather_and_warn_you_when_rai": "MowGo asks for your location to show local weather and warn you when rain may affect your route. We use it for your business weather—not continuous tracking.",
     "use_my_location": "Use my location",
