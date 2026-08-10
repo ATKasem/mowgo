@@ -136,11 +136,11 @@ export default function Clients({ jobs = [], unreadLeadCount = 0, onLeadsViewed 
 
 function RateReviewList({ items, average, search, expandedId, setExpandedId, editClient, tr }) {
   return <div className="space-y-3">
-    <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 p-3">
-      <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">{tr('Estimated rate based on scheduled duration')}</p>
-      <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">{tr('Review price, service time, and route value before making changes. This is not actual time tracking.')}</p>
+    <div className="rounded-xl bg-sky-50 dark:bg-sky-950/20 border border-sky-200 dark:border-sky-900 p-3">
+      <p className="text-sm font-semibold text-sky-900 dark:text-sky-200">{tr('Pricing opportunities')}</p>
+      <p className="text-xs text-sky-800 dark:text-sky-300 mt-1">{tr('MowGo looks for clients whose visit price may be low for the scheduled time. We need at least two completed jobs before we show a client here.')}</p>
     </div>
-    {items.length === 0 ? <Empty text={tr(search ? 'No matching clients' : 'No clients need review')} /> : items.map(item => {
+    {items.length === 0 ? <ReviewEmpty search={search} tr={tr} /> : items.map(item => {
       const client = item.client;
       const open = expandedId === client.id;
       return <div key={client.id} className="card">
@@ -156,6 +156,15 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
         </div>}
       </div>;
     })}
+  </div>;
+}
+
+function ReviewEmpty({ search, tr }) {
+  if (search) return <Empty text={tr('No matching clients')} />;
+  return <div className="card p-5 space-y-2">
+    <p className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Nothing needs your attention right now')}</p>
+    <p className="text-sm text-[var(--color-text-secondary)]">{tr('Clients appear here only when their visit price may be low for the time scheduled. MowGo waits for at least two completed jobs before checking.')}</p>
+    <p className="text-xs text-[var(--color-text-muted)]">{tr('This is an estimate based on scheduled time, not a timer.')}</p>
   </div>;
 }
 
