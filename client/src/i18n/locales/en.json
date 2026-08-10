@@ -1249,6 +1249,9 @@
   },
   "dashboard": {
     "todays_route": "Today's route",
+    "next_stop": "Next stop",
+    "count_stops_complete": "{{done}} of {{total}} stops complete",
+    "remaining_stops": "Remaining stops",
     "count_stops_left_hours_planned": "{{count}} stops left · {{hours}} planned",
     "open_route": "Open route",
     "all_stops_are_complete": "All stops are complete",

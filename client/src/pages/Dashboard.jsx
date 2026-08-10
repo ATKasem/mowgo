@@ -572,23 +572,23 @@ export default function Dashboard() {
 
       <div className="card p-4 mb-4">
         <div className="flex items-center justify-between gap-3 mb-2">
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr("Today's Plan")}</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300">{tr("Today's route")}</h3>
           <Link to="/app/today" className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
             {tr("View today's route")}<ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
         <p className="text-2xl font-bold text-[var(--color-text-primary)] dark:text-white">
-          {tr('{{done}} of {{total}} jobs done', { count: command.total, done: command.done, total: command.total })}
+          {tr('{{done}} of {{total}} stops complete', { count: command.total, done: command.done, total: command.total })}
         </p>
         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
           <span>{tr('{{count}} in-progress job', { count: command.inProgress })}</span>
-          <span>{tr('${{amount}} completed revenue', { amount: command.revenue.toLocaleString() })}</span>
+          <span>{tr('{{count}} stops left · {{hours}} planned', { count: todayRoute.length, hours: `${Math.floor(plannedMinutesRemaining / 60)}h ${plannedMinutesRemaining % 60}m` })}</span>
         </div>
         {command.nextJob ? (
           <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-3">
             <Clock className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Next job')}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Next stop')}</p>
               <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">
                 {command.nextJob.clientName || tr('Next job')}{command.nextJob.time ? ` · ${command.nextJob.time}` : ''}
               </p>
@@ -603,6 +603,19 @@ export default function Dashboard() {
           <div className="mt-3">
             <p className="text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('No jobs scheduled today')}</p>
             <Link to="/app/today" className="text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline mt-1 inline-block">{tr('Add a job')}</Link>
+          </div>
+        )}
+        {todayRoute.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <p className="text-xs font-semibold text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Remaining stops')}</p>
+            {todayRoute.slice(0, 3).map((job, index) => (
+              <Link key={job.id} to={`/app/today?date=${encodeURIComponent(job.scheduled_date)}`} className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] dark:border-gray-700 p-3 min-h-[48px]">
+                <span className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">{index + 1}</span>
+                <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">{job.clients?.name || tr('Next job')}</span><span className="block text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{job.scheduled_time || tr('Time not set')} · {job.duration_minutes || 0} min</span></span>
+                <ArrowRight className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
+              </Link>
+            ))}
+            {todayRoute.length > 3 && <Link to="/app/today" className="block text-xs font-medium text-brand-hover dark:text-emerald-400 hover:underline pt-1">{tr('View {{count}} more stops', { count: todayRoute.length - 3 })}</Link>}
           </div>
         )}
       </div>
