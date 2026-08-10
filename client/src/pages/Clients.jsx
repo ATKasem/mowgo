@@ -148,15 +148,15 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
         </button>
         {open && <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-4 text-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">{tr('Pricing opportunity')}</p>
-          <p className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('This client may be priced too low for the time scheduled')}</p>
-          <p className="text-xl font-bold text-amber-700 dark:text-amber-300">${item.estimatedHourlyRate.toFixed(2)}<span className="text-sm font-normal text-[var(--color-text-muted)]">/hr — {tr('estimate based on scheduled time')}</span></p>
+          <p className="font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('This visit may not be priced for the time it takes')}</p>
+          <p className="text-xl font-bold text-amber-700 dark:text-amber-300">${item.estimatedHourlyRate.toFixed(2)}<span className="text-sm font-normal text-[var(--color-text-muted)]">/hr — {tr('based on scheduled time')}</span></p>
           <div className="space-y-1 text-sm text-[var(--color-text-secondary)]">
-            <p>{tr('Visit price: ${{rate}} · Avg scheduled time: {{minutes}} min · {{count}} completed jobs', { rate: Number(client.rate).toFixed(2), minutes: Math.round(item.scheduledMinutes), count: item.completedJobCount })}</p>
-            <p>{tr('Other eligible clients average about ${{average}}/hr', { average: average.toFixed(2) })}</p>
+            <p>{tr('You charge ${{rate}} for a visit scheduled for about {{minutes}} minutes. Based on {{count}} completed jobs.', { rate: Number(client.rate).toFixed(2), minutes: Math.round(item.scheduledMinutes), count: item.completedJobCount })}</p>
+            <p>{tr('Similar clients average about ${{average}}/hr.', { average: average.toFixed(2) })}</p>
           </div>
           <div className="bg-gray-50 dark:bg-gray-800/60 rounded-lg p-3 space-y-1">
             <p className="text-xs font-semibold text-[var(--color-text-primary)] dark:text-white">{tr('Before changing the price')}</p>
-            <p className="text-xs text-[var(--color-text-secondary)]">{tr('Check the job notes for real visit times. Consider travel distance and property size. Scheduled time is an estimate — it is not actual clock time.')}</p>
+            <p className="text-xs text-[var(--color-text-secondary)]">{tr('Check how long the visit really takes and how far you drive. This is a suggestion to review — not a direction to change the price.')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary text-xs" onClick={() => editClient(client)}><Pencil className="w-3 h-3" />{tr('Review client')}</button>
