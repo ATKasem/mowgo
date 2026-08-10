@@ -182,7 +182,17 @@
     "invite_a_crew_get_a_free_month": "Invite a crew — get a free month",
     "share_your_code": "Share your code:",
     "copy": "Copy",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "needs_review": "Needs Review",
+    "estimated_rate_based_on_scheduled_duration": "Estimated rate based on scheduled duration",
+    "review_price_service_time_and_route_value_before_making_changes_this_is_": "Review price, service time, and route value before making changes. This is not actual time tracking.",
+    "no_clients_need_review": "No clients need review",
+    "minutes_scheduled_minutes_rate_per_visit": "{{minutes}} scheduled minutes · ${{rate}} per visit",
+    "hr": "hr",
+    "this_estimate_is_percent_of_the_eligible_client_average_of_average_per_h": "This estimate is {{percent}}% of the eligible client average of ${{average}} per hour. Clients appear here only with at least two completed jobs and when the estimate is below both 75% of that average and $50 per hour.",
+    "edit_client_price": "Edit client price",
+    "review_client_details": "Review client details",
+    "review_scheduled_duration": "Review scheduled duration"
   },
   "compare": {
     "compare_mowgo_plans": "Compare MowGo plans",
@@ -1296,7 +1306,10 @@
     "pending": "Pending",
     "business_snapshot": "Business snapshot",
     "static_summary": "Static summary",
-    "static_business_summary": "Static business summary"
+    "static_business_summary": "Static business summary",
+    "count_client_below_your_estimated_hourly_rate_target": "{{count}} client below your estimated hourly-rate target",
+    "count_client_below_your_estimated_hourly_rate_target_one": "{{count}} client below your estimated hourly-rate target",
+    "count_client_below_your_estimated_hourly_rate_target_other": "{{count}} clients below your estimated hourly-rate target"
   },
   "reviewPrompt": {
     "leave_a_review": "Leave a Review",

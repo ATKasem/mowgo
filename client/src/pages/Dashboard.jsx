@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { loadJobs, loadInvoices, loadProfile, loadTeamDashboard, loadLeads, getWeatherForLocation, getDayConditions } from '../lib/data';
+import { loadJobs, loadInvoices, loadProfile, loadTeamDashboard, loadLeads, loadClients, getWeatherForLocation, getDayConditions } from '../lib/data';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { AuthContext } from '../App';
 import { FileText, CheckCircle, Users, DollarSign, Loader2, AlertCircle, X, CalendarDays, CloudRain, RefreshCw, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
@@ -10,6 +10,7 @@ import ConciergeStatus from '../components/ConciergeStatus';
 import {
   localDate, summarizeDashboard, todayCommand, upcomingJobs, moneyToCollect,
   unfinishedJobCount, rainRiskDay, rainAffectedJobs, weatherBannerView, attentionItems,
+  estimatedRateReview,
 } from '../lib/dashboard-metrics';
 import { hasTeamAccess } from '../lib/constants';
 import { teamProgressView } from '../lib/today-ux';
@@ -288,6 +289,8 @@ function attentionItemMeta(item, tr) {
       };
     case 'new_leads':
       return { icon: Users, text: tr('{{count}} new lead', { count: item.count }), href: '/app/clients' };
+    case 'estimated_rate_review':
+      return { icon: AlertTriangle, text: tr('{{count}} client below your estimated hourly-rate target', { count: item.count }), href: '/app/clients?segment=review' };
     case 'unfinished_jobs':
       return { icon: AlertTriangle, text: tr('{{count}} unfinished job from a previous day', { count: item.count }), href: '/app/today' };
     default:
@@ -302,6 +305,7 @@ export default function Dashboard() {
   const [jobsData, setJobsData] = useState([]);
   const [invoicesData, setInvoicesData] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [reviewClients, setReviewClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [profile, setProfile] = useState(null);
@@ -323,6 +327,7 @@ export default function Dashboard() {
     setJobsData([]);
     setInvoicesData([]);
     setLeads([]);
+    setReviewClients([]);
     setProfile(null);
     setTeamProgress([]);
     setTeamError('');
@@ -338,14 +343,16 @@ export default function Dashboard() {
 
         const normalizedProfile = { ...profile, tier: profile.tier || 'free' };
         setProfile(normalizedProfile);
-        const [jobs, invoices] = await Promise.all([
+        const [jobs, invoices, clients] = await Promise.all([
           loadJobs(),
           normalizedProfile.role === 'owner' ? loadInvoices() : Promise.resolve([]),
+          normalizedProfile.role === 'owner' ? loadClients().catch(() => []) : Promise.resolve([]),
         ]);
         if (!mounted) return;
         setStats(summarizeDashboard(jobs, invoices));
         setJobsData(jobs);
         setInvoicesData(invoices);
+        setReviewClients(clients);
 
         // Owner-only: leads carry business/revenue-adjacent context that must
         // never surface on the assigned-work-only crew dashboard.
@@ -532,12 +539,14 @@ export default function Dashboard() {
   const upcoming = upcomingJobs(jobsData);
   const unfinished = unfinishedJobCount(jobsData);
   const newLeadCount = leads.filter(lead => lead.status === 'new').length;
+  const estimatedRateReviewCount = estimatedRateReview(reviewClients, jobsData).flagged.length;
   const attention = attentionItems({
     rainRisk: riskDay,
     rainAffectedCount,
     overdueInvoiceCount: money.overdueCount,
     overdueInvoiceTotal: money.overdueTotal,
     newLeadCount,
+    estimatedRateReviewCount,
     unfinishedJobCount: unfinished,
   });
 

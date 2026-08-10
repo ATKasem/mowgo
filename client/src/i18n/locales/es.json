@@ -182,7 +182,17 @@
     "not_now": "Ahora no",
     "see_plans": "Ver planes",
     "unlimited_clients_recurring_jobs_and_offline_mode_start_at_39_mo": "Clientes ilimitados, trabajos recurrentes y modo sin conexión desde $39/mes.",
-    "you_ve_hit_the_free_limit_5_clients": "Alcanzaste el límite gratuito (5 clientes)"
+    "you_ve_hit_the_free_limit_5_clients": "Alcanzaste el límite gratuito (5 clientes)",
+    "needs_review": "Requieren revisión",
+    "estimated_rate_based_on_scheduled_duration": "Tarifa estimada según la duración programada",
+    "review_price_service_time_and_route_value_before_making_changes_this_is_": "Revisa el precio, el tiempo de servicio y el valor de la ruta antes de hacer cambios. Esto no es seguimiento del tiempo real.",
+    "no_clients_need_review": "Ningún cliente requiere revisión",
+    "minutes_scheduled_minutes_rate_per_visit": "{{minutes}} minutos programados · ${{rate}} por visita",
+    "hr": "h",
+    "this_estimate_is_percent_of_the_eligible_client_average_of_average_per_h": "Esta estimación equivale al {{percent}}% del promedio de clientes elegibles de ${{average}} por hora. Los clientes aparecen aquí solo si tienen al menos dos trabajos completados y la estimación es menor tanto al 75% de ese promedio como a $50 por hora.",
+    "edit_client_price": "Editar precio del cliente",
+    "review_client_details": "Revisar detalles del cliente",
+    "review_scheduled_duration": "Revisar duración programada"
   },
   "compare": {
     "compare_mowgo_plans": "Compara los planes de MowGo",
@@ -1369,7 +1379,10 @@
     "pending": "Pendiente",
     "business_snapshot": "Resumen del negocio",
     "static_summary": "Resumen informativo",
-    "static_business_summary": "Resumen informativo del negocio"
+    "static_business_summary": "Resumen informativo del negocio",
+    "count_client_below_your_estimated_hourly_rate_target": "{{count}} cliente por debajo de tu objetivo de tarifa por hora estimada",
+    "count_client_below_your_estimated_hourly_rate_target_one": "{{count}} cliente por debajo de tu objetivo de tarifa por hora estimada",
+    "count_client_below_your_estimated_hourly_rate_target_other": "{{count}} clientes por debajo de tu objetivo de tarifa por hora estimada"
   },
   "reviewPrompt": {
     "leave_a_review": "Dejar una reseña",

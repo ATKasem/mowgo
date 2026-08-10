@@ -32,6 +32,49 @@ const validInvoices = value => asArray(value).filter(invoice => (
   && safeNumber(invoice.amount) >= 0
 ));
 
+/**
+ * Find clients whose price implies a low estimated hourly rate from scheduled
+ * duration. Each client needs at least two completed jobs with usable duration.
+ */
+export function estimatedRateReview(clients = [], jobs = []) {
+  const completedDurations = new Map();
+  for (const job of asArray(jobs)) {
+    if (!isRecord(job) || job.status !== 'done' || job.client_id == null) continue;
+    const duration = safeNumber(job.duration_minutes);
+    if (duration === null || duration <= 0) continue;
+    const durations = completedDurations.get(job.client_id) || [];
+    durations.push(duration);
+    completedDurations.set(job.client_id, durations);
+  }
+
+  const eligible = [];
+  for (const client of asArray(clients)) {
+    if (!isRecord(client) || client.id == null) continue;
+    const rate = safeNumber(client.rate);
+    const durations = completedDurations.get(client.id) || [];
+    if (rate === null || rate <= 0 || durations.length < 2) continue;
+    const scheduledMinutes = durations.reduce((sum, duration) => sum + duration, 0) / durations.length;
+    eligible.push({
+      client,
+      clientId: client.id,
+      completedJobCount: durations.length,
+      scheduledMinutes,
+      estimatedHourlyRate: rate / (scheduledMinutes / 60),
+    });
+  }
+
+  if (eligible.length === 0) return { eligibleAverage: null, flagged: [] };
+  const eligibleAverage = eligible.reduce((sum, item) => sum + item.estimatedHourlyRate, 0) / eligible.length;
+  const flagged = eligible
+    .filter(item => item.estimatedHourlyRate < eligibleAverage * 0.75 && item.estimatedHourlyRate < 50)
+    .map(item => ({
+      ...item,
+      comparisonPercent: (item.estimatedHourlyRate / eligibleAverage) * 100,
+    }));
+
+  return { eligibleAverage, flagged };
+}
+
 /** Build Dashboard values exclusively from the existing jobs/invoices loaders. */
 export function summarizeDashboard(jobs = [], invoices = [], now = new Date()) {
   jobs = validJobs(jobs);
@@ -156,7 +199,8 @@ export function weatherBannerView(hasLocation, loading, hasData) {
 
 /**
  * Needs Attention queue, in priority order: rain decision, overdue invoices,
- * new leads, unfinished work. Only actionable (non-zero) items are included.
+ * new leads, estimated-rate review, unfinished work. Only actionable (non-zero)
+ * items are included.
  */
 export function attentionItems(options = {}) {
   const {
@@ -165,6 +209,7 @@ export function attentionItems(options = {}) {
     overdueInvoiceCount = 0,
     overdueInvoiceTotal = 0,
     newLeadCount = 0,
+    estimatedRateReviewCount = 0,
     unfinishedJobCount = 0,
   } = isRecord(options) ? options : {};
   const items = [];
@@ -176,6 +221,9 @@ export function attentionItems(options = {}) {
   }
   if (newLeadCount > 0) {
     items.push({ type: 'new_leads', count: newLeadCount });
+  }
+  if (estimatedRateReviewCount > 0) {
+    items.push({ type: 'estimated_rate_review', count: estimatedRateReviewCount });
   }
   if (unfinishedJobCount > 0) {
     items.push({ type: 'unfinished_jobs', count: unfinishedJobCount });

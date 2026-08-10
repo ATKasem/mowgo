@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   localDate, summarizeDashboard, todayCommand, upcomingJobs, moneyToCollect,
   unfinishedJobCount, rainRiskDay, rainAffectedJobs, weatherBannerView, attentionItems,
+  estimatedRateReview,
 } from './dashboard-metrics.js';
 import { hasTeamAccess } from './constants.js';
 import { readFileSync } from 'node:fs';
@@ -162,11 +163,13 @@ test('attentionItems orders rain, overdue invoices, new leads, unfinished work â
     overdueInvoiceCount: 2,
     overdueInvoiceTotal: 150,
     newLeadCount: 1,
+    estimatedRateReviewCount: 2,
     unfinishedJobCount: 4,
   }), [
     { type: 'rain', count: 3, rainPercent: 70, date: '2026-08-09' },
     { type: 'overdue_invoices', count: 2, amount: 150 },
     { type: 'new_leads', count: 1 },
+    { type: 'estimated_rate_review', count: 2 },
     { type: 'unfinished_jobs', count: 4 },
   ]);
   assert.deepEqual(attentionItems(), []);
@@ -174,6 +177,84 @@ test('attentionItems orders rain, overdue invoices, new leads, unfinished work â
 
 test('attentionItems suppresses the rain item when a risk day exists but no jobs are affected', () => {
   assert.deepEqual(attentionItems({ rainRisk: { date: '2026-08-09', rain: 70 }, rainAffectedCount: 0 }), []);
+});
+
+test('estimatedRateReview flags eligible clients below both comparison thresholds', () => {
+  const clients = [
+    { id: 'low', name: 'Low', rate: 30 },
+    { id: 'mid', name: 'Mid', rate: 60 },
+    { id: 'high', name: 'High', rate: 90 },
+  ];
+  const jobs = clients.flatMap(client => [
+    { client_id: client.id, status: 'done', duration_minutes: 60 },
+    { client_id: client.id, status: 'done', duration_minutes: 60 },
+  ]);
+
+  const result = estimatedRateReview(clients, jobs);
+
+  assert.equal(result.eligibleAverage, 60);
+  assert.equal(result.flagged.length, 1);
+  assert.deepEqual(result.flagged[0], {
+    client: clients[0],
+    clientId: 'low',
+    completedJobCount: 2,
+    scheduledMinutes: 60,
+    estimatedHourlyRate: 30,
+    comparisonPercent: 50,
+  });
+});
+
+test('estimatedRateReview requires two completed jobs with positive rate and durations', () => {
+  const clients = [
+    { id: 'one-job', rate: 5 },
+    { id: 'scheduled', rate: 5 },
+    { id: 'zero-rate', rate: 0 },
+    { id: 'bad-duration', rate: 5 },
+    { id: 'eligible', rate: 100 },
+  ];
+  const jobs = [
+    { client_id: 'one-job', status: 'done', duration_minutes: 60 },
+    { client_id: 'scheduled', status: 'scheduled', duration_minutes: 60 },
+    { client_id: 'scheduled', status: 'scheduled', duration_minutes: 60 },
+    { client_id: 'zero-rate', status: 'done', duration_minutes: 60 },
+    { client_id: 'zero-rate', status: 'done', duration_minutes: 60 },
+    { client_id: 'bad-duration', status: 'done', duration_minutes: 60 },
+    { client_id: 'bad-duration', status: 'done', duration_minutes: 0 },
+    { client_id: 'eligible', status: 'done', duration_minutes: 60 },
+    { client_id: 'eligible', status: 'done', duration_minutes: 60 },
+  ];
+
+  const result = estimatedRateReview(clients, jobs);
+
+  assert.equal(result.eligibleAverage, 100);
+  assert.deepEqual(result.flagged, []);
+});
+
+test('estimatedRateReview excludes rates at either strict boundary and returns no false flags', () => {
+  const clients = [
+    { id: 'average-boundary', rate: 45 },
+    { id: 'dollar-boundary', rate: 50 },
+    { id: 'high', rate: 85 },
+  ];
+  const jobs = clients.flatMap(client => [
+    { client_id: client.id, status: 'done', duration_minutes: 60 },
+    { client_id: client.id, status: 'done', duration_minutes: 60 },
+  ]);
+
+  assert.deepEqual(estimatedRateReview(clients, jobs).flagged, []);
+});
+
+test('estimatedRateReview is null-safe and ignores malformed records', () => {
+  assert.deepEqual(estimatedRateReview(null, undefined), { eligibleAverage: null, flagged: [] });
+  assert.deepEqual(estimatedRateReview([
+    null,
+    { id: 'symbol-rate', rate: Symbol('rate') },
+    { id: 'missing-rate' },
+  ], [
+    null,
+    { client_id: 'symbol-rate', status: 'done', duration_minutes: Symbol('duration') },
+    { client_id: 'symbol-rate', status: 'done', duration_minutes: 60 },
+  ]), { eligibleAverage: null, flagged: [] });
 });
 
 test('dashboard helpers normalize null and non-array collections', () => {
