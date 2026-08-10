@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Calendar, ChevronRight, FileText, Filter, Loader2, Mail, MapPin, Navigation, Pencil, Phone, Plus, Search, StickyNote, Tag, Trash2, TrendingDown, X } from 'lucide-react';
+import { Calendar, ChevronRight, FileText, Filter, Loader2, Mail, MapPin, Navigation, Pencil, Phone, Plus, Search, StickyNote, Tag, Trash2, X } from 'lucide-react';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { CLIENT_TAGS, INITIAL_CLIENT_FORM } from '../lib/constants';
 import { createClient, createEstimate, createLead, deleteClient, deleteLead, loadClients, loadLeads, updateClient, updateLeadStatus, convertLeadToClient } from '../lib/data';
@@ -137,21 +137,14 @@ export default function Clients({ jobs = [], unreadLeadCount = 0, onLeadsViewed,
 }
 
 function RateReviewList({ items, average, search, expandedId, setExpandedId, editClient, tr }) {
-  return <div className="space-y-4">
-    {items.length === 0 ? <ReviewEmpty search={search} tr={tr} /> : <>
-      <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/20 p-4 sm:p-5">
-        <div className="flex items-start gap-3">
-          <TrendingDown className="w-7 h-7 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
-          <div><h3 className="text-lg sm:text-xl font-bold text-amber-800 dark:text-amber-300">{tr('Clients to review')}</h3><p className="mt-1 text-sm sm:text-base text-[var(--color-text-secondary)]">{tr('These clients may be priced low for the time scheduled. Review the details before making any changes.')}</p></div>
-        </div>
-      </div>
-      <div className="space-y-3">{items.map(item => {
+  return <div className="space-y-3">
+    {items.length === 0 ? <ReviewEmpty search={search} tr={tr} /> : items.map(item => {
       const client = item.client;
       const open = expandedId === client.id;
       return <div key={client.id} className="card">
         <button aria-expanded={open} className="w-full p-4 flex items-center justify-between gap-3 text-left" onClick={() => setExpandedId(open ? null : client.id)}>
-          <div className="flex items-start gap-3 min-w-0"><TrendingDown className="w-6 h-6 shrink-0 text-rose-500 dark:text-rose-400 mt-0.5" /><div className="min-w-0"><p className="font-bold text-base sm:text-lg text-[var(--color-text-primary)] dark:text-white truncate">{client.name}</p><p className="text-base sm:text-lg font-semibold text-[var(--color-text-secondary)] mt-1">{tr('${{rate}}/hr estimated vs ${{average}}/hr average', { rate: item.estimatedHourlyRate.toFixed(2), average: average.toFixed(2) })}</p><p className="text-sm text-[var(--color-text-muted)] mt-1">{tr('Visit price: ${{rate}} · {{minutes}} min scheduled · {{count}} completed jobs', { rate: Number(client.rate).toFixed(2), minutes: Math.round(item.scheduledMinutes), count: item.completedJobCount })}</p></div></div>
-          <ChevronRight className={`w-5 h-5 shrink-0 text-[var(--color-text-muted)] transition ${open ? 'rotate-90' : ''}`} />
+          <div className="min-w-0"><p className="font-semibold text-sm">{client.name}</p><p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('{{minutes}} scheduled minutes · ${{rate}} per visit', { minutes: Math.round(item.scheduledMinutes), rate: Number(client.rate).toFixed(2) })}</p><p className="text-xs text-[var(--color-text-muted)] mt-1">{tr('{{count}} completed jobs included', { count: item.completedJobCount })}{item.completedJobCount < 4 && ` · ${tr('Early estimate — verify scheduled time')}`}</p></div>
+          <div className="flex items-center gap-2"><span className="badge bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">${item.estimatedHourlyRate.toFixed(2)}/{tr('hr')}</span><ChevronRight className={`w-4 h-4 transition ${open ? 'rotate-90' : ''}`} /></div>
         </button>
         {open && <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-4 text-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">{tr('Pricing opportunity')}</p>
@@ -185,9 +178,8 @@ function RateReviewList({ items, average, search, expandedId, setExpandedId, edi
             </div>
           </details>
         </div>}
-      </div>
-      })}</div>
-    </>}
+      </div>;
+    })}
   </div>;
 }
 
