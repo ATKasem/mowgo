@@ -72,6 +72,7 @@ export async function resumeCheckoutIntent() {
     const { data: profile, error: profileErr } = await supabase
       .from('profiles')
       .select('tier, trial_ends_at')
+      .eq('id', user.id)
       .single();
     if (!profileErr && profile?.tier && profile.tier !== 'free' && !profile.trial_ends_at) {
       // Already a real paid subscriber — clear the intent.
@@ -82,10 +83,18 @@ export async function resumeCheckoutIntent() {
     }
 
     // Grant the trial via RPC (idempotent — no-ops if already active or tier != free).
-    const { error: rpcErr } = await supabase.rpc('grant_trial', { p_plan: intent });
+    const { error: rpcErr, data: grantResult } = await supabase.rpc('grant_trial', { p_plan: intent });
     if (rpcErr) {
       // Transport / RPC failure — keep intent so the user can retry on next mount.
       return { status: 'error', message: rpcErr.message || 'Trial grant failed', retryable: true };
+    }
+    if (grantResult === false) {
+      // RPC returned false (no-op: trial already used, already granted, etc.)
+      // Intent consumed either way — the user's tier is already set.
+      localStorage.removeItem('mowgo_plan_intent');
+      localStorage.removeItem('mowgo_interval_intent');
+      localStorage.removeItem('mowgo_intent_time');
+      return { status: 'granted' };
     }
     // Granted (or no-op for active trial) — intent consumed either way.
     localStorage.removeItem('mowgo_plan_intent');

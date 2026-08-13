@@ -28,6 +28,7 @@ export default function TrialBanner() {
       const { data, error } = await supabase
         .from('profiles')
         .select('trial_tier, trial_ends_at, tier')
+        .eq('id', user.id)
         .single();
       if (!active || error || !data) return;
       setTrialInfo({

@@ -500,7 +500,7 @@ async function fetchUserEmail(env, serviceKey, userId) {
 }
 
 function winbackContent(previousTier, appUrl) {
-  const subscribeUrl = `${appUrl}/subscribe`;
+  const subscribeUrl = `${appUrl}/#/subscribe`;
   if (previousTier === 'crew') {
     return {
       subject: "Don't lose your crew setup — Solo keeps you running at $39/mo",

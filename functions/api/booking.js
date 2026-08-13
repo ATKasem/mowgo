@@ -179,9 +179,11 @@ export async function onRequestPost(context) {
         }),
       });
       const newClients = await newClientRes.json();
-      if (newClientRes.ok && newClients?.length > 0) {
-        clientId = newClients[0].id;
+      if (!newClientRes.ok || !(newClients?.length > 0)) {
+        console.error('Booking: client insert failed', newClients);
+        return json({ error: 'Failed to create booking. Please try again.' }, 500);
       }
+      clientId = newClients[0].id;
     }
 
     // 4. Create the job
@@ -203,6 +205,10 @@ export async function onRequestPost(context) {
 
     const jobs = await jobRes.json();
     if (!jobRes.ok) {
+      // idx_jobs_booking_slot (unique constraint) — another booking won the race
+      if (jobRes.status === 409 || jobs?.code === '23505') {
+        return json({ error: 'This time slot is already booked. Please choose another.' }, 409);
+      }
       console.error('Booking: job insert failed', jobs);
       return json({ error: 'Failed to create booking. Please try again.' }, 500);
     }

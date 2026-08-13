@@ -77,6 +77,30 @@ export async function onRequestPost(context) {
 
     const hasAppTrial = Boolean(profile.trial_ends_at);
 
+    // Check for existing active subscriptions — prevent double-billing
+    if (profile.stripe_customer_id) {
+      const existingSubsResponse = await fetch(
+        `https://api.stripe.com/v1/subscriptions?customer=${encodeURIComponent(profile.stripe_customer_id)}&status=all&limit=3`,
+        {
+          headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+        },
+      );
+      if (existingSubsResponse.ok) {
+        const subsData = await existingSubsResponse.json();
+        const activeSub = (subsData.data || []).find(
+          (s) => s.status === 'active' || s.status === 'trialing' || s.status === 'past_due',
+        );
+        if (activeSub) {
+          const currentTier = activeSub.metadata?.tier || 'unknown';
+          console.error(`User ${user.id} already has active subscription ${activeSub.id} (tier=${currentTier}, status=${activeSub.status})`);
+          return json({
+            error: 'You already have an active subscription. Visit your account settings to manage it.',
+            portalUrl: `${appUrl}/#/settings?tab=billing`,
+          }, 409, origin);
+        }
+      }
+    }
+
     let customerId = profile.stripe_customer_id;
     if (!customerId) {
       const customerResponse = await fetch('https://api.stripe.com/v1/customers', {
@@ -84,6 +108,7 @@ export async function onRequestPost(context) {
         headers: {
           Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
           'Content-Type': 'application/x-www-form-urlencoded',
+          'Idempotency-Key': `customer-create-${user.id}`,
         },
         body: new URLSearchParams({
           email: user.email || '',

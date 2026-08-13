@@ -70,6 +70,34 @@ private struct JobStatusPatch: Encodable {
     let status: Job.JobStatus
 }
 
+/// Editable-from-the-UI job fields (matches Android's EditJobDialog scope:
+/// title, client, notes, route order — not schedule/assignment).
+///
+/// `notes`/`routeOrder` need an explicit `encode(to:)` — the default
+/// synthesized Encodable uses `encodeIfPresent` for Optional properties,
+/// which OMITS the key (rather than sending JSON `null`) when clearing a
+/// field to nil. That would silently no-op a "clear notes"/"clear route
+/// order" edit instead of persisting it. See JobAssignedPatch for the same
+/// footgun elsewhere in this file.
+private struct JobEditPatch: Codable {
+    let clientId: UUID
+    let title: String
+    let notes: String?
+    let routeOrder: Int?
+
+    private enum CodingKeys: String, CodingKey {
+        case clientId, title, notes, routeOrder
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(clientId, forKey: .clientId)
+        try container.encode(title, forKey: .title)
+        try container.encode(notes, forKey: .notes)
+        try container.encode(routeOrder, forKey: .routeOrder)
+    }
+}
+
 private struct JobSchedulePatch: Codable {
     let scheduledDate: String
 }
@@ -140,6 +168,17 @@ final class DataStore: ObservableObject {
     weak var auth: AuthService?
     let persistence: Persistence?
     private(set) var currentUserId: UUID?
+
+    func loadReferralStatus() async throws -> ReferralStatus? {
+        if auth?.isDemoMode == true {
+            return ReferralStatus(code: "MOWGO1", totalCount: 3, earnedCount: 1)
+        }
+        guard (currentUserId ?? (try await sb.getCurrentUserId())) != nil else {
+            throw DataStoreError.authenticationRequired
+        }
+        struct EmptyParams: Encodable {}
+        return try await sb.rpc("referral_status", params: EmptyParams(), ReferralStatus.self)
+    }
 
     init(modelContainer: ModelContainer) {
         self.persistence = Persistence(modelContainer: modelContainer)
@@ -386,6 +425,19 @@ final class DataStore: ObservableObject {
                 default:
                     break
                 }
+            }
+
+        case "job:update":
+            let patch = try JSONDecoder().decode(JobEditPatch.self, from: mutation.payload)
+            try await sb.update("jobs", id: mutation.entityId, patch)
+            if let job = jobs.first(where: { $0.id == mutation.entityId }) {
+                var updated = job
+                updated.clientId = patch.clientId
+                updated.title = patch.title
+                updated.notes = patch.notes
+                updated.routeOrder = patch.routeOrder
+                attachClientRef(to: &updated)
+                await fireWebhookJobUpdated(updated)
             }
 
         case "job:delete":
@@ -857,6 +909,41 @@ final class DataStore: ObservableObject {
         }
     }
 
+    /// Edits title/client/notes/routeOrder on an existing job (matches
+    /// Android's EditJobDialog scope — not schedule/assignment).
+    func updateJob(_ job: Job) async throws {
+        guard let clientId = job.clientId else { throw DataStoreError.clientRequired }
+        var updated = job
+        attachClientRef(to: &updated)
+        let patch = JobEditPatch(clientId: clientId, title: updated.title, notes: updated.notes, routeOrder: updated.routeOrder)
+
+        guard await canSync() else {
+            safeEnqueue("job:update", id: job.id, payload: patch)
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            return
+        }
+        do {
+            try await sb.update("jobs", id: job.id, patch)
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            await fireWebhookJobUpdated(updated)
+        } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            safeEnqueue("job:update", id: job.id, payload: patch)
+            if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
+                jobs[idx] = updated
+            }
+            self.error = "Saved offline — will sync when connected"
+            return
+        }
+    }
+
     private func updateJobStatus(_ job: Job, status: Job.JobStatus) async throws {
         var updated = job
         updated.status = status
@@ -1248,6 +1335,17 @@ final class DataStore: ObservableObject {
         )
     }
 
+    /// Texts affected clients via the send-rain-delay-sms Edge Function.
+    /// Fire-and-forget (mirrors web's data.js sendRainDelaySms) — never blocks
+    /// or fails the rain-delay flow.
+    private func fireRainDelaySms(jobIds: [UUID], targetDate: String) async {
+        let body: [String: Any] = [
+            "jobIds": jobIds.map { $0.uuidString },
+            "targetDate": targetDate
+        ]
+        _ = try? await sb.requestFunction("send-rain-delay-sms", body: body)
+    }
+
     private func firePushRainDelay(_ jobs: [Job], date: String) async {
         guard UserDefaults.standard.object(forKey: "rainDelayAlerts") as? Bool ?? true else { return }
         guard let userId = self.currentUserId else { return }
@@ -1360,6 +1458,7 @@ final class DataStore: ObservableObject {
             await WebhookService.shared.rainDelayApplied(
                 count: succeeded.count, date: date, targetDate: targetDate, userId: userId
             )
+            await fireRainDelaySms(jobIds: succeeded, targetDate: targetDate)
         }
         return true
     }

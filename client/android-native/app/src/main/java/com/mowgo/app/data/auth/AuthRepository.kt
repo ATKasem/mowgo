@@ -3,6 +3,7 @@ package com.mowgo.app.data.auth
 import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.TeamRepository
+import com.mowgo.app.data.local.AppDatabaseProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
@@ -58,8 +59,23 @@ class AuthRepository {
      * Sign out — clears session from memory and EncryptedSharedPreferences.
      */
     suspend fun signOut() {
+        // Capture user ID before clearing session
+        val userId = runCatching {
+            SupabaseClientProvider.client.auth.currentSessionOrNull()?.user?.id
+        }.getOrNull()
+        // Clear push tokens BEFORE signOut so the update runs authenticated
+        if (userId != null) {
+            runCatching {
+                SupabaseClientProvider.client.from("profiles").update(
+                    mapOf("fcm_token" to null, "device_platform" to null)
+                ) { filter { eq("id", userId) } }
+            }
+        }
         auth.signOut()
         runCatching { ProfileRepository.resetDemoState() }
         runCatching { TeamRepository.resetDemoTeam() }
+        // Wipe the offline cache + mutation queue so the next signed-in account
+        // on this device can't see this account's cached jobs/clients/invoices.
+        runCatching { AppDatabaseProvider.clearAll() }
     }
 }

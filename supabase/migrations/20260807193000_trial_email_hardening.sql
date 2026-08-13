@@ -49,7 +49,6 @@ DECLARE
   v_trial_end timestamptz;
   v_email text;
   v_norm_email text;
-  v_used boolean;
 BEGIN
   SELECT tier, trial_ends_at INTO v_tier, v_trial_end
     FROM public.profiles WHERE id = auth.uid();
@@ -57,16 +56,23 @@ BEGIN
   IF v_tier <> 'free' THEN RETURN false; END IF;            -- already paid (webhook)
   IF v_trial_end IS NOT NULL THEN RETURN false; END IF;     -- account-level one-shot
 
-  -- Human-level one-shot: normalize the caller's email and check used_trials.
+  -- Human-level one-shot: normalize the caller's email.
   -- SECURITY DEFINER: we may read auth.users as the function owner.
   SELECT email INTO v_email FROM auth.users WHERE id = auth.uid();
   IF v_email IS NULL THEN RETURN false; END IF;
   v_norm_email := public.normalize_trial_email(v_email);
-  SELECT EXISTS (SELECT 1 FROM public.used_trials WHERE email = v_norm_email)
-    INTO v_used;
-  IF v_used THEN RETURN false; END IF;
 
   IF p_plan NOT IN ('solo','crew','premium') THEN RETURN false; END IF;
+
+  -- Claim the human-level marker BEFORE granting anything. The PK on email
+  -- makes this the atomic serialization point: two concurrent grant_trial
+  -- calls for the same normalized email will have exactly one INSERT
+  -- succeed (FOUND = true); the loser returns false without granting a
+  -- trial. If anything below raises, the whole transaction — including this
+  -- insert — rolls back, so the marker is never left behind unclaimed.
+  INSERT INTO public.used_trials (email, plan) VALUES (v_norm_email, p_plan)
+  ON CONFLICT (email) DO NOTHING;
+  IF NOT FOUND THEN RETURN false; END IF;
 
   UPDATE public.profiles
      SET tier = p_plan,
@@ -75,11 +81,6 @@ BEGIN
          trial_ends_at = now() + interval '14 days'
    WHERE id = auth.uid();
 
-  -- Write the human-level marker and the audit trail. Insert may race (two
-  -- concurrent first-grants from the same email) — PK conflict is fine, the
-  -- second one just fails to insert and the trial already went through.
-  INSERT INTO public.used_trials (email, plan) VALUES (v_norm_email, p_plan)
-  ON CONFLICT (email) DO NOTHING;
   INSERT INTO public.tier_events (user_id, tier, source)
   VALUES (auth.uid(), p_plan, 'trial_grant')
   ON CONFLICT DO NOTHING;

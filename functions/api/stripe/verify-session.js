@@ -61,6 +61,26 @@ export async function onRequestGet(context) {
       return json({ error: 'Forbidden' }, 403, origin);
     }
 
+    // Stripe confirms the session completed, but the tier upgrade itself
+    // happens asynchronously via the webhook — verify it actually landed
+    // before telling the client the subscription is active.
+    if (session.status === 'complete' && session.payment_status === 'paid') {
+      const expectedTier = session.metadata?.tier;
+      if (expectedTier) {
+        const profileResponse = await fetch(
+          `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=tier`,
+          { headers: { Authorization: `Bearer ${token}`, apikey: supabaseAnonKey } },
+        );
+        const [profile] = profileResponse.ok ? await profileResponse.json() : [];
+        if (!profile || profile.tier !== expectedTier) {
+          return json({
+            status: 'processing',
+            error: 'Your payment succeeded but your account is still being set up. Please try again in a moment or contact support if this persists.',
+          }, 202, origin);
+        }
+      }
+    }
+
     return json({
       status: session.status,
       payment_status: session.payment_status,

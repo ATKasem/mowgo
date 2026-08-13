@@ -233,11 +233,12 @@ export async function onRequestPost({ request, env }) {
       const newUser = await createUserRes.json();
       invitedUserId = newUser.id;
 
-      // Create profile for new user
+      // The on_auth_user_created trigger already created a profile row for
+      // invitedUserId — update it instead of inserting (would conflict on PK).
       const insertRes = await fetch(
-        `${supabaseUrl}/rest/v1/profiles`,
+        `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}`,
         {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'apikey': serviceKey,
             'Authorization': `Bearer ${serviceKey}`,
@@ -245,7 +246,6 @@ export async function onRequestPost({ request, env }) {
             'Prefer': 'return=representation'
           },
           body: JSON.stringify({
-            id: invitedUserId,
             business_name: email.split('@')[0],
             tier: 'crew',
             role: 'crew',
