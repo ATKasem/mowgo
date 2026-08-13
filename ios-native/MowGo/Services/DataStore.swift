@@ -204,6 +204,7 @@ final class DataStore: ObservableObject {
         guard !Task.isCancelled, generation == loadGeneration else { return }
         self.currentUserId = loadedUserId
         guard let currentUserId = loadedUserId else {
+            guard !Task.isCancelled, generation == loadGeneration else { return }
             jobs = []
             clients = []
             leads = []
