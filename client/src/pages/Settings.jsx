@@ -1,6 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { loadProfile, saveProfile, updateLeadAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
+import { loadProfile, saveProfile, updateLeadAlertsEnabled, updateRainAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
 import { downloadCsv, toCsv } from '../lib/csv';
 import { TEAM_MEMBER_COLORS, TEAM_ACCESS_TIERS, hasTeamAccess } from '../lib/constants';
 import { isDemoMode, supabase } from '../lib/supabase';
@@ -41,7 +41,6 @@ export default function Settings() {
   const [showConcierge, setShowConcierge] = useState(false);
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
-  const [notifyOnRain, setNotifyOnRain] = useState(() => localStorage.getItem('mf_notify_rain') !== 'false');
   const [reviewPrompts, setReviewPrompts] = useState(() => localStorage.getItem('mf_review_prompts') !== 'false');
   const [teamMembers, setTeamMembers] = useState([]);
   const [teamLoading, setTeamLoading] = useState(false);
@@ -240,9 +239,15 @@ export default function Settings() {
     setNotifyOnComplete(val);
     localStorage.setItem('mf_notify_complete', val);
   }
-  function toggleNotifyRain(val) {
-    setNotifyOnRain(val);
-    localStorage.setItem('mf_notify_rain', val);
+  async function toggleNotifyRain(val) {
+    const previous = profile.rain_alerts_enabled;
+    setProfile(current => ({ ...current, rain_alerts_enabled: val }));
+    try {
+      await updateRainAlertsEnabled(val);
+    } catch (err) {
+      console.error('updateRainAlertsEnabled:', err);
+      setProfile(current => ({ ...current, rain_alerts_enabled: previous }));
+    }
   }
   function toggleReviewPrompts(val) {
     setReviewPrompts(val);
@@ -525,15 +530,19 @@ export default function Settings() {
               <p className="text-sm font-medium text-[var(--color-text-primary)] dark:text-white">{tr("Rain delay notifications")}</p>
               <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Alert when rain is forecast for tomorrow's jobs")}</p>
             </div>
-            <button
-              role="switch"
-              aria-checked={notifyOnRain}
-              aria-label={tr("Rain delay notifications")}
-              onClick={() => toggleNotifyRain(!notifyOnRain)}
-              className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${notifyOnRain ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
-            >
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${notifyOnRain ? 'translate-x-[18px]' : ''}`} />
-            </button>
+            {profileLoading ? (
+              <span className="w-10 h-[22px] rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" aria-hidden="true" />
+            ) : (
+              <button
+                role="switch"
+                aria-checked={profile.rain_alerts_enabled}
+                aria-label={tr("Rain delay notifications")}
+                onClick={() => toggleNotifyRain(!profile.rain_alerts_enabled)}
+                className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${profile.rain_alerts_enabled ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-[var(--color-surface)] shadow-sm transition-transform duration-200 ${profile.rain_alerts_enabled ? 'translate-x-[18px]' : ''}`} />
+              </button>
+            )}
           </label>
           <label className="flex items-center justify-between cursor-pointer">
             <div>

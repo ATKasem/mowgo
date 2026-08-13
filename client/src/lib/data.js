@@ -1141,7 +1141,7 @@ export async function loadProfile() {
     localStorage.setItem('mf_venmo_handle', base.venmo_handle || '');
     localStorage.setItem('mf_cashapp_handle', base.cashapp_handle || '');
     localStorage.setItem('mf_zelle_handle', base.zelle_handle || '');
-    return base;
+    return { rain_alerts_enabled: true, ...base };
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -1209,6 +1209,21 @@ export async function updateLeadAlertsEnabled(enabled) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   const { data, error } = await supabase.from('profiles').update({ lead_alerts_enabled: enabled }).eq('id', user.id).select('lead_alerts_enabled').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateRainAlertsEnabled(enabled) {
+  if (isDemoMode()) {
+    const userId = _currentDemoUserId();
+    const idx = _teamMembers.findIndex(member => member.id === userId);
+    if (idx >= 0) _teamMembers[idx] = { ..._teamMembers[idx], rain_alerts_enabled: enabled };
+    notify();
+    return { rain_alerts_enabled: enabled };
+  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await supabase.from('profiles').update({ rain_alerts_enabled: enabled }).eq('id', user.id).select('rain_alerts_enabled').single();
   if (error) throw error;
   return data;
 }
