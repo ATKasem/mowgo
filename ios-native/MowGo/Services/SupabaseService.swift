@@ -124,7 +124,10 @@ actor SupabaseService {
         if let expiresIn = json?["expires_in"] as? Double {
             tokenExpiry = Date().addingTimeInterval(expiresIn - 300) // 5 min buffer
         }
-        saveSession()
+        guard saveSession() else {
+            await signOut()
+            throw AuthError.sessionPersistenceFailed
+        }
         return accessToken
     }
 
@@ -177,7 +180,8 @@ actor SupabaseService {
 
     // MARK: - Keychain Helpers
 
-    private func saveToKeychain(key: String, value: String) {
+    @discardableResult
+    private func saveToKeychain(key: String, value: String) -> Bool {
         let data = Data(value.utf8)
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -192,7 +196,7 @@ actor SupabaseService {
             kSecValueData as String: data,
             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
         ]
-        SecItemAdd(addQuery as CFDictionary, nil)
+        return SecItemAdd(addQuery as CFDictionary, nil) == errSecSuccess
     }
 
     private func loadFromKeychain(key: String) -> String? {
@@ -220,47 +224,55 @@ actor SupabaseService {
 
     // MARK: - Session persistence (Keychain-backed)
 
-    private func saveSession() {
-        if let t = token { saveToKeychain(key: "sb_token", value: t) }
-        if let rt = refreshToken { saveToKeychain(key: "sb_refresh_token", value: rt) }
+    private func saveSession() -> Bool {
+        guard let token, saveToKeychain(key: "sb_token", value: token) else { return false }
+        if let refreshToken, !saveToKeychain(key: "sb_refresh_token", value: refreshToken) { return false }
         if let exp = tokenExpiry {
             let ts = String(exp.timeIntervalSince1970)
-            saveToKeychain(key: "sb_token_expiry", value: ts)
+            if !saveToKeychain(key: "sb_token_expiry", value: ts) { return false }
         }
+        return true
     }
 
     func restoreSession() async -> Bool {
-        // Try Keychain first, then fall back to UserDefaults (migration)
+        // Try Keychain first, then migrate each missing session field from UserDefaults.
         var t = loadFromKeychain(key: "sb_token")
         if t?.isEmpty != false {
             t = UserDefaults.standard.string(forKey: "sb_token")
-            if let migrated = t, !migrated.isEmpty {
-                // Migrate existing UserDefaults tokens to Keychain, removing
-                // each UserDefaults copy immediately after it is saved so a
-                // crash mid-migration cannot leave plaintext tokens behind.
-                saveToKeychain(key: "sb_token", value: migrated)
-                UserDefaults.standard.removeObject(forKey: "sb_token")
-                if let rt = UserDefaults.standard.string(forKey: "sb_refresh_token") {
-                    saveToKeychain(key: "sb_refresh_token", value: rt)
-                    UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
-                }
-                if let exp = UserDefaults.standard.string(forKey: "sb_token_expiry") {
-                    saveToKeychain(key: "sb_token_expiry", value: exp)
-                    UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
-                }
-            }
         }
-        guard let t = t, !t.isEmpty else {
+        guard let t, !t.isEmpty else {
             await signOut()
             return false
         }
-        // Sweep any leftover UserDefaults token copies (crash mid-migration
-        // or older builds) — keychain is the single source of truth now.
-        if loadFromKeychain(key: "sb_token")?.isEmpty == false {
+
+        // Migrate each field independently. A crash between fields must not cause
+        // a later launch to delete plaintext values whose Keychain copy is missing.
+        if loadFromKeychain(key: "sb_token")?.isEmpty != false {
+            if saveToKeychain(key: "sb_token", value: t) {
+                UserDefaults.standard.removeObject(forKey: "sb_token")
+            }
+        } else {
+            // A previous launch may have completed the Keychain write but crashed
+            // before deleting the plaintext legacy value.
             UserDefaults.standard.removeObject(forKey: "sb_token")
+        }
+        if loadFromKeychain(key: "sb_refresh_token")?.isEmpty != false {
+            if let refresh = UserDefaults.standard.string(forKey: "sb_refresh_token"),
+               saveToKeychain(key: "sb_refresh_token", value: refresh) {
+                UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
+            }
+        } else {
             UserDefaults.standard.removeObject(forKey: "sb_refresh_token")
+        }
+        if loadFromKeychain(key: "sb_token_expiry")?.isEmpty != false {
+            if let expiry = UserDefaults.standard.string(forKey: "sb_token_expiry"),
+               saveToKeychain(key: "sb_token_expiry", value: expiry) {
+                UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
+            }
+        } else {
             UserDefaults.standard.removeObject(forKey: "sb_token_expiry")
         }
+
         token = t
         refreshToken = loadFromKeychain(key: "sb_refresh_token")
         if let ts = loadFromKeychain(key: "sb_token_expiry"),
@@ -326,7 +338,9 @@ actor SupabaseService {
                 if let expiresIn = json?["expires_in"] as? Double {
                     tokenExpiry = Date().addingTimeInterval(expiresIn - 300)
                 }
-                saveSession()
+                guard saveSession() else {
+                    throw AuthError.sessionPersistenceFailed
+                }
             } else {
                 await signOut()
                 throw AuthError.sessionExpired
@@ -651,11 +665,13 @@ enum AuthError: LocalizedError {
     case invalidCredentials
     case signUpFailed
     case sessionExpired
+    case sessionPersistenceFailed
     var errorDescription: String? {
         switch self {
         case .invalidCredentials: "Invalid email or password."
         case .signUpFailed: "Could not create account. Please try again."
         case .sessionExpired: "Session expired. Please sign in again."
+        case .sessionPersistenceFailed: "Could not securely save your session. Please try again."
         }
     }
 }

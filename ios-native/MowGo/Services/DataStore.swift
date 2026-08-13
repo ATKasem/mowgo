@@ -195,12 +195,15 @@ final class DataStore: ObservableObject {
             return
         }
         guard !Task.isCancelled, generation == loadGeneration else { return }
+        let loadedUserId: UUID?
         do {
-            self.currentUserId = try await sb.getCurrentUserId()
+            loadedUserId = try await sb.getCurrentUserId()
         } catch {
-            self.currentUserId = nil
+            loadedUserId = nil
         }
-        guard let currentUserId = self.currentUserId else {
+        guard !Task.isCancelled, generation == loadGeneration else { return }
+        self.currentUserId = loadedUserId
+        guard let currentUserId = loadedUserId else {
             jobs = []
             clients = []
             leads = []
@@ -211,6 +214,7 @@ final class DataStore: ObservableObject {
             self.error = "Unable to load your account. Please try again."
             return
         }
+        guard !Task.isCancelled, generation == loadGeneration else { return }
         loadRainDelayHistory()
 
         // Cache reads are safe only after the authenticated owner is known.
@@ -219,6 +223,7 @@ final class DataStore: ObservableObject {
             clients = persistence.loadClients(currentUserId: currentUserId)
             invoices = persistence.loadInvoices(currentUserId: currentUserId)
         }
+        guard !Task.isCancelled, generation == loadGeneration else { return }
 
         loadTask = Task<Void, Never> {
             do {
