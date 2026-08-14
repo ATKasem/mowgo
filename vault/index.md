@@ -1,13 +1,33 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-08-09
+> **Last updated:** 2026-08-14
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
-| 2026-08-09 | `2026-08-09_daily-sync.md` | **Main sync note** — Mon Aug 11 22:23Z Reddit slot LOCKED + ARMED (cron `4c195234eaa9`, kit #55→#57→#43; #56 DEAD; Sat slot correctly CANCELED — 96h gate held), **LawnBook = new #1 WATCH** (Free 15 clients / Pro $9.99 — first to undercut free tier AND price; counters named), $49 = new generalist floor (Solo $39 undercuts; Crew $79 cheapest multi-user), **drought national → level billing = #1 drought feature + missed-call text-back = AI-receptionist wedge**, "quick favors" = industry's August profit leak (copy line banked), Stripe all green + bundles CONVERGED, W32 digest delivered (state v44, seen 1587), QuoteIQ Beginner $74.99 + 1% fee, +3 leads (tracker → 20, 0 replies), astroturf +6 |
+|| 2026-08-14 | `2026-08-14_daily-sync.md` | **Main sync note** — Aug 14 02:00 UTC sync — **Intel Engine RECOVERED** (7/8 runs succeeded, 1 connect timeout); full competitor pricing comparison; Stripe all green; Servinix beta Aug 17 in 4 days; Blasian silent Day 21 |
+|| 2026-08-14 | `2026-08-14_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **19 new** — Intel ×6 runs, Stripe check, invoice reminders, lead nurture; ALL bot, Blasian silent Day 21) |
+|| 2026-08-14 | `2026-08-14_channel-outreach-raw.md` | ⚠️ #🌱mowgo-outreach STILL GONE — 404 ×7 consecutive; 0 synced |
+|| 2026-08-14 | `2026-08-14_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; Day 37 empty) |
+||| 2026-08-13 | `2026-08-13_daily-sync.md` | **Main sync note** — Aug 13 02:00 UTC sync — **🚨 HTTP 402 CRISIS: Intel Engine dead ~16 hours** (0 of 5 last runs succeeded), Stripe health check also failing, lead nurture API key broken, Reddit kit skipped |
+|| 2026-08-13 | `2026-08-13_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **10 new** — 1 Intel success at 02:38, then 5× HTTP 402 failures; ALL bot, Blasian silent Day 20) |
+|| 2026-08-13 | `2026-08-13_channel-outreach-raw.md` | ⚠️ #🌱mowgo-outreach STILL GONE — 404 ×6 consecutive; 0 synced |
+|| 2026-08-13 | `2026-08-13_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; Day 34 empty) |
+|| 2026-08-12 | `2026-08-12_daily-sync.md` | **Main sync note** — Aug 12 02:00 UTC sync — Intel Engine Reddit Monitoring + Pricing Intelligence lane; State v53 |
+|| 2026-08-12 | `2026-08-12_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **20 new** — Intel ×5 runs w/ 02:38 success, Stripe check, invoice reminders, lead nurture; ALL bot, Blasian silent Day 19) |
+|| 2026-08-12 | `2026-08-12_channel-outreach-raw.md` | ⚠️ #🌱mowgo-outreach STILL GONE — 404 ×5 consecutive; 0 synced |
+|| 2026-08-12 | `2026-08-12_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup) |
+|| 2026-08-11 | `2026-08-11_daily-sync.md` | **Main sync note** — Aug 11 02:00 UTC sync |
+|| 2026-08-11 | `2026-08-11_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, 20 new — Intel reports, Stripe check, invoice reminders; ALL bot, Blasian silent Day 18) |
+|| 2026-08-11 | `2026-08-11_channel-outreach-raw.md` | ⚠️ #🌱mowgo-outreach STILL GONE — 404 ×4 consecutive; 0 synced |
+|| 2026-08-11 | `2026-08-11_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup) |
+|| 2026-08-10 | `2026-08-10_daily-sync.md` | **Main sync note** — **Mon Aug 10 22:23Z Reddit slot STILL ARMED** (cron `4c195234eaa9`), **Reddit RSS pipeline DEGRADED (403)** + Intel Engine **HTTP 402 (Insufficient Balance)** recovered, Stripe all green
+| 2026-08-10 | `2026-08-10_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **14 new** — Intel ×6 runs + Sunday Deep-Dive 10:00Z, Stripe check, invoice reminders; ALL bot, Blasian silent Day 13) |
+| 2026-08-10 | `2026-08-10_channel-outreach-raw.md` | ⚠️ **#🌱mowgo-outreach GONE — 404 ×4 consecutive nightly syncs; deletion CONFIRMED**; 0 synced |
+| 2026-08-10 | `2026-08-10_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; watchdog holding Day 10) |
+| 2026-08-09 | `2026-08-09_daily-sync.md` | **Main sync note** — Aug 9 02:00 UTC sync |
 | 2026-08-09 | `2026-08-09_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **17 new** — Intel ×5 runs + Sunday Deep-Dive W32 01:19Z, Stripe check, invoice reminders; ALL bot, Blasian silent Day 12) |
 | 2026-08-09 | `2026-08-09_channel-outreach-raw.md` | ⚠️ **#🌱mowgo-outreach GONE — 404 ×3 consecutive nightly syncs; deletion CONFIRMED**; 0 synced |
 | 2026-08-09 | `2026-08-09_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; watchdog holding Day 9) |
@@ -72,11 +92,11 @@
 | MowGo iOS repo | `/opt/data/mowgo/ios-native/` |
 | Discord server | Blasian's server (guild: `1520146213750440147`) |
 | Discord #🌱mowgo | `1529248227394850916` |
-| Discord #🌱mowgo-outreach | ~~`1529711006023024680`~~ **🗑️ GONE — 404 Unknown Channel on 2026-08-07, 08-08 AND 08-09 syncs; deletion CONFIRMED** — references pending cleanup |
+| Discord #🌱mowgo-outreach | ~~`1529711006023024680`~~ **🗑️ GONE — 404 Unknown Channel on 2026-08-07, 08-08, 08-09 AND 08-10 syncs; deletion CONFIRMED** — references pending cleanup |
 | Discord #🤝mowgo-cowork | `1529736297847980153` |
 | Cron config | `/opt/data/cron/jobs.json` |
 | Documentation | `/opt/data/mowgo/discord-403-and-cron-consolidation-2026-07-27.md` |
 
 ---
 
-*Index updated by MowGo nightly vault sync — 2026-08-09 02:00 UTC*
+*Index updated by MowGo nightly vault sync — 2026-08-13 02:00 UTC*

@@ -6,5 +6,9 @@ create table if not exists public.sms_optins (
   created_at timestamptz not null default now()
 );
 
+-- 024 patch: separated informational + marketing consent columns
+alter table public.sms_optins add column if not exists consent_info boolean not null default false;
+alter table public.sms_optins add column if not exists consent_mkt boolean not null default false;
+
 alter table public.sms_optins enable row level security;
 -- No policies: only service role (via CF Pages Function) writes; no client reads.

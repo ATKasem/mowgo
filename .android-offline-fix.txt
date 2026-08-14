@@ -1,0 +1,45 @@
+# Android Offline Cache + Mutation Queue
+
+## Task
+Implement offline resilience for the MowGo Android app. iOS has SwiftData + FIFO mutation replay. Android has nothing — a lost signal drops in-flight changes permanently.
+
+## What to build
+
+### 1. Room database for local caching
+- Add Room dependencies to `client/android-native/app/build.gradle.kts`
+- Create `data/local/AppDatabase.kt` — Room database with entities for cached jobs, clients, invoices, leads
+- Create entity classes with snake_case column names matching Supabase schema
+- Create DAOs for each entity with insert/update/delete/select operations
+- Follow existing patterns in `data/model/*.kt` for field names and serialization
+
+### 2. Mutation queue
+- Create `data/local/MutationQueue.kt` — Room-backed FIFO queue
+- Each mutation has: id (auto), operation (e.g. "job:status", "client:create"), entityId, payload (JSON string), createdAt, status (pending/processing/completed/failed)
+- Add `enqueue(operation, entityId, payload)` and `processNext()` methods
+- Mark mutations as completed or failed — remove completed, keep failed for retry
+
+### 3. Connectivity-aware sync
+- Create `data/sync/SyncManager.kt` — observes connectivity via ConnectivityManager
+- On reconnect, replays pending mutations in FIFO order
+- Calls the same Supabase RPCs/APIs as the online path
+- Uses WorkManager for background sync task
+
+### 4. Wire into existing repos
+- `JobRepository.kt` — after online operations fail, fall back to enqueueing offline mutations
+- `TodayViewModel.kt` — load from Room cache when offline, trigger sync when online
+- `MoreScreen.kt` — show sync status indicator
+
+### 5. Don't break existing code
+- Keep all existing mutation paths working
+- Offline should be invisible to the user until they lose connectivity
+- Add a small banner/indicator showing sync status
+
+## Files to modify
+- `client/android-native/app/build.gradle.kts` — add Room + WorkManager deps
+- Create new files under `data/local/` and `data/sync/`
+- Modify existing repositories and viewmodels to use cache
+
+## Do NOT touch
+- Any unrelated dirty files (BI, vault, intel, concierge, social, docs, etc.)
+- Supabase migrations or functions
+- iOS or web code

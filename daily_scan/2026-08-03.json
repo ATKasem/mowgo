@@ -1,0 +1,347 @@
+{
+  "scan_ts": "2026-08-03T12:14:00Z",
+  "scan_label": "7am CST — Mon Aug 3",
+  "channels_scanned": {
+    "mowgo": {
+      "channel_id": "1529248227394850916",
+      "status": "16 new messages since last scan (Aug 2 12:00Z) — ALL bot cron reports (5 Intel Engine runs ×2-3 msgs, 1 Stripe health check ×2, 1 invoice-reminders cron FAILURE). ZERO human messages.",
+      "last_human_msg": "Blasian — 'hello' 2026-07-29T15:39Z (~4.9 days silent, Day 5)"
+    },
+    "outreach": {
+      "channel_id": "1529711006023024680",
+      "status": "0 new messages; last message Jul 26 14:12Z (Reddit Monitor). Dormant Day 8.",
+      "note": "28 Reddit reply drafts still unposted (Day 12 of 403-block — RSS workaround now live, see overnight items)"
+    },
+    "cowork": {
+      "channel_id": "1529736297847980153",
+      "status": "empty — 0 messages, no coworking sessions ever"
+    },
+    "leads": {
+      "channel_id": "1529707289014042804",
+      "status": "0 new messages. Blasian's 'How would we get leads for MowGo' (Jul 28 17:03Z) STILL UNANSWERED — Day 6. Only a ✅ bot-ack reaction.",
+      "note": "Lead tracker: 17 leads, 5 emailed, 0 replies; 8 OK-lead DMs queued on Monday plate"
+    }
+  },
+  "overnight_messages_needing_attention": [
+    {
+      "id": "stripe_health_0916",
+      "ts": "2026-08-03T09:16Z",
+      "content": "STRIPE HEALTH CHECK — REGRESSION, CHECKOUT DEAD ON LIVE DOMAIN. (1) Aug 2 19:57Z GitHub auto-deploy (triggered by evening design/logo commits) did NOT include root functions/ dir → all 3 endpoints dead: POST /api/stripe/checkout-subscription = 405 (function NOT deployed), GET /api/stripe/verify-session = 200 SPA fallthrough, POST create-portal-session = 405. (2) Project has ZERO env vars (env_vars: {}) → even a function deploy would 500 without STRIPE_SECRET_KEY / SUPABASE_SERVICE_KEY. (3) Repo still has all 4 Stripe functions at root functions/ (Jul 28 version). (4) Web bundle correct by design (no pk in client); client wiring OK (checkout-subscription, create-portal-session, verify-session, stripe_customer_id all present in index-EKZAPuoA.js). (5) iOS PaymentSheet: OK — live key pk_live_51TwFQhGwXKVLlr2Ip5... valid format, matches acct_1TwFQhGwXKVLlr2I, stripe-ios 23.2.0. (6) mowflow.pages.dev: retired, no Stripe surface. BOTTOM LINE: the Aug 1-2 win (functions deployed, verify-session fix) was UNDONE by a GitHub auto-deploy; fix = manual `wrangler pages deploy` from repo root (picks up functions/) + repopulate env vars.",
+      "significance": "CRITICAL — Day 17. Revenue path is dark on the live domain; landing copy says 'Stripe payments are live' (false again). Recurring cause: GitHub auto-deploy on every commit wipes functions — needs a workflow pin or manual deploy process.",
+      "action": "Part 2: manual wrangler pages deploy from repo root + populate env vars (values were previously set — check CF dashboard history / .dev.vars / prior state). Then logged-in test checkout to confirm. Consider disabling GitHub auto-deploy or pinning functions in CI."
+    },
+    {
+      "id": "invoice_reminders_1230",
+      "ts": "2026-08-02T12:30Z",
+      "content": "Cron 'MowGo invoice reminders' FAILED again: Script not found: /opt/data/scripts/invoice_reminders.py. Script actually lives at /opt/data/mowgo/server/scripts/invoice_reminders.py. Same failure as first scheduled run — headline feature ('reminder cron live' is cited in copy/compare page) is silently dark since Aug 1.",
+      "significance": "CRITICAL (now FIXED this scan) — next run 12:30Z TODAY.",
+      "action": "✅ SYMLINK CREATED this scan: /opt/data/scripts/invoice_reminders.py → /opt/data/mowgo/server/scripts/invoice_reminders.py (script parses OK, was working Aug 1). Part 2: verify the 12:30Z run succeeds (check #🌱mowgo for absence of failure post / hermes cron logs)."
+    },
+    {
+      "id": "intel_0941_rss_breakthrough",
+      "ts": "2026-08-03T09:41Z",
+      "content": "REDDIT RSS BREAKTHROUGH — 48h drought BROKEN after 13 days. www.reddit.com/r/<sub>/new/.rss returns 200 (json/api still 403); needs 15-35s pacing + Accept: application/rss+xml + browser UA; tooling saved to .bi_tools/rss/. TWO verified fresh threads: (1) 1ve82mp r/smallbusiness (09:00Z, 1h) — HOT LEAD: 'sent an estimate, they said pay friday, nobody called back, how do you track that?' unpaid row in spreadsheet, no alert/nudge — QUEUED #1 for the 13:00Z outreach window, draft banked in intel/2026-08-03_0941.md. (2) 1ve8hew r/LawnCarePros (09:23Z, 0h) — NEW COMPETITOR ENTRANT: solo dev '60-second invoice app' recruiting testers; invoice-only wedge = MowGo's core action; monitor, not a buyer. PRICING (live-verified): Jobber restructure CONFIRMED — '$29 starting' is a hook; reminders+autopay+QB tier = Connect $99 (Servinix's $119 claim inflated; AI Receptionist bundled in Plus $199). QuoteIQ RAISED Elite $249.99→$299 and Max $399.99→$699 (Jul 31 drift flag RESOLVED — real increases; AI-credit metering 500-8,000/mo + Price-Lock Guarantee added). QuoteIQ's own listicle INFLATES Jobber prices ($39/$119/$199/$599 vs live $29/$99/$149/$199) — correct prospects who quote those. TurfHop /pricing/ throws raw .NET stack trace (JobKore/JobCloser/ThreadKore leak) — 7th consecutive failed check (~48h+). Anchor: small cos spend $50-130/mo; MowGo $49/$79 bottom of paid band with automation included.",
+      "significance": "HIGH — Reddit outreach unblocked (RSS) with a fresh hot lead queued; QuoteIQ price hikes + Jobber restructure verified = compare-page ammo; new competitor entrant to watch.",
+      "action": "Part 2 at 13:00Z: post/reply per 1ve82mp queue #1 (draft banked); monitor 1ve8hew; update compare page (QuoteIQ Elite $299/Max $699, Jobber Connect $99 line, correct inflated-Jobber-num myth); keep TurfHop stack-trace ammo for 1rm499y/1unfily replies."
+    },
+    {
+      "id": "intel_0537_fieldroutes",
+      "ts": "2026-08-03T05:37Z",
+      "content": "FIELDROUTES 2026 SURVEY (Jul 22, Turf Mag; Thrive Analytics n=1,027): planned software spend DOUBLED YoY 20%→44%; 62% expect revenue growth; AI top tech priority (40%) but COST is #1 AI blocker (42%) → MowGo flat $39/$79 with automation included is the direct answer; retention = 51% top worry → reminders/auto-invoice story. USE IN COLD EMAILS THIS WEEK. GREENPAL: Tulsa AND OKC both live on service-area page (new city ~every 2 months; 340% spring booking surge; avg mow $25-72) → 'keep clients off the aggregator' angle is current, not speculative. FCC ROBOT-MOWER IMPORT BAN VERIFIED (Jul 28 Covered List; 8 sources) — autonomous-mower threat slows; context ammo only. IBISWorld: $176.7B (2026) +0.9% this year, $195B by 2031; cite per-product. Turf Mag Jul 27: 'extra work gets completed but never gets billed' = top August profit killer → seasonal line: 'August is when unpaid extras pile up — MowGo auto-invoices the second the job's done.' TurfHop 6th consecutive check down (~36h+).",
+      "significance": "HIGH — fresh cold-email ammo (spend doubled, cost blocker); GreenPal confirmed on home turf; new seasonal copy line banked.",
+      "action": "Add FieldRoutes stat to follow-up email drafts (Emerge/Metro/Bigfoot/Simply/Campbell); add August-extras line to copy flags; GreenPal angle already on plate."
+    },
+    {
+      "id": "intel_0112_autopilot",
+      "ts": "2026-08-03T01:12Z",
+      "content": "SERVICE AUTOPILOT PRICING VERIFIED — open item CLOSED: Startup $49 → Pro $199 → Pro Plus $499 → Elite 'Request Pricing'; sign-up fee on paid tiers confirmed (live fetch + 3 sources); pricing page 926 days stale; Client Portal/Smart Maps/Email Integration 'Call for Pricing'; Two-Way Texting + QuickBooks gate at Pro+. Ammo: 'SA charges a sign-up fee and hides Elite behind a sales call — MowGo publishes $39/$79 and takes a card.' TURFHOP 5th consecutive 500 (~32h+). QUOTEIQ ASTROTURFING CONFIRMED: r/pressurewashinglife 1s1w53q (4mo, low-karma) is verbatim QuoteIQ ad copy — treat their Reddit presence as planted. quoteiq.io flipped 403→200 (bot-block flip). REDDIT: 0 new 48h threads (Day 12) at capture; 5 seen-adds incl. 1s40bzq r/smallbusiness 'scheduling + routes + invoices daily' — pain-point goldmine for landing copy (too old for outreach).",
+      "significance": "HIGH — SA tracker item closed; astroturfing watch established; reliability ammo 5× verified.",
+      "action": "Add SA signup-fee + opaque-Elite line to compare page (was already queued on plate); close SA open item in tracker."
+    },
+    {
+      "id": "intel_2104_quoteiq",
+      "ts": "2026-08-02T21:04Z",
+      "content": "QUOTEIQ PRICING CAPTURED LIVE FOR FIRST TIME (myquoteiq.com/pricing; quoteiq.io 403s): 5 tiers $29.99→$699. InstaQuote (self-quoting) + Route Optimization GATED AT ELITE $299/MO; QuickBooks at Pro $149.99; AI Virtual Call Team on $29.99 entry tier; Consumer Financing on every tier; 14-day trial. = MowGo's #1 STRUCTURAL GAP (quotes v1, 3-5d scoped) priced at $299 by a direct competitor. Route sequencing (0.5d) behind their Elite gate too. New compare line: 'QuoteIQ charges $299 for quotes + route optimization — MowGo includes both.' (Third gate-confirmation this week: Jobber Connect $119, HCP $149, QuoteIQ $299.) QUOTES V1 ESCALATED TO #1 BUILD PRIORITY — 3-way convergence: QuoteIQ $299 gate · LawnEstimates shipping weekly (branded storefront, QR codes, service-area polygons, PAYG) · oda.do 'AcreAI' concept ($39/mo solo AI quoting; 'lawn care software' search +171%/12mo; predicts bundler owns instant-quote SEO in 12-18mo).",
+      "significance": "HIGH — strategic: quotes v1 = #1 build priority; compare-page ammo ready.",
+      "action": "Quotes v1 scope (docs/quotes-v1-scope.md) is top of dev queue; add $299-gate line to compare page notes + Jobber-promo drafts."
+    },
+    {
+      "id": "intel_1704_pricing",
+      "ts": "2026-08-02T17:04Z",
+      "content": "FIRST FRESH REDDIT THREAD IN 11 DAYS: 1vcr90y r/CRM 'Do you recommend getting a CRM for lawn care if I'm...' (~8h old; construction worker starting lawn care side hustle; solo-op, price-sensitive → MowGo Solo pitch). Draft written (leads/reddit-threads.md #30), top Monday target — reply within 48h while warm. CORRECTION: SoloOp fee is NOT 3.5%+$0.50 — live site: card 1.75%+$1.30, bank 1%+$1.30, capped $19.95, added to client invoice; SoloOp is an AUSTRALIAN product (ABN/GST/PayTo). Fix intel notes before any copy uses it (compare page safe — only shows ✅). JOBER RECEPTIONIST DISCREPANCY: $99 (W31 digest) vs $29 live on pricing page today — verify (70% AI-price cut or stale intel?; relevant to Autopilot positioning). MOWSTACK LAUNCHED 'Mowstack Websites' (Starter/Pro/Premium, $399 setup fee waived with annual bundle) — closest-shaped competitor moving up-stack; mirrors MowGo's 'one flat price, cancel anytime' language. TurfHop 3rd straight check down (~24h+). Jobber card-on-file auto-charge explicit on pricing page → auto-pay gap (#3) re-validated as table-stakes.",
+      "significance": "HIGH — warm fresh thread queued; SoloOp intel correction; Receptionist discrepancy open.",
+      "action": "1vcr90y reply is plate item #1 (draft #30 ready); correct SoloOp notes; verify Receptionist $29 (5-min check); auto-pay stays pulled forward."
+    },
+    {
+      "id": "intel_1256_trends",
+      "ts": "2026-08-02T12:56Z",
+      "content": "CASH-FLOW CRISIS = STRONGEST AMMO YET (Aspire 2026 Commercial Landscape Report, 1,000+ pros via NALP): 76% bill within 4 days — only 39% get paid on time. 60% paid ≥1 week late; 7% paid 2-3 months late. MowGo auto-invoice-on-Complete + reminder cron + roadmap auto-pay hit this dead-on. Copy line: '60% of lawn companies get paid late. MowGo invoices the second the job's done.' SOFTWARE SPRAWL: 62% of firms run 7+ systems (28% run 10+); switch triggers: automate workflows 58%, efficiency 51%, feature gaps 44% → 'one flat tool replaces the app stack.' TAM VERIFIED: NALP 692,777 US landscaping businesses (+4.8% vs 2024); median firm 355 customers / $14,682 per customer; labor +20% by 2029; subscriptions = 66.45% of market. NUMBER-HYGIENE: cite IBISWorld $176.7B only.",
+      "significance": "MEDIUM-HIGH — core-loop copy ammo + TAM stats banked for digest.",
+      "action": "Copy flags banked (60%-paid-late line); no direct action needed."
+    }
+  ],
+  "open_tasks": {
+    "critical": [
+      {
+        "id": "stripe_functions_regression",
+        "title": "RESTORE Stripe checkout on mowgo.pages.dev — functions dropped by GitHub auto-deploy + ZERO env vars",
+        "days_open": 1,
+        "owner": "Bot/Dev",
+        "status": "🔴 CONFIRMED BROKEN 09:16Z today — checkout DEAD on live domain (all 3 endpoints 405/SPA-fallback)",
+        "note": "Aug 2 19:57Z GitHub auto-deploy (design/logo commits) deployed without root functions/ dir; project env_vars: {}. Fix = manual `wrangler pages deploy` from repo root + repopulate STRIPE_SECRET_KEY/SUPABASE_SERVICE_KEY. Then logged-in test checkout. Also: pin functions in CI or disable GH auto-deploy to stop recurrence. Landing copy 'Stripe payments are live' is false again."
+      },
+      {
+        "id": "stripe_env_verify",
+        "title": "Verify Stripe/Supabase env var VALUES + logged-in test checkout",
+        "days_open": 18,
+        "owner": "Aaron/Bot",
+        "status": "🟡 STILL UNPROVEN — now worsened: env vars currently EMPTY on CF project",
+        "note": "Only a real checkout proves the keys. Needs Aaron's credentials or a test account."
+      },
+      {
+        "id": "invoice_reminders_cron",
+        "title": "Invoice-reminders cron path — script not found (2 consecutive failures)",
+        "days_open": 2,
+        "owner": "Bot",
+        "status": "✅ FIXED THIS SCAN (12:13Z) — symlink /opt/data/scripts/invoice_reminders.py → repo script; next run 12:30Z today",
+        "note": "Part 2: confirm 12:30Z run succeeds; if it errors again, edit cron job (f51f38e19d7d) to full path instead."
+      },
+      {
+        "id": "softwareworld_submit",
+        "title": "Submit MowGo to SoftwareWorld + directory sites (Capterra/G2/SoftwareAdvice/GetApp)",
+        "days_open": 19,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — Day 20 of listicle absence (outdoorbrite '7 best apps 2026' + lawnmowing101 Jobber review seen overnight)",
+        "note": "10-15 min each; on Monday plate #6 — highest-leverage 30 min."
+      },
+      {
+        "id": "jobber_switcher_wave",
+        "title": "Competitor import (CSV) + /switch page — Jobber switcher window open through ~Aug 15",
+        "days_open": 3,
+        "owner": "Dev",
+        "status": "⚠️ WINDOW OPEN — Jobber restructure verified: $29 hook, real automation tier Connect $99",
+        "note": "QuoteIQ listicle inflates Jobber prices — correct prospects who quote $39/$119/$199/$599."
+      },
+      {
+        "id": "online_booking",
+        "title": "Ship online booking link (P0)",
+        "days_open": 12,
+        "owner": "Dev",
+        "status": "❌ NOT STARTED — every competitor has one",
+        "note": "1-2 days; still ahead of auto-pay/quotes? Quotes v1 now #1 per 21:04Z escalation."
+      }
+    ],
+    "medium": [
+      {
+        "id": "quotes_v1",
+        "title": "Minimal Quotes v1 (line items → Approve link → job) — NOW #1 BUILD PRIORITY",
+        "days_open": 3,
+        "owner": "Dev",
+        "status": "🚀 ESCALATED — QuoteIQ gates self-quoting at Elite $299; LawnEstimates shipping weekly; oda.do AcreAI $39 concept",
+        "note": "3-5 days, scoped (docs/quotes-v1-scope.md)."
+      },
+      {
+        "id": "emerge_followup",
+        "title": "Send 4 overdue follow-ups + Campbell & Sons (due TODAY) — new Stripe-live angle + FieldRoutes stat",
+        "days_open": 5,
+        "owner": "Aaron (manual)",
+        "status": "🔴 OVERDUE — 5 emails sent Jul 29-31, 0 replies",
+        "note": "Emerge/Metro Green/Bigfoot/Simply drafts ready; Campbell & Sons first email Jul 31 → follow-up due today. Highest-ROI minutes."
+      },
+      {
+        "id": "jobber_promo_posts",
+        "title": "Post 'Jobber promo just ended' campaign — TODAY (drafts A/B/D ready)",
+        "days_open": 4,
+        "owner": "Aaron (manual)",
+        "status": "⏳ DUE TODAY — prime capture day (promo died Jul 31); 'MowGo includes them flat' + QuoteIQ $299-gate lines ready",
+        "note": "Also lawnmowing101 ×4 + bluecollarmillionaire FB threads queued."
+      },
+      {
+        "id": "reddit_queue",
+        "title": "Manual Reddit posts — RSS workaround LIVE, queue now: 1ve82mp (#1, draft banked 09:41Z) · 1vcr90y (draft #30) · 1i3pv4b · 1rm499y · 1v6vwcn · 1l0y40z · 1bfw00i · 1unfily",
+        "days_open": 12,
+        "owner": "Aaron (manual)",
+        "status": "🟡 29-30 drafts, 0 posted; first fresh threads in 13 days now verified via RSS",
+        "note": "1ve82mp (r/smallbusiness, 1h old at 09:41Z capture) is the freshest — reply within 48h. TurfHop down 7 checks = ammo for 1rm499y/1unfily. NEW: 1ve8hew competitor entrant — observe only."
+      },
+      {
+        "id": "blasian_leads_question",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 6",
+        "days_open": 6,
+        "owner": "Aaron (manual)",
+        "status": "🔴 UNANSWERED — draft ready (leads/blasian-reply-draft-2026-08-01.md); human loop dead ~5 days",
+        "note": "Plate item #1 — cheapest restart of the human loop."
+      },
+      {
+        "id": "auto_pay_card_on_file",
+        "title": "Card-on-file auto-pay — feature gap #3 (Jobber card-on-file now explicit on pricing page)",
+        "days_open": 2,
+        "owner": "Dev",
+        "status": "🆕 RE-VALIDATED — Jobber explicit; SoloOp $0; MowStack ships it",
+        "note": "1-2d. After quotes v1 / per Aaron decision."
+      },
+      {
+        "id": "receptionist_verify",
+        "title": "Verify Jobber AI Receptionist $99 (digest) vs $29 (live pricing page) — 70% cut or stale intel?",
+        "days_open": 2,
+        "owner": "Bot",
+        "status": "🆕 OPEN — 5-min check; relevant to Autopilot positioning",
+        "note": "09:41Z run bundled Receptionist into Plus $199 — re-verify against live page once more."
+      },
+      {
+        "id": "photo_proof",
+        "title": "Photo proof galleries in completion emails",
+        "days_open": 3,
+        "owner": "Dev",
+        "status": "🆕 1-2 days — MowStack ships it; feeds Google-review loop"
+      }
+    ],
+    "low": [
+      {
+        "id": "mowflow_project_delete",
+        "title": "Delete mowflow.pages.dev PROJECT (stub retired Aug 2; project remains — CF guard 8000076)",
+        "owner": "Aaron (manual)",
+        "status": "🟡 Still blocked for bot; one-click decision on plate"
+      },
+      {
+        "id": "trial_length_decision",
+        "title": "Decide trial 7 vs 14 days (checkout grants 7, copy says 14) + CF env cleanup (VITE_STRIPE_PRICE_SOLO, VITE_FORCE_DEMO)",
+        "owner": "Aaron",
+        "status": "⏳ Plate decision #1/#2"
+      },
+      {
+        "id": "soloop_intel_correction",
+        "title": "Correct SoloOp fee intel everywhere (1.75%+$1.30 / 1%+$1.30 capped $19.95, AU product) — before any copy uses it",
+        "owner": "Bot",
+        "status": "🆕 10 min; compare page already safe (✅ only)"
+      },
+      {
+        "id": "lawnmanage_watch",
+        "title": "LawnManage watch-only (Wix, route-opt + equipment + free website, no pricing)",
+        "owner": "Bot",
+        "status": "🟢 Watch list"
+      },
+      {
+        "id": "ve8hew_monitor",
+        "title": "Monitor new entrant 1ve8hew '60-second invoice app' (solo dev, recruiting testers)",
+        "owner": "Bot",
+        "status": "🆕 Competitor watch — invoice-only wedge = MowGo's core action"
+      }
+    ],
+    "closed_since_yesterday": [
+      "verify_session_fix → was fixed+deployed Aug 2 (commit 051857c), but SUPERSEDED by stripe_functions_regression (GH auto-deploy wiped functions Aug 2 19:57Z)",
+      "service_autopilot_verify → VERIFIED Aug 3 01:12Z ($49→$499 ladder + signup fee + opaque Elite); ammo line ready; remove from tracker",
+      "fcc_robot_mower_ban → VERIFIED Aug 3 05:37Z (Jul 28 FCC Covered List; 8 sources); context ammo only",
+      "quoteiq_drift_flag → RESOLVED Aug 3 09:41Z: Elite $249.99→$299 and Max $399.99→$699 are REAL increases (AI-credit metering + Price-Lock added)",
+      "ibisworld_verify → DONE (Aug 2): $176.7B dashboard vs $188.8B industry report — name the product when citing",
+      "bilingual_scrub → DONE (Aug 2): no claim in live copy; do NOT reintroduce",
+      "kill_mowflow_domain → retired Aug 2; only project deletion remains",
+      "lawton_spraymasters_lookup → DONE (Aug 2): Spray Masters = Spray Masters Turf Mgmt Owasso (FB page, no phone); Lawton duo = no public footprint → group DM"
+    ]
+  },
+  "blockers_for_aaron": [
+    {
+      "blocker": "STRIPE CHECKOUT DEAD on live domain (functions + env vars) — Day 17/18",
+      "detail": "GitHub auto-deploy (Aug 2 19:57Z) wiped functions; project env_vars: {}. Bot/dev can run manual wrangler deploy + restore env vars, but the env VALUES were never runtime-verified — a logged-in test checkout (his account) is the only end-to-end proof. Also: decide whether to keep GH auto-deploy (it keeps breaking production) or pin functions in CI."
+    },
+    {
+      "blocker": "SoftwareWorld + directory submissions (Day 19-20)",
+      "detail": "MowGo absent from EVERY 'best of 2026' list; outdoorbrite listicle + lawnmowing101 Jobber review seen overnight. 10-15 min each, on plate #6."
+    },
+    {
+      "blocker": "Reddit posting (Day 12, 29-30 drafts, 0 posted)",
+      "detail": "Bot still 403-blocked on posting paths (RSS now works for MONITORING only). Fresh hot lead 1ve82mp (1h old) + warm 1vcr90y need replies within 48h — today is the window."
+    },
+    {
+      "blocker": "4 overdue lead follow-ups + Campbell & Sons due TODAY",
+      "detail": "Emerge/Metro Green/Bigfoot/Simply drafts ready; new ammo: Stripe-live angle + FieldRoutes 'spend doubled' stat + 60%-paid-late line. 5 sent, 0 replies."
+    },
+    {
+      "blocker": "Blasian silent ~5 days; leads question Day 6 unanswered",
+      "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md. No human messages anywhere since Jul 29 15:39Z. Reply first — restarts the loop."
+    },
+    {
+      "blocker": "Monday decisions: trial 7 vs 14 days, CF env cleanup, mowflow project deletion",
+      "detail": "Three one-click decisions on plate #8; bot blocked on mowflow deletion by CF guard 8000076."
+    }
+  ],
+  "quick_wins_sub_30min": [
+    {
+      "id": "stripe_manual_deploy",
+      "title": "Manual `wrangler pages deploy` from repo root (restores functions/) + repopulate env vars",
+      "estimate": "30 min",
+      "owner": "Bot/Dev",
+      "impact": "CRITICAL — restores live checkout; landing 'Stripe payments are live' becomes true again",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "invoice_reminders_verify",
+      "title": "Verify 12:30Z invoice-reminders cron run succeeds (symlink fix applied this scan)",
+      "estimate": "2 min",
+      "owner": "Bot",
+      "impact": "HIGH — headline feature (cited in copy) comes back; 2nd consecutive failure would be a bad look",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "ve82mp_reply",
+      "title": "Reply to 1ve82mp r/smallbusiness (fresh hot lead, draft banked in intel/2026-08-03_0941.md) — at 13:00Z outreach window",
+      "estimate": "10 min",
+      "owner": "Aaron (manual) / Bot draft",
+      "impact": "HIGH — freshest thread in 13 days; unpaid-invoice pain = MowGo's exact loop",
+      "actionable_by_bot": false
+    },
+    {
+      "id": "receptionist_verify",
+      "title": "Re-verify Jobber AI Receptionist pricing ($99 vs $29 vs bundled Plus $199)",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "LOW-MED — closes an intel discrepancy; Autopilot positioning",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "compare_page_updates",
+      "title": "Compare page: QuoteIQ Elite $299/Max $699 + Jobber Connect $99 (correct inflated-$119 row) + SA signup-fee line + Receptionist note",
+      "estimate": "20 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — main marketing artifact stays current; 4 verified updates banked",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "soloop_intel_correct",
+      "title": "Correct SoloOp fee intel (1.75%+$1.30/1%+$1.30 capped $19.95, AU) in intel notes",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "LOW — prevents wrong copy; compare page already safe",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "blasian_reply",
+      "title": "Post Blasian reply (draft ready) in #🌱mowgo-leads",
+      "estimate": "5 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — restarts human loop; Day 6 overdue",
+      "actionable_by_bot": false
+    },
+    {
+      "id": "followup_emails",
+      "title": "Send 4 overdue follow-ups + Campbell & Sons (due today) with new Stripe-live + FieldRoutes angle",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — warm leads going cold; 0 replies across 5 emails",
+      "actionable_by_bot": false
+    }
+  ],
+  "pricing_status": {
+    "recommendation": "HOLD $39 Solo / $79 Crew flat — 'flat everything: no per-user, no % of revenue'. New verified ammo: automation tier costs $99-199/mo everywhere (Jobber Connect $99, HCP Essentials $149, QuoteIQ Pro $149.99, SAP Pro $199) while MowGo ships reminders + auto-invoice + autopay at $49/$79 — 2-4x cheaper, no AI-credit metering. Anchor: small cos spend $50-130/mo.",
+    "new": "QuoteIQ RAISED Elite $249.99→$299, Max $399.99→$699 (real increases + AI-credit metering + Price-Lock). Jobber '$29 starting' = hook; real automation tier Connect $99; AI Receptionist bundled in Plus $199. TurfHop pricing page down 7th check (~48h+, raw stack trace leaking).",
+    "copy_flags_banked": [
+      "60% of lawn companies get paid late. MowGo invoices the second the job's done.",
+      "August is when unpaid extras pile up — MowGo auto-invoices the second the job's done.",
+      "QuoteIQ charges $299 for quotes + route optimization — MowGo includes both.",
+      "SA charges a sign-up fee and hides Elite behind a sales call — MowGo publishes $39/$79 and takes a card.",
+      "Planned software spend doubled year-over-year — but cost is the #1 blocker. MowGo is flat.",
+      "free tiers that skim 2% of every card payment (Grassly-specific, existing)"
+    ]
+  },
+  "summary": "16 new messages overnight, ALL bot cron reports — zero human activity (Blasian silent ~5 days, Day 5; his leads question Day 6 unanswered, draft ready). 🚨 CRITICAL #1: STRIPE CHECKOUT IS DEAD on the live domain — the Aug 2 19:57Z GitHub auto-deploy (design/logo commits) shipped without the root functions/ dir (all 3 endpoints 405/SPA-fallback) and the project has ZERO env vars; yesterday's verify-session win was undone by the deploy pipeline. Fix = manual wrangler deploy from repo root + restore env vars (30 min, bot/dev), then logged-in test checkout. 🚨 #2 (FIXED this scan): invoice-reminders cron failed its 2nd run (script path mismatch) — symlink created at /opt/data/scripts/invoice_reminders.py → repo script; next run 12:30Z today, verify. ✅ REDDIT UNBLOCKED: RSS endpoint works (13-day drought over) — fresh hot lead 1ve82mp r/smallbusiness (1h old, unpaid-invoice pain) queued #1 for 13:00Z; new competitor entrant 1ve8hew (60-second invoice app) to monitor. INTEL: QuoteIQ raised Elite→$299/Max→$699 (verified); Jobber restructure verified ($29 hook, Connect $99 = real automation tier; their listicle inflates Jobber's prices — correct prospects); Service Autopilot verified (item closed); TurfHop down 7 checks (~48h+, stack trace leaking) = ammo for 1rm499y/1unfily; FieldRoutes: software spend doubled 20%→44%, cost = #1 AI blocker (cold-email ammo); GreenPal live in Tulsa+OKC; FCC robot-mower ban verified (context only). Quotes v1 remains #1 build priority (QuoteIQ $299 gate). Aaron's Monday plate is packed: Blasian reply first (Day 6), 4+1 follow-ups due TODAY (Campbell & Sons), Jobber-promo posts (switcher window closing ~Aug 15), FB ×5, Reddit 7-8 (incl. two fresh threads), directories (Day 19), 8 OK-lead DMs, 3 one-click decisions. Part 2 (8am) priority: (1) stripe manual deploy + env vars, (2) verify reminders cron at 12:30Z, (3) package 13:00Z outreach (1ve82mp reply), (4) compare-page updates (QuoteIQ/Jobber/SA lines), (5) surface blockers: directories, Reddit posting, Blasian, follow-ups, decisions."
+}

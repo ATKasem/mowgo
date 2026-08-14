@@ -1,8 +1,12 @@
 package com.mowgo.app.data
 
+import android.content.Context
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.data.model.Job
+import com.mowgo.app.data.model.Lead
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 
 class ExportRepository(
     private val jobRepository: JobRepository = JobRepository(),
@@ -13,6 +17,16 @@ class ExportRepository(
     suspend fun exportJobs(): List<Job> = jobRepository.loadJobs().map { it.job }
 
     suspend fun exportInvoices(): List<Invoice> = invoiceRepository.loadInvoices()
+
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun exportLeads(context: Context, profileId: String): List<Lead> {
+        if (!SupabaseClientProvider.isConfigured) return LeadRepository().loadLeads()
+        require(profileId.isNotBlank()) { "Profile ID is required" }
+        return SupabaseClientProvider.client.from("leads").select {
+            filter { eq("user_id", profileId) }
+            order("created_at", Order.DESCENDING)
+        }.decodeList<Lead>()
+    }
 
     fun clientsCsv(clients: List<Client>): String = csv(
         listOf("ID", "User ID", "Name", "Address", "Phone", "Email", "Rate", "Cleaning Notes", "Key Code", "Alarm Code", "Pet Instructions", "Created At"),
@@ -31,6 +45,11 @@ class ExportRepository(
     fun invoicesCsv(invoices: List<Invoice>): String = csv(
         listOf("ID", "User ID", "Client ID", "Job ID", "Amount", "Status", "Paid At", "Created At"),
         invoices.map { invoice -> listOf(invoice.id, invoice.userId, invoice.clientId, invoice.jobId, invoice.amount, invoice.status, invoice.paidAt, invoice.createdAt) },
+    )
+
+    fun leadsCsv(leads: List<Lead>): String = csv(
+        listOf("ID", "User ID", "Name", "Phone", "Email", "Address", "Source", "Notes", "Status", "Client ID", "Created At", "Updated At"),
+        leads.map { lead -> listOf(lead.id, lead.userId, lead.name, lead.phone, lead.email, lead.address, lead.source, lead.notes, lead.status, lead.clientId, lead.createdAt, lead.updatedAt) },
     )
 
     private fun csv(headers: List<String>, rows: List<List<Any?>>): String =

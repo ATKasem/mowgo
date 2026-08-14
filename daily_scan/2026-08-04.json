@@ -1,0 +1,333 @@
+{
+  "scan_ts": "2026-08-04T13:55:00Z",
+  "scan_label": "7am CST — Tue Aug 4 (retry: prior 12:43Z run failed on provider timeout, 2593s)",
+  "channels_scanned": {
+    "mowgo": {
+      "channel_id": "1529248227394850916",
+      "status": "14 new messages since Aug 3 12:14Z — ALL bot cron reports (Intel Engine: 3 OK runs [13:48/22:25/07:25] + 3 FAILED [18:09Z storage-write, 02:53Z + 12:26Z provider timeouts] = 9 msgs; Stripe health check ×1 = 2 msgs; invoice reminders ×3 = 3 msgs). ZERO human messages.",
+      "last_human_msg": "Blasian — 'hello' 2026-07-29T15:39Z (~5.9 days silent, Day 6)"
+    },
+    "outreach": {
+      "channel_id": "1529711006023024680",
+      "status": "0 new messages (23 total); last message Jul 26 14:12Z (Reddit Monitor). Dormant Day 9.",
+      "note": "Reddit posting itself has RESUMED (via #🌱mowgo intel reports + friend-poster pipeline): 1ve82mp posted Aug 3 21:55Z, 1vcr90y (#30) done — both verified visible; shadow-filter cleared."
+    },
+    "cowork": {
+      "channel_id": "1529736297847980153",
+      "status": "⚠️ FLOODED — 100+ messages, ALL 'Provider failover watchdog (DeepSeek ↔ OpenRouter)' failures every 5 min ('Script not found: /opt/data/scripts/provider_failover.py'). Job 3e5857315983 created 2026-08-04T03:56Z with NO script ever written; ~127 failed runs, ~127 Discord posts. Channel was empty before.",
+      "note": "✅ FIXED THIS SCAN — script written to /opt/data/scripts/provider_failover.py (watchdog pattern: silent when healthy, alerts on state change + hourly heartbeat during outages). 13:50Z run = 'silent (empty output)' — spam stopped. Channel still holds ~127 failure messages needing cleanup; delivery channel for the watchdog is this cowork channel (consider moving)."
+    },
+    "leads": {
+      "channel_id": "1529707289014042804",
+      "status": "0 new messages (5 total). Blasian's 'How would we get leads for MowGo' (Jul 28 17:03Z) STILL UNANSWERED — Day 7. Only a ✅ bot-ack reaction.",
+      "note": "Lead tracker: 17 leads, 5 emailed (Jul 29-31), 0 replies."
+    }
+  },
+  "overnight_messages_needing_attention": [
+    {
+      "id": "watchdog_spam_1350",
+      "ts": "2026-08-04T03:56Z (first run) → 13:40Z (last failure)",
+      "content": "PROVIDER FAILOVER WATCHDOG SPAM — job 3e5857315983 created 03:56Z today with script='provider_failover.py' but the file never existed; every-5-min cron failed ~127 times, each failure posted to #🤝mowgo-cowork (previously empty channel now flooded with ~127 identical 'Script not found' messages). The watchdog's intended purpose (monitor DeepSeek ↔ OpenRouter health) matters: DeepSeek had provider timeouts all day (Intel Engine 02:53Z + 12:26Z, this 7am scan's prior run 12:43Z, Ashley outreach 12:26Z 2726s).",
+      "significance": "HIGH (spam + reliability) — now FIXED this scan: /opt/data/scripts/provider_failover.py created (probes api.deepseek.com + openrouter.ai /v1/models, 10s timeout; state in .provider_failover_state.json; SILENT when healthy — watchdog pattern; prints on status change + hourly heartbeat while degraded). Verified: manual runs OK, 13:50Z cron run = 'silent (empty output)'. Current state: both providers healthy.",
+      "action": "Part 2: nothing needed functionally. Housekeeping: ~127 spam messages remain in cowork channel (needs Aaron or a cleanup script); consider pointing watchdog delivery at #🌱mowgo instead of cowork."
+    },
+    {
+      "id": "stripe_health_0914",
+      "ts": "2026-08-04T09:14Z",
+      "content": "STRIPE HEALTH CHECK — 'MISCONFIGURED: zero env vars' claim. VERIFIED THIS SCAN: the claim is WRONG (same field-reading bug Part 2 identified Aug 3). Cloudflare API shows 14 env vars in deployment_configs.production.env_vars (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_KEY, SUPABASE_URL, VITE_* etc. — all present; only the project-level env_vars field is empty, which is normal). All 3 endpoints LIVE: checkout-subscription/verify-session/create-portal-session return JSON 401/403 (functions executing, JWT auth gate), not 405/HTML. NEW: GitHub-sourced deploy landed 13:47Z today (f8460eba, repo ATKasem/mowgo) — re-probed AFTER it: functions still live (no repeat of the Aug 2 19:57Z functions-wipe). Root / serves 200. Landing copy 'Stripe payments are live' = TRUE.",
+      "significance": "HIGH — revenue path confirmed LIVE. Day 18's only unproven link: a real logged-in user checkout end-to-end.",
+      "action": "Part 2: recommend the health-check cron be fixed to read deployment_configs.production.env_vars (it keeps false-alarming). Aaron: logged-in test checkout remains the only open Stripe item."
+    },
+    {
+      "id": "intel_1226_timeout",
+      "ts": "2026-08-04T12:26:57Z",
+      "content": "INTEL ENGINE FAILED — 'provider timeout. Fallback chain was exhausted or unavailable.' Same failure class as 02:53Z today (provider timeout) and 18:09Z Aug 3 (session storage write) — 3 of last ~5 runs failed. Pattern: DeepSeek upstream slowness/timeouts; exactly what the provider-failover watchdog (fixed this scan) exists to watch.",
+      "significance": "MEDIUM — intel cadence degraded (missed 02:53Z and 12:26Z lanes; next run should resume pricing_intelligence per .bi_state v21).",
+      "action": "Part 2: verify next Intel run lands; watchdog now tracks provider health and will alert on state change."
+    },
+    {
+      "id": "intel_0725_reddit_resumed",
+      "ts": "2026-08-04T07:25Z",
+      "content": "REDDIT PIPELINE RESUMED — 1ve82mp reply posted Aug 3 21:55Z (permalink p1j4w02, first outreach in 13 days, verified visible) and 1vcr90y (#30) DONE before 07:25Z today — both comments verified in public listings via Composio; shadow-filter suspicion CLEARED. #32 1venugz EXPIRED (thread ~4.5d old by next legal slot). 96h gate: next post ≥ Fri Aug 7 22:21Z. Sweep: 0 new on-ICP threads; 4 karma-builder candidates banked (1vetxrv unanswered-phones, 1vf0mzs boring-business, 1vezdw1 payments, 1vf2e7t Respond.io r/CRM).",
+      "significance": "HIGH — outreach unblocked and clean; first real posting in 13 days happened.",
+      "action": "Keep cadence: nothing until Aug 7 22:21Z window; banked candidates ready. Watch 1ve8hew (60-sec invoice app entrant) — no action."
+    },
+    {
+      "id": "intel_2225_competitors",
+      "ts": "2026-08-03T22:23Z",
+      "content": "COMPETITOR MOVES — (1) LawnBoss growth number HALVED: 829 → '404 pros joined this month' (first negative delta; new Lawnopoly client-marketplace feature — novel but needs liquidity; their comparison table lifts MX Build's marketing and their Jobber $169 conflicts with our verified $49/$139 — don't inherit). (2) MX Build: NEW $49/mo direct price-point competitor (estimates/invoices/payments) — profile next run. (3) QuoteIQ Essentials $29.99/mo first capture (no per-user fees; ladder $29.99→Elite $299→Max $699; AI stack expanded: Autopilot, Copilot, Estimator, Virtual Call Team — explicitly undercuts Jobber's $99 Receptionist; all IQ-credit metered). (4) Servinix timeline CORRECTED: beta Aug 17, commercial Sept 14 (not Jul 31). (5) TurfHop /pricing + /features 500 ~53h+ (6th check) — homepage 'No Credit Card Required' CTA links to dead pricing page = ammo. (6) Watch +1: Werx (werxapp.com). (7) Name-collision note: 'MowGo' search surfaces a Canadian lawn/snow app (SnowGo/MowGo) — not ours; Day 22 of zero listicle presence.",
+      "significance": "MEDIUM-HIGH — MX Build is the closest-shaped new entrant at MowGo's exact price point; Servinix threat date corrected to mid-Sept; TurfHop outage ammo persists.",
+      "action": "Add MX Build to competitor profile (next pricing lane); keep Servinix countdown (Sept 14); use TurfHop outage in Aug 7 reply window if still down."
+    },
+    {
+      "id": "intel_0710_ai_receptionist",
+      "ts": "2026-08-04T07:29Z",
+      "content": "AI RECEPTIONIST = NEW CATEGORY marketed at small crews (AgentZap, Aira, gettinylawn guide, QuoteIQ Virtual Call Team, FB devs recruiting testers). MowGo wedge: 1–3 crews don't need an AI front desk — they need the missed call to become a booked job tomorrow. No voice-AI build yet (0.5d Autopilot public face still queued). TurfHop 'Orbit AI' live (Feb 16, Pro): forecasting/Smart Quote/Schedule Assist — CREDIT-METERED (1 action = 1 credit), ChatGPT/Claude/Gemini routing → reinforces MowGo flat-price-no-credits counter. FCC robot-mower import ban 2nd confirmation (PCMag + WWLP + owner thread): pre-Jul-28 stock sellable, new imports blocked → weekly mowing stays the model. QuoteIQ co-founder self-ranking SEO listicles ('Top 10 AI Tools' #1) — Day 22 of zero MowGo listicle presence.",
+      "significance": "MEDIUM-HIGH — positioning ammo (no-credits, small-crew loop) + FCC ban context confirmed.",
+      "action": "Bank the 'missed call → booked job' wedge for copy; no build needed now."
+    },
+    {
+      "id": "invoice_reminders_ok",
+      "ts": "2026-08-04T12:30:02Z",
+      "content": "INVOICE REMINDERS ✅ — 'OK — no unpaid invoices older than 7d (0 unpaid found, 0 skipped/cooldown)'. Second consecutive success (also OK Aug 3 13:13Z after the real-copy fix). Headline feature healthy again.",
+      "significance": "LOW (positive) — closed item; feature cited in copy is truly live.",
+      "action": "None."
+    }
+  ],
+  "open_tasks": {
+    "critical": [
+      {
+        "id": "stripe_e2e_verify",
+        "title": "Logged-in end-to-end test checkout (the ONLY unproven Stripe link — Day 18)",
+        "days_open": 18,
+        "owner": "Aaron (manual)",
+        "status": "🟡 STILL UNPROVEN — but stack verified live this scan: 14 env vars in production deployment config + all 3 endpoints returning JSON 401/403 after the 13:47Z GitHub deploy",
+        "note": "Everything is green except a real user checkout with a real card. Also: health-check cron (9f622e63f4b8) keeps false-alarming on 'zero env vars' — it reads project-level env_vars (empty) instead of deployment_configs.production.env_vars (14 set). Fix that probe."
+      },
+      {
+        "id": "softwareworld_submit",
+        "title": "Submit MowGo to SoftwareWorld + directories (Capterra/G2/SoftwareAdvice/GetApp)",
+        "days_open": 21,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — Day 21-22 of listicle absence; QuoteIQ co-founder self-ranks #1 in his own listicles",
+        "note": "10-15 min each; highest-leverage 30 min on the plate."
+      },
+      {
+        "id": "jobber_switcher_wave",
+        "title": "Competitor import (CSV) + /switch page — Jobber switcher window open through ~Aug 15",
+        "days_open": 4,
+        "owner": "Dev",
+        "status": "⚠️ WINDOW STILL OPEN — but NEW: Jobber pricing page now headlines 'from $29/mo' (conflicts with verified $49/$139 tracked figures — verify in pricing lane)",
+        "note": "LawnBoss comparison table shows Jobber $169 — another conflicting figure; don't inherit third-party numbers."
+      },
+      {
+        "id": "online_booking",
+        "title": "Ship online booking link (P0)",
+        "days_open": 13,
+        "owner": "Dev",
+        "status": "❌ NOT STARTED — every competitor has one",
+        "note": "1-2 days; quotes v1 still #1 per escalation."
+      }
+    ],
+    "medium": [
+      {
+        "id": "quotes_v1",
+        "title": "Minimal Quotes v1 (line items → Approve link → job) — #1 BUILD PRIORITY",
+        "days_open": 4,
+        "owner": "Dev",
+        "status": "🚀 UNCHANGED — QuoteIQ Essentials $29.99 entry now captures the low end too (ladder to Elite $299)",
+        "note": "3-5 days, scoped (docs/quotes-v1-scope.md)."
+      },
+      {
+        "id": "emerge_followup",
+        "title": "Send 4 overdue follow-ups + Campbell & Sons — new ammo: Stripe LIVE + FieldRoutes stat + 60%-paid-late line",
+        "days_open": 6,
+        "owner": "Aaron (manual)",
+        "status": "🔴 OVERDUE Day 6 — 5 emails sent Jul 29-31, 0 replies",
+        "note": "Emerge/Metro Green/Bigfoot/Simply drafts ready; Campbell & Sons follow-up overdue since Aug 3. Highest-ROI minutes."
+      },
+      {
+        "id": "jobber_promo_posts",
+        "title": "Post 'Jobber promo just ended' campaign (drafts A/B/D ready)",
+        "days_open": 5,
+        "owner": "Aaron (manual)",
+        "status": "⏳ OVERDUE — was due Mon Aug 3; no evidence posted",
+        "note": "Switcher window closing ~Aug 15; QuoteIQ $299-gate + Jobber-hook lines ready."
+      },
+      {
+        "id": "reddit_queue",
+        "title": "Reddit cadence — pipeline LIVE: 1ve82mp ✅ (Aug 3 21:55Z) · 1vcr90y #30 ✅ done · #32 expired · NEXT SLOT ≥ Fri Aug 7 22:21Z (96h gate)",
+        "days_open": 13,
+        "owner": "Bot/Aaron",
+        "status": "🟢 WORKING — first posts in 13 days landed and are visible; shadow-filter cleared",
+        "note": "Banked candidates for Aug 7: 1vetxrv, 1vf0mzs, 1vezdw1, 1vf2e7t. TurfHop outage = ammo if still down. Watch 1ve8hew (entrant, observe only). Friend-poster cron (9b2791494b1b) is PAUSED — resume decision for Aaron."
+      },
+      {
+        "id": "blasian_leads_question",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 7",
+        "days_open": 7,
+        "owner": "Aaron (manual)",
+        "status": "🔴 UNANSWERED — draft ready (leads/blasian-reply-draft-2026-08-01.md); human loop dead ~6 days",
+        "note": "Cheapest restart of the human loop; plate item #1."
+      },
+      {
+        "id": "jobber_pricing_verify",
+        "title": "Verify Jobber '$29/mo' headline vs tracked $49/$139 (and LawnBoss's $169)",
+        "days_open": 1,
+        "owner": "Bot",
+        "status": "🆕 OPEN — 5-min check in next pricing lane; conflicts confuse switcher messaging",
+        "note": "Part 2 candidate."
+      },
+      {
+        "id": "auto_pay_card_on_file",
+        "title": "Card-on-file auto-pay — feature gap #3",
+        "days_open": 3,
+        "owner": "Dev",
+        "status": "🆕 RE-VALIDATED — Jobber explicit; SoloOp $0; MowStack ships it",
+        "note": "1-2d; after quotes v1 / per Aaron decision."
+      },
+      {
+        "id": "photo_proof",
+        "title": "Photo proof galleries in completion emails",
+        "days_open": 4,
+        "owner": "Dev",
+        "status": "🆕 1-2 days — MowStack ships it; feeds Google-review loop (auto review-request idea is the S-effort version)",
+        "note": "Feature lane evidence: Jobber/HCP both shipped photo attachments."
+      }
+    ],
+    "low": [
+      {
+        "id": "mowflow_project_delete",
+        "title": "Delete mowflow.pages.dev PROJECT (domain retired Aug 2; project remains — CF guard 8000076)",
+        "owner": "Aaron (manual)",
+        "status": "🟡 Still blocked for bot; one-click decision on plate"
+      },
+      {
+        "id": "trial_length_decision",
+        "title": "Decide trial 7 vs 14 days (checkout grants 7, copy says 14) + CF env cleanup (VITE_FORCE_DEMO etc.)",
+        "owner": "Aaron",
+        "status": "⏳ Plate decision — env vars now confirmed present (14) so cleanup = remove stale VITE_* if unused"
+      },
+      {
+        "id": "cowork_channel_cleanup",
+        "title": "Clean ~127 watchdog-failure spam messages from #🤝mowgo-cowork + decide watchdog delivery channel",
+        "owner": "Aaron/Bot",
+        "status": "🆕 Spam stopped (fix live 13:50Z); cleanup + delivery routing decision needed"
+      },
+      {
+        "id": "lawnboss_monitor",
+        "title": "Monitor LawnBoss (growth halved 829→404; Lawnopoly marketplace needs liquidity)",
+        "owner": "Bot",
+        "status": "🆕 Watch — first negative delta since tracking"
+      },
+      {
+        "id": "mxbuild_profile",
+        "title": "Profile MX Build ($49/mo estimates/invoices/payments entrant — direct price-point competitor)",
+        "owner": "Bot",
+        "status": "🆕 Next competitor lane"
+      },
+      {
+        "id": "lawnmanage_watch",
+        "title": "LawnManage watch-only (Wix, route-opt + equipment + free website)",
+        "owner": "Bot",
+        "status": "🟢 Watch list"
+      },
+      {
+        "id": "ve8hew_monitor",
+        "title": "Monitor new entrant 1ve8hew '60-second invoice app' (solo dev, recruiting testers)",
+        "owner": "Bot",
+        "status": "🆕 Competitor watch — invoice-only wedge = MowGo's core action"
+      }
+    ],
+    "closed_since_yesterday": [
+      "stripe_functions_regression → CLOSED: functions live (deployment 6da63e50 + verified AFTER today's 13:47Z GitHub deploy: all endpoints JSON 401/403); env vars confirmed present — 14 in deployment_configs.production.env_vars (health check reads wrong field)",
+      "invoice_reminders_cron → CLOSED: 2 consecutive OK runs (Aug 3 13:13Z, Aug 4 12:30Z)",
+      "receptionist_verify → CLOSED Aug 3 (Part 2): Jobber AI Receptionist = $29/mo add-on; $99 was stale",
+      "soloop_intel_correction → DONE Aug 3 (Part 2, 3 files)",
+      "reddit_1ve82mp + reddit_#30_1vcr90y → POSTED + verified visible (Aug 3 21:55Z and Aug 4 <07:25Z); shadow-filter cleared",
+      "provider_failover_watchdog → FIXED THIS SCAN: /opt/data/scripts/provider_failover.py written; 13:50Z run silent; state file healthy",
+      "stripe_health_probe_false_alarm → refuted THIS SCAN via Cloudflare API (14 env vars present)"
+    ]
+  },
+  "blockers_for_aaron": [
+    {
+      "blocker": "Stripe: logged-in end-to-end test checkout — Day 18, the only unproven link",
+      "detail": "Functions live + 14 env vars verified in production deployment config (via CF API this scan). Landing 'Stripe payments are live' is TRUE. A real checkout with his account is the final proof. (Also: the Stripe health-check cron keeps false-alarming 'zero env vars' — it reads the project-level field; fix the probe.)"
+    },
+    {
+      "blocker": "SoftwareWorld + directory submissions — Day 21-22",
+      "detail": "MowGo absent from every 'best of 2026' list; QuoteIQ co-founder self-ranks #1 in his own listicles; name collision with a Canadian SnowGo/MowGo app in search. 10-15 min each, plate item."
+    },
+    {
+      "blocker": "Blasian silent Day 6; leads question Day 7 unanswered",
+      "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md. Zero human messages anywhere since Jul 29 15:39Z. Reply first — restarts the loop."
+    },
+    {
+      "blocker": "4+1 overdue lead follow-ups (Day 6-7)",
+      "detail": "Emerge/Metro Green/Bigfoot/Simply (sent Jul 29, 0 replies) + Campbell & Sons (follow-up due Aug 3). New ammo: Stripe LIVE confirmed, FieldRoutes spend-doubled stat, 60%-paid-late line."
+    },
+    {
+      "blocker": "Cowork channel cleanup + watchdog delivery routing",
+      "detail": "~127 'Script not found' spam messages now sitting in #🤝mowgo-cowork (spam stopped 13:50Z). Watchdog currently delivers to cowork channel — consider #🌱mowgo or a dedicated ops channel."
+    },
+    {
+      "blocker": "One-click decisions: trial 7 vs 14 days · mowflow project deletion · Jobber '$29' pricing conflict",
+      "detail": "Also: friend-poster cron (9b2791494b1b) is paused — resume now that posting is verified clean?"
+    }
+  ],
+  "quick_wins_sub_30min": [
+    {
+      "id": "provider_failover_fix",
+      "title": "Write missing provider_failover.py (stops 5-min spam + restores DeepSeek↔OpenRouter health monitoring)",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "HIGH — ~127-msg/day spam loop killed; provider health now watched (silent-when-healthy + state-change alerts + hourly outage heartbeats)",
+      "actionable_by_bot": true,
+      "status": "✅ DONE THIS SCAN — 13:50Z cron run 'silent (empty output)'; both providers OK"
+    },
+    {
+      "id": "stripe_live_reverify",
+      "title": "Re-verify Stripe live status (endpoints + env vars) after today's 13:47Z GitHub deploy",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "HIGH — confirms no repeat of the Aug 2 functions-wipe; refutes health-check false alarm",
+      "actionable_by_bot": true,
+      "status": "✅ DONE THIS SCAN — functions live (JSON 401/403), 14 env vars present, root 200"
+    },
+    {
+      "id": "jobber_pricing_verify",
+      "title": "Verify Jobber '$29/mo' headline vs tracked $49/$139 (and LawnBoss's $169)",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "LOW-MED — kills a pricing conflict before switcher messaging uses wrong numbers",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "health_check_probe_fix",
+      "title": "Fix Stripe health-check probe to read deployment_configs.production.env_vars (stops false 'MISCONFIGURED' alarms)",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — prevents repeated Day-17-style false panics; cron 9f622e63f4b8",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "aug7_reddit_drafts",
+      "title": "Pre-draft Aug 7 window replies (candidates 1vetxrv/1vf0mzs/1vezdw1/1vf2e7t; TurfHop-outage ammo if still down)",
+      "estimate": "20 min",
+      "owner": "Bot/Aaron",
+      "impact": "MEDIUM — next legal slot ≥ Fri Aug 7 22:21Z; drafts ready-to-post",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "blasian_reply",
+      "title": "Post Blasian reply (draft ready) in #🌱mowgo-leads",
+      "estimate": "5 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — restarts human loop; Day 7 overdue",
+      "actionable_by_bot": false
+    },
+    {
+      "id": "followup_emails",
+      "title": "Send 4 overdue follow-ups + Campbell & Sons with Stripe-live + FieldRoutes + 60%-paid-late ammo",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — warm leads going cold; 0 replies across 5 emails",
+      "actionable_by_bot": false
+    }
+  ],
+  "pricing_status": {
+    "recommendation": "HOLD $39 Solo / $79 Crew flat — 'flat everything: no per-user, no % of revenue, no AI-credit metering'. Automation tiers cost $99-299/mo everywhere (Jobber Connect $99, HCP Essentials $149, QuoteIQ Pro $149.99/Elite $299, SAP Pro $199) while MowGo ships the whole loop at $49/$79. TurfHop Orbit AI is credit-metered — the no-credits counter is now triple-verified.",
+    "new": "Jobber pricing page headline now 'from $29/mo' — CONFLICTS with tracked $49/$139 (verify). QuoteIQ Essentials $29.99 entry tier captured (no per-user fees; ladder to Elite $299/Max $699, all IQ-credit metered). MX Build: new $49/mo direct price-point competitor (estimates/invoices/payments). LawnBoss growth halved 829→404 pros/mo (first negative delta). TurfHop pricing down ~53h+ (6th check) — homepage CTA links to dead page.",
+    "copy_flags_banked": [
+      "60% of lawn companies get paid late. MowGo invoices the second the job's done.",
+      "August is when unpaid extras pile up — MowGo auto-invoices the second the job's done.",
+      "QuoteIQ charges $299 for quotes + route optimization — MowGo includes both.",
+      "SA charges a sign-up fee and hides Elite behind a sales call — MowGo publishes $39/$79 and takes a card.",
+      "Planned software spend doubled year-over-year — but cost is the #1 blocker. MowGo is flat.",
+      "AI receptionists are credit-metered everywhere (TurfHop Orbit AI: 1 action = 1 credit) — MowGo is flat.",
+      "1–3 person crews don't need an AI front desk — they need the missed call to become a booked job tomorrow.",
+      "free tiers that skim 2% of every card payment (Grassly-specific, existing)"
+    ]
+  },
+  "summary": "14 new messages overnight, ALL bot cron reports — zero human activity (Blasian silent Day 6, his leads question Day 7, draft ready). 🚨 NEW CRISIS HANDLED THIS SCAN: a 'Provider failover watchdog' cron created 03:56Z today referenced a script that was never written → ~127 failures, ~127 identical spam messages flooded the previously-empty #🤝mowgo-cowork every 5 minutes; I wrote /opt/data/scripts/provider_failover.py (silent-when-healthy watchdog with state-change alerts + hourly outage heartbeats) and verified the 13:50Z run went 'silent (empty output)' — spam stopped; channel cleanup + delivery-channel decision still needed. ✅ STRIPE: fully LIVE again — functions responding JSON 401/403 (verified AFTER today's 13:47Z GitHub deploy), 14 env vars confirmed present in production deployment config via Cloudflare API (today's health-check 'zero env vars' claim refuted — it reads the wrong field; the probe should be fixed). Only unproven link: logged-in test checkout (Day 18, Aaron). ✅ Invoice-reminders cron: 2nd consecutive OK run (12:30Z). 🟢 REDDIT: pipeline resumed — 1ve82mp (Aug 3 21:55Z) + 1vcr90y #30 both posted and verified visible; shadow-filter cleared; next legal slot ≥ Fri Aug 7 22:21Z; #32 expired; 4 candidates banked. ⚠️ RELIABILITY: DeepSeek provider timeouts hit Intel Engine 2x today + this scan's prior run + Ashley outreach — the new watchdog now monitors both providers. INTEL: LawnBoss growth halved (829→404); MX Build new $49 entrant to profile; QuoteIQ Essentials $29.99 captured; Servinix corrected to Sept 14; TurfHop down ~53h+ (ammo); AI-receptionist category + credit-metering counter ammo banked; FCC robot-mower ban 2nd confirmation. Aaron's plate unchanged in priority: Blasian reply first (Day 7), 4+1 follow-ups (Day 6-7), SoftwareWorld (Day 21), Jobber-promo posts (overdue), logged-in Stripe checkout, 3 one-click decisions. Part 2 (8am) priority: (1) nothing critical broken — verify next Intel run + Jobber $29 pricing check, (2) fix health-check probe, (3) pre-draft Aug 7 Reddit window, (4) surface Aaron blockers (Stripe e2e, Blasian, follow-ups, SoftwareWorld, cowork cleanup)."
+}

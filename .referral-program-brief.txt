@@ -1,0 +1,39 @@
+# MowGo Referral Program — Full Stack
+
+## Why
+Hormozi audit (2026-08-06) identified this as the #1 missing acquisition channel. For hyper-local service businesses, referrals are the most cost-efficient growth lever. Existing companion-outreach spec exists but no code.
+
+## What to build
+
+### Supabase Migration
+Create `supabase/migrations/20260814000000_referral_program.sql`:
+- `referral_codes` table: id (uuid, pk), user_id (uuid, fk→profiles, unique), code (text, unique, 8-char alphanumeric), created_at (timestamptz), total_referrals (int default 0), reward_earned (int default 0)
+- `referral_events` table: id (uuid, pk), referrer_id (uuid, fk→profiles), referred_email (text), referred_id (uuid, fk→profiles, nullable — set when they sign up), status (text: 'sent'/'signed_up'/'converted'/'rewarded'), created_at (timestamptz), converted_at (timestamptz, nullable)
+- RPC `generate_referral_code(user_id)` — generates 8-char random alphanumeric code, inserts into referral_codes, returns it
+- RPC `get_referral_stats(user_id)` — returns code, total_referrals, reward_earned
+- RPC `claim_referral_reward(referral_event_id)` — marks as rewarded, grants 1 month free credit to referrer
+- RLS: users can only read/write their own rows
+- Grant EXECUTE to authenticated
+
+### Web UI (client/src/)
+- Add `loadReferralStats`, `generateReferralCode` to `client/src/lib/data.js`
+- Add referral section to `client/src/pages/Settings.jsx` — shows referral code, share button (copies link), stats (sent/signed/converted), reward balance
+- Share link format: `https://mowgoapp.com?ref=CODE`
+
+### iOS UI (ios-native/MowGo/)
+- Add referral model to `Models.swift`
+- Add referral service methods to `DataStore.swift`
+- Add referral section to `SettingsView.swift` — code display, share sheet, stats
+
+### Android UI (client/android-native/)
+- Add referral model to `data/model/`
+- Add referral methods to `ProfileRepository.kt` or new `ReferralRepository.kt`
+- Add referral section to `MoreScreen.kt` — code display, share intent, stats
+
+## Do NOT touch
+- Any unrelated dirty files
+- Weather push pipeline or offline cache
+
+## Verification
+- `git diff --check` must pass
+- `npm run build` must pass

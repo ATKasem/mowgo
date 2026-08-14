@@ -37,6 +37,8 @@ fun EditJobDialog(
     }
     var notes by remember { mutableStateOf(jobWithClient.notes ?: "") }
     var routeOrderText by remember { mutableStateOf(jobWithClient.routeOrder?.toString() ?: "") }
+    var recurrence by remember { mutableStateOf(jobWithClient.recurrenceRule ?: "none") }
+    var recurrenceExpanded by remember { mutableStateOf(false) }
     var showClientPicker by remember { mutableStateOf(false) }
 
     if (showClientPicker) {
@@ -133,6 +135,28 @@ fun EditJobDialog(
                     ),
                 )
 
+                ExposedDropdownMenuBox(
+                    expanded = recurrenceExpanded,
+                    onExpandedChange = { recurrenceExpanded = it },
+                ) {
+                    OutlinedTextField(
+                        value = recurrence.replaceFirstChar { it.uppercase() },
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Recurrence") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(recurrenceExpanded) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                    )
+                    ExposedDropdownMenu(expanded = recurrenceExpanded, onDismissRequest = { recurrenceExpanded = false }) {
+                        listOf("none", "daily", "weekly", "biweekly", "monthly").forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(if (option == "biweekly") "Biweekly" else option.replaceFirstChar { it.uppercase() }) },
+                                onClick = { recurrence = option; recurrenceExpanded = false },
+                            )
+                        }
+                    }
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
@@ -148,6 +172,7 @@ fun EditJobDialog(
                                 clientId = selectedClient?.id ?: jobWithClient.clientId,
                                 notes = notes.ifBlank { null },
                                 routeOrder = routeOrderText.toIntOrNull(),
+                                recurrenceRule = recurrence.takeUnless { it == "none" },
                             )
                             onSave(updatedJob)
                         },

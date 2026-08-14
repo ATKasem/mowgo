@@ -1,0 +1,25 @@
+# MowGo Parity Fix — iOS + Web
+
+## Fix these files. Do NOT touch unrelated dirty files.
+
+## 1. iOS: Add rain_alerts_enabled toggle
+- ios-native/MowGo/Models/Models.swift: Add `rainAlertsEnabled: Bool = true` to Profile struct with `@Default<BoolValue<true>>` and snake_case coding key `rain_alerts_enabled`
+- ios-native/MowGo/Views/Settings/SettingsView.swift: Add a Switch toggle row. Initial value from `store.profile?.rainAlertsEnabled ?? true`. Persist by calling `await store.saveProfile(...)` with the new value. Place it near the weather/alert section.
+
+## 2. iOS: Add lead alerts toggle
+- ios-native/MowGo/Views/Settings/SettingsView.swift: Add a tier-gated "Lead alerts" toggle. Only show when `auth.currentTier` is paid (solo/crew/premium). Initial value from `store.profile?.leadAlertsEnabled`. Save via `store.saveProfile`.
+
+## 3. iOS: Add edit-job UI
+- ios-native/MowGo/Views/Today/TodayView.swift: Add an edit button on job cards. When tapped, show a pre-filled form (reuse NewJobFormView.swift or present a sheet). Call `store.updateJob(...)` on save. Android already has this via EditJobDialog.kt.
+
+## 4. iOS: Wire rain-delay SMS
+- ios-native/MowGo/Views/Today/TodayView.swift: In the existing rain delay flow, after applying the delay, also call the `send-rain-delay-sms` edge function. Use `SupabaseService.functions.invoke("send-rain-delay-sms", body: ["jobId": jobId, "clientId": clientId, "delayDate": newDate])`. The web calls this in data.js:342-353.
+
+## 5. Web: Add edit-job UI
+- client/src/pages/Today.jsx: Add an edit button on job cards. When clicked, show a modal with pre-filled form fields (name, address, notes, scheduled_date, etc.). Reuse style patterns from NewJobForm.jsx. Call `updateJob()` from data.js (already exists at line 239 but has no UI caller).
+
+## 6. Web: Add skip job UI
+- client/src/pages/Today.jsx: Add a "Skip" action on job cards (iOS/Android already have this). Skip moves job to next recurrence date or marks as skipped. Use the existing `skipped` status from constants.js:21-25.
+
+## Verification
+After all changes, run: `npm run build` to verify web builds.

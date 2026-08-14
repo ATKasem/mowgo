@@ -1,0 +1,124 @@
+{
+  "run_ts": "2026-08-04T15:20:00Z",
+  "run_label": "8am CST Action — Tue Aug 4",
+  "phase": "2/3",
+  "feed": "Part 3 (9am report)",
+  "scan_source": "daily_scan.json scan_ts 2026-08-04T13:55:00Z (7am scan retry — the 12:43Z scheduled run failed on provider timeout 2593s; retry succeeded and also fixed the watchdog-spam crisis)",
+
+  "headline": "✅ No critical breakage this morning — the day's emergencies were already handled by the 7am scan retry (watchdog spam script written, Stripe re-verified live after the 13:47Z GitHub deploy). Part 2 executed 4 quick wins: (1) FIXED the recurring Stripe health-check false-alarm at its root — SKILL.md still said '❌ Broken, env vars empty' from Jul 28; updated to LIVE status + documented the env_vars field pitfall (project-level env_vars is always {}; real vars live in deployment_configs.production.env_vars) so tomorrow's 09:00Z check stops panicking. (2) Jobber '$29' pricing CONFLICT RESOLVED — no conflict: '$29/mo' headline = Core billed annually; tracked $49 = Core month-to-month; both right. Full ladder live-verified (Core $49/39/29, Connect $139/119/99 [reminders+auto-pay start here], Grow $199/169/149, Plus $299-699, Receptionist $29 / Marketing $79 / Pipeline $49 add-ons, +$29/user). Compare page needs NO change. (3) Aug 7 Reddit window kit banked (3 theme templates in u/Blasianzsz voice — no product mention per #31 spam-filter lesson; TurfHop still 500 on pricing+features ~60h+, 8th check = ammo). (4) Fixed Dartboard Status Check cron (e17d9c40286c) — was erroring daily on inference-config drift; pinned to deepseek/deepseek-chat. Watchdog: 25 consecutive healthy checks, spam stopped. Invoice reminders: 2nd consecutive OK (12:30Z). Intel Engine: 13:48Z run OK per scan (next 16:26Z).",
+
+  "quick_wins": {
+    "executed": [
+      {
+        "task": "Fix Stripe health-check false alarm at ROOT (cron 9f622e63f4b8, mowflow-ops skill)",
+        "status": "✅ DONE — 3 files",
+        "detail": "Root cause: SKILL.md line 167 still stated '❌ Broken in deployment (as of Jul 28 2026)... all 4 secret env vars empty' — every health-check run read this stale status and then read the WRONG CF API field (project-level env_vars, always {}). Fixes: (a) SKILL.md Stripe status → '✅ LIVE (restored Aug 3, deployment 6da63e50, re-verified Aug 4 after GitHub deploy f8460eba): 14 env vars in deployment_configs.production.env_vars, all 3 endpoints JSON 401/403'; (b) added env-var pitfall block to SKILL.md Stripe section with correct Python read pattern (deployment_configs.production.env_vars) + 'FALSE ALARM Aug 3 09:16Z + Aug 4 09:14Z — do not re-report'; (c) CORRECTION banner on references/deployed-stripe-health-check.md (its 'Env vars: STILL ZERO' conclusions are historical Jul 31). Next health check 09:00Z Aug 5 should come back clean.",
+        "impact": "MEDIUM-HIGH — kills the recurring Day-17/18-style false panic; correct status for all future ops runs",
+        "time_min": 15
+      },
+      {
+        "task": "Verify Jobber '$29/mo' headline vs tracked $49/$139 (scan quick-win #1)",
+        "status": "✅ VERIFIED LIVE (getjobber.com/pricing, Aug 4 15:10Z) — CONFLICT RESOLVED, no change needed",
+        "detail": "Full ladder extracted from live page: Core $49 mtm / $39 1-yr / $29 annual; Connect $139 / $119 / $99 (page: 'automated reminders + collect payments automatically' start at Connect — confirmed); Grow $199 / $169 / $149; higher tiers $299/$399/$499/$599/$699 by team size (Plus = $399 'starting at' per plan-quiz); add-ons: AI Receptionist $29/mo (re-confirmed), Marketing Suite $79/mo, Sales Pipeline $49/mo, +$29/mo per extra user. RESOLUTION: '$29/mo' headline = Core BILLED ANNUALLY; tracked $49 = Core month-to-month — both correct, different billing terms. LawnBoss's '$169 Jobber' = Grow 1-yr commitment price (not a headline) — still don't inherit third-party numbers. Annotated tracked table intel/2026-07-25_0730.md rows with [RE-VERIFIED Aug 4] / [UPDATED Aug 4]. Compare page ($29-$199 + 'automation starts at Connect $99' note) = accurate as-is; NO redeploy needed.",
+        "impact": "LOW-MED — pricing conflict closed; switcher messaging can use verified numbers",
+        "time_min": 8
+      },
+      {
+        "task": "Aug 7 Reddit window kit (scan quick-win; next legal slot ≥ Aug 7 22:21Z)",
+        "status": "✅ BANKED — leads/reddit-threads.md new section",
+        "detail": "The 4 banked Aug-4 candidates (1vetxrv/1vf0mzs/1vezdw1/1vf2e7t) expire before the slot (Rule 13 — 3-4d old), so wrote reusable TEMPLATES keyed to recurring pain: A) missed calls/unanswered phones (lawn care is the poster child; same-day text-back routine; no AI-front-desk wedge), B) boring business (recurring revenue, no inventory, hand-off path), C) late payments (invoice-on-completion + day-7/day-14 nudges + Friday 15-min block). All in u/Blasianzsz voice, ZERO product/brand/price mention (per #31 spam-filter lesson — pitch only if OP asks). + fresh-thread targeting notes (grab <24h threads in r/smallbusiness/r/LawnCarePros/r/landscaping/r/CRM; preference order) + TurfHop outage re-verified (pricing + features = HTTP 500, 8th consecutive check ~60h+, usable as factual aside in comparison threads only).",
+        "impact": "MEDIUM — Aug 7 window run can post instantly; no cold-thread waste",
+        "time_min": 20
+      },
+      {
+        "task": "Fix Dartboard Status Check cron (e17d9c40286c) — daily 'config drift, unpinned' skip",
+        "status": "✅ DONE — pinned deepseek/deepseek-chat",
+        "detail": "Job had been skipped daily since global inference config drifted ('deepseek-v4-pro' → 'deepseek-chat', ref #44585). Pinned via `hermes cron edit e17d9c40286c --model deepseek-chat --provider deepseek` (matches current global config — no unintended-spend risk). Next scheduled run 19:00Z today validates.",
+        "impact": "LOW-MED — restores the 7pm ideas-dartboard check that silently stopped",
+        "time_min": 3
+      }
+    ],
+    "verified_no_action_needed": [
+      "Provider failover watchdog: 25 consecutive healthy checks (state: healthy, deepseek, since 13:45:44Z); 15:05Z run silent — spam loop dead",
+      "Invoice reminders cron f51f38e19d7d: 12:30Z run OK — 2nd consecutive ('no unpaid invoices older than 7d')",
+      "Stripe: re-verified live by scan AFTER the 13:47Z GitHub deploy (f8460eba) — no repeat of Aug-2 functions-wipe; all 3 endpoints JSON 401/403; 14 env vars in deployment_configs.production.env_vars; root 200",
+      "Intel Engine: 13:48Z run OK (per scan channel read; no new intel file = clean sweep); next run 16:26Z — watchdog covers provider health",
+      "Reddit pipeline: 1ve82mp (21:55Z Aug 3) + 1vcr90y #30 posted and visible; shadow-filter cleared; nothing until Aug 7 22:21Z",
+      "TurfHop: re-checked this run — /pricing + /features both 500 (~60h+, 8th check); homepage CTA still links to dead page"
+    ],
+    "flagged_not_changed": [
+      "Cowork channel cleanup: ~127 'Script not found' spam messages still in #🤝mowgo-cowork — discord tool is READ-ONLY (fetch/create-thread only, no delete); needs Aaron or a bot with manage-messages. Spam itself stopped 13:50Z.",
+      "Watchdog delivery channel: cron 3e5857315983 still delivers to #🤝mowgo-cowork (silent-when-healthy so no posts unless degraded) — moving to #🌱mowgo or an ops channel is an Aaron decision.",
+      "Ashley PART 1 (d01936116301): last run error 'HTTP 400: model name invalid' (Aug 3 11:07Z) and 'Execution: running' state — likely a stale model pin from before config drift; NOT touched (out of cowork scope). Same provider-timeout failure class as the fixed watchdog's purpose.",
+      "Nightly vault sync (02:00Z) + Ashley cold-email outreach (12:26Z) failed on provider timeouts (2718s/2726s) — infra-level, not code; watchdog now monitoring.",
+      "Intel Engine storage-write failure (18:09Z Aug 3) did not recur (13:48Z OK)."
+    ]
+  },
+
+  "research_findings": {
+    "source": "Live fetch getjobber.com/pricing (Aug 4 15:10Z) + turfhop.com probes (15:15Z) + CF/cron state",
+    "key_items": [
+      "Jobber live ladder (mtm / 1-yr / annual): Core $49/$39/$29 · Connect $139/$119/$99 · Grow $199/$169/$149 · Plus+ $299→$699 by team size. Headline 'from $29/mo' = Core annual. Add-ons: AI Receptionist $29, Marketing Suite $79, Sales Pipeline $49, +$29/user. → '$29 conflict' CLOSED (annual vs mtm); tracked $49/$139 remain correct.",
+      "'Automated reminders + collect payments automatically' explicitly listed under Connect — the $99-139 tier, reinforcing the flat-price counter (MowGo ships the whole loop at $49/$79).",
+      "TurfHop outage now ~60h+ (8th check, HTTP 500 on both /pricing and /features) — longest verified outage in tracker history; homepage 'No Credit Card Required' CTA dead-ends.",
+      "LawnBoss's '$169 Jobber' figure = Grow 1-yr commitment price; their table still lifts MX Build marketing + conflicts with verified figures — do not inherit.",
+      "QuoteIQ co-founder self-ranking listicles continue (Day 22 of zero MowGo listicle presence) — directory submissions remain highest-leverage marketing minutes."
+    ]
+  },
+
+  "tasks_needing_aaron": {
+    "critical_today": [
+      {
+        "priority": "🔴 Day 7 — cheapest human-loop restart",
+        "task": "Reply to Blasian in #🌱mowgo-leads (draft ready: leads/blasian-reply-draft-2026-08-01.md)",
+        "detail": "Zero human messages anywhere since Jul 29 15:39Z. His 'How would we get leads for MowGo' question is Day 7 unanswered.",
+        "blocked_days": 7
+      },
+      {
+        "priority": "🔴 Day 6-7 — warm leads going cold",
+        "task": "Send 4 overdue follow-ups (Emerge/Metro Green/Bigfoot/Simply) + Campbell & Sons first follow-up",
+        "detail": "0 replies across 5 emails sent Jul 29-31. Ammo ready: Stripe LIVE confirmed, FieldRoutes spend-doubled stat, 60%-paid-late line.",
+        "blocked_days": 6
+      },
+      {
+        "priority": "🔴 Day 18 — the ONLY unproven Stripe link",
+        "task": "Logged-in end-to-end test checkout (real card, real account)",
+        "detail": "Functions live + 14 env vars verified (this scan, post-13:47Z deploy). Landing 'Stripe payments are live' = TRUE. 5-min test completes the proof.",
+        "blocked_days": 18
+      },
+      {
+        "priority": "🔴 Day 21-22 — highest-leverage 30 min",
+        "task": "Submit MowGo to SoftwareWorld + Capterra/G2/SoftwareAdvice/GetApp",
+        "detail": "10-15 min each; QuoteIQ co-founder self-ranks #1 in his own listicles while MowGo has zero presence; search name-collision with Canadian SnowGo/MowGo app.",
+        "blocked_days": 21
+      },
+      {
+        "priority": "🔴 Overdue — window closing ~Aug 15",
+        "task": "Post 'Jobber promo just ended' campaign (drafts A/B/D ready)",
+        "detail": "Was due Mon Aug 3. Verified ammo: $29 hook is annual-only (mtm $49), automation tier Connect $99-139, Receptionist $29 add-on — 'MowGo includes them flat'.",
+        "blocked_days": 5
+      }
+    ],
+    "decisions": [
+      "Cowork channel: cleanup ~127 spam msgs (bot can't delete) + watchdog delivery channel (cowork vs #🌱mowgo vs ops channel)",
+      "Trial 7 vs 14 days (checkout grants 7, copy says 14) + CF env cleanup (VITE_FORCE_DEMO etc.)",
+      "Delete mowflow.pages.dev project (CF guard 8000076 — one-click)",
+      "Resume friend-poster cron 9b2791494b1b? (posting verified clean since Aug 3)",
+      "Pin/repair Ashley PART 1 cron (d01936116301) — HTTP 400 model error, likely stale pin"
+    ]
+  },
+
+  "blockers": [
+    "None blocking Part 3. All bot-actionable items from the scan executed; the 7am scan retry had already resolved the day's only crisis (watchdog spam).",
+    "Remaining items are all Aaron-side (above) — none are bot-blocked except cowork-channel message deletion (read-only discord tool)."
+  ],
+
+  "key_items": [
+    "HEALTH-CHECK FIX SHIPPED at root (skill updated, not just the probe call) — expect clean 09:00Z Aug 5 report",
+    "JOBER PRICING: '$29' conflict CLOSED — annual vs mtm, both verified; compare page untouched (accurate)",
+    "AUG 7 KIT: 3 no-pitch templates + TurfHop 500 ammo (8th check) banked in reddit-threads.md",
+    "DARTBOARD CRON pinned (was silently skipping daily)",
+    "WATCHDOG: 25 consecutive healthy — DeepSeek/OpenRouter both up; intel next run 16:26Z",
+    "Aaron's plate (unchanged priority): Blasian → follow-ups → Stripe e2e → directories → Jobber-promo posts"
+  ]
+}

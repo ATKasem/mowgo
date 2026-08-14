@@ -1,0 +1,90 @@
+{
+  "actions_ts": "2026-08-08T13:35:00Z",
+  "action_label": "8am CST action — Sat Aug 8 (fed by daily_scan.json from Part 1; Saturday — no weekday action list, Sunday = W32 digest + lead discovery)",
+  "quick_wins": [
+    {
+      "id": "verify_no_sat_slot",
+      "status": "✅ VERIFIED CLEAN (scan claim re-confirmed)",
+      "detail": "jobs.json checked: NO one-shot fires today (only bd897f543d26, completed 06:00Z). post_kit_sat0822.py exists but is wired to NO cron. Nothing to cancel — kit stands for Mon.",
+      "evidence": "hermes cron store query — 0 jobs with run_at 2026-08-08 remaining"
+    },
+    {
+      "id": "mon_slot_cron",
+      "status": "✅ CREATED — one-shot 4c195234eaa9 at 2026-08-11T22:23:00Z",
+      "detail": "Prompt mirrors the verified Fri machinery (1fb9a6fd0113): UPDATED kit ① #55 1vi1hcj (reply angle = OP's unanswered SMS-platform question) → ② #57 1vi8tr3 → ③ #43 1vfyg2j (#56 DROPPED — OP [removed]) → fallback #50 1vh7t47. Encodes: thread-live check → post u/Blasianzsz (friend-mode, rule 31) → visibility verify via REDDIT_RETRIEVE_POST_COMMENTS (API success != visible, #48 lesson) → tracker update + post_times.log. Skill mowgo-leads, delivers to #🌱mowgo (1529248227394850916). State: scheduled, enabled.",
+      "evidence": "hermes cron create → 'Created job: 4c195234eaa9'; confirmed in jobs.json (run_at 2026-08-11T22:23:00+00:00)"
+    },
+    {
+      "id": "kit_tracker_update",
+      "status": "✅ DONE (committed e23868f)",
+      "detail": "leads/reddit-threads.md: new '🎯 MON Aug 11 22:23Z slot — KIT LOCKED' block — Sat slot CANCELLED (96h gate, post_kit_sat0822.py unwired, do NOT fire), #56 DEAD → #43 in at #3, #55 reply angle noted, fallback #50, cron ID recorded.",
+      "evidence": "git diff — 9-line block inserted after Fri SLOT RESULT"
+    },
+    {
+      "id": "compare_page_jobber_lmn",
+      "status": "✅ DONE VIA CODEX + COMMITTED + PUSHED (e23868f → main; CF Pages building)",
+      "detail": "Both Compare.jsx (SPA) and client/public/seo/compare/index.html (static SEO snapshot): Jobber cells refreshed to verified Aug 8 ladder — Core $49 (raised from $39), Connect $129 annual / $139 month-to-month, Grow $249, +$29/user, AI Receptionist $29 add-on (free only Plus $399+); gap line $42→$198/yr; per-user math $1,536→$1,896/yr; summary bar $348/$1,188→$588/$1,548; competitor table cell '$139/mo Connect'→'$49–$249/mo'; NEW LMN note paragraph ($197 quote-only / $297–697 design-build, verified Aug 8). Codex verified: 7/7 new strings present ×2 files, 0 old strings (1,188 / $348/yr / $42 a year / $24–40 / 'verified Aug 6') remain. Client build passed (vite 633ms). Item (a) table cell done manually after codex left it.",
+      "evidence": "codex verification output; npm run build ✓ built in 633ms; git e23868f pushed 45959f6..e23868f"
+    },
+    {
+      "id": "copy_flags_bank",
+      "status": "✅ DONE (committed e23868f)",
+      "detail": "marketing/competitor-comparison.md: new 'Copy flags — banked Aug 8, 2026' section — $49 entry floor dead, per-user tax, Jobber AI Receptionist $29 vs MowGo text-back wedge, level-billing drought quotes (1vi1hcj '42 services averaged'), NALP 67%/42% stat block, electric-transition regulatory, GorillaDesk $49 crew-tier watch, LMN band, welovejoe.com.",
+      "evidence": "git diff — 11 lines appended"
+    },
+    {
+      "id": "delta_backup_diag",
+      "status": "✅ ROOT-CAUSED + FIXED + PUSH VERIFIED — no longer just diagnosed",
+      "detail": "Root cause: delta-2026-08-08.tar.gz = 1,145.98MB > GitHub 100MB limit. Bloat = regenerable build caches /opt/data/.gradle (Android jars touched Aug 7 22:53 by the Android build) + /opt/data/.npm, missing from excludes. Fix (via codex, reviewed): .gradle/.npm added to EXCLUDE_NAMES; 80MB per-file cap (skipped files logged to LARGE-<date>.txt AND still rolled into manifest so they don't re-diff nightly); >90MB tar auto-splits into 90MB parts with restore command written to MANIFEST.txt. VERIFIED LIVE: re-ran script → '✅ Delta pushed: 2026-08-08 — 2880 changed, 18497 deleted (files 300.4MB)'; clone of deltas branch shows 4×90MB parts (aa/ab/ac/ad), MANIFEST restore line 'cat delta-2026-08-08.tar.gz.part* > delta-2026-08-08.tar.gz && tar xzf ...', retained sets 08-06/07/08 prune OK, local manifest rolled forward (34,979 entries). No LARGE file needed (excludes handled it).",
+      "evidence": "script stdout; git clone of ATKasem/hermes-backup@deltas listing part files; MANIFEST.txt content"
+    },
+    {
+      "id": "outreach_ref_cleanup",
+      "status": "✅ DONE (3 of 3)",
+      "detail": "(1) mowgo-leads SKILL.md curl example re-pointed 1529711006023024680 → #🌱mowgo-leads 1529707289014042804 + deletion NOTE added. (2) vault/index.md: '🗑️ #🌱mowgo-outreach officially CLOSED' row (404 ×3, do NOT re-add). (3) Part-1 7am scan cron f66408caf9fc prompt edited — outreach removed from scan list (NOTE documents the deletion, instructs not to scan). Verified: only remaining cron reference to the dead ID is the scan cron's documentation note; no scripts reference it.",
+      "evidence": "patch diffs; jobs.json grep — 1 hit (the doc note)"
+    },
+    {
+      "id": "trial_backstop_fix",
+      "status": "✅ FIXED + VERIFIED (bonus — found during delta diagnosis)",
+      "detail": "Cron b90210d278e7 failed 'Script not found: /opt/data/scripts/mowgo_expire_trials.sh' (real script lived at ~/.hermes/scripts/). Created exec wrapper at /opt/data/scripts/mowgo_expire_trials.sh (mode 755). Verified: runs exit 0 (silent watchdog — nothing expired). Next run Aug 9 08:00Z.",
+      "evidence": "wrapper exit 0"
+    }
+  ],
+  "bug_fix_lane": {
+    "status": "2 bugs fixed via Codex CLI + verified (review lane resumed — quota released 05:19Z)",
+    "detail": "delta-backup.py (cf89544f9829): 1.1GB tar > GitHub 100MB limit — excludes + 80MB per-file cap + 90MB split fallback; push VERIFIED (4 parts on deltas branch, manifest rolled). mowgo_expire_trials.sh (b90210d278e7): wrapper created; exit 0 verified. Both fixed by codex exec --sandbox workspace-write --skip-git-repo-check, diffs reviewed, live-verified from main shell (codex sandbox itself has no DNS — its verification failed but main-shell runs passed).",
+    "remaining": [
+      "🔴 Aaron: UNPAUSE SMS Sender cron 3f67268baeb6 (Day 7 — 23 queued + 6 wave-4 drafts, 0 sent; dry-run verified '10 would send').",
+      "🟡 Aaron: UNPAUSE Qualified-Lead SMS Alert 88f17cbe35b3.",
+      "🟡 Both Cloudflare API tokens dead (10000) — re-auth in CF dashboard → /opt/data/.env (blocks cf_check.py/wrangler; git-push deploys unaffected — proven again today)."
+    ]
+  },
+  "research_lane": {
+    "status": "NOT NEEDED this cycle — intel engine covered it (3 runs: 02:38Z NALP stats, 06:39Z $49 pricing floor, 11:36Z AI-receptionist arms race + kit update)",
+    "detail": "This cycle only APPLIED the intel (compare page refresh, copy flags banked). Sunday's Part 2 = weekly digest W32 + lead discovery (new TX-operator leads 1vi8tr3, 1vitibw). Watch list unchanged + GorillaDesk Basic $49 added as crew-tier direct rival.",
+    "watch": "LawnPro · GorillaDesk $49 (new) · Jobber (AI Receptionist $29, Now conf Sept 25) · Servinix (beta Aug 17) · QuoteIQ (AI Estimator + Virtual Call Team + 1% fee) · Yardbook free · DeepLawn · GreenPal photo-proof · LawnBoss · welovejoe.com · signld.ai/TradeKit/ContractorPlus astroturf"
+  },
+  "aaron_plate": [
+    {"id": "sms_unpause", "status": "🔴 Day 7 — 23 texts queued, 0 sent", "detail": "Cron 3f67268baeb6 still PAUSED. One command: hermes cron resume 3f67268baeb6 (14:00Z = 9am CT, 10/day) or manual sends. Wave-4 adds 6 more drafts in #leads. Wave-1 Day-2 texts due the moment sends start."},
+    {"id": "emerge_followup", "status": "🔴 Day 14 — 0 replies across 5 emails", "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). 2nd follow-up overdue; highest-ROI 10 min."},
+    {"id": "blasian_reply", "status": "🔴 Day 12 — ✅ reaction still no reply", "detail": "Draft at leads/blasian-reply-draft-2026-08-01.md. One session clears this + #48 manual paste."},
+    {"id": "reddit_48_paste", "status": "🆕 STILL FILTERED", "detail": "#48 reply (1vgvrg5, t1_p24ihev) AutoMod-filtered; MANUAL paste only (draft in intel/2026-08-06_1937.md). Do NOT re-queue via API."},
+    {"id": "stripe_e2e_verify", "status": "🟡 Day 24 — ONLY unproven payment link", "detail": "09:05Z check all green, bundles converged (index-iH6OkeXp.js both domains). One real logged-in checkout with Aaron's account+card closes it."},
+    {"id": "cf_tokens", "status": "🔴 Both CF API tokens dead (10000)", "detail": "Re-auth in CF dashboard → /opt/data/.env. Blocks cf_check.py + non-git-push deploys."},
+    {"id": "softwareworld_submit", "status": "❌ Day 28", "detail": "SoftwareWorld + Capterra/G2/SoftwareAdvice/GetApp. 10-15 min each; zero listicle presence."},
+    {"id": "jobber_switcher", "status": "⚠️ Window ~Aug 15 (7 days left)", "detail": "Promo posts drafts A/B/D still not posted; /switch page + CSV import ready; fresh ammo: Core $49 raise + AI Receptionist $29 add-on."},
+    {"id": "one_click_decisions", "status": "⏳ trial 7 vs 14 days · free-tier gap (5 vs 25 — now public on compare page) · friend-poster cron resume"}
+  ],
+  "blockers": [
+    "SMS unpause remains the single highest-value decision (Day 7): 23+6 texts queued, sender cron PAUSED, dry-run verified.",
+    "Reddit #48 paste + Blasian reply + Stripe logged-in checkout + CF token re-auth are Aaron-only (bot cannot bypass AutoMod, mint user JWTs, or re-auth third-party tokens).",
+    "Codex sandbox has no outbound DNS (its verification steps fail; code changes verified from the main shell instead)."
+  ],
+  "deployment": {
+    "commits": "e23868f (compare Jobber/LMN refresh + kit tracker + copy flags + vault index) — pushed 45959f6..e23868f → CF Pages auto-deploy",
+    "pushed": true,
+    "verified_live": "✅ curl mowgoapp.com/seo/compare/ → 'verified Aug 8, 2026' (1 hit) + 'LMN (design-build estimating)' (1 hit); main bundle index-DlGV8cEa.js live (was index-iH6OkeXp.js)"
+  },
+  "summary": "8/8 bot quick wins executed + 2 bonus bug fixes. Mon Aug 11 22:23Z slot LOCKED (one-shot cron 4c195234eaa9, updated kit #55→#57→#43; Sat slot verified clean). Compare page Jobber cells refreshed to the new ladder ($49 Core / $129-139 Connect / $249 Grow, AI Receptionist $29 add-on) + LMN $297-697 row added — both SPA and static SEO snapshot, built OK, pushed. Copy flags banked (9 flags). Delta-backup root-caused (1.1GB tar > 100MB GitHub limit from .gradle/.npm caches) and FIXED (excludes + 80MB cap + 90MB split) — re-run pushed 300MB as 4 parts, manifest rolled, next nightly run Aug 9 03:15Z should be clean. Trial-expiry cron wrapper fixed (was 'script not found' since Aug 8 08:00Z). Outreach channel references cleaned (skill curl example → #leads, vault index closure row, 7am scan prompt). Aaron's top 3 unchanged: SMS unpause Day 7, 5 lead follow-ups Day 14, Blasian reply + #48 paste (one session). Sunday = weekly digest W32 + lead discovery."
+}

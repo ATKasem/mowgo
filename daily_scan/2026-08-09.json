@@ -1,0 +1,313 @@
+{
+  "scan_ts": "2026-08-09T12:45:00Z",
+  "scan_label": "7am CST — Sun Aug 9 (window since Aug 8 12:16Z scan)",
+  "channels_scanned": {
+    "mowgo": {
+      "channel_id": "1529248227394850916",
+      "status": "100 fetched. ~25 new msgs since Aug 8 12:16Z — ALL bot: Intel Engine ×8 (02:38Z run1, 06:39Z run2/$49 floor, 11:36Z run3/AI-receptionist, 16:33Z run4/LawnBook watch, 20:51Z evening Sat, 01:19Z Sun deep-dive W32 digest, 05:32Z Mon summary + competitor delta: Servinix $300/mo, LawnBook inflated, Jobber unchanged; Stripe 09:08Z health OK + 12:30Z invoice reminders OK); Intel FAILED 09:48Z HTTP 402 Insufficient Balance ⚠️ — ZERO human messages.",
+      "last_human_msg": "Blasian — 'How would we get leads for MowGo' 2026-07-28T17:03Z (Day 12 of silence; ✅ reaction still no reply)"
+    },
+    "outreach": {
+      "channel_id": "1529711006023024680",
+      "status": "⚠️ CHANNEL GONE — 404 Unknown Channel, 4th consecutive sync. Deletion CONFIRMED.",
+      "note": "No active cron targets it."
+    },
+    "cowork": {
+      "channel_id": "1529736297847980153",
+      "status": "✅ EMPTY — 0 messages.",
+      "note": "Nothing to do."
+    },
+    "leads": {
+      "channel_id": "1529707289014042804",
+      "status": "11 fetched. Wave-4 drafts posted Aug 7 15:11Z (Campbell & Sons, Nutri-Green, Hicks, Eberly's, LBR, Aguilar Brothers) + 3 FB/IG posts; dedup passed; 0 sent. Blasian's leads question Jul 28 UNANSWERED — Day 12, ✅ reaction still no reply.",
+      "note": "Wave-4 SMS drafts NOT in sms_queue.json (still 23 entries all status=new from earlier waves)."
+    }
+  },
+  "overnight_messages_needing_attention": [
+    {
+      "id": "intel_402_credit_fail",
+      "ts": "2026-08-09T09:48:00Z",
+      "content": "⚠️ INTEL ENGINE FAILED: HTTP 402 — Insufficient Balance (cron job 54982fcbf42e). This means OpenRouter credits exhausted — subsequent runs may also fail until credits restored.",
+      "significance": "HIGH — BI reports, competitor monitoring, Reddit sweeps, and kit verification depend on this. Next runs likely to fail too.",
+      "action": "CRON: Check/restore OpenRouter credits for Intel Engine cron. All downstream intel stops until fixed."
+    },
+    {
+      "id": "w32_digest_ready",
+      "ts": "2026-08-09T01:19:00Z",
+      "content": "W32 weekly digest auto-generated with lead discovery (+3 leads → 20 total). Top 3: pricing story wrote itself (Jobber $24 anchor reconfirmed, QuoteIQ $74.99 Beginner, LawnBook FREE/$9.99); Mon 22:23Z kit locked (#55→#57→#43); lead follow-ups Day 11+ overdue. New: Servinix $300/mo pricing, LawnBook inflation red flag, fall seasonal dollars ($75-$1,815), TurfHop outage closed.",
+      "significance": "MEDIUM-HIGH — ready for human review; high-impact summaries phone-readable.",
+      "action": "Part 2: verify W32 digest saved at /opt/data/mowgo/weekly_digest_2026-08-09.md; feed to Part 3."
+    },
+    {
+      "id": "stripe_health_converged",
+      "ts": "2026-08-09T09:08:00Z",
+      "content": "Stripe: bundles CONVERGED again (index-Bt0NtHLK.js on both mowgo.pages.dev and mowgoapp.com — NEW hash since Aug 8 index-iH6OkeXp.js). Functions live + auth-gated. Zero pk/sk leaks. iOS PaymentSheet valid. Verify-session bug fixed in deploy. Only unproven = real logged-in e2e checkout (Aaron, Day 25).",
+      "significance": "LOW-MED — positive signal. New bundle hash suggests recent redeploy. Still awaiting Aaron's manual checkout.",
+      "action": "None bot-side."
+    },
+    {
+      "id": "servinix_pricing_published",
+      "ts": "2026-08-09T05:32:00Z",
+      "content": "Servinix published full pricing: AI Service Assistant $300/mo flat, FSM $20/tech, GPS $15/vehicle + $50 OBD. Hook = 'show your invoice, we'll beat it by 50%'. Beta Aug 17, launch Sept 14. 1-100 tech play, not direct lawn crew competitor but $300 alone > MowGo whole stack. Compare-page gold.",
+      "significance": "MEDIUM — confirm in compare page next edit cycle.",
+      "action": "Bank: add Servinix row to marketing/competitor-comparison.md."
+    },
+    {
+      "id": "lawnbook_inflation_flag",
+      "ts": "2026-08-09T05:32:00Z",
+      "content": "LawnBook's '1,000+ businesses' claim looks inflated: Google Play listing has only 100+ downloads, 6 reviews. Real channel is iOS. Feature surface growing (Mass Email Campaigns, missed-call lead capture, QBO/Xero import). Watch list priority maintained.",
+      "significance": "LOW — competitive intel, note for accuracy.",
+      "action": "Bank flag."
+    },
+    {
+      "id": "invoice_reminders_ok",
+      "ts": "2026-08-09T12:30:00Z",
+      "content": "Invoice reminders: OK — 0 unpaid invoices older than 7d (0 found, 0 skipped/cooldown). Same as every previous run.",
+      "significance": "LOW — routine green.",
+      "action": "None."
+    }
+  ],
+  "open_tasks": {
+    "critical": [
+      {
+        "id": "sms_batch_sends",
+        "title": "SMS Day-1 sends — 23 texts queued (all 'new'), ZERO ever sent; sender cron PAUSED since Aug 6",
+        "days_open": 8,
+        "owner": "Aaron (decision)",
+        "status": "🔴 PAUSED Day 8 — wrapper in place, dry-run verified; cron 3f67268baeb6 disabled. Wave-4 adds 6 more drafts in #leads."
+      },
+      {
+        "id": "emerge_followup",
+        "title": "Lead follow-ups Day 14 — 5 emails, 0 replies; 2nd follow-up overdue",
+        "days_open": 14,
+        "owner": "Aaron (manual)",
+        "status": "🔴 OVERDUE — 2nd follow-up script due Fri Aug 7, unsent"
+      },
+      {
+        "id": "blasian_leads_question",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 12; ✅ reaction, no reply",
+        "days_open": 12,
+        "owner": "Aaron (manual)",
+        "status": "🔴 UNANSWERED — draft ready"
+      },
+      {
+        "id": "reddit_slot_mon",
+        "title": "Reddit slot ≥ Mon Aug 11 22:23Z (96h gate) — kit ① #55 → ② #57 → ③ #43; fallback #50",
+        "days_open": 0,
+        "owner": "Bot",
+        "status": "🟢 GATED — create one-shot cron for Mon 22:23Z with updated kit"
+      },
+      {
+        "id": "stripe_e2e_verify",
+        "title": "Logged-in e2e checkout — Day 25, ONLY unproven link",
+        "days_open": 25,
+        "owner": "Aaron (manual)",
+        "status": "🟡 STILL UNPROVEN — bundles converged (new hash Bt0NtHLK.js)"
+      },
+      {
+        "id": "softwareworld_submit",
+        "title": "Submit MowGo to SoftwareWorld + directories — Day 29",
+        "days_open": 29,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — zero listicle presence"
+      },
+      {
+        "id": "reddit_48_manual_paste",
+        "title": "Manually paste #48 reply in 'boring local service' thread — AutoMod-filtered Aug 6",
+        "days_open": 3,
+        "owner": "Aaron/Blasian (manual)",
+        "status": "🆕 STILL FILTERED"
+      }
+    ],
+    "medium": [
+      {
+        "id": "cf_tokens_dead",
+        "title": "BOTH Cloudflare API tokens dead (10000 error since Aug 7) — blocks cf_check/wrangler",
+        "days_open": 3,
+        "owner": "Aaron",
+        "status": "🔴 DEAD — git push deploys still work"
+      },
+      {
+        "id": "intel_engine_402",
+        "title": "Intel Engine cron failing: HTTP 402 Insufficient Balance",
+        "days_open": 1,
+        "owner": "Bot/Ops",
+        "status": "🆕 STOPPED — all BI reports dependent on this"
+      },
+      {
+        "id": "delta_backup_cron",
+        "title": "Hermes nightly delta backup failing — git push error",
+        "days_open": 2,
+        "owner": "Bot",
+        "status": "🆕 NEXT RUN Aug 9 03:15Z"
+      },
+      {
+        "id": "quotes_v1",
+        "title": "Minimal Quotes v1 — #1 BUILD PRIORITY",
+        "days_open": 10,
+        "owner": "Dev",
+        "status": "🚀 UNCHANGED"
+      },
+      {
+        "id": "missed_call_textback",
+        "title": "Missed-call text-back (Twilio) — UPGRADED to THE wedge",
+        "days_open": 4,
+        "owner": "Dev",
+        "status": "S effort, after rain-delay SMS"
+      },
+      {
+        "id": "level_billing",
+        "title": "Level billing — #1 DROUGHT FEATURE",
+        "days_open": 2,
+        "owner": "Dev",
+        "status": "M effort, pairs with schedule broadcast"
+      },
+      {
+        "id": "compare_page_next",
+        "title": "Compare page: refresh Jobber ($49 floor) + add LMN $297-697 + Servinix $300",
+        "days_open": 2,
+        "owner": "Bot/Dev",
+        "status": "QUEUED"
+      }
+    ],
+    "low": [
+      {
+        "id": "trial_length_decision",
+        "title": "Decide trial 7 vs 14 days",
+        "owner": "Aaron",
+        "status": "⏳ Plate decision"
+      },
+      {
+        "id": "free_tier_gap",
+        "title": "Free-tier gap — MowGo Free 5 clients vs LawnPro Free 25",
+        "owner": "Aaron",
+        "status": "DECISION VISIBLE"
+      },
+      {
+        "id": "concierge_e2e_test",
+        "title": "Trigger one real concierge request (needs Aaron's logged-in session)",
+        "owner": "Aaron",
+        "status": "Pending"
+      }
+    ],
+    "closed_since_yesterday": [
+      "mon_slot_fri → ✅ LANDED: #54 posted 22:23Z via Composio, t1_p2aa3kn VERIFIED; slot CANCELLED for Sat (96h gate → next ≥ Aug 11)",
+      "stripe_bundle_convergence → ✅ BOTH DOMAINS CONVERGED (index-Bt0NtHLK.js — new hash; verify-session bug fixed in deploy)",
+      "w32_digest → ✅ AUTO-GENERATED with lead discovery (+3 leads, tracker=20); Servinix pricing, LawnBook, Fall dollars, drought story banked"
+    ]
+  },
+  "blockers_for_aaron": [
+    {
+      "blocker": "SMS: 23 Day-1 texts queued 8 days, ZERO ever sent — sender cron PAUSED",
+      "detail": "Cron 3f67268baeb6 disabled since Aug 6. One command: hermes cron resume 3f67268baeb6. Wave-4 adds 6 more drafts in #leads."
+    },
+    {
+      "blocker": "Lead follow-ups Day 14 — 0 replies across 5 emails; 2nd follow-up overdue",
+      "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). 10 min highest-ROI."
+    },
+    {
+      "blocker": "Blasian silent Day 12; leads question unanswered (✅ reaction only); human loop dead 12+ days",
+      "detail": "Draft ready. Pair with #48 manual paste in one human session."
+    },
+    {
+      "blocker": "Intel Engine: HTTP 402 Insufficient Balance — ALL BI stopped until credits restored",
+      "detail": "OpenRouter credits exhausted. Bot-side fix needed to restore automated monitoring."
+    },
+    {
+      "blocker": "CF API tokens dead + Stripe e2e checkout Day 25 + SoftwareWorld Day 29 + #48 manual paste",
+      "detail": "Four one-click decisions: CF re-auth · manual checkout · directory submissions · Reddit paste. All same-session feasible."
+    }
+  ],
+  "quick_wins_sub_30min": [
+    {
+      "id": "intel_402_fix",
+      "title": "RESTORE Intel Engine credits (HTTP 402) — stopgap: check/restore OpenRouter credits; root cause: credit exhaustion during weekend runs",
+      "estimate": "5 min",
+      "owner": "Bot/Ops",
+      "impact": "HIGH — everything depends on BI intel"
+    },
+    {
+      "id": "mon_slot_cron",
+      "title": "Create one-shot cron for Mon Aug 11 22:23Z with kit ① #55 → ② #57 → ③ #43 (fallback #50); encode liveness-check + visibility-verify",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "HIGH — locks next Reddit slot before weekend"
+    },
+    {
+      "id": "kit_tracker_update",
+      "title": "Update leads/reddit-threads.md: #56 DEAD → #43 at #3; note #55 reply angle (OP's unanswered SMS-platform question)",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — single source of truth"
+    },
+    {
+      "id": "servinix_compare_row",
+      "title": "Add Servinix $300/mo AI Assistant row to marketing/competitor-comparison.md",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — compare page ammo"
+    },
+    {
+      "id": "copy_flags_bank",
+      "title": "Bank flags: Servinix $300 + LawnBook inflation + Fall seasonal dollars + drought national story + NALP stat block",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — fuel for outreach + positioning"
+    },
+    {
+      "id": "delta_backup_diag",
+      "title": "Diagnose delta-backup cron cf89544f9829 — check git remote/auth",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — backup integrity"
+    },
+    {
+      "id": "outreach_ref_cleanup",
+      "title": "Clean #outreach references (4× 404 deletion confirmed): vault index, daily_scan lists, skill examples",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "LOW — hygiene"
+    },
+    {
+      "id": "w32_digest_review",
+      "title": "Review W32 digest at /opt/data/mowgo/weekly_digest_2026-08-09.md — phone-readable summaries ready",
+      "estimate": "5 min",
+      "owner": "Aaron",
+      "impact": "HIGH — actionable for Monday"
+    },
+    {
+      "id": "sms_manual_sends",
+      "title": "IF cron stays paused: send 23+6=29 Day-1 texts manually + log in LEAD_TRACKER",
+      "estimate": "15 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH"
+    },
+    {
+      "id": "followup_emails",
+      "title": "Send 5 overdue follow-ups (Day 14+)",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH"
+    },
+    {
+      "id": "blasian_reply",
+      "title": "Post Blasian reply + #48 manual paste (one session)",
+      "estimate": "5 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH"
+    }
+  ],
+  "pricing_status": {
+    "recommendation": "HOLD $39/$79 flat. NEW WEEK-END DELTAS: Jobber anchors '$24/mo' with 3-mo promos on every tier; QuoteIQ added $74.99 Beginner tier atop $299 Elite/$699 Max hikes; LawnBook entered FREE (15 clients) / Pro $9.99/mo — first tool to undercut MowGo on price AND free tier, but mobile-only with no web dashboard/crew depth. Servinix published: AI Assistant $300/mo flat, FSM $20/tech, GPS $15/vehicle — the AI layer alone costs more than MowGo's whole stack.",
+    "new_this_scan": ["Servinix published full pricing: $300/mo AI + $20/tech + $15/vehicle", "LawnBook '1,000+ businesses' appears inflated (Play Store: 100+ downloads, 6 reviews)", "Jobber $24 anchor confirmed (12-mo promo), Now conf Sept 25", "TurfHop outage fully closed (~114h, no relaunch discount)"],
+    "copy_flags_banked": [
+      "The floor moved to $49+. Solo is $39 flat, unlimited clients.",
+      "Per-user tax = industry pricing engine: Crew $79 beats every multi-user stack.",
+      "Servinix AI Assistant alone = $300/mo. MowGo's entire stack = $39-$79.",
+      "LawnBook Free 15 clients sounds great but mobile-only, no web/crew parity.",
+      "Drought = 2026 product story (CO, TX, NC/East). Level billing + schedule broadcast win here.",
+      "Fall seasonal = real dollars: aeration $75-225, seeding $680-1,815, leaf removal $155-460."
+    ]
+  },
+  "summary": "ALL BOT MESSAGES OVERNIGHT — ZERO human activity. Blasian silent Day 12 (leads question Jul 28, ✅ only). 🔴 CRITICAL: Intel Engine halted (HTTP 402 Insufficient Balance) — ALL BI reports, competitor monitoring, Reddit sweeps stopped until credits restored. 🧹 #cowork clean; #leads holds wave-4 drafts (not in sms_queue); #outreach 404 ×4 = confirmed deleted. ✅ STRIPE 09:08Z: bundles CONVERGED AGAIN (NEW hash Bt0NtHLK.js both domains; verify-session bug fixed in deploy). Invoice reminders: 0 unpaid. 📊 W32 DIGEST ready: Top 3 — pricing story ($24 Jobber anchor, LawnBook FREE/$9.99, Servinix $300), Mon 22:23Z kit (#55→#57→#43), lead follow-ups Day 11+ overdue. 🐦 MON SLOT LOCKED: 96h gate → next ≥ Mon Aug 11 22:23Z; kit #55 (53 cmts, OP unanswered SMS-platform question) → #57 (TX new-build) → #43 (first-5-customers). ❌ #56 dropped (OP [removed]). ☁️ CF tokens DEAD Day 3. 📋 Aaron plate: SMS unpause Day 8 (23 queued + 6 wave-4) · 5 follow-ups Day 14 · Blasian reply + #48 paste (one session) · Intel credits restore (bot) · CF re-auth · Stripe checkout Day 25 · SoftwareWorld Day 29. Bot Part 2 should prioritize: restore Intel Engine credits, create Mon one-shot cron, update kit tracker, add Servinix to compare page, bank copy flags."
+}

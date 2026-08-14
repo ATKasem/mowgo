@@ -286,7 +286,7 @@ class DashboardViewModel : ViewModel() {
                 .map { it.clientId }
                 .distinct()
                 .size,
-            isOwner = profile?.role == null || profile?.role == "owner",
+            isOwner = profile?.role == "owner" || profile == null,
             teamProgress = rows,
             actionMessage = actionMessage,
         )

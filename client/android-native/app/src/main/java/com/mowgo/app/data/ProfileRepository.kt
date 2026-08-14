@@ -1,12 +1,20 @@
 package com.mowgo.app.data
 
 import com.mowgo.app.data.model.Profile
+import com.mowgo.app.data.model.ReferralStatus
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 class ProfileRepository {
+    suspend fun loadReferralStatus(): ReferralStatus {
+        if (!SupabaseClientProvider.isConfigured) {
+            return ReferralStatus(code = "MOWGO1", totalCount = 3, earnedCount = 1)
+        }
+        return SupabaseClientProvider.client.postgrest.rpc("referral_status").decodeAs()
+    }
+
     suspend fun loadProfile(): Profile? {
         if (!SupabaseClientProvider.isConfigured) return demoProfile()
         val userId = SupabaseClientProvider.auth.currentSessionOrNull()?.user?.id ?: return null
@@ -38,6 +46,8 @@ class ProfileRepository {
                 tier = current.tier,
                 role = current.role,
                 businessId = current.businessId,
+                rainAlertsEnabled = current.rainAlertsEnabled,
+                leadAlertsEnabled = current.leadAlertsEnabled,
             )
             return
         }
@@ -55,6 +65,34 @@ class ProfileRepository {
                 "zelle_handle" to zelleHandle,
             )
         ) { filter { eq("id", userId) } }
+    }
+
+    suspend fun updateRainAlertsEnabled(enabled: Boolean) {
+        updateBooleanPreference("rain_alerts_enabled", enabled) { current ->
+            current.copy(rainAlertsEnabled = enabled)
+        }
+    }
+
+    suspend fun updateLeadAlertsEnabled(enabled: Boolean) {
+        updateBooleanPreference("lead_alerts_enabled", enabled) { current ->
+            current.copy(leadAlertsEnabled = enabled)
+        }
+    }
+
+    private suspend fun updateBooleanPreference(
+        column: String,
+        enabled: Boolean,
+        updateDemo: (Profile) -> Profile,
+    ) {
+        if (!SupabaseClientProvider.isConfigured) {
+            demoProfileMutable = updateDemo(demoProfile())
+            return
+        }
+        val userId = SupabaseClientProvider.auth.currentSessionOrNull()?.user?.id
+            ?: throw IllegalStateException("Not authenticated")
+        SupabaseClientProvider.client.from("profiles").update(mapOf(column to enabled)) {
+            filter { eq("id", userId) }
+        }
     }
 
     // MARK: - Trial-first no-card flow (spec 2026-08-07)

@@ -56,6 +56,9 @@
     <string name="today_spray_rule">≤%1$d°F · ≤%2$d mph</string>
     <string name="today_set_business_location">Set business location to see conditions</string>
     <string name="today_new_job_cd">New Job</string>
+    <string name="today_offline_banner">Offline — you can keep working</string>
+    <string name="today_offline_pending_banner">Offline — %1$d change(s) will sync when you\'re back online</string>
+    <string name="today_syncing_banner">Syncing %1$d change(s)…</string>
     <string name="today_rain_delay">Rain Delay</string>
     <string name="today_rain_delay_history">Rain Delay History</string>
     <string name="today_jobs_header">Today\'s Jobs</string>
@@ -241,6 +244,10 @@
     <string name="more_sign_out_body">You\'ll need to sign in again.</string>
     <string name="more_title">More</string>
     <string name="more_business_section">Business</string>
+    <string name="more_sync_status_title">Sync status</string>
+    <string name="more_sync_offline">Offline — you can keep working</string>
+    <string name="more_sync_offline_pending">Offline — %1$d change(s) will sync when you\'re back online</string>
+    <string name="more_sync_syncing">Syncing %1$d change(s)…</string>
     <string name="more_business_profile">Business Profile</string>
     <string name="more_business_profile_default_subtitle">Business name and phone</string>
     <string name="more_notifications">Notifications</string>
@@ -377,4 +384,13 @@
     <string name="trial_ended_title">Your trial ended</string>
     <string name="trial_ended_body">Your clients are safe — subscribe to keep scheduling beyond 5.</string>
     <string name="trial_start_button">Start Free Trial</string>
+    <string name="more_referrals">Referrals</string>
+    <string name="more_referrals_subtitle">Share MowGo and earn free months</string>
+    <string name="referral_heading">Give a month, earn a month</string>
+    <string name="referral_share">Share referral link</string>
+    <string name="referral_share_title">Share MowGo</string>
+    <string name="referral_sent">Sent</string>
+    <string name="referral_signed_up">Signed up</string>
+    <string name="referral_converted">Converted</string>
+    <string name="referral_rewards">Free months</string>
 </resources>

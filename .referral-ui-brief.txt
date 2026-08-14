@@ -1,0 +1,43 @@
+# MowGo Referral Program — iOS + Android UI only
+
+## Context
+The referral program already exists on the backend and web:
+
+**Schema:** `profiles.referral_code` (6-char, trigger-generated) + `profiles.referred_by`, `referrals` table (`referrer_id`, `referred_user_id`, `code_used`, `status: pending/earned`, `credit_applied`)
+**Migrations:** `20260806160000_referrals.sql`, `20260806200000_referral_credit_claim.sql`
+**RPCs:** `apply_referral_code(p_code)`, `referral_status()` (returns code/total_count/earned_count), `earn_referral_credit`, `claim_referral_credit`
+**Web:** `client/src/lib/referrals.js` (stash+apply on signup), `Subscribe.jsx`, `Clients.jsx`, `Dashboard.jsx`, `Login.jsx`, `App.jsx`
+**Backend:** Stripe webhook credits the referrer on checkout
+
+## What's missing — build these
+
+### 1. iOS Referral UI
+- `ios-native/MowGo/Models/Models.swift`: Add `ReferralStatus` struct with `code: String`, `totalCount: Int`, `earnedCount: Int` (snake_case coding keys)
+- `ios-native/MowGo/Services/DataStore.swift`: Add `loadReferralStatus()` method calling `sb.rpc("referral_status", ReferralStatus.self)`
+- `ios-native/MowGo/Views/Settings/SettingsView.swift`: Add a referral section showing:
+  - Referral code (copy to clipboard)
+  - Share button (iOS Share Sheet with link `https://mowgoapp.com?ref=CODE`)
+  - Stats: "You've referred X people. Y have signed up."
+  - Reward balance display
+
+### 2. Android Referral UI
+- `client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt`: Add `ReferralStatus` data class
+- `client/android-native/app/src/main/java/com/mowgo/app/data/ProfileRepository.kt`: Add `loadReferralStatus()` calling `rpc("referral_status")`
+- `client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt`: Add referral section with:
+  - Referral code display (copy to clipboard)
+  - Share button (Android share intent with link)
+  - Stats display
+- `client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt`: Add referral state + load
+
+### 3. Web Referral Section
+- `client/src/lib/data.js`: Add `loadReferralStats()` calling `supabase.rpc("referral_status")`
+- `client/src/pages/Settings.jsx`: Add a referral section showing code, share, stats. The data service already exists in `client/src/lib/referrals.js` — use the existing `referral_status` RPC.
+
+## Do NOT touch
+- Any existing referral migrations or RPCs — they're already correct
+- Any unrelated dirty files
+- Weather push, offline cache, or other features
+
+## Verification
+- `git diff --check` must pass
+- `npm run build` must pass

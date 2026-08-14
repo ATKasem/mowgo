@@ -28,6 +28,10 @@ struct SettingsView: View {
     @State private var exportFile: ExportFile?
     @State private var exportError: String?
     @State private var exporting: String?
+    @State private var referralStatus: ReferralStatus?
+    @State private var referralLoading = false
+    @State private var referralError: String?
+    @State private var referralShareItems: ReferralShareItems?
     @AppStorage("jobCompletionAlerts") private var jobCompletionAlerts = true
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
 
@@ -55,6 +59,9 @@ struct SettingsView: View {
                         SectionHeader("Business")
                         settingsLinks
 
+                        SectionHeader("Referrals")
+                        referralCard
+
                         if let bookingURL = bookingLink {
                             SectionHeader("Booking")
                             BookingLinkRow(url: bookingURL)
@@ -79,12 +86,16 @@ struct SettingsView: View {
                 destinationView(for: destination)
             }
             .onAppear(perform: loadProfileDraft)
+            .task { await loadReferrals() }
             .onChange(of: auth.user?.businessName) { _, _ in loadProfileDraft() }
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView(currentTier: auth.user?.tier ?? "free")
             }
             .sheet(item: $exportFile) { file in
                 ActivityView(activityItems: [file.url])
+            }
+            .sheet(item: $referralShareItems) { items in
+                ActivityView(activityItems: [items.url])
             }
             .alert("Export Failed", isPresented: Binding(
                 get: { exportError != nil },
@@ -194,6 +205,58 @@ struct SettingsView: View {
         .background(theme.surface)
         .cornerRadius(16)
         .disabled(exporting != nil)
+    }
+
+    private var referralCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Give a month, earn a month", systemImage: "gift.fill")
+                .font(.headline).foregroundColor(theme.textPrimary)
+            if referralLoading {
+                ProgressView().frame(maxWidth: .infinity).padding(.vertical, 12)
+            } else if let referralError {
+                Text(referralError).font(.caption).foregroundColor(.red)
+            } else if let status = referralStatus {
+                HStack {
+                    Text(status.code).font(.system(.title2, design: .monospaced).bold()).tracking(3)
+                    Spacer()
+                    Button {
+                        UIPasteboard.general.string = status.code
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+                    Button("Share") {
+                        referralShareItems = ReferralShareItems(url: URL(string: "https://mowgoapp.com?ref=\(status.code)")!)
+                    }.buttonStyle(.borderedProminent)
+                }
+                HStack {
+                    referralStat("Free months earned", status.earnedCount)
+                }
+                Text("You've referred \(status.totalCount) people. \(status.earnedCount) have signed up.")
+                    .font(.subheadline).foregroundColor(theme.textMuted)
+            }
+        }
+        .padding(16).background(theme.surface).cornerRadius(16)
+    }
+
+    private func referralStat(_ label: String, _ value: Int) -> some View {
+        VStack(spacing: 2) {
+            Text("\(value)").font(.headline).foregroundColor(theme.textPrimary)
+            Text(label).font(.caption2).foregroundColor(theme.textMuted).lineLimit(1).minimumScaleFactor(0.7)
+        }.frame(maxWidth: .infinity)
+    }
+
+    @MainActor
+    private func loadReferrals() async {
+        guard !referralLoading else { return }
+        referralLoading = true
+        referralError = nil
+        defer { referralLoading = false }
+        do {
+            referralStatus = try await store.loadReferralStatus()
+        } catch let caught {
+            referralError = caught.localizedDescription
+        }
     }
 
     @MainActor
@@ -410,6 +473,11 @@ private struct ExportFile: Identifiable {
     var id: URL { url }
 }
 
+private struct ReferralShareItems: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
 private struct ExportRow: View {
     @Environment(\.colorScheme) private var colorScheme
     let title: LocalizedStringKey
@@ -552,11 +620,61 @@ private struct BusinessProfileSettingsView: View {
 }
 
 private struct NotificationSettingsView: View {
+    @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
     @Binding var jobCompletionAlerts: Bool
     @Binding var rainDelayAlerts: Bool
+    @State private var rainAlertsEnabled = true
+    @State private var leadAlertsEnabled = true
+    @State private var rainAlertsError: String?
+    @State private var leadAlertsError: String?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    /// Crew role rides on the owner's plan, so tier alone is enough here —
+    /// matches the web gate in Settings.jsx (['solo','crew','premium']).
+    private var isPaidTier: Bool {
+        let tier = auth.user?.tier ?? "free"
+        return tier == "solo" || tier == "crew" || tier == "premium"
+    }
+
+    private var rainAlertsBinding: Binding<Bool> {
+        Binding(
+            get: { rainAlertsEnabled },
+            set: { newValue in
+                let previous = rainAlertsEnabled
+                rainAlertsEnabled = newValue
+                Task {
+                    do {
+                        try await auth.updateRainAlertsEnabled(newValue)
+                        rainAlertsError = nil
+                    } catch {
+                        rainAlertsEnabled = previous
+                        rainAlertsError = error.localizedDescription
+                    }
+                }
+            }
+        )
+    }
+
+    private var leadAlertsBinding: Binding<Bool> {
+        Binding(
+            get: { leadAlertsEnabled },
+            set: { newValue in
+                let previous = leadAlertsEnabled
+                leadAlertsEnabled = newValue
+                Task {
+                    do {
+                        try await auth.updateLeadAlertsEnabled(newValue)
+                        leadAlertsError = nil
+                    } catch {
+                        leadAlertsEnabled = previous
+                        leadAlertsError = error.localizedDescription
+                    }
+                }
+            }
+        )
+    }
 
     var body: some View {
         Form {
@@ -565,9 +683,25 @@ private struct NotificationSettingsView: View {
                     settingsLabel("Job completion alerts", "When a job is marked complete")
                 }
             }
+            if isPaidTier {
+                Section("Leads") {
+                    Toggle(isOn: leadAlertsBinding) {
+                        settingsLabel("Lead alerts", "Get notified instantly when a new lead comes in")
+                    }
+                    if let leadAlertsError {
+                        Text(leadAlertsError).font(.caption).foregroundColor(.red)
+                    }
+                }
+            }
             Section("Weather") {
                 Toggle(isOn: $rainDelayAlerts) {
                     settingsLabel("Rain delay alerts", "When rain may affect tomorrow's jobs")
+                }
+                Toggle(isOn: rainAlertsBinding) {
+                    settingsLabel("Rain delay notifications", "Alert when rain is forecast for tomorrow's jobs")
+                }
+                if let rainAlertsError {
+                    Text(rainAlertsError).font(.caption).foregroundColor(.red)
                 }
             }
         }
@@ -576,6 +710,10 @@ private struct NotificationSettingsView: View {
         .background(theme.background)
         .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            rainAlertsEnabled = auth.user?.rainAlertsEnabled ?? true
+            leadAlertsEnabled = auth.user?.leadAlertsEnabled ?? true
+        }
     }
 
     private func settingsLabel(_ title: LocalizedStringKey, _ subtitle: LocalizedStringKey) -> some View {

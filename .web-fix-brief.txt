@@ -1,0 +1,28 @@
+Fix the following issues in the MowGo codebase. Apply EXACT changes — no extra files, no re-verification, no reading unrelated code.
+
+## issues to fix
+
+### 1. functions/api/invite-crew.js — profile insert conflicts with auth trigger
+The `on_auth_user_created` trigger already creates a profile row. The manual INSERT after creating the Auth user conflicts with the primary key. Fix: after creating the Auth user, use UPDATE instead of INSERT for the profile, or skip the profile creation entirely since the trigger handles it.
+
+### 2. functions/api/stripe/verify-session.js — verify tier was provisioned
+After Stripe confirms the session completed, check that `profiles.tier` was actually updated. If the webhook failed, return a retryable error so the user can get help instead of being told "subscription is active" when it isn't.
+
+### 3. functions/api/booking.js — race condition on concurrent bookings
+Line 149: Availability checking and job creation are separate operations with no transaction. Fix: add a DB-level unique constraint or use a Supabase RPC that atomically checks + creates. Also handle line 159: client creation failure should stop processing, not continue with null clientId. Line 187: return 409 instead of generic 500 for race-losing bookings.
+
+### 4. functions/api/stripe/webhook.js — cancel email links to wrong URL
+Line 502: The win-back email links to `https://mowgoapp.com/subscribe` but the app uses HashRouter. Fix to `https://mowgoapp.com/#/subscribe`.
+
+### 5. functions/api/stripe/checkout-subscription.js — add idempotency key
+Line 81: Stripe customer creation should have an idempotency key to prevent duplicates on retry.
+
+### 6. client/src/lib/payments.js — already fixed (skip this file)
+
+### 7. client/src/components/TrialBanner.jsx — already fixed (skip this file)
+
+### 8. supabase/migrations/20260807193000_trial_email_hardening.sql — concurrent trial signup race
+Line 65: The used-trial check and marker insertion are not serialized. Two concurrent signups with the same normalized email can both pass the check. Fix: add `FOR UPDATE SKIP LOCKED` or use a unique constraint on the `used_trials` table so the second insert fails atomically.
+
+## Instructions
+Apply fixes to the actual files. For each fix, make the minimal correct change. Do not read files that are already described above. Do not add new files. Do not run tests. Report back what you fixed.

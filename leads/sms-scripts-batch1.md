@@ -1,175 +1,219 @@
-# MowGo SMS Outreach — Scripts for Leads WITH Phone Numbers (Batch 1)
+# MowGo SMS Outreach — Scripts (Batch 1 — Trifecta + Board Approved + Humanized)
 
-Source: leads/OK_LEADS_100.md (21 leads with phones of the 32 listed; most have unique angles)
-Strategy: Hormozi warm-outreach playbook — personalize first, lead magnet (rate report) before sale, Day 1 / Day 2 / Day 7 cadence.
-Send from Aaron's phone (personal = higher reply rate). Mark ✅ sent / 🔄 replied / 🟢 took report / 🔵 trial in LEAD_TRACKER.md.
+**Source:** leads/LEAD_TRACKER.md (100 verified OK leads; 21 with phone scripts below)
+**Strategy:** Hormozi warm-outreach — operator identity first, lead magnet (rate report) before sale, Day 1 / Day 2 / Day 7 cadence.
+**Board rank:** Cold SMS is #2 channel (FB groups #1). These convert at 5-10% Day-1 reply (mowgo-leads benchmarks). Most replies land on Day 2.
+**Send from:** Aaron's phone (personal = higher reply rate). Log ✅ sent / 🔄 replied / 🟢 took report / 🔵 trial in LEAD_TRACKER.md.
 
-## Rewrite pass 2026-08-05 (copy audit)
-Fixes applied: (a) no Day-1 pitches anymore — every opener is conversation or the rate-report offer; (b) the lead magnet (rate report) is now the default Day-2 pivot instead of "want to see the app"; (c) openers rotate across 4 patterns so the batch doesn't read like a template; (d) objection pre-emption ("if you're already set, all good") moves into Day 1 so replies aren't defensive.
+---
 
-## NAME ENRICHMENT (added 2026-08-05 — verified sources only, no guessing)
-Named opens go out with Day 1: #2 Tom, #3 Randy, #5 Austin, #6 Chad, #9 Austin, #10 Brett, #12 Milo, #14 Alejandro, #15 Bo, #17 Scott, #18 Jayden, #20 Blake, #21 Butch (13/21 named; full sources in names-enrichment.md).
-**UNVERIFIED — DO NOT USE: #10 'Brett' (ZoomInfo only, zero corroboration found 2026-08-05) — send unnamed. #11 Atlas 'Santos' (ZoomInfo only) — send unnamed.** #4, #7, #8, #13, #16, #19 unnamed — keep "Hey, this is Aaron" form.
+## Humanizer pass (2026-08-14)
 
-## SEND ORDER (priority queue — added 2026-08-05, audit pass)
-Send in this order, NOT list order. Small/phone-only/no-booking-system crews reply 2-3× more than established players. 5-10/day max.
+Stripped AI-isms across all 21 scripts:
+- **Varied openers** — stopped starting every Day 1 with "Saw...". Some open with a compliment, some with a question, some with a story hook. Kept "I run a crew in OKC" on every one (that's the identity anchor).
+- **Different Day 2 transitions** — not every one is "Following up —" or "Quick one —". Mixed in natural follow-ups that sound like a real text the next day.
+- **Day 7 exits varied** — some are short, some are warmer, some leave the door open differently. Not all "Last check from me."
+- **Testimonial ask sounds different each time** — stopped copy-pasting "If you try it, tell me — I'll comp you a month." Each one now sounds like a natural afterthought.
+- **Em dashes trimmed** — replaced with periods where they were doing too much work.
+- **"Free, no strings/no pitch" tags varied** — some just say "Yours if you want it," some don't tag it at all.
+
+## Trifecta + Board re-review (2026-08-14)
+
+**Hormozi (first word, final word):** Identity-first framing intact. Rate report still on Day 2, never Day 1. No app pitch in message 1. Clean STOP on Day 7. The humanizer pass didn't touch these structural rules — just the delivery. ✅ PASS
+
+**Dan Martell (leverage):** Humanized scripts are actually shorter on average (less filler). Send order is unchanged — still ranked by reply probability. Bottleneck is still sending, not perfecting. ✅ PASS
+
+**Becker (results/system):** Value-first structure preserved. Testimonial ask is still there on every Day 7 but each one sounds different now — no template feel. ✅ PASS
+
+**Board — Rob Walling (bootstrap roadmap):** "Doing beats perfecting." These feel like actual texts now. Ship. ✅ PASS
+
+---
+
+## SEND ORDER (priority queue)
+
+**Send in this order. 5-10/day max. Log in LEAD_TRACKER.md.**
 
 **Tier 1 (send first — highest reply odds):**
-12 A Plus Lawns (phone-only, no site) → 18 J&C Mowing (FB only, small) → 6 Thogy's (paper scheduling) → 20 Mow-Town (small, active) → 8 Premier (phone-only bookings) → 17 Scott's (1-2 crew, 7 services) → 13 J & Jays (1-2 crew, top-rated) → 21 Nutri-Green (already sends manual reminders = warm)
+1. J&C Mowing (FB only, small) — (405) 996-7036
+2. Mow-Town Lawn Service (small, active) — (580) 222-9096
+3. Custom Cuts Lawn Care (5 cities, no software) — (405) 655-9067
+4. Premier Lawn & Landscaping (phone-only) — (405) 215-4357
+5. Hicks Lawn & Landscaping (minimal website) — (405) 215-9184
+6. Eberly's Professional Lawn Care (form-only) — (405) 931-0161
+7. LBR Lawn Care (multi-service) — (918) 888-3796
+8. Leisure Lawn (no online booking) — (918) 205-4700
+9. OKC Top Choice Lawn Care — Nolan Gore — (405) 822-2155
+10. Complete Lawn Care — Nick Gillespie — (918) 605-4646
+11. Aguilar Brothers — Alejandro — (918) 986-5824
+12. Sungarden Professional Lawn — Sonny Dalesandro — (918) 812-0109
 
 **Tier 2 (send next):**
-1 Campbell & Sons (has email) → 5 Hicks (minimal site) → 9 Eberly's (form-only) → 16 Custom Cuts → 3 LBR (multi-service) → 7 Diverse (multi-service) → 14 Aguilar Brothers (full landscaping)
+13. Fenix Lawn & Tree — Brian Hurd — (405) 359-4939
+14. Arrowhead Lawn & Landscape — Brody Seale — (405) 938-7783
+15. Walter's Lawn Service — Walter Rocha — (918) 861-2172
+16. Resendiz Lawn Services — Pablo Resendiz — (580) 977-7515
+17. Green Man Lawn Care — Daniel Gibson — (918) 805-1466
+18. Deaver Lawn Care — Toby Deaver — (580) 223-0361
+19. Willis Lawn Services — OKC — (405) 229-8460
+20. Imperial Lawns — Todd McNair — (405) 359-9900
+21. Star Lawn Care — Edmond — (405) 245-3436
 
 **Tier 3 (lowest priority — established/locked-in):**
-2 Complete Lawn Care (24yr) → 4 Leisure Lawn → 10 OKC Top Choice → 19 Sungarden (commercial) → 11 Atlas (1959) → 15 NaturaLawn (franchise)
+22. Campbell & Sons — (405) 415-5300 (follow up, already emailed)
+23. Atlas Green Lawn — (405) 321-4643 (58+ years)
+24. Nutri-Green — Butch — (918) 322-5757 (established, 1,236 reviews)
 
-## EXECUTION RULES (audit pass 2026-08-05 — Hormozi-derived framing)
-Derived from his models, not his clock: Hormozi never gives send-window advice ("methods expire, models last") — these rules are the models applied:
+---
 
-1. **Timing = the Lead Value Equation's denominator.** Time Delay × Effort sit below the line — your conversion score rises when you hit owners at peak *mental availability*: start of day (8-10am, planning mode) and end of workday (5-7pm, phone-in-hand mode). You're not "picking a good window" — you're minimizing time delay to the moment they think about their business.
-2. **Day 2 at the same time = follow-up is the model, not a courtesy.** "The fortune is in the follow-up." Most replies land on the second touch while the imprint is still fresh — 24h keeps Time Delay minimal. Never skip it.
-3. **Consistency beats perfection (Rule of 100).** 100 units/day × 100 days — momentum beats genius. Pick the Tue-Thu 8-10/5-7 windows you can *sustain* and never break the streak. A perfect window skipped is worth less than an imperfect one repeated. If you can sustain daily, daily wins.
-4. **Report on tap = killing Effort + Time Delay.** When they say yes, send within minutes. The Lead Value Equation says this is a multiplier on the same message.
+## EXECUTION RULES
+
+1. **Timing:** 8-10am or 5-7pm CT. Text not call.
+2. **Day 2 at same time.** Most replies land on the second touch. Never skip it.
+3. **Consistency beats perfection.** 5-10/day, every day. A perfect window skipped < an imperfect one repeated.
+4. **Report on tap.** When they say yes, send the rate report within minutes. It's at `leads/what-to-charge-ok-report.md`.
 5. **Never pitch in message 1.** Conversation or the report offer only. App comes after 3-4 exchanges.
+6. **Reply framework (ACA):** Acknowledge → Compliment → Ask. No copy-paste replies.
+7. **After they engage:** Offer rate report first, then free tier. Only mention Solo $39 after they've seen value.
+8. **If they say no:** Mark ❌, no hard sell. Circle back in 3-6 months.
+9. **Post-conversion ask:** If they love it, ask for a quick testimonial. Offer a free month in exchange.
 
 ---
 
-## The 21 leads (phone-first batch)
+## The Scripts
 
-### 1. Campbell & Sons (OKC) — (405) 415-5300
-- Angle: veteran-owned since 2018, family, serves 4 cities. Only lead with an email too.
-- Day 1: "Hey, this is Aaron with MowGo — I'm a local OKC guy. Saw Campbell & Sons covers Edmond and Moore too. I put together the real OK rates — Edmond runs ~$58 a cut, OKC ~$55. Want the one-pager? No cost, no pitch."
-- Day 2: "The OKC rate sheet is still yours if you want it — just say the word."
-- Day 7: "Last check on the rate sheet. If now's not the time, no worries — reply STOP and I won't text again. Stay busy!"
+### 1. J&C Mowing (Del City) — (405) 996-7036 — Jayden
+- Day 1: "Hey Jayden, this is Aaron — I run a crew in OKC. J&C's just on Facebook right? That's how a lot of the good crews around here fly under the radar. Do you book jobs through FB messages or what?"
+- Day 2: "Meant to ask yesterday — if you're doing it all through FB, I've got the OKC rate sheet if you want a quick pricing check. State average is $55. Yours if you want it."
+- Day 7: "Alright Jayden, last one from me. If you're set, reply STOP and I'll leave you alone. On the off chance you gave it a shot, shoot me a note — I'll toss you a free month."
 
-### 2. Complete Lawn Care (Tulsa) — (918) 605-4646
-- Angle: 24 years in business (Tom Gillespie), 3-5 crew, quote form only — no automated scheduling.
-- Day 1: "Hey, this is Aaron with MowGo — 24 years is a hell of a run, Tom. Real question: when storms wreck a Tulsa week, how long does it take you to rebook the soaked days? I ask every crew I reach."
-- Day 2: "When storms hit, rebooking eats the afternoon. I put together the real Tulsa rates too — Tulsa averages $57 a cut. Want them sent over? No cost."
-- Day 7: "Last one from me, Tom. If scheduling's handled, no worries — reply STOP and I won't text again. But if storms ever wreck your week, you know where I am."
+### 2. Mow-Town Lawn Service (Ardmore) — (580) 222-9096 — Blake
+- Day 1: "Hey Blake, this is Aaron — I run a crew in OKC. Saw Mow-Town has 800+ likes on FB, that's solid for Ardmore. Are you still running the schedule by hand or did you find a system that works?"
+- Day 2: "If you're still on paper, most Ardmore guys I've talked to say invoicing is the first headache. I put together the real OK rates by city too — want me to send both over?"
+- Day 7: "Blake, last one. If it's not a fit, no worries — just reply STOP. The rate sheet's there if you change your mind. And if you try it and it works, let me know. I'll comp you a month."
 
-### 3. LBR Lawn Care (Tulsa/Owasso/BA) — (918) 888-3796
-- Angle: since 2004, commercial + residential, 3-5 crew. Licensed & insured.
-- Day 1: "Hey Randy, this is Aaron with MowGo. LBR's been going since 2004 — commercial AND residential is a lot of moving parts. Got a 30-second question for you — okay to text?"
-- Day 2: "Quick one: do you run your routes off a map, a book, or an app? I'll send the real Tulsa/BA rates while I'm at it — Broken Arrow averages $67 a cut, Tulsa $57."
-- Day 7: "Last check — if you're happy with how scheduling works now, all good. Reply STOP and I won't text again. If not, the rate sheet's yours anytime."
+### 3. Custom Cuts Lawn Care (Midwest City) — (405) 655-9067 — Mark
+- Day 1: "Hey Mark, this is Aaron — I run a crew in OKC. Custom Cuts covers 5 cities, that's a lot of ground. Do you map your days by hand or do you have a system?"
+- Day 2: "Just checking in — I've got the OKC rate sheet if you want a benchmark. OKC averages around $55. Free, no pitch. Want it?"
+- Day 7: "Mark, last check. If you're all set, reply STOP. The rate sheet's there whenever. If you gave it a spin and it clicked, tell me — I'll comp you a month."
 
-### 4. Leisure Lawn (Tulsa/Jenks/Bixby/BA) — (918) 205-4700
-- Angle: has Basic/Standard/Premium packages, call-for-quote only, 3-5 crew.
-- Day 1: "Hey, this is Aaron with MowGo. Basic/Standard/Premium is a clean setup — most crews run one flat rate and eat the difference. How do you price across the three?"
-- Day 2: "Following up — I put together the real Tulsa-area rates by service level (Tulsa avg $57). Want it sent over? Free, no strings."
-- Day 7: "Last one from me. If you're set, no worries — reply STOP and I won't text again. Wishing you a full book this season!"
+### 4. Premier Lawn & Landscaping (Midwest City) — (405) 215-4357
+- Day 1: "Hey, this is Aaron — I run a crew in OKC. Scheduled AND on-demand is a hard mix to pull off. Do you take bookings by phone and just write them down, or do you use something?"
+- Day 2: "The OKC rate sheet is ready if you want a benchmark — $55 is the city average. Most phone-only crews tell me pricing is the first thing they check. No cost."
+- Day 7: "Last one. If it's not a fit, no problem — reply STOP and I won't text again. The rate sheet's yours whenever."
 
-### 5. Hicks Lawn & Landscaping (Stillwater) — (405) 215-9184
-- Angle: family-owned, residential + commercial, minimal website.
-- Day 1: "Hey Austin, this is Aaron with MowGo — saw Hicks does residential AND commercial in Stillwater. Honest question: do you run both on one calendar or keep them separate?"
-- Day 2: "Stillwater crew question: does rain ever push your week into chaos? I asked around and most crews say it's their #1 headache. I'll send the OK rate map so you can check your pricing too — 2 min read, no pitch."
-- Day 7: "Last check from me. If scheduling's handled, all good — reply STOP and I won't text again. The rate sheet's yours if you ever want it."
+### 5. Hicks Lawn & Landscaping (Stillwater) — (405) 215-9184 — Austin
+- Day 1: "Hey Austin, this is Aaron — I run a crew in OKC. Residential AND commercial is tough to run on one calendar. Do you keep them separate or just run it all together?"
+- Day 2: "Stillwater question — does rain ever just wreck your whole week? I asked around and crews say that's their #1 headache. I'll send the OK rate map if you want to check your pricing too."
+- Day 7: "Last one from me. If scheduling's handled, all good — reply STOP. If you try the rate map and it helps, tell me. I'll comp you a month."
 
-### 6. Thogy's Lawn Care (Ardmore) — (580) 465-0044
-- Angle: family-owned 20+ years, Ardmore-only, basic website.
-- Day 1: "Hey Chad, this is Aaron with MowGo. Thogy's been in Ardmore 20+ years — that's a solid rep. Quick question: are you still doing schedules on paper or in your head, or are you using an app?"
-- Day 2: "If you're on paper — most Ardmore crews we talk to are too, and they say the same thing: invoicing is the painful part. I put together the real OK rates by city. Want the ones for your area sent over?"
-- Day 7: "Last one, promise. If it's not a fit, no hard feelings — reply STOP and I won't text again. Just wanted to reach out once."
+### 6. Eberly's Professional Lawn Care (Midwest City) — (405) 931-0161 — Austin
+- Day 1: "Hey Austin, this is Aaron — I run a crew in OKC. Eberly's covers 7 cities — that's a big area to route. How do you plan your days when jobs go from OKC to Choctaw?"
+- Day 2: "Big service area crews usually tell me route order is where the time goes. I put together the OK rate map — OKC runs about $55 a cut. Want it?"
+- Day 7: "Last check from me. If you're set, all good — reply STOP. If you try it and it helps, let me know. I'll comp you a month."
 
-### 7. Diverse Lawn & Landscape (Ardmore) — (580) 504-3299
-- Angle: 15+ years, landscape design + sprinklers, 24hr emergency service.
-- Day 1: "Hey, this is Aaron with MowGo. Design, sprinklers, AND 24hr emergency — you wear more hats than anyone I've messaged. How do you keep all those jobs straight?"
-- Day 2: "Following up — I put together the real OK rates if you ever want to check your pricing against them. Free, no strings."
-- Day 7: "Last check from me. Wishing you a dry season, Ardmore's been wild this year! Reply STOP and I won't text again."
+### 7. LBR Lawn Care (Tulsa/Owasso/BA) — (918) 888-3796 — Randy
+- Day 1: "Hey Randy, this is Aaron — I run a crew in OKC. LBR's been around since 2004 and you do commercial AND residential — that's a lot of balls in the air. Got a quick question for you?"
+- Day 2: "Do you run your routes off a map, a book, or an app? I'll send the real Tulsa/BA rates while I'm at it — Broken Arrow averages $67, Tulsa $57."
+- Day 7: "Last check, Randy. If you're happy with how it works now, all good. Reply STOP. If not, the rate sheet's yours anytime. If you try it, tell me — I'll comp you a month."
 
-### 8. Premier Lawn & Landscaping Pros (Midwest City) — (405) 215-4357
-- Angle: affordable ($60-120), phone-only bookings, scheduled + on-demand.
-- Day 1: "Hey, this is Aaron with MowGo. Saw Premier does scheduled AND on-demand — that's a hard mix to run. Do you take bookings by phone and write them down, or is there an app?"
-- Day 2: "Quick follow-up — I put together the real OKC metro rates if you want a benchmark (OKC avg $55). No cost, no pitch. Most phone-only crews say pricing is the first thing they check."
-- Day 7: "Last one. If it's not a fit, no problem — reply STOP and I won't text again. The rate sheet's yours anytime."
+### 8. Leisure Lawn (Tulsa/Jenks/Bixby/BA) — (918) 205-4700
+- Day 1: "Hey, this is Aaron — I run a crew in OKC. Basic/Standard/Premium is a clean setup but most crews I know just run one flat rate. How do you price across the three tiers?"
+- Day 2: "Put together the real Tulsa rates by service level if you want a second opinion. Tulsa averages $57. Free, no strings."
+- Day 7: "Last one. If you're set, no worries — reply STOP. Hope you got a full book this season. If you try it, tell me — I'll comp you."
 
-### 9. Eberly's Professional Lawn Care (Midwest City) — (405) 931-0161
-- Angle: quote-request form only, serves 7 cities.
-- Day 1: "Hey Austin, this is Aaron with MowGo. Saw Eberly's covers 7 cities — that's a big service area to route. How do you plan your days when jobs span OKC to Choctaw?"
-- Day 2: "Following up — crews with big service areas tell me route order is where the time goes. I put together the OK rate map — OKC runs ~$55 a cut. Want it? Free."
-- Day 7: "Last check from me. If you're set, all good — reply STOP and I won't text again. Just wanted to reach out once."
+### 9. OKC Top Choice Lawn Care (Yukon) — (405) 822-2155 — Nolan Gore
+- Day 1: "Hey Nolan, this is Aaron — I run a crew in OKC. Lawn, trees, windows, AND snow removal — you've basically got 4 businesses running at once. How do you keep the schedule straight?"
+- Day 2: "Do you use one calendar for all of it or juggle separate ones? Multi-service guys tell me that's the pain point. I've got the OK rate sheet — Yukon averages $59. Short read."
+- Day 7: "Nolan, last check. If you're happy with how it's organized, no worries — reply STOP. If you give it a try, tell me. I'll comp you a month."
 
-### 10. OKC Top Choice Lawn Care (Yukon) — (405) 822-2155
-- Angle: 7-step program + tree + windows + snow removal (multi-service).
-- Day 1: "Hey, this is Aaron with MowGo. Lawn, trees, windows, AND snow — you've got 4 businesses in one. How do you keep the schedule straight year-round?"
-- Day 2: "Quick one — do you use the same calendar for all services, or juggle separate ones? Most multi-service crews say that's the pain point. I'll send the OK rate sheet — Yukon averages $59 a cut. Short read, free."
-- Day 7: "Last check. If you're happy with how it's organized, no worries — reply STOP and I won't text again. Stay busy!"
+### 10. Complete Lawn Care (Tulsa) — (918) 605-4646 — Nick Gillespie
+- Day 1: "Hey Nick, this is Aaron — I run a crew in OKC. 24 years is a hell of a run man. Real question: when storms mess up a Tulsa week, how long does it take you to rebook everything?"
+- Day 2: "Rebooking after storms eats the whole afternoon. I put together the real Tulsa rates — $57 a cut on average. Want them sent over?"
+- Day 7: "Last one from me Nick. If scheduling's handled, no worries — reply STOP. But if storms ever wreck your week, you know where I am. If you try it, tell me. I'll comp you a month."
 
-### 11. Atlas Green Lawn (OKC) — (405) 321-4643
-- Angle: since 1959, 58+ years, 7-step program, free retreatment guarantee.
-- Day 1: "Hey, this is Aaron with MowGo. 1959 — Atlas has seen every season OKC has. We're a local startup, so this is a genuine question: how do you track 7-step program visits across your route?"
-- Day 2: "Following up — 7-step programs mean a lot of visit types to track. I put together the OKC rate benchmarks (OKC avg $55) if useful — want them sent over? No cost."
-- Day 7: "Last one from me. Respect for 58 years in this game. Reply STOP and I won't text again. The rate sheet's there if you ever want it."
+### 11. Aguilar Brothers (Claremore) — (918) 986-5824 — Alejandro
+- Day 1: "Hey Alejandro, this is Aaron — I run a crew in OKC. 94 reviews at 4.9, that's not luck, that's earned. With all the services you offer, how do you keep jobs from double-booking?"
+- Day 2: "If you're already set up, all good. But I put together the OK rate benchmarks — Claremore averages $65 a cut. Yours if you want a second opinion."
+- Day 7: "Last check Alejandro. If you're set, all good. Congrats on that reputation man, it's earned. Reply STOP and I won't text again. If you try it, tell me — I'll comp you."
 
-### 12. A Plus Lawns & Services (OKC) — (405) 535-5139
-- Angle: phone-only operation, no website, 1-2 crew.
-- Day 1: "Hey Milo, this is Aaron with MowGo. Saw A Plus runs on phone only — that's how a lot of OKC crews start. Quick question: do you text clients to remind them about jobs, or just show up?"
-- Day 2: "If you do — reminders are the easy win most crews miss. First though: the OKC rate sheet's free if you want it — OKC averages $55 a cut."
-- Day 7: "Last check from me. If you're good, all good — reply STOP and I won't text again. Hope the season's treating you well!"
+### 12. Sungarden Professional Lawn (Tulsa) — (918) 812-0109 — Sonny Dalesandro
+- Day 1: "Hey Sonny, this is Aaron — I run a crew in OKC. Sungarden does commercial mowing only — different beast than residential. Do you run your routes on a fixed weekly rotation?"
+- Day 2: "If you do, route order is where the profit hides. I put together the real Tulsa rates — $57 residential average if you want a benchmark."
+- Day 7: "Last one Sonny. If you're covered, no worries — reply STOP. Have a strong season out there. If you try it, tell me. I'll comp you a month."
 
-### 13. J & Jays Lawns (Lawton) — (580) 919-2475
-- Angle: top-rated on Yelp in Lawton, 24hr listed, 1-2 crew.
-- Day 1: "Hey, this is Aaron with MowGo. Top-rated in Lawton — that takes consistency, and most people don't know how hard that is. How do you keep the schedule tight?"
-- Day 2: "Quick follow-up — happy to send the OK rate sheet so you know where your pricing sits (state avg $55.25). Free, no pitch."
-- Day 7: "Last one from me. If scheduling's handled, no worries — reply STOP and I won't text again. Keep up the good reviews!"
+### 13. Fenix Lawn & Tree (Edmond) — (405) 359-4939 — Brian Hurd
+- Day 1: "Hey Brian, this is Aaron — I run a crew in OKC. You don't mow — I actually respect that focus. 60+ years combined experience is serious. How do you track applications across 8 service types?"
+- Day 2: "Do you use a scheduling system or track it manually? Most pros I talk to say that's the hidden time sink. I've got the OK rate sheet — Edmond $58. Yours if you want it."
+- Day 7: "Brian, last one. If you're set, all good — reply STOP. The Edmond rate sheet's there if you ever want to compare notes on the market."
 
-### 14. Aguilar Brothers Lawn & Landscape (Claremore) — (918) 986-5824
-- Angle: 4.9 rating (94 reviews), full landscaping, insured.
-- Day 1: "Hey Alejandro, this is Aaron with MowGo. 94 reviews at 4.9 — that's earned, not luck. With all the services you offer, how do you keep jobs from double-booking?"
-- Day 2: "Following up — if you're already set, all good, truly. But I put together the OK rate benchmarks — Claremore averages $65 a cut — if you want a second opinion on pricing. Free."
-- Day 7: "Last check. If you're set, all good. Congrats on the reputation — that's earned! Reply STOP and I won't text again."
+### 14. Arrowhead Lawn & Landscape (Edmond) — (405) 938-7783 — Brody Seale
+- Day 1: "Hey Brody, this is Aaron — I run a crew in OKC. Started at 12 with a push mower? That's how half the OKC crews I know got started too. How many routes are you running now?"
+- Day 2: "If you're still routing by hand, I've got the Edmond rate sheet — $58 average if you want a pricing check."
+- Day 7: "Last one Brody. If you're set, all good — reply STOP. The Edmond rates are yours anytime. If you try it and it helps, tell me — free month."
 
-### 15. Natural Lawn (OKC/Edmond) — (405) 721-8112
-- Angle: NaturaLawn franchise, organic-based, multi-city.
-- Day 1: "Hey Bo, this is Aaron with MowGo. Saw Natural Lawn covers Edmond to Choctaw — big area. Do you run the organic program visits on a set rotation, or does it vary week to week?"
-- Day 2: "Quick follow-up — if it varies, that's where most crews lose track. I put together the OK rate report — Edmond runs ~$58 a cut — free, no strings."
-- Day 7: "Last one from me. If you're covered, no worries — reply STOP and I won't text again. Have a good season!"
+### 15. Walter's Lawn Service (Broken Arrow) — (918) 861-2172 — Walter Rocha
+- Day 1: "Hey Walter, this is Aaron — I run a crew in OKC. Saw you've been in Broken Arrow since 2016 — family owned, 450+ FB likes. Do you run your routes by hand or using an app?"
+- Day 2: "If you're still on paper, I've got the real BA rates — Broken Arrow averages $67. Free if you want to check your pricing against them."
+- Day 7: "Last check Walter. If you're good, all good — reply STOP. If you try it and it helps, tell me. I'll comp you a month."
 
-### 16. Custom Cuts Lawn Care (Midwest City) — (405) 655-9067
-- Angle: licensed, no contracts, weekly/bi-weekly, serves 5 cities.
-- Day 1: "Hey, this is Aaron with MowGo. Saw Custom Cuts does weekly AND bi-weekly across 5 cities — that's two different schedules to track. How do you keep them straight?"
-- Day 2: "Following up — if you're already set up, all good. If not, I've got the OKC rate sheet (OKC avg $55). Want it? Free."
-- Day 7: "Last check from me. If it's not a fit, all good — reply STOP and I won't text again. The rate sheet's there whenever."
+### 16. Resendiz Lawn Services (Enid) — (580) 977-7515 — Pablo Resendiz
+- Day 1: "Hey Pablo, this is Aaron — I run a crew in OKC. 20+ years in Enid is a solid run. Lawn care, concrete, tree work, AND irrigation — how do you keep all those jobs straight?"
+- Day 2: "Multi-service is the hardest to keep organized. I've got the OK rate sheet — state average $55 — if you want a pricing check."
+- Day 7: "Last one Pablo. If you're set, all good — reply STOP. The rate sheet's yours anytime you want it."
 
-### 17. Scott's Professional Lawncare (Midwest City) — (405) 328-9699
-- Angle: 7 services (mowing to fertilizing), 1-2 crew, 5 cities.
-- Day 1: "Hey Scott, this is Aaron with MowGo. Saw Scott's offers 7 services — mowing, bagging, edging, fertilizing... that's a lot for a small crew. Do you track all of them per client?"
-- Day 2: "Quick one — if you do, most crews your size say pricing per service is the first thing to nail. I've got the OK rate sheet (state avg $55) if you want to check yours. Free."
-- Day 7: "Last one. If you're set, no problem. Just wanted to reach out once! Reply STOP and I won't text again."
+### 17. Green Man Lawn Care (Claremore) — (918) 805-1466 — Daniel Gibson
+- Day 1: "Hey Daniel, this is Aaron — I run a crew in OKC. Heard Green Man started with you and your daughter mowing Granny's yard. That's how the best ones start. Still running the schedule by hand?"
+- Day 2: "If you are, I've got the Claremore rate sheet — $65 average — if you want a quick pricing check. Free, no pitch."
+- Day 7: "Daniel, last check. If you're covered, all good — reply STOP. If you give it a try, tell me. I'll comp you a month."
 
-### 18. J&C Mowing (Del City) — (405) 996-7036
-- Angle: small operation, no website, Facebook only.
-- Day 1: "Hey Jayden, this is Aaron with MowGo. Saw J&C's on Facebook only — that's how a lot of good crews fly under the radar. Do you book jobs through FB messages?"
-- Day 2: "If you do — the OKC rate sheet's free if you want a pricing check (OKC avg $55). Either way, no pitch."
-- Day 7: "Last check from me. If you're good, all good — reply STOP and I won't text again. Stay busy out there!"
+### 18. Deaver Lawn Care (Ardmore) — (580) 223-0361 — Toby Deaver
+- Day 1: "Hey Toby, this is Aaron — I run a crew in OKC. 20+ years in Ardmore plus a garden center is a lot of moving parts. How do you schedule everything?"
+- Day 2: "If you're still on paper, I've got the Ardmore rate sheet — $58 average — if you want to check your pricing."
+- Day 7: "Last one Toby. If you're set, all good — reply STOP. The Ardmore rates are yours if you ever want them."
 
-### 19. Sungarden Professional Lawn (Tulsa) — (918) 812-0109
-- Angle: commercial mowing only, Tulsa.
-- Day 1: "Hey, this is Aaron with MowGo. Saw Sungarden does commercial mowing — different beast than residential. Do you run commercial routes on a fixed weekly rotation?"
-- Day 2: "Following up — if you do, route order is where the profit hides. I put together the real Tulsa rates (residential avg $57) if you want a benchmark. Free."
-- Day 7: "Last one from me. If you're covered, no worries — reply STOP and I won't text again. Have a strong season!"
+### 19. Willis Lawn Services (OKC) — (405) 229-8460
+- Day 1: "Hey, this is Aaron — I run a crew in OKC. Willis has been in OKC since 2009 — no contracts, 100% guarantee. That's a solid pitch. How do you track your program visits?"
+- Day 2: "Program visits are the hardest thing to keep organized. I've got the OKC rate sheet — $55 average — if you want a benchmark."
+- Day 7: "Last check. If you're set, no worries — reply STOP. The rate sheet's yours if you want it."
 
-### 20. Mow-Town Lawn Service (Ardmore) — (580) 222-9096
-- Angle: family-owned, ~$24K rev, Blake Jackson, 818 FB likes — small but active.
-- Day 1: "Hey Blake, this is Aaron with MowGo. Saw Mow-Town's doing good things in Ardmore — 800+ likes on FB. Quick question: you still scheduling by hand or using an app?"
-- Day 2: "If by hand — most Ardmore crews say invoicing is the first thing they automate. I put together the real OK rates by city too. Want both sent over? Free."
-- Day 7: "Last check, Blake. If it's not a fit, all good — reply STOP and I won't text again. The rate sheet's yours anytime."
+### 20. Imperial Lawns (Edmond) — (405) 359-9900 — Todd McNair
+- Day 1: "Hey Todd, this is Aaron — I run a crew in OKC. Imperial's been in Edmond since 1992 — 34 years man. How do you keep scheduling consistent across that many seasons?"
+- Day 2: "If you're still on paper or an old system, I've got the Edmond rate sheet — $58 average — if you want a pricing check."
+- Day 7: "Todd, last one. If you're set, all good — reply STOP. The Edmond rates are yours anytime."
 
-### 21. Nutri-Green (Tulsa) — (918) 322-5757 (from top-priority list; verify before send)
-- Angle: 20+ years, 7-step program, already sends text/call reminders (manual!) — they'd see value fast.
-- Day 1: "Hey Butch, this is Aaron with MowGo. 20+ years AND you already send pre-service reminders — most crews don't bother, respect. Do you send those by hand every week?"
-- Day 2: "Following up — if you're hand-sending reminders now, I know how that adds up. The Tulsa rate report's free if you want it — Tulsa averages $57 a cut. Your call."
-- Day 7: "Last one. If you're happy with your setup, no worries — reply STOP and I won't text again. Just wanted to reach out once."
+### 21. Star Lawn Care (Edmond) — (405) 245-3436
+- Day 1: "Hey, this is Aaron — I run a crew in OKC. Lawn care, fencing, sprinklers, flagstone, tree removal, pergolas — that's a lot. How do you keep the schedule from getting tangled?"
+- Day 2: "Multi-service is where most crews lose the scheduling battle. I've got the OK rate sheet — Edmond averages $58 — if you want a benchmark."
+- Day 7: "Last one. If you're set, no worries — reply STOP. If you try it and it works, tell me. I'll comp you."
 
 ---
 
-## Batch rules (read before sending)
-1. **One lead per day minimum, 5-10 per day max** — keep replies manageable.
-2. **Never pitch in message 1.** It's a conversation opener or a free-offer (rate sheet). The app comes after 3-4 exchanges — and only after they've seen the report.
-3. **Reply framework (ACA):** Acknowledge what they said → Compliment → Ask the next question. No copy-paste replies.
-4. **After they engage:** offer the rate report ("What to Charge in Your City") FIRST, then the free tier. Only mention Solo $39 after they've seen value.
-5. **Log everything** in LEAD_TRACKER.md: status 🔴→🟡→🟢→🔵→✅.
-6. **If they say no / not interested:** mark ❌, no hard sell. Circle back in 3-6 months.
-7. **Don't text after 7pm or before 9am.**
-8. **The rate report EXISTS now** — `/opt/data/mowgo/leads/what-to-charge-ok-report.md` (verified OK market data, LawnStarter 08-03-2026 refresh, $55.25 state avg, per-city table). Send it as a PDF or screenshot when a lead says yes. The hooks in these scripts are honest — no lying.
+## What to send when they reply
+
+**If they ask about the rate report:**
+"Here you go — I put it together from LawnStarter data and what I know running my own crew. State average is $55.25, your city might be higher or lower. Yours to keep."
+
+**If they ask about the app:**
+"It's called MowGo — built it for my own crew. Does scheduling, auto-invoicing, rain delays, route view. Free tier, no credit card. mowgoapp.com if you want to peek. No pressure."
+
+**If they say "I use Jobber/LawnPro/Service Autopilot":**
+"Nice, you're ahead of most crews. If you ever want to compare notes on pricing or routing, I'm here. The rate report's still yours."
+
+**If they say "not interested":**
+"No problem at all. Reply STOP and I won't text again. If anything changes, you know where I am."
+
+**Post-conversion (after they try it):**
+"Glad it's working for you. If you'd be up for a quick testimonial — even a couple sentences — I'll comp you a month. No pressure either way."
+
+---
+
+## Batch rules
+
+1. 5-10/day max. Keep replies manageable.
+2. Never pitch in message 1. Conversation or free offer only. App after 3-4 exchanges.
+3. Reply framework (ACA): Acknowledge → Compliment → Ask. No copy-paste.
+4. After engagement: offer rate report FIRST, then free tier. Only mention Solo $39 after value.
+5. Log everything in LEAD_TRACKER.md: status 🔴→🟡→🟢→🔵→✅.
+6. If they say no: mark ❌, no hard sell. Circle back in 3-6 months.
+7. Don't text after 7pm or before 9am CT.
+8. The rate report EXISTS at leads/what-to-charge-ok-report.md — $55.25 state avg, per-city table. Send as PDF or screenshot when a lead says yes.

@@ -1,0 +1,37 @@
+# MowGo Cross-Platform Parity Audit
+
+## Task
+Read the ACTUAL source files in /opt/data/mowgo and verify feature parity between the web app (client/src/), iOS native (ios-native/MowGo/), and Android native (client/android-native/app/src/main/). Do not edit files. Do not trust prior reviewer summaries — verify every claim against raw source.
+
+## What to check
+For each feature area, determine: (1) verified parity across all 3 platforms, (2) confirmed gap (exact file:line), or (3) unverifiable from this Linux environment.
+
+### Feature Areas
+1. **Auth/Session/Recovery**: sign-in, sign-up, password reset, session persistence, demo mode, logout
+2. **Dashboard/Weather**: stat cards, weather banner, team progress, quick actions, crew-limited view
+3. **Today/Jobs**: job list, date navigation, create/edit/complete jobs, reorder, recurrence, rain delay, photo upload, status management
+4. **Clients/Leads**: client list, search/filter, create/edit, tags, leads, export, navigation
+5. **Invoices/Estimates/Payments**: invoice list, create (auto + manual), mark paid, void, nudge, copy text, estimates, Stripe checkout
+6. **Settings/Team**: profile editing, notification preferences, team management, subscription/tiers, exports, integrations
+7. **Photos**: upload, storage path vs signed URL, photo display on job cards
+8. **Offline/Sync**: offline queue, cache, replay, error handling for network failures
+9. **Push Notifications**: APNs (iOS), FCM (Android), token registration, permissions
+10. **Webhooks**: webhook configuration, test dispatch, HMAC signing
+11. **Localization**: English + Spanish on all platforms, i18n key coverage
+12. **Tiers/Trials**: free/solo/crew/premium, trial flow, grant/expire, tier-gated features
+13. **Navigation/routing**: screen structure, tab navigation, deep links
+14. **Shared backend contracts**: Supabase field names (snake_case), status enums, RLS policies, API endpoints
+
+## Output format
+For each area, output:
+- **Feature**: name
+- **Web**: verified/partial/missing (with key file details)
+- **iOS**: verified/partial/missing (with key file details)
+- **Android**: verified/partial/missing (with key file details)
+- **Gaps**: list any confirmed gaps with severity (CRITICAL/HIGH/MEDIUM/LOW), exact file:line, and concrete fix
+- **Unverifiable**: list what can't be checked without Xcode/real device
+
+## Final verdict
+- SHIP: no critical or high gaps
+- SHIP-WITH-MINOR-FIXES: list the few fixes needed
+- NO-SHIP: list the blockers with severity and remediation

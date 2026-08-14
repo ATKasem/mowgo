@@ -1,0 +1,100 @@
+# MowGo Parity Fix - Batch 1: iOS + Web + Android rain/lead alerts
+
+## IMPORTANT RULES
+- Do NOT touch unrelated dirty files in the repo (BI scripts, vault, intel, concierge, social, docs, etc.)
+- Only modify the files listed below
+- After each change, run `npm run build` to verify web builds still pass
+- Do NOT commit or push
+
+## Fix 1: Add rain_alerts_enabled toggle to iOS
+
+**Files to modify:**
+- ios-native/MowGo/Models/Models.swift — add `rain_alerts_enabled` field to Profile struct
+- ios-native/MowGo/Views/Settings/SettingsView.swift — add toggle switch
+
+The DB column `profiles.rain_alerts_enabled` was added in migration 20260812120000_weather_push_pipeline.sql. The web Settings.jsx:538-543 already has this toggle. iOS needs the same.
+
+In Models.swift, add to the Profile struct:
+```swift
+var rainAlertsEnabled: Bool = true
+```
+with snake_case coding key `rain_alerts_enabled`.
+
+In SettingsView.swift, add a toggle similar to the lead alerts toggle pattern. Use `store.profile?.rainAlertsEnabled ?? true` as initial value, and call `saveProfile` to persist.
+
+## Fix 2: Add rain_alerts_enabled toggle to Android
+
+**Files to modify:**
+- client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt — add field
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt — add toggle
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt — add state + save logic
+
+In Profile.kt, add:
+```kotlin
+@SerialName("rain_alerts_enabled")
+val rainAlertsEnabled: Boolean = true
+```
+
+In MoreScreen.kt, add a toggle row similar to the existing lead alerts pattern.
+
+In MoreViewModel.kt, add the toggle state, load from profile, and save via ProfileRepository.
+
+## Fix 3: Add lead alerts toggle to iOS
+
+**File to modify:**
+- ios-native/MowGo/Views/Settings/SettingsView.swift
+
+Add a "Lead alerts" toggle, tier-gated (only show for paid tiers), similar to the web pattern at Settings.jsx:496-512. Load initial value from `store.profile?.leadAlertsEnabled`, save via `saveProfile`. The DB column `profiles.lead_alerts_enabled` already exists.
+
+## Fix 4: Add lead alerts toggle to Android
+
+**Files to modify:**
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt
+
+Same pattern as Fix 3 but for Android.
+
+## Fix 5: Wire rain-delay SMS for iOS
+
+**File to modify:**
+- ios-native/MowGo/Views/Today/TodayView.swift
+
+When rain delay is applied (the existing rain delay flow), also call the send-rain-delay-sms edge function. The web calls `data.js:342-353`. The endpoint is at `functions/api/jobs/send-rain-delay-sms.js`. Call it via the existing SupabaseService or a direct fetch with the service role. The function signature expects: `{ jobId, clientId, delayDate }`.
+
+## Fix 6: Wire rain-delay SMS for Android
+
+**Files to modify:**
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt
+- client/android-native/app/src/main/java/com/mowgo/app/data/JobRepository.kt
+
+Same logic as Fix 5 but for Android.
+
+## Fix 7: Add edit-job UI to web
+
+**File to modify:**
+- client/src/pages/Today.jsx
+
+The web has `updateJob()` in data.js:239 but no UI to call it. Add an edit button/modal to the job card that opens a pre-filled form. The existing `NewJobForm.jsx` component can be reused or adapted.
+
+## Fix 8: Add skip job UI to web
+
+**File to modify:**
+- client/src/pages/Today.jsx
+
+The web defines `skipped` status in constants.js:21-25 but no UI to trigger it. Add a "Skip" action on job cards. iOS and Android already have this.
+
+## Fix 9: Add edit-job UI to iOS
+
+**File to modify:**
+- ios-native/MowGo/Views/Today/TodayView.swift
+- ios-native/MowGo/Views/Today/NewJobFormView.swift (reuse for edit)
+
+Android already has an EditJobDialog.kt. Add the same on iOS — a pre-filled form that calls updateJob.
+
+## Fix 10: Android Leads CSV export
+
+**File to modify:**
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt
+- client/android-native/app/src/main/java/com/mowgo/app/data/ExportRepository.kt
+
+Add `leads` to the export options. Web and iOS already export leads CSV. Follow the existing `clients`/`jobs`/`invoices` export patterns in ExportRepository.kt and add the UI option in MoreViewModel.kt.

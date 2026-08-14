@@ -1,0 +1,130 @@
+{
+  "actions_ts": "2026-08-13T13:00:00Z",
+  "action_label": "8am CST Action — Thu Aug 13 (fed by daily_scan/2026-08-13.json Part 1)",
+  "quick_wins_executed": [
+    {
+      "id": "reddit_kit_liveness_check",
+      "status": "🔴 ALL 3 THREADS 404 — kit dead",
+      "detail": "Threads #55 (1vi1hcj r/smallbusiness), #57 (1vi8tr3 r/sweatystartup), #43 (1vfyg2j r/Entrepreneur) all return 404 Not Found through safereddit.com. Reddit JSON API also blocked from this container. The kit is completely dead — no threads to post to. New kit needed for Fri Aug 14 22:23Z slot.",
+      "evidence": "safereddit.com returns HTML title 'Error: Reddit error 404' for all 3 threads"
+    },
+    {
+      "id": "sweatystartup_ban_doc",
+      "status": "✅ DOCUMENTED — /opt/data/mowgo/docs/outreach-rules.md",
+      "detail": "Created MowGo Outreach Rules document covering: banned subreddits (r/sweatystartup), effective outreach subs (r/landscaping, r/CRM, r/LawnCarePros, r/smallbusiness, r/Entrepreneur), kit posting rules (96h gate, thread liveness check, no pitch threads, kit chain), and competitor monitoring notes. r/sweatystartup excluded from all future outreach.",
+      "evidence": "write_file → 2032 bytes, verified"
+    },
+    {
+      "id": "compare_page_updates",
+      "status": "✅ UPDATED — Compare.jsx",
+      "detail": "Two changes: (1) Servinix beta date corrected from 'Sept 14' to 'Aug 17 (beta)' — matches BI report. (2) Jobber pricing footnote updated: 'Starting at $24/mo' promo expired Aug 12, new entry anchor is $29/mo. Both strings wrapped in tr() for i18n.",
+      "evidence": "patch → 2 hunks applied, verified"
+    },
+    {
+      "id": "copy_flags_bank",
+      "status": "✅ SAVED — /opt/data/mowgo/docs/copy-flags/2026-08-13.md",
+      "detail": "Banked 7 copy flags: Jobber promo expired, r/sweatystartup ban, SMS pipeline real issue (area-code phone numbers), Lead Nurture Resend API key invalid, Intel Engine credit cliff, Reddit kit threads all dead, FieldProxy AI cascade rescheduling.",
+      "evidence": "write_file → 2412 bytes, verified"
+    },
+    {
+      "id": "lead_nurture_key_check",
+      "status": "🔴 CONFIRMED INVALID — Resend API key 401",
+      "detail": "Direct API test: POST to https://api.resend.com/emails with key re_RZ4SjXeb_EqZjmrasGRvPKKk343LkaG29 returned {'statusCode':401,'name':'validation_error','message':'API key is invalid'}. Lead nurture code is correct (User-Agent header already present at line 88). Fix is purely a key rotation in Resend dashboard + /opt/data/.env update. Fix instructions saved to /opt/data/mowgo/docs/lead-nurture-api-key-fix.md.",
+      "evidence": "curl to Resend API returned 401; fix doc written"
+    },
+    {
+      "id": "intel_report_review",
+      "status": "✅ REVIEWED — bi_report_2026-08-13_1048.md",
+      "detail": "Top ICP threads for Fri slot: 1vcr90y (r/CRM solo side-hustle, never used CRM — warmest prospect), 1uaa3yg (r/CRM comparison shopper, active), 1vj9nay (r/smallbusiness quote-form builder, check liveness). Also: QuoteIQ pricing may have dropped (Elite $249 from $299), RealGreen pivoting to SMB content, GreenRoute doing comparison content.",
+      "evidence": "Read full BI report — 113 lines"
+    }
+  ],
+  "investigation_findings": [
+    {
+      "id": "sms_21265_root_cause",
+      "status": "🔍 ROOT CAUSE IDENTIFIED — phone numbers are area codes only",
+      "detail": "All 21 numbered leads in sms_queue.json have phone numbers like '+1405', '+1918', '+1580' — these are just area codes (5 chars including +). Twilio error 21265 means 'To number cannot be a Short Code' — the number is too short. The scan's 'campaign not approved yet' diagnosis was WRONG — the real error is 21265 data quality issue. Only 2 tier0 entries (NG Outdoor +140****3185, Frankies +140****2170) have full numbers and those sent successfully. The phone numbers were never fully collected during lead scraping. TWILIO_A2P_APPROVED=false is also true but not the blocking issue.",
+      "evidence": "sms_queue.json line-by-line: phone fields show '+1405', '+1918', '+1580' (area codes); sms_log.jsonl shows error 21265 for all failed sends"
+    },
+    {
+      "id": "reddit_slot_cron_missing",
+      "status": "❌ NO CRON FOUND — 4c195234eaa9 not in active crons",
+      "detail": "The reddit kit one-shot cron (4c195234eaa9) referenced in Aug 11 scan does not appear in current cron list. It was either a one-shot that was removed after execution (failed), or was cleaned up. No reddit kit cron exists for the Fri Aug 14 22:23Z slot. New cron needs to be created once a new kit is assembled.",
+      "evidence": "hermes cron list — no match for '4c195', 'reddit', 'kit', '22:23', or 'spend'"
+    },
+    {
+      "id": "rule_of_100_credit_blocked",
+      "status": "🔴 Rule of 100 cron failed Aug 12 — HTTP 402 credit exhaustion",
+      "detail": "Rule of 100 cron (daily MowGo content + outreach) failed with HTTP 402 on Aug 12 — same credit exhaustion issue as Intel Engine. Both crons require 65536 max_tokens which exceeds current credit balance. Wave-5 drafts (10 texts + 3 posts) from Aug 11 were likely not posted/sent as a result.",
+      "evidence": "hermes cron list: 'error: HTTP 402: ... can only afford 21885'"
+    },
+    {
+      "id": "cron_402_credit_chain",
+      "status": "🔴 3 crons failing on HTTP 402",
+      "detail": "Three crons hitting credit exhaustion: (1) Aaron daily job matches (4e76626b7694) — max_tokens 65536, can afford 2515. (2) Daily overview report (28f7bf1880d1) — max_tokens 65536, can afford 21885. (3) Rule of 100 (0d650f407399) — max_tokens 65536, can afford 21885. Intel Engine recovered on its own (credits refreshed). Root cause: all 4 crons request 65536 max_tokens which exhausts the daily credit budget.",
+      "evidence": "hermes cron list error messages"
+    }
+  ],
+  "tasks_needing_aaron": [
+    {
+      "id": "resend_api_key_rotation",
+      "status": "🔴 BLOCKING — Lead Nurture dead",
+      "detail": "RESEND_API_KEY re_RZ4SjXeb_EqZjmrasGRvPKKk343LkaG29 confirmed invalid. Go to https://resend.com/api-keys → generate new key → update /opt/data/.env → test. Fix instructions saved to docs/lead-nurture-api-key-fix.md."
+    },
+    {
+      "id": "reddit_new_kit",
+      "status": "🔴 KIT DEAD — need new kit for Fri Aug 14 22:23Z",
+      "detail": "All 3 kit threads (#55 1vi1hcj, #57 1vi8tr3, #43 1vfyg2j) return 404. Cannot create Fri cron without a live kit. Top ICP threads from BI report: 1vcr90y (r/CRM solo side-hustle), 1uaa3yg (r/CRM comparison shopper), 1vj9nay (r/smallbusiness quote-form builder). Needs liveness check + kit assembly + cron creation."
+    },
+    {
+      "id": "sms_phone_numbers",
+      "status": "🔴 DATA QUALITY — 21 leads have area codes only",
+      "detail": "Phone numbers in sms_queue.json are '+1405', '+1918', '+1580' — just area codes. Twilio rejects these. Need to collect full 10-digit phone numbers from lead sources. Only 2 leads (NG Outdoor, Frankies) have full numbers — those were sent successfully."
+    },
+    {
+      "id": "blasian_reply",
+      "status": "🔴 Day 16 — UNANSWERED",
+      "detail": "Blasian asked 'How would we get leads for MowGo' on Jul 28. Draft ready at leads/blasian-reply-draft-2026-08-01.md. Human loop dead 16 days. Pair with #48 manual paste."
+    },
+    {
+      "id": "followup_emails",
+      "status": "🔴 Day 15 — OVERDUE 8+ days",
+      "detail": "5 leads (Emerge Lawns, Metro Green, Bigfoot Lawns, Simply LawnCare, Campbell & Sons) — 0 replies. 2nd follow-up overdue since Aug 5."
+    },
+    {
+      "id": "cf_tokens_renew",
+      "status": "🔴 Day 7 — DEAD",
+      "detail": "Both Cloudflare API tokens dead since Aug 7 (10000 error). Git push deploys still work."
+    },
+    {
+      "id": "directory_submissions",
+      "status": "❌ Day 33 — NO PRESENCE",
+      "detail": "Capterra/G2/SoftwareAdvice/GetApp. r/sweatystartup ban makes directory presence more important."
+    },
+    {
+      "id": "stripe_e2e_test",
+      "status": "🟡 Day 30+ — UNPROVEN",
+      "detail": "Logged-in e2e checkout still unproven. All endpoints alive, new bundle hash deployed."
+    },
+    {
+      "id": "openrouter_credits",
+      "status": "🔴 3 CRONS FAILING — credit exhaustion",
+      "detail": "Aaron daily job matches, Daily overview report, and Rule of 100 all failing with HTTP 402. Reduce max_tokens from 65536 to fit within credit budget, or add credits at https://openrouter.ai/settings/credits."
+    }
+  ],
+  "corrections_to_scan": [
+    "⚠️ SMS error is NOT 'campaign not approved yet' — it's Twilio 21265 'To number cannot be a Short Code'. Phone numbers are area codes only. The scan misdiagnosed the root cause.",
+    "⚠️ Reddit kit cron 4c195234eaa9 does NOT exist in active crons — it was not found in the cron list. The Aug 11 scan's 'armed' status was stale or the cron was deleted after the failed run.",
+    "⚠️ lead_nurture.py already has the User-Agent header fix (added Aug 11 by prior Part 2 run). The 401 error on Aug 12 is a NEW issue — the Resend API key itself expired/rotated."
+  ],
+  "critical_path_for_aaron": [
+    "1. 🔴 ROTATE Resend API key — Lead Nurture dead (401). Fix instructions: docs/lead-nurture-api-key-fix.md",
+    "2. 🔴 ASSEMBLE new Reddit kit — all 3 threads 404. Fri Aug 14 22:23Z slot needs live threads. Candidate: 1vcr90y, 1uaa3yg, 1vj9nay",
+    "3. 🔴 COLLECT full phone numbers for 21 SMS leads — area codes only in queue, Twilio 21265 error",
+    "4. 🔴 Add credits / reduce max_tokens — 3 crons failing with HTTP 402",
+    "5. 🔴 Answer Blasian (Day 16) + #48 paste — one 5-min session",
+    "6. 🔴 Send 5 overdue follow-ups (Day 15) — highest-ROI 10 min",
+    "7. 🔴 CF token re-auth (Day 7) — blocks cf_check/wrangler",
+    "8. 🔴 Directory submissions (Day 33) — more important after sweatystartup ban"
+  ]
+}

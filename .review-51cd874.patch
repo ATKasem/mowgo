@@ -1,0 +1,683 @@
+diff --git a/client/src/i18n/locales/en.json b/client/src/i18n/locales/en.json
+index 6b96ba4..c090bfe 100644
+--- a/client/src/i18n/locales/en.json
++++ b/client/src/i18n/locales/en.json
+@@ -1222,7 +1222,11 @@
+     "retry": "Retry",
+     "refer_a_crew_earn_a_free_month_when_they_subscribe": "Refer a crew, earn a free month when they subscribe.",
+     "get_your_referral_code": "Get your referral code",
+-    "dismiss": "Dismiss"
++    "dismiss": "Dismiss",
++    "most_crews_are_set_up_in_48h_your_clients_imported_first_operating_week_": "Most crews are set up in 48h — your clients imported, first operating week founder-reviewed.",
++    "close": "Close",
++    "claim_it": "Claim it",
++    "maybe_later": "Maybe later"
+   },
+   "reviewPrompt": {
+     "leave_a_review": "Leave a Review",
+@@ -1272,7 +1276,8 @@
+     "see_plans": "See plans",
+     "maybe_later": "Maybe later",
+     "close": "Close",
+-    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled."
++    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled.",
++    "free_setup_we_import_your_clients_and_founder_review_your_first_operating_week": "Free setup: we import your clients and founder-review your first operating week."
+   },
+   "booking": {
+     "book_a_service": "Book a lawn care service",
+diff --git a/client/src/i18n/locales/es.json b/client/src/i18n/locales/es.json
+index 60e4b94..67a969c 100644
+--- a/client/src/i18n/locales/es.json
++++ b/client/src/i18n/locales/es.json
+@@ -1295,7 +1295,11 @@
+     "retry": "Reintentar",
+     "refer_a_crew_earn_a_free_month_when_they_subscribe": "Recomienda a una cuadrilla y gana un mes gratis cuando se suscriban.",
+     "get_your_referral_code": "Obtén tu código de referencia",
+-    "dismiss": "Cerrar"
++    "dismiss": "Cerrar",
++    "most_crews_are_set_up_in_48h_your_clients_imported_first_operating_week_": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y revisamos tu primera semana operativa.",
++    "close": "Cerrar",
++    "claim_it": "Actívalo",
++    "maybe_later": "Más tarde"
+   },
+   "reviewPrompt": {
+     "leave_a_review": "Dejar una reseña",
+@@ -1345,7 +1349,8 @@
+     "see_plans": "Ver planes",
+     "maybe_later": "Más tarde",
+     "close": "Cerrar",
+-    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y programamos tus primeros 30 días."
++    "most_crews_are_set_up_in_48h_your_clients_imported_first_30_days_pre_sch": "La mayoría de las cuadrillas quedan listas en 48h — importamos tus clientes y programamos tus primeros 30 días.",
++    "free_setup_we_import_your_clients_and_founder_review_your_first_operating_week": "Configuración gratis: importamos tus clientes y revisamos tu primera semana operativa."
+   },
+   "booking": {
+     "book_a_service": "Agenda un servicio de jardinería",
+diff --git a/client/src/pages/Compare.jsx b/client/src/pages/Compare.jsx
+index 3fdef5b..70bc4df 100644
+--- a/client/src/pages/Compare.jsx
++++ b/client/src/pages/Compare.jsx
+@@ -67,7 +67,7 @@ const mowgoTiers = [
+     annualPrice: '$1,990/year · 2 months free',
+     features: [
+       'Everything in Crew',
+-      'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
++      'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
+       'Seasonal packs: spring pricing benchmarks, route templates',
+       'Priority text-first support',
+     ],
+@@ -303,7 +303,7 @@ export default function Compare() {
+           <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/40 p-5 mb-8">
+             <div className="flex items-start gap-2.5">
+               <Shield className="w-5 h-5 text-brand shrink-0 mt-0.5" />
+-              <p className="text-sm text-gray-700 dark:text-gray-300">{tr("Switching is the risky part — so we made it the safe part. We import your Jobber clients and pre-schedule your first 30 days within 48 hours. And if MowGo doesn't make you more organized in 30 days, we refund you. Jobber doesn't offer that.")}</p>
++              <p className="text-sm text-gray-700 dark:text-gray-300">{tr("Switching is the risky part — so we made it the safe part. We import your Jobber clients and founder-review your first operating week within 48 hours. And if MowGo doesn't make you more organized in 30 days, we refund you. Jobber doesn't offer that.")}</p>
+             </div>
+           </div>
+           <div className="flex flex-wrap gap-3">
+diff --git a/client/src/pages/Dashboard.jsx b/client/src/pages/Dashboard.jsx
+index 0d924f4..acc8a92 100644
+--- a/client/src/pages/Dashboard.jsx
++++ b/client/src/pages/Dashboard.jsx
+@@ -66,7 +66,7 @@ function ConciergeBookingPrompt() {
+           <X className="w-5 h-5" />
+         </button>
+         <h3 className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white pr-6">
+-          {tr('Most crews are set up in 48h — your clients imported, first 30 days pre-scheduled.')}
++          {tr('Most crews are set up in 48h — your clients imported, first operating week founder-reviewed.')}
+         </h3>
+         <Link to="/app/settings" onClick={dismiss} className="btn-primary w-full">{tr('Claim it')}</Link>
+         <button onClick={dismiss} className="block w-full text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] dark:hover:text-white transition-colors">
+diff --git a/client/src/pages/JobberPriceIncrease.jsx b/client/src/pages/JobberPriceIncrease.jsx
+index 05bf8ff..a099713 100644
+--- a/client/src/pages/JobberPriceIncrease.jsx
++++ b/client/src/pages/JobberPriceIncrease.jsx
+@@ -11,7 +11,7 @@ const jobberPlans = [
+ 
+ const whatToLookFor = [
+   { icon: DollarSign, title: 'No Per-User Fees', desc: 'Your pricing should not double just because you added a crew member.' },
+-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One-tap rescheduling that actually moves your whole schedule. Not just a note field.' },
++  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'MowGo suggests a dry date; you choose which jobs to move and confirm before clients are notified.' },
+   { icon: Smartphone, title: 'Mobile-First Design', desc: 'Built for the truck, not the office. Fast, simple, works on any phone.' },
+   { icon: Wifi, title: 'Offline Mode', desc: 'Spotty cell service in rural areas? Your app should keep working without internet.' },
+   { icon: Gift, title: 'Free Tier That Is Actually Useful', desc: 'Start with real features for free. Not a 14-day trial that requires a credit card.' },
+@@ -21,7 +21,7 @@ const comparisonRows = [
+   { feature: 'Monthly price (solo operator)', mowgo: '$39/mo', jobber: '$139/mo (Connect)' },
+   { feature: 'Per-user fees', mowgo: 'None', jobber: '$29/mo per additional user' },
+   { feature: 'Free tier', mowgo: 'Yes — 5 clients, forever', jobber: '14-day trial only' },
+-  { feature: 'Rain delay auto-reschedule', mowgo: 'Yes — one tap', jobber: 'No built-in rain delay' },
++  { feature: 'Rain delay owner-confirmed move', mowgo: 'Yes — you confirm the move', jobber: 'No built-in rain delay' },
+   { feature: 'Offline mode', mowgo: 'Yes — works without cell service', jobber: 'Limited offline support' },
+   { feature: 'Mobile-first design', mowgo: 'Yes — built for the truck', jobber: 'Desktop-first, mobile feels secondary' },
+   { feature: 'One-tap invoicing', mowgo: 'Yes — automatic on job complete', jobber: 'Manual invoicing workflow' },
+diff --git a/client/src/pages/Landing.jsx b/client/src/pages/Landing.jsx
+index 29687bd..0eeb51f 100644
+--- a/client/src/pages/Landing.jsx
++++ b/client/src/pages/Landing.jsx
+@@ -8,7 +8,7 @@ import { startCheckout } from '../lib/payments';
+ import { supabase } from '../lib/supabase';
+ 
+ const features = [
+-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'Oklahoma spring storms? One tap moves your whole schedule forward. Clients get notified automatically. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
++  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'Oklahoma spring storms? MowGo suggests a dry date, you choose which jobs to move, and clients are notified after you confirm. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
+   { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500' },
+   { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
+   { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. An invoice is created automatically — one tap copies a payment text. Clients pay via Venmo, Zelle, or Cash App. No processing fees.', color: 'from-amber-500 to-orange-500' },
+@@ -22,7 +22,7 @@ const differentiators = [
+ ];
+ 
+ const plans = [
+-  { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay auto-reschedule', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
++  { name: 'Free', price: '0', period: 'forever', desc: 'Try it with your first 5 clients', features: ['Up to 5 clients', 'Daily job scheduling', 'Rain delay suggestions with owner confirmation', 'Invoice tracking', 'Dark mode + installable PWA'], cta: 'Start Free', highlight: false },
+   {
+     name: 'Solo',
+     price: '39',
+@@ -31,11 +31,11 @@ const plans = [
+     desc: 'For independent landscapers with a full schedule',
+     features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'],
+     bonuses: [
+-      { text: 'Done-for-you setup: we import your clients and pre-schedule your first 30 days within 48 hours.', value: '$150 value' },
++      { text: 'Done-for-you setup: we import your clients and founder-review your first operating week within 48 hours.', value: '$150 value' },
+       { text: '"What to Charge in Your City" report: real mow prices from your market.', value: '$49 value' },
+       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
+     ],
+-    scarcity: 'Concierge setup is limited to 20 new businesses per week.',
++    scarcity: 'We personally walk Solo operators through their first operating week.',
+     cta: 'Start Free Trial',
+     highlight: true,
+   },
+@@ -48,7 +48,7 @@ const plans = [
+     desc: 'Everything in Crew',
+     features: [
+       'Everything in Crew',
+-      'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
++      'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
+       'Seasonal packs: spring pricing benchmarks, route templates',
+       'Priority text-first support',
+     ],
+@@ -68,7 +68,7 @@ const stats = [
+ 
+ const faqs = [
+   { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
+-  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On Solo and up, we import your clients and pre-schedule your first 30 days within 48 hours. Setup is limited to 20 new businesses per week.' },
++  { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On eligible paid plans, we import your clients and founder-review your first operating week within 48 hours. We confirm recurring patterns with you instead of changing your schedule automatically.' },
+   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
+   { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full." },
+   { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
+@@ -196,12 +196,12 @@ export default function Landing() {
+           </FadeIn>
+           <FadeIn delay={100}>
+             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
+-              {tr("Rain on Tuesday. Eight clients to rebook.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("One tap fixes it.")}</span>
++              {tr("Rain on Tuesday. Eight clients to rebook.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("You confirm the move.")}</span>
+             </h1>
+           </FadeIn>
+           <FadeIn delay={200}>
+             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
+-              {tr("When Oklahoma rain hits, MowGo moves your whole schedule forward and texts every client for you. Jobs, routes, and invoices in one place.")}
++              {tr("When Oklahoma rain hits, MowGo suggests a dry date. You choose which jobs to move, confirm once, and clients get notified. Jobs, routes, and invoices in one place.")}
+             </p>
+           </FadeIn>
+           <FadeIn delay={300}>
+diff --git a/client/src/pages/ProBaseComparison.jsx b/client/src/pages/ProBaseComparison.jsx
+index fabcc18..9f9526c 100644
+--- a/client/src/pages/ProBaseComparison.jsx
++++ b/client/src/pages/ProBaseComparison.jsx
+@@ -24,7 +24,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
+ 
+ // true = MowGo wins this row, false = ProBase wins, 'tie' = both have it
+ const features = [
+-  { label: 'Rain delay auto-reschedule', desc: 'One tap moves today\u2019s route to tomorrow', mowgo: true, probase: false, star: true },
++  { label: 'Rain delay owner-confirmed move', desc: 'MowGo suggests a dry date; you choose jobs and confirm the move', mowgo: true, probase: false, star: true },
+   { label: 'Offline mode', desc: 'Keep working with no cell service, syncs later', mowgo: true, probase: false },
+   { label: 'Installable web app (PWA)', desc: 'Works on iPhone, Android, and desktop from the home screen', mowgo: true, probase: true },
+   { label: 'QuickBooks / accounting sync', desc: 'Via Zapier webhooks (ProBase: \u201cnot designed for businesses that need accounting sync\u201d)', mowgo: true, probase: false },
+diff --git a/client/src/pages/QuoteIQAlternative.jsx b/client/src/pages/QuoteIQAlternative.jsx
+index 94695e9..b9a9c44 100644
+--- a/client/src/pages/QuoteIQAlternative.jsx
++++ b/client/src/pages/QuoteIQAlternative.jsx
+@@ -4,7 +4,7 @@ import { Sprout, ArrowRight, Check, X, DollarSign, Users, CloudRain, Smartphone,
+ import { Link } from 'react-router-dom';
+ 
+ const whatToLookFor = [
+-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One-tap rescheduling that actually moves your whole schedule. Not just a note field.' },
++  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'MowGo suggests a dry date; you choose which jobs to move and confirm before clients are notified.' },
+   { icon: Users, title: 'No Per-User Fees', desc: 'Your pricing should not double just because you added a crew member.' },
+   { icon: Gift, title: 'Free Tier That Is Actually Useful', desc: 'Start with real features for free. Not a 14-day trial that requires a credit card.' },
+   { icon: Smartphone, title: 'Mobile-First Design', desc: 'Built for the truck, not the office. Fast, simple, works on any phone.' },
+@@ -13,7 +13,7 @@ const whatToLookFor = [
+ 
+ const comparisonRows = [
+   { feature: 'Free tier', mowgo: 'Yes — 5 clients, forever', quoteiq: 'Discontinued (July 2026)' },
+-  { feature: 'Rain delay auto-reschedule', mowgo: 'Yes — one tap', quoteiq: 'Manual reschedule only' },
++  { feature: 'Rain delay owner-confirmed move', mowgo: 'Yes — you confirm the move', quoteiq: 'Manual reschedule only' },
+   { feature: 'Offline mode', mowgo: 'Yes — works without cell service', quoteiq: 'Not available' },
+   { feature: 'Per-user fees', mowgo: 'None', quoteiq: 'Charges per user on paid plans' },
+   { feature: 'Transaction fees', mowgo: 'No platform fee — Stripe\u2019s cut only', quoteiq: 'Payment processing fees apply' },
+diff --git a/client/src/pages/Settings.jsx b/client/src/pages/Settings.jsx
+index 39f76ce..3459534 100644
+--- a/client/src/pages/Settings.jsx
++++ b/client/src/pages/Settings.jsx
+@@ -351,7 +351,7 @@ export default function Settings() {
+         {!isDemoMode() && ['solo', 'crew', 'premium'].includes(profile?.tier) && conciergeClaimed === false && (
+           showConcierge ? <ConciergeSetup onDone={() => { setConciergeClaimed(true); setShowConcierge(false); }} /> : (
+             <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-brand/30">
+-              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup: we import your clients and pre-schedule your first 30 days.")}</p>
++              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{conciergeTr("Free setup: we import your clients and founder-review your first operating week.")}</p>
+               <button type="button" className="btn-primary whitespace-nowrap" onClick={() => setShowConcierge(true)}>{conciergeTr('Claim it')}</button>
+             </div>
+           )
+diff --git a/client/src/pages/Subscribe.jsx b/client/src/pages/Subscribe.jsx
+index 6659a9f..65d7325 100644
+--- a/client/src/pages/Subscribe.jsx
++++ b/client/src/pages/Subscribe.jsx
+@@ -93,7 +93,7 @@ export default function Subscribe() {
+       annualPrice: '1990',
+       features: [
+         'Everything in Crew',
+-        'Priority concierge setup — your clients imported + first 30 days pre-scheduled in 48h',
++        'Priority concierge setup — your clients imported + first operating week founder-reviewed in 48h',
+         'Seasonal packs: spring pricing benchmarks, route templates',
+         'Priority text-first support',
+       ],
+diff --git a/client/src/pages/SwitchingFromLawnPro.jsx b/client/src/pages/SwitchingFromLawnPro.jsx
+index b6e07d0..2bb2ee6 100644
+--- a/client/src/pages/SwitchingFromLawnPro.jsx
++++ b/client/src/pages/SwitchingFromLawnPro.jsx
+@@ -12,14 +12,14 @@ const painPoints = [
+ ];
+ 
+ const solutions = [
+-  { icon: CloudRain, title: 'Rain Delay Auto-Reschedule', desc: 'One tap moves your entire schedule forward when it rains. Clients get notified automatically. Included on every plan — even free.', color: 'from-emerald-500 to-green-500' },
++  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'MowGo suggests a dry date; you choose which jobs to move and confirm before clients are notified. Included on every plan — even free.', color: 'from-emerald-500 to-green-500' },
+   { icon: Wifi, title: 'Offline Mode', desc: 'MowGo works without internet. Rural areas, bad signal, doesn\'t matter. Your data syncs when you\'re back online.', color: 'from-teal-500 to-cyan-500' },
+   { icon: Shield, title: '$39 Flat Pricing', desc: 'Solo plan: $39/mo. That\'s it. No per-user fees, no hidden charges, no "gotcha" upsells. Unlimited clients and jobs.', color: 'from-amber-500 to-orange-500' },
+   { icon: Sprout, title: 'Your Data Is Yours', desc: 'We don\'t sell your customer data to advertisers. You are the customer, not the product. Full data export whenever you want.', color: 'from-violet-500 to-purple-500' },
+ ];
+ 
+ const comparisons = [
+-  { feature: 'Rain delay auto-reschedule', mowgo: true, lawnpro: false },
++  { feature: 'Rain delay owner-confirmed move', mowgo: true, lawnpro: false },
+   { feature: 'Offline mode', mowgo: true, lawnpro: false },
+   { feature: 'Unlimited clients on Solo', mowgo: true, lawnpro: false },
+   { feature: 'Client notes & gate codes', mowgo: true, lawnpro: true },
+diff --git a/functions/api/admin/concierge.js b/functions/api/admin/concierge.js
+index a9e0671..1f9deff 100644
+--- a/functions/api/admin/concierge.js
++++ b/functions/api/admin/concierge.js
+@@ -57,7 +57,7 @@ export async function onRequestPost(context) {
+     }
+     if(body.action==='import'){
+       if(Array.isArray(item.imported_client_ids)&&item.imported_client_ids.length)return response({error:'This request has already been imported'},400,request);
+-      let profileResult;try{profileResult=await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?select=tier&id=eq.${item.user_id}`,{headers:service(env)});}catch{return response({error:'Could not verify user plan'},500,request);}if(!profileResult.ok)return response({error:'Could not verify user plan'},500,request);const profiles=await profileResult.json().catch(()=>null);if(!Array.isArray(profiles))return response({error:'Could not verify user plan'},500,request);if(!['solo','crew'].includes(profiles[0]?.tier))return response({error:'User is not on a paid plan — import blocked'},403,request);
++      let profileResult;try{profileResult=await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?select=tier&id=eq.${item.user_id}`,{headers:service(env)});}catch{return response({error:'Could not verify user plan'},500,request);}if(!profileResult.ok)return response({error:'Could not verify user plan'},500,request);const profiles=await profileResult.json().catch(()=>null);if(!Array.isArray(profiles))return response({error:'Could not verify user plan'},500,request);if(!['solo','crew','premium'].includes(profiles[0]?.tier))return response({error:'User is not on a paid plan — import blocked'},403,request);
+       const parsed=parseCsv(item.csv_content);if(parsed.rows.length>500)return response({error:'Too many clients (max 500 per import)'},400,request); if(!parsed.rows.length)return response({error:'No valid clients to import',skipped:parsed.errors},400,request);const organized=cleanClientRows(parsed.rows);
+       const claim=await fetch(`${env.SUPABASE_URL}/rest/v1/concierge_requests?id=eq.${item.id}`,{method:'PATCH',headers:service(env),body:JSON.stringify({status:'importing',imported_client_ids:[]})});if(!claim.ok)throw new Error('Failed to claim request');
+       const clients=organized.rows.map(row=>{const value={user_id:item.user_id,name:row.name,address:row.address}; if(row.phone)value.phone=row.phone;if(row.email)value.email=row.email;const rate=Number.parseFloat(row.rate);if(row.rate&&Number.isFinite(rate))value.rate=rate;return value;});
+diff --git a/marketing/CONTENT_TEMPLATES.md b/marketing/CONTENT_TEMPLATES.md
+index e265cda..dca3e0f 100644
+--- a/marketing/CONTENT_TEMPLATES.md
++++ b/marketing/CONTENT_TEMPLATES.md
+@@ -17,7 +17,7 @@ I'm a dev, so I built her something. Spent 4 weeks on it. Here's what I learned:
+ 
+ **What I got right:**
+ - Mobile-first. She's on her phone all day. The desktop version is an afterthought.
+-- Free tier with 10 clients. She wouldn't even look at it if there wasn't a free option.
++- Free tier with 5 clients. She wouldn't even look at it if there wasn't a free option.
+ - One-button rain delay. OK weather is unpredictable. Pushing everything to tomorrow with one tap.
+ 
+ **What I got wrong:**
+@@ -25,7 +25,7 @@ I'm a dev, so I built her something. Spent 4 weeks on it. Here's what I learned:
+ - Built a fancy dashboard. She just wants "who's next and did they pay."
+ - Assumed she'd use Stripe. Half her clients pay cash.
+ 
+-**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, $39/mo for unlimited.
++**The app:** MowGo — dead simple scheduling + invoicing for 1-3 person lawn care crews. Free tier, 5 clients; Solo is $39/mo for unlimited.
+ 
+ **What I want to know from you:** If you run a service business, what's your current scheduling system? What would it take for you to switch?
+ 
+@@ -81,7 +81,7 @@ Quick comparison for a 2-person team:
+ 
+ Jobber is great for 5+ person operations with an office manager. For a solo landscaper or 2-person crew, it's overkill and overpriced.
+ 
+-Happy to share more if you're interested — free tier (10 clients, no card needed).
++Happy to share more if you're interested — free tier (5 clients, no card needed).
+ ```
+ 
+ ---
+@@ -115,7 +115,7 @@ Hi [Name],
+ Saw your comment in [Group Name] about [pain point they mentioned]. That exact problem is why I built MowGo.
+ 
+ It's a simple scheduling + invoicing app for small lawn care crews:
+-- Free tier (10 clients, no credit card)
++- Free tier (5 clients, no credit card)
+ - Mobile-first (works on the phone in your pocket)
+ - One-button "day off" for when things go sideways
+ 
+@@ -187,7 +187,7 @@ That's the bar. Not "better than Jobber." Better than a notebook.
+ ```
+ If you run a small lawn care business and your scheduling system is "texts and memory" —
+ 
+-I built something for you. Free tier, 10 clients, no credit card.
++I built something for you. Free tier, 5 clients, no credit card.
+ 
+ DM me. I want 10 beta users who'll tell me what sucks about it.
+ ```
+@@ -202,7 +202,7 @@ DM me. I want 10 beta users who'll tell me what sucks about it.
+ 
+ Stop losing $400/month to missed appointments and late payments. MowGo handles scheduling, routing, and invoicing — built for 1-3 person lawn care crews.
+ 
+-[Start Free — 10 Clients, No Card]
++[Start Free — 5 Clients, No Card]
+ ```
+ 
+ ### Problem
+@@ -231,7 +231,7 @@ There's a better way.
+ ```
+ | Free | Solo $39/mo | Crew $79/mo |
+ |------|-------------|-------------|
+-| 10 clients | Unlimited | Unlimited |
++| Free | 5 clients | Unlimited | Unlimited |
+ | Scheduling | Everything in Free | Everything in Solo |
+ | Routing | + Reminders | + QuickBooks sync |
+ | Invoicing | + Client portal | + 3 team members |
+diff --git a/marketing/MARKETING_PLAYBOOK.md b/marketing/MARKETING_PLAYBOOK.md
+index 1c6b010..9bfceaa 100644
+--- a/marketing/MARKETING_PLAYBOOK.md
++++ b/marketing/MARKETING_PLAYBOOK.md
+@@ -57,7 +57,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
+ - Yelp: lawn care businesses with < 10 reviews (small, likely no software)
+ - Facebook group members who mention scheduling problems
+ 
+-**Script:** "Saw your lawn care business on Google Maps. I built MowGo — dead simple scheduling + invoicing for small lawn care crews. Free tier (10 clients, no credit card). Would you be open to trying it and giving feedback? Happy to hop on a 5-min call."
++**Script:** "Saw your lawn care business on Google Maps. I built MowGo — dead simple scheduling + invoicing for small lawn care crews. Free tier (5 clients, no credit card). Would you be open to trying it and giving feedback? Happy to hop on a 5-min call."
+ 
+ ### Channel 3: SEO (long game)
+ **Target keywords:**
+@@ -116,7 +116,7 @@ Runs a 2-person house lawn care business. 25-40 recurring clients. Schedules via
+ > "Most lawn care business owners run their schedule from texts, memory, and a notebook. They lose $400+/month in missed appointments. Jobber costs $119/month and is built for 10-person operations. MowGo is $39/month and does exactly what a 1-3 person crew needs."
+ 
+ ### Key differentiators
+-1. **Free tier** — 10 clients, no credit card
++1. **Free tier** — 5 clients, no credit card
+ 2. **Rain delay** — one button reschedules everything (works for any weather/service disruption)
+ 3. **$39 Solo** — includes what Jobber charges $119 for
+ 4. **No per-user fees** — Jobber charges $29/extra user
+diff --git a/marketing/outreach-queue.md b/marketing/outreach-queue.md
+new file mode 100644
+index 0000000..7bff5e8
+--- /dev/null
++++ b/marketing/outreach-queue.md
+@@ -0,0 +1,77 @@
++# MowGo Outreach Queue
++
++Use `marketing/zero-to-ten-operator-gtm.md` as the operating brief and copy source.
++
++## First 5 targets
++
++These are selected from the existing tracker because they are small, owner-operated, and appear to have low software lock-in. Verify the contact and current workflow before sending.
++
++1. **NG Outdoor — Edmond**
++   - Contact: phone listed in `leads/LEAD_TRACKER.md`
++   - Ask: current scheduling and rain-change workflow
++   - Offer: concierge pilot if manual workflow is confirmed
++
++2. **Frankies Lawn Care LLC — Norman**
++   - Contact: phone listed in `leads/LEAD_TRACKER.md`
++   - Ask: how mixed services affect scheduling and invoicing
++   - Offer: concierge pilot if the workflow is still manual; explain that the pilot requires a paid-plan trial or plan
++
++3. **Bigfoot Lawns LLC — Tulsa**
++   - Contact: email/phone listed in `leads/LEAD_TRACKER.md`
++   - Ask: owner-operated scheduling workflow
++   - Offer: concierge pilot; do not claim results
++
++4. **Chris Young — Oklahoma**
++   - Contact: reply/DM through the original Facebook group thread
++   - Ask: how the new business will manage its first recurring clients
++   - Offer: help starting with the right workflow before software lock-in
++
++5. **Lawton owner + Noah**
++   - Contact: reply/DM through the original Facebook group thread
++   - Ask: current schedule and client-management method
++   - Offer: concierge pilot only after a real pain is confirmed
++
++## Send order
++
++- Send one message at a time.
++- Personalize the first sentence to the business and city.
++- Ask the workflow question.
++- Do not attach a generic pitch or claim that MowGo will increase revenue.
++- Log the result immediately in `leads/LEAD_TRACKER.md`.
++
++## Reply handling
++
++- **They answer with a workflow:** ask the next qualification question; then offer the pilot.
++- **They ask for the app:** send the production link and offer to set up the first week personally; explain that concierge submission is available after Solo, Crew, or Premium trial/plan activation.
++- **They ask for price:** say Solo is $39/month after the pilot; do not negotiate before they experience the workflow.
++- **They say they already use Jobber/Yardbook:** ask what still requires manual work. Do not attack their current tool.
++- **No response:** one respectful follow-up, then stop.
++- **They decline:** record the reason; do not argue.
++
++## Founder-only actions still required
++
++Outreach is the main remaining work, but it is not literally the only work. For every pilot, Aaron must:
++
++1. help a qualified prospect activate a Solo, Crew, or Premium trial/plan;
++2. monitor the concierge queue and import the client list;
++3. schedule the first week, review skipped rows, and mark the request done;
++4. verify the imported data and first operating week with the operator;
++5. observe real usage;
++6. capture the first measurable win;
++7. ask for payment;
++8. request testimonial permission only after a genuine win.
++
++No automation or fabricated proof substitutes for these steps at the first-10 stage.
++
++## Definition of outreach-ready
++
++- The message has a named recipient and specific context.
++- The current workflow is unknown, not assumed.
++- The offer is a pilot, not an unsupported promise.
++- The next step is one clear question.
++- The tracker is updated after sending.
++- Any result is recorded only after it happens.
++
++## Source
++
++Lead identities and contact channels are from the existing MowGo lead tracker. Re-verify contact details before sending; the tracker is operational context, not proof that a lead has a particular workflow.
+diff --git a/marketing/zero-to-ten-operator-gtm.md b/marketing/zero-to-ten-operator-gtm.md
+new file mode 100644
+index 0000000..4bc8542
+--- /dev/null
++++ b/marketing/zero-to-ten-operator-gtm.md
+@@ -0,0 +1,229 @@
++# MowGo Zero-to-10 Operator GTM
++
++**Status:** Outreach-ready operating brief
++**Audience:** Solo and 2-person lawn-care crews using texts, paper, Google Calendar, or basic/free software
++**Stage:** 0–10 real paying operators
++
++## The decision
++
++MowGo is not launching as generic field-service software. For the first 10 operators, it is:
++
++> **The simplest way for a solo or 2-person lawn crew to keep the week scheduled, handle rain changes, and get paid—without rebuilding the workflow every Sunday.**
++
++The product can serve larger crews later. The first job is to prove this narrow operator will use MowGo during real work and pay for it.
++
++## The offer
++
++### Core offer: MowGo Concierge Pilot
++
++> **Give us your current client list and schedule. We import it, set up your first operating week, and walk you through the real workflow. You use MowGo on actual jobs for 14 days.**
++
++**Operational boundary:** The current product accepts a CSV/text client list and creates a concierge request; it does not yet guarantee that the first 30 days are automatically pre-scheduled by the backend. Treat “first 30 days pre-scheduled” as a founder-delivered service promise only after Aaron has reviewed the file and confirmed the schedule. Do not tell a prospect that setup is automatic.
++
++Included:
++
++- Client import plus first-week scheduling (the current admin workflow creates one-time jobs; recurring rules are configured afterward if needed)
++- Founder-reviewed schedule setup for the first operating week; do not promise a 30-day setup until the operator's recurrence pattern has been confirmed
++- One live setup call or guided setup exchange
++- Route and navigation workflow
++- Invoice workflow
++- Rain-delay workflow remains owner-controlled: MowGo suggests options; the operator confirms any move
++- Direct founder support during the pilot
++
++### Risk reversal
++
++> **If we do not get your first operating week set up, we keep working until it is done.**
++
++Do not promise more jobs, revenue, hours saved, or automatic rescheduling until a real operator has produced and documented that result.
++
++### Pricing test
++
++- Free: first 5 clients, no card, self-serve
++- Solo: $39/month or $390/year
++- Crew: $79/month or $790/year
++- Concierge is a setup and onboarding experience attached to paid plans, not a free data-entry service. A pilot operator must activate the 14-day Solo trial (or another eligible paid tier) before submitting the concierge request.
++
++For the first 10 operators, the conversion question is simple:
++
++> “After we set this up and you use it on real jobs, will you keep it at $39/month?”
++
++A signup is not validation. Real usage plus payment is validation.
++
++## Why this offer should win
++
++- **Hormozi:** sells the operator's desired result and removes setup friction instead of leading with feature inventory.
++- **Becker:** narrows the niche and sells the outcome before spending on traffic; no paid ads until organic conversion is proven.
++- **Dan:** targets people already experiencing the problem, uses a pilot, and charges before calling the product validated.
++
++## What the founder must do
++
++1. Send the approved outreach below to 5 highly matched operators per weekday.
++2. Ask about the current workflow before pitching.
++3. Offer the concierge pilot only when the pain is present.
++4. Help a qualified responder activate a Solo, Crew, or Premium trial/plan before submitting concierge; free-tier users cannot submit a concierge request.
++5. Monitor the concierge queue, import clients, schedule the first week, review skipped rows, and mark the request done.
++6. Record the exact current workflow and the first measurable win.
++7. Ask for payment after the operator has used MowGo on real work.
++
++## Qualification questions
++
++Ask these in order:
++
++1. “How are you scheduling recurring lawns today?”
++2. “What happens when rain changes the day?”
++3. “How do you know what is done and who still owes you?”
++4. “What part of that process is most annoying or error-prone?”
++5. “If someone imported your current clients and set up next week for you, would you try it on real jobs?”
++
++Do not ask “Would you use an app?” That produces polite opinions, not evidence.
++
++## 30-day acceptance criteria
++
++MowGo earns the next product investment only if the outreach produces:
++
++- 15 relevant conversations
++- 3 active pilots
++- 3 operators using MowGo during a real work week
++- 2 documented measurable wins
++- 1 paid Solo conversion
++- 1 approved, genuine testimonial
++
++If these do not happen, revisit the audience, pain, or offer before adding features.
++
++## Proof rules
++
++Never publish invented numbers, screenshots, customer names, or testimonials. Capture:
++
++- Before workflow in the operator's words
++- First win in the operator's words
++- One real number: jobs moved, invoices paid, hours saved, or setup time
++- Permission to use the quote and business context
++
++## Product scope for this GTM phase
++
++Keep the core path reliable:
++
++1. Import or create clients
++2. Schedule recurring jobs
++3. View today's jobs and routes
++4. Complete a job and create/send an invoice
++5. See a rain suggestion and explicitly confirm any reschedule
++
++Do not add AI, broad CRM functionality, or new automation as a substitute for proving this path.
++
++## Sources used
++
++- Dan Martell, “How To Validate Your Startup Ideas” (`3_A5JNLeHAQ`): paying competitor users, clickable prototype/pilot, pre-buying at a discount.
++- Dan Martell, “How to Start a SaaS Business (Find the Pain)” (`0jjL3ZDpkxc`): inspect existing workflows/spreadsheets and find willingness to pay.
++- Alex Becker, “How To Get 1,000 Paying SaaS Customer FAST From Scratch” (`EsgQ0bQzvZ0`): 0–10 customers requires direct acquisition and results, not scale infrastructure.
++- MowGo proof-capture sequence: real-only proof at the operator's win moment.
++- Current competitor research: Yardbook and Jobber create a real category and pricing floor; therefore MowGo must win on simplicity and assisted setup, not merely existence of scheduling features.
++
++## Founder decision rule
++
++At zero, the founder's job is not to “do marketing” broadly. It is to create 10 operator conversations, 3 real pilots, and the first paid proof that MowGo is better than the operator's current workaround.
++
++Once that happens, the messaging, proof, and channel can scale.
++
++Until then, outreach is the product discovery system.
++
++---
++
++# Copy-paste outreach
++
++## Initial email — workflow-first
++
++**Subject:** Quick question about your lawn schedule
++
++Hi [Name]—I’m Aaron. I’m building MowGo for solo and small lawn crews.
++
++Quick question: how are you handling recurring jobs, rain changes, and invoices today—Jobber/Yardbook, a calendar, texts, or something else?
++
++I’m looking for a few Oklahoma operators willing to show me the real workflow. If it looks like a fit, I’ll import your clients and set up your first operating week so you can test it on actual jobs. No generic demo and no pressure.
++
++What are you using today?
++
++—Aaron
++
++## Follow-up — pain-specific
++
++**Subject:** Re: quick question about your lawn schedule
++
++Hi [Name]—following up because I’m specifically trying to learn how small crews handle the week when weather changes.
++
++What is the most annoying part for you right now?
++
++1. Rebuilding the schedule after rain
++2. Keeping routes and client notes together
++3. Tracking completed work and unpaid invoices
++4. Something else
++
++If you want, I can show you the workflow using your first few real clients and set it up with you.
++
++—Aaron
++
++## Pilot invitation
++
++Based on what you described, MowGo may fit.
++
++I’ll personally:
++
++- import your clients,
++- set up your first operating week,
++- show you the route, completion, invoice, and rain-delay workflows,
++- and support you while you use it on real jobs for 14 days.
++
++If it helps, Solo is $39/month after the pilot. If it does not fit, no hard feelings. Would you like to try it with your current schedule?
++
++## Facebook/DM version
++
++Hey [Name]—saw you run a small lawn crew in [City]. Quick question: are you scheduling recurring lawns through Jobber/Yardbook, a calendar, or mostly texts and memory?
++
++I’m building MowGo specifically for solo/2-person crews. I’m taking a few operators through a hands-on pilot where I import the client list and set up the first operating week for them. I’m trying to learn the real workflow, not pitch a generic app.
++
++What are you using today?
++
++## Phone opener
++
++“Hi, is this [Name]? I’m Aaron, a local developer building scheduling software for small lawn crews. I’m not calling to run you through a sales pitch. I have one quick question: how do you handle recurring jobs and rain changes today?”
++
++If they engage:
++
++“Would you be open to letting me see the workflow? If MowGo can help, I’ll set up the first week for you personally. If not, I’ll leave you alone.”
++
++## Do not say
++
++- “We will get you 30% more jobs.”
++- “We have hundreds of customers.”
++- “Nobody else does this.”
++- “Automatic rain rescheduling” when the owner must confirm the change.
++- Any customer number, testimonial, screenshot, or result that has not been verified.
++
++## Tracker fields to add for each conversation
++
++- Current system
++- Recurring job count or rough range
++- Crew size
++- Rain-change workflow
++- Invoice/payment workflow
++- Exact pain quote
++- Pilot offered?
++- Pilot scheduled?
++- First real win
++- Paid after pilot?
++- Testimonial permission?
++
++## Daily founder checklist
++
++- [ ] 5 matched outreach attempts
++- [ ] Follow up with prior responders
++- [ ] Conduct any scheduled discovery/setup call
++- [ ] Record exact words and current workflow
++- [ ] Ask for the next concrete step
++- [ ] Update the lead tracker before stopping
++
++The founder only needs to execute this list. Product changes should come from repeated evidence in these conversations—not from guessing.
++
++## Outreach source note
++
++The templates intentionally avoid unsupported market statistics and invented proof. Add a real result only after it is captured and approved under `marketing/proof-capture-sequence.md`.
+\ No newline at end of file

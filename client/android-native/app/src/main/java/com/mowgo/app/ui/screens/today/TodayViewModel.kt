@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
-import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.RainDelayHistoryStore
@@ -14,14 +13,26 @@ import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
 import com.mowgo.app.data.model.JobWithClient
 import com.mowgo.app.data.model.RainDelayEntry
+import com.mowgo.app.data.SupabaseClientProvider
+import com.mowgo.app.data.auth.AuthRepository
+import com.mowgo.app.data.sync.SyncManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.mowgo.app.BuildConfig
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * UI state for the Today screen.
@@ -45,6 +56,8 @@ data class TodayUiState(
     val showNewJobDialog: Boolean = false,
     val editingJob: JobWithClient? = null,
     val uploadingPhotoJobIds: Set<String> = emptySet(),
+    val isOffline: Boolean = false,
+    val pendingSyncCount: Int = 0,
 ) {
     val todayJobs: List<JobWithClient>
         get() {
@@ -81,18 +94,33 @@ data class TodayUiState(
 class TodayViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = JobRepository()
-    private val invoiceRepository = InvoiceRepository()
     private val photoRepository = JobPhotoRepository(repository)
     private val historyStore = RainDelayHistoryStore(application.applicationContext)
     private val weatherRepository = WeatherRepository()
     private val profileRepository = ProfileRepository()
     private var loadGeneration = 0
+    private val pendingRecurringJobs = mutableSetOf<String>()
+    private val httpClient = OkHttpClient()
 
     private val _uiState = MutableStateFlow(TodayUiState())
     val uiState: StateFlow<TodayUiState> = _uiState.asStateFlow()
 
     init {
         loadData()
+        // Skip the initial emission (already reflected in loadData()'s first pass) —
+        // only react to genuine offline→online transitions so we don't double-load at startup.
+        viewModelScope.launch {
+            SyncManager.isOnline.drop(1).collect { online ->
+                _uiState.value = _uiState.value.copy(isOffline = !online)
+                if (online) {
+                    // Wait for the queued mutations to replay before reloading remote
+                    // data — otherwise the reload can race the sync and stale server
+                    // rows would overwrite optimistic local edits that haven't synced yet.
+                    SyncManager.triggerSyncAndAwait()
+                    loadData()
+                }
+            }
+        }
     }
 
     fun loadData() {
@@ -109,6 +137,7 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                 val hasLocation = latitude != null && longitude != null
                 val forecasts = if (hasLocation) weatherRepository.forecast(latitude, longitude) else null
                 val todayForecast = forecasts?.firstOrNull { it.date == LocalDate.now().toString() } ?: forecasts?.firstOrNull()
+                val pendingSyncCount = runCatching { SyncManager.pendingMutationCount() }.getOrDefault(0)
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     jobs = jobs,
@@ -116,6 +145,8 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                     rainDelayHistory = history,
                     weatherForecast = todayForecast,
                     hasBusinessLocation = hasLocation,
+                    isOffline = !SyncManager.isOnline.value,
+                    pendingSyncCount = pendingSyncCount,
                 )
             } catch (e: Exception) {
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
@@ -133,22 +164,17 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
     fun updateJobStatus(jobId: String, newStatus: String) {
         viewModelScope.launch {
             try {
-                repository.updateJobStatus(jobId, newStatus)
-                // Auto-invoice on completion (mirrors web): idempotent per job, $0 rates skipped.
+                val completedJob = _uiState.value.jobs.firstOrNull { it.id == jobId }
+                // Auto-invoicing on completion (mirrors web) is handled by the
+                // repository so it's queued/replayed as part of the same offline
+                // mutation as the status change instead of being dropped silently.
+                repository.updateJobStatus(
+                    jobId, newStatus,
+                    invoiceClientId = completedJob?.job?.clientId,
+                    invoiceAmount = completedJob?.clientRate,
+                )
                 if (newStatus == Job.STATUS_DONE) {
-                    _uiState.value.jobs.firstOrNull { it.id == jobId }?.let { jobWithClient ->
-                        if (jobWithClient.clientRate > 0) {
-                            runCatching {
-                                invoiceRepository.createInvoiceForJob(
-                                    jobId = jobId,
-                                    clientId = jobWithClient.job.clientId,
-                                    amount = jobWithClient.clientRate,
-                                )
-                            }.onFailure { e ->
-                                if (BuildConfig.DEBUG) android.util.Log.w("TodayViewModel", "auto-invoice failed", e)
-                            }
-                        }
-                    }
+                    completedJob?.let { createNextRecurringJob(it) }
                 }
                 // Reload to get fresh state
                 loadData()
@@ -174,6 +200,49 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                     showSnackbar = "Failed to delete: ${e.message}",
                 )
             }
+        }
+    }
+
+    fun moveJob(jobId: String, newOrder: Int) {
+        viewModelScope.launch {
+            try {
+                repository.reorderJob(jobId, newOrder)
+                loadData()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(showSnackbar = "Failed to reorder: ${error.message}")
+            }
+        }
+    }
+
+    private suspend fun createNextRecurringJob(jobWithClient: JobWithClient) {
+        val recurrence = jobWithClient.recurrenceRule?.takeUnless { it == "none" } ?: return
+        val nextDate = when (recurrence) {
+            "daily" -> LocalDate.parse(jobWithClient.scheduledDate).plusDays(1)
+            "weekly" -> LocalDate.parse(jobWithClient.scheduledDate).plusWeeks(1)
+            "biweekly" -> LocalDate.parse(jobWithClient.scheduledDate).plusWeeks(2)
+            "monthly" -> LocalDate.parse(jobWithClient.scheduledDate).plusMonths(1)
+            else -> return
+        }.toString()
+        val dedupeKey = "${jobWithClient.clientId}:$nextDate:${jobWithClient.title}"
+        val alreadyExists = _uiState.value.jobs.any {
+            it.clientId == jobWithClient.clientId && it.scheduledDate == nextDate && it.title == jobWithClient.title
+        }
+        if (alreadyExists || !pendingRecurringJobs.add(dedupeKey)) return
+        try {
+            repository.createJob(
+                jobWithClient.job.copy(
+                    id = "",
+                    scheduledDate = nextDate,
+                    status = Job.STATUS_SCHEDULED,
+                    routeOrder = 99,
+                    photoUrl = null,
+                )
+            )
+            _uiState.value = _uiState.value.copy(showSnackbar = "Next ${recurrence.replaceFirstChar { it.uppercase() }} job created")
+        } catch (error: Exception) {
+            _uiState.value = _uiState.value.copy(showSnackbar = "Job completed, but recurring job failed: ${error.message}")
+        } finally {
+            pendingRecurringJobs.remove(dedupeKey)
         }
     }
 
@@ -214,6 +283,7 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val entry = repository.rainDelay(sourceDate, targetDate)
                 val history = if (entry == null) historyStore.load() else historyStore.add(entry)
+                if (entry != null) viewModelScope.launch { sendRainDelaySms(entry, targetDate) }
                 _uiState.value = _uiState.value.copy(
                     showRainDelayDialog = false,
                     isApplyingRainDelay = false,
@@ -227,6 +297,39 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                     showSnackbar = "Failed to delay: ${e.message}",
                 )
             }
+        }
+    }
+
+    private suspend fun sendRainDelaySms(entry: RainDelayEntry, delayDate: String) {
+        if (!SupabaseClientProvider.isConfigured || entry.jobIds.isEmpty()) return
+        val token = AuthRepository().currentSession?.accessToken ?: return
+        val movedJobs = _uiState.value.jobs.filter { it.id in entry.jobIds }
+        val body = JSONObject()
+            .put("jobIds", JSONArray(entry.jobIds))
+            .put("targetDate", delayDate)
+            .put("delays", JSONArray().apply {
+                movedJobs.forEach { job ->
+                    put(JSONObject()
+                        .put("jobId", job.id)
+                        .put("clientId", job.clientId)
+                        .put("delayDate", delayDate))
+                }
+            })
+            .toString()
+        runCatching {
+            withContext(Dispatchers.IO) {
+                val request = Request.Builder()
+                    .url("${BuildConfig.SUPABASE_URL}/functions/v1/send-rain-delay-sms")
+                    .header("Authorization", "Bearer $token")
+                    .header("apikey", BuildConfig.SUPABASE_ANON_KEY)
+                    .post(body.toRequestBody("application/json".toMediaType()))
+                    .build()
+                httpClient.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) throw IllegalStateException("Rain-delay SMS returned ${response.code}")
+                }
+            }
+        }.onFailure { error ->
+            if (BuildConfig.DEBUG) android.util.Log.w("TodayViewModel", "rain-delay SMS failed", error)
         }
     }
 
@@ -266,6 +369,7 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
         scheduledTime: String?,
         notes: String?,
         routeOrder: Int?,
+        recurrenceRule: String,
     ) {
         viewModelScope.launch {
             try {
@@ -277,6 +381,7 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                     notes = notes,
                     routeOrder = routeOrder,
                     status = Job.STATUS_SCHEDULED,
+                    recurrenceRule = recurrenceRule.takeUnless { it == "none" },
                 )
                 repository.createJob(job)
                 _uiState.value = _uiState.value.copy(

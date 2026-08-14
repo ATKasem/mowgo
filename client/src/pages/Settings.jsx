@@ -1,12 +1,12 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
-import { loadProfile, saveProfile, updateLeadAlertsEnabled, updateRainAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport } from '../lib/data';
+import { loadProfile, saveProfile, updateLeadAlertsEnabled, updateRainAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport, loadReferralStats } from '../lib/data';
 import { downloadCsv, toCsv } from '../lib/csv';
 import { TEAM_MEMBER_COLORS, TEAM_ACCESS_TIERS, hasTeamAccess } from '../lib/constants';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
-import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, DollarSign } from 'lucide-react';
+import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, DollarSign, Gift } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 import ConciergeSetup from '../components/ConciergeSetup';
@@ -39,6 +39,10 @@ export default function Settings() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [conciergeRequest, setConciergeRequest] = useState(undefined);
   const [showConcierge, setShowConcierge] = useState(false);
+  const [referralStats, setReferralStats] = useState(null);
+  const [referralLoading, setReferralLoading] = useState(true);
+  const [referralError, setReferralError] = useState('');
+  const [referralCopied, setReferralCopied] = useState(false);
 
   const [notifyOnComplete, setNotifyOnComplete] = useState(() => localStorage.getItem('mf_notify_complete') !== 'false');
   const [reviewPrompts, setReviewPrompts] = useState(() => localStorage.getItem('mf_review_prompts') !== 'false');
@@ -92,6 +96,16 @@ export default function Settings() {
       });
     return () => { active = false; };
   }, [user]);
+
+  useEffect(() => {
+    let active = true;
+    setReferralLoading(true);
+    loadReferralStats()
+      .then(stats => { if (active) setReferralStats(stats); })
+      .catch(err => { if (active) setReferralError(err.message || tr('Failed to load referral program')); })
+      .finally(() => { if (active) setReferralLoading(false); });
+    return () => { active = false; };
+  }, [user?.id]);
 
   useEffect(() => {
     let active = true;
@@ -416,6 +430,45 @@ export default function Settings() {
             </>
           )}
         </form>
+
+        <SectionHeader>{tr('Referrals')}</SectionHeader>
+        <div className="card p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <Gift className="w-4 h-4 text-brand" />
+            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm">{tr('Give a month, earn a month')}</h4>
+          </div>
+          {referralLoading ? <div className="flex justify-center py-5"><Loader2 className="w-5 h-5 text-brand animate-spin" /></div> : referralError ? (
+            <p role="alert" className="text-sm text-red-600 dark:text-red-400">{referralError}</p>
+          ) : referralStats?.code ? (
+            <>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 p-4">
+                <code className="font-mono text-2xl font-bold tracking-[0.18em] text-brand">{referralStats.code}</code>
+                <button type="button" className="btn-secondary sm:ml-auto" onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(referralStats.code);
+                    setReferralCopied(true); setTimeout(() => setReferralCopied(false), 1500);
+                  } catch { setReferralError(tr('Unable to copy referral code')); }
+                }}><Copy className="w-4 h-4" />{referralCopied ? tr('Copied!') : tr('Copy code')}</button>
+                <button type="button" className="btn-primary" onClick={async () => {
+                  const link = `https://mowgoapp.com?ref=${encodeURIComponent(referralStats.code)}`;
+                  try {
+                    if (navigator.share) await navigator.share({ title: 'MowGo', text: tr('Try MowGo with my referral code'), url: link });
+                    else await navigator.clipboard.writeText(link);
+                  } catch (err) { if (err?.name !== 'AbortError') setReferralError(tr('Unable to share referral link')); }
+                }}>{tr('Share referral link')}</button>
+              </div>
+              <p className="text-xs text-[var(--color-text-muted)] break-all">{`https://mowgoapp.com?ref=${referralStats.code}`}</p>
+              <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">
+                {tr("You've referred {{total}} people. {{earned}} have signed up.", { total: referralStats.total_count, earned: referralStats.earned_count })}
+              </p>
+              <div className="grid grid-cols-1 gap-2">
+                {[[tr('Reward balance'), `${referralStats.earned_count ?? 0} ${tr('free months')}`]].map(([label, value]) => (
+                  <div key={label} className="rounded-lg border border-gray-100 dark:border-gray-800 p-3 text-center"><div className="text-xl font-bold text-[var(--color-text-primary)] dark:text-white">{value ?? 0}</div><div className="text-xs text-[var(--color-text-muted)]">{label}</div></div>
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
 
         {!isDemoMode() && conciergeEligible && conciergeRequest !== undefined && !activeConciergeRequest && conciergeRequest?.status !== 'done' && (
           showConcierge ? <ConciergeSetup onDone={(request) => { setConciergeRequest(request); setShowConcierge(false); }} /> : (

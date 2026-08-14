@@ -24,6 +24,8 @@ data class Profile(
     @SerialName("trial_ends_at") val trialEndsAt: String? = null,
     @SerialName("latitude") val latitude: Double? = null,
     @SerialName("longitude") val longitude: Double? = null,
+    @SerialName("rain_alerts_enabled") val rainAlertsEnabled: Boolean = true,
+    @SerialName("lead_alerts_enabled") val leadAlertsEnabled: Boolean = true,
 ) {
     /** True while a 14-day app trial is active (trialTier set, not expired). */
     val hasActiveTrial: Boolean
@@ -62,3 +64,10 @@ data class Profile(
             else -> trialTier
         }
 }
+
+@Serializable
+data class ReferralStatus(
+    val code: String = "",
+    @SerialName("total_count") val totalCount: Int = 0,
+    @SerialName("earned_count") val earnedCount: Int = 0,
+)

@@ -430,6 +430,10 @@ struct UserProfile: Codable, Identifiable {
     var venmoHandle: String?
     var cashappHandle: String?
     var zelleHandle: String?
+    /// Server-side proactive weather-alert push pipeline opt-in (`profiles.rain_alerts_enabled`).
+    var rainAlertsEnabled: Bool = true
+    /// Instant new-lead push notification opt-in (`profiles.lead_alerts_enabled`), paid tiers only.
+    var leadAlertsEnabled: Bool = true
     var createdAt: String?
     /// Trial-first no-card flow: plan granted during trial + expiry.
     /// `select=*` in fetchProfile picks these up automatically.
@@ -474,6 +478,18 @@ struct UserProfile: Codable, Identifiable {
         case "premium": "Premium"
         default: tier ?? NSLocalizedString("Free", comment: "Subscription tier name: free plan")
         }
+    }
+}
+
+struct ReferralStatus: Codable, Equatable {
+    let code: String
+    let totalCount: Int
+    let earnedCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case code
+        case totalCount = "total_count"
+        case earnedCount = "earned_count"
     }
 }
 

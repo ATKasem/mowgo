@@ -1,0 +1,339 @@
+{
+  "scan_ts": "2026-08-13T12:00:00Z",
+  "scan_label": "7am CST — Thu Aug 13 (window since Aug 9 12:45Z scan; ~100 new bot msgs in #mowgo, 21 in #leads, 0 in #cowork; ZERO human messages anywhere — Blasian silent Day 16)",
+  "channels_scanned": {
+    "mowgo": {
+      "channel_id": "1529248227394850916",
+      "status": "100 messages fetched (Aug 7–Aug 13). ALL bot: Intel Engine, Stripe health, Lead Nurture, Invoice reminders, SMS sender, Reddit kit cron. ZERO human messages.",
+      "last_human_msg": "Blasian — 'How would we get leads for MowGo' 2026-07-28T17:03Z (Day 16 of silence; ✅ reaction still no reply)"
+    },
+    "cowork": {
+      "channel_id": "1529736297847980153",
+      "status": "✅ EMPTY — 0 messages. Clean since Aug 6.",
+      "note": "Nothing to do."
+    },
+    "leads": {
+      "channel_id": "1529707289014042804",
+      "status": "21 messages fetched (Jul 26–Aug 12). ALL bot: SMS sender runs, Rule of 100 drafts, lead discovery. Last human = Blasian Jul 28. ✅ reaction, no reply. Day 16.",
+      "note": "SMS sender partially working — ~2/10 send, ~8/10 'campaign not approved yet' error. Rule of 100 failed Aug 12 (402 credits)."
+    }
+  },
+  "overnight_messages_needing_attention": [
+    {
+      "id": "intel_engine_recovered",
+      "ts": "2026-08-13T02:39:00Z",
+      "content": "⚠️ Intel Engine DOWN Aug 12 06:38→22:39Z (HTTP 402 — credit exhaustion), then RECOVERED Aug 13 02:39Z. Ran full BI report: 10 new Reddit threads found. Top ICP match: r/smallbusiness 'FSM recs no fancy features' (1vmknrg) — exact MowGo ICP. Also found 5 more threads including r/CRM solo operator thread.",
+      "significance": "HIGH — Engine recovered on its own (credits refreshed). 10 new threads discovered including prime ICP targets. r/sweatystartup banned all software posts — major outreach channel LOST.",
+      "action": "Part 2: review full BI report at bi_report_2026-08-13_1048.md; bank r/sweatystartup ban note; update outreach sub list."
+    },
+    {
+      "id": "sms_sender_campaign_errors",
+      "ts": "2026-08-12T14:00:00Z",
+      "content": "📲 SMS sender ran Aug 12: 10 sent, 10 'API error (campaign not approved yet?)'. Same pattern Aug 11 run: 2 queued (NG Outdoor, Frankies), 8 errored. The campaign approval issue is persistent — 10/10 errored on Aug 12, 8/10 on Aug 11.",
+      "significance": "HIGH — SMS delivery is BROKEN. Only 2 texts actually sent across 2 runs (NG Outdoor, Frankies). The rest hit A2P campaign approval gates. This needs Aaron to approve the messaging campaign in the SMS provider dashboard.",
+      "action": "Aaron: approve A2P 10DLC campaign in Twilio/SMS provider dashboard. The queue has 29+ texts waiting."
+    },
+    {
+      "id": "reddit_mon_slot_failed",
+      "ts": "2026-08-11T22:23:00Z",
+      "content": "❌ Mon Aug 11 22:23Z Reddit slot cron FAILED: 'Skipped to prevent unintended spend: global inference co...' — the kit (① #55 1vi1hcj → ② #57 1vi8tr3 → ③ #43 1vfyg2j) never fired. Kit post MISSED entirely.",
+      "significance": "HIGH — the slot was the first legal window after Fri's post (96h gate) and it didn't fire. Next slot: Fri Aug 14 22:23Z (96h gate from Mon). Need to check if kit threads are still alive.",
+      "action": "Part 2: verify liveness of #55 1vi1hcj, #57 1vi8tr3, #43 1vfyg2j; create Fri 22:23Z one-shot if threads still viable."
+    },
+    {
+      "id": "stripe_health_recovered",
+      "ts": "2026-08-13T09:12:00Z",
+      "content": "✅ Stripe health check recovered: both domains serve identical bundle (hash `index-HnDaX_xE.js` — NEW since Aug 9's Bt0NtHLK.js). All endpoints green. No pk/sk leaks. Functions deployed and auth-gated. Only unproven link: real logged-in checkout (Aaron, Day 30+).",
+      "significance": "MEDIUM — positive. New bundle hash suggests redeploy. Still awaiting Aaron's manual checkout.",
+      "action": "None bot-side."
+    },
+    {
+      "id": "lead_nurture_api_key_invalid",
+      "ts": "2026-08-12T14:30:00Z",
+      "content": "❌ Lead Nurture (Day2/Day7) failed: 0 sent, 0 sms. Email to aaronkasemt@gmail.com returned 401 'API key is invalid'. The nurture SMTP/email API key has expired or been rotated.",
+      "significance": "MEDIUM — downstream email automation is broken. Day-2 and Day-7 follow-ups to leads not sending.",
+      "action": "Part 2: check/rotate email API key (Resend/SendGrid/etc.) in env."
+    },
+    {
+      "id": "sweatystartup_ban",
+      "ts": "2026-08-13T10:48:00Z",
+      "content": "🚫 r/sweatystartup just banned all software/website posts. This was MowGo's best outreach sub (previous Reddit kit targets frequently came from here). Kills that outreach lane entirely.",
+      "significance": "MEDIUM-HIGH — redirect outreach strategy. Shift to r/landscaping, r/CRM, r/LawnCarePros as noted by Intel Engine.",
+      "action": "Part 2: update Reddit kit rules to exclude r/sweatystartup; document replacement subs."
+    },
+    {
+      "id": "jobber_promo_ended",
+      "ts": "2026-08-13T10:48:00Z",
+      "content": "📊 Jobber's 'Starting at $24/mo' promo expired Aug 12 midnight PT. Anchor is back to $29. First time their pricing got worse, not better. Good timing for compare-page update.",
+      "significance": "MEDIUM — messaging opportunity. 'Jobber's entry price just went up, ours stayed flat.' Update compare page.",
+      "action": "Part 2: update compare page with Jobber $29 anchor (was $24)."
+    },
+    {
+      "id": "rule_of_100_failed_402",
+      "ts": "2026-08-12T15:00:00Z",
+      "content": "⚠️ Rule of 100 — daily MowGo content + outreach failed: HTTP 402 credit exhaustion. Same root cause as Intel Engine. Wave-5 drafts (10 texts + 3 posts) from Aug 11 likely not posted/sent.",
+      "significance": "MEDIUM — content pipeline stalled. Drafts exist but weren't sent.",
+      "action": "Part 2: check if wave-5 drafts logged to sms_queue; monitor credit status."
+    }
+  ],
+  "open_tasks": {
+    "critical": [
+      {
+        "id": "sms_campaign_approval",
+        "title": "SMS A2P campaign approval — 90% of texts hitting 'campaign not approved yet' error",
+        "days_open": 2,
+        "owner": "Aaron (SMS provider dashboard)",
+        "status": "🔴 BLOCKING — only 2/20 texts sent across 2 runs (NG Outdoor, Frankies). 18+ errored. Queue has ~29 texts waiting including wave-5 drafts."
+      },
+      {
+        "id": "reddit_slot_missed",
+        "title": "Mon Aug 11 22:23Z Reddit slot FAILED — kit never fired. Next slot Fri Aug 14 22:23Z (96h gate)",
+        "days_open": 2,
+        "owner": "Bot",
+        "status": "🔴 SLOT MISSED — cron skipped due to 'unintended spend' guard. Need to verify kit thread liveness for Fri."
+      },
+      {
+        "id": "lead_nurture_broken",
+        "title": "Lead Nurture API key invalid (401) — no Day-2/Day-7 follow-up emails sending",
+        "days_open": 1,
+        "owner": "Aaron/Ops",
+        "status": "🔴 BROKEN — email nurture pipeline halted."
+      },
+      {
+        "id": "blasian_leads_question",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 16; ✅ reaction, no reply",
+        "days_open": 16,
+        "owner": "Aaron (manual)",
+        "status": "🔴 UNANSWERED — Day 16. Draft ready (leads/blasian-reply-draft-2026-08-01.md). Human loop dead 16 days."
+      },
+      {
+        "id": "emerge_followup",
+        "title": "Lead follow-ups Day 15 — 5 contacted Jul 29-31, 0 replies; 2nd follow-up 8+ days overdue",
+        "days_open": 15,
+        "owner": "Aaron (manual)",
+        "status": "🔴 OVERDUE — Emerge Lawns, Metro Green, Bigfoot Lawns, Simply LawnCare, Campbell & Sons. Zero replies. 10 min work."
+      },
+      {
+        "id": "reddit_48_manual_paste",
+        "title": "Manually paste #48 reply in 'boring local service' thread — AutoMod-filtered Aug 6",
+        "days_open": 7,
+        "owner": "Aaron/Blasian (manual)",
+        "status": "🆕 STILL FILTERED Day 7"
+      },
+      {
+        "id": "stripe_e2e_verify",
+        "title": "Logged-in e2e checkout — Day 30+, ONLY unproven Stripe link",
+        "days_open": 30,
+        "owner": "Aaron (manual)",
+        "status": "🟡 STILL UNPROVEN — bundles show new hash (index-HnDaX_xE.js)"
+      },
+      {
+        "id": "softwareworld_submit",
+        "title": "Submit MowGo to directories (Capterra/G2/SoftwareAdvice/GetApp) — Day 33+",
+        "days_open": 33,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — zero listicle presence. r/sweatystartup ban makes directory presence more important."
+      }
+    ],
+    "medium": [
+      {
+        "id": "intel_engine_credits",
+        "title": "Intel Engine credit cliff — recovered but ran out Aug 12 (402 errors for ~20h). Next exhaustion could be longer.",
+        "days_open": 5,
+        "owner": "Bot/Ops",
+        "status": "🟡 RECOVERED (credits refreshed before Aug 13 02:39Z run). Monitor balance."
+      },
+      {
+        "id": "sweatystartup_ban",
+        "title": "r/sweatystartup banned all software posts — best outreach sub lost",
+        "days_open": 1,
+        "owner": "Bot",
+        "status": "🆕 NEW — shift to r/landscaping, r/CRM, r/LawnCarePros"
+      },
+      {
+        "id": "cf_tokens_dead",
+        "title": "BOTH Cloudflare API tokens dead (10000 error) — blocks cf_check/wrangler",
+        "days_open": 7,
+        "owner": "Aaron",
+        "status": "🔴 STILL DEAD — git push deploys still work"
+      },
+      {
+        "id": "quotes_v1",
+        "title": "Minimal Quotes v1 — #1 BUILD PRIORITY",
+        "days_open": 14,
+        "owner": "Dev",
+        "status": "🚀 UNCHANGED"
+      },
+      {
+        "id": "missed_call_textback",
+        "title": "Missed-call text-back (Twilio) — THE wedge vs AI receptionist arms race",
+        "days_open": 8,
+        "owner": "Dev",
+        "status": "S effort, after rain-delay SMS"
+      },
+      {
+        "id": "level_billing",
+        "title": "Level billing — #1 DROUGHT FEATURE",
+        "days_open": 6,
+        "owner": "Dev",
+        "status": "M effort"
+      },
+      {
+        "id": "compare_page_update",
+        "title": "Compare page: update Jobber $24→$29 anchor + add Servinix $300 row",
+        "days_open": 5,
+        "owner": "Bot/Dev",
+        "status": "QUEUED — Jobber promo ended Aug 12, now more urgent"
+      }
+    ],
+    "low": [
+      {
+        "id": "trial_length_decision",
+        "title": "Decide trial 7 vs 14 days",
+        "owner": "Aaron",
+        "status": "⏳ Unchanged"
+      },
+      {
+        "id": "free_tier_gap",
+        "title": "Free-tier gap — MowGo Free 5 clients vs LawnPro Free 25",
+        "owner": "Aaron",
+        "status": "Unchanged"
+      },
+      {
+        "id": "concierge_e2e_test",
+        "title": "Trigger one real concierge request",
+        "owner": "Aaron",
+        "status": "Pending"
+      }
+    ],
+    "closed_since_last_scan": [
+      "intel_engine_402 → ✅ RECOVERED: credits refreshed, ran full BI Aug 13 02:39Z and 10:48Z. 10 new threads found.",
+      "stripe_health_402 → ✅ RECOVERED: Aug 13 09:12Z all green. New bundle hash index-HnDaX_xE.js both domains.",
+      "sms_sender → ⚠️ PARTIAL: cron resumed (was paused Aug 6-10). Running again but ~80% failing on campaign approval.",
+      "wave_4_drafts → ✅ POSTED: Campbell & Sons, Nutri-Green, Hicks, Eberly's, LBR, Aguilar Brothers drafts posted Aug 7.",
+      "wave_5_drafts → ✅ POSTED: NG Outdoor, Frankies, A Plus, J&C, Thogy's, Mow-Town, Premier, Scott's, J&Jays, Nutri-Green posted Aug 11."
+    ]
+  },
+  "blockers_for_aaron": [
+    {
+      "blocker": "SMS A2P campaign not approved — ~90% of texts bounce with 'campaign not approved yet'",
+      "detail": "Only 2 texts ever sent (NG Outdoor, Frankies). ~18+ errored across Aug 11+12 runs. Queue has ~29 texts. Needs your approval in Twilio/SMS provider dashboard under A2P 10DLC campaign settings."
+    },
+    {
+      "blocker": "Reddit Mon slot FAILED — kit #55/#57/#43 never posted. Next slot Fri Aug 14 22:23Z.",
+      "detail": "Cron skipped due to spend guard. Need thread liveness check before scheduling Fri."
+    },
+    {
+      "blocker": "Lead Nurture email API key invalid (401) — Day-2/Day-7 emails dead",
+      "detail": "Email to aaronkasemt@gmail.com returned 'API key is invalid'. Check Resend/SendGrid API key in env."
+    },
+    {
+      "blocker": "Blasian silent Day 16; leads question unanswered; human loop dead 16 days",
+      "detail": "Draft ready. Same one-session requirement as #48 manual paste."
+    },
+    {
+      "blocker": "Lead follow-ups Day 15 — 5 emails, 0 replies, 2nd follow-up 8+ days overdue",
+      "detail": "Emerge Lawns, Metro Green, Bigfoot Lawns, Simply LawnCare, Campbell & Sons. 10 min work."
+    },
+    {
+      "blocker": "r/sweatystartup banned all software posts — best outreach sub lost",
+      "detail": "Shift strategy to r/landscaping, r/CRM, r/LawnCarePros. Also amplifies need for directory presence."
+    },
+    {
+      "blocker": "CF API tokens dead Day 7 + Stripe checkout Day 30+ + SoftwareWorld Day 33+",
+      "detail": "Same three one-click items. CF: re-auth in dashboard. Stripe: one checkout. Directories: 10 min each."
+    }
+  ],
+  "quick_wins_sub_30min": [
+    {
+      "id": "reddit_kit_liveness_check",
+      "title": "Verify #55 1vi1hcj, #57 1vi8tr3, #43 1vfyg2j thread liveness for Fri slot",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "HIGH — determines if Fri 22:23Z slot is feasible"
+    },
+    {
+      "id": "fri_slot_cron",
+      "title": "Create one-shot cron for Fri Aug 14 22:23Z with verified kit; encode liveness-check pre-step",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "HIGH — locks next Reddit slot"
+    },
+    {
+      "id": "compare_page_jobber_servinix",
+      "title": "Update compare page: Jobber $24→$29 anchor (promo expired) + add Servinix $300 AI row",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — live page prospect-facing; pricing delta grew"
+    },
+    {
+      "id": "sweatystartup_ban_doc",
+      "title": "Document r/sweatystartup ban in Reddit outreach rules; update sub list to r/landscaping/r/CRM/r/LawnCarePros",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — prevents wasting future slot on banned sub"
+    },
+    {
+      "id": "intel_report_review",
+      "title": "Review BI report bi_report_2026-08-13_1048.md — top 3 ICP threads: 1vmknrg (FSM recs), r/CRM solo op, +3 more",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — find best thread for Fri kit"
+    },
+    {
+      "id": "copy_flags_bank",
+      "title": "Bank flags: Jobber promo expired ($24→$29), r/sweatystartup ban, FieldProxy AI rescheduling, ProBase/GreenRoute new competitors, 10 new Reddit threads",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — fuel for W33 digest + Friday slot copy"
+    },
+    {
+      "id": "lead_nurture_key_check",
+      "title": "Check/rotate email API key for Lead Nurture cron — diagnose 401 'API key is invalid'",
+      "estimate": "10 min",
+      "owner": "Bot/Ops",
+      "impact": "MEDIUM — unblocks email nurture pipeline"
+    },
+    {
+      "id": "sms_manual_sends",
+      "title": "IF A2P campaign gets approved: send ~29 queued texts manually from wave-4+5 drafts",
+      "estimate": "15 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — first SMS wave after 2 weeks"
+    },
+    {
+      "id": "followup_emails",
+      "title": "Send 5 overdue lead follow-ups (Day 15) — 2nd follow-up overdue 8+ days",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — warm leads going cold"
+    },
+    {
+      "id": "blasian_reply",
+      "title": "Post Blasian reply + #48 manual paste (one session) — Day 16 silence",
+      "estimate": "5 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — restarts human loop"
+    }
+  ],
+  "pricing_status": {
+    "recommendation": "HOLD $39/$79 flat. Jobber's promo ending ($24→$29 anchor) is the best messaging opportunity in weeks — their entry point went up, ours stayed flat. r/sweatystartup ban increases importance of directory presence (Capterra/G2). SMS pipeline still broken on campaign approval.",
+    "new_this_scan": [
+      "Jobber 'Starting at $24/mo' promo expired Aug 12 midnight PT — anchor back to $29",
+      "r/sweatystartup banned all software/website posts — best outreach sub lost",
+      "FieldProxy expanding AI features: cascade rescheduling, seasonal transition management",
+      "ProBase and GreenRoute identified as new competitors in recent Intel runs",
+      "Intel Engine recovered after ~20h of 402 failures (Aug 12 06:38→22:39Z)",
+      "SMS sender now running but ~80% fail on A2P campaign approval"
+    ],
+    "copy_flags_banked": [
+      "Jobber's entry price went up. Ours didn't. $39 flat vs $29+ ladder.",
+      "r/sweatystartup killed software posts — the grassroots Reddit outreach lane is closing. Directory presence matters more now.",
+      "SMS delivery is broken at the carrier approval level, not the code level.",
+      "Intel Engine runs on credits — 20h outage means monitoring laps need a credit buffer.",
+      "FieldProxy's AI cascade rescheduling is Rain Delay v2 at 10× depth — watch for feature gap."
+    ]
+  },
+  "summary": "🔥 CRITICAL: Reddit Mon slot FAILED (kit #55/#57/#43 never posted). Next slot Fri Aug 14 22:23Z — verify liveness. SMS pipeline BROKEN — ~90% of texts hit 'campaign not approved yet' (only 2/20 ever sent). A2P campaign approval needed in Twilio dashboard. Lead Nurture email dead (401 API key invalid). r/sweatystartup banned all software posts — best outreach sub LOST. Intel Engine recovered after ~20h 402 outage (credit exhaustion). Stripe health recovered (new bundle hash). Blasian silent Day 16 (leads question Jul 28, ✅ only). Lead follow-ups Day 15, 0 replies. Aaron plate: SMS campaign approval · email API key fix · Reddit Fri slot (bot creates) · Blasian reply + #48 paste (same session) · 5 follow-up emails · directory submissions Day 33 · CF tokens Day 7 · Stripe checkout Day 30+. Bot Part 2: verify thread liveness for Fri slot, create Fri 22:23Z cron, update compare page ($24→$29), document r/sweatystartup ban, review BI report for top ICP threads.",
+  "vault_files_written": []
+}

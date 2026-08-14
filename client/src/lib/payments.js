@@ -64,6 +64,11 @@ export async function resumeCheckoutIntent() {
   }
   resumeInFlight = true;
   try {
+    const { data: { user }, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !user) {
+      return { status: 'error', message: 'Not authenticated', retryable: true };
+    }
+
     // Expire any past trial first so tier reverts to free (grant can then re-grant).
     // Best-effort — RPC failure does not block the grant attempt.
     try { await supabase.rpc('expire_trial'); } catch { /* non-fatal */ }

@@ -1,0 +1,77 @@
+## MowGo Profile Save Bug — Review Findings
+
+### FINDING 1 — CRITICAL: All profile saves fail, not just Business Location
+
+**File:** `client/src/lib/data.js:1175-1181`
+
+```js
+const { error } = await supabase.from('profiles').upsert({
+  id: user.id, business_name, phone, latitude, longitude,
+  preferred_nav_app: preferred_nav_app || null,
+  venmo_handle: venmo_handle || null,
+  cashapp_handle: cashapp_handle || null,
+  zelle_handle: zelle_handle || null,
+});
+```
+
+**Root cause (verified live, not inferred):** `saveProfile()` is the single save handler for the entire web Settings form — `Settings.jsx:117` calls it for business name, phone, payment handles, *and* location, all in one `save()` submit. It uses `.upsert()`, which PostgREST compiles to `INSERT ... ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id, business_name = EXCLUDED.business_name, ...` — every column present in the payload, **including the primary key `id`**, goes into the `SET` clause.
+
+`002_crew_features.sql:79` did a blanket `REVOKE UPDATE ON profiles FROM authenticated`, then re-granted UPDATE per-column (`business_name, phone` in 002; `latitude, longitude` in 013; `preferred_nav_app`, `venmo_handle`/`cashapp_handle`/`zelle_handle` in later migrations). **No migration ever grants column-level UPDATE on `id`** — correctly, since a user should never be able to change their own row's primary key. But because `id` rides along in the upsert payload, Postgres rejects the *entire statement* the moment it tries to `SET id = EXCLUDED.id`.
+
+I reproduced this exactly against the live linked DB, running as the `authenticated` role with `auth.uid()` set to a real profile id:
+
+```
+ERROR:  42501: permission denied for table profiles
+HINT:  Grant the required privileges to the current role with: GRANT UPDATE ON public.profiles TO authenticated;
+```
+— byte-identical error class to the screenshot. The identical statement with `id` **omitted** from the `SET` clause succeeds cleanly.
+
+**This is not a location-specific bug.** Every profile row already exists at this point (created synchronously by the `handle_new_user()` `SECURITY DEFINER` trigger, `001_initial_schema.sql:66`, on signup), so `.upsert()` always takes the `ON CONFLICT DO UPDATE` path and always includes `id`. Saving business name or phone alone hits the same failure — location is simply the most recently touched field, likely the first to draw attention because it's a new, isolated action in the UI.
+
+**Git history confirms this is a long-standing regression, not new:** `saveProfile()` has used `.upsert({id: user.id, ...profile})` since the data layer was introduced (`146cfd0`). It worked fine until `0fb0201` ("crew tier...") added `002_crew_features.sql`'s `REVOKE UPDATE`, which silently broke it. `013_profile_location.sql` (location feature) didn't introduce the bug — it just added two more columns to an already-broken save path.
+
+**Data-loss implication:** None — the failure is atomic (whole statement rejected), so no partial/corrupt writes. But it is a **total, silent-until-now regression of a core feature**: no web user has been able to save any Settings field (business name, phone, Venmo/CashApp/Zelle, location) since the crew-features migration shipped, unless privileges drifted differently in prod than what the migrations imply.
+
+**Fix (smallest safe change):** Switch from `upsert` to a scoped `update`, matching the pattern already used elsewhere in the same file (`updateLeadAlertsEnabled`, `data.js:1190`) and on both native clients:
+
+```js
+const { error } = await supabase.from('profiles').update({
+  business_name, phone, latitude, longitude,
+  preferred_nav_app: preferred_nav_app || null,
+  venmo_handle: venmo_handle || null,
+  cashapp_handle: cashapp_handle || null,
+  zelle_handle: zelle_handle || null,
+}).eq('id', user.id);
+```
+No migration/grant change needed — the column-level UPDATE grants already correctly cover every field being written; `update()` never touches `id`. No INSERT path is required since the row always pre-exists via the signup trigger.
+
+**Regression tests required:**
+1. Settings save with only business_name/phone changed (no location) — must succeed (this was silently broken before location was ever added).
+2. Settings save with latitude/longitude set via geocode, and with location removed (nulled) — round-trip.
+3. Settings save of payment handles (venmo/cashapp/zelle) and `preferred_nav_app`.
+4. A grep/lint guard (or code comment, consistent with the one already in `ProfileRepository.kt:46-48`) against reintroducing `.upsert()` on `profiles` from client code.
+
+---
+
+### FINDING 2 — LOW: `profiles` RLS INSERT policy live in prod is undocumented and unrestricted
+
+**Evidence (live DB, `pg_policy` on `public.profiles`):** a policy named `"Insert profile"` exists with `polcmd = 'a'` (INSERT) and `WITH CHECK (true)` — applying to all roles, with no `auth.uid() = id` restriction. This policy (along with `"Own profile"` and `"Update profile"`) is **not present in any checked-in migration file** — consistent with CLAUDE.md's note that "007-018 applied out-of-band" and prod has drifted from the migration history.
+
+**Exploit path:** any authenticated user could `INSERT` a `profiles` row for an arbitrary `id`, including columns with no column-level grant restriction on INSERT (table-level INSERT is granted wholesale to `authenticated`) — e.g. `role`, `business_id`, `tier`. This is only exploitable for an `auth.users` id that doesn't yet have a profile row (blocked by PK + the FK to `auth.users(id)`), so the practical window is a signup race or an id whose profile was later deleted — narrow, but real and unintended given the `handle_new_user` trigger is clearly meant to be the sole creation path.
+
+**Fix:** tighten to `WITH CHECK (auth.uid() = id)` and add it to a migration file so prod state matches the repo (closes both the narrow authz gap and the documentation drift).
+
+---
+
+### Cross-platform check (verified by sub-agent, both native clients read-only reviewed)
+
+- **iOS/Android do not have this bug.** Neither uses `.upsert()` on `profiles`; both use scoped `PATCH`/`update()` filtered by `id`, with `id` never in the write body (`AuthService.swift:193-203`, `SupabaseService.swift:533-536`, `ProfileRepository.kt:49-57`).
+- **Business Location is web-only.** iOS (`Models.swift:426-428`) and Android (`Profile.kt:14-15`, `UserProfile.kt:25-26`) both decode `latitude`/`longitude` for read-only display (iOS weather card) but have **no Settings UI to edit it** — this is an absent-UI parity gap, not a defect, since the underlying `profiles` schema and grants already support it identically on both platforms if a future PR adds the UI.
+- Android's `ProfileRepository.kt:46-48` has an explicit comment warning that including ungranted columns (e.g. `email`) in an update "rejects the whole update" — the team has already internalized this column-grant fragility for `update()`; **the same lesson was never applied to the `upsert()` call in web's `data.js`.**
+
+---
+
+### SHIP/NO-SHIP: **NO-SHIP**
+
+Finding 1 is a confirmed, reproduced, CRITICAL-impact regression that blocks the entire Settings save flow on web (not just location) for every user — must be fixed before any deploy claiming this bug is resolved. Finding 2 should be fixed in the same pass since it's a live authz/documentation gap on the same table under review, though it's not blocking on its own.
+EXIT=0

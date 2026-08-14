@@ -1,10 +1,12 @@
 // CF Pages Function: SMS opt-in capture (A2P 10DLC compliance).
-// POST /api/sms-optin  { phone: "4055550123" }
+// POST /api/sms-optin  { phone: "4055550123", consent_info: true, consent_mkt: false }
 // Validates US number, rate-limits per IP, stores in Supabase sms_optins (service role).
 export async function onRequestPost(context) {
   const env = context.env;
   const body = await context.request.json().catch(() => null);
   const phone = (body?.phone || "").replace(/\D/g, "");
+  const consentInfo = !!body?.consent_info;
+  const consentMkt = !!body?.consent_mkt;
   if (!/^(1?\d{10})$/.test(phone)) {
     return json({ ok: false, error: "Enter a valid 10-digit US phone number." }, 400);
   }
@@ -31,7 +33,7 @@ export async function onRequestPost(context) {
       Authorization: `Bearer ${svc}`,
       Prefer: "return=minimal,resolution=ignore-duplicates",
     },
-    body: JSON.stringify({ phone: e164, source: "sms-optin-page" }),
+    body: JSON.stringify({ phone: e164, source: "sms-optin-page", consent_info: consentInfo, consent_mkt: consentMkt }),
   });
   if (!res.ok) return json({ ok: false, error: "Could not save your number — try again." }, 500);
   return json({ ok: true });

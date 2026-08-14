@@ -27,6 +27,15 @@ export function onDataChange(fn) { listeners.add(fn); return () => listeners.del
 
 function uid() { return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()); }
 
+const demoReferralStats = { code: 'MOWGO1', total_count: 3, earned_count: 1 };
+
+export async function loadReferralStats() {
+  if (isDemoMode()) return { ...demoReferralStats };
+  const { data, error } = await supabase.rpc('referral_status');
+  if (error) throw error;
+  return data;
+}
+
 // ===== Webhook helper =====
 
 /**
@@ -275,6 +284,14 @@ export async function updateJob(id, updates) {
     });
     if (updates.status === 'done') {
       fireWebhook('job.completed', {
+        job_id: data.id,
+        title: data.title,
+        client_id: data.client_id,
+        scheduled_date: data.scheduled_date,
+      });
+    }
+    if (updates.status === 'skipped') {
+      fireWebhook('job.skipped', {
         job_id: data.id,
         title: data.title,
         client_id: data.client_id,

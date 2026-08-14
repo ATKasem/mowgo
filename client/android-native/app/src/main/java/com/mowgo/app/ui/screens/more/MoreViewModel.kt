@@ -1,6 +1,6 @@
 package com.mowgo.app.ui.screens.more
 
-import android.content.ContentResolver
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,9 +10,12 @@ import com.mowgo.app.data.PaymentRepository
 import com.mowgo.app.data.SettingsRepository
 import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.model.Profile
+import com.mowgo.app.data.model.ReferralStatus
+import com.mowgo.app.data.sync.SyncManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 data class MoreUiState(
@@ -34,6 +37,13 @@ data class MoreUiState(
     val exportLoadingAction: String? = null,
     val exportMessage: String? = null,
     val exportError: String? = null,
+    val rainAlertsEnabled: Boolean = true,
+    val leadAlertsEnabled: Boolean = true,
+    val isOffline: Boolean = false,
+    val pendingSyncCount: Int = 0,
+    val referralStatus: ReferralStatus? = null,
+    val referralLoading: Boolean = true,
+    val referralError: String? = null,
 )
 
 class MoreViewModel(
@@ -54,11 +64,17 @@ class MoreViewModel(
 
     init {
         loadProfile()
+        loadReferrals()
         // Trial-first no-card flow: converge expired trials on app open
         // (idempotent; cron is the backstop). Best-effort, non-blocking.
         viewModelScope.launch {
             runCatching { profileRepository.expireTrial() }
             loadProfile()
+        }
+        // Skip the initial emission (loadProfile() above already covers current state) —
+        // only react to genuine offline→online transitions.
+        viewModelScope.launch {
+            SyncManager.isOnline.drop(1).collect { refreshSyncStatus() }
         }
     }
 
@@ -68,8 +84,16 @@ class MoreViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val profile = profileRepository.loadProfile()
+                val pending = runCatching { SyncManager.pendingMutationCount() }.getOrDefault(0)
                 if (generation == profileLoadGeneration) {
-                    _uiState.value = _uiState.value.copy(isLoading = false, profile = profile)
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        profile = profile,
+                        rainAlertsEnabled = profile?.rainAlertsEnabled ?: true,
+                        leadAlertsEnabled = profile?.leadAlertsEnabled ?: true,
+                        isOffline = !SyncManager.isOnline.value,
+                        pendingSyncCount = pending,
+                    )
                 }
             } catch (error: Exception) {
                 if (generation == profileLoadGeneration) {
@@ -77,6 +101,23 @@ class MoreViewModel(
                 }
             }
         }
+    }
+
+    fun loadReferrals() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(referralLoading = true, referralError = null)
+            try {
+                val status = profileRepository.loadReferralStatus()
+                _uiState.value = _uiState.value.copy(referralLoading = false, referralStatus = status)
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(referralLoading = false, referralError = error.message ?: "Failed to load referrals")
+            }
+        }
+    }
+
+    private suspend fun refreshSyncStatus() {
+        val pending = runCatching { SyncManager.pendingMutationCount() }.getOrDefault(0)
+        _uiState.value = _uiState.value.copy(isOffline = !SyncManager.isOnline.value, pendingSyncCount = pending)
     }
 
     fun onResume() {
@@ -107,6 +148,50 @@ class MoreViewModel(
     fun setAppearance(value: String) { viewModelScope.launch { settingsRepository.setAppearanceMode(value) } }
     fun setCompletionAlerts(value: Boolean) { viewModelScope.launch { settingsRepository.setJobCompletionAlerts(value) } }
     fun setRainAlerts(value: Boolean) { viewModelScope.launch { settingsRepository.setRainDelayAlerts(value) } }
+
+    fun setProfileRainAlerts(value: Boolean) {
+        profileLoadGeneration++
+        val previous = _uiState.value
+        _uiState.value = previous.copy(rainAlertsEnabled = value, error = null)
+        viewModelScope.launch {
+            try {
+                profileRepository.updateRainAlertsEnabled(value)
+                _uiState.value = _uiState.value.copy(
+                    profile = _uiState.value.profile?.copy(rainAlertsEnabled = value),
+                )
+                loadProfile()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    rainAlertsEnabled = previous.rainAlertsEnabled,
+                    profile = _uiState.value.profile?.copy(rainAlertsEnabled = previous.rainAlertsEnabled),
+                    error = error.message ?: "Failed to save alert preference",
+                )
+            }
+        }
+    }
+
+    fun setLeadAlerts(value: Boolean) {
+        profileLoadGeneration++
+        val previous = _uiState.value
+        _uiState.value = previous.copy(leadAlertsEnabled = value, error = null)
+        viewModelScope.launch {
+            try {
+                profileRepository.updateLeadAlertsEnabled(value)
+                _uiState.value = _uiState.value.copy(
+                    profile = _uiState.value.profile?.copy(leadAlertsEnabled = value),
+                )
+                loadProfile()
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    leadAlertsEnabled = previous.leadAlertsEnabled,
+                    profile = _uiState.value.profile?.copy(leadAlertsEnabled = previous.leadAlertsEnabled),
+                    error = error.message ?: "Failed to save alert preference",
+                )
+            }
+        }
+    }
 
     fun setBillingInterval(interval: String) {
         _uiState.value = _uiState.value.copy(billingInterval = interval)
@@ -252,7 +337,7 @@ class MoreViewModel(
 
     fun dismissSaveMessage() { _uiState.value = _uiState.value.copy(saveMessage = null) }
 
-    fun exportData(kind: String, uri: Uri, contentResolver: ContentResolver) {
+    fun exportData(kind: String, uri: Uri, context: Context) {
         if (_uiState.value.exportLoadingAction != null) return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(exportLoadingAction = kind, exportMessage = null, exportError = null)
@@ -261,9 +346,16 @@ class MoreViewModel(
                     "clients" -> exportRepository.clientsCsv(exportRepository.exportClients())
                     "jobs" -> exportRepository.jobsCsv(exportRepository.exportJobs())
                     "invoices" -> exportRepository.invoicesCsv(exportRepository.exportInvoices())
+                    "leads" -> {
+                        val profileId = authRepository.currentSession?.user?.id.orEmpty()
+                        if (com.mowgo.app.data.SupabaseClientProvider.isConfigured && profileId.isBlank()) {
+                            throw IllegalStateException("Not authenticated")
+                        }
+                        exportRepository.leadsCsv(exportRepository.exportLeads(context, profileId))
+                    }
                     else -> throw IllegalArgumentException("Unknown export type")
                 }
-                val output = contentResolver.openOutputStream(uri)
+                val output = context.contentResolver.openOutputStream(uri)
                     ?: throw IllegalStateException("Could not open the selected file")
                 output.use { it.write(csv.toByteArray(Charsets.UTF_8)) }
                 _uiState.value = _uiState.value.copy(exportLoadingAction = null, exportMessage = "Exported")
@@ -275,7 +367,6 @@ class MoreViewModel(
             }
         }
     }
-
     fun dismissExportResult() {
         _uiState.value = _uiState.value.copy(exportMessage = null, exportError = null)
     }

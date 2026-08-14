@@ -34,7 +34,7 @@ import com.mowgo.app.R
 import com.mowgo.app.data.SettingsRepository
 import com.mowgo.app.data.model.Profile
 
-private enum class MoreDestination { ROOT, PROFILE, NOTIFICATIONS, APPEARANCE, BILLING, INTEGRATIONS }
+private enum class MoreDestination { ROOT, PROFILE, NOTIFICATIONS, APPEARANCE, BILLING, INTEGRATIONS, REFERRALS }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +69,18 @@ fun MoreScreen(
     when (destination) {
         MoreDestination.ROOT -> MoreRootScreen(state, appearance, viewModel::loadProfile, { destination = it }, viewModel, onSignedOut)
         MoreDestination.PROFILE -> BusinessProfileScreen(state, { destination = MoreDestination.ROOT }, viewModel::updateProfile, viewModel::dismissSaveMessage)
-        MoreDestination.NOTIFICATIONS -> NotificationSettingsScreen(completionAlerts, rainAlerts, { destination = MoreDestination.ROOT }, viewModel::setCompletionAlerts, viewModel::setRainAlerts)
+        MoreDestination.NOTIFICATIONS -> NotificationSettingsScreen(
+            completion = completionAlerts,
+            localRain = rainAlerts,
+            profileRain = state.rainAlertsEnabled,
+            leadAlerts = state.leadAlertsEnabled,
+            tier = state.profile?.tier,
+            back = { destination = MoreDestination.ROOT },
+            setCompletion = viewModel::setCompletionAlerts,
+            setLocalRain = viewModel::setRainAlerts,
+            setProfileRain = viewModel::setProfileRainAlerts,
+            setLeadAlerts = viewModel::setLeadAlerts,
+        )
         MoreDestination.APPEARANCE -> AppearanceSettingsScreen(appearance, { destination = MoreDestination.ROOT }, viewModel::setAppearance)
         MoreDestination.BILLING -> BillingSettingsScreen(
             state = state,
@@ -83,6 +94,7 @@ fun MoreScreen(
             billingUrlFailed = viewModel::billingUrlFailed,
         )
         MoreDestination.INTEGRATIONS -> IntegrationsScreen(back = { destination = MoreDestination.ROOT })
+        MoreDestination.REFERRALS -> ReferralScreen(state, { destination = MoreDestination.ROOT }, viewModel::loadReferrals)
     }
 }
 
@@ -99,13 +111,16 @@ private fun MoreRootScreen(
     val context = LocalContext.current
     var confirmSignOut by remember { mutableStateOf(false) }
     val clientsExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
-        if (uri != null) viewModel.exportData("clients", uri, context.contentResolver)
+        if (uri != null) viewModel.exportData("clients", uri, context)
     }
     val jobsExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
-        if (uri != null) viewModel.exportData("jobs", uri, context.contentResolver)
+        if (uri != null) viewModel.exportData("jobs", uri, context)
     }
     val invoicesExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
-        if (uri != null) viewModel.exportData("invoices", uri, context.contentResolver)
+        if (uri != null) viewModel.exportData("invoices", uri, context)
+    }
+    val leadsExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        if (uri != null) viewModel.exportData("leads", uri, context)
     }
     LaunchedEffect(state.exportMessage, state.exportError) {
         val message = state.exportMessage ?: state.exportError
@@ -186,6 +201,9 @@ private fun MoreRootScreen(
                 }
 
                 ProfileCard(state.profile)
+                if (state.isOffline || state.pendingSyncCount > 0) {
+                    SyncStatusCard(isOffline = state.isOffline, pendingSyncCount = state.pendingSyncCount)
+                }
                 SectionLabel(stringResource(R.string.more_business_section))
                 Card {
                     SettingsRow(Icons.Default.Storefront, stringResource(R.string.more_business_profile), state.profile?.businessName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.more_business_profile_default_subtitle)) { navigate(MoreDestination.PROFILE) }
@@ -195,6 +213,8 @@ private fun MoreRootScreen(
                     SettingsRow(Icons.Default.Contrast, stringResource(R.string.more_appearance), appearance.replaceFirstChar { it.titlecase() }) { navigate(MoreDestination.APPEARANCE) }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
                     SettingsRow(Icons.Default.CreditCard, stringResource(R.string.more_billing), tierLabel(state.profile?.tier)) { navigate(MoreDestination.BILLING) }
+                    HorizontalDivider(Modifier.padding(start = 56.dp))
+                    SettingsRow(Icons.Default.CardGiftcard, stringResource(R.string.more_referrals), stringResource(R.string.more_referrals_subtitle)) { navigate(MoreDestination.REFERRALS) }
                     if (state.profile?.tier == "solo" || state.profile?.tier == "crew" || state.profile?.tier == "premium") {
                         HorizontalDivider(Modifier.padding(start = 56.dp))
                         SettingsRow(Icons.Default.Link, stringResource(R.string.more_integrations), stringResource(R.string.more_integrations_subtitle)) { navigate(MoreDestination.INTEGRATIONS) }
@@ -207,6 +227,8 @@ private fun MoreRootScreen(
                     ExportRow(Icons.Default.Work, stringResource(R.string.more_export_jobs), state.exportLoadingAction == "jobs", state.exportLoadingAction == null) { jobsExport.launch("mowgo-jobs.csv") }
                     HorizontalDivider(Modifier.padding(start = 56.dp))
                     ExportRow(Icons.Default.ReceiptLong, stringResource(R.string.more_export_invoices), state.exportLoadingAction == "invoices", state.exportLoadingAction == null) { invoicesExport.launch("mowgo-invoices.csv") }
+                    HorizontalDivider(Modifier.padding(start = 56.dp))
+                    ExportRow(Icons.Default.Campaign, "Export Leads", state.exportLoadingAction == "leads", state.exportLoadingAction == null) { leadsExport.launch("mowgo-leads.csv") }
                 }
                 SectionLabel(stringResource(R.string.more_about_section))
                 Card { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -231,6 +253,41 @@ private fun MoreRootScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ReferralScreen(state: MoreUiState, back: () -> Unit, refresh: () -> Unit) {
+    val context = LocalContext.current
+    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.more_referrals)) }, navigationIcon = { IconButton(onClick = back) { Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.more_back_cd)) } }) }) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(stringResource(R.string.referral_heading), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            when {
+                state.referralLoading -> CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+                state.referralError != null -> { Text(state.referralError, color = MaterialTheme.colorScheme.error); Button(onClick = refresh) { Text(stringResource(R.string.action_retry)) } }
+                state.referralStatus != null -> {
+                    val status = state.referralStatus
+                    Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        Text(status.code, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                        Text("https://mowgoapp.com?ref=${status.code}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(onClick = {
+                                val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
+                                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("MowGo referral code", status.code))
+                                Toast.makeText(context, "Referral code copied", Toast.LENGTH_SHORT).show()
+                            }) { Icon(Icons.Default.ContentCopy, contentDescription = null); Spacer(Modifier.width(8.dp)); Text("Copy") }
+                            Button(onClick = {
+                            val link = "https://mowgoapp.com?ref=${status.code}"
+                            context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, link) }, context.getString(R.string.referral_share_title)))
+                            }) { Icon(Icons.Default.Share, contentDescription = null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.referral_share)) }
+                        }
+                        Text("You've referred ${status.totalCount} people. ${status.earnedCount} have signed up.")
+                        Text("Reward balance: ${status.earnedCount} free month${if (status.earnedCount == 1) "" else "s"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun ProfileCard(profile: Profile?) = Card(Modifier.fillMaxWidth()) {
     Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -238,6 +295,28 @@ private fun ProfileCard(profile: Profile?) = Card(Modifier.fillMaxWidth()) {
         Spacer(Modifier.height(8.dp))
         Text(profile?.businessName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.more_default_business_name), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Text(tierLabel(profile?.tier), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun SyncStatusCard(isOffline: Boolean, pendingSyncCount: Int) {
+    val subtitle = when {
+        isOffline && pendingSyncCount > 0 -> stringResource(R.string.more_sync_offline_pending, pendingSyncCount)
+        isOffline -> stringResource(R.string.more_sync_offline)
+        else -> stringResource(R.string.more_sync_syncing, pendingSyncCount)
+    }
+    Card(Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.more_sync_status_title)) },
+            supportingContent = { Text(subtitle) },
+            leadingContent = {
+                Icon(
+                    if (isOffline) Icons.Default.CloudOff else Icons.Default.Sync,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            },
+        )
     }
 }
 
@@ -304,10 +383,33 @@ private fun BusinessProfileScreen(state: MoreUiState, back: () -> Unit, save: (S
 }
 
 @Composable
-private fun NotificationSettingsScreen(completion: Boolean, rain: Boolean, back: () -> Unit, setCompletion: (Boolean) -> Unit, setRain: (Boolean) -> Unit) {
+private fun NotificationSettingsScreen(
+    completion: Boolean,
+    localRain: Boolean,
+    profileRain: Boolean,
+    leadAlerts: Boolean,
+    tier: String?,
+    back: () -> Unit,
+    setCompletion: (Boolean) -> Unit,
+    setLocalRain: (Boolean) -> Unit,
+    setProfileRain: (Boolean) -> Unit,
+    setLeadAlerts: (Boolean) -> Unit,
+) {
     DetailScaffold(stringResource(R.string.more_notifications), back) {
         Card { SettingsSwitchRow(stringResource(R.string.more_notif_completion_title), stringResource(R.string.more_notif_completion_subtitle), completion, setCompletion) }
-        Card { SettingsSwitchRow(stringResource(R.string.more_notif_rain_title), stringResource(R.string.more_notif_rain_subtitle), rain, setRain) }
+        Card {
+            SettingsSwitchRow(
+                stringResource(R.string.more_notif_rain_title),
+                stringResource(R.string.more_notif_rain_subtitle),
+                localRain && profileRain,
+            ) { enabled ->
+                setLocalRain(enabled)
+                setProfileRain(enabled)
+            }
+        }
+        if (tier?.lowercase() in setOf("solo", "crew", "premium")) {
+            Card { SettingsSwitchRow("Lead alerts", "When a new lead comes in", leadAlerts, setLeadAlerts) }
+        }
     }
 }
 

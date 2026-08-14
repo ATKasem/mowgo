@@ -1,16 +1,17 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { memo, useState, useEffect } from 'react';
-import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical, Clock, Camera } from 'lucide-react';
+import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical, Clock, Camera, Pencil, SkipForward } from 'lucide-react';
 import { STATUS_CONFIG, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 import { getJobPhotos } from '../lib/data';
 import { getMapsUrl } from '../lib/maps';
 
-function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown, teamMembers }) {
+function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown, onEdit, onSkip, teamMembers }) {
   const { tr } = useLocalizedText('jobCard');
   const [photos, setPhotos] = useState({ before: null, after: null });
   const client = job.clients;
   const isDone = job.status === 'done';
   const isInProgress = job.status === 'in_progress';
+  const isSkipped = job.status === 'skipped';
   const isActive = !isDone && !isInProgress;
   const statusInfo = STATUS_CONFIG[job.status] || STATUS_CONFIG.scheduled;
   const recurrenceLabel = job.recurrence && job.recurrence !== 'none'
@@ -166,6 +167,26 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
               {tr(isDone ? 'Undo' : isInProgress ? 'Mark Complete' : 'Start Work')}
             </button>
           </div>
+          {(onEdit || (onSkip && !isDone && !isSkipped)) && (
+            <div className="flex gap-2">
+              {onEdit && (
+                <button
+                  onClick={e => { e.stopPropagation(); onEdit(); }}
+                  className="btn-secondary flex-1 text-xs gap-1.5 min-h-[40px] py-2"
+                >
+                  <Pencil className="w-3.5 h-3.5" />{tr('Edit')}
+                </button>
+              )}
+              {onSkip && !isDone && !isSkipped && (
+                <button
+                  onClick={e => { e.stopPropagation(); onSkip(); }}
+                  className="btn-secondary flex-1 text-xs gap-1.5 min-h-[40px] py-2 text-amber-700 dark:text-amber-400"
+                >
+                  <SkipForward className="w-3.5 h-3.5" />{tr('Skip')}
+                </button>
+              )}
+            </div>
+          )}
           {/* Keyboard reordering buttons — hidden from mouse users, accessible to keyboard */}
           {isActive && (
             <div className="flex gap-2">

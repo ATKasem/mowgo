@@ -1,0 +1,38 @@
+# Android Offline Cache — Fix HIGH findings from Codex review
+
+## Fix these issues in client/android-native/
+
+### 1. CRITICAL (already fixed) — AuthRepository.kt signOut
+Already fixed. Skip.
+
+### 2. HIGH — Atomic cache+queue transactions (JobRepository.kt)
+Each optimistic cache mutation and queue insertion are separate Room transactions. Process termination between them can leave a locally visible write that will never sync.
+Fix: Wrap cache update + mutation enqueue in a single Room `@Transaction` or database transaction.
+
+### 3. HIGH — Trigger sync after every enqueue (SyncManager.kt)
+Work is scheduled only on offline-to-online callback. A network error mid-session enqueues a mutation but never triggers sync.
+Fix: Call `triggerSync()` after every successful enqueue, keeping WorkManager's network constraint.
+
+### 4. HIGH — Crash-idempotent replay (MutationQueue.kt, JobRepository.kt)
+Replay is not crash-idempotent. If remote create succeeds but process dies before queue row deletion, next replay retries and conflicts.
+Fix: Make replay idempotent — use upsert semantics, treat already-applied mutations as success.
+
+### 5. HIGH — Wait for sync before reload (TodayViewModel.kt, JobRepository.kt)
+Reconnection starts WorkManager and immediately reloads remote data. If reload wins, stale server rows overwrite optimistic cached mutations.
+Fix: Wait for sync work to finish before refreshing, or reapply pending mutations after cache replace.
+
+### 6. HIGH — Compound offline completion (TodayViewModel.kt, JobRepository.kt)
+Completing a job offline queues only the status update. Auto-invoice is never created.
+Fix: Queue completion as a compound operation. On replay, invoke `create_invoice_for_job` RPC.
+
+### 7. MEDIUM — Require NET_CAPABILITY_VALIDATED (SyncManager.kt)
+Connectivity uses NET_CAPABILITY_INTERNET alone. Captive portals show as online.
+Fix: Also require NET_CAPABILITY_VALIDATED.
+
+### 8. MEDIUM — Explicit Room migrations (AppDatabase.kt)
+`fallbackToDestructiveMigration()` erases mutation queue on schema upgrade.
+Fix: Add explicit Room migrations or at minimum add a migration for the mutation queue table.
+
+## Do NOT touch
+- Any unrelated dirty files
+- iOS or web code

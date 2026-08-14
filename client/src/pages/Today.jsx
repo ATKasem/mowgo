@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS, hasTeamAccess } from '../lib/constants';
 import { localDate } from '../lib/dashboard-metrics';
 import { dayConditionsView, teamProgressView } from '../lib/today-ux';
-import { createJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, getDayConditions, sprayStatus, SPRAY_RULE, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
+import { createJob, updateJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, getDayConditions, sprayStatus, SPRAY_RULE, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
 import { buildRouteLink, buildSingleStopUrl } from '../lib/navLinks';
 import { optimizeRoute } from '../lib/optimizeRoute';
 import { useSearchParams, Link } from 'react-router-dom';
@@ -47,6 +47,10 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
   });
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(INITIAL_JOB_FORM);
+  const [editingJob, setEditingJob] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState('');
   const [expandedId, setExpandedId] = useState(null);
   const [animating, setAnimating] = useState(null);
   const [completedToast, setCompletedToast] = useState(null);
@@ -421,6 +425,58 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
     }, 150);
     statusToggleTimeoutsRef.current.set(job.id, toggleTimeout);
   }, [setJobs]);
+
+  const openEditJob = useCallback((job) => {
+    setEditingJob(job);
+    setEditError('');
+    setEditForm({
+      client_id: job.client_id || '',
+      title: job.title || '',
+      scheduled_date: job.scheduled_date || date,
+      scheduled_time: job.scheduled_time || '',
+      duration_minutes: job.duration_minutes || 60,
+      recurrence: job.recurrence || 'none',
+      assigned_to: job.assigned_to || null,
+    });
+  }, [date]);
+
+  const closeEditJob = useCallback(() => {
+    setEditingJob(null);
+    setEditForm(null);
+    setEditError('');
+  }, []);
+
+  const saveEditJob = useCallback(async (e) => {
+    e.preventDefault();
+    if (!editingJob || !editForm?.client_id) return;
+    setEditSaving(true);
+    setEditError('');
+    try {
+      const updated = await updateJob(editingJob.id, editForm);
+      if (updated) {
+        setJobs(prev => prev.map(j => j.id === updated.id ? updated : j));
+      }
+      closeEditJob();
+    } catch (err) {
+      console.error('updateJob:', err);
+      setEditError(tr('Failed to save changes. Try again.'));
+    }
+    setEditSaving(false);
+  }, [editingJob, editForm, setJobs, closeEditJob, tr]);
+
+  const skipJob = useCallback(async (job) => {
+    if (!window.confirm(tr('Skip this job? It will be marked as skipped and won\'t appear in your active route.'))) return;
+    try {
+      await updateJobStatus(job.id, 'skipped');
+      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'skipped' } : j));
+      setCompletedToast({ name: tr('{{client}} · Job skipped', { client: job.clients?.name || tr('Job') }), amount: 0, type: 'plain' });
+      setTimeout(() => setCompletedToast(null), 4000);
+    } catch (err) {
+      console.error('skipJob:', err);
+      setCompletedToast({ name: tr('Failed to skip job. Try again.'), amount: 0, type: 'error' });
+      setTimeout(() => setCompletedToast(null), 4000);
+    }
+  }, [setJobs, tr]);
 
   // Clean up timeouts on unmount
   useEffect(() => {
@@ -941,10 +997,83 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
             onDragEnd={handleDragEnd}
             onMoveUp={() => handleMoveUp(job)}
             onMoveDown={() => handleMoveDown(job)}
+            onEdit={() => openEditJob(job)}
+            onSkip={() => skipJob(job)}
             teamMembers={teamMembers}
           />
         ))}
       </div>
+
+      {editingJob && editForm && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="edit-job-title">
+          <div className="absolute inset-0 bg-black/60" onClick={closeEditJob} />
+          <form
+            onSubmit={saveEditJob}
+            className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto bg-[var(--color-surface)] dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl border border-[var(--color-border)] dark:border-gray-700 space-y-3"
+          >
+            <div className="flex items-start justify-between gap-3 mb-1">
+              <h3 id="edit-job-title" className="text-lg font-bold text-[var(--color-text-primary)] dark:text-white">{tr('Edit Job')}</h3>
+              <button type="button" aria-label={tr('Close')} onClick={closeEditJob} className="p-2 -m-2 text-[var(--color-text-muted)]"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div>
+              <label className="label">{tr("Client")}</label>
+              <select value={editForm.client_id} onChange={e => setEditForm({ ...editForm, client_id: e.target.value })} className="select" required>
+                <option value="">{tr("Select a client...")}</option>
+                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="label">{tr("Job Title")}</label>
+              <input type="text" value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} placeholder={tr("e.g. Full Service")} className="input" required />
+            </div>
+            <div>
+              <label className="label">{tr("Date")}</label>
+              <input type="date" value={editForm.scheduled_date} onChange={e => setEditForm({ ...editForm, scheduled_date: e.target.value })} className="input" required />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label">{tr("Time")}</label>
+                <input type="time" value={editForm.scheduled_time} onChange={e => setEditForm({ ...editForm, scheduled_time: e.target.value })} className="input" />
+              </div>
+              <div>
+                <label className="label">{tr("Duration")}</label>
+                <select value={editForm.duration_minutes} onChange={e => setEditForm({ ...editForm, duration_minutes: Number(e.target.value) })} className="select">
+                  <option value={30}>{tr("30 min")}</option>
+                  <option value={60}>{tr("1 hour")}</option>
+                  <option value={90}>{tr("1.5 hours")}</option>
+                  <option value={120}>{tr("2 hours")}</option>
+                  <option value={180}>{tr("3 hours")}</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="label">{tr("Recurrence")}</label>
+              <select value={editForm.recurrence} onChange={e => setEditForm({ ...editForm, recurrence: e.target.value })} className="select">
+                {RECURRENCE_OPTIONS.map(r => <option key={r.value} value={r.value}>{tr(r.label)}</option>)}
+              </select>
+            </div>
+            {!teamLoading && canManageCrew && teamMembers.length > 0 && (
+              <div>
+                <label className="label">{tr("Assign To")}</label>
+                <select value={editForm.assigned_to || ''} onChange={e => setEditForm({ ...editForm, assigned_to: e.target.value || null })} className="select">
+                  <option value="">{tr("Unassigned")}</option>
+                  {teamMembers.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.business_name || tr('Unnamed member')} ({tr(m.role === 'owner' ? 'Owner' : 'Crew')})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {editError && <p className="text-sm text-red-600 dark:text-red-400">{editError}</p>}
+            <div className="flex gap-2 pt-1">
+              <button type="submit" disabled={editSaving} className="btn-primary flex-1">{tr(editSaving ? 'Saving...' : 'Save Changes')}</button>
+              <button type="button" onClick={closeEditJob} disabled={editSaving} className="btn-secondary flex-1">{tr("Cancel")}</button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {showRainDelay && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="rain-delay-title">

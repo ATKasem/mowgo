@@ -56,6 +56,9 @@
     <string name="today_spray_rule">≤%1$d°F · ≤%2$d mph</string>
     <string name="today_set_business_location">Configura la ubicación del negocio para ver las condiciones</string>
     <string name="today_new_job_cd">Nuevo trabajo</string>
+    <string name="today_offline_banner">Sin conexión — puedes seguir trabajando</string>
+    <string name="today_offline_pending_banner">Sin conexión — %1$d cambio(s) se sincronizarán al reconectar</string>
+    <string name="today_syncing_banner">Sincronizando %1$d cambio(s)…</string>
     <string name="today_rain_delay">Retraso por lluvia</string>
     <string name="today_rain_delay_history">Historial de retrasos por lluvia</string>
     <string name="today_jobs_header">Trabajos de hoy</string>
@@ -241,6 +244,10 @@
     <string name="more_sign_out_body">Deberás iniciar sesión de nuevo.</string>
     <string name="more_title">Más</string>
     <string name="more_business_section">Negocio</string>
+    <string name="more_sync_status_title">Estado de sincronización</string>
+    <string name="more_sync_offline">Sin conexión — puedes seguir trabajando</string>
+    <string name="more_sync_offline_pending">Sin conexión — %1$d cambio(s) se sincronizarán al reconectar</string>
+    <string name="more_sync_syncing">Sincronizando %1$d cambio(s)…</string>
     <string name="more_business_profile">Perfil del negocio</string>
     <string name="more_business_profile_default_subtitle">Nombre del negocio y teléfono</string>
     <string name="more_notifications">Notificaciones</string>
@@ -377,4 +384,13 @@
     <string name="trial_ended_title">Tu prueba terminó</string>
     <string name="trial_ended_body">Tus clientes están a salvo — suscríbete para seguir programando más allá de 5.</string>
     <string name="trial_start_button">Comenzar prueba gratuita</string>
+    <string name="more_referrals">Referidos</string>
+    <string name="more_referrals_subtitle">Comparte MowGo y gana meses gratis</string>
+    <string name="referral_heading">Regala un mes y gana un mes</string>
+    <string name="referral_share">Compartir enlace</string>
+    <string name="referral_share_title">Compartir MowGo</string>
+    <string name="referral_sent">Enviados</string>
+    <string name="referral_signed_up">Registrados</string>
+    <string name="referral_converted">Convertidos</string>
+    <string name="referral_rewards">Meses gratis</string>
 </resources>

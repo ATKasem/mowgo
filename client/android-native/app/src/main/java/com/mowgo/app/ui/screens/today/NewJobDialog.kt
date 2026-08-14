@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 fun NewJobDialog(
     clients: List<Client>,
     onDismiss: () -> Unit,
-    onCreate: (title: String, clientId: String, date: String, time: String?, notes: String?, routeOrder: Int?) -> Unit,
+    onCreate: (title: String, clientId: String, date: String, time: String?, notes: String?, routeOrder: Int?, recurrence: String) -> Unit,
 ) {
     var title by remember { mutableStateOf("") }
     var selectedClient by remember { mutableStateOf<Client?>(null) }
@@ -36,6 +36,8 @@ fun NewJobDialog(
     var selectedTime by remember { mutableStateOf<String?>(null) }
     var notes by remember { mutableStateOf("") }
     var routeOrderText by remember { mutableStateOf("") }
+    var recurrence by remember { mutableStateOf("none") }
+    var recurrenceExpanded by remember { mutableStateOf(false) }
     var showClientPicker by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -255,6 +257,30 @@ fun NewJobDialog(
                     )
                 }
 
+                item {
+                    ExposedDropdownMenuBox(
+                        expanded = recurrenceExpanded,
+                        onExpandedChange = { recurrenceExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = recurrence.replaceFirstChar { it.uppercase() },
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Recurrence") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(recurrenceExpanded) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        )
+                        ExposedDropdownMenu(expanded = recurrenceExpanded, onDismissRequest = { recurrenceExpanded = false }) {
+                            listOf("none", "daily", "weekly", "biweekly", "monthly").forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(if (option == "biweekly") "Biweekly" else option.replaceFirstChar { it.uppercase() }) },
+                                    onClick = { recurrence = option; recurrenceExpanded = false },
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Notes
                 item {
                     OutlinedTextField(
@@ -290,7 +316,7 @@ fun NewJobDialog(
                                 val clientId = selectedClient?.id
                                 if (clientId != null) {
                                     val routeOrder = routeOrderText.toIntOrNull()
-                                    onCreate(title, clientId, selectedDate, selectedTime, notes.ifBlank { null }, routeOrder)
+                                    onCreate(title, clientId, selectedDate, selectedTime, notes.ifBlank { null }, routeOrder, recurrence)
                                 }
                             },
                             enabled = title.isNotBlank() && selectedClient != null,

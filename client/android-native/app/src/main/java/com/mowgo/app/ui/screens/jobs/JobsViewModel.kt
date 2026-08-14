@@ -3,11 +3,9 @@ package com.mowgo.app.ui.screens.jobs
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mowgo.app.data.JobRepository
-import com.mowgo.app.data.InvoiceRepository
 import com.mowgo.app.data.JobPhotoRepository
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Job
-import com.mowgo.app.BuildConfig
 import com.mowgo.app.data.model.JobWithClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +24,6 @@ data class JobsUiState(
 
 class JobsViewModel : ViewModel() {
     private val repository = JobRepository()
-    private val invoiceRepository = InvoiceRepository()
     private val photoRepository = JobPhotoRepository(repository)
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState: StateFlow<JobsUiState> = _uiState.asStateFlow()
@@ -63,19 +60,14 @@ class JobsViewModel : ViewModel() {
         val status = if (job.status == Job.STATUS_DONE) Job.STATUS_SCHEDULED else Job.STATUS_DONE
         viewModelScope.launch {
             try {
-                repository.updateJobStatus(jobId, status)
-                // Auto-invoice on completion (mirrors Today screen): idempotent per job, $0 rates skipped.
-                if (status == Job.STATUS_DONE && job.clientRate > 0) {
-                    runCatching {
-                        invoiceRepository.createInvoiceForJob(
-                            jobId = jobId,
-                            clientId = job.job.clientId,
-                            amount = job.clientRate,
-                        )
-                    }.onFailure { e ->
-                        if (BuildConfig.DEBUG) android.util.Log.w("JobsViewModel", "auto-invoice failed", e)
-                    }
-                }
+                // Auto-invoicing on completion is handled by the repository (mirrors
+                // Today screen) so it's queued/replayed as part of the same offline
+                // mutation as the status change instead of being dropped silently.
+                repository.updateJobStatus(
+                    jobId, status,
+                    invoiceClientId = job.job.clientId,
+                    invoiceAmount = job.clientRate,
+                )
                 load()
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(message = error.message ?: "Failed to update job")

@@ -1,0 +1,415 @@
+{
+  "scan_ts": "2026-08-07T12:15:00Z",
+  "scan_label": "7am CST — Fri Aug 7 (window since Aug 6 12:00Z scan; 12 new msgs in #mowgo, ALL bot cron reports; ZERO human msgs anywhere — Blasian 'hello' Jul 29 15:39Z = Day 10 of silence; his leads question Day 11; REDDIT SLOT TODAY 22:21Z)",
+  "channels_scanned": {
+    "mowgo": {
+      "channel_id": "1529248227394850916",
+      "status": "12 new messages since Aug 6 12:00Z — ALL bot cron reports: Intel Engine x5 (15:37Z, 19:55Z, 00:49Z, 05:12Z, 09:28Z), Stripe health check 09:19Z (3 msgs), invoice reminders 12:30Z. ZERO human messages.",
+      "last_human_msg": "Blasian — 'hello' 2026-07-29T15:39Z (Day 10 of silence; his leads question Day 11)"
+    },
+    "outreach": {
+      "channel_id": "1529711006023024680",
+      "status": "⚠️ CHANNEL GONE — fetch returns 404 Unknown Channel (x3 today; vault sync also logged 404 x2 overnight). Deleted or bot access removed. Wave-1 SMS scripts (Aug 5 01:33Z) only reachable via archives now.",
+      "note": "Rule of 100 already delivers to #leads — no active producer targeting outreach found; update channel map/docs so nothing re-points here."
+    },
+    "cowork": {
+      "channel_id": "1529736297847980153",
+      "status": "✅ EMPTY — 0 messages. 128 watchdog-failure spam messages CLEANED Aug 6 (commits f022da6 + c8ecbd9, cleanup tool added). Watchdog healthy: 841 consecutive checks, deepseek, since Aug 4 13:45Z. Day-5 hygiene item CLOSED.",
+      "note": "0 new failures since Aug 4 fix — watchdog holding."
+    },
+    "leads": {
+      "channel_id": "1529707289014042804",
+      "status": "9 total msgs; newest Aug 6 15:12Z Rule of 100 wave-3 (2 Day-1 texts: NG Outdoor + Frankies — only remaining phone leads; dedup gate held; 3 FB/IG posts). Blasian's 'How would we get leads for MowGo' (Jul 28 17:03Z) STILL UNANSWERED — Day 11, ✅ reaction still no reply.",
+      "note": "⚠️ NEW: wave-3 post reports cron 'MowGo SMS Sender' (3f67268baeb6) failing daily — looks for /opt/data/scripts/send_sms.py which does NOT exist; real script at /opt/data/mowgo/scripts/send_sms.py. VERIFIED locally: 23 leads in sms_queue.json all status=new, sent_at=None, sms_log.jsonl never created → ZERO SMS ever sent."
+    }
+  },
+  "overnight_messages_needing_attention": [
+    {
+      "id": "intel_1937_autoMod_48",
+      "ts": "2026-08-06T19:55Z",
+      "content": "⚠️ ACTION: #48 reply ('boring local service' thread 1vgvrg5) was posted via API and AutoMod-FILTERED ~19:50Z (t1_p24ihev). 'Don't re-queue via API' — needs MANUAL paste by a human. Kit re-sequenced: ① #43 → ② NEW #50 (mulch-pricing, 1vh7t47) → ③ #41 (fallbacks #38/#40). Draft #50 banked (tiny gardening operator, exact ICP; signld.ai competitor already pitch-commenting). TurfHop outage FULLY closed (pricing + features back ~5d down, no relaunch discount) — retire compare line. LawnPro $29/mo annual w/ 3 logins = new undercut flag (full profile next run).",
+      "significance": "HIGH — AutoMod-filtered reply needs human paste; kit for TODAY's 22:21Z slot finalized.",
+      "action": "Part 2: flag #48 manual paste to Aaron; kit is ready (#43→#50→#41)."
+    },
+    {
+      "id": "intel_2355_features",
+      "ts": "2026-08-07T00:49Z",
+      "content": "Feature lane: 4 ideas, 2 worth doing — ⭐ Quote-approval capture (live r/landscaping payment fight 1vhj4sb: $335 work, no approved quote, homeowner refused to pay → explicit timestamped 'Approved' state = dispute shield; pairs with quotes v1 Approve link + photo-proof) · ⭐ Crew clock-in/out + field forms (Service Autopilot only shipper of 'Team App'; owners anxious about labor %). Customer self-quote page (QuoteIQ gates at $299/$699 — our ?mode=quote is the wedge) + min-job-price setting = nice-to-haves. AI receptionist 3rd signal in 24h, still don't build. Copy fuel verbatim: 1vhhu28 top comment 're-keying the same numbers into [three tools]' = MowGo's whole pitch. TradeKit astroturfing caught (2nd shill after ContractorPlusApp).",
+      "significance": "MEDIUM-HIGH — quotes v1 re-validated as the dispute shield; new Crew-tier depth candidate; 2 astroturf competitors tracked.",
+      "action": "Part 2: bank copy fuel; quotes v1 keeps #1 build priority."
+    },
+    {
+      "id": "intel_0449_lawnpro",
+      "ts": "2026-08-07T05:12Z",
+      "content": "⚠️ LawnPro = CLOSEST PRICE RIVAL, full profile captured: Free (25 customers) / $39 Startup (3 employee logins + deposits + tips) / $129 Grow / $249 Plus. $39 Startup = same sticker as MowGo Solo with 3 logins; free tier 5x more generous than MowGo Free's 5 clients. MowGo wins cleanly: Crew $79 vs $129, Premium $199 vs $249, flat vs add-on economy (routes/2-way text/QBO sync cost extra below Plus). 'Free-tier gap is now visible on a compare page a prospect might actually read.' DeepLawn (AI satellite measurement) now in Service Autopilot + LawnPro add-on — AI measurement = table stakes, watch don't build. GreenPal pays only after timestamped photo proof → backs photo roadmap. Jobber academy preaches 'minimum stop rate' (min-job-price double-confirmed) + 2026 price charts + '65% of owners raised prices' stat banked.",
+      "significance": "HIGH — new $39 rival + visible free-tier gap; photo-proof now 3x validated; Jobber min-price ammo.",
+      "action": "Part 2: compare-page LawnPro note (free-tier gap + add-on economy); free-tier 5-vs-25 review decision for Aaron."
+    },
+    {
+      "id": "stripe_check_0919",
+      "ts": "2026-08-07T09:19Z",
+      "content": "STRIPE: all green on mowgoapp.com + mowgo.pages.dev (converged bundle index-D_aBBC3d.js) — no pk in bundle (by design), zero sk_ leaks, checkout-subscription/verify-session/create-portal-session/webhook all deployed + JWT-gated. ⚠️ SIDE FINDING: BOTH Cloudflare API tokens DEAD. ⚠️ FLAG: deployed client is STALE — missing verify-session client flow → REDEPLOY main. iOS: PaymentSheet configured live (pk_live_ valid, merchant 'MowGo'); caveat: depends on create-payment-intent Supabase edge function.",
+      "significance": "MEDIUM-HIGH — Stripe itself healthy; 2 new ops items (CF tokens, redeploy).",
+      "action": "Part 2: commit+push client changes (uncommitted in working tree: App.jsx, data.js, InvoiceToast.jsx, Settings.jsx) → redeploy; CF token repair on Aaron plate."
+    },
+    {
+      "id": "intel_0912_trends",
+      "ts": "2026-08-07T09:28Z",
+      "content": "Price ladder refresh — gap WIDENED: Jobber Core $29 (1 user, annual) / Grow $149-299 · HCP Basic $59-79 / Essentials $149-189 / MAX $299-329 + $35/user · ServiceTitan $250-500/tech + $5-50k implementation (thread-confirmed; their own commenters call Jobber 'the cheap option below $1M revenue' — nobody names a sub-$100 crew tool). NEW DRAFT: 1vhv10k r/smallbusiness (uncle pays $379/mo for website+SEO+booking widget, quoted $2,400 for a dropdown) — 'Nobody names the middle. That middle is MowGo.' Banked friend-mode; POST WITHIN ~6h (by ~14:41Z) or thread dies; else Saturday-slot candidate. Drought = structural 2026 sales event (Denver Stage 1, fines to $36k) — Rain Delay fits watering-window chaos; OK minor. AI estimating productized: QuoteIQ AI Estimator all plans $29.99 floor, TurfHop Orbit AI — watch don't build; Solo-tier feature if ever. Labor +20% by end-2029 (NALP/ITR); 28% of crews earn $21-25/hr.",
+      "significance": "MEDIUM-HIGH — 1vhv10k reply has a ~14:41Z deadline (13:12Z intel run is in-window); 4 new copy flags.",
+      "action": "Part 2: ensure 1vhv10k reply goes out (deadline ~14:41Z); bank drought/labor/AI-estimating flags."
+    },
+    {
+      "id": "rule100_wave3_1512",
+      "ts": "2026-08-06T15:12Z",
+      "content": "Rule of 100 wave-3 in #leads: 2 new Day-1 SMS (NG Outdoor — Edmond $58.02 avg; Frankies — Norman $52.89; only remaining phone leads, dedup gate held) + 3 FB/IG posts (rain-day, money $55.25 avg, positioning flat-vs-per-seat). ⚠️ CRON FAILURE REPORT: 'MowGo SMS Sender' (3f67268baeb6) failing daily — wrong script path (/opt/data/scripts/send_sms.py missing; real: /opt/data/mowgo/scripts/send_sms.py).",
+      "significance": "HIGH — root cause of ZERO SMS sends ever (23 queued, 0 sent); bot-fixable path issue but job not visible in this profile's cron list (vault says 'paused').",
+      "action": "Part 2: create missing path wrapper (copy of /opt/data/.hermes/scripts/send_sms.py wrapper) → unblocks 10/day sends; verify job status."
+    },
+    {
+      "id": "invoice_reminders_1230",
+      "ts": "2026-08-06T12:30Z",
+      "content": "Invoice reminders: OK — 0 unpaid invoices older than 7d (0 sent, 0 skipped).",
+      "significance": "LOW (routine green)",
+      "action": "None."
+    }
+  ],
+  "open_tasks": {
+    "critical": [
+      {
+        "id": "sms_batch_sends",
+        "title": "SMS Day-1 sends — 23 texts queued (sms_queue.json all 'new', sent_at=None), ZERO ever sent; sender cron path-broken + 'paused' per vault",
+        "days_open": 5,
+        "owner": "Bot/Aaron",
+        "status": "🔴 QUEUED ×23 — scripts delivered in 3 waves (5 in #outreach Aug 5 01:33Z, 5 in #leads Aug 5 15:11Z, 2 in #leads Aug 6 15:12Z) + queue built Aug 5-6. Cron 3f67268baeb6 looks for /opt/data/scripts/send_sms.py (MISSING; wrapper exists at /opt/data/.hermes/scripts/send_sms.py; real script at /opt/data/mowgo/scripts/send_sms.py). sms_log.jsonl never created = never ran successfully.",
+        "note": "Bot-fix: drop wrapper at /opt/data/scripts/send_sms.py, then unpause/verify job. 10/day cap, weekdays 9-11am CT (14:00Z cron). Wave-1 Day-2 texts never fired."
+      },
+      {
+        "id": "emerge_followup",
+        "title": "Lead follow-ups Day 12 — Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31); 0 replies; 2nd follow-up script overdue (was 'Fri if silent')",
+        "days_open": 12,
+        "owner": "Aaron (manual)",
+        "status": "🔴 OVERDUE Day 12 — 5 emails sent Jul 29-31, 0 replies",
+        "note": "Highest-ROI 10 min; drafts ready."
+      },
+      {
+        "id": "blasian_leads_question",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 11; ✅ reaction still no reply; human loop dead ~10 days",
+        "days_open": 11,
+        "owner": "Aaron (manual)",
+        "status": "🔴 UNANSWERED — draft ready (leads/blasian-reply-draft-2026-08-01.md)",
+        "note": "Cheapest restart of the human loop; ZERO human messages in any channel for 10 days."
+      },
+      {
+        "id": "reddit_48_manual_paste",
+        "title": "Manually paste #48 reply in 'boring local service' thread (1vgvrg5) — API post AutoMod-filtered ~19:50Z Aug 6 (t1_p24ihev); do NOT re-queue via API",
+        "days_open": 1,
+        "owner": "Aaron/Blasian (manual)",
+        "status": "🆕 FILTERED — draft exists in intel report 2026-08-06_1937",
+        "note": "Bot can't bypass AutoMod; needs human account paste."
+      },
+      {
+        "id": "stripe_e2e_verify",
+        "title": "Logged-in end-to-end test checkout (the ONLY unproven Stripe link — Day 23)",
+        "days_open": 23,
+        "owner": "Aaron (manual)",
+        "status": "🟡 STILL UNPROVEN — 09:19Z check all green; ⚠️ NEW: deployed client stale (missing verify-session flow — redeploy main), both CF API tokens dead",
+        "note": "Redeploy is bot-side; checkout test is Aaron's. One real checkout with his account closes it."
+      },
+      {
+        "id": "softwareworld_submit",
+        "title": "Submit MowGo to SoftwareWorld + directories (Capterra/G2/SoftwareAdvice/GetApp) — Day 27",
+        "days_open": 27,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — zero listicle presence; QuoteIQ co-founder still self-ranking in his own 'Top 8'",
+        "note": "10-15 min each; highest-leverage 30 min on the plate."
+      },
+      {
+        "id": "reddit_slot_fri",
+        "title": "Reddit slot TODAY — Fri Aug 7 22:21Z (96h gate); kit ① #43 (1vfyg2j, alive 20 comments) → ② #50 (1vh7t47 mulch-pricing, NEW) → ③ #41 (1vfvq1g); fallbacks #38/#40 — all verified alive 04:56Z",
+        "days_open": 17,
+        "owner": "Bot",
+        "status": "🟢 GATED, KIT READY — post at slot, then verify visibility (successful API ≠ visible; #48 got filtered)",
+        "note": "Watch: 1vhv10k reply draft deadline ~14:41Z (13:12Z run in-window). Friend-poster cron (9b2791494b1b) still paused — resume decision for Aaron."
+      },
+      {
+        "id": "jobber_switcher_wave",
+        "title": "Competitor import (CSV) + /switch page — Jobber switcher window open through ~Aug 15; promo posts STILL overdue (drafts A/B/D ready)",
+        "days_open": 8,
+        "owner": "Dev",
+        "status": "⚠️ WINDOW OPEN (8 days left) — ammo: Jobber 3-mo promos + triple-loaded $29 + Core/Grow ladder; ServiceTitan thread consensus 'Jobber = cheap option below $1M'",
+        "note": "Switcher campaign can finally run — Aaron's promo posts are the blocker."
+      },
+      {
+        "id": "online_booking",
+        "title": "Ship online booking link (P0, NAMED) — 'included at $39 flat' vs gated everywhere (QuoteIQ $299, Jobber $119+, GorillaDesk $49+per-route)",
+        "days_open": 18,
+        "owner": "Dev",
+        "status": "❌ NOT STARTED — still behind quotes v1 per escalation",
+        "note": "S-M effort."
+      }
+    ],
+    "medium": [
+      {
+        "id": "quotes_v1",
+        "title": "Minimal Quotes v1 (line items → Approve link → job) — #1 BUILD PRIORITY; quote-approval capture RE-VALIDATED as dispute shield (live payment-fight thread 1vhj4sb: $335 work refused, no approved quote)",
+        "days_open": 8,
+        "owner": "Dev",
+        "status": "🚀 UNCHANGED — Approve link IS the timestamped 'Approved' state; pairs with photo-proof",
+        "note": "3-5 days, scoped (docs/quotes-v1-scope.md)."
+      },
+      {
+        "id": "crew_clock_in",
+        "title": "Crew clock-in/out + field forms — NEW Crew-tier depth (Service Autopilot only shipper of 'Team App'; labor % anxiety is live in threads)",
+        "days_open": 1,
+        "owner": "Dev",
+        "status": "🆕 VALIDATED — natural Crew ($79) differentiator; quote-approval pairs",
+        "note": "After quotes v1 / per Aaron decision."
+      },
+      {
+        "id": "missed_call_textback",
+        "title": "Missed-call text-back edge fn (Twilio) — 3rd AI-receptionist signal in 24h (QuoteIQ 'Virtual Call Team'), still the right cheap version",
+        "days_open": 2,
+        "owner": "Dev",
+        "status": "🆕 S effort — Twilio number already being set up for rain-delay SMS",
+        "note": "Don't build voice AI; text-back is enough."
+      },
+      {
+        "id": "photo_checklist",
+        "title": "Job photo checklist (before/after proof) — validated x3 now (QuoteIQ Inspection Tool, Planado photo reports, GreenPal timestamped-photo payouts, proof-of-work CRM thread)",
+        "days_open": 2,
+        "owner": "Dev",
+        "status": "🆕 VALIDATED ×4 — dispute shield + feeds review-request text",
+        "note": "S-M effort."
+      },
+      {
+        "id": "review_request_text",
+        "title": "Review-request text — #1 UNSHIPPED CHEAP WIN",
+        "days_open": 8,
+        "owner": "Dev",
+        "status": "⏳ Still unshipped",
+        "note": "After-photo from photo checklist makes it self-feeding."
+      },
+      {
+        "id": "auto_pay_card_on_file",
+        "title": "Card-on-file auto-pay — feature gap #3",
+        "days_open": 7,
+        "owner": "Dev",
+        "status": "UNCHANGED — after quotes v1 / per Aaron decision",
+        "note": "1-2d."
+      },
+      {
+        "id": "rain_delay_shift",
+        "title": "Rain-delay 'shift +1 day' with one-tap auto-text — SMS side in build (Twilio); drought-reschedule angle is new ammo",
+        "days_open": 4,
+        "owner": "Dev",
+        "status": "🚧 IN BUILD (SMS plumbing)",
+        "note": "Rain = top pain; close the loop in-app after SMS."
+      },
+      {
+        "id": "cf_tokens_dead",
+        "title": "BOTH Cloudflare API tokens dead (09:19Z side finding) — CF CLI/API ops blocked; Pages deploys via git push still work",
+        "days_open": 1,
+        "owner": "Aaron",
+        "status": "🆕 CONFIRMED by Stripe health check",
+        "note": "Re-auth in CF dashboard; affects .bi_tools/cf_check.py and any CF API automation."
+      },
+      {
+        "id": "redeploy_main",
+        "title": "Redeploy main — deployed client STALE, missing verify-session flow; client changes uncommitted in working tree (App.jsx, data.js, InvoiceToast.jsx, Settings.jsx, android build.gradle.kts + supabase migration 20260806220000_lead_alerts.sql)",
+        "days_open": 1,
+        "owner": "Dev",
+        "status": "🆕 FLAGGED by Stripe check — commit + push main → CF auto-deploy",
+        "note": "Review working tree diff before commit (multi-agent repo; several modified files)."
+      }
+    ],
+    "low": [
+      {
+        "id": "concierge_e2e_test",
+        "title": "Trigger one real concierge request to verify the notification pipeline end-to-end",
+        "owner": "Bot/Aaron",
+        "status": "🆕 Channel wired Aug 4; never carried a real request"
+      },
+      {
+        "id": "mxbuild_profile",
+        "title": "Profile MX Build ($49/mo estimates/invoices/payments entrant)",
+        "owner": "Bot",
+        "status": "🆕 Still owed (carried since Aug 4 lane)"
+      },
+      {
+        "id": "trial_length_decision",
+        "title": "Decide trial 7 vs 14 days (checkout grants 7, copy says 14) — QuoteIQ trial-gate complaints are the cautionary tale",
+        "owner": "Aaron",
+        "status": "⏳ Plate decision — keep 14-day fully functional end-to-end"
+      },
+      {
+        "id": "free_tier_gap",
+        "title": "Review free-tier gap — MowGo Free 5 clients vs LawnPro Free 25 customers ('visible on a compare page a prospect might actually read')",
+        "owner": "Aaron",
+        "status": "🆕 NEW — decision: widen MowGo Free, or lean on Solo $39 unlimited"
+      },
+      {
+        "id": "mowflow_cf_delete",
+        "title": "mowflow CF project deletion — domain redirects to live app (verified); deletion one-click confirm",
+        "owner": "Aaron/Bot",
+        "status": "✅ OUTCOME ACHIEVED (verified Aug 6 09:12Z)"
+      },
+      {
+        "id": "watch_list",
+        "title": "Watch: LawnPro $39 Startup (CLOSEST RIVAL — full profile 0449) · Servinix (beta Aug 17, commercial Sept 14) · QuoteIQ AI Estimator all plans + Virtual Call Team + stealth 1% fee · TurfHop fully recovered (retire outage line; Orbit AI credit copilot) · TradeKit/ContractorPlus astroturfing · DeepLawn AI-measurement integrations · GreenPal photo-proof payouts · LawnBoss 305/mo stalled decline · Yardbook $34.99",
+        "owner": "Bot",
+        "status": "🟢 Watch list"
+      }
+    ],
+    "closed_since_yesterday": [
+      "cowork_channel_cleanup → CLOSED Aug 6: 128 watchdog-failure spam messages DELETED (commits f022da6 + c8ecbd9, cleanup tool added); channel now EMPTY; watchdog healthy 841 consecutive",
+      "turfhop_outage → FULLY CLOSED: /pricing AND /features back after ~5d down, pricing unchanged, NO relaunch discount — retire compare-page line",
+      "reddit_#44 → DEMOTED (score 0, dead); kit slot #2 replaced by NEW #50 (mulch-pricing)",
+      "outreach_channel → GONE: 404 x3 today + x2 in vault sync — channel deleted/access removed; Rule of 100 already delivers to #leads; update channel map"
+    ]
+  },
+  "blockers_for_aaron": [
+    {
+      "blocker": "SMS: 23 Day-1 texts queued, ZERO ever sent — sender cron path-broken ('paused' per vault); wave-1 Day-2 texts never fired",
+      "detail": "Cron 3f67268baeb6 looks for /opt/data/scripts/send_sms.py (missing; real script /opt/data/mowgo/scripts/send_sms.py; wrapper exists at /opt/data/.hermes/scripts/send_sms.py). Bot can drop the missing-path wrapper — then DECISION: unpause and let it send 10/day (weekdays 9-11am CT), or send manually. Scripts for 12 of 23 posted to #outreach/#leads Aug 5-6."
+    },
+    {
+      "blocker": "Lead follow-ups Day 12 — 0 replies across 5 emails; 2nd follow-up script overdue",
+      "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). Highest-ROI 10 min, unchanged."
+    },
+    {
+      "blocker": "Blasian silent Day 10; leads question Day 11 unanswered (✅ reaction, no reply); human loop dead ~10 days",
+      "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md. Reply first — restarts the loop."
+    },
+    {
+      "blocker": "Reddit #48 reply AutoMod-filtered — needs MANUAL paste (t1_p24ihev, 'boring local service' thread 1vgvrg5); do NOT re-queue via API",
+      "detail": "Draft in intel report 2026-08-06_1937. Same manual-account requirement as the Blasian reply — one human session can clear both."
+    },
+    {
+      "blocker": "Stripe logged-in e2e checkout — Day 23, the ONLY unproven link; PLUS: both CF API tokens dead, deployed client stale (redeploy main, bot-side)",
+      "detail": "09:19Z check: functions live, keys valid, no key in bundle (by design), bundles converged. Redeploy is queued for Part 2; the checkout test needs Aaron's account + card."
+    },
+    {
+      "blocker": "SoftwareWorld + directory submissions — Day 27",
+      "detail": "Zero listicle presence; QuoteIQ co-founder self-ranks #1 in his own 'Top 8'. 10-15 min each."
+    },
+    {
+      "blocker": "One-click decisions: trial 7 vs 14 days · free-tier gap (5 vs 25 clients) · friend-poster cron resume (9b2791494b1b) · Jobber promo posts (overdue, drafts A/B/D; switcher window ~Aug 15) · SMS cron unpause · CF token repair",
+      "detail": "Fresh ammo: LawnPro $39 rival + free-tier gap, ServiceTitan $250-500/tech + $5-50k impl thread-confirmed, Jobber Core/Grow ladder, drought sales event, AI-estimating $29.99 floor."
+    }
+  ],
+  "quick_wins_sub_30min": [
+    {
+      "id": "sms_sender_path_fix",
+      "title": "Create /opt/data/scripts/send_sms.py wrapper (copy of /opt/data/.hermes/scripts/send_sms.py) so cron 3f67268baeb6 resolves → unblocks 23 queued Day-1 texts; then verify job status (vault says paused)",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "HIGH — first SMS wave after 6 days of queued scripts; 10/day cap, 9-11am CT window",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "reddit_kit_today",
+      "title": "Fri 22:21Z slot: post kit ① #43 (1vfyg2j) → ② #50 (1vh7t47) → ③ #41 (1vfvq1g), verify visibility after post (API success ≠ visible — #48 got filtered)",
+      "estimate": "20 min",
+      "owner": "Bot",
+      "impact": "MEDIUM-HIGH — first slot in 4 days; 5-8 quiet sweeps; kit fully stocked",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "reddit_1vhv10k_reply",
+      "title": "Post banked reply draft on 1vhv10k (r/smallbusiness, $379/mo booking widget + $2,400 dropdown) — DEADLINE ~14:41Z; 13:12Z intel run is in-window; friend-mode, no brand; else Saturday-slot candidate",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — freshest live thread; 'nobody names the middle' wedge",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "compare_page_lawnpro",
+      "title": "Compare page: add LawnPro row (Free 25 customers / $39 Startup 3 logins / $129 Grow / $249 Plus; add-on economy below Plus) + free-tier gap note; retire TurfHop outage line",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — closest rival now documented; flat-vs-add-on line sharpens",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "copy_flags_bank",
+      "title": "Bank new copy flags: LawnPro $39 vs MowGo Solo ($39 = full feature set, no add-on economy) · ServiceTitan thread consensus 'Jobber = cheap option below $1M revenue; nobody names a sub-$100 crew tool' · 1vhhu28 verbatim 're-keying the same numbers into three tools' · drought sales event + Rain Delay fit · AI estimating now $29.99 floor (watch, don't build) · labor +20% by 2029 · '65% of owners raised prices'",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — fuel for tonight's post + Sunday digest",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "redeploy_main",
+      "title": "Review working-tree diff (App.jsx, data.js, InvoiceToast.jsx, Settings.jsx, android gradle, lead_alerts migration) → commit + push main → CF auto-deploy (fixes stale client missing verify-session)",
+      "estimate": "20-30 min",
+      "owner": "Dev/Bot",
+      "impact": "MEDIUM-HIGH — closes the only Stripe-side flag; lead-alerts migration goes live",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "mxbuild_profile",
+      "title": "Profile MX Build ($49/mo entrant) — still owed since Aug 4",
+      "estimate": "15 min",
+      "owner": "Bot",
+      "impact": "LOW — completes competitor matrix at MowGo's price point",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "concierge_e2e",
+      "title": "Trigger one real concierge request to verify the notification pipeline",
+      "estimate": "10 min",
+      "owner": "Bot/Aaron",
+      "impact": "LOW-MED — first real test of wired channel",
+      "actionable_by_bot": true
+    },
+    {
+      "id": "sms_manual_sends",
+      "title": "IF cron stays paused: send 23 Day-1 texts manually + log in LEAD_TRACKER (wave-1 Day-2 texts then due)",
+      "estimate": "15 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — first SMS wave; 0 replies across emails so far",
+      "actionable_by_bot": false
+    },
+    {
+      "id": "followup_emails",
+      "title": "Send 5 overdue follow-ups (Day 12) — 2nd follow-up script overdue",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — warm leads going cold",
+      "actionable_by_bot": false
+    },
+    {
+      "id": "blasian_reply",
+      "title": "Post Blasian reply (draft ready) in #🌱mowgo-leads — Day 11; pair with #48 manual paste in one human session",
+      "estimate": "5 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — restarts human loop",
+      "actionable_by_bot": false
+    },
+    {
+      "id": "cf_token_repair",
+      "title": "Re-auth both dead Cloudflare API tokens in dashboard",
+      "estimate": "15 min",
+      "owner": "Aaron",
+      "impact": "MEDIUM — unblocks CF API automation (cf_check.py etc.)",
+      "actionable_by_bot": false
+    }
+  ],
+  "pricing_status": {
+    "recommendation": "HOLD $39/$79 flat — month-to-month, no per-user, no add-on economy. NEW closest rival: LawnPro $39 Startup (3 employee logins + deposits + tips) matches Solo's sticker, but their ladder is add-on-based (routes, 2-way text, QBO sync cost extra below Plus) and Crew $79 beats their $129 Grow, Premium $199 beats $249 Plus. The one visible weakness: MowGo Free (5 clients) vs LawnPro Free (25 customers) — decide whether to widen. The band is otherwise all-teaser: Jobber $29 (1-yr lock, +$29/seat, now 3-mo promos), QuoteIQ $29.99 + stealth 1% fee + AI Estimator floor, SA $49 one-license teaser, ServiceTitan $250-500/tech + $5-50k implementation.",
+    "new": "LawnPro FULL PROFILE (04:49Z): Free (25 customers) / $39 Startup (3 logins + deposits + tips) / $129 Grow / $249 Plus. ServiceTitan thread-confirmed $250-500/tech + $5-50k implementation — own commenters call Jobber 'the cheap option below $1M revenue', nobody names a sub-$100 crew tool. Jobber Core $29 (1 user annual) / Grow $149-299. HCP Basic $59-79 / Essentials $149-189 / MAX $299-329 + $35/user. QuoteIQ $29.99-149.99 with AI Estimator on every plan. TurfHop recovered ($49/$79/$129, Orbit AI copilot). Planado $12-29/user, still zero invoicing. Yardbook Business $34.99. DeepLawn AI measurement now in Service Autopilot + LawnPro add-ons.",
+    "copy_flags_banked": [
+      "LawnPro's $39 matches MowGo Solo's sticker — but routes, 2-way text, and QBO sync are add-ons until their $129 tier. MowGo Solo is $39 flat, everything included.",
+      "ServiceTitan's own thread: $250-500 per tech plus $5k-50k implementation — commenters call Jobber 'the cheap option below $1M revenue'. Nobody names a sub-$100 crew tool. That's the gap.",
+      "'The consolidation that actually pays is quote to signature to invoice to payment... re-keying the same numbers into three tools' — a stranger on Reddit describing MowGo's whole pitch, verbatim.",
+      "Jobber's own academy preaches 'minimum stop rate' and 65% of owners raised prices in 2026 — price off data, not buddies (matches the $55.25 OK average content line).",
+      "2026 drought: Denver metro Stage 1 water restrictions through Oct 31, fines to $36k — fewer routine mows, more premium xeriscape/irrigation projects with bigger one-off invoices. MowGo's auto-invoice + Rain Delay reschedule fits the chaos.",
+      "AI estimating went productized overnight: QuoteIQ ships it on every plan from $29.99, TurfHop launched Orbit AI. It's table stakes now — MowGo watches, doesn't build; if ever added, it's a Solo-tier feature.",
+      "Labor costs +20% by end of 2029 (NALP/ITR); 28% of maintenance crews earn $21-25/hr — every admin hour is field labor lost. MowGo's one-tap day view + auto-invoice is the counter.",
+      "GreenPal pays crews only after timestamped photo confirmation — photo proof is becoming a homeowner expectation (validates MowGo's photo-checklist roadmap)."
+    ]
+  },
+  "summary": "12 new messages overnight-to-morning in #mowgo, ALL bot cron reports — ZERO human messages anywhere (Blasian silent Day 10; his leads question Day 11, ✅ still no reply; draft ready). 🐦 REDDIT SLOT IS TODAY 22:21Z: kit ① #43 (1vfyg2j, alive 20 comments) → ② #50 (1vh7t47 mulch, NEW) → ③ #41 (all verified alive 04:56Z); PLUS banked 1vhv10k reply draft with ~14:41Z deadline (13:12Z run in-window). ⚠️ #48 reply was API-posted and AutoMod-FILTERED (t1_p24ihev) — needs manual paste, do not re-queue. 🟢 INTEL: LawnPro full profile = CLOSEST PRICE RIVAL ($39 Startup 3-login vs Solo $39; free tier 25 vs 5 clients — gap now visible; Crew $79/$199 still win); ServiceTitan pricing thread-confirmed ($250-500/tech + $5-50k impl; 'Jobber = cheap option below $1M', nobody names sub-$100 crew tool = MowGo gap); price ladder gap widened; 2 feature ideas worth doing (quote-approval capture = quotes v1 dispute shield, crew clock-in = Crew-tier depth); drought + AI-estimating + labor +20% = 3 content flags; TurfHop outage FULLY closed (retire line); TradeKit astroturfing 2nd sighting. ✅ STRIPE: 09:19Z all green, bundles converged, no key leak — BUT both CF API tokens DEAD and deployed client STALE (missing verify-session flow → redeploy main; client changes uncommitted). ✅ COWORK: 128 spam CLEANED Aug 6 (channel empty; watchdog 841 consecutive) — Day-5 hygiene item CLOSED. ⚠️ OUTREACH CHANNEL GONE (404 x3; vault logged x2) — deleted/access removed; Rule of 100 delivers to #leads. 📋 Aaron's plate: 23 Day-1 SMS queued 0 sent (sender cron path-broken + paused — bot can drop wrapper, then unpause decision), 5 lead follow-ups Day 12 (0 replies, 2nd script overdue), Blasian reply Day 11 + #48 manual paste (one human session clears both), Stripe logged-in checkout Day 23, SoftwareWorld Day 27, CF token repair, Jobber promo posts (window ~Aug 15), one-click decisions (trial, free tier, friend-poster, SMS unpause). Bot's plate (Part 2): SMS path wrapper, 22:21Z kit post + visibility verify, 1vhv10k reply (≤14:41Z), compare-page LawnPro row + retire TurfHop line, copy flags, redeploy main, MX Build, concierge e2e.",
+  "vault_files_written": []
+}

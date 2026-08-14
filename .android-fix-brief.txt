@@ -1,0 +1,20 @@
+Fix the following issues in the MowGo Android codebase at /opt/data/mowgo/client/android-native/. Apply EXACT changes — no extra files, no re-verification, no reading unrelated code.
+
+## Issues to fix
+
+### 1. app/src/main/java/com/mowgo/app/data/auth/AuthRepository.kt — ALREADY FIXED, skip
+
+### 2. app/src/main/java/com/mowgo/app/ui/dashboard/DashboardViewModel.kt — owner check fails when profile is null
+Line 289: The owner-role check no longer defaults to owner when `profile == null`. A brand-new owner landing on Dashboard right after signup can see QuickActions/TeamCard/CrewRoster hidden. Fix: when `profile == null`, default to `isOwner = true` (the first user is always the owner).
+
+### 3. app/src/main/java/com/mowgo/app/data/local/dao/MutationDao.kt — no status filter on oldest()
+Line 11: `oldest()` has no status filter and `processNext()` catches any Exception. A permanently-failing offline mutation blocks the entire sync queue forever with no UI path to skip it. Fix: `oldest()` should filter to `status = 'pending'` AND `retry_count < MAX_RETRIES`. Mutations exceeding max retries should be marked as `failed` rather than blocking the queue.
+
+### 4. app/src/main/java/com/mowgo/app/data/JobRepository.kt — reorder not in offline queue
+Line 204: `reorderJob()` is not part of the offline mutation queue like every other write. A reorder attempted offline is silently lost instead of retried. Fix: wrap the reorder in the offline mutation queue pattern.
+
+### 5. app/src/main/java/com/mowgo/app/data/EncryptedSessionManager.kt — unguarded Keystore corruption
+Line 13: Unguarded `EncryptedSharedPreferences.create()` in the lazy client init. A corrupted Keystore would crash at Splash with no recovery except clearing app data. Fix: wrap in try-catch and fall back to plain SharedPreferences on Keystore failure.
+
+## Instructions
+Apply fixes to the actual files. For each fix, make the minimal correct change. Do not read files that are already described above. Do not add new files. Do not run tests. Report back what you fixed.

@@ -203,6 +203,28 @@ final class AuthService: ObservableObject {
         )
         await loadProfile()
     }
+
+    func updateRainAlertsEnabled(_ enabled: Bool) async throws {
+        if isDemoMode {
+            user?.rainAlertsEnabled = enabled
+            return
+        }
+        guard let id = user?.id else { throw ProfileUpdateError.profileUnavailable }
+        struct RainAlertsPatch: Encodable { let rainAlertsEnabled: Bool }
+        try await sb.update("profiles", id: id, RainAlertsPatch(rainAlertsEnabled: enabled))
+        user?.rainAlertsEnabled = enabled
+    }
+
+    func updateLeadAlertsEnabled(_ enabled: Bool) async throws {
+        if isDemoMode {
+            user?.leadAlertsEnabled = enabled
+            return
+        }
+        guard let id = user?.id else { throw ProfileUpdateError.profileUnavailable }
+        struct LeadAlertsPatch: Encodable { let leadAlertsEnabled: Bool }
+        try await sb.update("profiles", id: id, LeadAlertsPatch(leadAlertsEnabled: enabled))
+        user?.leadAlertsEnabled = enabled
+    }
 }
 
 private enum ProfileUpdateError: LocalizedError {

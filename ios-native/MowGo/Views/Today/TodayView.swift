@@ -19,6 +19,7 @@ struct TodayView: View {
     @State private var showingActionSheet = false
     @State private var showingAddJob = false
     @State private var showingAddClient = false
+    @State private var editingJob: Job?
     @State private var selectedDate = Date()
     @State private var operationError: String?
     @State private var selectedCrewFilter: UUID? = nil
@@ -227,6 +228,10 @@ struct TodayView: View {
             }
             .sheet(isPresented: $showingAddClient) {
                 NewClientFormView()
+            }
+            .sheet(item: $editingJob) { job in
+                EditJobFormView(job: job)
+                    .environmentObject(store)
             }
             .onAppear {
                 if auth.user?.tier == "crew" || auth.user?.tier == "premium" {
@@ -616,6 +621,7 @@ struct TodayView: View {
                     operationError = error.localizedDescription
                 }
             },
+            onEdit: { editingJob = job },
             showDate: !isToday
         )
     }

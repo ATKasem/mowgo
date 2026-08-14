@@ -1,0 +1,28 @@
+# MowGo Parity Fix — Android
+
+## Fix these files. Do NOT touch unrelated dirty files.
+
+## 1. Android: Add rain_alerts_enabled toggle
+- client/android-native/app/src/main/java/com/mowgo/app/data/model/Profile.kt: Add `@SerialName("rain_alerts_enabled") val rainAlertsEnabled: Boolean = true`
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt: Add a Switch toggle row
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt: Add state variable, load from profile, save via ProfileRepository
+
+## 2. Android: Add lead alerts toggle
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreScreen.kt: Add tier-gated toggle (only show when tier is solo/crew/premium)
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt: Add state + save
+
+## 3. Android: Add job reorder
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayScreen.kt: Add up/down arrow buttons on each job card. Tap up moves job earlier in the route order, tap down moves it later. Call `JobRepository.reorderJob(jobId, newOrder)`.
+- client/android-native/app/src/main/java/com/mowgo/app/data/JobRepository.kt: Add `reorderJob` method that calls the `reorder_jobs` RPC, similar to how web and iOS do it.
+
+## 4. Android: Add recurrence UI
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/NewJobDialog.kt: Add recurrence picker (none/daily/weekly/biweekly/monthly)
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/EditJobDialog.kt: Add recurrence picker
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt: Wire recurrence generation on job completion
+
+## 5. Android: Wire rain-delay SMS
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/today/TodayViewModel.kt: In the rain delay flow, after applying the delay, call the `send-rain-delay-sms` Supabase edge function with `{jobId, clientId, delayDate}`.
+
+## 6. Android: Add Leads CSV export
+- client/android-native/app/src/main/java/com/mowgo/app/data/ExportRepository.kt: Add `exportLeads(context, profileId)` method following the existing client/jobs/invoice export patterns
+- client/android-native/app/src/main/java/com/mowgo/app/ui/screens/more/MoreViewModel.kt: Add "Export Leads" option to the exports list

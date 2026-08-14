@@ -1,0 +1,328 @@
+{
+  "scan_ts": "2026-08-10T12:00:00Z",
+  "scan_label": "7am CST — Mon Aug 10 (window since Aug 9 12:45Z scan)",
+  "channels_scanned": {
+    "mowgo": {
+      "channel_id": "1529248227394850916",
+      "status": "100 fetched. ~30 new msgs since Aug 9 12:45Z — ALL bot: Intel Engine ×6 (01:42Z feature_ideas v48, 05:46Z competitor_monitoring v49/RSS recovered/LawnPro level billing confirmed, 09:56Z industry_trends/300B market/drought mode toggle, plus Stripe 09:07Z all green new bundle hash, invoice reminders 12:30Z OK). Intel Engine SELF-RECOVERED from Aug 9 402 error — running fine now v49. ✅ ZERO human messages.",
+      "last_human_msg": "Blasian — 'How would we get leads for MowGo' 2026-07-28T17:03Z (Day 13 of silence; ✅ reaction still no reply)"
+    },
+    "outreach": {
+      "channel_id": "1529711006023024680",
+      "status": "⚠️ CHANNEL GONE — 404 Unknown Channel, 5th consecutive sync. Deletion CONFIRMED.",
+      "note": "No active cron targets it."
+    },
+    "cowork": {
+      "channel_id": "1529736297847980153",
+      "status": "✅ EMPTY — 0 messages. Watchdog clean Day 10.",
+      "note": "Nothing to do."
+    },
+    "leads": {
+      "channel_id": "1529707289014042804",
+      "status": "No new messages. Last activity: Wave-4 SMS drafts posted Aug 7 15:11Z (Campbell & Sons, Nutri-Green, Hicks, Eberly's, LBR, Aguilar Brothers) + 3 FB/IG posts. Blasian's leads question Jul 28 UNANSWERED — Day 13, ✅ reaction still no reply.",
+      "note": "Wave-4 SMS drafts NOT in sms_queue.json (still 23 entries all status=new from earlier waves)."
+    }
+  },
+  "overnight_messages_needing_attention": [
+    {
+      "id": "intel_engine_recovered",
+      "ts": "2026-08-10T05:46:00Z",
+      "content": "✅ Intel Engine SELF-RECOVERED from the Aug 9 09:48Z HTTP 402 Insufficient Balance failure. Running normally at v49, RSS pipeline working (6/8 subs recovered from 403 block). All BI reports back online.",
+      "significance": "HIGH — critical pipeline restored without intervention. Monitor OpenRouter balance.",
+      "action": "Check OpenRouter balance if credits were auto-refilled; flag if this was a platform credit grant vs burn-through."
+    },
+    {
+      "id": "reddit_rss_recovered",
+      "ts": "2026-08-10T05:46:00Z",
+      "content": "RSS pipeline recovered from 403 block that hit at Aug 9 21:38Z. 6/8 target subreddits now working. Mon 22:23Z slot (cron 4c195234eaa9) unaffected since it uses the poster kit, not RSS.",
+      "significance": "MEDIUM — pipeline restored for discovery. Mon slot still on-track.",
+      "action": "None — auto-recovered. Monitor for recurring 403 pattern."
+    },
+    {
+      "id": "stripe_health_ok_new_hash",
+      "ts": "2026-08-10T09:07:00Z",
+      "content": "Stripe: ALL GREEN. New bundle hash (index-SYdfvHNk.js) on BOTH domains — another redeploy (previously Bt0NtHLK.js). All 3 endpoints alive and auth-gated. Zero key leaks. iOS PaymentSheet valid. pages.dev origin-blocked as expected.",
+      "significance": "LOW-MED — positive signal of active deployment. Still awaiting Aaron's manual e2e checkout (Day 26).",
+      "action": "None bot-side."
+    },
+    {
+      "id": "level_billing_table_stakes",
+      "ts": "2026-08-10T05:46:00Z",
+      "content": "LawnPro confirmed level billing on FREE tier (ToS updated Aug 2). Level billing is now table-stakes — every competitor's free tier beats MowGo Free's 5-client cap (LawnPro: 25, LawnBook: 15). MowGo still unique on: no per-user tax, rain delay, booking link.",
+      "significance": "MEDIUM — feature parity gap widening. Level billing priority UP.",
+      "action": "Consider expanding MowGo Free free-tier cap from 5 to 10 or 15 clients — or push level billing as Solo/Crew feature to justify paid tiers."
+    },
+    {
+      "id": "crewnext_listicle_omission",
+      "ts": "2026-08-10T05:46:00Z",
+      "content": "CrewNest published 'Best 8 Lawn Care Software 2026' — covers Aspire, CrewNest, HCP, Jobber, LMN, SA, ServiceTitan, Yardbook. ZERO MowGo mentions. Proves directory/gap problem is real and costing distribution.",
+      "significance": "MEDIUM — another data point for directory submissions urgency (Day 29). MowGo absent from competitor's own SEO play.",
+      "action": "Reinforce directory submissions priority: Capterra/G2/SoftwareAdvice/GetApp."
+    },
+    {
+      "id": "market_crossed_300b",
+      "ts": "2026-08-10T09:56:00Z",
+      "content": "US lawn care/landscaping crossed $300B. Software sub-market growing 12.5% CAGR — 2-4x industry rate. 'Do I need software?' era is over.",
+      "significance": "MEDIUM — validates TAM and timing. Use in outreach and compare page.",
+      "action": "Bank for copy: 'The $300B lawn industry runs on software now. MowGo is the flat-rate option built for OK crews.'"
+    },
+    {
+      "id": "servinix_beta_countdown",
+      "ts": "2026-08-10T05:46:00Z",
+      "content": "Servinix beta opens Aug 17 (7 days away), launch Sept 14. Shipping rain delay automation (SMS + auto-reschedule), crew GPS, '60% off your invoice' switcher hook. Direct threat at 2+ crew ICP.",
+      "significance": "MEDIUM-HIGH — direct competitor entering the space MowGo owns. 7-day countdown.",
+      "action": "Watch for beta pricing + feature reveal. Prep Servinix compare-page row if pricing emerges."
+    },
+    {
+      "id": "invoice_reminders_ok",
+      "ts": "2026-08-10T12:30:00Z",
+      "content": "Invoice reminders: OK — 0 unpaid invoices older than 7d (0 found, 0 skipped/cooldown). Clean sweep.",
+      "significance": "LOW — routine green.",
+      "action": "None."
+    }
+  ],
+  "open_tasks": {
+    "critical": [
+      {
+        "id": "reddit_slot_mon_night",
+        "title": "🔴 FIRE TONIGHT Mon Aug 10 22:23Z Reddit slot — kit #55 → #57 → #43, cron 4c195234eaa9 ARMED",
+        "days_open": 0,
+        "owner": "Bot/Aaron",
+        "status": "🟢 ARMED — first slot after 96h gate. Kit: #55 (drought/level-billing, OP's SMS question still unanswered) → #57 (Central TX new lawn biz) → #43 (first-5-customers). Fallback tracks available."
+      },
+      {
+        "id": "sms_batch_sends",
+        "title": "SMS Day-1 sends — 23 texts queued (all 'new'), ZERO ever sent; sender cron PAUSED since Aug 6",
+        "days_open": 9,
+        "owner": "Aaron (decision)",
+        "status": "🔴 PAUSED Day 9 — cron 3f67268baeb6 disabled. Wave-4 adds 6 more drafts in #leads."
+      },
+      {
+        "id": "emerge_followup",
+        "title": "Lead follow-ups Day 15 — 5 emails, 0 replies; 2nd follow-up overdue (was due Aug 7)",
+        "days_open": 15,
+        "owner": "Aaron (manual)",
+        "status": "🔴 OVERDUE — highest-ROI 10 min of the week, still unsent"
+      },
+      {
+        "id": "blasian_leads_question",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 13; ✅ reaction, no reply",
+        "days_open": 13,
+        "owner": "Aaron (manual)",
+        "status": "🔴 UNANSWERED — draft ready at leads/blasian-reply-draft-2026-08-01.md"
+      },
+      {
+        "id": "stripe_e2e_verify",
+        "title": "Logged-in e2e checkout — Day 26, ONLY unproven link",
+        "days_open": 26,
+        "owner": "Aaron (manual)",
+        "status": "🟡 STILL UNPROVEN — bundles converged (new hash SYdfvHNk.js both domains)"
+      },
+      {
+        "id": "softwareworld_submit",
+        "title": "Submit MowGo to directory listings — Day 30 of zero presence",
+        "days_open": 30,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — CrewNest listicle omission proved the gap"
+      },
+      {
+        "id": "reddit_48_manual_paste",
+        "title": "Manually paste #48 reply in 'boring local service' thread — AutoMod-filtered Aug 6",
+        "days_open": 4,
+        "owner": "Aaron/Blasian (manual)",
+        "status": "🆕 STILL FILTERED"
+      }
+    ],
+    "medium": [
+      {
+        "id": "cf_tokens_dead",
+        "title": "BOTH Cloudflare API tokens dead (10000 error since Aug 7) — blocks cf_check/wrangler",
+        "days_open": 4,
+        "owner": "Aaron",
+        "status": "🔴 DEAD — git push deploys still work. New bundle hash appeared without CF tokens (manual deploy)"
+      },
+      {
+        "id": "friend_mode_replies",
+        "title": "Reply 1vj9nay (quote→Jobber loop builder) + 1vj4wob (pricing question) in Mon slot",
+        "days_open": 2,
+        "owner": "Aaron/Bot",
+        "status": "🆕 DUE — friend-mode, no pitch. Warm leads."
+      },
+      {
+        "id": "level_billing_feature",
+        "title": "Level billing — #1 DROUGHT FEATURE — now table-stakes (LawnPro FREE tier confirmed)",
+        "days_open": 3,
+        "owner": "Dev",
+        "status": "🚀 PRIORITY UP — 'Drought Mode' toggle (freeze + level billing + broadcast SMS) could be market-first"
+      },
+      {
+        "id": "missed_call_textback",
+        "title": "Missed-call text-back (Twilio) — THE wedge vs AI-receptionist arms race",
+        "days_open": 5,
+        "owner": "Dev",
+        "status": "S effort — beats Jobber $29 AI Receptionist with lower-cost Twilio"
+      },
+      {
+        "id": "quotes_v1",
+        "title": "Minimal Quotes v1 — #1 BUILD PRIORITY (unchanged)",
+        "days_open": 11,
+        "owner": "Dev",
+        "status": "🚀 UNCHANGED"
+      },
+      {
+        "id": "compare_page_next",
+        "title": "Compare page: add Servinix row, LawnPro level billing note, CrewNest omission flag, drought mode angle",
+        "days_open": 3,
+        "owner": "Bot/Dev",
+        "status": "QUEUED — multiple new data points ready"
+      },
+      {
+        "id": "directory_submissions",
+        "title": "Directory submissions (Capterra/G2/SoftwareAdvice/GetApp) — Day 30",
+        "days_open": 30,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — CrewNest omission proves cost of delay"
+      }
+    ],
+    "low": [
+      {
+        "id": "trial_length_decision",
+        "title": "Decide trial 7 vs 14 days",
+        "owner": "Aaron",
+        "status": "⏳ Plate decision"
+      },
+      {
+        "id": "free_tier_gap",
+        "title": "Free-tier gap — MowGo Free 5 clients vs LawnPro Free 25 vs LawnBook Free 15",
+        "owner": "Aaron",
+        "status": "DECISION VISIBLE — gap widening"
+      },
+      {
+        "id": "concierge_e2e_test",
+        "title": "Trigger one real concierge request (needs Aaron's logged-in session)",
+        "owner": "Aaron",
+        "status": "Pending"
+      }
+    ],
+    "closed_since_yesterday": [
+      "intel_engine_402 → ✅ SELF-RECOVERED from HTTP 402 at 09:48Z Aug 9 — running normally by 13:37Z. v49 active.",
+      "reddit_rss_403 → ✅ RECOVERED — 6/8 subs back online. 403 at 21:38Z Aug 9 resolved by 05:46Z Aug 10.",
+      "mon_slot_cron → ✅ ALREADY ARMED — cron 4c195234eaa9 ready for tonight 22:23Z.",
+      "stripe_new_hash → ✅ index-SYdfvHNk.js on both domains — new deploy (was Bt0NtHLK.js). All green."
+    ]
+  },
+  "blockers_for_aaron": [
+    {
+      "blocker": "SMS: 23 Day-1 texts queued 9 days, ZERO ever sent — sender cron PAUSED",
+      "detail": "Cron 3f67268baeb6 disabled since Aug 6. One command: hermes cron resume 3f67268baeb6. Wave-4 adds 6 more drafts in #leads."
+    },
+    {
+      "blocker": "Lead follow-ups Day 15 — 0 replies across 5 emails; 2nd follow-up overdue since Aug 7",
+      "detail": "Emerge / Metro Green / Bigfoot / Simply (Jul 29) + Campbell & Sons (Jul 31). 10 min highest-ROI, still unsent."
+    },
+    {
+      "blocker": "Blasian silent Day 13; leads question unanswered (✅ reaction only); human loop dead 13+ days",
+      "detail": "Draft ready. Pair with #48 manual paste in one human session."
+    },
+    {
+      "blocker": "CF API tokens dead Day 4 + Stripe e2e checkout Day 26 + directory submissions Day 30 + #48 manual paste",
+      "detail": "Four one-click decisions: CF re-auth · manual checkout · directory submissions · Reddit paste. All same-session feasible."
+    },
+    {
+      "blocker": "Servinix beta in 7 days (Aug 17) — rain delay automation competitor, no pricing revealed yet",
+      "detail": "MowGo already ships Rain Delay v2. Prep compare-page row if pricing emerges at beta launch."
+    }
+  ],
+  "quick_wins_sub_30min": [
+    {
+      "id": "mon_slot_verify_cron",
+      "title": "VERIFY Mon 22:23Z one-shot cron 4c195234eaa9 is armed and kit locks are current (kit #55→#57→#43)",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "HIGH — locks the first post after 96h gate"
+    },
+    {
+      "id": "friend_mode_replies",
+      "title": "Reply 1vj9nay (quote→Jobber loop builder) + 1vj4wob (pricing question) — friend-mode, no pitch",
+      "estimate": "10 min",
+      "owner": "Aaron",
+      "impact": "HIGH — warm leads, non-pitch opens engagement"
+    },
+    {
+      "id": "followup_emails",
+      "title": "Send 5 overdue follow-ups (Day 15+)",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — highest-ROI 10 min of the week"
+    },
+    {
+      "id": "sms_unpause_decision",
+      "title": "UNPAUSE SMS sender cron (hermes cron resume 3f67268baeb6) or commit to manual sends",
+      "estimate": "2 min",
+      "owner": "Aaron (decision)",
+      "impact": "HIGH — 23+6=29 Day-1 texts waiting 9 days"
+    },
+    {
+      "id": "blasian_reply",
+      "title": "Post Blasian reply + #48 manual paste (one session, 5 min)",
+      "estimate": "5 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — re-engages the only human collaborator"
+    },
+    {
+      "id": "level_billing_drought_mode",
+      "title": "Bank 'Drought Mode' feature spec: freeze + level billing + broadcast SMS toggle — market-first angle",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — positions level billing as drought-season differentiator"
+    },
+    {
+      "id": "grasshopper_compare_row",
+      "title": "Add LawnPro confirmed level billing on FREE tier to compare page data",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — compare page accuracy"
+    },
+    {
+      "id": "market_300b_copy_bank",
+      "title": "Bank $300B market + 12.5% CAGR software stat for outreach/copy",
+      "estimate": "5 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — fuel for outreach + positioning"
+    },
+    {
+      "id": "servinix_beta_countdown",
+      "title": "Prep Servinix beta watch entry (Aug 17) — note rain delay overlap, 60% switcher hook, prep compare row",
+      "estimate": "10 min",
+      "owner": "Bot",
+      "impact": "MEDIUM — competitor intel, 7-day countdown"
+    },
+    {
+      "id": "sms_manual_sends",
+      "title": "IF cron stays paused: send 23+6=29 Day-1 texts manually + log in LEAD_TRACKER",
+      "estimate": "15 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH"
+    }
+  ],
+  "pricing_status": {
+    "recommendation": "HOLD $39/$79 flat. NEW MONDAY DELTAS: LawnPro confirmed level billing on FREE tier (ToS updated Aug 2) — our planned level billing feature is now catch-up. Market crossed $300B, software sub-market 12.5% CAGR. Jobber's 4-tier wall ($24 anchor → $320+ actual) is widest gap in years — every Connect user pays more than Crew $79 flat. Servinix beta Aug 17 (7 days) — rain delay competitor, pricing unlisted.",
+    "new_this_scan": [
+      "LawnPro confirmed level billing on FREE tier (ToS Aug 2) — table stakes now",
+      "MowGo Free 5 clients vs LawnPro Free 25, LawnBook Free 15 — gap widening",
+      "Market crossed $300B, software sub-market 12.5% CAGR",
+      "Jobber's 4-tier wall widest ever: $24 anchor → $320+ actual",
+      "Servinix beta in 7 days (Aug 17) — rain delay automations + '60% off invoice' switcher hook"
+    ],
+    "copy_flags_banked": [
+      "Level billing is now table-stakes — MowGo needs it to compete on free tier",
+      "The floor moved to $49+. Solo is $39 flat, unlimited clients.",
+      "Per-user tax = industry pricing engine: Crew $79 beats every multi-user stack.",
+      "Crossed $300B lawn industry. Software adoption CAGR 12.5%.",
+      "Servinix AI Assistant alone = $300/mo. MowGo's entire stack = $39-$79.",
+      "Servinix beta Aug 17 — shipping rain delay automation (MowGo already ships it).",
+      "Drought = 2026 national story. 'Drought Mode' toggle = market-first feature angle."
+    ]
+  },
+  "summary": "ALL BOT MESSAGES OVERNIGHT — ZERO human activity (Blasian silent Day 13). ✅ INTEL ENGINE SELF-RECOVERED from Aug 9 402 (OpenRouter credit fail) — running fine v49, RSS pipeline recovered. ✅ STRIPE 09:07Z: all green, NEW bundle hash (SYdfvHNk.js) both domains. Launched new bundle without CF tokens (manual deploy on pages.dev?). 🐦 MON 22:23Z SLOT ARMED: cron 4c195234eaa9, kit #55→#57→#43 — first legal slot after 96h gate. NEW: LawnPro confirmed level billing on FREE tier (table-stakes now), CrewNest listicle omits MowGo (directory gap proven), market crossed $300B (12.5% CAGR software). Servinix beta Aug 17 (7 days) — shipping rain delay overlap with MowGo. Lead pipeline unchanged: 20 tracked / 5 contacted / 0 replies (Day 15). SMS 23 texts queued Day 9, cron paused. CF tokens dead Day 4. 🔴 CRITICAL for Aaron: fire Reddit slot tonight 22:23Z · unpause SMS (9 days) · 5 overdue follow-ups (Day 15) · Blasian reply + #48 paste · CF re-auth · directory submissions (Day 30). Bot should: verify slot cron, bank Drought Mode spec + $300B stat, prep Servinix watch entry."
+}

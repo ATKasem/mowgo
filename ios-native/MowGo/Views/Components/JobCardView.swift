@@ -15,6 +15,7 @@ struct JobCardView: View {
     var teamMembers: [UserProfile] = []
     var onToggle: (() async -> Void)?
     var onSkip: (() async -> Void)?
+    var onEdit: (() -> Void)?
     var showDate: Bool = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -274,6 +275,11 @@ struct JobCardView: View {
         .background(theme.surface)
         .cornerRadius(12)
         .contextMenu {
+            if let onEdit {
+                Button { onEdit() } label: {
+                    Label("Edit Job", systemImage: "pencil")
+                }
+            }
             if job.status != .skipped {
                 Button { showSkipConfirm = true } label: {
                     Label("Skip Job", systemImage: "forward")

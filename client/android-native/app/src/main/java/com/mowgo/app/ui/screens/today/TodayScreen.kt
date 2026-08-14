@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -67,8 +68,8 @@ fun TodayScreen(
         NewJobDialog(
             clients = state.clients,
             onDismiss = { viewModel.dismissNewJobDialog() },
-            onCreate = { title, clientId, date, time, notes, routeOrder ->
-                viewModel.createJob(title, clientId, date, time, notes, routeOrder)
+            onCreate = { title, clientId, date, time, notes, routeOrder, recurrence ->
+                viewModel.createJob(title, clientId, date, time, notes, routeOrder, recurrence)
             },
         )
     }
@@ -104,13 +105,19 @@ fun TodayScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = state.isLoading,
-            onRefresh = { viewModel.refresh() },
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            SyncStatusBanner(isOffline = state.isOffline, pendingSyncCount = state.pendingSyncCount)
+            PullToRefreshBox(
+                isRefreshing = state.isLoading,
+                onRefresh = { viewModel.refresh() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+            ) {
             if (state.isLoading && state.jobs.isEmpty()) {
                 // Initial loading state
                 Box(
@@ -187,10 +194,10 @@ fun TodayScreen(
                     }
 
                     // Job cards
-                    items(
+                    itemsIndexed(
                         items = state.todayJobs,
-                        key = { it.id },
-                    ) { jobWithClient ->
+                        key = { _, item -> item.id },
+                    ) { index, jobWithClient ->
                         JobCard(
                             jobWithClient = jobWithClient,
                             onMarkDone = { viewModel.markDone(jobWithClient.id) },
@@ -200,10 +207,39 @@ fun TodayScreen(
                             isUploadingPhoto = jobWithClient.id in state.uploadingPhotoJobIds,
                             onPhotoReady = { bytes -> viewModel.uploadJobPhoto(jobWithClient.id, bytes) },
                             onPhotoError = viewModel::showPhotoError,
+                            canMoveUp = index > 0,
+                            canMoveDown = index < state.todayJobs.lastIndex,
+                            onMoveUp = { viewModel.moveJob(jobWithClient.id, index - 1) },
+                            onMoveDown = { viewModel.moveJob(jobWithClient.id, index + 1) },
                         )
                     }
                 }
             }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SyncStatusBanner(isOffline: Boolean, pendingSyncCount: Int) {
+    if (!isOffline && pendingSyncCount == 0) return
+    val text = when {
+        isOffline && pendingSyncCount > 0 -> stringResource(R.string.today_offline_pending_banner, pendingSyncCount)
+        isOffline -> stringResource(R.string.today_offline_banner)
+        else -> stringResource(R.string.today_syncing_banner, pendingSyncCount)
+    }
+    Surface(
+        color = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.CloudOff, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(text, style = MaterialTheme.typography.labelMedium)
         }
     }
 }
@@ -531,6 +567,10 @@ private fun JobCard(
     isUploadingPhoto: Boolean,
     onPhotoReady: (ByteArray) -> Unit,
     onPhotoError: (String) -> Unit,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -559,7 +599,7 @@ private fun JobCard(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "${order + 1}",
+                            text = "$order",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -593,6 +633,15 @@ private fun JobCard(
                     onImageReady = onPhotoReady,
                     onError = onPhotoError,
                 )
+
+                Column {
+                    IconButton(onClick = onMoveUp, enabled = canMoveUp, modifier = Modifier.size(28.dp)) {
+                        Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Move job earlier")
+                    }
+                    IconButton(onClick = onMoveDown, enabled = canMoveDown, modifier = Modifier.size(28.dp)) {
+                        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Move job later")
+                    }
+                }
 
                 // Time + status chip
                 Column(horizontalAlignment = Alignment.End) {

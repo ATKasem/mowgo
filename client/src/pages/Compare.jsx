@@ -361,7 +361,7 @@ export default function Compare() {
             {tr("TurfHop's pricing page was down for 5 days (Aug 1–6, 2026, 500 errors) — its features page is still down. Verify current features with them before you buy.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Jobber's ladder moved again (verified Aug 8, 2026): Core $49/mo (raised from $39), Connect $129–$139/mo, Grow $249/mo — plus $29/mo for every extra user, and their new AI Receptionist is another $29/mo add-on (free only on Plus $399+). MowGo is $39–$79 flat, month-to-month, whole crew included — and missed-call text-back is on our roadmap, not a paid add-on.")}
+            {tr("Jobber's ladder moved again (verified Aug 8, 2026): Core $49/mo (raised from $39), Connect $129–$139/mo, Grow $249/mo — plus $29/mo for every extra user, and their new AI Receptionist is another $29/mo add-on (free only on Plus $399+). Their 'Starting at $24/mo' promo expired Aug 12, 2026 — the entry anchor is now $29/mo. MowGo is $39–$79 flat, month-to-month, whole crew included — and missed-call text-back is on our roadmap, not a paid add-on.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Service Autopilot's $49/mo is ONE mobile license — a 2-person crew runs $199+/mo with a signup fee and annual-only billing. MowGo Crew is $79 flat, whole crew included.")}
@@ -370,7 +370,7 @@ export default function Compare() {
             {tr("Planado (new in the band) charges per user — $12–$29/user/mo — and has no invoicing or payments at all. MowGo's auto-invoice + SMS pay link is included at $39 flat.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Servinix ($300/mo AI Service Assistant flat) launches Sept 14 with an invoice-coupon switcher hook — but their entire stack starts above MowGo's total price. Commercial-focused (1–100 tech), not a direct lawn-crew competitor. Still worth noting: $300 for their AI layer alone exceeds MowGo's whole stack.")}
+            {tr("Servinix ($300/mo AI Service Assistant flat) launches Aug 17 (beta) with an invoice-coupon switcher hook — but their entire stack starts above MowGo's total price. Commercial-focused (1–100 tech), not a direct lawn-crew competitor. Still worth noting: $300 for their AI layer alone exceeds MowGo's whole stack.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">{tr("LMN (design-build estimating) starts around $197/mo for quote-only and runs $297–$697/mo for the design-build band (verified Aug 8, 2026) — built for a different business than a 1–2 person mow crew. MowGo covers scheduling through payment at $39/$79 flat.")}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">

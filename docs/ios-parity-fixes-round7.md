@@ -1,0 +1,24 @@
+# iOS Parity — Review Round 7 Fixes
+
+**Status:** 🆕 — Aug 4, 2026
+**Why:** Round-7 confirmation review (Codex) found 3 HIGH issues, all in rollback state consistency: dequeued jobs' in-memory dates not restored, and server-rollback failures swallowed with `try?` without surfacing. Fix all three. CI is the compiler. No local builds.
+
+## Fixes
+
+### R7-1. Undo rollback: successful dequeue leaves queued job's in-memory date wrong (DataStore ~1164)
+In undoRainDelay's rollback, when a wasQueued job's mutation is successfully dequeued, the job's in-memory `scheduledDate` stays at `originalDate` (the undone date) — but the server never changed, so local state diverges and the UI shows the job restored when it isn't.
+**Fix:** after a successful dequeue of a queued job, update that job's in-memory `scheduledDate` back to `entry.targetDate` (find by id in `jobs`, mutate via the same local-update pattern used elsewhere; do NOT enqueue anything). If the dequeue failed, leave it (the mutation will still sync; the error path already surfaces).
+
+### R7-2. Rain-delay rollback: server-rollback failures swallowed with `try?` (DataStore ~1101)
+`try? await updateJobSchedule(realJob, scheduledDate: original)` discards failures. If the server rollback fails, `loadAll()` may reveal jobs still on the target date with no error shown.
+**Fix:** capture the outcome: use `try?` result + the returned Bool. If the update threw or returned false (queued/not synced), set a rollback flag; after `loadAll()`, if the flag is set, set `self.error = "Rain delay rollback incomplete — verify your schedule"` (in addition to any existing error, re-applied after loadAll as in R5-2).
+
+### R7-3. Undo rollback: server-rollback failures discarded, no reload/verification (DataStore ~1186)
+Same class in undoRainDelay's rollback for synced jobs: `try? await updateJobSchedule(current, scheduledDate: entry.targetDate)` swallows failures, and there's no `loadAll()` after the rollback.
+**Fix:** mirror R7-2: track rollback failure, call `loadAll()` after the rollback loop, and surface `self.error = "Undo rollback incomplete — verify your schedule"` when any server rollback failed.
+
+## Constraints
+- Only touch `/opt/data/mowgo/ios-native/MowGo/`.
+- Read rainDelay rollback (~1074-1110) and undoRainDelay rollback (~1155-1195) first; follow existing patterns (in-memory job updates by id, error re-application after loadAll).
+- Do NOT build locally. CI compiles on push.
+- Report: files changed, per-fix notes, compile risks, deviations.
