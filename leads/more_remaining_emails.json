@@ -1,0 +1,1354 @@
+{
+  "leads": [
+    {
+      "business": "Apex Lawn Care",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "",
+      "website": "",
+      "email": "apexlandscapeaz@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "All Pro Lawn Care",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "",
+      "website": "",
+      "email": "emailinfo@allproturfplc.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Wesley's Mobile Lawn & Pressure",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 399-6475",
+      "website": "",
+      "email": "info@wesleyslandscape.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Cain's Landscaping Service",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(678) 363-0872",
+      "website": "",
+      "email": "cainslawnmaintenance316@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Ortez Lawn Services",
+      "city": "Mableton",
+      "state": "GA",
+      "phone": "(678) 361-1139",
+      "website": "",
+      "email": "swfllawn@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "TKO Landscaping and Maintenance",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 380-8447",
+      "website": "",
+      "email": "tkolandscapingservices@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Boles Lawn Maintenance",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 396-9078",
+      "website": "",
+      "email": "info@blountslawncaresolutions.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Creel Lawn & Garden Service Inc",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(678) 705-1251",
+      "website": "",
+      "email": "jason@alabamalawnpros.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Mjt Lawns Etc LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 642-9860",
+      "website": "",
+      "email": "info@mjtgroup.co.uk",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "LawnService.com",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 800-9436",
+      "website": "lawnservice.com",
+      "email": "jeff@atllawncareservices.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Hard-Pro Landscaping LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "",
+      "website": "hardprolandscapingllc.com",
+      "email": "support@usdirectory.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Pride in Turf",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(833) 388-8873",
+      "website": "prideinturf.com",
+      "email": "info@prideinturf.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Atlanta Lawn Care Services Inc",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 869-6396",
+      "website": "atllawncareservices.com",
+      "email": "jeff@atllawncareservices.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "A1 Advanced Landscaping LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 795-5120",
+      "website": "a1advancedlandscape.com",
+      "email": "info@advancedlandscapega.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Labor Amigos",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 714-7670",
+      "website": "laboramigos.com",
+      "email": "amigos.cove@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "W C Lawn Care",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 202-8567",
+      "website": "",
+      "email": "info@cklawnservices.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "North Atlanta Lawn Maintenance LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 252-4989",
+      "website": "",
+      "email": "aalandservice@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Gary Brothers Lawn & Landscape",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 792-7558",
+      "website": "",
+      "email": "wilsonbroslandscape@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Caldwell Lawn Maintenance",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 569-3951",
+      "website": "",
+      "email": "info@caldwelllawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Ramos Lawncare Services LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(678) 687-6274",
+      "website": "",
+      "email": "info@greenviewlandscapegroup.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Dunwoody Total Lawn Care Company",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 458-8094",
+      "website": "",
+      "email": "info@thegreenqueen.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Peachy Green Lawn Care LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 346-7685",
+      "website": "",
+      "email": "info@ivygreenlawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Curb Appeal Landscaping & Lawncare LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 891-2245",
+      "website": "sod-installation-atlanta.net",
+      "email": "danant40@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "JS Lawn Care",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 416-9039",
+      "website": "",
+      "email": "jslawncareatl@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Fresh Cut Lawn Service",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 912-8213",
+      "website": "fresh-cut.us",
+      "email": "info@fresh-cut-lawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "AJ Lawncare",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 406-9722",
+      "website": "",
+      "email": "aj.lawncare@hotmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "JV Especialite Lawncare",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 841-2255",
+      "website": "",
+      "email": "jvlawncare0922@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Rooks Lawn Care LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(678) 519-0145",
+      "website": "",
+      "email": "brooks.landscaping@yahoo.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Hollis Lawn Maintenance",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 752-5453",
+      "website": "",
+      "email": "holliscontractingco@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Blades Of Grass Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 507-1978",
+      "website": "bladesofgrasslawncare.com",
+      "email": "bladesofgrass@live.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Hudson's Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 351-0991",
+      "website": "",
+      "email": "rob@hudsonbroslawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Mitchell Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 480-8024",
+      "website": "",
+      "email": "mitchelllawn@yahoo.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Artwork Lawncare",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 308-1728",
+      "website": "artworklawncare.com",
+      "email": "info@procutlawncarega.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Chatham Property Maintenance",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 988-3832",
+      "website": "ChathamPropertyMaintenance.com",
+      "email": "info@chathammanagement.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "All-Green Lawns",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 897-3054",
+      "website": "allgreenlawns.com",
+      "email": "allgreenlawns@comcast.net",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Brown's Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 898-9887",
+      "website": "",
+      "email": "jacobi@brownsqualitylawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Ideal Lawn LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 658-9288",
+      "website": "ideallawnllc.com",
+      "email": "snw.landscapers@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Mckendree's Lawn Care Dba",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 308-8106",
+      "website": "",
+      "email": "w.landscapers@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "All About Lawns LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 897-4432",
+      "website": "",
+      "email": "allgreenlawns@comcast.net",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Yardman Lawn Care Inc",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 667-7723",
+      "website": "",
+      "email": "schuman550@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Matt's Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 507-8346",
+      "website": "mattslawncareco.com",
+      "email": "contact@spiceupyourlawn.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "BEz Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 272-0928",
+      "website": "",
+      "email": ".landscapers@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Davis Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 201-3818",
+      "website": "",
+      "email": "account-services@swivl.tech",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Grassroots Lawn Care Inc",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 507-7352",
+      "website": "",
+      "email": "info@grassrootsturf.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Grassmaster Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 598-0140",
+      "website": "mygrassmaster.com",
+      "email": "schuman550@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Michael Pinckney's Lawn Masters Inc",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 441-6230",
+      "website": "",
+      "email": "info@buffalolandscapedesigninc.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Evergreen Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 604-3756",
+      "website": "",
+      "email": "info@evergreenlawnserviceinc.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Cutting Edge Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 927-8773",
+      "website": "",
+      "email": "thecuttingedge.sav@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Pro Care Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "",
+      "website": "",
+      "email": "snw.landscapers@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Browns Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 412-6165",
+      "website": "",
+      "email": "brownslawncareservice245@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Jenkins Home Maintenance Co",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 996-6984",
+      "website": "",
+      "email": "jenkinshvac@bellsouth.net",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Sanders Lawn Care Inc",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 201-1795",
+      "website": "",
+      "email": "info@sanderslandscapeservices.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Monoroe's Lawncare",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 272-6259",
+      "website": "",
+      "email": "kane@monroelawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Greener Grass Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 663-3555",
+      "website": "",
+      "email": "nrgreengrass.ab@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Procut Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 313-6894",
+      "website": "procutlawncarega.com",
+      "email": "info@procutlawncarega.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "7 Palms Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 704-5515",
+      "website": "",
+      "email": "growitwemowit@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Scotts Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 898-4387",
+      "website": "",
+      "email": "scottslawncarellc@live.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Let Us Give You a Hand",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 294-7247",
+      "website": "",
+      "email": "churchoffice@firstpresaugusta.org",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Augusta Grass Masters LLC",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 955-8563",
+      "website": "augustagrassmasters.com",
+      "email": "info@augustagrassmasters.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Beckles and Son Enterprises",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 533-7128",
+      "website": "",
+      "email": "abmealing@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "All-Star Lawns",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 840-4339",
+      "website": "",
+      "email": "leagueoffice282@i9sports.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "South Eastern Property Service",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 533-4670",
+      "website": "",
+      "email": "info@southeastern.company",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Shirley's Lawncare",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 738-1756",
+      "website": "",
+      "email": "ni@yahoo.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Arc of the Covenant Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 951-5193",
+      "website": "",
+      "email": "email-yourlawnservicellc@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "C & J Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 793-4138",
+      "website": "cjlawncaresvc.com",
+      "email": "candjslawncare2016@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Islander Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 792-9011",
+      "website": "",
+      "email": "southerngrovelandco@outlook.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Lawn Master",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 373-8353",
+      "website": "",
+      "email": "orders@cleva-na.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Turf Pro Lawncare",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "",
+      "website": "",
+      "email": "info@turfpro-lawncare.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Steel Blade Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 631-2970",
+      "website": "",
+      "email": "cdrwest@cdrepro.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Mejia Lawn Care Service",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 251-1554",
+      "website": "",
+      "email": "mejia.lawncare30@gmail.com",
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Cut N Edge Landscaping",
+      "city": "Atlanta",
+      "state": "GA",
+      "email": "jdscutnedge@gmail.com",
+      "all_emails": [
+        "jdscutnedge@gmail.com",
+        "jdscutnedgelandscapes@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Ogletree Enterprises Inc",
+      "city": "Atlanta",
+      "state": "GA",
+      "email": "emailalphonsooliver6@gmail.com",
+      "all_emails": [
+        "emailalphonsooliver6@gmail.com",
+        "alphonsooliver6@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Charles's Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "email": "bladesofgrass@live.com",
+      "all_emails": [
+        "bladesofgrass@live.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Mowbility Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "email": "bladesofgrass@live.com",
+      "all_emails": [
+        "bladesofgrass@live.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Nichols Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "email": "jane@nicholslawncare.com",
+      "all_emails": [
+        "jane@nicholslawncare.com",
+        "doe@nicholslawncare.com",
+        "jane.doe@nicholslawncare.com",
+        "jane-doe@nicholslawncare.com",
+        "_nichols@nicholslawncare.com",
+        "roylene_nichols@nicholslawncare.com",
+        "janed@nicholslawncare.com",
+        "last@nicholslawncare.com",
+        "jdoe@nicholslawncare.com",
+        "_doe@nicholslawncare.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Erwin's Lawn Care Small Engine Repair",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "emailangelaerwin@gci.netview",
+      "all_emails": [
+        "emailangelaerwin@gci.netview",
+        "addressricky.erwin@yahoo.comview"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "All In The Family Lawn Care And Home Repair",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "allinthefamilylawncare@gmail.com",
+      "all_emails": [
+        "allinthefamilylawncare@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Cardinal Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "cardinallawncarelandscapingllc@gmail.com",
+      "all_emails": [
+        "cardinallawncarelandscapingllc@gmail.com",
+        "estimates@cardinallawncare.com",
+        "rcarr@cardinallandscape.net",
+        "brock@cardinal-llp.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Perfect Lawn Service",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "info@pictureperfectlawn.net",
+      "all_emails": [
+        "info@pictureperfectlawn.net",
+        "augusta@augustalawncareservices.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "B & B Lawncare & Landscaping",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "sales@buzzfile.com",
+      "all_emails": [
+        "sales@buzzfile.com",
+        "816@gmail.com",
+        "brad@bblawncareservices.com",
+        "info@buzzfile.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Morris' Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "barrettstmorris@gmail.com",
+      "all_emails": [
+        "barrettstmorris@gmail.com",
+        "info@morrislawncareks.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Earth Care Lawn Service",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "support@giftly.com",
+      "all_emails": [
+        "support@giftly.com",
+        "delarosalawncare@icloud.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "B C Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "bclawn03@gmail.com",
+      "all_emails": [
+        "bclawn03@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Tony Lawncare",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "anatoliydor1@icloud.com",
+      "all_emails": [
+        "anatoliydor1@icloud.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "C & E Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "cclandscapepros@gmail.com",
+      "all_emails": [
+        "cclandscapepros@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Master's Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "info@themasterslawncare.com",
+      "all_emails": [
+        "info@themasterslawncare.com",
+        "turfmastersaugusta@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Mulich Home & Lawn",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "augusta@augustalawncareservices.com",
+      "all_emails": [
+        "augusta@augustalawncareservices.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Lawns Unlimited",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "info@lawnsunlimited.com",
+      "all_emails": [
+        "info@lawnsunlimited.com",
+        "unlimitedlawnmaintenance@gmail.com",
+        "lawnsunl@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Ron's Lawncare",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "ronslawncare@att.net",
+      "all_emails": [
+        "ronslawncare@att.net"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Lawn Solutions",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "hello@simplelawnsolutions.com",
+      "all_emails": [
+        "hello@simplelawnsolutions.com",
+        "contact@atomicturf.com",
+        "office@lawnsolutionsinc.net",
+        "bholley@lawnsolutionsinc.net"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Holmes Lawn Care Service",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "admin@holmeslawncareinc.com",
+      "all_emails": [
+        "admin@holmeslawncareinc.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Grasshopperz Lawn Service",
+      "city": "Augusta",
+      "state": "GA",
+      "email": "augusta@augustalawncareservices.com",
+      "all_emails": [
+        "augusta@augustalawncareservices.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Augusta Quality Lawn Care",
+      "city": "Hephzibah",
+      "state": "GA",
+      "email": "augusta@augustalawncareservices.com",
+      "all_emails": [
+        "augusta@augustalawncareservices.com",
+        "augustaqualitylawncare@yahoo.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "First Green Lawn Care",
+      "city": "Charlotte",
+      "state": "NC",
+      "email": "info@p95f019f8e19ee.com",
+      "all_emails": [
+        "info@p95f019f8e19ee.com",
+        "info@e72428f0e088s.com",
+        "pr@por2h.com",
+        "firstgreen@carolina.rr.com",
+        "info@l0f30d9139136c.com",
+        "gene@yee61d5c257l.com",
+        "tom@sca2da9e5093e.com",
+        "pr@plo0z.com",
+        "tina@m527f43400f98e.com",
+        "mike@p610baf4b12acg.com",
+        "firstgreencarolina@gmail.com",
+        "info@ee02a2c00eaae.com",
+        "info@pafc5ee019y.com",
+        "lee@go1e7e75088h.com",
+        "info@a4aa6f338g.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Jay's Lawncare",
+      "city": "Charlotte",
+      "state": "NC",
+      "email": "_doe@jayslawncare.com",
+      "all_emails": [
+        "_doe@jayslawncare.com",
+        "jdoe@jayslawncare.com",
+        "jane.doe@jayslawncare.com",
+        "jane@jayslawncare.com",
+        "last@jayslawncare.com",
+        "nienaberzack@gmail.com",
+        "j.doe@jayslawncare.com",
+        "office.allinc@gmail.com",
+        "jane-doe@jayslawncare.com",
+        "janedoe@jayslawncare.com",
+        "doe@jayslawncare.com",
+        "janed@jayslawncare.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Gomez Lawn Care Service",
+      "city": "Charlotte",
+      "state": "NC",
+      "email": "gogreenlandscapingncc@gmail.com",
+      "all_emails": [
+        "gogreenlandscapingncc@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "H&H Lawn Service & Landscaping",
+      "city": "Charlotte",
+      "state": "NC",
+      "email": "hhmaintenance25@gmail.com",
+      "all_emails": [
+        "hhmaintenance25@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Wetherby Grounds Maintenance",
+      "city": "Mint Hill",
+      "state": "NC",
+      "email": "cjoh120@gmail.com",
+      "all_emails": [
+        "cjoh120@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Green Hill Lawn Service",
+      "city": "Charlotte",
+      "state": "NC",
+      "email": "greenhilllawncarellc@gmail.com",
+      "all_emails": [
+        "greenhilllawncarellc@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Johnson's Lawn Care",
+      "city": "Kansas City",
+      "state": "MO",
+      "email": "info@johnsonslawn.com",
+      "all_emails": [
+        "info@johnsonslawn.com",
+        "jcjlawncareservices@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "M&M Lawn Care",
+      "city": "Saint Joseph",
+      "state": "MO",
+      "email": "mmlawncare24@icloud.com",
+      "all_emails": [
+        "mmlawncare24@icloud.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Taylor Made Lawns",
+      "city": "Saint Joseph",
+      "state": "MO",
+      "email": "taylormadelawns20@gmail.com",
+      "all_emails": [
+        "taylormadelawns20@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Dans Lawn Service",
+      "city": "Smithville",
+      "state": "MO",
+      "email": "service@archerlawncare.com",
+      "all_emails": [
+        "service@archerlawncare.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Walter Lawn & Landscape LLC",
+      "city": "Kansas City",
+      "state": "MO",
+      "email": "orlawnandlandscape@gmail.com",
+      "all_emails": [
+        "orlawnandlandscape@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Branton Lawn Care LLC",
+      "city": "Shreveport",
+      "state": "LA",
+      "email": "perfectlylawncareservicesllc@gmail.com",
+      "all_emails": [
+        "perfectlylawncareservicesllc@gmail.com",
+        "bbell1316@yahoo.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Aa Lawns Etc LLC",
+      "city": "Shreveport",
+      "state": "LA",
+      "email": "tina.floyd@uslawns.net",
+      "all_emails": [
+        "tina.floyd@uslawns.net",
+        "scottie.floyd@uslawns.net",
+        "scotty.floyd@uslawns.net"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Greer's Green Thumb Lawn Care",
+      "city": "Shreveport",
+      "state": "LA",
+      "email": "jgreer@qualityservice.com",
+      "all_emails": [
+        "jgreer@qualityservice.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Kennedys Lawn Care",
+      "city": "Shreveport",
+      "state": "LA",
+      "email": "ryleykennedy24@gmail.com",
+      "all_emails": [
+        "ryleykennedy24@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Caddo Lawn Care",
+      "city": "Shreveport",
+      "state": "LA",
+      "email": "caddolawns@gmail.com",
+      "all_emails": [
+        "caddolawns@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Abel's Lawncare LLC",
+      "city": "Slidell",
+      "state": "LA",
+      "email": "gfbincleaners@gmail.com",
+      "all_emails": [
+        "gfbincleaners@gmail.com",
+        "abelslawncare@yahoo.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "The Grass Man LLC",
+      "city": "Slidell",
+      "state": "LA",
+      "email": "matthew@oldglorygrounds.net",
+      "all_emails": [
+        "matthew@oldglorygrounds.net",
+        "alicialucas9@gmail.com",
+        "thegrassmanllc@hotmail.com",
+        "donthegrassman@yahoo.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Dad's Lawn Care LLC",
+      "city": "Slidell",
+      "state": "LA",
+      "email": "alicialucas9@gmail.com",
+      "all_emails": [
+        "alicialucas9@gmail.com",
+        "dadslawncare.co@yahoo.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "A&A Lawncare & Landscape",
+      "city": "Gretna",
+      "state": "LA",
+      "email": "aalawn@gmail.com",
+      "all_emails": [
+        "aalawn@gmail.com"
+      ],
+      "source": "manta",
+      "verified_email": true,
+      "email_source": "web_search"
+    }
+  ],
+  "emails_found": 113,
+  "total_leads": 113
+}

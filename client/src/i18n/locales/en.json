@@ -1020,7 +1020,20 @@
     "export_failed_please_try_again": "Export failed. Please try again.",
     "exporting": "Exporting...",
     "exported": "Exported",
-    "share_this_link_so_customers_can_book_online_no_login_needed": "Share this link so customers can book online — no login needed."
+    "share_this_link_so_customers_can_book_online_no_login_needed": "Share this link so customers can book online — no login needed.",
+    "quickbooks_integration": "QuickBooks Integration",
+    "connect_quickbooks": "Connect QuickBooks",
+    "sync_your_invoices_to_quickbooks_online_automatically": "Sync your invoices to QuickBooks Online automatically.",
+    "connected_to_company": "Connected to {companyName}",
+    "sync_now": "Sync Now",
+    "syncing": "Syncing...",
+    "disconnect_quickbooks": "Disconnect QuickBooks",
+    "disconnect_quickbooks_confirm": "Disconnect QuickBooks? This will stop invoice sync.",
+    "quickbooks_sync_success": "Invoices synced successfully",
+    "quickbooks_sync_error": "Sync failed: {error}",
+    "auto_sync_invoices": "Auto-sync invoices",
+    "last_synced": "Last synced",
+    "never": "Never"
   },
   "subscribe": {
     "premium": "Premium",

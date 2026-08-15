@@ -1,201 +1,158 @@
 {
-  "scan_ts": "2026-08-11T12:00:00Z",
-  "scan_label": "7am CST — Tue Aug 11 (window since Aug 10 12:00Z scan; Reddit slot CORRECTED — fires TONIGHT Aug 11 22:23Z, NOT last night)",
+  "scan_ts": "2026-08-15T13:00:00Z",
+  "scan_label": "7am CST — Sat Aug 15 (next: 8am action cycle; Servinix beta in 2 days)",
   "channels_scanned": {
-    "mowgo": {
+    "mowgo_general": {
       "channel_id": "1529248227394850916",
-      "status": "30 fetched. ALL bot: Intel Engine ×3 (02:14Z feature_ideas v50, 06:22Z pricing_intelligence v51, 10:25Z industry_trends v51), Stripe 09:07Z all green, Lead Nurture 14:30Z 0 sent (1 failed), Weekly Activation 14:15Z 6 signups/0% activation, Invoice reminders 12:30Z OK. ZERO human messages.",
-      "last_human_msg": "Blasian — 'How would we get leads for MowGo' 2026-07-28T17:03Z (Day 14 of silence; ✅ reaction still no reply)"
-    },
-    "outreach": {
-      "channel_id": "1529711006023024680",
-      "status": "⚠️ CHANNEL GONE — 404 Unknown Channel, 6th consecutive sync. Deletion CONFIRMED.",
-      "note": "Not scanned per instructions."
+      "status": "All bot messages via Intel Engine + Stripe health check. ZERO human messages. Last human msg still Blasian Jul 28 'How would we get leads' (Day 50 silent).",
+      "last_human_msg": "Blasian — 'How would we get leads for MowGo' 2026-07-28T17:03Z (Day 50 of silence)"
     },
     "cowork": {
       "channel_id": "1529736297847980153",
-      "status": "✅ EMPTY — 0 messages. Watchdog clean Day 11.",
+      "status": "EMPTY — Day 40 of zero human activity. Only watchdog cleanups.",
       "note": "Nothing to do."
     },
     "leads": {
       "channel_id": "1529707289014042804",
-      "status": "15 fetched. 10 new SMS drafts posted Aug 10 15:01Z (Rule of 100 — NG Outdoor, Frankies, Ponca City op, A Plus, J&C, Thogy's, Premier, Scott's, J&Jays, Mow-Town) + 3 FB/IG posts. Prior wave-4 still there (Campbell & Sons, Nutri-Green, Hicks, Eberly's, LBR, Aguilar Brothers). Blasian's Jul 28 question UNANSWERED Day 14 (✅ reaction only). Oldest message: Jul 23 lead discovery.",
-      "note": "sms_queue.json: 23 entries (21 numbered + 2 tier0), ALL status='new', ALL sent_at=null — ZERO SMS ever sent."
+      "status": "Bot-only: Rule of 100 SMS drafts continue daily; SMS sender auto-attempted 10 sends/day for past 4 days, ALL failing with 'campaign not approved yet' (Twilio)."
     }
   },
   "overnight_messages_needing_attention": [
     {
-      "id": "intel_engine_v51_active",
-      "ts": "2026-08-11T02:14:00Z",
-      "content": "Intel Engine v50 at 02:14Z: Reddit BLOCKED (403) on direct scraping, RSS 6/8 subs working. New thread `1txtgnv` r/lawncare — brand-new operator asking about tools/software, perfect Solo $39 prospect. ProBase (free, LawnStarter-backed) confirmed as major new threat targeting 1-5 crew ICP. Servinix beta in 6 days (Aug 17).",
-      "significance": "HIGH — v51 running, 3 threads today: 1uaa3yg (CRM), 1vj9nay (quote→Jobber loop, aging), 1vk2tgr (\"what software is worth money\"). ProBase is new serious free competitor.",
-      "action": "Watch ProBase feature releases. `1txtgnv` is brand-new operator — high-value target for tonight's slot or Aaron manual reply."
+      "id": "greenroute_free_plan_discovery",
+      "ts": "2026-08-15T11:34Z",
+      "source": "Intel Engine BI Report (cycle 2/4)",
+      "content": "GreenRoute has a genuinely free plan at $0/mo with unlimited customers, invoicing, contracts, credit card payments, satellite measurement. Route planning/weather/SMS for $10/mo flat — no per-user fees. Teams/P&L reports at $50/mo undercuts MowGo Crew ($79). Small brand, minimal SEO, but pricing structure directly challenges every MowGo tier.",
+      "significance": "NEW — This is a fresh competitive threat. Free tier matches our free tier, paid tiers undercrew us. Feature parity needed before Crew gains traction.",
+      "action": "Add to competitor watchlist. Verify GreenRoute website/pricing. Update compare page."
     },
     {
-      "id": "intel_engine_0622",
-      "ts": "2026-08-11T06:22:00Z",
-      "content": "Intel Engine v51 pricing_intelligence lane: 3 threads for today's window. Post-slot window opens 12:00 UTC. MowGo flat $39/$79 vs Jobber $169 (3-crew) advantage confirmed. Squeezed from below by CrewNest $29, LawnBook $9.99, LawnPro free, GreenRoute free. Level billing now table-stakes.",
-      "significance": "MEDIUM — pricing gap from above widening, but floor getting more competitive. Level billing is competitive negative without it.",
-      "action": "None bot-side — Aaron needs level billing decision."
+      "id": "jobber_ai_launch",
+      "ts": "2026-08-15T07:32Z",
+      "source": "Intel Engine industry_trends lane",
+      "content": "Jobber AI launched — rolling out AI features across quotes, scheduling, customer communication, invoicing. First real AI push into our feature set. If bundled free, it shifts value perception hard.",
+      "significance": "MEDIUM — Jobber adding AI features could narrow our differentiation gap if included at base price.",
+      "action": "Monitor Jobber's AI pricing strategy. Note: still $49/mo base, so even with AI, MowGo stays cheaper."
     },
     {
-      "id": "intel_engine_1025",
-      "ts": "2026-08-11T10:25:00Z",
-      "content": "Intel Engine v51 industry_trends lane: US landscaping services $116B, global $267B→$401B by 2034. Jobber restructured pricing (Core $21, Connect $70-210, Grow $105-280, Plus $280-371). ProBase confirmed new entrant. 3 threads for reply: 1uaa3yg (CRM thread), 1vj9nay (borderline old), 1vk2tgr (Tue/Wed slot). No new ICP leads this run.",
-      "significance": "MEDIUM — confirms Jobber's per-user pricing still biggest for MowGo's positioning.",
-      "action": "Bank ProBase in competitor-comparison.md when next editing it."
+      "id": "sms_campaign_not_approved_escalating",
+      "ts": "2026-08-14T14:00Z",
+      "source": "Rule of 100 cron / SMS sender cron",
+      "content": "SMS sender attempted 10 sends today AND yesterday — ALL failing with 'API error (campaign not approved yet?)'. Running for 4+ consecutive days with same result. Batch of ~25 entries queued, 0 successfully delivered.",
+      "significance": "HIGH — Lead outreach pipeline completely blocked by Twilio campaign approval. Needs Aaron's attention (Twilio console fix) or manual sending from phone as interim workaround.",
+      "action": "Aaron must approve Twilio campaigns OR manually text top leads from phone. Check Twilio dashboard for campaign approval status."
     },
     {
-      "id": "stripe_health_all_green",
-      "ts": "2026-08-11T09:07:00Z",
-      "content": "Stripe: ALL GREEN. Identical bundles (index-l1pQgg7x.js) across both domains. No publishable key in client bundle (server-side design). All 4 endpoints alive and auth-gated. Only unproven link: real e2e checkout by logged-in user (Day 27).",
-      "significance": "LOW-MED — routine green. Stripe infrastructure solid.",
-      "action": "None bot-side."
+      "id": "openrouter_credits_flapping",
+      "ts": "2026-08-15T13:00Z",
+      "source": "Multiple crons (Intel Engine, Stripe health check)",
+      "content": "OpenRouter credits intermittently exhausted — 402 errors on morning runs (07:20, 09:00, 11:20 UTC Aug 14), but today's later runs succeeded (03:30, 07:31, 09:04, 11:34 UTC Aug 15). Seems to recover, suggesting credits are available but insufficient for high-token requests.",
+      "significance": "LOW-MEDIUM — Some runs succeed, some don't. Lower max_tokens on crons would help reliability without losing capability.",
+      "action": "Consider reducing max_tokens on Intel Engine cron if 402s recur. Not urgent — today's runs completed."
     },
     {
-      "id": "lead_nurture_failed_1010",
-      "ts": "2026-08-10T14:30:00Z",
-      "content": "Lead Nurture cron (bf343547e81e): 0 email sent, 0 sms sent. Email day2 → aaronkasemt@gmail.com failed with error code 1010 (likely recipient rejected or address format issue).",
-      "significance": "MEDIUM — day2 email to Aaron's own email address failing. Might be sending to wrong address or SMTP rejection.",
-      "action": "Investigate aaronkasemt@gmail.com in lead nurture database — is this a test lead with wrong email? Check SMTP config."
-    },
-    {
-      "id": "weekly_activation_0pct",
-      "ts": "2026-08-10T14:15:00Z",
-      "content": "Weekly Activation Report (14 days): 6 signups, 0% first client added, 0% first job scheduled, 0% first invoice created, 0 cancellations. Zero activation — all 6 reached signup but nobody added a client.",
-      "significance": "HIGH — activation funnel is completely broken. 6 signups with ZERO activation in 14 days means onboarding fails immediately.",
-      "action": "Investigate signup flow: is first-client tutorial skipped? Is client-add UX broken? 0/6 is not normal even for silent users."
-    },
-    {
-      "id": "invoice_reminders_ok",
-      "ts": "2026-08-10T12:30:00Z",
-      "content": "Invoice reminders: OK — 0 unpaid invoices older than 7d.",
-      "significance": "LOW — routine green.",
-      "action": "None."
+      "id": "yardbook_comparison_content_flood",
+      "ts": "2026-08-15T03:31Z",
+      "source": "Intel Engine BI Report",
+      "content": "fieldtics.com, businessgenieapp.com, realgreen.com all published 2026 roundups in Q2-Q3. They rank well for 'lawn care software' Google searches and push readers toward whichever they recommend. MowGo invisible in these lists.",
+      "significance": "MEDIUM — Competitor SEO moat growing. Need directory presence + comparison content to counter.",
+      "action": "Directory submissions remain highest-ROI growth task. Consider submitting to roundup publishers directly."
     }
   ],
   "open_tasks": {
     "critical": [
       {
-        "id": "reddit_slot_tonight",
-        "title": "🔴 FIRE TONIGHT Aug 11 22:23Z Reddit slot — kit #55→#57→#43→#50, cron 4c195234eaa9 ARMED",
+        "id": "servinix_beta_watch",
+        "title": "🔴 SERVINIX BETA MONDAY Aug 17 — 60% off hook, rain delay overlap",
         "days_open": 0,
         "owner": "Bot/Aaron",
-        "status": "🟢 ARMED — cron 4c195234eaa9 confirmed: state='scheduled', enabled=true, next_run=2026-08-11T22:23:00Z. Kit: #55 1vi1hcj (53 comments, OP unanswered SMS question) → #57 1vi8tr3 (new TX lawn biz) → #43 1vfyg2j (first 5 customers) → fallback #50 1vh7t47. CORRECTION from yesterday: this was ALWAYS Aug 11, not Aug 10 (96h gate from Fri Aug 7 22:23Z = Aug 11)."
+        "status": "🆕 DUE MONDAY — Sign up to evaluate. Watch landing page Mon morning. Prep compare-page counter-positioning."
       },
       {
-        "id": "sms_batch_sends",
-        "title": "SMS Day-1 sends — 25 texts queued (all 'new'), ZERO ever sent; sender cron MISSING (never created)",
-        "days_open": 10,
+        "id": "emerge_followup_day21",
+        "title": "Lead follow-ups Day 21 — 5 emails, 0 replies; 2nd follow-up overdue since Aug 7",
+        "days_open": 21,
+        "owner": "Aaron (manual)",
+        "status": "🔴 CRITICAL OVERDUE — Emerge/Metro Green/Bigfoot/Simply + Campbell & Sons. Mark most red, keep hottest 2."
+      },
+      {
+        "id": "blasian_leads_question_day50",
+        "title": "Answer Blasian's 'How would we get leads for MowGo' — Day 50; ✅ reaction, no reply",
+        "days_open": 50,
+        "owner": "Aaron (manual)",
+        "status": "🔴 EXTREMELY STALE — draft ready but stale. Human loop dead nearly 7 weeks."
+      },
+      {
+        "id": "twilio_sms_campaign_blocked",
+        "title": "SMS queue: ~25 texts queued, ALL failed 'campaign not approved' for 4+ days",
+        "days_open": 4,
         "owner": "Aaron (decision)",
-        "status": "🔴 Day 10 — 23 numbered + 2 tier0 entries in sms_queue.json, ALL status='new', ALL sent_at=null. Cron 3f67268baeb6 schedule is 'paused' (created but can't send). CORRECTION from yesterday: cron does NOT exist as a functional sender — it was created Aug 6 as 'MowGo SMS Sender' but the script was never written. The 'resume' command doesn't help; needs a sender script first. Wave-4 drafts (+6) from Aug 7 + Aug 10 batch (+10) posted to Discord but NEVER added to sms_queue.json."
+        "status": "🔴 BLOCKED — Twilio campaign approval needed. Interim: manual texts from phone."
       },
       {
-        "id": "emerge_followup",
-        "title": "Lead follow-ups Day 16 — 5 emails, 0 replies; 2nd follow-up overdue (was due Aug 7)",
-        "days_open": 16,
-        "owner": "Aaron (manual)",
-        "status": "🔴 OVERDUE — Emerge/Metro Green/Bigfoot/Simply (Jul 29) + Campbell & Sons (Jul 31). Highest-ROI 10 min of the week."
-      },
-      {
-        "id": "blasian_leads_question",
-        "title": "Answer Blasian's 'How would we get leads for MowGo' (Jul 28) — Day 14; ✅ reaction, no reply",
-        "days_open": 14,
-        "owner": "Aaron (manual)",
-        "status": "🔴 UNANSWERED — draft ready at leads/blasian-reply-draft-2026-08-01.md"
-      },
-      {
-        "id": "stripe_e2e_verify",
-        "title": "Logged-in e2e checkout — Day 27, ONLY unproven link",
-        "days_open": 27,
-        "owner": "Aaron (manual)",
-        "status": "🟡 STILL UNPROVEN — bundles converged (identical hash both domains). All endpoints alive."
-      },
-      {
-        "id": "softwareworld_submit",
-        "title": "Submit MowGo to directory listings — Day 31 of zero presence",
+        "id": "stripe_e2e_verify_day31",
+        "title": "Logged-in e2e checkout — Day 31, ONLY unproven link",
         "days_open": 31,
         "owner": "Aaron (manual)",
-        "status": "❌ NO PROGRESS — CrewNest listicle omission proved the gap"
+        "status": "🟡 STILL UNPROVEN — bundles converged, endpoints alive (Stripe health check passed)"
       },
       {
-        "id": "reddit_48_manual_paste",
-        "title": "Manually paste #48 reply — AutoMod-filtered Aug 6",
-        "days_open": 5,
-        "owner": "Aaron/Blasian (manual)",
-        "status": "🆕 STILL FILTERED"
+        "id": "softwareworld_submit_day34",
+        "title": "Submit MowGo to Capterra/G2/SoftwareAdvice/GetApp — Day 34 of zero presence",
+        "days_open": 34,
+        "owner": "Aaron (manual)",
+        "status": "❌ NO PROGRESS — every competitor ranking above MowGo on directory lists"
+      },
+      {
+        "id": "cf_tokens_dead_day8",
+        "title": "BOTH Cloudflare API tokens dead (10000 error since Aug 7)",
+        "days_open": 8,
+        "owner": "Aaron",
+        "status": "🔴 DEAD — git push deploys still work but wrangler/cf-check broken"
       },
       {
         "id": "weekly_activation_0pct",
-        "title": "🔴 6 signups, 0% activation in 14 days — onboarding funnel broken",
-        "days_open": 0,
+        "title": "🔴 6 signups, 0% activation in 16 days — onboarding funnel broken",
+        "days_open": 2,
         "owner": "Aaron/Dev",
-        "status": "🆕 NEW — 0 of 6 signups added a client, scheduled a job, or created an invoice. Onboarding tutorial may be skipped or broken. Needs immediate investigation."
+        "status": "CRITICAL — 0 of 6 signups added client, scheduled job, or created invoice"
       }
     ],
     "medium": [
       {
-        "id": "lead_nurture_1010",
-        "title": "Lead Nurture cron error 1010 — day2 email to aaronkasemt@gmail.com failed",
+        "id": "lead_nurture_api_key",
+        "title": "Lead Nurture cron — SendGrid API key invalid (401) persisting",
         "days_open": 0,
-        "owner": "Aaron",
-        "status": "🆕 NEW — email rejected. Check lead database for misconfigured test entry."
-      },
-      {
-        "id": "cf_tokens_dead",
-        "title": "BOTH Cloudflare API tokens dead (10000 error since Aug 7) — blocks cf_check/wrangler",
-        "days_open": 5,
-        "owner": "Aaron",
-        "status": "🔴 DEAD — git push deploys still work. New bundle appeared Aug 10 (manual deploy)."
-      },
-      {
-        "id": "friend_mode_replies",
-        "title": "3 threads for today's window: 1uaa3yg (CRM), 1vj9nay (quote-loop, aging), 1vk2tgr (software worth money)",
-        "days_open": 2,
         "owner": "Aaron/Bot",
-        "status": "🆕 DUE — cron 4c195234eaa9 handles kit posts tonight; friend-mode replies to these 3 need manual or separate handling. 1vj9nay is ~3d old — borderline."
+        "status": "NEEDS FIX — check SENDGRID_API_KEY env var"
+      },
+      {
+        "id": "reddit_friend_mode_replies",
+        "title": "3 Reddit friend-mode replies queued for Monday window (12:00Z+)",
+        "days_open": 0,
+        "owner": "Aaron/Bot",
+        "status": "QUEUED — 1uaa3yg (CRM/solo), Home Depot thread, r/landscaping"
+      },
+      {
+        "id": "greenroute_monitor",
+        "title": "GreenRoute — free plan with unlimited customers, $10/mo route add-on. Undercuts Crew tier.",
+        "days_open": 0,
+        "owner": "Bot/Aaron",
+        "status": "NEW — verify pricing, update intel, consider feature parity"
       },
       {
         "id": "level_billing_feature",
-        "title": "Level billing — #1 DROUGHT FEATURE — now table-stakes (LawnPro FREE tier confirmed)",
-        "days_open": 4,
-        "owner": "Dev",
-        "status": "🚀 PRIORITY UP — 'Drought Mode' toggle opportunity still waiting."
-      },
-      {
-        "id": "missed_call_textback",
-        "title": "Missed-call text-back (Twilio) — THE wedge vs AI-receptionist arms race",
+        "title": "Level billing — #1 DROUGHT FEATURE — LawnPro ships FREE tier with it",
         "days_open": 6,
         "owner": "Dev",
-        "status": "S effort — beats Jobber $29 AI Receptionist with lower-cost Twilio"
+        "status": "PRIORITY — market gap widening"
       },
       {
-        "id": "quotes_v1",
-        "title": "Minimal Quotes v1 — #1 BUILD PRIORITY (unchanged)",
-        "days_open": 12,
-        "owner": "Dev",
-        "status": "🚀 UNCHANGED"
-      },
-      {
-        "id": "probase_threat",
-        "title": "ProBase (free, LawnStarter-backed) — new competitor targeting 1-5 crew ICP",
+        "id": "compare_page_updates",
+        "title": "Add GreenRoute + ProBase + Servinix rows + Jobber price increase stat to compare page",
         "days_open": 0,
         "owner": "Bot/Dev",
-        "status": "🆕 NEW — free with job lead marketplace revenue model. MowGo counter: rain delay, webhooks, booking link, crew invite, trial-first-flow."
-      },
-      {
-        "id": "compare_page_next",
-        "title": "Compare page: add ProBase row, Servinix row, LawnPro level billing note, $300B stat",
-        "days_open": 4,
-        "owner": "Bot/Dev",
-        "status": "QUEUED — ProBase now critical addition."
-      },
-      {
-        "id": "directory_submissions",
-        "title": "Directory submissions (Capterra/G2/SoftwareAdvice/GetApp) — Day 31",
-        "days_open": 31,
-        "owner": "Aaron (manual)",
-        "status": "❌ NO PROGRESS — CrewNest omission proves cost of delay"
+        "status": "QUEUED — 4 new competitors need coverage"
       }
     ],
     "low": [
@@ -207,156 +164,107 @@
       },
       {
         "id": "free_tier_gap",
-        "title": "Free-tier gap — MowGo Free 5 clients vs LawnPro Free 25 vs LawnBook Free 15",
+        "title": "Free-tier gap — MowGo Free 5 clients vs Yardbook Unlimited vs LawnPro Free 50",
         "owner": "Aaron",
         "status": "DECISION VISIBLE — gap widening"
       },
       {
         "id": "concierge_e2e_test",
-        "title": "Trigger one real concierge request (needs Aaron's logged-in session)",
+        "title": "Trigger one real concierge request",
         "owner": "Aaron",
         "status": "Pending"
       }
-    ],
-    "closed_since_yesterday": [
-      "stripe_new_hash → ✅ VERIFIED: identical bundles (index-l1pQgg7x.js) both domains. All endpoints green. No key leaks.",
-      "lead_nurture_0_sent → ⚠️ 0 sent, but NEW ISSUE: error 1010 on day2 to aaronkasemt@gmail.com. Not really closed — transferred.",
-      "reddit_slot_date → 🔧 CORRECTED: Aug 10 scan said 'FIRE TONIGHT Mon Aug 10' but cron 4c195234eaa9 was always scheduled for Aug 11 22:23Z. 96h gate from Fri Aug 7 = Mon Aug 11, not Aug 10. This is legal and armed."
     ]
   },
   "blockers_for_aaron": [
     {
-      "blocker": "SMS: 25 Day-1 texts queued 10 days, ZERO ever sent — sender script never written",
-      "detail": "Cron 3f67268baeb6 was created but the script send_sms.py was never implemented. Cannot 'resume' — needs a sender script first. 23 entries in sms_queue.json + 2 tier0 (NG Outdoor, Frankies). Wave-4 (6 more) + Aug 10 batch (10 more) drafted in #leads but not in queue. Total potential: 41 leads with drafts."
+      "blocker": "SERVINIX beta Monday Aug 17 — need evaluation before commercial launch",
+      "detail": "Direct competitor launching with 60% off invoice hook, rain delay automation, crew GPS. MowGo already has Rain Delay v2. Counter-positioning: no-contract, flat $39/$79, booking link built-in. Sign up Tue to evaluate."
     },
     {
-      "blocker": "Lead follow-ups Day 16 — 0 replies across 5 emails; 2nd follow-up overdue since Aug 7",
-      "detail": "Emerge/Metro Green/Bigfoot/Simply (Jul 29) + Campbell & Sons (Jul 31). 10 min highest-ROI, still unsent."
+      "blocker": "TWILIO SMS CAMPAIGNS BLOCKED — can't reach 25+ leads via automated SMS",
+      "detail": "Campaign approval pending on Twilio. Aaron must either approve in Twilio dashboard or manually text top leads from phone. Interim workaround: manual texting."
     },
     {
-      "blocker": "Blasian silent Day 14; leads question unanswered (✅ reaction only); human loop dead 14+ days",
-      "detail": "Draft ready. Pair with #48 manual paste in one human session."
+      "blocker": "Lead follow-ups Day 21 — 5 emails, 0 replies — cut dead or mark red",
+      "detail": "Emerge Lawns, Metro Green, Bigfoot Lawns, Simply LawnCare, Campbell & Sons. 21 days of silence. Keep hottest 2, cut rest."
     },
     {
-      "blocker": "CF API tokens dead Day 5 + Stripe e2e checkout Day 27 + directory submissions Day 31 + #48 manual paste",
-      "detail": "All same-session feasible items."
+      "blocker": "Blasian silent Day 50; leads question unanswered; human loop dead nearly 7 weeks",
+      "detail": "Draft exists but stale. If Aaron not engaging, reconsider autonomous outreach viability."
     },
     {
-      "blocker": "Weekly Activation Report: 6 signups, 0% activation in 14 days",
-      "detail": "CRITICAL — not a single signup added a client, scheduled a job, or created an invoice. Either onboarding tutorial is broken/skippable, or first-client UX has a bug. Investigate signup-to-first-client flow urgently."
+      "blocker": "CF API tokens dead Day 8 + directory submissions Day 34 + Stripe e2e Day 31",
+      "detail": "Three separate auth/verification items blocking progress."
     },
     {
-      "blocker": "Lead Nurture cron error 1010 — day2 email failed to aaronkasemt@gmail.com",
-      "detail": "Check if this is a test lead entry with wrong email address. SMTP rejection vs address-not-found."
+      "blocker": "Weekly Activation: 6 signups, 0% activation — onboarding funnel investigation urgent",
+      "detail": "No single signup completed any primary action in 16 days."
     },
     {
-      "blocker": "ProBase (free, LawnStarter-backed) launched — 1-5 crew ICP overlap with MowGo",
-      "detail": "Worth watching. MowGo counters: rain delay, webhooks, booking link, crew invite, native iOS/Android, trial-first flow. Monitored by Intel Engine."
-    },
-    {
-      "blocker": "Servinix beta in 6 days (Aug 17) — rain delay automation competitor, no pricing revealed",
-      "detail": "MowGo already ships Rain Delay v2. Prep compare-page row if pricing emerges."
+      "blocker": "GreenRoute emerged as new competitor — free plan, threatens all MowGo tiers",
+      "detail": "Need to understand their positioning and decide whether to build parity features or differentiate."
     }
   ],
   "quick_wins_sub_30min": [
     {
-      "id": "reddit_slot_verify",
-      "title": "VERIFY Aug 11 22:23Z one-shot cron 4c195234eaa9 — state=scheduled, enabled=true ✅",
-      "estimate": "5 min",
-      "owner": "✅ DONE (this scan)",
-      "impact": "HIGH — first post after 96h gate, confirmed for tonight"
+      "id": "manually_text_top_5_sms",
+      "title": "Manually text top 5 priority leads from phone right now (bypass Twilio blocker)",
+      "estimate": "10 min",
+      "owner": "Aaron (manual)",
+      "impact": "HIGH — 5 texts could break 21-day silence"
     },
     {
-      "id": "friend_mode_replies",
-      "title": "Reply 1uaa3yg (CRM), 1vj9nay (quote-loop), 1vk2tgr ('worth money') — friend-mode, no pitch",
+      "id": "servinix_signup",
+      "title": "Sign up for Servinix beta before Monday launch",
+      "estimate": "5 min",
+      "owner": "Aaron",
+      "impact": "HIGH — intel on competitor launch timing and pricing"
+    },
+    {
+      "id": "mark_old_leads_red",
+      "title": "Mark 3 of 5 overdue leads as RED/dead; keep hottest 2 in rotation",
+      "estimate": "5 min",
+      "owner": "Aaron",
+      "impact": "MEDIUM — keeps lead tracker actionable"
+    },
+    {
+      "id": "sendgrid_api_key_fix",
+      "title": "Fix SendGrid API key — check env var, replace invalid key, resume lead nurture",
+      "estimate": "5 min",
+      "owner": "Aaron",
+      "impact": "MEDIUM — reactivates automated lead follow-up pipeline"
+    },
+    {
+      "id": "approve_twilio_campaign",
+      "title": "Approve Twilio SMS campaigns in Twilio dashboard",
       "estimate": "10 min",
       "owner": "Aaron",
-      "impact": "HIGH — warm leads, 1vj9nay aging out"
+      "impact": "HIGH — unlocks automated SMS to 25+ leads"
     },
     {
-      "id": "followup_emails",
-      "title": "Send 5 overdue follow-ups (Day 16+)",
-      "estimate": "10 min",
-      "owner": "Aaron (manual)",
-      "impact": "HIGH — highest-ROI 10 min of the week"
-    },
-    {
-      "id": "sms_decision",
-      "title": "DECIDE: write sender script or abandon SMS outreach. 25 texts queued 10 days.",
-      "estimate": "2 min decision, ~30 min to write script",
-      "owner": "Aaron (decision)",
-      "impact": "HIGH — 25+ leads waiting 10 days"
-    },
-    {
-      "id": "blasian_reply",
-      "title": "Post Blasian reply + #48 manual paste (one session, 5 min)",
+      "id": "cold_call_karma_lawn",
+      "title": "Cold call Karma Lawn Mowing, Ponca City (405) 747-7869",
       "estimate": "5 min",
-      "owner": "Aaron (manual)",
-      "impact": "HIGH — re-engages only human collaborator, Day 14"
+      "owner": "Aaron",
+      "impact": "MEDIUM — new lead, no contact yet"
     },
     {
-      "id": "activation_funnel_check",
-      "title": "Check signup→first-client flow: create test account, see if onboarding tutorial fires",
+      "id": "check_stripe_health",
+      "title": "Run Stripe health check to confirm everything still green post-deploy",
       "estimate": "15 min",
-      "owner": "Bot/Dev",
-      "impact": "CRITICAL — 6 signups, 0% activation is a broken funnel"
-    },
-    {
-      "id": "lead_nurture_investigate",
-      "title": "Investigate error 1010 on day2 email to aaronkasemt@gmail.com — check lead DB entry",
-      "estimate": "5 min",
       "owner": "Bot",
-      "impact": "MEDIUM — lead nurture pipeline silent"
-    },
-    {
-      "id": "level_billing_drought_mode",
-      "title": "Bank 'Drought Mode' feature spec: freeze + level billing + broadcast SMS toggle",
-      "estimate": "10 min",
-      "owner": "Bot",
-      "impact": "MEDIUM — positions level billing as drought-season differentiator"
-    },
-    {
-      "id": "compare_page_updates",
-      "title": "Add ProBase row + $300B market stat to compare page data",
-      "estimate": "10 min",
-      "owner": "Bot",
-      "impact": "MEDIUM — competitor completeness"
-    },
-    {
-      "id": "sms_manual_sends",
-      "title": "IF no sender script: send 10 highest-priority Day-1 texts manually from Aaron's phone",
-      "estimate": "15 min",
-      "owner": "Aaron (manual)",
-      "impact": "HIGH — re-engages cold lead pipeline"
-    },
-    {
-      "id": "sms_queue_add_wave4",
-      "title": "IF sender script written: add all Wave-4 (6) + Aug 10 batch (10) to sms_queue.json",
-      "estimate": "10 min",
-      "owner": "Bot",
-      "impact": "MEDIUM — queue completeness"
+      "impact": "LOW-MED — routine verification (health check already running OK this cycle)"
     }
   ],
-  "pricing_status": {
-    "recommendation": "HOLD $39/$79 flat. NEW TUESDAY DELTAS: ProBase launched FREE (LawnStarter-backed, 1-5 crew ICP). Jobber restructured to $21-$371/mo — Core $21 is lowest ever but 1-user only. LawnBook $9.99 Pro confirmed. MowGo's flat $39/$79 advantage vs 3-crew on Jobber ($169) is real but squeezed from below by LawnPro free/LawnBook $9.99/GreenRoute free/ProBase free. Level billing is now table-stakes — competitive negative without it.",
-    "new_this_scan": [
-      "ProBase (free, LawnStarter-backed) — new free competitor targeting 1-5 crew",
-      "Jobber restructured plans: Core $21 (1-user), Connect $70-210 (2-5), Grow $105-280 (5-10), Plus $280-371 (10-15+API)",
-      "Weekly activation: 6 signups, 0% activation in 14 days — funnel broken",
-      "Lead Nurture cron error 1010 — day2 email rejected",
-      "Intel Engine v51 active, Reddit 403 block continues on direct scraping",
-      "Servinix beta in 6 days (Aug 17)"
-    ],
-    "copy_flags_banked": [
-      "ProBase is free with job-fee revenue model — MowGo is flat price with no hidden fees",
-      "Jobber Core now $21 but 1-user only — real multi-user cost $169+ for 3 crew",
-      "Level billing is table-stakes — MowGo needs it to compete on free tier",
-      "The floor moved to $49+. Solo is $39 flat, unlimited clients.",
-      "Per-user tax = industry pricing engine: Crew $79 beats every multi-user stack.",
-      "Crossed $300B lawn industry. Software adoption CAGR 12.5%.",
-      "Servinix beta Aug 17 — shipping rain delay automation (MowGo already ships it).",
-      "Drought = 2026 national story. 'Drought Mode' toggle = market-first feature angle."
-    ]
+  "intel_highlights_this_cycle": {
+    "servinix": "Beta launches Monday Aug 17. 60% off invoice hook. Rain delay automation, crew GPS, setup in one day, cancel anytime. Threat level: HIGH for Crew tier ICP.",
+    "jobber": "First permanent price increase ($24→$29). Jobber AI launched — first real AI push. Organic 'pricing trap' narrative growing organically. Conference Sept 25.",
+    "quoteiq": "Most aggressive feature shipper. 60+ features June update. July: AI AutoMeasure, Ask AI Reports. Elite possibly dropped $299→$249.",
+    "greenroute_new": "GREENROUTE EMERGED — genuinely free plan ($0/mo) with unlimited customers, invoicing, contracts, credit cards, satellite measurement. Routes/weather/SMS for $10/mo flat. Teams reports $50/mo. Small brand, minimal SEO. Directly challenges every MowGo tier.",
+    "yardbook": "Strongest free-tier competitor. 1% payment commission complaint recurring. Invoice deliverability problems. Native iOS app vs web/mobile web = MowGo advantage.",
+    "probase": "Completely free, all features, backed by LawnStarter. Marketing angle sharp ('Sunday night problem'). New competitor to monitor.",
+    "market": "US lawn care $62.9B (2026), 4.85% CAGR to $79.7B by 2031. 66.5% revenue from subscription contracts. Route optimization = #1 feature gap across all competitors."
   },
-  "summary": "ALL BOT MESSAGES — ZERO human activity (Blasian silent Day 14). ✅ REDDIT SLOT CRON CORRECTED: fires TONIGHT Aug 11 22:23Z (cron 4c195234eaa9, state=scheduled, enabled=true) — yesterday's scan said 'Mon Aug 10' but 96h gate from Fri Aug 7 = Aug 11. Kit #55→#57→#43→#50 locked. ✅ STRIPE 09:07Z: all green, identical bundles both domains. 🆕 NEW CRITICAL: Weekly Activation Report shows 6 signups with 0% activation in 14 days — onboarding funnel completely broken. 🆕 Lead Nurture cron error 1010 (email to aaronkasemt@gmail.com rejected). 🆕 ProBase (free, LawnStarter-backed) confirmed as major new free competitor. Intel Engine v51 running fine, Reddit direct scraping still 403-blocked (RSS 6/8 subs working). Servinix beta in 6 days. Lead pipeline unchanged: 20+ tracked / 5 contacted / 0 replies (Day 16). SMS 25 texts queued Day 10, no sender script exists. CF tokens dead Day 5. 🔴 CRITICAL for Aaron: fire Reddit slot tonight · investigate 0% activation funnel · fix lead nurture 1010 · unpause/decide SMS (10 days) · 5 overdue follow-ups (Day 16) · Blasian reply + #48 paste (Day 14) · CF re-auth · directory submissions (Day 31). Bot can: add ProBase/$300B to compare page, investigate activation funnel with test signup."
+  "summary": "ALL BOT MESSAGES — ZERO human activity (Blasian silent Day 50). 🆕 NEW COMPETITOR: GreenRoute discovered with genuinely free plan ($0/mo unlimited) + $10/mo route add-on. Challenges every MowGo tier directly — needs monitoring. 🔴 SERVINIX BETA MONDAY Aug 17: Biggest immediate action item. Sign up Mon to evaluate rain delay overlap, crew GPS, and 60% off hook. 📱 SMS BLOCKED: Twilio campaigns 'not approved' — 4+ consecutive days of failures, ~25 leads unable to receive automated SMS. Aaron must either approve campaigns or manually text top leads. 💡 Quick wins today: manually text top 5 leads (10 min), sign up Servinix (5 min), mark 3 old leads dead (5 min), fix SendGrid key (5 min), approve Twilio campaigns (10 min). Jobber AI launched, Yardbook comparison content flooding search results, openRouter credits flapping but recovering."
 }

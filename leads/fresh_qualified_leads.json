@@ -1,0 +1,985 @@
+{
+  "leads": [
+    {
+      "business": "Perry's Lawn Care",
+      "city": "New Smyrna Beach",
+      "state": "FL",
+      "email": "bradperrylawncare@gmail.com",
+      "phone": "(386) 847-9142",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "MJR Landscaping & Lawn Care",
+      "city": "Fort Myers",
+      "state": "FL",
+      "email": "mjrlandscaping77@gmail.com",
+      "phone": "(239) 645-5201",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "3G Landscaping & Lawn Care",
+      "city": "Stockton",
+      "state": "CA",
+      "email": "peejacob@yahoo.com",
+      "phone": "(417) 955-0216",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Atlas Lawn Care",
+      "city": "West Lafayette",
+      "state": "IN",
+      "email": "atlasinc14@gmail.com",
+      "phone": "(765) 588-3333",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Prime Lawn & Property",
+      "city": "Murfreesboro",
+      "state": "TN",
+      "email": "tylerjrowlison@gmail.com",
+      "phone": "(615) 663-8232",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Heritage Lawn Maintenance of Brevard",
+      "city": "Titusville",
+      "state": "FL",
+      "email": "matt_recicar@cfl.rr.com",
+      "phone": "(321) 289-8519",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Ace Property Maintenance",
+      "city": "Clio",
+      "state": "MI",
+      "email": "acemaintaining@aol.com",
+      "phone": "(810) 938-3438",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "VARGAS LAWN SERVICE",
+      "city": "Henderson",
+      "state": "NV",
+      "email": "vargaslawnservice@yahoo.com",
+      "phone": "(702) 494-9129",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Huntsville Lawn Care Services",
+      "city": "Huntsville",
+      "state": "AL",
+      "email": "huntsvillelawns@yahoo.com",
+      "phone": "(256) 529-9008",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Fletchers Landscape & Maintenance Co",
+      "city": "Rio Linda",
+      "state": "CA",
+      "email": "fletcherslandscape@gmail.com",
+      "phone": "(916) 410-6651",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Juan's Complete Gardening Service",
+      "city": "San Mateo",
+      "state": "CA",
+      "email": "juan_gardening@yahoo.com",
+      "phone": "(650) 347-4152",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Bahena Gardens Landscape Maintenance Service",
+      "city": "Auburn",
+      "state": "CA",
+      "email": "bahenagardenslandscape@gmail.com",
+      "phone": "(530) 305-4787",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Steve-N-Son Landscaping",
+      "city": "South Jordan",
+      "state": "UT",
+      "email": "steve@steve-n-son.com",
+      "phone": "(801) 523-8888",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Cruz Landscaping Maintenance & Irrigation",
+      "city": "Oceanside",
+      "state": "CA",
+      "email": "cruzlandscapingms@gmail.com",
+      "phone": "(760) 845-0204",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "On the Green Landscape MNTNC",
+      "city": "Stockton",
+      "state": "CA",
+      "email": "onthegreen1985@yahoo.com",
+      "phone": "(209) 463-4688",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Quality Lawn & Landscape Maintenance",
+      "city": "Oakland",
+      "state": "OR",
+      "email": "danvilletammie@yahoo.com",
+      "phone": "(541) 680-2365",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Fulchino Landscape Companies (FLC Corp)",
+      "city": "Rowley",
+      "state": "MA",
+      "email": "ajf@flccorp.net",
+      "phone": "(978) 948-7168",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Green Images & Design",
+      "city": "Petaluma",
+      "state": "CA",
+      "email": "imageinc@att.net",
+      "phone": "(707) 753-1824",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "First Class Lawn Service",
+      "city": "Fraser",
+      "state": "MI",
+      "email": "info@firstclasslawnllc.com",
+      "phone": "(586) 825-3333",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Francis Lawn Service",
+      "city": "Gaithersburg",
+      "state": "MD",
+      "email": "francislawnservice@yahoo.com",
+      "phone": "(301) 370-7408",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "RNA Lawn Care & Services",
+      "city": "Springtown",
+      "state": "TX",
+      "email": "crsmoto251@gmail.com",
+      "phone": "(817) 304-3677",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Wolfe & Sons Lawn Service",
+      "city": "Belton",
+      "state": "MO",
+      "email": "wolfeandsons@gmail.com",
+      "phone": "(816) 425-4583",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Mancil's Lawn Service",
+      "city": "Summerfield",
+      "state": "FL",
+      "email": "mancillawnservice@gmail.com",
+      "phone": "(352) 427-0566",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Terra Verde Lawn Care Service",
+      "city": "Port Charlotte",
+      "state": "FL",
+      "email": "terraverdelcs@gmail.com",
+      "phone": "(941) 549-1161",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Frank's Lawn Service LLC",
+      "city": "Elkhart",
+      "state": "IN",
+      "email": "frankslawnservice@hotmail.com",
+      "phone": "(574) 875-4516",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Goldstar Lawn Service",
+      "city": "Beaumont",
+      "state": "TX",
+      "email": "goldstarlawnservice@gmail.com",
+      "phone": "(409) 658-5651",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lucas Lawn Mowing Service",
+      "city": "Omro",
+      "state": "WI",
+      "email": "lucaslawnmowingservice@gmail.com",
+      "phone": "(920) 527-9595",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "No Sweat Lawn Mowing",
+      "city": "Lewisburg",
+      "state": "PA",
+      "email": "nosweatlawnmowing@gmail.com",
+      "phone": "(570) 716-1886",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "St. Charles County Lawn Care - No Contract Lawn Mowing Service",
+      "city": "O Fallon",
+      "state": "MO",
+      "email": "kevin@scclawncare.com",
+      "phone": "(636) 399-7327",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "W. & K. Lawn Services",
+      "city": "Orlando",
+      "state": "FL",
+      "email": "wklawnservices@gmail.com",
+      "phone": "(407) 340-6657",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Pohlman Mowing & Lawn Care",
+      "city": "Hillsboro",
+      "state": "OH",
+      "email": "joshuajpohlman@gmail.com",
+      "phone": "(937) 205-9028",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Mike Pierre Lawn Service",
+      "city": "Cantonment",
+      "state": "FL",
+      "email": "mowingpensacola@gmail.com",
+      "phone": "(850) 529-8128",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "ML Services Landscaping",
+      "city": "Marlborough",
+      "state": "MA",
+      "email": "mlservices@comcast.net",
+      "phone": "(508) 460-1804",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Northern Lights Landscape Contractors",
+      "city": "Milford",
+      "state": "NH",
+      "email": "info@nllandscapes.com",
+      "phone": "(603) 654-2004",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Nations Landscaping",
+      "city": "Orlando",
+      "state": "FL",
+      "email": "nationslandscape@aol.com",
+      "phone": "(321) 276-0228",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Landscape Inc",
+      "city": "Latham",
+      "state": "NY",
+      "email": "landscapeinc.588@albany-biz.com",
+      "phone": "(518) 290-1393",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Land Lovers Landscaping & Construction",
+      "city": "Mechanicsville",
+      "state": "VA",
+      "email": "melinda@landloversservices.com",
+      "phone": "(804) 937-1622",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Blade Runners",
+      "city": "Fairfax",
+      "state": "VA",
+      "email": "eric@blade-runners.com",
+      "phone": "(703) 273-8873",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Acer Landscape Services",
+      "city": "Nashville",
+      "state": "TN",
+      "email": "astewart@acerlandscapeservices.com",
+      "phone": "(615) 350-8030",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Rudy's Landscaping",
+      "city": "Lynchburg",
+      "state": "VA",
+      "email": "admin@rudyslandscaping-va.com",
+      "phone": "(276) 209-8010",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Sanchez R Landscape",
+      "city": "San Jacinto",
+      "state": "CA",
+      "email": "admin@sanchezrlandscape.com",
+      "phone": "(951) 390-7938",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Salute Lawn Maintenance",
+      "city": "Eugene",
+      "state": "OR",
+      "email": "michaelm@salutelawnmaintenance.com",
+      "phone": "(541) 337-7486",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Captains Lawn Service",
+      "city": "Fayette City",
+      "state": "PA",
+      "email": "captain724@atlanticbb.net",
+      "phone": "(724) 326-4119",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lawn Landscaping BY 707 Inc",
+      "city": "Port Saint Lucie",
+      "state": "FL",
+      "email": "wschopp@bellsouth.net",
+      "phone": "(772) 335-9274",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "PRO LAWNCARE & LIGHTING INC",
+      "city": "Huntley",
+      "state": "IL",
+      "email": "prolawncare4@comcast.net",
+      "phone": "(847) 721-8346",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Fox & Sons Lawn Care",
+      "city": "Jackson",
+      "state": "NJ",
+      "email": "foxnsonslawncare@aol.com",
+      "phone": "(732) 718-4977",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "D&D Lawn Care",
+      "city": "Earleville",
+      "state": "MD",
+      "email": "ddlawncaremd@yahoo.com",
+      "phone": "(443) 907-2066",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Petrella Landscaping & Lawncare",
+      "city": "Galloway",
+      "state": "NJ",
+      "email": "stevenpetrella11@msn.com",
+      "phone": "(609) 338-9797",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Clean Cut Lawn Care",
+      "city": "Point Pleasant Boro",
+      "state": "NJ",
+      "email": "cleancutlccorp@aol.com",
+      "phone": "(732) 714-1786",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Kent Landscaping Company",
+      "city": "Camden",
+      "state": "DE",
+      "email": "kentlc@comcast.net",
+      "phone": "(302) 535-4296",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Good Life Landscaping & Lawn Care",
+      "city": "Ames",
+      "state": "IA",
+      "email": "goodlifelandscaping@gmail.com",
+      "phone": "(515) 509-7218",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Dominguez Masonry & Landscaping",
+      "city": "Rancho Cucamonga",
+      "state": "CA",
+      "email": "froy@dmandl.com",
+      "phone": "(909) 463-2886",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Fleck's Landscaping",
+      "city": "Wheeling",
+      "state": "IL",
+      "email": "dean@fleckslawn.com",
+      "phone": "(847) 588-2100",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Ruben's Jr.Landscaping Inc",
+      "city": "Waukegan",
+      "state": "IL",
+      "email": "ruben4338@att.net",
+      "phone": "(847) 343-6296",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Vaca Landscaping",
+      "city": "Chicago",
+      "state": "IL",
+      "email": "robertovaca3@yahoo.com",
+      "phone": "(773) 814-4519",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Oceanside Landscaping",
+      "city": "Rye Beach",
+      "state": "CA",
+      "email": "intoccia@gmail.com",
+      "phone": "(603) 396-2406",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Jessica Jones Lawn Care Service",
+      "city": "Savannah",
+      "state": "GA",
+      "email": "jessicajones725s@gmail.com",
+      "phone": "(912) 239-8350",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Gator Mowing",
+      "city": "Williston",
+      "state": "FL",
+      "email": "_mowing@yahoo.com",
+      "phone": "(352) 246-1248",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Hathaway's Lawn & Yard Care",
+      "city": "Rochester",
+      "state": "NY",
+      "email": "hathawayslawn@yahoo.com",
+      "phone": "(774) 849-5138",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lip's Persnickety Lawn Service",
+      "city": "Clinton",
+      "state": "MO",
+      "email": "clarencehaizlip86@gmail.com",
+      "phone": "(301) 758-0693",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Flintstones Landscaping",
+      "city": "Nantucket",
+      "state": "MA",
+      "email": "gregpartida@yahoo.com",
+      "phone": "(774) 368-0146",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Kehm's Lawn Mowing Service",
+      "city": "Mertztown",
+      "state": "PA",
+      "email": "bkehm@ptd.net",
+      "phone": "(484) 336-9199",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "HS Lawn Care Service",
+      "city": "Detroit",
+      "state": "MI",
+      "email": "h.viviansmith60@yahoo.com",
+      "phone": "(313) 310-0383",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Parrigin's Precision Mowing",
+      "city": "Summerfield",
+      "state": "FL",
+      "email": "rdparrigin@aol.com",
+      "phone": "(352) 267-9604",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Holtzinger Outdoor Services",
+      "city": "Windsor",
+      "state": "OH",
+      "email": "aholtzinger@comcast.net",
+      "phone": "(717) 244-7451",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Brian's Lawn Care",
+      "city": "Nazareth",
+      "state": "PA",
+      "email": "1brianslawncare@gmail.com",
+      "phone": "(610) 360-2457",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Super Green Lawn Care",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "email": "supergreenlawncare@yahoo.com",
+      "phone": "(260) 444-9020",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lawnscape Services",
+      "city": "New Carlisle",
+      "state": "IN",
+      "email": "pplawn@msn.com",
+      "phone": "(574) 654-7326",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Cut For Success L.L.C",
+      "city": "Munster",
+      "state": "IN",
+      "email": "cutforsuccess@att.net",
+      "phone": "(219) 781-6028",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Complete Lawn & Snow Service",
+      "city": "Palatine",
+      "state": "IL",
+      "email": "class85@sbcglobal.net",
+      "phone": "(847) 776-7287",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Joe & Tony Landscaping",
+      "city": "Highland Park",
+      "state": "IL",
+      "email": "joetony73@ymail.com",
+      "phone": "(847) 831-3951",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Grass Roots Lawn Service",
+      "city": "Lagrange",
+      "state": "IN",
+      "email": "info@grassrootslawnservice.net",
+      "phone": "(706) 845-9922",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Rau Lawncare",
+      "city": "Saint Charles",
+      "state": "MO",
+      "email": "raulawncare@gmail.com",
+      "phone": "(314) 952-8797",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Evergreen Lawn Care",
+      "city": "Charlottesville",
+      "state": "VA",
+      "email": "evergreenlawn@embarqmail.com",
+      "phone": "(434) 466-7891",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Blue Line Lawn Care",
+      "city": "Ladson",
+      "state": "SC",
+      "email": "bluelinelawns.sc@gmail.com",
+      "phone": "(843) 709-5119",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Green Thumb Services",
+      "city": "North Brunswick",
+      "state": "NJ",
+      "email": "greenthumb3333@verizon.net",
+      "phone": "(732) 297-3333",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Tiger Pop's Lawn Maintenance",
+      "city": "Wallington",
+      "state": "NJ",
+      "email": "mitch@tigerpopslawn.com",
+      "phone": "(551) 795-5444",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "GreenMax Lawn Care",
+      "city": "Landing",
+      "state": "NJ",
+      "email": "info@greenmaxlawns.com",
+      "phone": "(973) 288-1246",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Charlie's Lawn Service LLC - Union Beach, NJ",
+      "city": "Union Beach",
+      "state": "NJ",
+      "email": "charlielawns@aol.com",
+      "phone": "(732) 264-1129",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Marc & Sons Lawn Care",
+      "city": "Mamaroneck",
+      "state": "NY",
+      "email": "marcandsons10543@gmail.com",
+      "phone": "(646) 337-7613",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Jesses Lawn Care",
+      "city": "Smithfield",
+      "state": "NC",
+      "email": "jesseslawncare@verizon.net",
+      "phone": "(401) 640-3080",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "JRB Lawn Care & Landscaping",
+      "city": "Mount Bethel",
+      "state": "PA",
+      "email": "jrblawncare@gmail.com",
+      "phone": "(570) 242-4672",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Jeremiah Schmidt Landscape",
+      "city": "Annapolis",
+      "state": "MD",
+      "email": "jeremiahschmidt@gmail.com",
+      "phone": "(707) 322-7298",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "L&J Lawn Services",
+      "city": "Lake Worth",
+      "state": "FL",
+      "email": "landjlawninc@aol.com",
+      "phone": "(561) 856-5921",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Kissel Landscaping & Lawn Service",
+      "city": "Pembroke Pines",
+      "state": "FL",
+      "email": "jason@kissel-landscaping.com",
+      "phone": "(954) 445-1696",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Total Maintenance Inc Landscaping",
+      "city": "Boca Raton",
+      "state": "FL",
+      "email": "landpro@ymail.com",
+      "phone": "(561) 451-3532",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Layback & Look Lawn Maintenance Inc",
+      "city": "Middleburg",
+      "state": "FL",
+      "email": "laybackandlook@yahoo.com",
+      "phone": "(904) 282-4591",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Valle Lawn Maintenance",
+      "city": "Palmetto",
+      "state": "FL",
+      "email": "vallelawnmaintenance@yahoo.com",
+      "phone": "(941) 243-4793",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Rodney S Lawn Care",
+      "city": "Port Charlotte",
+      "state": "FL",
+      "email": "alw1020@comcast.net",
+      "phone": "(941) 815-1420",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "American Lawn & Tree Specialists",
+      "city": "Sykesville",
+      "state": "MD",
+      "email": "joe@americanlawnandtree.com",
+      "phone": "(443) 920-3513",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "The Plugman Lawn Aeration & Landscape Services",
+      "city": "Chandler",
+      "state": "AZ",
+      "email": "plugman@cox.net",
+      "phone": "(480) 940-8196",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lawn Medic",
+      "city": "South Bend",
+      "state": "IN",
+      "email": "lawnmedic@comcast.net",
+      "phone": "(574) 251-9000",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Green Turf Care",
+      "city": "Emmaus",
+      "state": "PA",
+      "email": "geoff@greenturfcare.com",
+      "phone": "(484) 452-3595",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Woods Sod Farm",
+      "city": "Pingree",
+      "state": "ID",
+      "email": "dustingocrazy@hotmail.com",
+      "phone": "(208) 684-3199",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lawns For Less L.I. Landscaping Service",
+      "city": "Smithtown",
+      "state": "NY",
+      "email": "lawnsforlessli@gmail.com",
+      "phone": "(631) 252-3300",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Augusta Quality Lawn Care",
+      "city": "Hephzibah",
+      "state": "GA",
+      "email": "augustaqualitylawncare@yahoo.com",
+      "phone": "(706) 592-9841",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Galeana Lawn Care Services - Durham, NC",
+      "city": "Durham",
+      "state": "NC",
+      "email": "mario@galeanalawncare.com",
+      "phone": "(919) 224-7367",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Lawrence Lawn Care",
+      "city": "Lawrence",
+      "state": "KS",
+      "email": "lawrencelawncare@sunflower.com",
+      "phone": "(785) 749-5857",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Jim's Lawn & Landscaping",
+      "city": "Columbia",
+      "state": "MO",
+      "email": "jim@jimslawnandlandscaping.com",
+      "phone": "(573) 864-0832",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Small Root Landscape & Lawn Care",
+      "city": "Kansas City",
+      "state": "MO",
+      "email": "joseayala0866@gmail.com",
+      "phone": "(913) 579-2279",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "TLC Lawncare Kim Alexander owner",
+      "city": "Debary",
+      "state": "FL",
+      "email": "tlcpropertymaintenance@yahoo.com",
+      "phone": "(386) 668-1090",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Friendly Lawn & Snow",
+      "city": "Chisago City",
+      "state": "MN",
+      "email": "derrick@friendlawnandsnow.com",
+      "phone": "(651) 468-7704",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "RichMor Lawn Care",
+      "city": "Emporia",
+      "state": "KS",
+      "email": "richmorlawns@gmail.com",
+      "phone": "(620) 341-7939",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Pebblestone Landscape Group",
+      "city": "Lawrenceville",
+      "state": "KS",
+      "email": "randy_huffman@bellsouth.net",
+      "phone": "(770) 560-3490",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Chris's Lawn Service",
+      "city": "Hiawassee",
+      "state": "GA",
+      "email": "lawncare@inhiawassee.com",
+      "phone": "(706) 897-7024",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "The Green Keeper",
+      "city": "Savannah",
+      "state": "GA",
+      "email": "greenkeeper49@aol.com",
+      "phone": "(912) 657-2713",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "Gibson Lawn Care & home repair services",
+      "city": "Macon",
+      "state": "GA",
+      "email": "gibsonhomecare@gmail.com",
+      "phone": "(478) 390-0572",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "C&M Landscaping",
+      "city": "Fort Lauderdale",
+      "state": "FL",
+      "email": "paperchaser1875@gmail.com",
+      "phone": "(954) 614-6115",
+      "website": "",
+      "source": "association_directory"
+    },
+    {
+      "business": "ALLEN'LAWN SERVICE",
+      "city": "Lockhart",
+      "state": "TX",
+      "email": "las71656@gmail.com",
+      "phone": "(407) 353-6283",
+      "website": "",
+      "source": "association_directory"
+    }
+  ]
+}

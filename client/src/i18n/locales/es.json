@@ -1083,7 +1083,20 @@
     "export_failed_please_try_again": "No se pudo exportar. Inténtalo de nuevo.",
     "exporting": "Exportando...",
     "exported": "Exportado",
-    "share_this_link_so_customers_can_book_online_no_login_needed": "Comparte este enlace para que los clientes reserven en línea, sin necesidad de iniciar sesión."
+    "share_this_link_so_customers_can_book_online_no_login_needed": "Comparte este enlace para que los clientes reserven en línea, sin necesidad de iniciar sesión.",
+    "quickbooks_integration": "Integración con QuickBooks",
+    "connect_quickbooks": "Conectar QuickBooks",
+    "sync_your_invoices_to_quickbooks_online_automatically": "Sincroniza tus facturas con QuickBooks Online automáticamente.",
+    "connected_to_company": "Conectado a {companyName}",
+    "sync_now": "Sincronizar ahora",
+    "syncing": "Sincronizando...",
+    "disconnect_quickbooks": "Desconectar QuickBooks",
+    "disconnect_quickbooks_confirm": "¿Desconectar QuickBooks? Esto detendrá la sincronización de facturas.",
+    "quickbooks_sync_success": "Facturas sincronizadas correctamente",
+    "quickbooks_sync_error": "Error de sincronización: {error}",
+    "auto_sync_invoices": "Sincronización automática",
+    "last_synced": "Última sincronización",
+    "never": "Nunca"
   },
   "subscribe": {
     "premium": "Premium",

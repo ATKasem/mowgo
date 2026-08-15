@@ -1,14 +1,17 @@
 # MowGo Vault Index
 
 > **Vault path:** `/opt/data/mowgo/vault/`
-> **Last updated:** 2026-08-14
+| **Last updated:** 2026-08-15 |
 
 ## Entry points
 
 | Date | File | Description |
 |------|------|-------------|
-|| 2026-08-14 | `2026-08-14_daily-sync.md` | **Main sync note** — Aug 14 02:00 UTC sync — **Intel Engine RECOVERED** (7/8 runs succeeded, 1 connect timeout); full competitor pricing comparison; Stripe all green; Servinix beta Aug 17 in 4 days; Blasian silent Day 21 |
-|| 2026-08-14 | `2026-08-14_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **19 new** — Intel ×6 runs, Stripe check, invoice reminders, lead nurture; ALL bot, Blasian silent Day 21) |
+| | 2026-08-15 | `2026-08-15_daily-sync.md` | **Main sync note** — Aug 15 02:00 UTC sync — Intel Engine partially degraded (3/4 runs succeeded, 1 HTTP 402 credit exhaustion streak); ProBase confirmed #1 competitive threat; Servinix launches Monday in 2 days; Lead Nurture API key broken (401); Reddit extraction still blocked (403) |
+| | 2026-08-15 | `2026-08-15_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **12 new** — Intel Engine ×6 runs w/ partial failures, Stripe check failure, invoice reminders OK, lead nurture failed; ALL bot, Blasian silent Day 17) |
+| | 2026-08-15 | `2026-08-15_extracted-items.md` | Extracted items: 2 decisions, 8 action items, 6 research findings, 5 tasks |
+| | 2026-08-14 | `2026-08-14_daily-sync.md` | **Main sync note** — Aug 14 02:00 UTC sync — **Intel Engine RECOVERED** (7/8 runs succeeded, 1 connect timeout); full competitor pricing comparison; Stripe all green; Servinix beta Aug 17 in 4 days; Blasian silent Day 21 |
+| | 2026-08-14 | `2026-08-14_channel-mowgo-raw.md` | Raw dump from #🌱mowgo (100 messages, **19 new** — Intel ×6 runs, Stripe check, invoice reminders, lead nurture; ALL bot, Blasian silent Day 21) |
 || 2026-08-14 | `2026-08-14_channel-outreach-raw.md` | ⚠️ #🌱mowgo-outreach STILL GONE — 404 ×7 consecutive; 0 synced |
 || 2026-08-14 | `2026-08-14_channel-cowork-raw.md` | Raw dump from #🤝mowgo-cowork (0 messages — empty since Aug 6 cleanup; Day 37 empty) |
 ||| 2026-08-13 | `2026-08-13_daily-sync.md` | **Main sync note** — Aug 13 02:00 UTC sync — **🚨 HTTP 402 CRISIS: Intel Engine dead ~16 hours** (0 of 5 last runs succeeded), Stripe health check also failing, lead nurture API key broken, Reddit kit skipped |

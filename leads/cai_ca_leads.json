@@ -1,0 +1,683 @@
+{
+  "leads": [
+    {
+      "business": "Alder Landscape Services, Inc.",
+      "city": "Newport Beach",
+      "state": "CA",
+      "email": "jgrise@alderlandscape.com",
+      "phone": "714-962-8177",
+      "website": "www.alderlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "American Heritage Landscape",
+      "city": "Canoga Park",
+      "state": "CA",
+      "email": "cgomez@americanheritagelandscape.com",
+      "phone": "818-999-2041",
+      "website": "www.americanheritagelandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Benchmark Landscape, Inc.",
+      "city": "Poway",
+      "state": "CA",
+      "email": "craigm@benchmarklandscape.com",
+      "phone": "858-513-7190",
+      "website": "www.benchmarklandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "California Landscape & Design, Inc.",
+      "city": "Upland",
+      "state": "CA",
+      "email": "yvargas@calandscape.com",
+      "phone": "909-949-1601",
+      "website": "www.calandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Cresta Verde Landscape",
+      "city": "Santa Ana",
+      "state": "CA",
+      "email": "morgan@crestaverdelandscape.com",
+      "phone": "714-568-1186",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Gothic Landscape",
+      "city": "Indio",
+      "state": "CA",
+      "email": "kellan.falconieri@gothiclandscape.com",
+      "phone": "602-305-3690",
+      "website": "www.gothicgroundsmanagement.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Greatland Landscape, Inc.",
+      "city": "Corona",
+      "state": "CA",
+      "email": "rafael@greatlandlandscape.com",
+      "phone": "714-364-7153",
+      "website": "www.greatlandlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Green Horizons Landscape and Maintenance, Inc.",
+      "city": "Escondido",
+      "state": "CA",
+      "email": "john@greenhorizonsmaint.com",
+      "phone": "877-476-4796",
+      "website": "www.greenhorizonslandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Green Valley Landscape & Maintenance, Inc.",
+      "city": "Escondido",
+      "state": "CA",
+      "email": "miguels@gvlminc.com",
+      "phone": "760-233-7791",
+      "website": "www.gvlminc.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Hort Tech Landscape",
+      "city": "Palm Desert",
+      "state": "CA",
+      "email": "rosa@horttechlandscape.com",
+      "phone": "760-360-9000",
+      "website": "www.horttechlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Landscape Care Company",
+      "city": "Martinez",
+      "state": "CA",
+      "email": "landscapecare@earthlink.net",
+      "phone": "925-372-7973",
+      "website": "www.landscapecare.net",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Oakridge Landscape, Inc.",
+      "city": "Valencia",
+      "state": "CA",
+      "email": "mhernandez@oakridgelandscape.net",
+      "phone": "818-891-0468",
+      "website": "www.oakridgelandscape.net",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Pacific Green Landscape, Inc.",
+      "city": "Lakeside",
+      "state": "CA",
+      "email": "Jade@pacificgreenlandscape.com",
+      "phone": "800-439-9962",
+      "website": "www.pacificgreenlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Richard Cohen Landscape & Construction, Inc.",
+      "city": "Lake Forest",
+      "state": "CA",
+      "email": "jseverns@richardcohenlandscape.com",
+      "phone": "949-768-0599",
+      "website": "www.richardcohenlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Steven Smith Landscape, Inc.",
+      "city": "Escondido",
+      "state": "CA",
+      "email": "ggolden@stevensmithlandscape.com",
+      "phone": "760-745-9916",
+      "website": "stevensmithlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Villa Park Landscape",
+      "city": "Orange",
+      "state": "CA",
+      "email": "valerie@vplinc.com",
+      "phone": "714-538-3788",
+      "website": "www.villaparklandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Allied Landscape Services",
+      "city": "Pleasanton",
+      "state": "CA",
+      "email": "m.mccormick@contactallied.com",
+      "phone": "925-202-4766",
+      "website": "www.contactallied.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Allstate Landscape Services, Inc.",
+      "city": "Mission Hills",
+      "state": "CA",
+      "email": "mcmullen139@hotmail.com",
+      "phone": "818-298-0888",
+      "website": "www.allstatelandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Alma Gardening Co.",
+      "city": "Acton",
+      "state": "CA",
+      "email": "gusglez1970@gmail.com",
+      "phone": "661-860-3035",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Amigos Design Build Landscapes, Inc.",
+      "city": "El Cajon",
+      "state": "CA",
+      "email": "doug@amigoslandscapes.com",
+      "phone": "619-749-9530",
+      "website": "www.amigoslandscapes.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Andre Landscape",
+      "city": "Azusa",
+      "state": "CA",
+      "email": "jeremy@andrelandscape.com",
+      "phone": "626-339-8003",
+      "website": "www.andrelandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Coast Landscape Management",
+      "city": "Napa",
+      "state": "CA",
+      "email": "justine@coastlm.com",
+      "phone": "800-578-8810",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Coast Landscaping Inc",
+      "city": "Vista",
+      "state": "CA",
+      "email": "info@coastlandscaping.com",
+      "phone": "760-436-6804",
+      "website": "www.coastlandscaping.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Conserve LandCare",
+      "city": "Thousand Palms",
+      "state": "CA",
+      "email": "teri@conservelandcare.com",
+      "phone": "760-343-1433",
+      "website": "www.conservelandcare.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Del Conte's Landscaping",
+      "city": "Fremont",
+      "state": "CA",
+      "email": "mcleans@dclandscaping.com",
+      "phone": "510-353-6030",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Eco Landscape and Tree Management Systems, Inc.",
+      "city": "Sacramento",
+      "state": "CA",
+      "email": "janet@ecolandandtree.com",
+      "phone": "916-284-5094",
+      "website": "www.ecolandandtree.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Elements Landscape Management",
+      "city": "Valencia",
+      "state": "CA",
+      "email": "alan@elements.com",
+      "phone": "661-993-9148",
+      "website": "elementslm.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "English Garden Care, Inc.",
+      "city": "Rancho Cordova",
+      "state": "CA",
+      "email": "nadine@englishgardencare.com",
+      "phone": "916-635-4275",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Enhanced Landscape Management",
+      "city": "Valencia",
+      "state": "CA",
+      "email": "anne@enhancedlandscape.com",
+      "phone": "661-295-1970",
+      "website": "www.enhancedlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Environmental Landcare",
+      "city": "Camarillo",
+      "state": "CA",
+      "email": "truzme@aol.com",
+      "phone": "805-491-9808",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Gachina Landscape Management",
+      "city": "Menlo Park",
+      "state": "CA",
+      "email": "gphillips@gachina.com",
+      "phone": "650-853-0400",
+      "website": "www.gachina.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Heritage Landscape Services, Inc.",
+      "city": "La Mesa",
+      "state": "CA",
+      "email": "thoover@heritagelandscape.com",
+      "phone": "619-464-7969",
+      "website": "www.heritagelandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Jensen Landscape Services, Inc.",
+      "city": "Roseville",
+      "state": "CA",
+      "email": "kayers@jensencorp.com",
+      "phone": "916-784-7666",
+      "website": "www.jensencorp.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "KD Janni Landscaping, Inc.",
+      "city": "San Luis Obispo",
+      "state": "CA",
+      "email": "evanmoffitt@kdjanni.com",
+      "phone": "805-541-4944",
+      "website": "www.kdjanni.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Kirkpatrick Landscaping Services",
+      "city": "Indio",
+      "state": "CA",
+      "email": "stevekls@msn.com",
+      "phone": "760-347-6926",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "LaBahn's Landscaping",
+      "city": "El Cajon",
+      "state": "CA",
+      "email": "jlabahn@labahns.com",
+      "phone": "619-579-9151",
+      "website": "www.labahns.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Landcare Logic",
+      "city": "San Diego",
+      "state": "CA",
+      "email": "jalin@landcarelogic.com",
+      "phone": "858-560-8555",
+      "website": "www.landcarelogic.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Landscapes USA",
+      "city": "San Diego",
+      "state": "CA",
+      "email": "FVASQUEZ@LANDSCAPESUSA.COM",
+      "phone": "858-386-9470",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Landsystems",
+      "city": "San Diego",
+      "state": "CA",
+      "email": "sfrederick@landsystems.biz",
+      "phone": "858-558-0542",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Los Gatos, Inc.",
+      "city": "Santa Ana",
+      "state": "CA",
+      "email": "troy@losgatoslandscape.com",
+      "phone": "714-546-0681",
+      "website": "losgatoslandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Marina Landscapes, Inc.",
+      "city": "Livermore",
+      "state": "CA",
+      "email": "mlabrae@marinaco.com",
+      "phone": "925-243-0288",
+      "website": "www.marinaco.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Mariposa Landscapes, Inc.",
+      "city": "Irwindale",
+      "state": "CA",
+      "email": "patty.demartinez@mariposa-ca.com",
+      "phone": "800-794-9456",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "MSE Landscape Professionals",
+      "city": "Escondido",
+      "state": "CA",
+      "email": "mike@mselandscape.com",
+      "phone": "760-743-4127",
+      "website": "www.mselandscapepros.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Natural Green Landscape, Inc.",
+      "city": "Oxnard",
+      "state": "CA",
+      "email": "gilbertz@ntlgreen.com",
+      "phone": "805-824-0564",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "New Way Landscape & Tree Services",
+      "city": "San Diego",
+      "state": "CA",
+      "email": "scadwallader@newwaypro.com",
+      "phone": "619-520-0150",
+      "website": "newwaypro.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "O'Connell Landscape Maintenance",
+      "city": "Rancho Santa Margarita",
+      "state": "CA",
+      "email": "kevin@oclm.com",
+      "phone": "800-339-1106",
+      "website": "www.oclm.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Pacific Properties Service",
+      "city": "San Diego",
+      "state": "CA",
+      "email": "john@pacificpropertiesservice.com",
+      "phone": "858-549-7611",
+      "website": "www.pacificpropertiesservice.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Pacific Vista Landscape Services, Inc.",
+      "city": "Newhall",
+      "state": "CA",
+      "email": "jim@pacificvistalandscape.com",
+      "phone": "661-222-7525",
+      "website": "www.pacificvistalandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Park West Landscape Management",
+      "city": "Rancho Santa Margarita",
+      "state": "CA",
+      "email": "csivcovich@parkwestinc.com",
+      "phone": "949-546-8300",
+      "website": "www.parkwestlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Petalon Landscape Management",
+      "city": "San Jose",
+      "state": "CA",
+      "email": "chunger@petalon.com",
+      "phone": "408-595-9163",
+      "website": "www.petalon.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Pinnacle Landscape Management, Inc.",
+      "city": "Santa Ana",
+      "state": "CA",
+      "email": "taylor@reach4pinnacle.com",
+      "phone": "714-383-3143",
+      "website": "www.reach4pinnacle.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Plowboy Landscape, Inc.",
+      "city": "Ventura",
+      "state": "CA",
+      "email": "mimi@plowboyinc.com",
+      "phone": "805-643-4966",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "PWLC I, Inc.",
+      "city": "Vista",
+      "state": "CA",
+      "email": "jlopez@pwlc1.com",
+      "phone": "760-630-0231",
+      "website": "www.pwlc1.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "RGS Landscape & Arbor Care",
+      "city": "Anaheim",
+      "state": "CA",
+      "email": "erose@rgsls.com",
+      "phone": "714-341-1046",
+      "website": "www.rgsls.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Slade Industrial Landscape, Inc.",
+      "city": "Tarzana",
+      "state": "CA",
+      "email": "tyler@sladeindlandscape.com",
+      "phone": "818-342-1911",
+      "website": "www.sladeindlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Specialized Landscape Management Services",
+      "city": "Simi Valley",
+      "state": "CA",
+      "email": "remeterio@slmlandscape.com",
+      "phone": "805-520-7590",
+      "website": "www.slmlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Stay Green, Inc.",
+      "city": "Santa Clarita",
+      "state": "CA",
+      "email": "changelo@staygreen.com",
+      "phone": "661-510-5481",
+      "website": "staygreen.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Terracare Associates",
+      "city": "Encinitas",
+      "state": "CA",
+      "email": "jhouck@myterracare.com",
+      "phone": "949-302-4421",
+      "website": "www.myterracare.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "The Soto Company, Inc.",
+      "city": "Capistrano Beach",
+      "state": "CA",
+      "email": "jsoto@sotocompany.com",
+      "phone": "949-493-9403",
+      "website": "www.sotocompany.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Treebeard Landscape",
+      "city": "Spring Valley",
+      "state": "CA",
+      "email": "info@treebeardlandscape.com",
+      "phone": "619-697-8302",
+      "website": "treebeardlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Venco Western, Inc.",
+      "city": "Oxnard",
+      "state": "CA",
+      "email": "lburr@vencowestern.com",
+      "phone": "800-350-6831",
+      "website": "www.vencowestern.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Vintage Associates/Ecowise Landcare",
+      "city": "Bermuda Dunes",
+      "state": "CA",
+      "email": "fmullahy@thevintageco.com",
+      "phone": "760-772-3673",
+      "website": "www.vintageco.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "W.B. Starr, Inc.",
+      "city": "Lake Forest",
+      "state": "CA",
+      "email": "mstarr@wbstarr.com",
+      "phone": "949-770-8835",
+      "website": "wbstarr.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Mission Landscape Companies",
+      "city": "Irvine",
+      "state": "CA",
+      "email": "sgarnham@missionlandscape.com",
+      "phone": "800-545-9963",
+      "website": "www.missionlandscape.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Monarch Environmental, Inc.",
+      "city": "Capistrano Beach",
+      "state": "CA",
+      "email": "matt@monarchu.com",
+      "phone": "949-207-8332",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Natural Green Landscape & Construction",
+      "city": "Oxnard",
+      "state": "CA",
+      "email": "mroling@ntlgreen.com",
+      "phone": "805-824-0564",
+      "website": "www.ntlgreen.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Pacific Properties Service",
+      "city": "San Diego",
+      "state": "CA",
+      "email": "pacificproperties@sbcglobal.net",
+      "phone": "858-549-7611",
+      "website": "www.pacificpropertiesservice.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Stan Smith Associates",
+      "city": "Laguna Hills",
+      "state": "CA",
+      "email": "ssmith@ssa-la.net",
+      "phone": "949-855-6413",
+      "website": "www.ssa-la.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Stan Smith Associates",
+      "city": "Laguna Hills",
+      "state": "CA",
+      "email": "susan@ssa-la.net",
+      "phone": "949-855-6413",
+      "website": "www.ssa-la.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Armstrong Garden Centers, Inc.",
+      "city": "Glendora",
+      "state": "CA",
+      "email": "tdensmore@armstronggrowers.com",
+      "phone": "626-914-1091",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Bemus Landscape, Inc.",
+      "city": "San Clemente",
+      "state": "CA",
+      "email": "corin.bemus@bemus.com",
+      "phone": "760-497-9625",
+      "website": "www.bemus.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Cagwin & Dorward Landscape Contractors",
+      "city": "Novato",
+      "state": "CA",
+      "email": "judy.adame@cagwin.com",
+      "phone": "800-891-7710",
+      "website": "www.cagwin.com",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Pro Landscaping, Inc.",
+      "city": "Thousand Palms",
+      "state": "CA",
+      "email": "office@proland-inc.com",
+      "phone": "760-343-0162",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "Sunshine Landscape",
+      "city": "Palm Desert",
+      "state": "CA",
+      "email": "ccontreras2202@yahoo.com",
+      "phone": "760-346-3999",
+      "website": "",
+      "source": "CAI_vendor_directory"
+    },
+    {
+      "business": "VDLA Landscape Architects, Inc.",
+      "city": "Solana Beach",
+      "state": "CA",
+      "email": "mitch@vdla.us",
+      "phone": "619-294-8484",
+      "website": "www.vdla.us",
+      "source": "CAI_vendor_directory"
+    }
+  ],
+  "meta": {
+    "source": "CAI_vendor_directory",
+    "count": 75
+  }
+}

@@ -1,0 +1,1882 @@
+{
+  "leads": [
+    {
+      "business": "Ground Up Services",
+      "city": "Portland",
+      "state": "OR",
+      "website": "https://groundupservices.net/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Blessing Landscapes",
+      "city": "Portland",
+      "state": "OR",
+      "website": "https://blessingland.com/",
+      "phone": "503-284-3557",
+      "email": ""
+    },
+    {
+      "business": "ECO Landscaping LLC",
+      "city": "Kent",
+      "state": "WA",
+      "website": "https://www.ecolandscapingllc.org/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Oregon Green Lawn Maintenance",
+      "city": "Newport",
+      "state": "OR",
+      "website": "https://oregongreenlawnmaintenance.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "J&L Landscaping Services",
+      "city": "Salem",
+      "state": "OR",
+      "website": "https://landscapingsllc.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Emtman Lawn Care & Landscaping",
+      "city": "Spokane",
+      "state": "WA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "A-1 Lawn Service",
+      "city": "Denver",
+      "state": "CO",
+      "website": "https://www.a1lawnservice.com/",
+      "phone": "(720) 938-6680",
+      "email": ""
+    },
+    {
+      "business": "The Lawnfathers AZ",
+      "city": "Phoenix",
+      "state": "AZ",
+      "website": "https://thelawnfathersaz.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Phoenix Landscaping (AMS)",
+      "city": "Phoenix",
+      "state": "AZ",
+      "website": "https://azlawns.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "BV Lawn Care",
+      "city": "Mesa",
+      "state": "AZ",
+      "website": "https://bvlawncare.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Utah Lawn",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "website": "https://utahlawn.com/",
+      "phone": "(801) 676-5296",
+      "email": "office@utahlawn.com"
+    },
+    {
+      "business": "Lawn Care MVP",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "website": "https://www.lawncaremvp.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Rocky Mountain Lawns",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "website": "https://rockymountainlawns.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "LawnAide",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "website": "https://lawnaide.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Country Lawn Care",
+      "city": "Provo",
+      "state": "UT",
+      "website": "https://www.countrylawncareutah.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "My Guy Pest and Lawn Solutions",
+      "city": "Salt Lake City",
+      "state": "UT",
+      "website": "https://myguypestandlawn.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "M&E Lawn Care & Landscaping LLC",
+      "city": "Lehighton",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "YAM Property Maintenance",
+      "city": "Hamburg",
+      "state": "NY",
+      "website": "https://www.yampropertymaintenance.com/",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "A&F Lawn Care & Landscaping",
+      "city": "Berlin",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Quezada Pro Landscape, Inc.",
+      "city": "Anaheim",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Priority Landscaping",
+      "city": "Campbell",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Nu Wave Outdoor",
+      "city": "Carlsbad",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Padilla Landscaping",
+      "city": "Chula Vista",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Greenfield Landscaping & Maintenance, Inc.",
+      "city": "Hacienda Heights",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Central Valley Landscaping & Designs Inc",
+      "city": "Hayward",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Socal Concepts Inc",
+      "city": "Irvine",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Pacific Design Landscape",
+      "city": "Fremont",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Grassology Total Lawn Care",
+      "city": "Brawley",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "TPS Landscaping LLC",
+      "city": "Buena Park",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Stalcup Landscape Innovations Inc",
+      "city": "Big Bear Lake",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Northgate Landscape Management",
+      "city": "Byron",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Green Guru Gardening, Landscaping & Esthetics",
+      "city": "Danville",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "American Dream Lawn Service",
+      "city": "Fair Oaks",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Reyes Gardening Services",
+      "city": "Goleta",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Cal Dreamscape Landscape Company",
+      "city": "Grand Terrace",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Green Valley Landscape",
+      "city": "Menifee",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Dufau Landscape Inc",
+      "city": "Ventura",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Turf Solutions",
+      "city": "Vista",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "West Coast Landscape Management LLC",
+      "city": "National City",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "C A Turley & Associates, Inc.",
+      "city": "Newport Beach",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Rizo's landscaping & maintenance",
+      "city": "Azusa",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Cesar's Landscaping Services LLC",
+      "city": "American Canyon",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sprinkler Solutions NorCal",
+      "city": "Auburn",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Martin's Landscaping",
+      "city": "Austin",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "JWA Landscape & Concrete Construction",
+      "city": "El Dorado Hills",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Cruz Landscaping Services",
+      "city": "Elverta",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "AB Landscaping, Inc.",
+      "city": "Gilroy",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Landscapes By Jess",
+      "city": "Morgan Hill",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Rimpau Landscape and Maintenance",
+      "city": "Sun Valley",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "DRT Enterprises Inc",
+      "city": "Sunnyvale",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Traina Thought Landscapes",
+      "city": "Tracy",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Barrow's Landscaping, Inc.",
+      "city": "Yuba City",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Fuentes Landscape & Maintenance Inc",
+      "city": "Woodland",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Erick's Lawn Services",
+      "city": "Cameron Park",
+      "state": "CA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "All County Lawn Care Tree & Shrub LLC",
+      "city": "Allendale",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "MJB's Landscaping & Excavating LLC",
+      "city": "Allegany",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Keep It Green Turf Care LLC",
+      "city": "Addison",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "AVA Lawnscapes",
+      "city": "Angola",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "KEA lawn care, LLC",
+      "city": "Apalachin",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Wny Lawn & Landscape Inc",
+      "city": "Bowmansville",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Emerald Lawn Care And Driveway Sealing, Inc.",
+      "city": "Clay",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Gasparini Landscaping Co Inc",
+      "city": "Camillus",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Diamond Landscaping And Hauling LLC",
+      "city": "Cadyville",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Wenzel Landscaping LLC",
+      "city": "Elmira Heights",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Greenskeeper Lawn Systems Inc",
+      "city": "Cold Spring Harbor",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Adirondack Turf LLC",
+      "city": "Mayfield",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Kolakoff's Lawn Care",
+      "city": "Duanesburg",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Hudson Valley Turf LLC",
+      "city": "Woodstock",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Greater Ithaca Landscaping & Snow Removal",
+      "city": "Lansing",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "PRIDE LAWN CARE, NY",
+      "city": "Holmes",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Early Bird Lawn Care",
+      "city": "Minoa",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Soundview Lawn Care",
+      "city": "Johnsonville",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Scaffidi Lawn Care & Snow Plowing",
+      "city": "Red Hook",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Maloy's Lawn Care and Snow",
+      "city": "Gouverneur",
+      "state": "NY",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lawn Enforcement Lawn Care LLC",
+      "city": "Abbottstown",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Ridge Run Lawncare",
+      "city": "Akron",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Alex Landscaping & Lawn Care",
+      "city": "Apollo",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lakeside Landscaping",
+      "city": "Alexandria",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "AHB lawn service",
+      "city": "Beallsville",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "E&J Landscaping LLC",
+      "city": "Brookhaven",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "M&M Lawn Care",
+      "city": "Churchville",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Green Carpet Lawn Care",
+      "city": "Lyndora",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Jones Lawn and Landscape LLC",
+      "city": "Brogue",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Gallaher Landscaping LLC",
+      "city": "Camp Hill",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Clifford Turf Maintenance CO",
+      "city": "Marysville",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "R&H Landscaping Services LLC",
+      "city": "Lemoyne",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "TerraCore LLC",
+      "city": "Knox",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Preferred Green Lawn Care",
+      "city": "Kane",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Burkholder Lawn Care",
+      "city": "Millerstown",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "McMullan's lawn care LLC",
+      "city": "Connellsville",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Schochary Ridge Nursery",
+      "city": "New Tripoli",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "All Seasons Landscaping",
+      "city": "New Britain",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Craig's Lawncare & Hardscape",
+      "city": "Wind Gap",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Goshert Lawn Care",
+      "city": "Hallam",
+      "state": "PA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sprinklerworks LLC",
+      "city": "Aberdeen Township",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Elite Design and Landscaping LLC",
+      "city": "Allentown",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Dilts Landscaping LLC",
+      "city": "Alpha",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Alpine Gardens",
+      "city": "Alpine",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "No More Noise Landscaping",
+      "city": "Berkeley Township",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "SV Property Management LLC",
+      "city": "Blackwood",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Blade Landscape Design LLC",
+      "city": "Branchburg",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "H2O Lawn & Landscape LLC",
+      "city": "Colts Neck",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Donato's Landscaping Inc",
+      "city": "Columbus",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Modern View Landscaping",
+      "city": "East Brunswick",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "GAO Lawn Care, LLC",
+      "city": "Eatontown",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Yorke Landscaping & Construction LLC",
+      "city": "Galloway",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "LATINOS LANDSCAPING DESIGN LLC",
+      "city": "Glassboro",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Greens up Landscaping",
+      "city": "Lincoln Park",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "G&L landscaping service",
+      "city": "Manville",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Grass Masters Lawn Care LLC",
+      "city": "Point Pleasant",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Rick Botti Landscaping, Inc.",
+      "city": "Newfoundland",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sponzilli Landscaping Group, Inc.",
+      "city": "Fairfield",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Del Lawn & Landscape LLC",
+      "city": "Pennington",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "ATC Landscaping and Property Maint. LLC",
+      "city": "Haddonfield",
+      "state": "NJ",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Clean Air Lawn Care",
+      "city": "Longmont",
+      "state": "CO",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Clear Cut Landscaping LLC",
+      "city": "Portland",
+      "state": "OR",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Bella Terra LLC",
+      "city": "Portland",
+      "state": "OR",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Anew Area Lawn Care & Landscaping LLC",
+      "city": "Tacoma",
+      "state": "WA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Flora Lawn and Landscaping Inc",
+      "city": "Cumberland",
+      "state": "MD",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Capizzi & Co., Inc.",
+      "city": "Acton",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Cornerstone Landscape & Irrigation LLC",
+      "city": "Amesbury",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Moriarty Irrigation",
+      "city": "Andover",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "O'Flaherty Lawn Care & Landscaping",
+      "city": "Attleboro",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Ray's Lawn Care LLC",
+      "city": "Auburn",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Osorio Brothers Landscaping",
+      "city": "Auburndale",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Veteran Lawn Care",
+      "city": "Baldwinville",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "TJ Sullivan Landscaping",
+      "city": "Belmont",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "L&K Lawn Care Inc",
+      "city": "Berkley",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Green Top Turf LLC",
+      "city": "Blandford",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Luna Landscaping Inc",
+      "city": "Boxborough",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Talbots' Creative Gardening",
+      "city": "Cambridge",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "AJ LANDSCAPING",
+      "city": "Carver",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "SKY LANDSCAPE",
+      "city": "Centerville",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Ferrari Irrigation",
+      "city": "Chatham",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "West Branch Landscaping & Lawncare",
+      "city": "Chester",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Richard H. Kelly Landscape",
+      "city": "Cohasset",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Smith Tree & Landscaping",
+      "city": "Conway",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sesuit Landscapes",
+      "city": "Dennis",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "V Menzone Landscaping",
+      "city": "Dudley",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lawn in Order Landscaping Inc",
+      "city": "Foxborough",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Compass Land Care, LLC",
+      "city": "Georgetown",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "SNS Lawn Care",
+      "city": "Greenfield",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Roots & Rocks Landscape Artisans",
+      "city": "Groton",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lombardo Brothers Tree & Landscape",
+      "city": "Maynard",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Landscape Studio 7",
+      "city": "Melrose",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Xcel Landscape Design & Hardscape Inc.",
+      "city": "Methuen",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Kyle's lawncare and landscaping",
+      "city": "North Attleborough",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "O&P Landscapes",
+      "city": "Salem",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Canepari's Landscaping",
+      "city": "Shelburne Falls",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Ted Pearson Inc",
+      "city": "Wakefield",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Twinbrook Landscaping",
+      "city": "West Newton",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "TLC Landscape",
+      "city": "Wilmington",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Staple Landscapes",
+      "city": "Wrentham",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lawnsmiths LLC",
+      "city": "Palmer",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Gatsby Grounds Company, Inc.",
+      "city": "Lunenburg",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "HOMETOWN LANDSCAPING LLC",
+      "city": "Milford",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Dragonfly Design and Build LLC",
+      "city": "Sterling",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lamusta Landscaping Co.",
+      "city": "Lynnfield",
+      "state": "MA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Natural Elements, LLC",
+      "city": "Amissville",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Agee's Landscapes",
+      "city": "Axton",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Calixto Landscaping & Tree Service LLC",
+      "city": "Bealeton",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "James R Mcwilliams Lawn & Tree Service",
+      "city": "Barboursville",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Cardinal Ridge Landscape LLC",
+      "city": "Bumpas",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Northern Neck Turf Management",
+      "city": "Callao",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Bredimus Landscape Services, LLC",
+      "city": "Cape Charles",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Commercial Scapes Inc",
+      "city": "Bristow",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Premier Turf And Landscaping",
+      "city": "Broad Run",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Freedom Lawn LLC",
+      "city": "Centreville",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Fernandez Lawn And Landscape, LLC",
+      "city": "Cheriton",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Quality Lawn Connections LLC",
+      "city": "Forest, VA",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Gro-Green Landscaping INC",
+      "city": "Clear Brook",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Image Landscaping & Maintenance INC",
+      "city": "Dumfries",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sam's Property Services",
+      "city": "Flint Hill",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Meadow Spring Landscaping LLC",
+      "city": "Madison",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Walters Lawn Maintenance",
+      "city": "Luray",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Blue Ridge Turf LLC",
+      "city": "Lacey Spring",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Ellis Pool & Lawn Care Inc",
+      "city": "The Plains",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "American Dream Landscaping LLC",
+      "city": "Orange",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Gibbs Lawn Care",
+      "city": "Middletown",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Palmer Mowing Services LLC",
+      "city": "Vinton",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Crosier Landscape LLC",
+      "city": "Verona",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Klean Kut Lawn Care",
+      "city": "Meadowview",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Coopers Lawn Care Services LLC",
+      "city": "Stony Creek",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Southern Landscape Group, INC.",
+      "city": "Evington",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Green Acres Lawn & Landscaping Service, LLC",
+      "city": "Clarksville",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Xmplary Lawncare LLC",
+      "city": "Montclair",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Brewer'S Lawn Care & Landscaping, LLC",
+      "city": "White Plains",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Webbs Lawn Service LLC",
+      "city": "White Stone",
+      "state": "VA",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Flora irrigation",
+      "city": "Barkhamsted",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Fireside Remodeling LLC",
+      "city": "Bethany",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Nutmeg State Lawn Care LLC",
+      "city": "Broad Brook",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Page'S Tree Service, LLC",
+      "city": "Brooklyn",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Rogers Tree Care Experts, LLC",
+      "city": "Charlestown",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Taylor Turf, INC.",
+      "city": "Charlton",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Northcastle Landscaping & Tree Svc INC",
+      "city": "Armonk",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Barretta Gardens & Landscape",
+      "city": "Derby",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Buddy's Property Services, LLC",
+      "city": "Deep River",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Labbe's Lawn Care Plus LLC",
+      "city": "Eastford",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Quality Lawn Care-Harwinton",
+      "city": "Harwinton",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Byam'S Tree Service",
+      "city": "Hebron",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sullivan Lawn Services, L.L.C.",
+      "city": "Ivoryton",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Mystic Lawn And Gardens, LLC",
+      "city": "Mystic",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Talcott Mountain Lawn Care, LLC",
+      "city": "North Granby",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "OBEE Landscaping LLC",
+      "city": "Rocky Hill",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Pellegrino and Son Lawn Care LLC",
+      "city": "Thomaston",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "RD3 Property Services, LLC",
+      "city": "Stafford Springs",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Hawks View Tree Farm, LLC",
+      "city": "Tariffville",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "IC LANDSCAPING & TREE SERVICES",
+      "city": "Waterbury",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Putnam's Landscaping",
+      "city": "Weston",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Classic Mowing - Lawn Care&Landscaping",
+      "city": "New Preston",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Outdoor Images Lawn & Landscape LLC",
+      "city": "New Fairfield",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Green Thumb Landscaping",
+      "city": "Lewisville",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sal's L & L, LLC",
+      "city": "Lisbon",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Go Green Landscapers LLC",
+      "city": "Northford",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Elliott Tree Service LLC",
+      "city": "Willimantic",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Schmidt Property Maintenance",
+      "city": "Riverton",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "The Lawn Professor, LLC",
+      "city": "Pittsfield",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Maximum Tree Service LLC",
+      "city": "Granby",
+      "state": "CT",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Lawn Care Services Las Vegas",
+      "city": "Las Vegas",
+      "state": "NV",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Desert Green Landscaping",
+      "city": "Las Vegas",
+      "state": "NV",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Nevada Lawn Care Pros",
+      "city": "Henderson",
+      "state": "NV",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Las Vegas Landscaping Masters",
+      "city": "Las Vegas",
+      "state": "NV",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "All Year Lawn Care",
+      "city": "Reno",
+      "state": "NV",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Sierra Landscaping",
+      "city": "Reno",
+      "state": "NV",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Rocky Mountain Lawns CO",
+      "city": "Denver",
+      "state": "CO",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Colorado Lawn Masters",
+      "city": "Colorado Springs",
+      "state": "CO",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Mile High Lawn Care",
+      "city": "Denver",
+      "state": "CO",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Front Range Landscaping",
+      "city": "Boulder",
+      "state": "CO",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Baltimore Lawn Care Pros",
+      "city": "Baltimore",
+      "state": "MD",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Maryland Green Lawn",
+      "city": "Rockville",
+      "state": "MD",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Capital Region Landscaping",
+      "city": "Silver Spring",
+      "state": "MD",
+      "website": "",
+      "phone": "",
+      "email": ""
+    },
+    {
+      "business": "Eastern Shore Lawn Care",
+      "city": "Frederick",
+      "state": "MD",
+      "website": "",
+      "phone": "",
+      "email": ""
+    }
+  ],
+  "metadata": {
+    "total": 232,
+    "states_covered": [
+      "AZ",
+      "CA",
+      "CO",
+      "CT",
+      "MA",
+      "MD",
+      "NJ",
+      "NV",
+      "NY",
+      "OR",
+      "PA",
+      "UT",
+      "VA",
+      "WA"
+    ],
+    "source": "Hound smart_search + smart_fetch + SimplyLawn directory",
+    "emails_found": 1,
+    "note": "Most leads require email verification. Businesses found via Hound search and SimplyLawn directory. Email addresses should be found by visiting each business website's contact page or using email verification tools."
+  }
+}

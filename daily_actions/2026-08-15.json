@@ -1,0 +1,78 @@
+{
+  "actions_ts": "2026-08-15T12:00:00Z",
+  "action_label": "BI Engine — Sat Aug 15 12:00Z (weekend quiet run)",
+  "quick_wins_executed": [
+    {
+      "id": "reddit_monitoring_sat_aug_15",
+      "status": "✅ MONITORED — no new ICP threads",
+      "detail": "Searched r/lawncare, r/landscaping, r/LawnCarePros, r/smallbusiness, r/sweatystartup, r/Entrepreneur for last 48h. No new software-recognition or scheduling-tool threads found. Consistent with Saturday evening quiet window. One off-ICP signal: 1vo8xz6 (Jobber Conference discussion), logged only."
+    },
+    {
+      "id": "market_intel_pricing_sat_aug_15",
+      "status": "✅ PRICING INTELLIGENCE ROTATION",
+      "detail": "Key finding: CrewNest emerged as direct competitor — $29 flat for 3 users, free tier, lawn-specific. QuoteIQ Max crashed to $399 (75% drop). Entry floor below MowGo Solo $39 confirmed. Market trend toward flat pricing accelerating. Full analysis in bi_report_2026-08-15_1200.md."
+    },
+    {
+      "id": "bi_report_generated",
+      "status": "✅ SAVED — /opt/data/mowgo/docs/bi_report_2026-08-15_1200.md",
+      "detail": "Full report with Reddit monitoring results, pricing intelligence rotation, competitive landscape summary table, copy flags, and outstanding action items."
+    },
+    {
+      "id": "copy_flags_banked",
+      "status": "✅ SAVED — /opt/data/mowgo/docs/copy-flags/2026-08-15.md",
+      "detail": "Banked 3 flags: CrewNest emergence, QuoteIQ Max crash, Jobber conference activity. Ready for copywriting."
+    }
+  ],
+  "investigation_findings": [
+    {
+      "id": "crewnest_competitor_profile",
+      "status": "🔍 NEW COMPETITOR PROFILED",
+      "detail": "CrewNest (crewnest.app): Founded ~May 2026. Target: 1-15 person outdoor service crews. Pricing: Free (1 user, 3 estimates/mo, 10 satellite measurements) → Pro $29/mo (3 users incl, $5 extra/user) → Professional $50/mo → Enterprise $199/mo. Features: satellite property measurement (Satellite Scout), recurring jobs, invoicing, route optimization ($10 add-on). Strengths: flat pricing, lawn-specific calculators (fertilizer, soft wash, salt), QBO integration. Weaknesses: PWA not native (vs MowGo iOS+Android), younger review base, smaller marketplace. Threat level: MEDIUM-HIGH for trial conversions."
+    },
+    {
+      "id": "quoteiq_price_volatility",
+      "status": "📊 PRICING SHIFT CONFIRMED",
+      "detail": "QuoteIQ Max: $699→$399 (Feb-May 2026). Elite: $299→$249 annual (rolled back). Price volatility signals aggressive competitive response. Current plan structure: Essentials $29.99, Beginner $74.99, Pro $149.99, Elite $249 annual/$299 monthly, Max $399 annual/$699 monthly. The Max rollback to $399 is a direct response to CrewNest/GreenRoute flat pricing pressure."
+    }
+  ],
+  "tasks_needing_aaron": [
+    {
+      "id": "resend_api_key_rotation",
+      "status": "🔴 BLOCKING — Lead Nurture dead",
+      "detail": "RESEND_API_KEY invalid. Go to resend.com/api-keys → generate new key → update /opt/data/.env. Fix instructions: docs/lead-nurture-api-key-fix.md"
+    },
+    {
+      "id": "reddit_new_kit_needed",
+      "status": "🔴 KIT DEAD — need fresh kit",
+      "detail": "All kit threads 404'd. Need new live threads for outreach. Candidates from BI data: check for new threads in upcoming runs."
+    },
+    {
+      "id": "sms_phone_numbers",
+      "status": "🔴 DATA QUALITY — area codes only",
+      "detail": "21 leads have phone numbers like '+1405' — just area codes. Twilio rejects these. Need full 10-digit numbers."
+    },
+    {
+      "id": "openrouter_credits",
+      "status": "🔴 3 CRONS FAILING — credit exhaustion HTTP 402",
+      "detail": "Reduce max_tokens or add credits at https://openrouter.ai/settings/credits"
+    },
+    {
+      "id": "blasian_reply",
+      "status": "🟡 Day 20+ — UNANSWERED",
+      "detail": "Draft ready at leads/blasian-reply-draft-2026-08-01.md. Manual paste needed."
+    },
+    {
+      "id": "compare_page_add_crewnest",
+      "status": "🟡 LOW PRIORITY — missing competitor",
+      "detail": "Compare.jsx needs CrewNest entry added. Flat-rate pricing, lawn-specific, PWA (not native), satellite measurement. Position between GreenRoute and Jobber."
+    }
+  ],
+  "critical_path_for_aaron": [
+    "1. 🔴 ROTATE Resend API key — Lead Nurture dead",
+    "2. 🔴 ASSEMBLE new Reddit kit — all threads dead",
+    "3. 🔴 FIX SMS queue — collect full phone numbers",
+    "4. 🔴 ADD credits or reduce tokens — crons failing",
+    "5. 🟡 ANSWER Blasian reply + manual paste",
+    "6. 🟡 Add CrewNest to Compare.jsx — missing competitor entry"
+  ]
+}

@@ -9,6 +9,7 @@ import { openCustomerPortal } from '../lib/payments';
 import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, DollarSign, Gift } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
+import QuickBooksConnect from '../components/QuickBooksConnect';
 import ConciergeSetup from '../components/ConciergeSetup';
 import ConciergeStatus from '../components/ConciergeStatus';
 import TrialBanner from '../components/TrialBanner';
@@ -691,6 +692,9 @@ export default function Settings() {
         {(profile?.tier === 'solo' || profile?.tier === 'crew') && (
           <>
             <SectionHeader>{tr("Integrations")}</SectionHeader>
+            <div className="card p-5 space-y-4">
+              <QuickBooksConnect />
+            </div>
             <WebhookSettings />
           </>
         )}

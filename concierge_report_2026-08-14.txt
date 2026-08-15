@@ -1,0 +1,46 @@
+MowGo Concierge Auto-Processor — Run Report
+============================================================
+Run time: 2026-08-14 17:30 UTC
+Cron job execution mode
+
+BLOCKED — Cannot process pending requests due to credential issues.
+
+FINDINGS:
+---------
+1. SUPABASE SERVICE KEY INVALID
+   File: /opt/data/mowgo/server/.env
+   Key stored: SUPABASE_SERVICE_KEY=eyJhbG...IqS8 (truncated/invalid JWT)
+   Error when testing: HTTP 401 "Invalid API key"
+   
+   Also found duplicate in /opt/data/.env as SUPABASE_SERVICE_ROLE_KEY (same truncated key).
+
+2. CF ADMIN ENDPOINT REQUIRES OPERATOR JWT
+   URL: https://mowgo.pages.dev/api/admin/concierge?action=list
+   x-admin-code header: VALID (code loaded from /opt/data/secrets/concierge-admin-code.txt)
+   Authorization Bearer: REQUIRED but no valid operator JWT available
+   
+   Root cause: Commit 2a7a4f0 (Aug 9, 2026) changed auth from simple code-only
+   check to require both x-admin-code AND a Bearer JWT verified against
+   Supabase Auth, plus CONCIERGE_ADMIN_USER_IDS must be configured on Cloudflare.
+   
+   Result: HTTP 401 Unauthorized even with correct admin code.
+
+WHAT WAS TESTED:
+----------------
+- Listed pending requests via CF admin endpoint → 401
+- Direct Supabase REST with service_role key → 401 Invalid API key
+- Direct Supabase REST with anon key → 401 permission denied on concierge_requests table
+- Checked all .env files across project → no valid service_role key found anywhere
+- Searched vaults, logs, daily scan reports → no operator JWT or full key stored
+
+REQUIRED TO RESOLVE:
+--------------------
+Option A (recommended): Aaron sets CONCIERGE_ADMIN_USER_IDS env var on Cloudflare Pages
+project + provides a valid operator JWT (or a way to generate one).
+The service_role key also needs to be updated to a valid value.
+
+Option B: Revert the concierge.js admin auth back to code-only (reverting commit 2a7a4f0
+auth change), if Aaron wants automated cron processing without human-in-the-loop.
+
+CONCIERGE REQUEST STATUS: Unknown — cannot query the database to determine if there are
+pending requests.

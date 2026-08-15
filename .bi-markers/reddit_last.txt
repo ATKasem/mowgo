@@ -1,0 +1,4 @@
+last_run=2026-08-14T19:24Z
+reddit_checked=true
+lane_rotation=competitor_monitoring
+next_lane=industry_trends

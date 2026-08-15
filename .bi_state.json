@@ -1,45 +1,43 @@
 {
-  "last_run": "2026-08-14T15:21:00Z",
-  "market_intel_lane": 3,
-  "lanes_total": 4,
-  "lane_names": [
-    "competitor_monitoring",
-    "industry_trends",
-    "pricing_intelligence",
-    "feature_ideas"
+  "last_run": "2026-08-15T15:35:00Z",
+  "rotation": "feature_ideas",
+  "rotation_history": ["competitor_monitoring", "industry_trends", "pricing_intelligence", "feature_ideas"],
+  "last_reddit_scan": "2026-08-15T15:35:00Z",
+  "reddit_threads_tracked": [
+    "1txtgnv - r/lawncare - Need advice on tools and software for a lawn care business that I'm starting (NEW, brand-new business starter)",
+    "1qhthe7 - r/landscaping - Landscaping business software",
+    "1uaa3yg - r/CRM - Best CRM for lawn care business in 2026",
+    "1unfily - r/WhichCRM - Jobber vs Yardbook vs QuoteIQ",
+    "1p6hg19 - r/sweatystartup - Is lawn mowing biz highly competitive",
+    "1qc8wy8 - r/WhichCRM - 16 Apps for Lawn Care 2026",
+    "1rjwqtt - r/lawncare_canada - Free app for lawn care businesses",
+    "1vj9nay - r/smallbusiness - Hand-building quote form (brand new biz, warm lead)",
+    "1vi1hcj - r/landscaping - Drought thread (53 comments, TX pro slowed business)",
+    "1ene1ll - r/LawnCarePros - Best software tools for lawn care pros (JOBBER AI DISCUSSION)",
+    "1vo8xz6 - r/landscaping - Jobber Conference 2026 - is it worth it? (new)",
+    "1lubqjr - r/lawncare - New ai lawn care app scheduling assistant (Yardly - consumer app, NOT FSM)"
   ],
-  "next_lane": "competitor_monitoring",
-  "seen_reddit_urls": [
-    "https://www.reddit.com/r/CRM/comments/1uaa3yg/best_crm_for_lawn_care_business_in_2026/",
-    "https://www.reddit.com/r/Contractor/comments/1qk5y04/im_really_disappointed_with_jobber/",
-    "https://www.reddit.com/r/CRM/comments/1qvrjm6/having_issues_with_jobber_for_lawn_business/",
-    "https://www.reddit.com/r/WhichCRM/comments/1qd484m/lawn_care_crm_comparison_2026_housecall_pro/",
-    "https://www.reddit.com/r/sweatystartup/comments/1pecsgf/scheduling_lawn_care_customers/",
-    "https://www.reddit.com/r/landscaping/comments/1rm499y/landscaping_business_owners_what_would_be_your/",
-    "https://www.reddit.com/r/landscaping/comments/1nxg94x/new_landscaper_what_websites_and_online_apps_do/",
-    "https://www.reddit.com/r/WhichCRM/comments/1ps8993/housecall_pro_vs_jobber_vs_quoteiq_the_complete/",
-    "https://www.reddit.com/r/pressurewashinglife/comments/1s1w53q/best_jobber_alternative_for_lawn_care_businesses/",
-    "https://www.reddit.com/r/WhichCRM/comments/1phrj8r/anyone_used_quoteiq/",
-    "https://www.reddit.com/r/smallbusiness/comments/1vmknrg/fsm_recommendations_no_fancy_features_needed/",
-    "https://www.reddit.com/r/lawncare/comments/1vmdfiu/lawn_care_businesses_how_important_is_your/",
-    "https://www.reddit.com/r/smallbusiness/comments/1vlajf4/are_these_the_4_internal_tools_every_small/",
-    "https://www.reddit.com/r/LawnCarePros/comments/1vmq8xz/lawncare_owners_businesses/",
-    "https://www.reddit.com/r/smallbusiness/comments/1vll4ha/what_did_you_waste_money_on_when_starting_your/",
-    "https://www.reddit.com/r/sweatystartup/comments/1vmd3hb/dog_waste_removal_have_a_chance_at_being/",
-    "https://www.reddit.com/r/Entrepreneur/comments/1vlgkfq/how_i_got_my_first_customers/",
-    "https://www.reddit.com/r/smallbusiness/comments/1vlw75b/home_service_business_owners/",
-    "https://www.reddit.com/r/smallbusiness/comments/1vmufvi/do_small_businesses_really_need_a_fancy_website/",
-    "https://www.reddit.com/r/Entrepreneur/comments/1vlirn4/whats_making_you_good_money_right_now/",
-    "https://www.reddit.com/r/landscaping/comments/1udvuh4/landscaping_software/",
-    "https://www.reddit.com/r/lawncare/comments/1tuhllo/business_app/",
-    "https://www.reddit.com/r/CRM/comments/1vcr90y/do_you_recommend_getting_a_crm_for_lawn_care_if/",
-    "https://www.reddit.com/r/landscaping/comments/1vljqlb/how_do_you_track_home_depot_runs_by_job/",
-    "https://www.reddit.com/r/LawnCarePros/comments/1vmfdsl/could_i_start_a_gardening_business_as_a_side/",
-    "https://www.reddit.com/r/smallbusiness/comments/1vna5wg/liquid_capital_for_landscape_design_company/",
-    "https://www.reddit.com/r/lawncare/comments/1vmnsat/trugreen_results/",
-    "https://www.reddit.com/r/WhichCRM/comments/1t407mz/lawn_care_crm_comparison_2026/"
+  "soft_candidates": [
+    "1kyexs3 - r/LawnCarePros - Managing the Business (software builder looking to create landscaping tool) — UNVERIFIED DATE",
+    "1udvuh4 - r/landscaping - Landscaping software (Reddit blocked extract; appears fresh)",
+    "1tuhllo - r/lawncare - Business App (browser unavailable, needs manual check)"
   ],
-  "weekly_digest_week": "2026-W33",
-  "version": "v58",
-  "state_version": 58
+  "recent_findings": {
+    "jobber_conference_2026": "Jobber Now event September 2026, first in-person. Flash sale AUGUST code $300 off. Heavy community investment = strong brand loyalty push.",
+    "quoteiq_expansion": "QuoteIQ running 60+ comparison pages across all major FSM competitors. Expanded to 12+ industries (pest, pool, roofing, painting, holiday lights). Claims 40K+ contractors. Positioned at $29.99/mo — direct undercut of Jobber $39. Publishing 'Top 10' comparison lists actively."
+  },
+  "servinix_details": {
+    "launch_date": "Aug 17 beta, Sept 14 commercial",
+    "positioning": "AI + GPS FSM, half the price of Jobber stack",
+    "key_features": ["Maya AI phone agent (answers 24/7, books jobs from $1200 avg value)", "Phone-GPS fleet tracking", "Route optimization included in FSM ($20/tech/mo)", "Chemical application logging", "Recurring contracts auto-scheduled", "Before/after job photos", "QuickBooks sync", "OBD-II optional hardware for fuel/engine data"],
+    "pricing": "$300/mo flat for AI Assistant (unlimited users/calls). FSM: $20/tech/mo. GPS Fleet: $15/vehicle/mo (+$50 OBD hardware). 60% founding discount.",
+    "threat_level": "HIGH for mid-market (2+ crews). Not a solo operator play yet but explicitly targets Jobber/Housecall Pro switchers with invoice-beating guarantee. Launches in 48h (beta Aug 17). Watch for Reddit fallout and early reviews."
+  },
+  "greenroute_update": {
+    "free_plan_details": "Starter plan: unlimited customers, invoicing, scheduling, satellite measurement, chemical tracking, online booking, offline mobile app. Professional: $10/mo adds route optimization, weather, SMS/email. Professional Plus: $50/mo adds teams, expense tracking, custom branding. Enterprise: $199/mo.",
+    "competitive_note": "Free plan is genuinely comprehensive — includes satellite measurement and offline mode which are MowGo Solo-tier features. The $10 professional plan for route planning is deeply undercutting every competitor."
+  },
+  "sortscape_notes": "Australian-focused app (Xero integration). Schedule, route, invoice. Facebook group mentions $200/mo — likely incorrect or misattributed. Not a US-focused threat currently.",
+  "comparison_content_surge": "Multiple 'Best Lawn Care Software 2026' articles published in July-August 2026 from RealGreen, QuoteIQ, Shifton, FieldCamp, Clientility, Business Genie, SaberTask. QuoteIQ publishing 10+ comparison pages per vertical. This content flood means organic search discovery for lawn FSM alternatives is heavily competitive — MowGo needs to be visible in these spaces eventually.",
+  "notes": "No new Reddit threads since last run at 11:32 UTC today (Saturday). Feature ideas rotation: GreenRoute's free plan remains the most significant wedge threat to MowGo's free-tier hook. Servinix launches in 48 hours (Aug 17 beta) — HIGH priority watch item. QuoteIQ content machine continues expanding comparison pages. Next rotation: competitor_monitoring."
 }

@@ -60,9 +60,36 @@ export async function fireWebhook(event, payload = {}) {
     }).catch((err) => {
       console.warn('fireWebhook:', event, err?.message || err);
     });
+    // Also fire QuickBooks sync if auto-sync is enabled
+    fireQuickBooksSync(event, payload, token);
   } catch (err) {
     // Webhook failures must never break the main flow
     console.warn('fireWebhook:', event, err?.message || err);
+  }
+}
+
+/**
+ * Fire a QuickBooks sync event if auto-sync is enabled.
+ */
+async function fireQuickBooksSync(event, payload, token) {
+  if (!token) return;
+  try {
+    const autoSync = localStorage.getItem('qbo_auto_sync') !== 'false';
+    if (!autoSync) return;
+    // Only sync invoice-related events
+    if (!event.startsWith('invoice.')) return;
+    fetch('/api/integrations/qbo-sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ event, payload }),
+    }).catch((err) => {
+      console.warn('fireQuickBooksSync:', event, err?.message || err);
+    });
+  } catch (err) {
+    console.warn('fireQuickBooksSync:', event, err?.message || err);
   }
 }
 

@@ -1,0 +1,933 @@
+{
+  "leads": [
+    {
+      "business": "LawnService.com",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 800-9436",
+      "website": "lawnservice.com",
+      "email": "info@lawnservice.com",
+      "all_emails": [
+        "info@lawnservice.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Hard-Pro Landscaping LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "",
+      "website": "hardprolandscapingllc.com",
+      "email": "info@atlprolandscape.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@atlprolandscape.com"
+      ]
+    },
+    {
+      "business": "Pride in Turf",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(833) 388-8873",
+      "website": "prideinturf.com",
+      "email": "info@prideinturf.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@prideinturf.com"
+      ]
+    },
+    {
+      "business": "Atlanta Lawn Care Services Inc",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 869-6396",
+      "website": "atllawncareservices.com",
+      "email": "info@atllawncareservices.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "contact_page",
+      "all_emails": [
+        "info@atllawncareservices.com"
+      ]
+    },
+    {
+      "business": "A1 Advanced Landscaping LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(404) 795-5120",
+      "website": "a1advancedlandscape.com",
+      "email": "info@advancedlandscapellc.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search_v2",
+      "all_emails": [
+        "info@advancedlandscapellc.com"
+      ],
+      "email_note": "removed: random gmail, likely wrong"
+    },
+    {
+      "business": "Labor Amigos",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 714-7670",
+      "website": "laboramigos.com",
+      "email": "myservice753@hotmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search_v2",
+      "all_emails": [
+        "myservice753@hotmail.com"
+      ],
+      "email_note": "removed: different organization entirely"
+    },
+    {
+      "business": "Curb Appeal Landscaping & Lawncare LLC",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 891-2245",
+      "website": "sod-installation-atlanta.net",
+      "email": "alex.miosi@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "alex.miosi@gmail.com"
+      ]
+    },
+    {
+      "business": "Fresh Cut Lawn Service",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 912-8213",
+      "website": "fresh-cut.us",
+      "email": "z71@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "z71@gmail.com"
+      ]
+    },
+    {
+      "business": "Falling Leaves Lawncare",
+      "city": "Atlanta",
+      "state": "GA",
+      "phone": "(770) 934-1227",
+      "website": "fallingleaveslawncare.com",
+      "email": "julie@juliepaulk.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "julie@juliepaulk.com"
+      ]
+    },
+    {
+      "business": "Blades Of Grass Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 507-1978",
+      "website": "bladesofgrasslawncare.com",
+      "email": "bladesofgrass@live.com",
+      "all_emails": [
+        "bladesofgrass@live.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Artwork Lawncare",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 308-1728",
+      "website": "artworklawncare.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "artlawncarenj@gmail.com"
+      ],
+      "email_note": "removed: wrong - says NJ but business is in Savannah GA"
+    },
+    {
+      "business": "Chatham Property Maintenance",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 988-3832",
+      "website": "ChathamPropertyMaintenance.com",
+      "email": "service@chathampropertymaintenance.com",
+      "all_emails": [
+        "service@chathampropertymaintenance.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "All-Green Lawns",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 897-3054",
+      "website": "allgreenlawns.com",
+      "email": "allgreenlawns@comcast.net",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "contact_page",
+      "all_emails": [
+        "allgreenlawns@comcast.net"
+      ]
+    },
+    {
+      "business": "Ideal Lawn LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 658-9288",
+      "website": "ideallawnllc.com",
+      "email": "info@idealpropertycarellc.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@idealpropertycarellc.com"
+      ]
+    },
+    {
+      "business": "Matt's Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 507-8346",
+      "website": "mattslawncareco.com",
+      "email": "office@mattslawncare.biz",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "office@mattslawncare.biz"
+      ]
+    },
+    {
+      "business": "Grassmaster Lawn Care",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 598-0140",
+      "website": "mygrassmaster.com",
+      "email": "",
+      "all_emails": [
+        "schuman550@gmail.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "email_note": "removed: random gmail, not business-related"
+    },
+    {
+      "business": "Procut Lawn Care LLC",
+      "city": "Savannah",
+      "state": "GA",
+      "phone": "(912) 313-6894",
+      "website": "procutlawncarega.com",
+      "email": "info@procutlawncarega.com",
+      "all_emails": [
+        "info@procutlawncarega.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Augusta Grass Masters LLC",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 955-8563",
+      "website": "augustagrassmasters.com",
+      "email": "info@augustagrassmasters.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@augustagrassmasters.com"
+      ]
+    },
+    {
+      "business": "C & J Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 793-4138",
+      "website": "cjlawncaresvc.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "redrumog45@icloud.com"
+      ],
+      "email_note": "removed: random icloud, likely wrong"
+    },
+    {
+      "business": "Turner Lawn Care",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 294-2238",
+      "website": "Turnerlawncare.com",
+      "email": "info@turnerlawn.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@turnerlawn.com"
+      ]
+    },
+    {
+      "business": "Green Keeper Landscaping Inc",
+      "city": "Augusta",
+      "state": "GA",
+      "phone": "(706) 667-0107",
+      "website": "greenkeeperlandscaping.com",
+      "email": "INFO@GREENKEEPER1986.COM",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "INFO@GREENKEEPER1986.COM"
+      ]
+    },
+    {
+      "business": "McMillan Group II",
+      "city": "Raleigh",
+      "state": "NC",
+      "phone": "(919) 862-6607",
+      "website": "mcmillanlawncare.com",
+      "email": "Info@LuxeLandscapeManagement.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "Info@LuxeLandscapeManagement.com"
+      ]
+    },
+    {
+      "business": "Giovanni Lawn Care LLC",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 490-1127",
+      "website": "giovannilawncarellc.com",
+      "email": "giovannilawncare@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "giovannilawncare@gmail.com"
+      ]
+    },
+    {
+      "business": "Mosier Landscape",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 271-8957",
+      "website": "mosierlandscape.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "lanceslawnandhomecare8560@gmail.com"
+      ],
+      "email_note": "removed: wrong business email, appears for multiple unrelated businesses"
+    },
+    {
+      "business": "Hardiboi Yard Svc",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 603-2922",
+      "website": "hardiboiservices.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "harryslawngarden@aol.com"
+      ],
+      "email_note": "removed: random aol, likely wrong"
+    },
+    {
+      "business": "WB & Sons Lawn Care LLC",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 991-0200",
+      "website": "wbsonslawncare.com",
+      "email": "wbsonslawncare@gmail.com",
+      "all_emails": [
+        "wbsonslawncare@gmail.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Clark Lawn Svc Inc",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 543-0025",
+      "website": "clarklawnservice.com",
+      "email": "clawn36@aol.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "clawn36@aol.com"
+      ]
+    },
+    {
+      "business": "Diversity LawnCare Inc",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 201-7698",
+      "website": "diversitylawncare.com",
+      "email": "First.Last@diversitylawncare.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "First.Last@diversitylawncare.com",
+        "John.Doe@diversitylawncare.com"
+      ]
+    },
+    {
+      "business": "Allpro Lawn Care LLC",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 347-9503",
+      "website": "allprolawncare.biz",
+      "email": "allprolandscaping1@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "allprolandscaping1@gmail.com"
+      ]
+    },
+    {
+      "business": "Turfmaster Lawn Maintenance",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 414-5375",
+      "website": "goturfmaster.com",
+      "email": "turfmaster@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "contact_page",
+      "all_emails": [
+        "turfmaster@gmail.com"
+      ]
+    },
+    {
+      "business": "Signature Lawn Solutions Inc",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 840-3300",
+      "website": "signaturelawnsolutions.com",
+      "email": "team@signaturelawnservices.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "team@signaturelawnservices.com"
+      ]
+    },
+    {
+      "business": "Boochees Lawncare Inc",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 602-7388",
+      "website": "boocheelawncareinc.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "info@buylarine.com"
+      ],
+      "email_note": "removed: wrong domain"
+    },
+    {
+      "business": "Spotts Lawn & Garden Service",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 356-8808",
+      "website": "spottsgardens.com",
+      "email": "info@spottsgardens.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@spottsgardens.com"
+      ]
+    },
+    {
+      "business": "Clean Cuts Lawn Care LLC",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 376-0330",
+      "website": "cleancutsfortwayne.com",
+      "email": "CleanCutsLawnCareMd@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "CleanCutsLawnCareMd@gmail.com"
+      ]
+    },
+    {
+      "business": "Envy Lawn Charles Triplett",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 710-3689",
+      "website": "envylawnonline.com",
+      "email": "cjtrip@msn.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "cjtrip@msn.com"
+      ]
+    },
+    {
+      "business": "P And M Lawn Care",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 471-5891",
+      "website": "pmlawncare.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "loneylandscaping2023@gmail.com"
+      ],
+      "email_note": "removed: wrong business name in email"
+    },
+    {
+      "business": "All Green Corporation",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 493-0075",
+      "website": "allgreen.net",
+      "email": "jcooper@allgreen.net",
+      "all_emails": [
+        "jcooper@allgreen.net"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Leisure Lawn Corporation",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 338-1893",
+      "website": "leisurelawn.com",
+      "email": "manager@leisurelawn.com",
+      "all_emails": [
+        "manager@leisurelawn.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Crown And Blade LLC",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 489-2500",
+      "website": "crownandblade.com",
+      "email": "customerservice@crownandblade.com",
+      "all_emails": [
+        "customerservice@crownandblade.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Lawnscape Lawn Maintenance Inc",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 749-8611",
+      "website": "lawnscape-online.com",
+      "email": "fortgardening@outlook.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "fortgardening@outlook.com"
+      ]
+    },
+    {
+      "business": "Lawn Graphix",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 485-1975",
+      "website": "lawngraphix.com",
+      "email": "skyhighfw@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "skyhighfw@gmail.com"
+      ]
+    },
+    {
+      "business": "All Lawn Care Service",
+      "city": "Fort Wayne",
+      "state": "IN",
+      "phone": "(260) 494-5700",
+      "website": "fwlawns.com",
+      "email": "georgebourounis30@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "georgebourounis30@gmail.com"
+      ]
+    },
+    {
+      "business": "Big Easy Lawn Care",
+      "city": "New Orleans",
+      "state": "LA",
+      "phone": "(504) 267-2333",
+      "website": "bigeasylawncare.com",
+      "email": "bigeasylotsandlawns@yahoo.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "bigeasylotsandlawns@yahoo.com"
+      ]
+    },
+    {
+      "business": "Absolute Lawn Care & Landscaping",
+      "city": "New Orleans",
+      "state": "LA",
+      "phone": "(703) 969-6207",
+      "website": "absolutelawncarela.com",
+      "email": "info@absolutelawncarela.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@absolutelawncarela.com"
+      ]
+    },
+    {
+      "business": "Southern Accent Landscaping & Lawn Care Inc",
+      "city": "New Orleans",
+      "state": "LA",
+      "phone": "(504) 451-0693",
+      "website": "southernaccentnola.com",
+      "email": "info@southernaccentsco.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search_v2",
+      "all_emails": [
+        "info@southernaccentsco.com"
+      ]
+    },
+    {
+      "business": "Pfefferle's Lawn Care",
+      "city": "New Orleans",
+      "state": "LA",
+      "phone": "(504) 338-3547",
+      "website": "pfefferlelawns.com",
+      "email": "PfefferleLawns@gmail.com",
+      "all_emails": [
+        "PfefferleLawns@gmail.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Garden Dctors Ldscpg Hort Firm",
+      "city": "New Orleans",
+      "state": "LA",
+      "phone": "(504) 818-2626",
+      "website": "gardendoctors.net",
+      "email": "info@gardendoctors.net",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@gardendoctors.net"
+      ]
+    },
+    {
+      "business": "CutScape LLC",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 588-3502",
+      "website": "cutscape225.com",
+      "email": "Admin@CutScape225.Com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "Admin@CutScape225.Com"
+      ]
+    },
+    {
+      "business": "Landscape Baton Rouge LLC",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 663-4910",
+      "website": "LandscapeBR.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "crystal@kyleslawnandlandscape.com"
+      ],
+      "email_note": "removed: wrong business - this is Kyle's email, not Landscape BR"
+    },
+    {
+      "business": "H & O Investments LLC",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 454-6397",
+      "website": "handollc.com",
+      "email": "ssica@ho-investments.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "ssica@ho-investments.com"
+      ]
+    },
+    {
+      "business": "Kyle's Lawn and Landscape LLC",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 978-8658",
+      "website": "kyleslawnandlandscape.com",
+      "email": "kyleslawncare2019@aol.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "kyleslawncare2019@aol.com"
+      ]
+    },
+    {
+      "business": "Clean Cut Lawn Care And Pressure Washing LLC",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 395-5959",
+      "website": "cleancut.us",
+      "email": "lliner83@yahoo.com",
+      "all_emails": [
+        "lliner83@yahoo.com"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search"
+    },
+    {
+      "business": "Overgrown Lawn Care Services LLC",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 362-2370",
+      "website": "overgrownllc.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "info@overgrownclothing.co.uk"
+      ],
+      "email_note": "removed: completely wrong business (clothing company)"
+    },
+    {
+      "business": "Superior Landscape & Maintenance",
+      "city": "Baton Rouge",
+      "state": "LA",
+      "phone": "(225) 272-4257",
+      "website": "superiorlandscapeandmaintenance.com",
+      "email": "rafaelazuara@cox.net",
+      "all_emails": [
+        "rafaelazuara@cox.net"
+      ],
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "website_homepage"
+    },
+    {
+      "business": "Lawnmasters",
+      "city": "Shreveport",
+      "state": "LA",
+      "phone": "(318) 686-4103",
+      "website": "lawnmastersinc.com",
+      "email": "receptionist@lawnmastersinc.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "receptionist@lawnmastersinc.com"
+      ]
+    },
+    {
+      "business": "Jewitt Lawn Service LLC",
+      "city": "Shreveport",
+      "state": "LA",
+      "phone": "(318) 990-7278",
+      "website": "jewittlawnservice.com",
+      "email": "grass@jewittlawnservice.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "grass@jewittlawnservice.com"
+      ]
+    },
+    {
+      "business": "Lagniappe Lawnscapes LLC",
+      "city": "Shreveport",
+      "state": "LA",
+      "phone": "(318) 572-1806",
+      "website": "lagniappelawnscapes.com",
+      "email": "lagniappelawnscapes@yahoo.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search_v2",
+      "all_emails": [
+        "lagniappelawnscapes@yahoo.com"
+      ],
+      "email_note": "removed: wrong business"
+    },
+    {
+      "business": "Lawn Care Solution LLC",
+      "city": "Shreveport",
+      "state": "LA",
+      "phone": "(318) 524-2965",
+      "website": "lawnadvisor.com",
+      "email": "rjf904@hotmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "rjf904@hotmail.com"
+      ]
+    },
+    {
+      "business": "Oak Mossy Lawn & Landscape",
+      "city": "Shreveport",
+      "state": "LA",
+      "phone": "(318) 218-8840",
+      "website": "mossyoaklawn.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "editorial@mossyoak.com",
+        "ccessibility@mossyoak.com"
+      ],
+      "email_note": "removed: wrong - mossyoak.com is a large corporation, not this small business"
+    },
+    {
+      "business": "Turf Masters Lawn Care",
+      "city": "Shreveport",
+      "state": "LA",
+      "phone": "(318) 347-4099",
+      "website": "turfmasterslawn.com",
+      "email": "info@turfmasterslc.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "info@turfmasterslc.com",
+        "Steve.Jordan@turfmasterslc.com"
+      ]
+    },
+    {
+      "business": "Grasshopper Lawns LLC",
+      "city": "Slidell",
+      "state": "LA",
+      "phone": "(985) 788-5611",
+      "website": "grasshoppersonline.com",
+      "email": "",
+      "source": "web_scrape",
+      "verified_email": false,
+      "email_source": "",
+      "all_emails": [
+        "info@nicelawns.com"
+      ],
+      "email_note": "removed: wrong - goto.com is a tech company"
+    },
+    {
+      "business": "Spayde Lawn Maintenance",
+      "city": "Slidell",
+      "state": "LA",
+      "phone": "(985) 445-4826",
+      "website": "spaydelawnla.com",
+      "email": "lidell3@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "lidell3@gmail.com"
+      ]
+    },
+    {
+      "business": "DJ's Lawn Care Service",
+      "city": "Slidell",
+      "state": "LA",
+      "phone": "(985) 788-6255",
+      "website": "djslawncareservice.com",
+      "email": "DJsLawnCareService@HotMail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "DJsLawnCareService@HotMail.com"
+      ]
+    },
+    {
+      "business": "Bowman's Pro Turf Company",
+      "city": "Brazil",
+      "state": "IN",
+      "phone": "(812) 448-1852",
+      "website": "bowmansproturf.com",
+      "email": "lawn@bowmansproturf.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "lawn@bowmansproturf.com"
+      ]
+    },
+    {
+      "business": "Fell Lawn Care LLC",
+      "city": "Brazil",
+      "state": "IN",
+      "phone": "(812) 201-0731",
+      "website": "felllawncarellc.com",
+      "email": "johnyslawncare@gmail.com",
+      "source": "web_scrape",
+      "verified_email": true,
+      "email_source": "web_search",
+      "all_emails": [
+        "johnyslawncare@gmail.com"
+      ]
+    }
+  ],
+  "emails_found": 54,
+  "total_leads": 65
+}
