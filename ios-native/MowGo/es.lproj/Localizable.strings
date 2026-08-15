@@ -277,6 +277,20 @@
 
 // MARK: - Integrations
 
+"QuickBooks" = "QuickBooks";
+"Sync your invoices to QuickBooks Online automatically." = "Sincroniza tus facturas con QuickBooks Online automáticamente.";
+"Connect QuickBooks" = "Conectar QuickBooks";
+"Connected to %@" = "Conectado a %@";
+"Last synced: %@" = "Última sincronización: %@";
+"Never" = "Nunca";
+"Sync Now" = "Sincronizar ahora";
+"Disconnect QuickBooks" = "Desconectar QuickBooks";
+"Disconnect QuickBooks?" = "¿Desconectar QuickBooks?";
+"This will stop invoice sync with QuickBooks Online." = "Esto detendrá la sincronización de facturas con QuickBooks Online.";
+"Sign in required to use QuickBooks." = "Debes iniciar sesión para usar QuickBooks.";
+"QuickBooks sync failed." = "Error al sincronizar con QuickBooks.";
+"QuickBooks disconnect failed." = "Error al desconectar QuickBooks.";
+
 "Send MowGo events to Zapier, Make, n8n, or any HTTPS endpoint that accepts POST JSON." = "Envía eventos de MowGo a Zapier, Make, n8n o cualquier endpoint HTTPS que acepte POST JSON.";
 "Add Endpoint" = "Agregar endpoint";
 "No webhook endpoints yet." = "Aún no hay endpoints de webhook.";

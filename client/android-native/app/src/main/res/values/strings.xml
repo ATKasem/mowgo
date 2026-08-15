@@ -362,6 +362,21 @@
     <string name="integrations_event_lead_status_title">Lead Status Updated</string>
     <string name="integrations_event_lead_status_detail">Lead status changes</string>
 
+    <!-- QuickBooks Integration -->
+    <string name="qbo_integration">QuickBooks Integration</string>
+    <string name="qbo_connect">Connect QuickBooks</string>
+    <string name="qbo_description">Sync your invoices to QuickBooks Online automatically.</string>
+    <string name="qbo_connected">Connected to %s</string>
+    <string name="qbo_sync_now">Sync Now</string>
+    <string name="qbo_syncing">Syncing…</string>
+    <string name="qbo_disconnect">Disconnect QuickBooks</string>
+    <string name="qbo_disconnect_confirm">Disconnect QuickBooks? This will stop invoice sync.</string>
+    <string name="qbo_sync_success">Invoices synced successfully</string>
+    <string name="qbo_sync_error">Sync failed: %s</string>
+    <string name="qbo_last_synced">Last synced: %s</string>
+    <string name="qbo_never">Never</string>
+    <string name="qbo_redirecting">Redirecting to QuickBooks…</string>
+
     <!-- Bottom navigation -->
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_today">Today</string>

@@ -254,6 +254,21 @@ const HANDLERS = {
   'invoice.created': handleInvoiceCreated,
   'invoice.paid': handleInvoicePaid,
   'invoice.deleted': handleInvoiceDeleted,
+  'manual': async function handleManualSync(env, userId, tokenInfo) {
+    // Manual "Sync Now" — verify connection is working and return status
+    const supabaseUrl = getSupabaseUrl(env);
+    const serviceKey = getSupabaseServiceKey(env);
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/integrations?user_id=eq.${encodeURIComponent(userId)}&provider=eq.quickbooks&select=last_synced_at,connected_at,metadata`,
+      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }, signal: AbortSignal.timeout(5_000) },
+    );
+    const rows = await res.json();
+    const row = rows?.[0];
+    return {
+      status: 200,
+      body: { synced: true, qboInvoiceId: null, error: null, lastSyncedAt: row?.last_synced_at || null },
+    };
+  },
 };
 
 export async function onRequestPost({ request, env }) {

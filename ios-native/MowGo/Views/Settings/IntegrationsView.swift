@@ -1,5 +1,29 @@
 import SwiftUI
 import UIKit
+import AuthenticationServices
+
+private struct QBOStatusResponse: Decodable {
+    let connected: Bool
+    let companyName: String?
+    let lastSyncedAt: String?
+}
+
+private struct QBOSyncResponse: Decodable {
+    let synced: Bool?
+    let error: String?
+}
+
+/// Anchors the QuickBooks OAuth browser sheet to the app's key window.
+/// ASWebAuthenticationPresentationContextProviding is an `@objc` protocol,
+/// so this needs to be a class — IntegrationsView (a struct) can't conform.
+private final class QBOAuthContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow) ?? ASPresentationAnchor()
+    }
+}
 
 private struct WebhookEventOption: Identifiable {
     let id: String
@@ -26,6 +50,18 @@ struct IntegrationsView: View {
     @State private var editingConfig: WebhookConfig?
     @State private var deletingConfig: WebhookConfig?
 
+    @State private var qboConnected = false
+    @State private var qboCompanyName: String?
+    @State private var qboLastSyncedAt: String?
+    @State private var qboLoading = true
+    @State private var qboConnecting = false
+    @State private var qboSyncing = false
+    @State private var qboDisconnecting = false
+    @State private var qboError: String?
+    @State private var confirmDisconnectQBO = false
+    @State private var qboWebAuthSession: ASWebAuthenticationSession?
+    private let qboAuthContextProvider = QBOAuthContextProvider()
+
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     var body: some View {
@@ -33,6 +69,8 @@ struct IntegrationsView: View {
             theme.background.ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    quickBooksCard()
+
                     Text("Send MowGo events to Zapier, Make, n8n, or any HTTPS endpoint that accepts POST JSON.")
                         .font(.subheadline).foregroundColor(theme.textMuted)
 
@@ -57,6 +95,11 @@ struct IntegrationsView: View {
         .task {
             do { _ = try await store.loadConfigs() } catch { store.report(error) }
         }
+        .task { await refreshQBOStatus() }
+        .alert("Disconnect QuickBooks?", isPresented: $confirmDisconnectQBO) {
+            Button("Disconnect QuickBooks", role: .destructive) { Task { await disconnectQuickBooks() } }
+            Button("Cancel", role: .cancel) {}
+        } message: { Text("This will stop invoice sync with QuickBooks Online.") }
         .sheet(item: $editingConfig) { config in
             WebhookEditorView(config: config) { saved in
                 try await store.saveConfig(saved)
@@ -75,6 +118,175 @@ struct IntegrationsView: View {
         .alert("Couldn’t Update Integrations", isPresented: Binding(
             get: { store.errorMessage != nil }, set: { if !$0 { store.clearError() } }
         )) { Button("OK") { store.clearError() } } message: { Text(store.errorMessage ?? NSLocalizedString("Unknown error", comment: "Integrations save failure fallback message")) }
+    }
+
+    private func quickBooksCard() -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: qboConnected ? "checkmark.circle.fill" : "link.circle")
+                    .foregroundColor(qboConnected ? MowGoTheme.success : theme.textMuted)
+                Text("QuickBooks").font(.headline)
+                Spacer()
+            }
+
+            if qboLoading || qboConnecting {
+                ProgressView().frame(maxWidth: .infinity)
+            } else if qboConnected {
+                Text(String(format: NSLocalizedString("Connected to %@", comment: "QuickBooks connected status; %@ is the QuickBooks company name"), qboCompanyName ?? NSLocalizedString("QuickBooks", comment: "Fallback QuickBooks company name when none is returned")))
+                    .font(.subheadline).foregroundColor(theme.textPrimary)
+                Text(String(format: NSLocalizedString("Last synced: %@", comment: "QuickBooks last sync timestamp label"), formattedQBOLastSynced))
+                    .font(.caption).foregroundColor(theme.textMuted)
+
+                HStack {
+                    Button {
+                        Task { await syncQuickBooks() }
+                    } label: {
+                        if qboSyncing { ProgressView() } else { Text("Sync Now") }
+                    }
+                    .buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen)
+                    .disabled(qboSyncing)
+                    Spacer()
+                }
+
+                Button("Disconnect QuickBooks") { confirmDisconnectQBO = true }
+                    .font(.caption).foregroundColor(theme.textMuted)
+                    .disabled(qboDisconnecting)
+            } else {
+                Text("Sync your invoices to QuickBooks Online automatically.")
+                    .font(.subheadline).foregroundColor(theme.textMuted)
+                Button {
+                    connectQuickBooks()
+                } label: {
+                    Label("Connect QuickBooks", systemImage: "link")
+                }
+                .buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen)
+            }
+
+            if let qboError { Text(qboError).font(.caption).foregroundColor(.red) }
+        }.padding(16).background(theme.surface).cornerRadius(16)
+    }
+
+    private var formattedQBOLastSynced: String {
+        guard let raw = qboLastSyncedAt, let date = Self.parseISODate(raw) else {
+            return NSLocalizedString("Never", comment: "QuickBooks has never synced")
+        }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+
+    /// Tolerant ISO-8601 parser: Supabase timestamps carry fractional seconds,
+    /// which the default ISO8601DateFormatter rejects.
+    private static func parseISODate(_ value: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) { return date }
+        return ISO8601DateFormatter().date(from: value)
+    }
+
+    private func refreshQBOStatus() async {
+        qboLoading = true
+        defer { qboLoading = false }
+        guard let token = await SupabaseService.shared.token, !token.isEmpty else { return }
+
+        var request = URLRequest(url: URL(string: "https://mowgoapp.com/api/integrations/qbo-status")!)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return }
+            let decoded = try JSONDecoder().decode(QBOStatusResponse.self, from: data)
+            qboConnected = decoded.connected
+            qboCompanyName = decoded.companyName
+            qboLastSyncedAt = decoded.lastSyncedAt
+        } catch {
+            #if DEBUG
+            print("[IntegrationsView] QuickBooks status fetch failed: \(error.localizedDescription)")
+            #endif
+        }
+    }
+
+    private func connectQuickBooks() {
+        qboError = nil
+        qboConnecting = true
+        Task {
+            guard let token = await SupabaseService.shared.token, !token.isEmpty else {
+                qboError = NSLocalizedString("Sign in required to use QuickBooks.", comment: "QuickBooks action error when no auth token is available")
+                qboConnecting = false
+                return
+            }
+
+            var components = URLComponents(string: "https://mowgoapp.com/api/integrations/qbo-connect")!
+            components.queryItems = [URLQueryItem(name: "token", value: token)]
+            guard let url = components.url else { qboConnecting = false; return }
+
+            // qbo-connect is a top-level browser redirect straight to Intuit's
+            // OAuth consent screen (not a JSON API) — the OAuth callback lands
+            // on a mowgoapp.com page, so there's no custom callback scheme for
+            // ASWebAuthenticationSession to intercept. The user dismisses the
+            // sheet themselves once they see the confirmation page; we just
+            // re-check qbo-status afterward regardless of how the sheet closed.
+            let session = ASWebAuthenticationSession(url: url, callbackURLScheme: nil) { _, _ in
+                Task {
+                    qboConnecting = false
+                    await refreshQBOStatus()
+                }
+            }
+            session.presentationContextProvider = qboAuthContextProvider
+            qboWebAuthSession = session
+            session.start()
+        }
+    }
+
+    private func syncQuickBooks() async {
+        qboError = nil
+        qboSyncing = true
+        defer { qboSyncing = false }
+        guard let token = await SupabaseService.shared.token, !token.isEmpty else {
+            qboError = NSLocalizedString("Sign in required to use QuickBooks.", comment: "QuickBooks action error when no auth token is available")
+            return
+        }
+
+        var request = URLRequest(url: URL(string: "https://mowgoapp.com/api/integrations/qbo-sync")!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["event": "manual", "payload": [String: Any]()])
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            let http = response as? HTTPURLResponse
+            let decoded = try? JSONDecoder().decode(QBOSyncResponse.self, from: data)
+            if http?.statusCode == 200, decoded?.synced == true {
+                await refreshQBOStatus()
+            } else {
+                qboError = decoded?.error ?? NSLocalizedString("QuickBooks sync failed.", comment: "Generic QuickBooks sync failure message")
+            }
+        } catch {
+            qboError = error.localizedDescription
+        }
+    }
+
+    private func disconnectQuickBooks() async {
+        qboDisconnecting = true
+        defer { qboDisconnecting = false }
+        guard let token = await SupabaseService.shared.token, !token.isEmpty else { return }
+
+        var request = URLRequest(url: URL(string: "https://mowgoapp.com/api/integrations/qbo-disconnect")!)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                qboError = NSLocalizedString("QuickBooks disconnect failed.", comment: "Generic QuickBooks disconnect failure message")
+                return
+            }
+            qboConnected = false
+            qboCompanyName = nil
+            qboLastSyncedAt = nil
+        } catch {
+            qboError = error.localizedDescription
+        }
     }
 
     private func endpointCard(_ config: WebhookConfig) -> some View {
