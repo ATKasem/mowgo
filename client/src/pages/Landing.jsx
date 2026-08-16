@@ -189,7 +189,7 @@ export default function Landing() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <Zap className="w-4 h-4" />
-              {tr("Built in Oklahoma City, for Oklahoma lawn crews")}
+              {tr("Built in Oklahoma City, for crews everywhere")}
             </div>
           </FadeIn>
           <FadeIn delay={100}>
