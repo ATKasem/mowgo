@@ -135,6 +135,15 @@ function RouteTheme() {
   return null;
 }
 
+// Meta Pixel — fire pageView on every route change (SPA HashRouter)
+function MetaPixelPageView() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    try { if (typeof fbq === 'function') fbq('track', 'PageView'); } catch {}
+  }, [pathname]);
+  return null;
+}
+
 // ===== Error Boundary =====
 class ErrorBoundary extends React.Component {
   state = { error: null };
@@ -302,6 +311,7 @@ export default function App() {
     <ErrorBoundary>
     <HashRouter>
       <RouteTheme />
+      <MetaPixelPageView />
       <AuthProvider>
         <SupabaseErrorRedirect />
         <ResumeCheckoutIntent />
