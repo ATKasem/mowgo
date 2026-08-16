@@ -657,7 +657,7 @@ export async function createClient(client) {
   if (isDemoMode()) {
     const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
     if (FREE_TIERS.includes(profile?.tier) && _clients.length >= FREE_CLIENT_LIMIT) {
-      throw new Error(`Free plan is limited to ${FREE_CLIENT_LIMIT} clients. Upgrade to Solo or Crew for unlimited.`);
+      throw new Error(`You've hit the free limit (${FREE_CLIENT_LIMIT} clients). Upgrade to Solo ($39/mo) or Crew ($79/mo) for unlimited clients, route optimization, and offline mode.`);
     }
     const newClient = { ...client, id: uid() };
     _clients = [..._clients, newClient];
@@ -682,7 +682,7 @@ export async function createClient(client) {
       .select('id', { count: 'exact', head: true })
       .eq('user_id', ownerId);
     if ((count || 0) >= FREE_CLIENT_LIMIT) {
-      throw new Error(`Free plan is limited to ${FREE_CLIENT_LIMIT} clients. Upgrade to Solo or Crew for unlimited.`);
+      throw new Error(`You've hit the free limit (${FREE_CLIENT_LIMIT} clients). Upgrade to Solo ($39/mo) or Crew ($79/mo) for unlimited clients, route optimization, and offline mode.`);
     }
   }
 

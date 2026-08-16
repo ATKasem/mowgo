@@ -35,7 +35,7 @@ const plans = [
       { text: '"What to Charge in Your City" report: real mow prices from your market.', value: '$49 value' },
       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
     ],
-    scarcity: 'Eligible paid plans include hands-on setup support.',
+    scarcity: 'Setup is limited to 20 new businesses per week — estimated wait ~3 days.',
     cta: 'Start Free Trial',
     highlight: true,
   },
@@ -273,6 +273,16 @@ export default function Landing() {
           ))}
         </div>
 
+        {/* Rain-Proof Guarantee */}
+        <FadeIn delay={200}>
+          <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700 text-center">
+            <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+            <h3 className="text-xl font-bold text-white mb-2">{tr('The Rain-Proof Guarantee')}</h3>
+            <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for crews like yours. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
+            <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}{billingInterval === 'year' && <span> {tr("Annual? Unused months refunded.")}</span>}</p>
+          </div>
+        </FadeIn>
+
         {/* Comparison Callout */}
         <FadeIn delay={200}>
           <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
@@ -460,14 +470,6 @@ export default function Landing() {
               </FadeIn>
             ))}
           </div>
-          <FadeIn delay={200}>
-            <div className="mt-10 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700 text-center">
-              <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-white mb-2">{tr('The Rain-Proof Guarantee')}</h3>
-              <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for crews like yours. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
-              <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}{billingInterval === 'year' && <span> {tr("Annual? Unused months refunded.")}</span>}</p>
-            </div>
-          </FadeIn>
           <FadeIn delay={400}>
             <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Route optimization is live — included on Solo, Crew, and Premium.")}</p>
           </FadeIn>
