@@ -36,6 +36,7 @@ const Booking = lazy(() => import('./pages/Booking'));
 const PortalReturn = lazy(() => import('./pages/PortalReturn'));
 const AdminConcierge = lazy(() => import('./pages/AdminConcierge'));
 const RouteAudit = lazy(() => import('./pages/RouteAudit'));
+const Rates = lazy(() => import('./pages/Rates'));
 const SmsOptIn = lazy(() => import('./pages/SmsOptIn'));
 const Terms = lazy(() => import('./pages/Terms'));
 
@@ -312,6 +313,7 @@ export default function App() {
           {/* Public */}
           <Route path="/" element={<Landing />} />
           <Route path="/route-audit" element={<RouteAudit />} />
+          <Route path="/rates" element={<Rates />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/blog/jobber-price-increase-2026" element={<JobberPriceIncrease />} />
           <Route path="/privacy" element={<Privacy />} />

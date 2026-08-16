@@ -136,9 +136,25 @@ DAY7_EMAIL_HTML = (
 )
 DAY7_SMS = "MowGo: We onboard 20 new businesses a week. Reply to grab a setup slot. mowgoapp.com Reply STOP to opt out."
 
-EMAIL_CONTENT = {"day2": (DAY2_EMAIL_SUBJECT, DAY2_EMAIL_HTML), "day7": (DAY7_EMAIL_SUBJECT, DAY7_EMAIL_HTML)}
+# Day-3: rates report follow-up — how to raise prices (only for rates_report source)
+DAY3_EMAIL_SUBJECT = "How to raise your prices (the right way)"
+DAY3_EMAIL_HTML = (
+    '<!doctype html><html><body style="font-family:Arial,sans-serif;color:#17201b;line-height:1.6">'
+    '<h1>You got the rates. Now what?</h1>'
+    '<p>The data in the report is real — but raising prices is where most crews freeze.</p>'
+    '<p><strong>3 rules for a clean price bump:</strong></p>'
+    '<ol>'
+    '<li><strong>Raise on new customers first.</strong> Grandpa\'s Lawn Service doesn\'t know what your other customers pay. New prospects have nothing to compare against.</li>'
+    '<li><strong>Grandfather your loyal ones.</strong> The customer who\'s been with you 3 years and pays on time? Keep them at their current rate. The value of a reliable payer beats a $5 bump.</li>'
+    '<li><strong>Anchor with the high number.</strong> When quoting a new job, say "$65 for bi-weekly, $52 for weekly" — not "$52 for weekly, $65 for bi-weekly." The first number sets the anchor.</li>'
+    '</ol>'
+    '<p><a href="https://mowgoapp.com/#/">MowGo helps you track every client\'s rate, schedule, and history in one place →</a></p>'
+    '</body></html>'
+)
+
+EMAIL_CONTENT = {"day2": (DAY2_EMAIL_SUBJECT, DAY2_EMAIL_HTML), "day3": (DAY3_EMAIL_SUBJECT, DAY3_EMAIL_HTML), "day7": (DAY7_EMAIL_SUBJECT, DAY7_EMAIL_HTML)}
 SMS_CONTENT = {"day2": DAY2_SMS, "day7": DAY7_SMS}
-DAY_OFFSET = {"day2": 2, "day7": 7}
+DAY_OFFSET = {"day2": 2, "day3": 3, "day7": 7}
 
 
 def due_rows(kind, now):
@@ -178,7 +194,7 @@ def run(dry_run):
     email_sent = email_failed = sms_sent = sms_deferred = sms_failed = 0
     lines = []
 
-    for kind in ("day2", "day7"):
+    for kind in ("day2", "day3", "day7"):
         for row in due_rows(kind, now):
             attempt_count = row["attempt_count"] + 1
             if row["channel"] == "email":
@@ -211,7 +227,12 @@ def run(dry_run):
                 if dry_run:
                     lines.append(f"[DRY] sms {kind} -> {row['lead_phone']}")
                     continue
-                ok, err = send_sms(row["lead_phone"], SMS_CONTENT[kind])
+                sms_body = SMS_CONTENT.get(kind)
+                if sms_body is None:
+                    print(f"⚠️ sms {kind}: no template — skipping", file=sys.stderr)
+                    sms_deferred += 1
+                    continue
+                ok, err = send_sms(row["lead_phone"], sms_body)
                 record(row["id"], "sent" if ok else ("failed" if attempt_count >= MAX_ATTEMPTS else "queued"), attempt_count, now)
                 lines.append(f"{'✅' if ok else '❌'} sms {kind} -> {row['lead_phone']}" + ("" if ok else f" — {err}"))
                 sms_sent += 1 if ok else 0
