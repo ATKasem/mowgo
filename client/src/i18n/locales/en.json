@@ -175,8 +175,8 @@
     "client": "Client",
     "amount": "Amount",
     "note_optional": "Note (optional)",
-    "you_ve_hit_the_free_limit_5_clients": "You've hit the free limit (5 clients)",
-    "unlimited_clients_recurring_jobs_and_offline_mode_start_at_39_mo": "Unlimited clients, recurring jobs and offline mode start at $39/mo.",
+    "you_ve_hit_the_free_limit_5_clients": "You've hit the free limit (5 clients) — time to upgrade",
+    "unlimited_clients_recurring_jobs_and_offline_mode_start_at_39_mo": "Upgrade to Solo ($39/mo) or Crew ($79/mo) for unlimited clients, route optimization, and offline mode.",
     "see_plans": "See plans",
     "not_now": "Not now",
     "invite_a_crew_get_a_free_month": "Invite a crew — get a free month",
@@ -1582,7 +1582,7 @@
       "select": "Select one",
       "submit": "Run my free audit →",
       "submitting": "Running your audit...",
-      "scarcity": "We onboard 50 new crews this month — spots are filling."
+      "scarcity": "Free audit — no signup required. Your results in 30 seconds."
     },
     "options": {
       "under10": "Under 10",
