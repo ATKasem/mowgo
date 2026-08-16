@@ -189,17 +189,17 @@ export default function Landing() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
               <Zap className="w-4 h-4" />
-              {tr("Built in Oklahoma City, for Oklahoma crews")}
+              {tr("Built in Oklahoma City, for Oklahoma lawn crews")}
             </div>
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Rain on Tuesday. Eight clients to rebook.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("You confirm the move.")}</span>
+              {tr("Run your crew without an office manager.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Scheduling, routing, invoicing in one app.")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("When Oklahoma rain hits, MowGo suggests a dry date. You choose which jobs to move, confirm once, and clients get notified. Jobs, routes, and invoices in one place.")}
+              {tr("MowGo handles the scheduling, routing, and invoicing so you can focus on the mowing. Built for Oklahoma crews by an Oklahoma operator.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -210,8 +210,9 @@ export default function Landing() {
               </Link>
               <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("View Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
               <Link to="/route-audit" className="group inline-flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-gray-300 font-semibold text-sm underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors">{t('routeAudit.landingCta')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
+              <Link to="/rates" className="group inline-flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-gray-300 font-semibold text-sm underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors">{tr("Free pricing guide")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
             </div>
-            <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Rain delay on free tier. No credit card required.")}</p>
+            <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Free for 5 clients. No credit card. 2 minutes to start.")}</p>
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Cancel anytime. 30-day money-back guarantee. No contracts.")}</p>
           </FadeIn>
         </div>

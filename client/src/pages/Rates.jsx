@@ -154,7 +154,10 @@ export default function Rates() {
                   </tbody>
                 </table>
               </div>
-              <Link to="/login?mode=signup" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">Start scheduling with MowGo<ArrowRight className="h-4 w-4" /></Link>
+              <div className="mt-6 flex flex-col gap-3">
+                <Link to="/login?mode=signup" className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">Start scheduling with MowGo<ArrowRight className="h-4 w-4" /></Link>
+                <a href="https://calendly.com/aaron-mowgo/15min" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-xl border border-emerald-600 px-5 py-3 font-semibold text-emerald-700 hover:bg-emerald-50">Book a free setup call →</a>
+              </div>
             </div>
           )}
         </section>

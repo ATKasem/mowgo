@@ -20,7 +20,17 @@ function json(body, status = 200, origin = 'https://mowgoapp.com') {
 }
 
 function welcomeHtml() {
-  return `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#17201b;line-height:1.6"><h1>Welcome to MowGo</h1><p>3 steps to your first scheduled job:</p><ol><li>Add your first client.</li><li>Schedule their first job.</li><li>Mark it complete — the invoice is created automatically.</li></ol><p>Want us to set you up? Reply and we'll import your clients (Solo, Crew &amp; Premium — 48h setup).</p><p><a href="https://mowgoapp.com/#/app">Open MowGo</a></p></body></html>`;
+  return `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#17201b;line-height:1.6">
+<h1>Welcome to MowGo</h1>
+<p>You're set up. Here's how to get your first week running in 3 minutes:</p>
+<ol>
+<li><strong>Add your first client.</strong> Tap the Clients tab → Add Client. Name, address, phone, rate. That's it.</li>
+<li><strong>Schedule their first job.</strong> Tap Today → Schedule Job. Pick the date, assign the crew, set recurring if it's weekly/bi-weekly.</li>
+<li><strong>Send the first invoice.</strong> Mark the job complete → the invoice is created automatically. One tap copies a payment text for Venmo, Zelle, or Cash App.</li>
+</ol>
+<p>That's it. You're running.</p>
+<p style="margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:13px;color:#6b7280">Need help? Reply to this email — we'll import your clients and set up your first week. <a href="https://mowgoapp.com/#/app" style="color:#047857">Open MowGo →</a></p>
+</body></html>`;
 }
 
 async function sendWelcomeEmail(env, email) {

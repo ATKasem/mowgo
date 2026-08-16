@@ -132,6 +132,7 @@ DAY7_EMAIL_HTML = (
     "<h1>Free concierge setup — your clients imported, first 30 days pre-scheduled</h1>"
     "<p>We onboard 20 new businesses a week — reply to grab a setup slot.</p>"
     "<p><a href=\"https://mowgoapp.com/#/login?mode=signup\">Start free</a></p>"
+    "<p style=\"margin-top:12px\"><a href=\"https://calendly.com/aaron-mowgo/15min\" style=\"color:#047857\">Book a free setup call →</a></p>"
     "</body></html>"
 )
 DAY7_SMS = "MowGo: We onboard 20 new businesses a week. Reply to grab a setup slot. mowgoapp.com Reply STOP to opt out."
