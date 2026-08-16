@@ -1,12 +1,13 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { loadProfile, saveProfile, updateLeadAlertsEnabled, updateRainAlertsEnabled, loadTeamMembers, inviteTeamMember, removeTeamMember, fetchClientsForExport, fetchJobsForExport, fetchInvoicesForExport, fetchLeadsForExport, loadReferralStats } from '../lib/data';
 import { downloadCsv, toCsv } from '../lib/csv';
 import { TEAM_MEMBER_COLORS, TEAM_ACCESS_TIERS, hasTeamAccess } from '../lib/constants';
 import { isDemoMode, supabase } from '../lib/supabase';
 import { useAuth } from '../App';
 import { openCustomerPortal } from '../lib/payments';
-import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, DollarSign, Gift } from 'lucide-react';
+import { Store, Save, CheckCircle, Loader2, Bell, Users, CreditCard, HelpCircle, AlertCircle, Link as LinkIcon, Copy, Download, Upload, DollarSign, Gift } from 'lucide-react';
 import { Star } from 'lucide-react';
 import WebhookSettings from '../components/WebhookSettings';
 import QuickBooksConnect from '../components/QuickBooksConnect';
@@ -728,6 +729,13 @@ export default function Settings() {
             ))}
           </div>
           {exportError && <p role="alert" className="text-xs text-red-600 dark:text-red-400">{exportError}</p>}
+        </div>
+
+        {/* Import from Yardbook */}
+        <div className="card p-5 space-y-3">
+          <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Upload className="w-4 h-4 text-brand" />{tr('Import from Yardbook')}</h4>
+          <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr('Bring your customer list from Yardbook into MowGo in a couple of minutes.')}</p>
+          <Link to="/import/yardbook" className="btn-primary inline-flex text-sm">{tr('Import from Yardbook')}</Link>
         </div>
 
         <SectionHeader>{tr("Support")}</SectionHeader>

@@ -10,6 +10,7 @@ const AVAILABLE_EVENTS = [
   { key: 'job.completed',      label: 'Job Completed',       desc: 'Fired when a job status changes to completed' },
   { key: 'invoice.paid',       label: 'Invoice Paid',        desc: 'Fired when an invoice is marked paid' },
   { key: 'customer.created',   label: 'Customer Created',    desc: 'Fired when a new client is added' },
+  { key: 'clients.imported',   label: 'Clients Imported',    desc: 'Fired when clients are imported from another platform (e.g. Yardbook)' },
   { key: 'lead.created',       label: 'Lead Created',         desc: 'Fired when a new lead is captured' },
   { key: 'lead.status.updated', label: 'Lead Status Updated', desc: 'Fired when a lead moves through the pipeline' },
   { key: 'payment.failed',     label: 'Payment Failed',      desc: 'Fired when a Stripe payment fails' },

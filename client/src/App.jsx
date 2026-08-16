@@ -39,6 +39,7 @@ const RouteAudit = lazy(() => import('./pages/RouteAudit'));
 const Rates = lazy(() => import('./pages/Rates'));
 const SmsOptIn = lazy(() => import('./pages/SmsOptIn'));
 const Terms = lazy(() => import('./pages/Terms'));
+const ImportFromYardbook = lazy(() => import('./pages/ImportFromYardbook'));
 
 // ===== Auth Context =====
 export const AuthContext = createContext(null);
@@ -352,6 +353,7 @@ export default function App() {
             <Route path="/app/clients" element={<ClientsRoute jobs={jobs} unreadLeadCount={unreadLeadCount} onLeadsViewed={clearUnreadLeads} />} />
             <Route path="/app/invoices" element={<Invoices invoices={invoices} setInvoices={setInvoices} />} />
             <Route path="/app/settings" element={<Settings />} />
+            <Route path="/import/yardbook" element={<ImportFromYardbook />} />
             <Route path="*" element={<Navigate to="/app" />} />
           </Route>
         </Routes>
