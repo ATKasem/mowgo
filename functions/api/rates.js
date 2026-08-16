@@ -70,6 +70,7 @@ function emailHtml() {
 <li>Reliability beats a rate bump — showing up matters more than being cheap.</li>
 </ol>
 <p style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280">Built by <a href="https://mowgoapp.com/#/" style="color:#047857">MowGo</a> — scheduling, routing, and invoicing for Oklahoma lawn crews. Data: LawnStarter OK market, refreshed August 2026.</p>
+<p style="margin-top:12px;font-size:13px"><a href="https://mowgoapp.com/#/rates?source=email" style="color:#047857">Want pricing tips sent to your inbox? →</a></p>
 </body></html>`;
 }
 
