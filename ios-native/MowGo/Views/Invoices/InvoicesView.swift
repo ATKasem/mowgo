@@ -13,6 +13,7 @@ struct InvoicesView: View {
         }
     }
     @EnvironmentObject var store: DataStore
+    @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
     @State private var segment = Segment.invoices
     @State private var selectedInvoice: Invoice?
