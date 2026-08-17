@@ -173,7 +173,7 @@ final class DataStore: ObservableObject {
         if auth?.isDemoMode == true {
             return ReferralStatus(code: "MOWGO1", totalCount: 3, earnedCount: 1)
         }
-        guard (currentUserId ?? (try await sb.getCurrentUserId())) != nil else {
+        guard currentUserId != nil || (try? await sb.getCurrentUserId()) != nil else {
             throw DataStoreError.authenticationRequired
         }
         struct EmptyParams: Encodable {}
@@ -1152,7 +1152,7 @@ final class DataStore: ObservableObject {
         if invoices.contains(where: { $0.jobId == job.id }) { return }
 
         if auth?.isDemoMode == true {
-            var created = Invoice(
+            let created = Invoice(
                 id: UUID(), clientId: clientId, jobId: job.id, amount: rate,
                 status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
                 clients: Invoice.ClientRef(name: job.clients?.name)
@@ -1234,7 +1234,7 @@ final class DataStore: ObservableObject {
             // Prefer the RPC-returned authoritative amount (client rate may
             // be stale); fall back to the local rate if absent.
             let resolvedAmount = row.amount.map { Decimal(string: String(format: "%.2f", $0)) ?? 0 } ?? amount
-            var created = Invoice(
+            let created = Invoice(
                 id: row.invoiceId, clientId: clientId, jobId: jobId, amount: resolvedAmount,
                 status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
                 clients: Invoice.ClientRef(name: clientName)
@@ -2159,7 +2159,7 @@ final class DataStore: ObservableObject {
         // Real mode: call Cloudflare edge function that handles both flows:
         //   1. New user → creates auth user + profile
         //   2. Existing user → updates their profile to join crew
-        let token = await sb.token ?? ""
+        let token = try await sb.validAccessToken()
         let url = URL(string: "https://mowgoapp.com/api/invite-crew")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
