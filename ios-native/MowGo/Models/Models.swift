@@ -461,10 +461,10 @@ struct UserProfile: Codable, Identifiable {
     var trialPlanLabel: String? {
         guard let t = trialTier else { return nil }
         switch t {
-        case "solo": "Solo"
-        case "crew": "Crew"
-        case "premium": "Premium"
-        default: t
+        case "solo": return "Solo"
+        case "crew": return "Crew"
+        case "premium": return "Premium"
+        default: return t
         }
     }
 
