@@ -71,7 +71,7 @@ struct SettingsView: View {
                         NavigationLink(value: SettingsDestination.importYardbook) {
                             HStack {
                                 Image(systemName: "square.and.arrow.down")
-                                    .foregroundColor(theme.brand)
+                                    .foregroundColor(MowGoTheme.deepGreen)
                                     .frame(width: 24)
                                 Text("Import from Yardbook")
                                     .foregroundColor(theme.textPrimary)
