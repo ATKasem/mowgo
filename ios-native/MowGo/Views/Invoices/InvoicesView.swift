@@ -21,6 +21,8 @@ struct InvoicesView: View {
     @State private var showPayment = false
     @State private var showNewInvoice = false
     @State private var showNewEstimate = false
+    @State private var showCollectCopied = false
+    @State private var collectCopiedInvoice: Invoice?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid || $0.status == .overdue } }
@@ -71,7 +73,7 @@ struct InvoicesView: View {
                     invoice: inv,
                     showPay: true,
                     onOpen: { selectedInvoiceDetail = inv },
-                    onPay: { selectedInvoice = inv; showPayment = true }
+                    onPay: { copyPaymentText(inv) }
                 )
             }
             if !paid.isEmpty { sectionHeader("Paid") }
@@ -158,6 +160,7 @@ private struct InvoiceDetailView: View {
     @State private var voiding = false
     @State private var markPaidError: String?
     @State private var markingPaid = false
+    @State private var showDetailCollectCopied = false
     let invoice: Invoice
     @Environment(\.colorScheme) private var colorScheme
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -183,7 +186,11 @@ private struct InvoiceDetailView: View {
                         Button("Nudge") { copy(nudgeText) }.tint(.orange)
                     }
                     if currentInvoice.status == .unpaid || currentInvoice.status == .overdue {
-                        Button("Send Payment Link") { showPayment = true }
+                        Button("Collect") {
+                            UIPasteboard.general.string = invoiceText
+                            showDetailCollectCopied = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showDetailCollectCopied = false }
+                        }
                         Button("Mark Paid") {
                             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                             markPaid()
@@ -244,6 +251,32 @@ private struct InvoiceDetailView: View {
     private func copy(_ text: String) {
         UIPasteboard.general.string = text
         UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+
+    /// Formats payment text for an invoice and copies it to clipboard.
+    private func copyPaymentText(_ invoice: Invoice) {
+        let profile = auth.user
+        var parts: [String] = []
+        let datePart: String
+        if let createdAt = invoice.createdAt, let date = Self.parseISODate(createdAt) {
+            datePart = " on \(date.formatted(.dateTime.month(.abbreviated).day()))"
+        } else {
+            datePart = ""
+        }
+        if let venmo = profile?.venmoHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !venmo.isEmpty {
+            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: .regularExpression))")
+        }
+        if let cashapp = profile?.cashappHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !cashapp.isEmpty {
+            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: .regularExpression))")
+        }
+        let payLine = parts.isEmpty
+            ? "Please send payment at your earliest convenience"
+            : "Pay via \(parts.joined(separator: " · "))"
+        let text = "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
+        copy(text)
+        collectCopiedInvoice = invoice
+        showCollectCopied = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showCollectCopied = false }
     }
 
     private func markPaid() {
