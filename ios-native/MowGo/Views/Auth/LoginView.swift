@@ -14,6 +14,7 @@ struct LoginView: View {
 
     @State private var email = ""
     @State private var password = ""
+    @State private var referralCode = ""
     @State private var isSignUp = false
     @FocusState private var focusedField: Field?
 
@@ -70,6 +71,15 @@ struct LoginView: View {
                             .cornerRadius(12)
                             .foregroundColor(theme.textPrimary)
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+
+                        if isSignUp {
+                            TextField("Referral code (optional)", text: $referralCode)
+                                .padding()
+                                .background(theme.surface)
+                                .cornerRadius(12)
+                                .foregroundColor(theme.textPrimary)
+                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                        }
                     }
 
                     // Error
@@ -118,6 +128,7 @@ struct LoginView: View {
                     // Toggle
                     Button(isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up") {
                         withAnimation { isSignUp.toggle() }
+                        referralCode = ""
                         auth.error = nil
                     }
                     .font(.footnote)
@@ -161,7 +172,11 @@ struct LoginView: View {
         focusedField = nil
         Task {
             if isSignUp {
-                await auth.signUp(email: email, password: password)
+                await auth.signUp(
+                    email: email,
+                    password: password,
+                    referralCode: referralCode.isEmpty ? nil : referralCode
+                )
             } else {
                 await auth.signIn(email: email, password: password)
             }

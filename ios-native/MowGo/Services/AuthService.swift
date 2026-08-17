@@ -76,13 +76,18 @@ final class AuthService: ObservableObject {
         isLoading = false
     }
 
-    func signUp(email: String, password: String) async {
+    func signUp(email: String, password: String, referralCode: String? = nil) async {
         isLoading = true
         error = nil
         authMessage = nil
         do {
             try await sb.signUp(email: email, password: password)
             authMessage = "Check your email to confirm your account."
+            if let referralCode, !referralCode.isEmpty {
+                Task {
+                    _ = try? await sb.rpc("apply_referral_code", params: ["p_code": referralCode], Bool.self)
+                }
+            }
         } catch {
             self.error = error.localizedDescription
         }
