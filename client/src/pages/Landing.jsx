@@ -8,10 +8,10 @@ import { startCheckout } from '../lib/payments';
 import { supabase } from '../lib/supabase';
 
 const features = [
-  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'Oklahoma spring storms? MowGo suggests a dry date, you choose which jobs to move, and clients are notified after you confirm. Built for OK weather, not California sunshine.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Optimization', desc: 'Smarter daily routes across OKC, Tulsa, Edmond, and beyond. Less time on I-35, more time mowing.', color: 'from-emerald-500 to-teal-500' },
-  { icon: Users, title: 'Built for Lawn Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use every day.', color: 'from-violet-500 to-purple-500' },
-  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. An invoice is created automatically — one tap copies a payment text. Clients pay via Venmo, Zelle, or Cash App. No processing fees.', color: 'from-amber-500 to-orange-500' },
+  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'Oklahoma spring storms? One tap moves every job to the next dry day. Clients are notified automatically. No phone calls, no rescheduling chaos.', color: 'from-emerald-500 to-green-500' },
+  { icon: MapPin, title: 'Route Optimization', desc: 'Your crew spends less time on I-35 and more time mowing. MowGo plans the day\'s route so you hit more jobs per gallon.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Users, title: 'Built for Real Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue notes — the fields Oklahoma crews actually use. Not a generic CRM.', color: 'from-violet-500 to-purple-500' },
+  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete, invoice is created automatically. One tap copies a payment text to the client. No processing fees. Venmo, Zelle, or Cash App.', color: 'from-amber-500 to-orange-500' },
 ];
 
 const differentiators = [
@@ -194,26 +194,27 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Run your crew without an office manager.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("Scheduling, routing, invoicing in one app.")}</span>
+              {tr("Stop losing jobs to scheduling chaos.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("MowGo handles the routing, invoicing, and rain delays so you don't have to.")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("MowGo handles the scheduling, routing, and invoicing so you can focus on the mowing. Built for Oklahoma crews by an Oklahoma operator.")}
+              {tr("One missed job costs more than a month of MowGo. Oklahoma crews use it to schedule smarter, route faster, and get paid — without an office manager.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
-                {tr("Start Free")}
+                {tr("Start Free — No Credit Card")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("View Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
-              <Link to="/route-audit" className="group inline-flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-gray-300 font-semibold text-sm underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors">{t('routeAudit.landingCta')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
-              <Link to="/rates" className="group inline-flex items-center gap-2 text-[var(--color-text-secondary)] dark:text-gray-300 font-semibold text-sm underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors">{tr("Free pricing guide")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
+              <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("See Plans & Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
             </div>
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Free for 5 clients. No credit card. 2 minutes to start.")}</p>
-            <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Cancel anytime. 30-day money-back guarantee. No contracts.")}</p>
+            <div className="mt-3 flex items-center justify-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+              <Shield className="w-4 h-4" />
+              <span>{tr("30-Day Rain-Proof Guarantee: If Solo doesn't save you 5 hours a week, we refund your first month.")}</span>
+            </div>
           </FadeIn>
         </div>
       </section>
