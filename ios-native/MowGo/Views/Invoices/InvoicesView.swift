@@ -135,7 +135,7 @@ struct InvoiceRow: View {
             .buttonStyle(.plain)
             if showPay {
                 Button("Collect") {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                     onPay()
                 }
                 .buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small)

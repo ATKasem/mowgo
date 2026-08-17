@@ -2096,12 +2096,12 @@ final class DataStore: ObservableObject {
         }
     }
 
-    /// Owner-only: voids an unpaid invoice via the `void_invoice` RPC and
+    /// Owner-only: voids an unpaid or overdue invoice via the `void_invoice` RPC and
     /// drops it from the list. Only unpaid invoices can be voided — paid
     /// invoices reflect money already collected.
     func voidInvoice(_ invoice: Invoice) async throws {
-        guard invoice.status == .unpaid else {
-            throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Only unpaid invoices can be voided"])
+        guard invoice.status == .unpaid || invoice.status == .overdue else {
+            throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Only unpaid or overdue invoices can be voided"])
         }
         if auth?.isDemoMode == true {
             invoices.removeAll { $0.id == invoice.id }
