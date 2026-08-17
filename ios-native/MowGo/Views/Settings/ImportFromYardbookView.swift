@@ -137,9 +137,9 @@ struct ImportFromYardbookView: View {
         return HStack(spacing: 0) {
             ForEach(Array(all.enumerated()), id: \.offset) { i, s in
                 VStack(spacing: 4) {
-                    Circle().fill(i < ci ? Color.green : (s == step ? theme.brand : Color.gray.opacity(0.3))).frame(width: 24, height: 24)
+                    Circle().fill(i < ci ? Color.green : (s == step ? MowGoTheme.deepGreen : Color.gray.opacity(0.3))).frame(width: 24, height: 24)
                         .overlay(Text(i < ci ? "✓" : "\(i + 1)").font(.caption2.bold()).foregroundColor(.white))
-                    Text(s.rawValue.capitalized).font(.system(size: 8)).foregroundColor(s == step ? theme.brand : theme.textSecondary)
+                    Text(s.rawValue.capitalized).font(.system(size: 8)).foregroundColor(s == step ? MowGoTheme.deepGreen : theme.textSecondary)
                 }
                 if i < all.count - 1 {
                     Rectangle().fill(i < ci ? Color.green : Color.gray.opacity(0.2)).frame(height: 2).frame(maxWidth: .infinity)
@@ -156,16 +156,16 @@ struct ImportFromYardbookView: View {
             Text("Import your clients from a Yardbook CSV export.").font(.subheadline).foregroundColor(theme.textSecondary).multilineTextAlignment(.center)
             Button(action: { showFilePicker = true }) {
                 VStack(spacing: 12) {
-                    Image(systemName: "doc.badge.arrow.up").font(.system(size: 36)).foregroundColor(theme.brand)
+                    Image(systemName: "doc.badge.arrow.up").font(.system(size: 36)).foregroundColor(MowGoTheme.deepGreen)
                     Text("Tap to select a CSV file").font(.headline).foregroundColor(theme.textPrimary)
                     Text("Supports CSV exports from Yardbook and other tools").font(.caption).foregroundColor(theme.textSecondary)
                 }
                 .frame(maxWidth: .infinity).padding(40).background(theme.surface).cornerRadius(16)
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(theme.brand.opacity(0.3), style: StrokeStyle(lineWidth: 2, dash: [8])))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(MowGoTheme.deepGreen.opacity(0.3), style: StrokeStyle(lineWidth: 2, dash: [8])))
             }
             if !rawText.isEmpty {
                 HStack {
-                    Image(systemName: "checkmark.circle.fill").foregroundColor(theme.brand)
+                    Image(systemName: "checkmark.circle.fill").foregroundColor(MowGoTheme.deepGreen)
                     Text("\(parsedRows.count) rows loaded").font(.subheadline).foregroundColor(theme.textPrimary)
                 }.padding().frame(maxWidth: .infinity).background(theme.surface).cornerRadius(12)
                 if !parseErrors.isEmpty {
@@ -177,7 +177,7 @@ struct ImportFromYardbookView: View {
                 Button("Continue →") { goToPreview() }.buttonStyle(PrimaryButton(theme: theme)).padding(.top).disabled(!existingLoaded)
                 if !existingLoaded && !rawText.isEmpty {
                     HStack {
-                        ProgressView().tint(theme.brand)
+                        ProgressView().tint(MowGoTheme.deepGreen)
                         Text("Checking your existing clients for duplicates…").font(.caption).foregroundColor(theme.textSecondary)
                     }
                 }
@@ -201,7 +201,7 @@ struct ImportFromYardbookView: View {
                     )) {
                         Text("—").tag(nil as CsvField?)
                         ForEach(CsvField.allCases, id: \.rawValue) { Text($0.label).tag($0 as CsvField?) }
-                    }.pickerStyle(.menu).tint(theme.brand)
+                    }.pickerStyle(.menu).tint(MowGoTheme.deepGreen)
                 }.padding(12).background(theme.surface).cornerRadius(10)
             }
             if !parsedRows.isEmpty {
@@ -233,7 +233,7 @@ struct ImportFromYardbookView: View {
             }
             if let p = importPreview {
                 VStack(spacing: 8) {
-                    Label("\(p.rows.count) clients will be imported", systemImage: "person.3").font(.subheadline).foregroundColor(theme.brand)
+                    Label("\(p.rows.count) clients will be imported", systemImage: "person.3").font(.subheadline).foregroundColor(MowGoTheme.deepGreen)
                     if p.skippedMissingName > 0 { Label("\(p.skippedMissingName) skipped (no name)", systemImage: "exclamationmark.triangle").font(.caption).foregroundColor(.orange) }
                     if p.skippedDuplicates > 0 { Label("\(p.skippedDuplicates) skipped (duplicates in CSV)", systemImage: "exclamationmark.triangle").font(.caption).foregroundColor(.orange) }
                     if p.skippedExisting > 0 { Label("\(p.skippedExisting) skipped (already in your client list)", systemImage: "exclamationmark.triangle").font(.caption).foregroundColor(.orange) }
@@ -252,9 +252,9 @@ struct ImportFromYardbookView: View {
         VStack(spacing: 24) {
             if importedCount > 0 {
                 Text("\(importedCount) clients imported so far…").font(.subheadline).foregroundColor(theme.textSecondary)
-                ProgressView().tint(theme.brand)
+                ProgressView().tint(MowGoTheme.deepGreen)
             } else {
-                ProgressView().tint(theme.brand)
+                ProgressView().tint(MowGoTheme.deepGreen)
                 Text("Importing clients…").font(.subheadline).foregroundColor(theme.textSecondary)
             }
         }.padding(40)
@@ -289,7 +289,7 @@ struct ImportFromYardbookView: View {
                     TextField("60", value: $config.scheduleDuration, format: .number).keyboardType(.numberPad).textFieldStyle(.plain).foregroundColor(theme.textPrimary)
                 }.padding(12).background(theme.surface).cornerRadius(10)
                 TextField("Job title", text: $config.scheduleTitle).textFieldStyle(.plain).foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(10)
-                Button("Apply to all selected") { applyBulkToSelected() }.font(.caption).foregroundColor(theme.brand)
+                Button("Apply to all selected") { applyBulkToSelected() }.font(.caption).foregroundColor(MowGoTheme.deepGreen)
             }.padding().background(theme.surface).cornerRadius(12)
 
             ForEach(clientSchedules.indices, id: \.self) { idx in
@@ -302,7 +302,7 @@ struct ImportFromYardbookView: View {
                                 Button(["", "M", "T", "W", "T", "F", "S"][day]) {
                                     if clientSchedules[idx].days.contains(day) { clientSchedules[idx].days.removeAll { $0 == day } }
                                     else { clientSchedules[idx].days.append(day); clientSchedules[idx].days.sort() }
-                                }.font(.caption2).padding(4).background(r.days.contains(day) ? theme.brand : theme.surface).foregroundColor(r.days.contains(day) ? .white : theme.textPrimary).cornerRadius(4)
+                                }.font(.caption2).padding(4).background(r.days.contains(day) ? MowGoTheme.deepGreen : theme.surface).foregroundColor(r.days.contains(day) ? .white : theme.textPrimary).cornerRadius(4)
                             }
                         }
                     }
@@ -320,7 +320,7 @@ struct ImportFromYardbookView: View {
         return Button(labels[day]) {
             if config.scheduleDays.contains(day) { config.scheduleDays.removeAll { $0 == day } }
             else { config.scheduleDays.append(day); config.scheduleDays.sort() }
-        }.font(.caption).padding(8).background(config.scheduleDays.contains(day) ? theme.brand : theme.surface).foregroundColor(config.scheduleDays.contains(day) ? .white : theme.textPrimary).cornerRadius(6)
+        }.font(.caption).padding(8).background(config.scheduleDays.contains(day) ? MowGoTheme.deepGreen : theme.surface).foregroundColor(config.scheduleDays.contains(day) ? .white : theme.textPrimary).cornerRadius(6)
     }
 
     // MARK: - Step 6: Results
@@ -338,7 +338,7 @@ struct ImportFromYardbookView: View {
 
                 if r.skipped > 0 { Text("\(r.skipped) rows skipped").font(.caption).foregroundColor(theme.textSecondary) }
                 if let error = r.error { Text(error).font(.caption).foregroundColor(.red) }
-                if schedulesCreated > 0 { Text("\(schedulesCreated) recurring schedules created").font(.subheadline).foregroundColor(theme.brand) }
+                if schedulesCreated > 0 { Text("\(schedulesCreated) recurring schedules created").font(.subheadline).foregroundColor(MowGoTheme.deepGreen) }
 
                 if !r.names.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
@@ -490,7 +490,7 @@ private struct ClientScheduleRow {
 private struct PrimaryButton: ButtonStyle {
     let theme: MowGoTheme
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.font(.subheadline.bold()).foregroundColor(.white).padding(.horizontal, 24).padding(.vertical, 12).background(theme.brand).cornerRadius(10).opacity(configuration.isPressed ? 0.8 : 1)
+        configuration.label.font(.subheadline.bold()).foregroundColor(.white).padding(.horizontal, 24).padding(.vertical, 12).background(MowGoTheme.deepGreen).cornerRadius(10).opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 
