@@ -121,8 +121,11 @@ serve(async (req) => {
     if (!resp.ok) {
       const err = await resp.text();
       console.error("Stripe error:", err);
+      // Truncate the Stripe error so we avoid leaking secrets but still get
+      // actionable diagnostics in the client-facing message.
+      const detail = (err || "").slice(0, 200);
       return new Response(
-        JSON.stringify({ error: "Payment creation failed" }),
+        JSON.stringify({ error: "Payment creation failed", detail }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

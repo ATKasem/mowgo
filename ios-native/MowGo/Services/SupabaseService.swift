@@ -671,6 +671,7 @@ actor SupabaseService {
         }
         if let error = json["error"] as? String { return error }
         if let message = json["message"] as? String { return message }
+        if let detail = json["detail"] as? String { return detail }
         return nil
     }
 }
