@@ -173,7 +173,8 @@ final class DataStore: ObservableObject {
         if auth?.isDemoMode == true {
             return ReferralStatus(code: "MOWGO1", totalCount: 3, earnedCount: 1)
         }
-        guard currentUserId != nil || (try? await sb.getCurrentUserId()) != nil else {
+        let fetchedUserId = try? await sb.getCurrentUserId()
+        guard currentUserId != nil || fetchedUserId != nil else {
             throw DataStoreError.authenticationRequired
         }
         struct EmptyParams: Encodable {}
