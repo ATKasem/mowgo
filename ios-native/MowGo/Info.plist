@@ -11,5 +11,11 @@
 	<string>sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz</string>
 	<key>StripePublishableKey</key>
 	<string>pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>waze</string>
+		<string>maps</string>
+	</array>
 </dict>
 </plist>
