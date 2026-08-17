@@ -23,6 +23,7 @@ final class AuthService: ObservableObject {
     @Published var resetMessage: String?
 
     private let sb = SupabaseService.shared
+    private let stashedReferralKey = "stashed_referral_code"
 
     /// True only if Supabase credentials are missing/unconfigured.
     /// Defaults to false so startup cannot enter demo mode before configuration
@@ -70,6 +71,11 @@ final class AuthService: ObservableObject {
             _ = try await sb.signIn(email: email, password: password)
             isAuthenticated = true
             await loadProfile()
+            // Apply stashed referral code from a prior signup
+            if let code = UserDefaults.standard.string(forKey: stashedReferralKey), !code.isEmpty {
+                UserDefaults.standard.removeObject(forKey: stashedReferralKey)
+                Task { _ = try? await sb.rpc("apply_referral_code", params: ["p_code": code], String.self) }
+            }
         } catch {
             self.error = error.localizedDescription
         }
@@ -83,10 +89,10 @@ final class AuthService: ObservableObject {
         do {
             try await sb.signUp(email: email, password: password)
             authMessage = "Check your email to confirm your account."
+            // Stash referral code for after email confirmation (user isn't
+            // authenticated yet — the RPC requires auth.uid()).
             if let referralCode, !referralCode.isEmpty {
-                Task {
-                    _ = try? await sb.rpc("apply_referral_code", params: ["p_code": referralCode], Bool.self)
-                }
+                UserDefaults.standard.set(referralCode, forKey: stashedReferralKey)
             }
         } catch {
             self.error = error.localizedDescription
