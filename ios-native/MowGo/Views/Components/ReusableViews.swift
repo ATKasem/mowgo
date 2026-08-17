@@ -89,7 +89,7 @@ struct StatCard: View {
         .background(theme.surface)
         .cornerRadius(12)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(value) \(title)")
+        .accessibilityLabel(Text(value) + Text(" ") + Text(title))
     }
 }
 
