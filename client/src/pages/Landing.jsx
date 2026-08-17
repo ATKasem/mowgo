@@ -68,7 +68,7 @@ const faqs = [
   { q: 'Is it really free?', a: 'Free for your first 5 clients, forever. No credit card. Rain delay, scheduling, and invoicing included.' },
   { q: 'What happens if I want to switch from Jobber or LawnPro?', a: 'On eligible paid plans, we import your clients and prepare your first operating week within 48 hours.' },
   { q: 'Does it work without cell service?', a: 'Yes. Offline mode keeps working in rural Oklahoma and syncs when you are back in range.' },
-  { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day money-back guarantee. If Solo does not make you more organized in 30 days, we refund your first month in full." },
+  { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day Rain-Proof Guarantee: If Solo doesn't save you 5 hours a week, we refund your first month in full." },
   { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
   { q: 'What happens to my data if I cancel?', a: 'Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request.' },
 ];
@@ -213,7 +213,7 @@ export default function Landing() {
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Free for 5 clients. No credit card. 2 minutes to start.")}</p>
             <div className="mt-3 flex items-center justify-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
               <Shield className="w-4 h-4" />
-              <span>{tr("30-Day Rain-Proof Guarantee. Cancel anytime. Full refund.")}</span>
+              <span>{tr("30-Day Rain-Proof Guarantee: If Solo doesn't save you 5 hours a week, we refund your first month.")}</span>
             </div>
           </FadeIn>
         </div>
