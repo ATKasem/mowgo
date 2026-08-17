@@ -420,6 +420,7 @@ final class DataStore: ObservableObject {
                 switch status {
                 case .done:
                     await fireWebhookJobCompleted(updated)
+                    await fireJobCompleteSms(updated)
                     await firePushJobCompleted(updated)
                 case .skipped:
                     await fireWebhookJobSkipped(updated)
@@ -981,6 +982,7 @@ final class DataStore: ObservableObject {
             switch status {
             case .done:
                 await fireWebhookJobCompleted(updated)
+                await fireJobCompleteSms(updated)
                 await firePushJobCompleted(updated)
             case .skipped:
                 await fireWebhookJobSkipped(updated)
@@ -1351,6 +1353,12 @@ final class DataStore: ObservableObject {
             title: "Job Completed ✓",
             body: "\(job.title) for \(clientName) marked as done."
         )
+    }
+
+    /// Texts the client via the send-job-complete-sms Edge Function.
+    /// Best effort: SMS failure never fails the completed-job flow.
+    private func fireJobCompleteSms(_ job: Job) async {
+        _ = try? await sb.requestFunction("send-job-complete-sms", body: ["jobId": job.id.uuidString])
     }
 
     /// Texts affected clients via the send-rain-delay-sms Edge Function.
