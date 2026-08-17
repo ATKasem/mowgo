@@ -109,6 +109,33 @@ struct InvoicesView: View {
     private func sectionHeader(_ title: String) -> some View { Text(title).font(.headline).foregroundColor(theme.textPrimary).frame(maxWidth: .infinity, alignment: .leading) }
     private var invoiceEmpty: some View { VStack(spacing: 12) { Text("No invoices yet").font(.headline); Text("Complete a job to create one").font(.subheadline).foregroundColor(theme.textMuted) }.foregroundColor(theme.textPrimary).padding(.top, 60) }
     @ViewBuilder private var paymentSheet: some View { if let inv = selectedInvoice { NavigationStack { PaymentView(invoice: inv).navigationTitle("Payment").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { showPayment = false } } } } } }
+
+    /// Formats payment text for an invoice and copies it to clipboard.
+    private func copyPaymentText(_ invoice: Invoice) {
+        let profile = auth.user
+        var parts: [String] = []
+        let datePart: String
+        if let createdAt = invoice.createdAt, let date = InvoiceDetailView.parseISODate(createdAt) {
+            datePart = " on \(date.formatted(.dateTime.month(.abbreviated).day()))"
+        } else {
+            datePart = ""
+        }
+        if let venmo = profile?.venmoHandle?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), !venmo.isEmpty {
+            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: NSString.CompareOptions.regularExpression))")
+        }
+        if let cashapp = profile?.cashappHandle?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), !cashapp.isEmpty {
+            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: NSString.CompareOptions.regularExpression))")
+        }
+        let payLine = parts.isEmpty
+            ? "Please send payment at your earliest convenience"
+            : "Pay via \(parts.joined(separator: " · "))"
+        let text = "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
+        UIPasteboard.general.string = text
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        collectCopiedInvoice = invoice
+        showCollectCopied = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showCollectCopied = false }
+    }
 }
 
 struct InvoiceRow: View {
@@ -242,7 +269,7 @@ private struct InvoiceDetailView: View {
 
     /// Tolerant ISO-8601 parser: Supabase timestamps carry fractional seconds,
     /// which the default ISO8601DateFormatter rejects.
-    private static func parseISODate(_ value: String) -> Date? {
+    fileprivate static func parseISODate(_ value: String) -> Date? {
         let fractional = ISO8601DateFormatter()
         fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let date = fractional.date(from: value) { return date }
@@ -252,32 +279,6 @@ private struct InvoiceDetailView: View {
     private func copy(_ text: String) {
         UIPasteboard.general.string = text
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-    }
-
-    /// Formats payment text for an invoice and copies it to clipboard.
-    private func copyPaymentText(_ invoice: Invoice) {
-        let profile = auth.user
-        var parts: [String] = []
-        let datePart: String
-        if let createdAt = invoice.createdAt, let date = Self.parseISODate(createdAt) {
-            datePart = " on \(date.formatted(.dateTime.month(.abbreviated).day()))"
-        } else {
-            datePart = ""
-        }
-        if let venmo = profile?.venmoHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !venmo.isEmpty {
-            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: .regularExpression))")
-        }
-        if let cashapp = profile?.cashappHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !cashapp.isEmpty {
-            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: .regularExpression))")
-        }
-        let payLine = parts.isEmpty
-            ? "Please send payment at your earliest convenience"
-            : "Pay via \(parts.joined(separator: " · "))"
-        let text = "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
-        copy(text)
-        collectCopiedInvoice = invoice
-        showCollectCopied = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showCollectCopied = false }
     }
 
     private func markPaid() {
@@ -315,14 +316,14 @@ private struct InvoiceDetailView: View {
     private var payMethods: [String] {
         guard let profile = store.auth?.user else { return [] }
         var parts: [String] = []
-        if let zelle = profile.zelleHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !zelle.isEmpty {
+        if let zelle = profile.zelleHandle?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), !zelle.isEmpty {
             parts.append("Zelle: \(zelle)")
         }
-        if let venmo = profile.venmoHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !venmo.isEmpty {
-            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: .regularExpression))")
+        if let venmo = profile.venmoHandle?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), !venmo.isEmpty {
+            parts.append("Venmo: @\(venmo.replacingOccurrences(of: "^@", with: "", options: NSString.CompareOptions.regularExpression))")
         }
-        if let cashapp = profile.cashappHandle?.trimmingCharacters(in: .whitespacesAndNewlines), !cashapp.isEmpty {
-            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: .regularExpression))")
+        if let cashapp = profile.cashappHandle?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), !cashapp.isEmpty {
+            parts.append("Cash App: $\(cashapp.replacingOccurrences(of: "^\\$", with: "", options: NSString.CompareOptions.regularExpression))")
         }
         return parts
     }
