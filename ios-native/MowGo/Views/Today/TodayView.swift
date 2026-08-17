@@ -769,7 +769,7 @@ struct TodayView: View {
 
         Task {
             var failedAddresses = 0
-            let clientIds = Set(todayJobs.compactMap { job in
+            let clientIds: Set<UUID> = Set(todayJobs.compactMap { job -> UUID? in
                 guard job.clients?.latitude == nil || job.clients?.longitude == nil else { return nil }
                 return job.clientId
             })
@@ -793,7 +793,7 @@ struct TodayView: View {
                 }
             }
 
-            let entries = previousOrder.compactMap { id -> RouteOptimizer.Entry? in
+            let entries: [RouteOptimizer.Entry] = previousOrder.compactMap { id -> RouteOptimizer.Entry? in
                 guard let job = store.jobs.first(where: { $0.id == id }) else { return nil }
                 let coordinate = coordinates(for: job)
                 return (job.id, coordinate?.lat, coordinate?.lng)
