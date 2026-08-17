@@ -53,6 +53,14 @@
 "Scheduled" = "Programados";
 "Revenue" = "Ingresos";
 "All" = "Todos";
+"Filter" = "Filtrar";
+"Sort" = "Ordenar";
+"With Jobs" = "Con trabajos";
+"With Invoices" = "Con facturas";
+"Recent" = "Recientes";
+"Oldest" = "Más antiguos";
+"Name A-Z" = "Nombre A-Z";
+"Name Z-A" = "Nombre Z-A";
 "Unknown" = "Desconocido";
 
 // MARK: - Job card (JobCardView)

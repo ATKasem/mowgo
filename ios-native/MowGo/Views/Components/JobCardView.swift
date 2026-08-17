@@ -240,16 +240,16 @@ struct JobCardView: View {
                     }
                     .buttonStyle(.plain)
                     .confirmationDialog("Navigate", isPresented: $showMapPicker) {
-                        if let enc = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                            if let url = URL(string: "https://maps.apple.com/?q=\(enc)") {
-                                Button("Apple Maps") { UIApplication.shared.open(url) }
-                            }
-                            if let url = URL(string: "comgooglemaps://?q=\(enc)"), UIApplication.shared.canOpenURL(url) {
-                                Button("Google Maps") { UIApplication.shared.open(url) }
-                            }
-                            if let url = URL(string: "waze://?q=\(enc)"), UIApplication.shared.canOpenURL(url) {
-                                Button("Waze") { UIApplication.shared.open(url) }
-                            }
+                        if let url = navigationURL(scheme: "https", host: "maps.apple.com", address: address) {
+                            Button("Apple Maps") { UIApplication.shared.open(url) }
+                        }
+                        if let url = navigationURL(scheme: "comgooglemaps", address: address),
+                           UIApplication.shared.canOpenURL(url) {
+                            Button("Google Maps") { UIApplication.shared.open(url) }
+                        }
+                        if let url = navigationURL(scheme: "waze", address: address),
+                           UIApplication.shared.canOpenURL(url) {
+                            Button("Waze") { UIApplication.shared.open(url) }
                         }
                         Button("Cancel", role: .cancel) { }
                     }
@@ -322,5 +322,13 @@ struct JobCardView: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
+    }
+
+    private func navigationURL(scheme: String, host: String? = nil, address: String) -> URL? {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = host ?? ""
+        components.queryItems = [URLQueryItem(name: "q", value: address)]
+        return components.url
     }
 }

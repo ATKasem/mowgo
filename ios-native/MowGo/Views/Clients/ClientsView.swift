@@ -8,6 +8,20 @@
 import SwiftUI
 
 struct ClientsView: View {
+    private enum ClientFilter: String {
+        case all = "All"
+        case withJobs = "With Jobs"
+        case withInvoices = "With Invoices"
+        case recent = "Recent"
+    }
+
+    private enum ClientSort: String {
+        case nameAscending = "Name A-Z"
+        case nameDescending = "Name Z-A"
+        case recent = "Recent"
+        case oldest = "Oldest"
+    }
+
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
@@ -18,12 +32,46 @@ struct ClientsView: View {
     @State private var selectedSegment = 0
     @State private var showNewLead = false
     @State private var operationError: String?
+    @State private var selectedFilter: ClientFilter = .all
+    @State private var selectedSort: ClientSort = .nameAscending
+    @State private var showFilterOptions = false
+    @State private var showSortOptions = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
-    private var filtered: [Client] {
-        if searchText.isEmpty { return store.clients }
-        return store.clients.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    private var filteredClients: [Client] {
+        var clients = store.clients
+
+        if !searchText.isEmpty {
+            clients = clients.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+
+        switch selectedFilter {
+        case .all:
+            break
+        case .withJobs:
+            let clientIds = Set(store.jobs.compactMap(\.clientId))
+            clients = clients.filter { clientIds.contains($0.id) }
+        case .withInvoices:
+            let clientIds = Set(store.invoices.compactMap(\.clientId))
+            clients = clients.filter { clientIds.contains($0.id) }
+        case .recent:
+            let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? .distantPast
+            clients = clients.filter { clientCreatedAt($0).map { $0 >= cutoff } ?? false }
+        }
+
+        return clients.sorted { lhs, rhs in
+            switch selectedSort {
+            case .nameAscending:
+                return compareNames(lhs, rhs, ascending: true)
+            case .nameDescending:
+                return compareNames(lhs, rhs, ascending: false)
+            case .recent:
+                return compareDates(lhs, rhs, newestFirst: true)
+            case .oldest:
+                return compareDates(lhs, rhs, newestFirst: false)
+            }
+        }
     }
 
     var body: some View {
@@ -52,6 +100,13 @@ struct ClientsView: View {
                                     .foregroundColor(theme.textPrimary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.bottom, 4)
+
+                                HStack {
+                                    filterButton
+                                    Spacer()
+                                    sortButton
+                                }
+                                .padding(.bottom, 4)
                             }
 
                             if store.clients.isEmpty && searchText.isEmpty {
@@ -80,7 +135,7 @@ struct ClientsView: View {
                             }
 
                                     LazyVStack(spacing: 8) {
-                                        ForEach(filtered) { client in
+                                        ForEach(filteredClients) { client in
                                             ClientCard(
                                                 client: client,
                                                 isExpanded: expandedId == client.id,
@@ -135,6 +190,76 @@ struct ClientsView: View {
             .sheet(isPresented: $showNewLead) {
                 NewLeadFormView().environmentObject(store)
             }
+        }
+    }
+
+    private var filterButton: some View {
+        Button {
+            showFilterOptions = true
+        } label: {
+            Label("Filter", systemImage: "line.3.horizontal.decrease")
+                .font(.caption.weight(.medium))
+                .foregroundColor(theme.textPrimary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(theme.surface)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .confirmationDialog("Filter", isPresented: $showFilterOptions, titleVisibility: .visible) {
+            Button("All") { selectedFilter = .all }
+            Button("With Jobs") { selectedFilter = .withJobs }
+            Button("With Invoices") { selectedFilter = .withInvoices }
+            Button("Recent") { selectedFilter = .recent }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private var sortButton: some View {
+        Button {
+            showSortOptions = true
+        } label: {
+            Label("Sort", systemImage: "arrow.up.arrow.down")
+                .font(.caption.weight(.medium))
+                .foregroundColor(theme.textPrimary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(theme.surface)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .confirmationDialog("Sort", isPresented: $showSortOptions, titleVisibility: .visible) {
+            Button("Name A-Z") { selectedSort = .nameAscending }
+            Button("Name Z-A") { selectedSort = .nameDescending }
+            Button("Recent") { selectedSort = .recent }
+            Button("Oldest") { selectedSort = .oldest }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private func clientCreatedAt(_ client: Client) -> Date? {
+        guard let value = client.createdAt else { return nil }
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return fractional.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+    }
+
+    private func compareNames(_ lhs: Client, _ rhs: Client, ascending: Bool) -> Bool {
+        let result = lhs.name.localizedStandardCompare(rhs.name)
+        if result == .orderedSame { return lhs.id.uuidString < rhs.id.uuidString }
+        return ascending ? result == .orderedAscending : result == .orderedDescending
+    }
+
+    private func compareDates(_ lhs: Client, _ rhs: Client, newestFirst: Bool) -> Bool {
+        switch (clientCreatedAt(lhs), clientCreatedAt(rhs)) {
+        case let (left?, right?) where left != right:
+            return newestFirst ? left > right : left < right
+        case (_?, nil):
+            return true
+        case (nil, _?):
+            return false
+        default:
+            return compareNames(lhs, rhs, ascending: true)
         }
     }
 

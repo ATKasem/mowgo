@@ -16,9 +16,8 @@ INFOPLIST_KEY_NSCameraUsageDescription = MowGo uses your camera to attach photos
 
 // MARK: - Supabase
 // _SLASH variable trick: xcconfig treats // as comment start, so we build
-// the double-slash from two variable expansions. GENERATE_INFOPLIST_FILE
-// strips the INFOPLIST_KEY_ prefix, producing SUPABASE_URL / SUPABASE_ANON_KEY
-// in the final Info.plist.
+// the double-slash from two variable expansions. These values mirror the
+// custom keys in Info.plist for build-setting visibility.
 _SLASH = /
 INFOPLIST_KEY_SUPABASE_URL = https:$(_SLASH)$(_SLASH)vqgiynfrpsqddjrayczc.supabase.co
 INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
@@ -31,4 +30,4 @@ PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
 MARKETING_VERSION = 1.0.0
 CURRENT_PROJECT_VERSION = 1
 SWIFT_EMIT_LOC_STRINGS = YES
-GENERATE_INFOPLIST_FILE = YES
+GENERATE_INFOPLIST_FILE = NO

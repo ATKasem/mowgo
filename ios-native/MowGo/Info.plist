@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ⚠️  SOURCE OF TRUTH: Config.xcconfig (INFOPLIST_KEY_* keys).        -->
-<!-- This plist is overwritten by GENERATE_INFOPLIST_FILE=YES.             -->
-<!-- Edit xcconfig, not this file.                                         -->
+<!-- Source of truth for custom plist keys. GENERATE_INFOPLIST_FILE is disabled. -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -11,11 +9,25 @@
 	<string>sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz</string>
 	<key>StripePublishableKey</key>
 	<string>pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.mowgo.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mowgo</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>MowGo uses your camera to attach photos to jobs.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MowGo accesses your photo library to attach photos to jobs.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>
 		<string>waze</string>
-		<string>maps</string>
 	</array>
 </dict>
 </plist>
