@@ -446,8 +446,10 @@ export default function Landing() {
                           {plan.bonuses.map(bonus => (
                             <div key={bonus.text} className="flex items-start gap-2">
                               <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-brand" />
-                              <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] flex-1">{tr(bonus.text)}</span>
-                              <span className="text-xs font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr(bonus.text)}</span>
+                                <span className="ml-2 text-xs font-semibold text-brand bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5 whitespace-nowrap">{tr(bonus.value)}</span>
+                              </div>
                             </div>
                           ))}
                         </div>
