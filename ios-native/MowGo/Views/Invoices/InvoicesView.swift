@@ -122,6 +122,9 @@ struct InvoiceRow: View {
                         if let date = invoice.createdAt {
                             Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted)
                         }
+                        Text("Tap for details")
+                            .font(.caption2)
+                            .foregroundColor(theme.textInverse)
                     }
                     Spacer()
                     status
@@ -131,12 +134,15 @@ struct InvoiceRow: View {
             }
             .buttonStyle(.plain)
             if showPay {
-                Button("Pay") {
+                Button("Collect") {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     onPay()
                 }
                 .buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small)
             }
+            Image(systemName: "chevron.right")
+                .font(.caption2)
+                .foregroundColor(theme.textInverse)
         }
         .foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12)
     }
@@ -177,7 +183,7 @@ private struct InvoiceDetailView: View {
                         Button("Nudge") { copy(nudgeText) }.tint(.orange)
                     }
                     if currentInvoice.status == .unpaid || currentInvoice.status == .overdue {
-                        Button("Pay via Stripe") { showPayment = true }
+                        Button("Send Payment Link") { showPayment = true }
                         Button("Mark Paid") {
                             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                             markPaid()

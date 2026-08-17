@@ -186,7 +186,7 @@
 "Created" = "Creada";
 "Copy payment text" = "Copiar texto de pago";
 "Nudge" = "Recordatorio";
-"Pay via Stripe" = "Pagar con Stripe";
+"Send Payment Link" = "Enviar enlace de pago";
 "Mark Paid" = "Marcar como pagada";
 "Void invoice" = "Anular factura";
 "Void this invoice?" = "¿Anular esta factura?";
