@@ -216,9 +216,18 @@ struct IntegrationsView: View {
                 return
             }
 
-            var components = URLComponents(string: "https://mowgoapp.com/api/integrations/qbo-connect")!
-            components.queryItems = [URLQueryItem(name: "token", value: token)]
-            guard let url = components.url else { qboConnecting = false; return }
+            var request = URLRequest(url: URL(string: "https://mowgoapp.com/api/integrations/qbo-connect")!)
+            request.httpMethod = "POST"
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+            guard let (data, response) = try? await URLSession.shared.data(for: request),
+                  let http = response as? HTTPURLResponse, http.statusCode == 200,
+                  let payload = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+                  let urlString = payload["url"], let url = URL(string: urlString) else {
+                qboError = NSLocalizedString("Could not start QuickBooks connection.", comment: "QuickBooks connection startup error")
+                qboConnecting = false
+                return
+            }
 
             // qbo-connect is a top-level browser redirect straight to Intuit's
             // OAuth consent screen (not a JSON API) — the OAuth callback lands
