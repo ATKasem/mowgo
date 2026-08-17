@@ -35,7 +35,7 @@ const plans = [
       { text: '"What to Charge in Your City" report: real mow prices from your market.', value: '$49 value' },
       { text: 'Template pack: 15 ready-to-send scripts — invoices, reminders, price raises, no-show follow-ups.', value: '$79 value' },
     ],
-    scarcity: 'Setup is limited to 20 new businesses per week — estimated wait ~3 days.',
+    scarcity: '🔥 Founder\'s Rate: $29/mo for the first 50 — lock it in forever',
     cta: 'Start Free Trial',
     highlight: true,
   },
@@ -514,7 +514,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[var(--color-surface-bg)] dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] text-sm">
