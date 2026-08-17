@@ -1208,7 +1208,8 @@ final class DataStore: ObservableObject {
     /// columns never receive binary-float noise (0.1+0.2 artifacts).
     private func centsDouble(_ amount: Decimal) -> Double {
         var rounded = Decimal()
-        NSDecimalRound(&rounded, &amount, 2, .plain)
+        var amt = amount
+        NSDecimalRound(&rounded, &amt, 2, .plain)
         return NSDecimalNumber(decimal: rounded).doubleValue
     }
 
@@ -2160,7 +2161,9 @@ final class DataStore: ObservableObject {
         // Real mode: call Cloudflare edge function that handles both flows:
         //   1. New user → creates auth user + profile
         //   2. Existing user → updates their profile to join crew
-        let token = try await sb.validAccessToken()
+        guard let token = await sb.token else {
+            throw SupabaseError.network
+        }
         let url = URL(string: "https://mowgoapp.com/api/invite-crew")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
