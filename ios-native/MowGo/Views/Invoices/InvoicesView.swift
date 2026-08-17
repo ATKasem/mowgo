@@ -63,6 +63,24 @@ struct InvoicesView: View {
             .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
             .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
             .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
+
+            // Collect copied toast
+            if showCollectCopied {
+                VStack {
+                    Spacer()
+                    Text("Payment text copied ✓")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(MowGoTheme.deepGreen)
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+                        .padding(.bottom, 80)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+                .animation(.easeInOut(duration: 0.3), value: showCollectCopied)
+            }
         }
     }
 
