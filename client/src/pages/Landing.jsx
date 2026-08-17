@@ -91,7 +91,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const [paymentError, setPaymentError] = useState('');
   const [billingInterval, setBillingInterval] = useState('year');
-  const [kitOpen, setKitOpen] = useState(false);
+  const [kitOpen, setKitOpen] = useState(new Set());
   const [testimonials, setTestimonials] = useState([]);
   const errorTimerRef = useRef(null);
   const checkoutPendingRef = useRef(false);
@@ -433,16 +433,16 @@ export default function Landing() {
                     <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4">
                       <button
                         type="button"
-                        onClick={() => setKitOpen(!kitOpen)}
-                        aria-expanded={kitOpen}
-                        aria-controls="launch-kit-panel"
+                        onClick={() => setKitOpen(prev => { const next = new Set(prev); if (next.has(plan.name)) next.delete(plan.name); else next.add(plan.name); return next; })}
+                        aria-expanded={kitOpen.has(plan.name)}
+                        aria-controls={`launch-kit-panel-${plan.name}`}
                         className="w-full flex items-center justify-between gap-2 text-left min-h-[44px]"
                       >
                         <span className="text-sm font-bold uppercase tracking-wide text-brand">{tr('Free Launch Kit — $278 value, included with Solo')}</span>
-                        <ChevronDown className={`w-4 h-4 shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 ${kitOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 ${kitOpen.has(plan.name) ? 'rotate-180' : ''}`} />
                       </button>
-                      {kitOpen && (
-                        <div id="launch-kit-panel" className="mt-3 space-y-3">
+                      {kitOpen.has(plan.name) && (
+                        <div id={`launch-kit-panel-${plan.name}`} className="mt-3 space-y-3">
                           {plan.bonuses.map(bonus => (
                             <div key={bonus.text} className="flex items-start gap-2">
                               <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-brand" />
