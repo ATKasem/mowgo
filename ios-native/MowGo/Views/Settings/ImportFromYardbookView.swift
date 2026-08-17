@@ -139,8 +139,10 @@ struct ImportFromYardbookView: View {
                 VStack(spacing: 4) {
                     Circle().fill(i < ci ? Color.green : (s == step ? MowGoTheme.deepGreen : Color.gray.opacity(0.3))).frame(width: 24, height: 24)
                         .overlay(Text(i < ci ? "✓" : "\(i + 1)").font(.caption2.bold()).foregroundColor(.white))
-                    Text(s.rawValue.capitalized).font(.system(size: 8)).foregroundColor(s == step ? MowGoTheme.deepGreen : theme.textSecondary)
+                    Text(s.rawValue.capitalized).font(.system(size: 8)).lineLimit(1).minimumScaleFactor(0.5).foregroundColor(s == step ? MowGoTheme.deepGreen : theme.textSecondary)
+                        .frame(maxWidth: 50)
                 }
+                .frame(minWidth: 40)
                 if i < all.count - 1 {
                     Rectangle().fill(i < ci ? Color.green : Color.gray.opacity(0.2)).frame(height: 2).frame(maxWidth: .infinity)
                 }
