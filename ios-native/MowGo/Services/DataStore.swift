@@ -22,6 +22,8 @@ private struct ClientInsert: Encodable {
     let alarmCode: String?
     let petInstructions: String?
     let tags: [String]?
+    let latitude: Double?
+    let longitude: Double?
 }
 
 private struct ClientUpdate: Encodable {
@@ -35,6 +37,8 @@ private struct ClientUpdate: Encodable {
     let alarmCode: String?
     let petInstructions: String?
     let tags: [String]?
+    let latitude: Double?
+    let longitude: Double?
 }
 
 private struct LeadInsert: Encodable {
@@ -482,7 +486,9 @@ final class DataStore: ObservableObject {
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
                 petInstructions: client.petInstructions,
-                tags: client.tags
+                tags: client.tags,
+                latitude: client.latitude,
+                longitude: client.longitude
             ))
 
         case "client:delete":
@@ -634,7 +640,9 @@ final class DataStore: ObservableObject {
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
                 petInstructions: client.petInstructions,
-                tags: client.tags
+                tags: client.tags,
+                latitude: client.latitude,
+                longitude: client.longitude
             ))
             return client
         }
@@ -708,7 +716,9 @@ final class DataStore: ObservableObject {
             keyCode: client.keyCode,
             alarmCode: client.alarmCode,
             petInstructions: client.petInstructions,
-            tags: client.tags
+            tags: client.tags,
+            latitude: client.latitude,
+            longitude: client.longitude
         ))
     }
 
@@ -855,7 +865,9 @@ final class DataStore: ObservableObject {
             cleaningNotes: client.cleaningNotes,
             keyCode: client.keyCode,
             alarmCode: client.alarmCode,
-            petInstructions: client.petInstructions
+            petInstructions: client.petInstructions,
+            latitude: client.latitude,
+            longitude: client.longitude
         )
     }
 
@@ -1101,6 +1113,23 @@ final class DataStore: ObservableObject {
             }
             self.error = "Saved offline — will sync when connected"
             return
+        }
+    }
+
+    /// Persists a complete day route in one logical operation and updates the
+    /// in-memory order as each write succeeds. Callers retain the prior IDs so
+    /// they can offer an explicit undo if a later write fails.
+    func reorderJobs(_ orderedIds: [UUID]) async throws {
+        guard Set(orderedIds).count == orderedIds.count else {
+            throw DataStoreError.serverError("Route contains duplicate jobs")
+        }
+        for (order, id) in orderedIds.enumerated() {
+            guard let job = jobs.first(where: { $0.id == id }) else {
+                throw DataStoreError.serverError("Route contains an unknown job")
+            }
+            if job.routeOrder != order {
+                try await updateRouteOrder(job, order: order)
+            }
         }
     }
 
@@ -1978,7 +2007,9 @@ final class DataStore: ObservableObject {
                 keyCode: client.keyCode,
                 alarmCode: client.alarmCode,
                 petInstructions: client.petInstructions,
-                tags: client.tags
+                tags: client.tags,
+                latitude: client.latitude,
+                longitude: client.longitude
             ))
             clients.append(created)
             await fireWebhookCustomerCreated(created)
@@ -2023,7 +2054,9 @@ final class DataStore: ObservableObject {
                 keyCode: updated.keyCode,
                 alarmCode: updated.alarmCode,
                 petInstructions: updated.petInstructions,
-                tags: updated.tags
+                tags: updated.tags,
+                latitude: updated.latitude,
+                longitude: updated.longitude
             ))
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
@@ -2393,10 +2426,10 @@ struct DemoData {
     ]
 
     let jobs: [Job] = [
-        Job(id: UUID(), assignedTo: DemoData.demoOwnerId, title: "Weekly Mow", scheduledDate: DemoData.today(), scheduledTime: "08:00", status: .done, routeOrder: 0, clients: Job.ClientRef(id: UUID(), name: "Smith Residence", address: "123 Main St", rate: 45)),
-        Job(id: UUID(), assignedTo: DemoData.demoCrewJake, title: "Trim + Mow", scheduledDate: DemoData.today(), scheduledTime: "09:30", status: .inProgress, routeOrder: 1, clients: Job.ClientRef(id: UUID(), name: "Johnson Home", address: "456 Oak Ave", rate: 65)),
-        Job(id: UUID(), assignedTo: DemoData.demoCrewMaria, title: "Quick Mow", scheduledDate: DemoData.today(), scheduledTime: "11:00", status: .scheduled, routeOrder: 2, clients: Job.ClientRef(id: UUID(), name: "Williams Estate", address: "789 Pine Rd", rate: 80)),
-        Job(id: UUID(), title: "Biweekly Service", scheduledDate: DemoData.today(), scheduledTime: "13:00", status: .scheduled, routeOrder: 3, clients: Job.ClientRef(id: UUID(), name: "Brown Property", address: "101 Elm St", rate: 45)),
+        Job(id: UUID(), assignedTo: DemoData.demoOwnerId, title: "Weekly Mow", scheduledDate: DemoData.today(), scheduledTime: "08:00", status: .done, routeOrder: 0, clients: Job.ClientRef(id: UUID(), name: "Smith Residence", address: "123 Main St", rate: 45, latitude: 35.493, longitude: -97.520)),
+        Job(id: UUID(), assignedTo: DemoData.demoCrewJake, title: "Trim + Mow", scheduledDate: DemoData.today(), scheduledTime: "09:30", status: .inProgress, routeOrder: 1, clients: Job.ClientRef(id: UUID(), name: "Johnson Home", address: "456 Oak Ave", rate: 65, latitude: 35.538, longitude: -97.572)),
+        Job(id: UUID(), assignedTo: DemoData.demoCrewMaria, title: "Quick Mow", scheduledDate: DemoData.today(), scheduledTime: "11:00", status: .scheduled, routeOrder: 2, clients: Job.ClientRef(id: UUID(), name: "Williams Estate", address: "789 Pine Rd", rate: 80, latitude: 35.652, longitude: -97.478)),
+        Job(id: UUID(), title: "Biweekly Service", scheduledDate: DemoData.today(), scheduledTime: "13:00", status: .scheduled, routeOrder: 3, clients: Job.ClientRef(id: UUID(), name: "Brown Property", address: "101 Elm St", rate: 45, latitude: 35.445, longitude: -97.489)),
     ]
 
     let clients: [Client] = [

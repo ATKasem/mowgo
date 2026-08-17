@@ -41,6 +41,13 @@ targets:
         product: StripePayments
       - package: stripe-ios
         product: StripePaymentSheet
+  MowGoTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: MowGo
 packages:
   stripe-ios:
     url: https://github.com/stripe/stripe-ios.git

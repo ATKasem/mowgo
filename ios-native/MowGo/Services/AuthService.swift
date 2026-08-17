@@ -57,7 +57,9 @@ final class AuthService: ObservableObject {
                     phone: "405-555-0100",
                     email: "owner@mowgoapp.com",
                     tier: "solo",
-                    role: "owner"
+                    role: "owner",
+                    latitude: 35.4676,
+                    longitude: -97.5164
                 )
             }
         }

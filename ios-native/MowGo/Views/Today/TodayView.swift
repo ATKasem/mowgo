@@ -13,6 +13,7 @@ struct TodayView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var auth: AuthService
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.openURL) private var openURL
     @Binding var selectedTab: Int
     @State private var showingRainConfirm = false
     @State private var showingRainHistory = false
@@ -33,6 +34,10 @@ struct TodayView: View {
     @State private var bannerDismissTask: Task<Void, Never>?
     @State private var undoEntry: RainDelayEntry?
     @State private var weatherForecast: WeatherForecast?
+    @State private var routeUndoIds: [UUID]?
+    @State private var showingSendRouteOptions = false
+    @State private var showingRouteStops = false
+    @AppStorage("preferred_nav_app") private var preferredNavAppRaw = PreferredNavigationApp.appleMaps.rawValue
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -114,6 +119,10 @@ struct TodayView: View {
                             // Control bar — date nav + rain delay
                             controlBar
 
+                            if canOptimizeRoute {
+                                routeTools
+                            }
+
                             if !auth.isDemoMode {
                                 dayConditionsCard
                             }
@@ -172,8 +181,8 @@ struct TodayView: View {
                         Spacer()
                         HStack(spacing: 12) {
                             Text(msg).font(.subheadline.weight(.medium)).foregroundColor(.white)
-                            if undoEntry != nil {
-                                Button("Undo") { undoLatestRainDelay() }
+                            if undoEntry != nil || routeUndoIds != nil {
+                                Button("Undo") { undoLatestAction() }
                                     .font(.subheadline.weight(.bold)).foregroundColor(.white)
                             }
                         }
@@ -232,6 +241,20 @@ struct TodayView: View {
             .sheet(item: $editingJob) { job in
                 EditJobFormView(job: job)
                     .environmentObject(store)
+            }
+            .sheet(isPresented: $showingRouteStops) {
+                routeStopsSheet
+            }
+            .confirmationDialog("Send Route", isPresented: $showingSendRouteOptions) {
+                if preferredNavApp != .waze {
+                    Button("Send all stops") { sendAllStops() }
+                }
+                Button("Send one by one") { showingRouteStops = true }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                if preferredNavApp == .waze {
+                    Text("Waze supports one destination at a time.")
+                }
             }
             .onAppear {
                 if auth.user?.tier == "crew" || auth.user?.tier == "premium" {
@@ -592,6 +615,52 @@ struct TodayView: View {
         .padding(.vertical, 4)
     }
 
+    private var canOptimizeRoute: Bool {
+        let paidTiers = Set(["solo", "crew", "premium"])
+        return paidTiers.contains(auth.user?.tier ?? "")
+            && auth.user?.role == "owner"
+            && selectedCrewFilter == nil
+            && todayJobs.count >= 3
+    }
+
+    private var preferredNavApp: PreferredNavigationApp {
+        PreferredNavigationApp(rawValue: preferredNavAppRaw) ?? .appleMaps
+    }
+
+    private var routeTools: some View {
+        HStack(spacing: 8) {
+            Button {
+                optimizeCurrentRoute()
+            } label: {
+                Label(isOperating ? "Optimizing…" : "Optimize", systemImage: "point.topleft.down.to.point.bottomright.curvepath")
+                    .font(.caption.weight(.semibold))
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(MowGoTheme.deepGreen)
+            .disabled(isOperating)
+
+            Button {
+                showingSendRouteOptions = true
+            } label: {
+                Label("Send Route", systemImage: "location.fill")
+                    .font(.caption.weight(.semibold))
+            }
+            .buttonStyle(.bordered)
+            .disabled(routeStops.isEmpty)
+
+            Spacer()
+
+            Picker("Navigation app", selection: $preferredNavAppRaw) {
+                ForEach(PreferredNavigationApp.allCases) { app in
+                    Text(app.label).tag(app.rawValue)
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .accessibilityLabel("Preferred navigation app")
+        }
+    }
+
     private func jobCard(_ job: Job) -> some View {
         JobCardView(job: job, teamMembers: store.teamMembers,
             onToggle: {
@@ -662,6 +731,150 @@ struct TodayView: View {
             guard !Task.isCancelled else { return }
             withAnimation { showNotificationBanner = false }
         }
+    }
+
+    private var routeStops: [RouteStop] {
+        routeOrderedJobs.compactMap { job in
+            guard let coordinate = coordinates(for: job) else { return nil }
+            return RouteStop(
+                name: job.clients?.name ?? job.title,
+                address: job.clients?.address ?? "",
+                latitude: coordinate.lat,
+                longitude: coordinate.lng
+            )
+        }
+    }
+
+    private func coordinates(for job: Job) -> (lat: Double, lng: Double)? {
+        if let latitude = job.clients?.latitude, let longitude = job.clients?.longitude {
+            return (latitude, longitude)
+        }
+        guard let clientId = job.clientId,
+              let client = store.clients.first(where: { $0.id == clientId }),
+              let latitude = client.latitude,
+              let longitude = client.longitude else { return nil }
+        return (latitude, longitude)
+    }
+
+    private var routeAnchor: (lat: Double, lng: Double)? {
+        guard let latitude = auth.user?.latitude, let longitude = auth.user?.longitude else { return nil }
+        return (latitude, longitude)
+    }
+
+    private func optimizeCurrentRoute() {
+        guard canOptimizeRoute, !isOperating else { return }
+        let previousOrder = routeOrderedJobs.map(\.id)
+        isOperating = true
+        operationError = nil
+
+        Task {
+            var failedAddresses = 0
+            let clientIds = Set(todayJobs.compactMap { job in
+                guard job.clients?.latitude == nil || job.clients?.longitude == nil else { return nil }
+                return job.clientId
+            })
+            for clientId in clientIds {
+                guard var client = store.clients.first(where: { $0.id == clientId }) else {
+                    failedAddresses += 1
+                    continue
+                }
+                guard client.latitude == nil || client.longitude == nil else { continue }
+                guard let address = client.address, !address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                      let coordinate = await GeocodingService().geocodeAddress(address) else {
+                    failedAddresses += 1
+                    continue
+                }
+                client.latitude = coordinate.lat
+                client.longitude = coordinate.lng
+                do {
+                    try await store.updateClient(client)
+                } catch {
+                    failedAddresses += 1
+                }
+            }
+
+            let entries = previousOrder.compactMap { id -> RouteOptimizer.Entry? in
+                guard let job = store.jobs.first(where: { $0.id == id }) else { return nil }
+                let coordinate = coordinates(for: job)
+                return (job.id, coordinate?.lat, coordinate?.lng)
+            }
+            let optimizedIds = RouteOptimizer.optimizeRoute(entries: entries, anchor: routeAnchor)
+            do {
+                try await store.reorderJobs(optimizedIds)
+                routeUndoIds = previousOrder
+                undoEntry = nil
+                routeMode = true
+                routeOrderIds = optimizedIds
+                showBanner(failedAddresses > 0 ? "Some addresses couldn't be mapped" : "Route optimized")
+            } catch {
+                operationError = error.localizedDescription
+            }
+            isOperating = false
+        }
+    }
+
+    private func undoLatestAction() {
+        if routeUndoIds != nil {
+            undoRouteOptimization()
+        } else {
+            undoLatestRainDelay()
+        }
+    }
+
+    private func undoRouteOptimization() {
+        guard let previousOrder = routeUndoIds, !isOperating else { return }
+        bannerDismissTask?.cancel()
+        isOperating = true
+        Task {
+            do {
+                try await store.reorderJobs(previousOrder)
+                routeOrderIds = previousOrder
+                routeUndoIds = nil
+                showBanner("Route order restored")
+            } catch {
+                operationError = error.localizedDescription
+            }
+            isOperating = false
+        }
+    }
+
+    private func sendAllStops() {
+        let stops = routeStops
+        guard let url = NavigationRouteBuilder.multiStopURL(
+            app: preferredNavApp,
+            stops: stops,
+            anchor: routeAnchor
+        ) else { return }
+        openURL(url)
+        if preferredNavApp == .googleMaps, stops.count > 10 {
+            showBanner("Google Maps received the first 10 stops")
+        }
+    }
+
+    private var routeStopsSheet: some View {
+        NavigationStack {
+            List(routeStops) { stop in
+                Button {
+                    guard let url = NavigationRouteBuilder.singleStopURL(app: preferredNavApp, stop: stop) else { return }
+                    openURL(url)
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(stop.name).foregroundColor(theme.textPrimary)
+                        if !stop.address.isEmpty {
+                            Text(stop.address).font(.caption).foregroundColor(theme.textMuted)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Route Stops")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { showingRouteStops = false }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 
     // MARK: - Day Conditions Card

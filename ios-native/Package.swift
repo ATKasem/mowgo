@@ -19,5 +19,11 @@ let package = Package(
                 .process("Assets.xcassets"),
             ]
         ),
+        .testTarget(
+            name: "MowGoTests",
+            dependencies: ["MowGo"],
+            path: "Tests",
+            exclude: ["theme_audit.sh"]
+        ),
     ]
 )

@@ -159,6 +159,8 @@ struct Job: Codable, Identifiable, Equatable {
         var keyCode: String?
         var alarmCode: String?
         var petInstructions: String?
+        var latitude: Double?
+        var longitude: Double?
     }
 
     // Computed helpers (mirrors web app's data.js mapping)
@@ -183,6 +185,8 @@ struct Client: Codable, Identifiable, Equatable {
     var alarmCode: String?
     var petInstructions: String?
     var tags: [String]?
+    var latitude: Double?
+    var longitude: Double?
     var createdAt: String?
 }
 
