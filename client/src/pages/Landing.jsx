@@ -213,7 +213,7 @@ export default function Landing() {
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Free for 5 clients. No credit card. 2 minutes to start.")}</p>
             <div className="mt-3 flex items-center justify-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
               <Shield className="w-4 h-4" />
-              <span>{tr("30-Day Rain-Proof Guarantee: If Solo doesn't save you 5 hours a week, we refund your first month.")}</span>
+              <span>{tr("30-Day Rain-Proof Guarantee. Cancel anytime. Full refund.")}</span>
             </div>
           </FadeIn>
         </div>
