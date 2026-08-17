@@ -16,7 +16,7 @@ final class RouteOptimizerTests: XCTestCase {
             (id: middle, lat: Optional(35.6), lng: Optional(-97.5))
         ]
 
-        let result = RouteOptimizer.nearestNeighborTour(entries: entries, anchor: (35.5, -97.5))
+        let result = RouteOptimizer.nearestNeighborTour(entries: entries, anchor: (lat: 35.5, lng: -97.5))
 
         XCTAssertEqual(result.map(\.id), [near, middle, far])
     }
@@ -29,7 +29,7 @@ final class RouteOptimizerTests: XCTestCase {
             (id: near, lat: Optional(35.51), lng: Optional(-97.5))
         ]
 
-        let result = RouteOptimizer.optimizeRoute(entries: entries, anchor: (35.5, -97.5))
+        let result = RouteOptimizer.optimizeRoute(entries: entries, anchor: (lat: 35.5, lng: -97.5))
 
         XCTAssertEqual(result, [near, unmapped, far])
     }
@@ -56,7 +56,7 @@ final class NavigationRouteBuilderTests: XCTestCase {
 
     func testGoogleRouteContainsOriginWaypointAndDestination() {
         let url = NavigationRouteBuilder.multiStopURL(
-            app: .googleMaps, stops: stops, anchor: (35.4, -97.4)
+            app: .googleMaps, stops: stops, anchor: (lat: 35.4, lng: -97.4)
         )
         let components = URLComponents(url: try! XCTUnwrap(url), resolvingAgainstBaseURL: false)
         let values = Dictionary(uniqueKeysWithValues: (components?.queryItems ?? []).map { ($0.name, $0.value) })
