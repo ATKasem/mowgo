@@ -76,9 +76,9 @@ enum RouteOptimizer {
         return (lat, lng)
     }
 
-    private static func distance(from coordinate: Coordinate, to entry: Entry) -> Double {
+    private static func distance(from coord: Coordinate, to entry: Entry) -> Double {
         guard let target = coordinate(for: entry) else { return .infinity }
-        return haversineKm(lat1: coordinate.lat, lon1: coordinate.lng,
+        return haversineKm(lat1: coord.lat, lon1: coord.lng,
                            lat2: target.lat, lon2: target.lng)
     }
 
