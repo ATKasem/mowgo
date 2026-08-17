@@ -74,6 +74,9 @@ struct IntegrationsView: View {
                     Text("Send MowGo events to Zapier, Make, n8n, or any HTTPS endpoint that accepts POST JSON.")
                         .font(.subheadline).foregroundColor(theme.textMuted)
 
+                    Text("Set up a webhook for job.completed to automatically notify customers when their lawn service is done. Connect it to Zapier or Make to send SMS, email, or any other notification.")
+                        .font(.caption).foregroundColor(theme.textSecondary)
+
                     Button { editingConfig = WebhookConfigStore.newConfig() } label: {
                         Label("Add Endpoint", systemImage: "plus")
                             .fontWeight(.semibold).frame(maxWidth: .infinity).padding(12)

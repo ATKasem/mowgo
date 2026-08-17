@@ -302,6 +302,7 @@
 "Send MowGo events to Zapier, Make, n8n, or any HTTPS endpoint that accepts POST JSON." = "Envía eventos de MowGo a Zapier, Make, n8n o cualquier endpoint HTTPS que acepte POST JSON.";
 "Add Endpoint" = "Agregar endpoint";
 "No webhook endpoints yet." = "Aún no hay endpoints de webhook.";
+"Set up a webhook for job.completed to automatically notify customers when their lawn service is done. Connect it to Zapier or Make to send SMS, email, or any other notification." = "Configura un webhook para job.completed y notifica automáticamente a los clientes cuando su servicio de jardinería esté terminado. Conéctalo a Zapier o Make para enviar SMS, correo electrónico o cualquier otra notificación.";
 "Untitled endpoint" = "Endpoint sin título";
 "Active" = "Activo";
 "Delete Endpoint?" = "¿Eliminar endpoint?";
