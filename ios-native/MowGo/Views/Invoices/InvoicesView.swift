@@ -24,6 +24,7 @@ struct InvoicesView: View {
     @State private var showNewEstimate = false
     @State private var showCollectCopied = false
     @State private var collectCopiedInvoice: Invoice?
+    @State private var collectShareItem: ShareText?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid || $0.status == .overdue } }
@@ -63,6 +64,9 @@ struct InvoicesView: View {
             .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
             .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
             .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
+            .sheet(item: $collectShareItem) { item in
+                ActivityView(activityItems: [item.text])
+            }
 
             // Collect copied toast
             if showCollectCopied {
@@ -152,6 +156,7 @@ struct InvoicesView: View {
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         collectCopiedInvoice = invoice
         showCollectCopied = true
+        collectShareItem = ShareText(text: text)
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showCollectCopied = false }
     }
 }
@@ -459,3 +464,14 @@ private struct EstimateDetailView: View {
 
 private func estimateText(_ estimate: Estimate) -> String { "Hi \(estimate.clientName ?? "there"), here's your estimate: \(estimate.amount.formatted(.currency(code: "USD"))) for lawn care. Valid for 30 days. Thanks!" }
 private func nudgeText(_ estimate: Estimate) -> String { "Hi \(estimate.clientName ?? "there"), just checking in on your estimate for \(estimate.amount.formatted(.currency(code: "USD"))) from \(String((estimate.sentAt ?? estimate.createdAt ?? "").prefix(10))) — still want me to hold the spot? Happy to adjust anything. Thanks!" }
+
+struct ShareText: Identifiable {
+    let id = UUID()
+    let text: String
+}
+
+private struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController { UIActivityViewController(activityItems: activityItems, applicationActivities: nil) }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
