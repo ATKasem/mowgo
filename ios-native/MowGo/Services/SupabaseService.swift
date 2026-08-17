@@ -544,6 +544,17 @@ actor SupabaseService {
         return first
     }
 
+    /// Batch-insert multiple rows into a table. Returns the inserted rows decoded as [Result].
+    func insertBatch<Payload: Encodable, Result: Decodable>(
+        _ table: String,
+        _ items: [Payload]
+    ) async throws -> [Result] {
+        let data = try await request("POST", "/rest/v1/\(table)",
+            body: try JSONSerialization.jsonObject(with: encoder.encode(items)),
+            prefer: "return=representation")
+        return try decoder.decode([Result].self, from: data)
+    }
+
     func update<T: Encodable>(_ table: String, id: UUID, _ item: T) async throws {
         _ = try await request("PATCH", "/rest/v1/\(table)?id=eq.\(id.uuidString)",
             body: try JSONSerialization.jsonObject(with: encoder.encode(item)))
@@ -568,6 +579,11 @@ actor SupabaseService {
     func requestFunction(_ name: String, body: [String: Any]) async throws -> Data {
         let path = "/functions/v1/\(name)"
         return try await request("POST", path, body: body)
+    }
+
+    func validAccessToken() async throws -> String {
+        guard await ensureAuthenticated(), let token else { throw SupabaseError.network }
+        return token
     }
 
     /// Call a PostgREST RPC function. Scalar JSON returns (e.g. a UUID string)

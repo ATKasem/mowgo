@@ -36,7 +36,7 @@ struct SettingsView: View {
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
 
     private enum SettingsDestination: Hashable {
-        case businessProfile, notifications, appearance, billing, integrations
+        case businessProfile, notifications, appearance, billing, integrations, importYardbook
     }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -68,6 +68,22 @@ struct SettingsView: View {
                         }
 
                         SectionHeader("Data")
+                        NavigationLink(value: SettingsDestination.importYardbook) {
+                            HStack {
+                                Image(systemName: "square.and.arrow.down")
+                                    .foregroundColor(theme.brand)
+                                    .frame(width: 24)
+                                Text("Import from Yardbook")
+                                    .foregroundColor(theme.textPrimary)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundColor(theme.textSecondary)
+                            }
+                            .padding(12)
+                            .background(theme.surface)
+                            .cornerRadius(12)
+                        }
                         exportLinks
 
                         SectionHeader("About")
@@ -153,6 +169,8 @@ struct SettingsView: View {
             )
         case .integrations:
             IntegrationsView()
+        case .importYardbook:
+            ImportFromYardbookView()
         }
     }
 
@@ -226,7 +244,10 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.bordered)
                     Button("Share") {
-                        referralShareItems = ReferralShareItems(url: URL(string: "https://mowgoapp.com?ref=\(status.code)")!)
+                        guard var components = URLComponents(string: "https://mowgoapp.com") else { return }
+                        components.queryItems = [URLQueryItem(name: "ref", value: status.code)]
+                        guard let url = components.url else { return }
+                        referralShareItems = ReferralShareItems(url: url)
                     }.buttonStyle(.borderedProminent)
                 }
                 HStack {

@@ -868,8 +868,8 @@ final class DataStore: ObservableObject {
         var job = job
         attachClientRef(to: &job)
         guard await canSync() else {
+            guard safeEnqueue("job:create", id: job.id, payload: job) else { throw DataStoreError.persistenceUnavailable }
             jobs.append(job)
-            safeEnqueue("job:create", id: job.id, payload: job)
             return
         }
         do {
@@ -903,8 +903,8 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
+            guard safeEnqueue("job:create", id: job.id, payload: job) else { throw DataStoreError.persistenceUnavailable }
             jobs.append(job)
-            safeEnqueue("job:create", id: job.id, payload: job)
             self.error = "Saved offline — will sync when connected"
             return
         }
@@ -919,7 +919,7 @@ final class DataStore: ObservableObject {
         let patch = JobEditPatch(clientId: clientId, title: updated.title, notes: updated.notes, routeOrder: updated.routeOrder)
 
         guard await canSync() else {
-            safeEnqueue("job:update", id: job.id, payload: patch)
+            guard safeEnqueue("job:update", id: job.id, payload: patch) else { throw DataStoreError.persistenceUnavailable }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -936,7 +936,7 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
-            safeEnqueue("job:update", id: job.id, payload: patch)
+            guard safeEnqueue("job:update", id: job.id, payload: patch) else { throw DataStoreError.persistenceUnavailable }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -950,7 +950,7 @@ final class DataStore: ObservableObject {
         updated.status = status
         guard await canSync() else {
             struct P: Encodable { let status: String }
-            safeEnqueue("job:status", id: job.id, payload: P(status: status.rawValue))
+            guard safeEnqueue("job:status", id: job.id, payload: P(status: status.rawValue)) else { throw DataStoreError.persistenceUnavailable }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -993,7 +993,7 @@ final class DataStore: ObservableObject {
                 throw error
             }
             struct P: Encodable { let status: String }
-            safeEnqueue("job:status", id: job.id, payload: P(status: status.rawValue))
+            guard safeEnqueue("job:status", id: job.id, payload: P(status: status.rawValue)) else { throw DataStoreError.persistenceUnavailable }
             // Network-fallback path: queue the invoice right after the status
             // so replay produces the same result as the happy path.
             if status == .done {
@@ -1004,7 +1004,8 @@ final class DataStore: ObservableObject {
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
@@ -1051,8 +1052,8 @@ final class DataStore: ObservableObject {
 
     func deleteJob(_ job: Job) async throws {
         guard await canSync() else {
+            guard safeEnqueueEmpty("job:delete", id: job.id) else { throw DataStoreError.persistenceUnavailable }
             jobs.removeAll { $0.id == job.id }
-            safeEnqueueEmpty("job:delete", id: job.id)
             return
         }
         do {
@@ -1063,9 +1064,10 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
+            guard safeEnqueueEmpty("job:delete", id: job.id) else { throw DataStoreError.persistenceUnavailable }
             jobs.removeAll { $0.id == job.id }
-            safeEnqueueEmpty("job:delete", id: job.id)
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
@@ -1074,7 +1076,7 @@ final class DataStore: ObservableObject {
         updated.routeOrder = order
         guard await canSync() else {
             struct P: Encodable { let routeOrder: Int }
-            safeEnqueue("job:route", id: job.id, payload: P(routeOrder: order))
+            guard safeEnqueue("job:route", id: job.id, payload: P(routeOrder: order)) else { throw DataStoreError.persistenceUnavailable }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
@@ -1091,11 +1093,12 @@ final class DataStore: ObservableObject {
                 throw error
             }
             struct P: Encodable { let routeOrder: Int }
-            safeEnqueue("job:route", id: job.id, payload: P(routeOrder: order))
+            guard safeEnqueue("job:route", id: job.id, payload: P(routeOrder: order)) else { throw DataStoreError.persistenceUnavailable }
             if let idx = jobs.firstIndex(where: { $0.id == job.id }) {
                 jobs[idx] = updated
             }
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
@@ -1104,6 +1107,7 @@ final class DataStore: ObservableObject {
 
     func updateJobPhoto(jobId: UUID, url: String) async {
         guard let idx = jobs.firstIndex(where: { $0.id == jobId }) else { return }
+        let previousURL = jobs[idx].photoUrl
         jobs[idx].photoUrl = url
         let uploadId = UUID()
         let previous = photoUploadQueue[jobId]
@@ -1112,7 +1116,13 @@ final class DataStore: ObservableObject {
             await previous?.value
             guard !Task.isCancelled else { return }
             guard await canSync() else {
-                safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
+                guard safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url)) else {
+                    if let idx = jobs.firstIndex(where: { $0.id == jobId }), jobs[idx].photoUrl == url {
+                        jobs[idx].photoUrl = previousURL
+                    }
+                    self.error = DataStoreError.persistenceUnavailable.localizedDescription
+                    return
+                }
                 return
             }
 
@@ -1121,7 +1131,13 @@ final class DataStore: ObservableObject {
             } catch {
                 guard !Task.isCancelled else { return }
                 if isNetworkError(error) {
-                    safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url))
+                    guard safeEnqueue("job:photo", id: jobId, payload: JobPhotoPatch(photoUrl: url)) else {
+                        if let idx = jobs.firstIndex(where: { $0.id == jobId }), jobs[idx].photoUrl == url {
+                            jobs[idx].photoUrl = previousURL
+                        }
+                        self.error = DataStoreError.persistenceUnavailable.localizedDescription
+                        return
+                    }
                 } else {
                     self.error = error.localizedDescription
                 }
@@ -1600,8 +1616,8 @@ final class DataStore: ObservableObject {
 
     func createRecurringJob(_ template: RecurringJob) async throws {
         guard await canSync() else {
+            guard safeEnqueue("recurring:create", id: template.id, payload: template) else { throw DataStoreError.persistenceUnavailable }
             recurringJobs.append(template)
-            safeEnqueue("recurring:create", id: template.id, payload: template)
             return
         }
         do {
@@ -1628,8 +1644,8 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
+            guard safeEnqueue("recurring:create", id: template.id, payload: template) else { throw DataStoreError.persistenceUnavailable }
             recurringJobs.append(template)
-            safeEnqueue("recurring:create", id: template.id, payload: template)
             self.error = "Saved offline — will sync when connected"
             return
         }
@@ -1637,8 +1653,8 @@ final class DataStore: ObservableObject {
 
     func deleteRecurringJob(_ template: RecurringJob) async throws {
         guard await canSync() else {
+            guard safeEnqueueEmpty("recurring:delete", id: template.id) else { throw DataStoreError.persistenceUnavailable }
             recurringJobs.removeAll { $0.id == template.id }
-            safeEnqueueEmpty("recurring:delete", id: template.id)
             return
         }
         do {
@@ -1649,9 +1665,10 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
+            guard safeEnqueueEmpty("recurring:delete", id: template.id) else { throw DataStoreError.persistenceUnavailable }
             recurringJobs.removeAll { $0.id == template.id }
-            safeEnqueueEmpty("recurring:delete", id: template.id)
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
@@ -1980,7 +1997,7 @@ final class DataStore: ObservableObject {
         }
 
         guard await canSync() else {
-            safeEnqueue("client:update", id: client.id, payload: updated)
+            guard safeEnqueue("client:update", id: client.id, payload: updated) else { throw DataStoreError.persistenceUnavailable }
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
@@ -2009,19 +2026,20 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
-            safeEnqueue("client:update", id: client.id, payload: updated)
+            guard safeEnqueue("client:update", id: client.id, payload: updated) else { throw DataStoreError.persistenceUnavailable }
             if let idx = clients.firstIndex(where: { $0.id == client.id }) {
                 clients[idx] = updated
             }
             refreshJobClientRefs(for: updated.id)
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
     func deleteClient(_ client: Client) async throws {
         guard await canSync() else {
+            guard safeEnqueueEmpty("client:delete", id: client.id) else { throw DataStoreError.persistenceUnavailable }
             clients.removeAll { $0.id == client.id }
-            safeEnqueueEmpty("client:delete", id: client.id)
             return
         }
         do {
@@ -2032,9 +2050,10 @@ final class DataStore: ObservableObject {
                 self.error = error.localizedDescription
                 throw error
             }
+            guard safeEnqueueEmpty("client:delete", id: client.id) else { throw DataStoreError.persistenceUnavailable }
             clients.removeAll { $0.id == client.id }
-            safeEnqueueEmpty("client:delete", id: client.id)
-            throw error
+            self.error = "Saved offline — will sync when connected"
+            return
         }
     }
 
@@ -2047,7 +2066,7 @@ final class DataStore: ObservableObject {
         updated.paidAt = paidAt
         guard await canSync() else {
             struct P: Encodable { let paidAt: String }
-            safeEnqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
+            guard safeEnqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt)) else { throw DataStoreError.persistenceUnavailable }
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
@@ -2068,12 +2087,12 @@ final class DataStore: ObservableObject {
                 throw error
             }
             struct P: Encodable { let paidAt: String }
-            safeEnqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt))
+            guard safeEnqueue("invoice:pay", id: invoice.id, payload: P(paidAt: paidAt)) else { throw DataStoreError.persistenceUnavailable }
             if let idx = invoices.firstIndex(where: { $0.id == invoice.id }) {
                 invoices[idx] = updated
             }
             self.error = "Saved offline — will sync when connected"
-            throw error
+            return
         }
     }
 

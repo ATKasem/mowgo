@@ -123,10 +123,11 @@ struct MowGoApp: App {
                     }
                 } else {
                     // Clear device token when signed out
-                    await MainActor.run {
+                    let clearTokenTask = await MainActor.run {
                         push.setCurrentUserId(store.currentUserId)
-                        push.clearDeviceToken()
+                        return push.clearDeviceToken()
                     }
+                    await clearTokenTask?.value
                     await store.clear()
                 }
             }

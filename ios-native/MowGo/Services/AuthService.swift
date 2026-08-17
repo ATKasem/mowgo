@@ -129,8 +129,13 @@ final class AuthService: ObservableObject {
                 if retries > 0 {
                     try? await Task.sleep(for: .seconds(1))
                 } else {
-                    self.error = "Unable to load your profile: \(error.localizedDescription). Please sign in again."
-                    await signOut()
+                    if case SupabaseError.httpStatus(let code, _) = error,
+                       code == 401 || code == 403 {
+                        self.error = "Session expired. Please sign in again."
+                        await signOut()
+                    } else {
+                        self.error = "Unable to load your profile. Please try again."
+                    }
                 }
             }
         }

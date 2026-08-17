@@ -29,6 +29,10 @@ final class PushNotificationService: NSObject, ObservableObject, UNUserNotificat
     // MARK: - Registration
 
     func setCurrentUserId(_ userId: UUID?) {
+        if userId != nil {
+            clearTokenTask?.cancel()
+            clearTokenTask = nil
+        }
         currentUserId = userId
     }
 
