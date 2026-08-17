@@ -23,7 +23,6 @@ struct InvoicesView: View {
     @State private var showNewInvoice = false
     @State private var showNewEstimate = false
     @State private var showCollectCopied = false
-    @State private var collectCopiedInvoice: Invoice?
     @State private var collectShareItem: ShareText?
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -57,16 +56,6 @@ struct InvoicesView: View {
                     }.padding(20).accessibilityLabel("New Estimate")
                 }
             }
-            .navigationTitle("Invoices").navigationBarTitleDisplayMode(.inline)
-            .task { await store.loadEstimates() }
-            .sheet(isPresented: $showPayment) { paymentSheet }
-            .sheet(isPresented: $showNewInvoice) { NewInvoiceView() }
-            .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
-            .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
-            .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
-            .sheet(item: $collectShareItem) { item in
-                ActivityView(activityItems: [item.text])
-            }
 
             // Collect copied toast
             if showCollectCopied {
@@ -85,6 +74,16 @@ struct InvoicesView: View {
                 }
                 .animation(.easeInOut(duration: 0.3), value: showCollectCopied)
             }
+        }
+        .navigationTitle("Invoices").navigationBarTitleDisplayMode(.inline)
+        .task { await store.loadEstimates() }
+        .sheet(isPresented: $showPayment) { paymentSheet }
+        .sheet(isPresented: $showNewInvoice) { NewInvoiceView() }
+        .sheet(isPresented: $showNewEstimate) { NewEstimateView() }
+        .sheet(item: $selectedInvoiceDetail) { InvoiceDetailView(invoice: $0) }
+        .sheet(item: $selectedEstimate) { EstimateDetailView(estimate: $0) }
+        .sheet(item: $collectShareItem) { item in
+            ActivityView(activityItems: [item.text])
         }
     }
 
@@ -154,7 +153,6 @@ struct InvoicesView: View {
         let text = "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
         UIPasteboard.general.string = text
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        collectCopiedInvoice = invoice
         showCollectCopied = true
         collectShareItem = ShareText(text: text)
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showCollectCopied = false }
