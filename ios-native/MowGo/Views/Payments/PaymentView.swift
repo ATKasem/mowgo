@@ -11,6 +11,7 @@ import StripePaymentSheet
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var stripe = StripeService.shared
     @State private var showingCheckout = false
@@ -39,17 +40,18 @@ struct PaymentView: View {
             }
             .padding()
 
-            // Pay button
+            // Collect button
             Button {
+                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                 Task { @MainActor in await processPayment() }
             } label: {
                 HStack {
                     if stripe.isLoading {
                         ProgressView().tint(MowGoTheme.onAccent)
                     } else {
-                        Image(systemName: "creditcard.fill")
+                        Image(systemName: "dollarsign.circle.fill")
                     }
-                    Text("Pay Now")
+                    Text("Collect")
                         .fontWeight(.semibold)
                 }
                 .frame(maxWidth: .infinity)
@@ -58,6 +60,7 @@ struct PaymentView: View {
                 .foregroundColor(MowGoTheme.onAccent)
                 .cornerRadius(12)
             }
+            .buttonStyle(CollectButtonStyle())
             .disabled(stripe.isLoading)
 
             if let err = paymentError {
@@ -115,6 +118,7 @@ struct PaymentView: View {
                                 paymentIntentId: paymentId
                             )
                             await self.store.loadAll()
+                            await MainActor.run { self.dismiss() }
                         } catch {
                             await MainActor.run {
                                 self.paymentError = "Payment succeeded, but verification failed: \(error.localizedDescription). Refresh before trying again."
@@ -129,8 +133,16 @@ struct PaymentView: View {
             }
             return  // PaymentSheet handles the rest via its completion handler
         } catch {
-            paymentError = error.localizedDescription
+            paymentError = paymentCreationErrorMessage(for: error)
         }
+    }
+
+    private func paymentCreationErrorMessage(for error: Error) -> String {
+        if case SupabaseError.httpStatus(let statusCode, _) = error,
+           (500...599).contains(statusCode) {
+            return "Payment service is temporarily unavailable. Please try again in a moment."
+        }
+        return error.localizedDescription
     }
 
     private func topmostViewController(from viewController: UIViewController?) -> UIViewController? {
@@ -144,6 +156,15 @@ struct PaymentView: View {
             return topmostViewController(from: tabBarController.selectedViewController)
         }
         return viewController
+    }
+}
+
+private struct CollectButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .opacity(configuration.isPressed ? 0.92 : 1)
+            .animation(.spring(response: 0.24, dampingFraction: 0.62), value: configuration.isPressed)
     }
 }
 

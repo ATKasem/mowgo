@@ -210,7 +210,7 @@
 
 // MARK: - Payment / Subscription
 
-"Pay Now" = "Pagar ahora";
+"Collect" = "Cobrar";
 "Current" = "Actual";
 "Billing interval changes via Manage Billing" = "Los cambios de intervalo de facturación se hacen en Gestionar facturación";
 "Upgrade" = "Mejorar plan";

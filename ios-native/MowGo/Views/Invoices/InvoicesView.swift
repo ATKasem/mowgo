@@ -66,13 +66,18 @@ struct InvoicesView: View {
     private var invoiceList: some View {
         ScrollView { VStack(spacing: 16) {
             if !unpaid.isEmpty { totalBar; sectionHeader("Unpaid") }
-            ForEach(unpaid) { inv in InvoiceRow(invoice: inv, showPay: true) { selectedInvoice = inv; showPayment = true }
-                .onTapGesture { selectedInvoiceDetail = inv }
-                .contentShape(Rectangle()) }
+            ForEach(unpaid) { inv in
+                InvoiceRow(
+                    invoice: inv,
+                    showPay: true,
+                    onOpen: { selectedInvoiceDetail = inv },
+                    onPay: { selectedInvoice = inv; showPayment = true }
+                )
+            }
             if !paid.isEmpty { sectionHeader("Paid") }
-            ForEach(paid) { inv in InvoiceRow(invoice: inv, showPay: false) {}
-                .onTapGesture { selectedInvoiceDetail = inv }
-                .contentShape(Rectangle()) }
+            ForEach(paid) { inv in
+                InvoiceRow(invoice: inv, showPay: false, onOpen: { selectedInvoiceDetail = inv }) {}
+            }
             if unpaid.isEmpty && paid.isEmpty { invoiceEmpty }
         }.padding(16) }
     }
@@ -105,9 +110,36 @@ struct InvoicesView: View {
 
 struct InvoiceRow: View {
     @Environment(\.colorScheme) private var colorScheme
-    let invoice: Invoice; var showPay: Bool; var onPay: () -> Void
+    let invoice: Invoice; var showPay: Bool; var onOpen: () -> Void; var onPay: () -> Void
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
-    var body: some View { HStack(spacing: 12) { VStack(alignment: .leading) { Text(invoice.clientName ?? NSLocalizedString("Invoice", comment: "Invoice row fallback when no client name")).font(.subheadline.weight(.medium)); if let date = invoice.createdAt { Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted) } }; Spacer(); status; Text(invoice.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold)); if showPay { Button("Pay") { UIImpactFeedbackGenerator(style: .medium).impactOccurred(); onPay() }.buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small) } }.foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12) }
+    var body: some View {
+        HStack(spacing: 12) {
+            Button(action: onOpen) {
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading) {
+                        Text(invoice.clientName ?? NSLocalizedString("Invoice", comment: "Invoice row fallback when no client name"))
+                            .font(.subheadline.weight(.medium))
+                        if let date = invoice.createdAt {
+                            Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted)
+                        }
+                    }
+                    Spacer()
+                    status
+                    Text(invoice.amount.formatted(.currency(code: "USD"))).font(.subheadline.weight(.semibold))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            if showPay {
+                Button("Pay") {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onPay()
+                }
+                .buttonStyle(.borderedProminent).tint(MowGoTheme.deepGreen).controlSize(.small)
+            }
+        }
+        .foregroundColor(theme.textPrimary).padding(12).background(theme.surface).cornerRadius(12)
+    }
     private var status: some View { Text(showPay ? "Due" : "Paid").font(.caption2.weight(.medium)).foregroundColor(showPay ? MowGoTheme.warning : MowGoTheme.success).padding(.horizontal, 8).padding(.vertical, 3).background((showPay ? MowGoTheme.warning : MowGoTheme.success).opacity(0.12)).clipShape(Capsule()) }
 }
 
@@ -118,33 +150,45 @@ private struct InvoiceDetailView: View {
     @State private var showVoidConfirm = false
     @State private var voidError: String?
     @State private var voiding = false
+    @State private var markPaidError: String?
+    @State private var markingPaid = false
     let invoice: Invoice
     @Environment(\.colorScheme) private var colorScheme
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+    private var currentInvoice: Invoice {
+        store.invoices.first(where: { $0.id == invoice.id }) ?? invoice
+    }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    HStack { Text("Client").foregroundColor(theme.textMuted); Spacer(); Text(invoice.clientName ?? NSLocalizedString("Unknown", comment: "Invoice detail fallback when no client name")) }
-                    HStack { Text("Amount").foregroundColor(theme.textMuted); Spacer(); Text(invoice.amount.formatted(.currency(code: "USD"))) }
-                    if let date = invoice.createdAt {
+                    HStack { Text("Client").foregroundColor(theme.textMuted); Spacer(); Text(currentInvoice.clientName ?? NSLocalizedString("Unknown", comment: "Invoice detail fallback when no client name")) }
+                    HStack { Text("Amount").foregroundColor(theme.textMuted); Spacer(); Text(currentInvoice.amount.formatted(.currency(code: "USD"))) }
+                    if let date = currentInvoice.createdAt {
                         HStack { Text("Created").foregroundColor(theme.textMuted); Spacer(); Text(String(date.prefix(10))) }
                     }
                 }
                 Section {
-                    if invoice.status != .voided {
+                    if currentInvoice.status != .voided {
                         Button("Copy payment text") { copy(invoiceText) }
                     }
                     if canNudge {
                         Button("Nudge") { copy(nudgeText) }.tint(.orange)
                     }
-                    if invoice.status != .voided {
+                    if currentInvoice.status == .unpaid || currentInvoice.status == .overdue {
                         Button("Pay via Stripe") { showPayment = true }
-                        Button("Mark Paid") { markPaid() }
+                        Button("Mark Paid") {
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            markPaid()
+                        }
+                        .disabled(markingPaid)
+                        if let markPaidError {
+                            Text(markPaidError).foregroundColor(MowGoTheme.danger)
+                        }
                     }
                 }
-                if invoice.status == .unpaid || invoice.status == .overdue {
+                if currentInvoice.status == .unpaid || currentInvoice.status == .overdue {
                     Section {
                         Button("Void invoice", role: .destructive) { showVoidConfirm = true }
                             .disabled(voiding)
@@ -160,7 +204,7 @@ private struct InvoiceDetailView: View {
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
             .sheet(isPresented: $showPayment) {
                 NavigationStack {
-                    PaymentView(invoice: invoice).navigationTitle("Payment")
+                    PaymentView(invoice: currentInvoice).navigationTitle("Payment")
                         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { showPayment = false } } }
                 }
             }
@@ -175,9 +219,9 @@ private struct InvoiceDetailView: View {
     }
 
     private var canNudge: Bool {
-        guard invoice.status != .paid,
-              invoice.status != .voided,
-              let value = invoice.createdAt,
+        guard currentInvoice.status != .paid,
+              currentInvoice.status != .voided,
+              let value = currentInvoice.createdAt,
               let date = Self.parseISODate(value) else { return false }
         return date < Calendar.current.date(byAdding: .day, value: -3, to: Date())!
     }
@@ -197,9 +241,19 @@ private struct InvoiceDetailView: View {
     }
 
     private func markPaid() {
+        guard !markingPaid else { return }
+        markingPaid = true
+        markPaidError = nil
         Task {
-            try? await store.markInvoicePaid(invoice)
-            dismiss()
+            do {
+                try await store.markInvoicePaid(currentInvoice)
+                await MainActor.run { dismiss() }
+            } catch {
+                await MainActor.run {
+                    markPaidError = error.localizedDescription
+                    markingPaid = false
+                }
+            }
         }
     }
 
@@ -208,7 +262,7 @@ private struct InvoiceDetailView: View {
         voidError = nil
         Task {
             do {
-                try await store.voidInvoice(invoice)
+                try await store.voidInvoice(currentInvoice)
                 await MainActor.run { dismiss() }
             } catch {
                 await MainActor.run { voidError = error.localizedDescription; voiding = false }
@@ -241,18 +295,18 @@ private struct InvoiceDetailView: View {
     }
 
     private var shortDate: String {
-        guard let value = invoice.createdAt, let date = Self.parseISODate(value) else { return "" }
+        guard let value = currentInvoice.createdAt, let date = Self.parseISODate(value) else { return "" }
         return date.formatted(.dateTime.month(.abbreviated).day())
     }
 
     private var invoiceText: String {
         let datePart = shortDate.isEmpty ? "" : " on \(shortDate)"
-        return "Hi \(invoice.clientName ?? "there") — your lawn was serviced\(datePart). \(invoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
+        return "Hi \(currentInvoice.clientName ?? "there") — your lawn was serviced\(datePart). \(currentInvoice.amount.formatted(.currency(code: "USD"))) due. \(payLine). Thanks!"
     }
 
     private var nudgeText: String {
         let datePart = shortDate.isEmpty ? "" : " from \(shortDate)"
-        return "Hi \(invoice.clientName ?? "there") — friendly reminder: \(invoice.amount.formatted(.currency(code: "USD")))\(datePart) is still due. \(payLine). Thanks!"
+        return "Hi \(currentInvoice.clientName ?? "there") — friendly reminder: \(currentInvoice.amount.formatted(.currency(code: "USD")))\(datePart) is still due. \(payLine). Thanks!"
     }
 }
 
