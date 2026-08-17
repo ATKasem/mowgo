@@ -107,7 +107,7 @@ serve(async (req) => {
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
-        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}`,
+        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}-${Date.now()}`,
       },
       body: new URLSearchParams({
         amount: String(amount),
