@@ -275,6 +275,8 @@ struct SettingsView: View {
         defer { referralLoading = false }
         do {
             referralStatus = try await store.loadReferralStatus()
+        } catch is DecodingError {
+            referralError = "Referral stats are not available right now."
         } catch let caught {
             referralError = caught.localizedDescription
         }
@@ -1010,6 +1012,11 @@ private struct BookingLinkRow: View {
 
     var body: some View {
         VStack(spacing: 10) {
+            Text("Share this link with clients so they can book their own appointments online. You can also add it to your website or social media.")
+                .font(.caption)
+                .foregroundColor(theme.textMuted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
             HStack(spacing: 10) {
                 Image(systemName: "link")
                     .font(.system(size: 16))
