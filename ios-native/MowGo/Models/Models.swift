@@ -482,7 +482,7 @@ struct UserProfile: Codable, Identifiable {
 }
 
 struct ReferralStatus: Codable, Equatable {
-    let code: String
+    let code: String?
     let totalCount: Int
     let earnedCount: Int
 

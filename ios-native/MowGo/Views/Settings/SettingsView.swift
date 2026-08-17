@@ -233,28 +233,34 @@ struct SettingsView: View {
                 ProgressView().frame(maxWidth: .infinity).padding(.vertical, 12)
             } else if let referralError {
                 Text(referralError).font(.caption).foregroundColor(.red)
+                Text("Refer another lawn care operator and you both earn a free month of MowGo.")
+                    .font(.caption).foregroundColor(theme.textMuted)
             } else if let status = referralStatus {
-                HStack {
-                    Text(status.code).font(.system(.title2, design: .monospaced).bold()).tracking(3)
-                    Spacer()
-                    Button {
-                        UIPasteboard.general.string = status.code
-                    } label: {
-                        Label("Copy", systemImage: "doc.on.doc")
+                if let code = status.code {
+                    HStack {
+                        Text(code).font(.system(.title2, design: .monospaced).bold()).tracking(3)
+                        Spacer()
+                        Button {
+                            UIPasteboard.general.string = code
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                        .buttonStyle(.bordered)
+                        Button("Share") {
+                            guard var components = URLComponents(string: "https://mowgoapp.com") else { return }
+                            components.queryItems = [URLQueryItem(name: "ref", value: code)]
+                            guard let url = components.url else { return }
+                            referralShareItems = ReferralShareItems(url: url)
+                        }.buttonStyle(.borderedProminent)
                     }
-                    .buttonStyle(.bordered)
-                    Button("Share") {
-                        guard var components = URLComponents(string: "https://mowgoapp.com") else { return }
-                        components.queryItems = [URLQueryItem(name: "ref", value: status.code)]
-                        guard let url = components.url else { return }
-                        referralShareItems = ReferralShareItems(url: url)
-                    }.buttonStyle(.borderedProminent)
                 }
                 HStack {
                     referralStat("Free months earned", status.earnedCount)
                 }
                 Text("You've referred \(status.totalCount) people. \(status.earnedCount) have signed up.")
                     .font(.subheadline).foregroundColor(theme.textMuted)
+                Text("When another lawn care operator signs up using your referral code, you both earn a free month of MowGo. Share your code with other crews you know.")
+                    .font(.caption).foregroundColor(theme.textMuted)
             }
         }
         .padding(16).background(theme.surface).cornerRadius(16)
