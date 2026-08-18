@@ -95,4 +95,32 @@ enum RouteOptimizer {
         }
         return total
     }
+
+    struct DaySuggestion {
+        let dayIndex: Int
+        let dayName: String
+        let avgDistanceKm: Double
+    }
+
+    static func suggestDay(jobsByDay: [Int: [Coordinate]], newClient: Coordinate) -> DaySuggestion? {
+        let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        var bestDay: Int? = nil
+        var bestAvg: Double = .infinity
+
+        for (dayIndex, jobs) in jobsByDay {
+            guard !jobs.isEmpty else { continue }
+            let totalDist = jobs.reduce(0.0) { sum, job in
+                sum + haversineKm(lat1: newClient.lat, lon1: newClient.lng,
+                                 lat2: job.lat, lon2: job.lng)
+            }
+            let avg = totalDist / Double(jobs.count)
+            if avg < bestAvg {
+                bestAvg = avg
+                bestDay = dayIndex
+            }
+        }
+
+        guard let day = bestDay else { return nil }
+        return DaySuggestion(dayIndex: day, dayName: dayNames[day], avgDistanceKm: (bestAvg * 10).rounded() / 10)
+    }
 }

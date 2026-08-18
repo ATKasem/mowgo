@@ -45,6 +45,23 @@ final class RouteOptimizerTests: XCTestCase {
         XCTAssertEqual(RouteOptimizer.optimizeRoute(entries: entries, anchor: nil),
                        [first, second, third])
     }
+
+    func testSuggestDayPicksClosestDay() {
+        let byDay: [Int: [RouteOptimizer.Coordinate]] = [
+            1: [(lat: 35.5, lng: -97.5), (lat: 35.51, lng: -97.52)],  // Monday - OKC
+            3: [(lat: 36.1, lng: -96.1)],  // Wednesday - Tulsa
+        ]
+        let newClient = RouteOptimizer.Coordinate(lat: 35.49, lng: -97.51)  // OKC
+        let result = RouteOptimizer.suggestDay(jobsByDay: byDay, newClient: newClient)
+        XCTAssertEqual(result?.dayIndex, 1)
+        XCTAssertNotNil(result?.avgDistanceKm)
+        XCTAssertLessThan(result?.avgDistanceKm ?? 100, 10)
+    }
+
+    func testSuggestDayReturnsNilWhenNoDays() {
+        let result = RouteOptimizer.suggestDay(jobsByDay: [:], newClient: (35.5, -97.5))
+        XCTAssertNil(result)
+    }
 }
 
 final class NavigationRouteBuilderTests: XCTestCase {
