@@ -84,6 +84,10 @@ export default function RouteAudit() {
           <ul className="mt-8 space-y-4">
             {['hours', 'revenue', 'fixes'].map((key) => <li key={key} className="flex gap-3 text-gray-700"><span className="mt-0.5 rounded-full bg-emerald-100 p-1"><Check className="h-4 w-4 text-emerald-700" /></span>{t(`routeAudit.bullets.${key}`)}</li>)}
           </ul>
+          <p className="mt-6 text-sm text-gray-500">
+            {t('routeAudit.heroCta.prefix', 'Already have a crew? Skip the audit and')}{' '}
+            <Link to="/subscribe" className="font-semibold text-emerald-700 underline">{t('routeAudit.heroCta.link', 'start a free trial →')}</Link>
+          </p>
         </section>
 
         <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xl shadow-emerald-900/10 sm:p-8">
@@ -124,6 +128,19 @@ export default function RouteAudit() {
               <p className="mt-4 text-xs font-medium text-gray-500">{t('routeAudit.report.estimate')}</p>
               <div className="mt-6 rounded-xl border border-gray-200 p-4"><h3 className="font-bold">{t('routeAudit.report.mathTitle')}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600">{t('routeAudit.report.formula')}</p></div>
               {result.lawnsBucket === 'under_10' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p><Link to="/?section=pricing" onClick={() => setTimeout(() => document.getElementById('pricing')?.scrollIntoView(), 0)} className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.pricing')} →</Link></> : result.lawnsBucket === '50_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p><Link to="/compare" className="mt-5 inline-flex font-bold text-emerald-700">{t('routeAudit.branches.compare')} →</Link></> : result.crewBucket === '4_plus' ? <><p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p><Link to="/login?mode=signup" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.crewCta')}<ArrowRight className="h-4 w-4" /></Link></> : <Link to="/login?mode=signup" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.qualifiedCta')}<ArrowRight className="h-4 w-4" /></Link>}
+
+              <div className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-6">
+                <h3 className="text-xl font-bold text-gray-900">{t('routeAudit.upsell.headline', 'MowGo automates these savings')}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{t('routeAudit.upsell.body', "MowGo's scheduling + routing saves crews like you 5-10 hours/week. See exactly how it works.")}</p>
+                <ul className="mt-4 space-y-2.5">
+                  {[
+                    ['batchByZone', 'Batch jobs by zone'],
+                    ['blockRecurring', 'Block recurring clients on the same day'],
+                    ['buffers', 'Leave 15-minute buffers'],
+                  ].map(([key, fallback]) => <li key={key} className="flex gap-2.5 text-sm text-gray-700"><span className="mt-0.5 rounded-full bg-emerald-100 p-1"><Check className="h-3.5 w-3.5 text-emerald-700" /></span>{t(`routeAudit.upsell.bullets.${key}`, fallback)}</li>)}
+                </ul>
+                <Link to="/subscribe" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white transition hover:bg-emerald-700">{t('routeAudit.upsell.cta', 'Start Free Trial')} →</Link>
+              </div>
             </div>
           )}
         </section>

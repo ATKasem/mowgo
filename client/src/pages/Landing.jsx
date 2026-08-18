@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import usePageTitle from '../hooks/usePageTitle';
 import { useState, useEffect, useRef } from 'react';
-import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, DollarSign, Shield, AlertCircle, ChevronDown } from 'lucide-react';
+import { CloudRain, MapPin, Users, FileText, Check, X, ArrowRight, Zap, Wifi, DollarSign, Shield, AlertCircle, ChevronDown, BadgeCheck, Gift } from 'lucide-react';
 import Logo from '../components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
@@ -194,21 +194,21 @@ export default function Landing() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Stop losing jobs to scheduling chaos.")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("MowGo handles the routing, invoicing, and rain delays so you don't have to.")}</span>
+              {tr("Free Route Audit:")} <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">{tr("See how many hours — and dollars — you're losing to bad scheduling")}</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-              {tr("One missed job costs more than a month of MowGo. Oklahoma crews use it to schedule smarter, route faster, and get paid — without an office manager.")}
+              {tr("Enter your numbers. We'll show you what optimized routes are worth to your lawn business. No signup required.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
-                {tr("Start Free — No Credit Card")}
+              <Link to="/route-audit" className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
+                {tr("Run My Free Audit →")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("See Plans & Pricing")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
+              <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("Start Free — No Credit Card")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
             </div>
             <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Free for 5 clients. No credit card. 2 minutes to start.")}</p>
             <div className="mt-3 flex items-center justify-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
@@ -477,6 +477,32 @@ export default function Landing() {
             <p className="text-center text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-8">{tr("Route optimization is live — included on Solo, Crew, and Premium.")}</p>
           </FadeIn>
         </div>
+      </section>
+
+      {/* Guarantee */}
+      <section className="max-w-2xl mx-auto px-4 py-16">
+        <FadeIn>
+          <div className="card border border-[var(--color-border)] dark:border-gray-800 p-8 md:p-10 text-center">
+            <BadgeCheck className="w-10 h-10 text-brand mx-auto mb-4" />
+            <h2 className="text-2xl md:text-3xl font-extrabold text-[var(--color-text-primary)] dark:text-white mb-3 tracking-tight">{tr("Our guarantee: save 10 hours/week or your first month is free")}</h2>
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed">{tr("If MowGo doesn't save you at least 10 hours a week in your first 60 days, your first month is on us. And we'll set up your next 50 clients for free. No fine print.")}</p>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* Referral */}
+      <section className="max-w-2xl mx-auto px-4 py-16">
+        <FadeIn>
+          <div className="card border border-[var(--color-border)] dark:border-gray-800 p-8 md:p-10 text-center">
+            <Gift className="w-10 h-10 text-brand mx-auto mb-4" />
+            <h2 className="text-2xl md:text-3xl font-extrabold text-[var(--color-text-primary)] dark:text-white mb-3 tracking-tight">{tr("Get a free month for every crew you bring")}</h2>
+            <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed mb-6">{tr("Give your referral code to another lawn crew. When they subscribe, you get a month free. They get a free trial. Win-win.")}</p>
+            <Link to="/subscribe" className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200">
+              {tr("Get your referral code")}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </FadeIn>
       </section>
 
       {/* FAQ */}
