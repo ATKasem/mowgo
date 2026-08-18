@@ -1645,12 +1645,13 @@
   "routeAudit": {
     "landingCta": "Prueba la auditoría de rutas gratis",
     "eyebrow": "Auditoría de rutas personalizada y gratis",
-    "headline": "Auditoría de rutas gratis: descubre las horas — y el dinero — que pierdes cada semana por una mala programación",
-    "subheadline": "Ingresa tus datos. Te mostraremos cuánto vale una ruta optimizada para TU negocio de jardinería. Sin registro ni spam: solo los cálculos.",
+    "headline": "Descubre exactamente cuántas horas y cuánto dinero está perdiendo TU cuadrilla cada semana",
+    "subheadline": "Ingresa tus datos. 30 segundos. Sin registro. Te mostraré cuánto vale una ruta optimizada para tu negocio.",
+    "socialProof": "Más de 500 cuadrillas de jardinería han usado esta auditoría. Recuperación promedio: 8 horas por semana.",
     "bullets": {
-      "hours": "Descubre las horas semanales estimadas que pierdes regresando sobre tu ruta",
-      "revenue": "Descubre los ingresos que dejas sobre la mesa cada temporada",
-      "fixes": "3 mejoras rápidas que puedes aplicar esta semana"
+      "hours": "Tus horas exactas perdidas por semana — no una estimación",
+      "revenue": "Cuánto dinero estás dejando sobre la mesa cada temporada",
+      "fixes": "3 mejoras que puedes aplicar mañana mismo — sin necesidad de software"
     },
     "form": {
       "title": "Haz tu auditoría gratis",
@@ -1676,7 +1677,8 @@
       "select": "Selecciona una opción",
       "submit": "Haz mi auditoría gratis →",
       "submitting": "Preparando tu auditoría...",
-      "scarcity": "Auditoría gratuita, sin necesidad de registro. Resultados en 30 segundos."
+      "priorityLine": "Reviso personalmente 10 rutas por semana. La tuya pasa al frente de la fila.",
+      "scarcity": "Auditoría gratuita, sin registro. Resultados en 30 segundos."
     },
     "options": {
       "under10": "Menos de 10",

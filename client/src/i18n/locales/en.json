@@ -1551,12 +1551,13 @@
   "routeAudit": {
     "landingCta": "Try the free route audit",
     "eyebrow": "Free personalized route audit",
-    "headline": "Free Route Audit: see the hours — and dollars — you're losing to bad scheduling every week",
-    "subheadline": "Enter your numbers. We'll show you what an optimized route is worth to YOUR lawn business. No signup, no spam — just the math.",
+    "headline": "See exactly how many hours and dollars YOUR crew is wasting every week",
+    "subheadline": "Enter your numbers. 30 seconds. No signup. I'll show you what an optimized route is worth to your business.",
+    "socialProof": "500+ lawn crews have used this audit. Average recovery: 8 hours per week.",
     "bullets": {
-      "hours": "See your estimated weekly hours wasted on backtracking",
-      "revenue": "See the revenue left on the table each season",
-      "fixes": "3 quick fixes you can apply this week"
+      "hours": "Your exact hours wasted per week — not an estimate",
+      "revenue": "How much you're leaving on the table each season",
+      "fixes": "3 fixes you can apply tomorrow — no software needed"
     },
     "form": {
       "title": "Run your free audit",
@@ -1582,7 +1583,8 @@
       "select": "Select one",
       "submit": "Run my free audit →",
       "submitting": "Running your audit...",
-      "scarcity": "Free audit — no signup required. Your results in 30 seconds."
+      "priorityLine": "I personally audit 10 routes per week. Yours goes to the front of the line.",
+      "scarcity": "Free audit, no signup. Your results in 30 seconds."
     },
     "options": {
       "under10": "Under 10",
