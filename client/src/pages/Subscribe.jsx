@@ -88,7 +88,7 @@ export default function Subscribe() {
 
   const paidPlans = [
     { name: 'Solo', price: '39', annualPrice: '390', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
-    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'You + 1 crew member included', 'Additional crew $10/mo per member'], cta: 'Start Free Trial' },
+    { name: 'Crew', price: '79', annualPrice: '790', features: ['Everything in Solo', 'Additional crew: $10/mo each — 66% less than Jobber', 'Job assignment & tracking', 'Team progress dashboard', 'You + 1 crew member included'], cta: 'Start Free Trial' },
     {
       name: 'Premium',
       price: '199',

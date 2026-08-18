@@ -34,6 +34,7 @@ const features = [
   { label: 'Installable Web App', key: 'pwa', desc: 'Works on iPhone, Android, and desktop as a PWA' },
   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
   { label: 'Zero-Fee Payments', key: 'stripe', desc: 'Venmo, Zelle, Cash App — no card processing fees' },
+  { label: 'Per-User Fees', key: 'perUser', desc: 'MowGo: $10/mo per extra crew member. Jobber: $29/mo per user. Servinix: $20/mo per tech.', star: true },
   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
   { label: 'Route Optimization', key: 'route', desc: 'One-tap optimized routes + send stops to your maps app' },
 ];
@@ -52,15 +53,16 @@ const data = {
   recurring:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
   pwa:          [ true,   true,  true,  false, false, true,  false, false, false, false ],
   privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
-  stripe:       [ true,  false, false, false, false, false, false, false, false, false ],
-  gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false ],
+  stripe:       [ true,  false, false, false, false, false, false, false, false, false, false ],
+  perUser:      [ "$10/mo", "N/A", "$29/mo", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "$20/tech" ],
+  gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false, false ],
   // Route Optimization availability — researched Aug 5, 2026: QuoteIQ (myquoteiq.com, all plans), Jobber (help.getjobber.com, Connect+), Yardbook (support.yardbook.com), LawnPro (lawnprosoftware.com/features/routing), Housecall Pro 'soon' (alpha per help.housecallpro.com), GreenRoute (greenrouteapp.com), LawnBoss (lawnboss.app), SoloOp (solo-op.com), TurfHop (youraspire.com lawn routing list)
   route:        [ true,  true,  true,  true,  true,  'soon', true,  true,  true,  true ],
 };
 
 const mowgoTiers = [
   { name: 'Solo', price: '$39/mo', annualPrice: '$390/year · 2 months free', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
-  { name: 'Crew', price: '$79/mo', annualPrice: '$790/year · 2 months free', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'You + 1 crew member included', 'Additional crew $10/mo per member'], cta: 'Start Free Trial' },
+  { name: 'Crew', price: '$79/mo', annualPrice: '$790/year · 2 months free', features: ['Everything in Solo', 'Additional crew: $10/mo each — 66% less than Jobber', 'Job assignment & tracking', 'Team progress dashboard', 'You + 1 crew member included'], cta: 'Start Free Trial' },
   {
     name: 'Premium',
     price: '$199/mo',
