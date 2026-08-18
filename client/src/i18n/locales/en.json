@@ -1623,8 +1623,9 @@
       "large": "MowGo is built for solo crews and small teams — check out these tools for larger operations.",
       "compare": "Compare your options",
       "crew": "With four or more people, the Crew tier gives your team job assignment and progress tracking.",
-      "crewCta": "Explore the Crew tier",
-      "qualifiedCta": "Book your free setup call"
+      "crewCta": "Start Free Trial",
+      "qualifiedCta": "Start Free Trial",
+      "cta": "Start Free Trial"
     },
     "seo_title": "Free Route Audit for Oklahoma Lawn Care Crews",
     "seo_description": "Get a free route audit for your lawn care business. See how much drive time and gas you can save with MowGo routing."
