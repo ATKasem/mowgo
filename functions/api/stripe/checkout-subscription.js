@@ -85,19 +85,20 @@ export async function onRequestPost(context) {
           headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
         },
       );
-      if (existingSubsResponse.ok) {
-        const subsData = await existingSubsResponse.json();
-        const activeSub = (subsData.data || []).find(
-          (s) => s.status === 'active' || s.status === 'trialing' || s.status === 'past_due',
-        );
-        if (activeSub) {
-          const currentTier = activeSub.metadata?.tier || 'unknown';
-          console.error(`User ${user.id} already has active subscription ${activeSub.id} (tier=${currentTier}, status=${activeSub.status})`);
-          return json({
-            error: 'You already have an active subscription. Visit your account settings to manage it.',
-            portalUrl: `${appUrl}/#/settings?tab=billing`,
-          }, 409, origin);
-        }
+      // Fail closed: if Stripe cannot confirm that the customer has no active
+      // subscription, creating Checkout could double-bill them.
+      if (!existingSubsResponse.ok) throw new Error('Could not check existing Stripe subscriptions');
+      const subsData = await existingSubsResponse.json();
+      const activeSub = (subsData.data || []).find(
+        (s) => s.status === 'active' || s.status === 'trialing' || s.status === 'past_due',
+      );
+      if (activeSub) {
+        const currentTier = activeSub.metadata?.tier || 'unknown';
+        console.error(`User ${user.id} already has active subscription ${activeSub.id} (tier=${currentTier}, status=${activeSub.status})`);
+        return json({
+          error: 'You already have an active subscription. Visit your account settings to manage it.',
+          portalUrl: `${appUrl}/#/settings?tab=billing`,
+        }, 409, origin);
       }
     }
 
@@ -174,8 +175,8 @@ export async function onRequestPost(context) {
 
     const session = await stripeResponse.json();
 
-    if (session.error) {
-      console.error('Stripe checkout error:', session.error.type, session.error.message);
+    if (!stripeResponse.ok || session.error || !session.url) {
+      console.error('Stripe checkout error:', session.error?.type || stripeResponse.status, session.error?.message || 'missing checkout URL');
       return json({ error: 'Unable to start checkout. Please try again.' }, 400, origin);
     }
 

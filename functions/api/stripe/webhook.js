@@ -4,6 +4,7 @@
  */
 
 import { dispatchWebhookEvent } from '../_shared/dispatch-webhook.js';
+import { updateCrewQuantity } from '../_shared/update-crew-quantity.js';
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
@@ -61,12 +62,13 @@ export async function onRequestPost({ request, env }) {
       const subscription = await getSubscription(object.subscription, env);
       const tier = tierForSubscription(subscription, env);
       if (tier !== null) {
-        await updateProfile({
+        const profileId = await updateProfile({
           env,
           userId: object.metadata?.user_id,
           customerId: customerIdOf(object.customer) || customerIdOf(subscription.customer),
           tier,
         });
+        if (tier === 'crew' && profileId) await updateCrewQuantity(env, profileId);
 
         // Referral earn (service-role only, never fails the webhook)
         try {
@@ -118,12 +120,13 @@ export async function onRequestPost({ request, env }) {
     } else if (event.type === 'customer.subscription.updated') {
       const tier = tierForSubscription(object, env);
       if (tier !== null) {
-        await updateProfile({
+        const profileId = await updateProfile({
           env,
           userId: object.metadata?.user_id,
           customerId: customerIdOf(object.customer),
           tier,
         });
+        if (tier === 'crew' && profileId) await updateCrewQuantity(env, profileId);
       }
     } else if (event.type === 'customer.subscription.deleted') {
       await handleSubscriptionDeleted(object, env);
@@ -357,7 +360,7 @@ async function updateProfile({ env, userId, customerId, tier }) {
     const matched = await patchProfile(env, `id=eq.${encodeURIComponent(userId)}`, profile);
     if (matched || !customerId) {
       if (before && before.tier !== tier) await logTierChange(env, serviceKey, userId, tier);
-      return;
+      return matched ? userId : null;
     }
   }
 
@@ -366,12 +369,12 @@ async function updateProfile({ env, userId, customerId, tier }) {
   const matchingProfiles = await fetchMatchingProfiles(
     env, serviceKey, `stripe_customer_id=eq.${encodeURIComponent(customerId)}`,
   );
-  if (!matchingProfiles || matchingProfiles.length === 0) return;
+  if (!matchingProfiles || matchingProfiles.length === 0) return null;
   if (matchingProfiles.length > 1) {
     console.warn(
       `Stripe webhook updateProfile: ambiguous customer id ${customerId} — ${matchingProfiles.length} profiles match, patching none`,
     );
-    return;
+    return null;
   }
   // Exactly one match — patch by primary key, never by customer filter
   const resolvedId = matchingProfiles[0].id;
@@ -380,6 +383,7 @@ async function updateProfile({ env, userId, customerId, tier }) {
   if (matchedByCustomer && before && before.tier !== tier) {
     await logTierChange(env, serviceKey, resolvedId, tier);
   }
+  return matchedByCustomer ? resolvedId : null;
 }
 
 // Cancellation win-back/downsell flow (customer.subscription.deleted).

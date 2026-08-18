@@ -258,7 +258,12 @@ export default function Subscribe() {
               <p className="mt-3 mb-5"><span className="text-4xl font-extrabold text-gray-900 dark:text-white">${billingInterval === 'year' ? plan.annualPrice : plan.price}</span><span className="text-gray-500">/{tr(billingInterval === 'year' ? 'year' : 'month')}</span></p>
               {plan.name === 'Premium' && billingInterval === 'year' && <p className="-mt-3 mb-4 text-xs font-semibold text-emerald-600">{tr('2 months free')}</p>}
               <ul className="space-y-3 flex-1">
-                {plan.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
+                {plan.features.map(feature => {
+                  const displayedFeature = feature === 'Additional crew $10/mo per member' && billingInterval === 'year'
+                    ? 'Additional crew $100/year per member'
+                    : feature;
+                  return <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(displayedFeature)}</span></li>;
+                })}
               </ul>
               <button type="button" onClick={() => handleCheckout(plan.name)} disabled={checkoutPending} className={plan.name === 'Premium' ? 'btn-primary mt-6 justify-center disabled:opacity-60' : 'btn-secondary mt-6 justify-center disabled:opacity-60'}>{tr(plan.cta)} <ArrowRight className="w-4 h-4" /></button>
             </div>

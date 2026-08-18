@@ -97,8 +97,24 @@ async function reconcileCrewQuantity(env, ownerId) {
     if (!Array.isArray(members)) return;
     const addonQty = Math.max(0, members.length - 1);
 
-    // Step 5: Find or create the add-on line item
-    const addonItem = items.find(item => priceIdOf(item) === addonPrice);
+    // Step 5: Find or create the add-on line item.
+    // Two concurrent reconciliations for the same owner (different isolates —
+    // the in-memory ownerUpdates queue only serializes within one isolate)
+    // can both see "no add-on item yet" and both create one. .find() would
+    // silently ignore the duplicate on every future call, permanently
+    // stranding it at a stale quantity, so clean up any extras here instead.
+    const [addonItem, ...duplicateAddonItems] = items.filter(item => priceIdOf(item) === addonPrice);
+    for (const dup of duplicateAddonItems) {
+      const res = await fetch(`${STRIPE_API}/subscription_items/${encodeURIComponent(dup.id)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ proration_behavior: 'none' }).toString(),
+      });
+      if (!res.ok) console.error('updateCrewQuantity: duplicate add-on cleanup failed', await res.text());
+    }
 
     if (addonItem && addonItem.quantity === addonQty) {
       // Already correct — nothing to do

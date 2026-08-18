@@ -261,7 +261,12 @@ export default function Compare() {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tr(tier.name)}</h3>
               <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">{tr(billingInterval === 'year' && tier.annualPrice ? tier.annualPrice : tier.price)}</p>
               <ul className="space-y-3 mt-5 flex-1">
-                {tier.features.map(feature => <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(feature)}</span></li>)}
+                {tier.features.map(feature => {
+                  const displayedFeature = feature === 'Additional crew $10/mo per member' && billingInterval === 'year'
+                    ? 'Additional crew $100/year per member'
+                    : feature;
+                  return <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"><Check className="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" /><span>{tr(displayedFeature)}</span></li>;
+                })}
               </ul>
               {tier.cta && <button type="button" onClick={() => handleTierCheckout(tier.name)} className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">{tr(tier.cta)} <ArrowRight className="w-4 h-4" /></button>}
             </div>
@@ -285,7 +290,7 @@ export default function Compare() {
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                 <X className="w-4 h-4 text-red-500 shrink-0" /> {tr("Every extra crew member costs $29/mo more.")}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,896/yr ($1,548 base + $348 for the second user). MowGo Crew: $790/yr, flat, whole crew included.")}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tr("Jobber's $29/mo per-user fee adds up: a 2-person crew on Connect runs $1,896/yr ($1,548 base + $348 for the second user). MowGo Crew: $790/yr includes you + 1 crew member; each additional member is $100/yr.")}</p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
@@ -361,10 +366,10 @@ export default function Compare() {
             {tr("TurfHop's pricing page was down for 5 days (Aug 1–6, 2026, 500 errors) — its features page is still down. Verify current features with them before you buy.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Jobber's ladder moved again (verified Aug 8, 2026): Core $49/mo (raised from $39), Connect $129–$139/mo, Grow $249/mo — plus $29/mo for every extra user, and their new AI Receptionist is another $29/mo add-on (free only on Plus $399+). Their 'Starting at $24/mo' promo expired Aug 12, 2026 — the entry anchor is now $29/mo. MowGo is $39–$79 flat, month-to-month, whole crew included — and missed-call text-back is on our roadmap, not a paid add-on.")}
+            {tr("Jobber's ladder moved again (verified Aug 8, 2026): Core $49/mo (raised from $39), Connect $129–$139/mo, Grow $249/mo — plus $29/mo for every extra user, and their new AI Receptionist is another $29/mo add-on (free only on Plus $399+). Their 'Starting at $24/mo' promo expired Aug 12, 2026 — the entry anchor is now $29/mo. MowGo starts at $39/mo; Crew is $79/mo including you + 1 crew member, then $10/mo per additional member — and missed-call text-back is on our roadmap, not a paid add-on.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {tr("Service Autopilot's $49/mo is ONE mobile license — a 2-person crew runs $199+/mo with a signup fee and annual-only billing. MowGo Crew is $79 flat, whole crew included.")}
+            {tr("Service Autopilot's $49/mo is ONE mobile license — a 2-person crew runs $199+/mo with a signup fee and annual-only billing. MowGo Crew is $79/mo including you + 1 crew member.")}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Planado (new in the band) charges per user — $12–$29/user/mo — and has no invoicing or payments at all. MowGo's auto-invoice + SMS pay link is included at $39 flat.")}
@@ -372,7 +377,7 @@ export default function Compare() {
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Servinix ($300/mo AI Service Assistant flat) launches Aug 17 (beta) with an invoice-coupon switcher hook — but their entire stack starts above MowGo's total price. Commercial-focused (1–100 tech), not a direct lawn-crew competitor. Still worth noting: $300 for their AI layer alone exceeds MowGo's whole stack.")}
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{tr("LMN (design-build estimating) starts around $197/mo for quote-only and runs $297–$697/mo for the design-build band (verified Aug 8, 2026) — built for a different business than a 1–2 person mow crew. MowGo covers scheduling through payment at $39/$79 flat.")}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{tr("LMN (design-build estimating) starts around $197/mo for quote-only and runs $297–$697/mo for the design-build band (verified Aug 8, 2026) — built for a different business than a 1–2 person mow crew. MowGo covers scheduling through payment starting at $39/mo; Crew starts at $79/mo.")}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {tr("Some competitors charge a sign-up fee and hide their top tier behind a sales call — MowGo publishes $39/$79 and takes a card.")}
           </p>

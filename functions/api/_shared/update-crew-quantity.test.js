@@ -32,12 +32,12 @@ function subscription({ id = 'sub_1', status = 'active', interval = 'month', pau
   };
 }
 
-function mockFetch({ subscriptions = [subscription()], crewCount = 3 } = {}) {
+function mockFetch({ subscriptions = [subscription()], crewCount = 3, profileTier = 'crew' } = {}) {
   const calls = [];
   globalThis.fetch = async (input, init = {}) => {
     const url = String(input);
     calls.push({ url, init });
-    if (url.includes('/profiles?id=eq.')) return Response.json([{ tier: 'crew', stripe_customer_id: 'cus_1' }]);
+    if (url.includes('/profiles?id=eq.')) return Response.json([{ tier: profileTier, stripe_customer_id: 'cus_1' }]);
     if (url.includes('/subscriptions?')) return Response.json({ data: subscriptions });
     if (url.includes('/profiles?business_id=')) return Response.json(Array.from({ length: crewCount }, (_, i) => ({ id: `user_${i}` })));
     if (url.endsWith('/subscription_items')) return Response.json({ id: 'si_addon' });
@@ -59,6 +59,7 @@ test('creates an annual add-on through the Subscription Items API', async () => 
   assert.equal(body.get('subscription'), 'sub_1');
   assert.equal(body.get('price'), env.STRIPE_PRICE_CREW_ADDON_ANNUAL);
   assert.equal(body.get('quantity'), '2');
+  assert.equal(body.get('proration_behavior'), 'none');
 });
 
 test('does nothing when the annual add-on price is not configured', async () => {
@@ -78,6 +79,21 @@ test('updates an existing add-on with POST and removes it with DELETE', async ()
   await updateCrewQuantity(env, 'owner_1');
   mutation = calls.find(call => call.url.endsWith('/subscription_items/si_addon'));
   assert.equal(mutation?.init.method, 'DELETE');
+  assert.equal(new URLSearchParams(mutation.init.body).get('proration_behavior'), 'none');
+});
+
+test('does nothing without one active Crew subscription', async () => {
+  for (const subscriptions of [[], [subscription({ status: 'canceled' })]]) {
+    const calls = mockFetch({ subscriptions });
+    await updateCrewQuantity(env, 'owner_1');
+    assert.equal(calls.some(call => call.url.endsWith('/subscription_items')), false);
+  }
+});
+
+test('does not bill Premium subscribers for crew add-ons', async () => {
+  const calls = mockFetch({ profileTier: 'premium' });
+  await updateCrewQuantity(env, 'owner_1');
+  assert.equal(calls.some(call => call.url.includes('/subscriptions?')), false);
 });
 
 test('does not update canceled or paused subscriptions', async () => {
