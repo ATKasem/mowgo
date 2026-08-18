@@ -60,7 +60,7 @@ const data = {
 
 const mowgoTiers = [
   { name: 'Solo', price: '$39/mo', annualPrice: '$390/year · 2 months free', features: ['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode'], cta: 'Start Free Trial' },
-  { name: 'Crew', price: '$79/mo', annualPrice: '$790/year · 2 months free', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard'], cta: 'Start Free Trial' },
+  { name: 'Crew', price: '$79/mo', annualPrice: '$790/year · 2 months free', features: ['Everything in Solo', 'Job assignment & tracking', 'Team progress dashboard', 'You + 1 crew member included', 'Additional crew $10/mo per member'], cta: 'Start Free Trial' },
   {
     name: 'Premium',
     price: '$199/mo',

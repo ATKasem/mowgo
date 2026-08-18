@@ -14,6 +14,8 @@
  *   SUPABASE_SERVICE_ROLE_KEY — service_role key (never exposed to client)
  */
 
+import { updateCrewQuantity } from './_shared/update-crew-quantity.js';
+
 const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
@@ -87,9 +89,13 @@ export async function onRequestPost({ request, env }) {
 
     // Get owner's profile to verify they're an owner
     const ownerProfileRes = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${ownerId}&role=eq.owner&select=id,business_name,role,tier`,
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(ownerId)}&role=eq.owner&select=id,business_name,role,tier`,
       { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
     );
+    if (!ownerProfileRes.ok) {
+      console.error('invite-crew: owner profile lookup failed', await ownerProfileRes.text());
+      return Response.json({ error: 'Could not verify account owner' }, { status: 500, headers: corsHeaders });
+    }
     const ownerProfiles = await ownerProfileRes.json();
     if (!ownerProfiles?.length || ownerProfiles[0].role !== 'owner') {
       return Response.json({ error: 'Only account owners can invite crew' }, { status: 403, headers: corsHeaders });
@@ -104,6 +110,10 @@ export async function onRequestPost({ request, env }) {
       `${supabaseUrl}/auth/v1/admin/users?filter=email%3Deq%3A${encodeURIComponent(email)}`,
       { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
     );
+    if (!listRes.ok) {
+      console.error('invite-crew: auth user lookup failed', await listRes.text());
+      return Response.json({ error: 'Could not check invited user' }, { status: 500, headers: corsHeaders });
+    }
     const { users } = await listRes.json();
 
     let invitedUserId;
@@ -117,6 +127,10 @@ export async function onRequestPost({ request, env }) {
         `${supabaseUrl}/rest/v1/profiles?id=eq.${invitedUserId}&select=id,business_id,role`,
         { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
       );
+      if (!existingProfileRes.ok) {
+        console.error('invite-crew: invited profile lookup failed', await existingProfileRes.text());
+        return Response.json({ error: 'Could not check invited profile' }, { status: 500, headers: corsHeaders });
+      }
       const existingProfiles = await existingProfileRes.json();
 
       if (existingProfiles?.length > 0) {
@@ -137,6 +151,10 @@ export async function onRequestPost({ request, env }) {
           `${supabaseUrl}/rest/v1/jobs?select=id&user_id=eq.${invitedUserId}&limit=1`,
           { headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` } }
         );
+        if (!ownedData.ok || !ownedJobs.ok) {
+          console.error('invite-crew: invited user data-existence check failed');
+          return Response.json({ error: 'Could not verify invited account eligibility' }, { status: 500, headers: corsHeaders });
+        }
         const [clients, jobs] = await Promise.all([ownedData, ownedJobs]).then(([c, j]) =>
           Promise.all([c.json(), j.json()])
         );
@@ -166,6 +184,7 @@ export async function onRequestPost({ request, env }) {
           return Response.json({ error: 'Failed to update profile' }, { status: 500, headers: corsHeaders });
         }
         const [updated] = await updateRes.json();
+        await updateCrewQuantity(env, ownerId);
         return Response.json({
           invited: email,
           flow: 'existing_user',
@@ -197,6 +216,7 @@ export async function onRequestPost({ request, env }) {
           return Response.json({ error: 'Failed to create profile' }, { status: 500, headers: corsHeaders });
         }
         const [created] = await insertRes.json();
+        await updateCrewQuantity(env, ownerId);
         return Response.json({
           invited: email,
           flow: 'existing_user_new_profile',
@@ -294,6 +314,8 @@ export async function onRequestPost({ request, env }) {
       } catch (e) {
         // invite still succeeds; user can use forgot-password
       }
+
+      await updateCrewQuantity(env, ownerId);
 
       return Response.json({
         invited: email,

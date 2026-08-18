@@ -8,6 +8,8 @@
  * business data owned by that profile.
  */
 
+import { updateCrewQuantity } from '../_shared/update-crew-quantity.js';
+
 const ALLOWED_ORIGINS = ['https://mowgoapp.com'];
 
 function corsHeaders(request) {
@@ -109,6 +111,8 @@ export async function onRequestDelete({ request, env, params }) {
       console.error('remove-team: profile detach failed', await detachRes.text());
       return jsonResponse(request, { error: 'Could not detach crew member' }, 500);
     }
+
+    await updateCrewQuantity(env, ownerId);
 
     return jsonResponse(request, { success: true }, 200);
   } catch (error) {
