@@ -84,7 +84,8 @@ export default function RouteAudit() {
           <ul className="mt-8 space-y-4">
             {['hours', 'revenue', 'fixes'].map((key) => <li key={key} className="flex gap-3 text-gray-700"><span className="mt-0.5 rounded-full bg-emerald-100 p-1"><Check className="h-4 w-4 text-emerald-700" /></span>{t(`routeAudit.bullets.${key}`)}</li>)}
           </ul>
-          <p className="mt-6 text-sm text-gray-500">
+          <p className="mt-6"><span style={{ fontSize: '14px', color: '#059669', fontWeight: 600 }}>{t('routeAudit.socialProof')}</span></p>
+          <p className="mt-4 text-sm text-gray-500">
             {t('routeAudit.heroCta.prefix', 'Already have a crew? Skip the audit and')}{' '}
             <Link to="/subscribe" className="font-semibold text-emerald-700 underline">{t('routeAudit.heroCta.link', 'start a free trial →')}</Link>
           </p>
@@ -113,6 +114,7 @@ export default function RouteAudit() {
               </div>
               {serverError && <p className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{serverError}</p>}
               <button disabled={submitting} className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 font-bold text-white transition hover:bg-emerald-700 disabled:opacity-60">{submitting ? t('routeAudit.form.submitting') : t('routeAudit.form.submit')}</button>
+              <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '12px' }}>{t('routeAudit.form.priorityLine')}</p>
               <p className="mt-3 text-center text-sm text-gray-500">{t('routeAudit.form.scarcity')}</p>
             </form>
           ) : (

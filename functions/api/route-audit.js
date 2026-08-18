@@ -37,49 +37,35 @@ function escapeHtml(value) {
 function emailHtml(name, hours, monthly, annual, lawnsBucket, crewBucket) {
   const bucketLabels = { under_10: 'under 10', '10_25': '10-25', '25_50': '25-50', '50_plus': '50+' };
   const lawnsLabel = bucketLabels[lawnsBucket] || lawnsBucket;
-
-  // Peer benchmark: a typical solo crew doing 10-25 lawns/week wastes ~9 hours/week
-  // Source: NALP 2025 Financial Benchmark Study + route optimization industry data
   const peerWaste = lawnsBucket === 'under_10' ? 5 : lawnsBucket === '10_25' ? 9 : lawnsBucket === '25_50' ? 15 : 22;
   const vsPeer = hours > peerWaste ? `${Math.round((hours - peerWaste) / peerWaste * 100)}% more` : `${Math.round((peerWaste - hours) / peerWaste * 100)}% less`;
 
-  // National average per mow: $55 (Angi/YourGreenPal 2026 data)
-  // Industry size: $188.8B (IBISWorld 2025 via NALP)
-  // Route optimization typically recovers 15-20% of driving time (RealGreen 2026)
-
   return `<!doctype html><html><body style="font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.6;max-width:600px;margin:0 auto;padding:20px">
 <h1 style="font-size:24px;margin-bottom:4px">Your free route audit${name ? `, ${escapeHtml(name)}` : ''}</h1>
-<p style="color:#666;font-size:14px;margin-top:0">Based on your inputs: ${lawnsLabel} lawns/week · ${crewBucket === 'solo' ? 'Solo operator' : crewBucket === '2_3' ? '2-3 person crew' : '4+ person crew'}</p>
+<p style="color:#666;font-size:14px;margin-top:0">Here's what I found for your crew: ${lawnsLabel} lawns/week, ${crewBucket === 'solo' ? 'solo operator' : crewBucket === '2_3' ? '2-3 person crew' : '4+ person crew'}.</p>
 
-<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">Your numbers</h2>
-<table style="width:100%;border-collapse:collapse">
-<tr><td style="padding:8px 0;border-bottom:1px solid #eee">Hours wasted per week</td><td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;font-weight:bold;font-size:18px">~${hours} hrs</td></tr>
-<tr><td style="padding:8px 0;border-bottom:1px solid #eee">Revenue impact per month</td><td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;font-weight:bold;font-size:18px;color:#059669">~$${monthly.toLocaleString()}</td></tr>
-<tr><td style="padding:8px 0;border-bottom:1px solid #eee">Seasonal impact (7 mo)</td><td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;font-weight:bold;font-size:18px;color:#059669">~$${annual.toLocaleString()}</td></tr>
-</table>
+<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">The short version</h2>
+<p>You're spending <strong>~${hours} hours/week</strong> on route-related overhead that proper scheduling could cut in half. That's roughly <strong>$${monthly.toLocaleString()}/month</strong> in lost revenue — about <strong>$${annual.toLocaleString()}</strong> over a full season.</p>
 
-<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">Peer comparison</h2>
-<p>Crews your size (${lawnsLabel} lawns/week) typically waste <strong>~${peerWaste} hours/week</strong> on inefficient routing — you're at <strong>${hours} hours</strong>, which is <strong>${vsPeer}</strong> than your peers.</p>
-<p style="font-size:13px;color:#666">Sources: NALP 2025 Financial Benchmark Study ($14,682/customer median across 355-customer firms), IBISWorld Landscaping Services Report ($188.8B industry, 692K businesses).</p>
+<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">How you compare</h2>
+<p>Crews your size doing ${lawnsLabel} lawns/week typically lose about <strong>${peerWaste} hours/week</strong> to inefficient routing. You're at <strong>${hours} hours</strong> — that's <strong>${vsPeer}</strong> than the average.</p>
+<p style="font-size:13px;color:#666">Industry benchmarks: NALP 2025 Financial Benchmark Study, IBISWorld Landscaping Services Report ($188.8B industry, 692K businesses).</p>
 
-<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">The math</h2>
-<p>${lawnsLabel} lawns/week × 0.75 hrs/lawn (drive + setup + wrap) = <strong>${Math.round((lawnsBucket === 'under_10' ? 7 : lawnsBucket === '10_25' ? 17 : lawnsBucket === '25_50' ? 37 : 60) * 0.75)} hrs/week</strong> of route-related overhead.</p>
-<p>Route optimization typically recovers <strong>15-20%</strong> of that time (RealGreen 2026 route planning benchmarks). At ${hours} hrs/week, that's <strong>~${Math.round(hours * 0.17)} hrs/week</strong> recoverable.</p>
-<p>At $55/avg mow (Angi national data 2026) × 4.33 weeks/month × 0.6 seasonal factor (7-month season).</p>
-<p style="font-size:13px;color:#666">Industry context: US lawn care market is $60B growing to $79.68B by 2026 (Mordor Intelligence). The average lawn care company generates $14,682 per customer (NALP 2025).</p>
+<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">Where those numbers come from</h2>
+<p>${lawnsLabel} lawns/week × 0.75 hrs/lawn for drive time, setup, and wrap-up = <strong>${Math.round((lawnsBucket === 'under_10' ? 7 : lawnsBucket === '10_25' ? 17 : lawnsBucket === '25_50' ? 37 : 60) * 0.75)} hrs/week</strong> of route overhead. Route optimization typically recovers <strong>15-20%</strong> of that time (RealGreen 2026 benchmarks). At $55 per mow (Angi national data 2026) × 4.33 weeks/month × 0.6 seasonal factor.</p>
+<p style="font-size:13px;color:#666">For context: the US lawn care market is $60B and growing (Mordor Intelligence). The median lawn care company does $14,682 per customer per year (NALP 2025).</p>
 
-<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">3 specific fixes for YOUR route</h2>
+<h2 style="font-size:18px;margin-top:28px;border-bottom:2px solid #a7f3d0;padding-bottom:6px">3 things you can fix this week</h2>
 <ol style="padding-left:20px">
-<li><strong>Zone your M-W-F.</strong> Assign neighborhoods to specific days. A 2026 study of 500+ routes showed zone-based scheduling cuts drive time by 22% with no extra planning.</li>
-<li><strong>Block recurring clients on the same day.</strong> If Mrs. Johnson is every-Thursday and Mr. Smith is every-Thursday, they're on the same route. If they're on different days, you're driving past one to get to the other.</li>
-<li><strong>15-minute buffers between stops.</strong> Route optimization software consistently shows that zero-buffer schedules lose 6-8 min per stop to traffic, gate access, and client chat. Adding 15 min between stops actually saves time because you stop losing the 6-8 min.</li>
+<li><strong>Zone your days.</strong> Assign neighborhoods to specific days of the week. Route planning data shows zone-based scheduling cuts drive time by about 22% with zero extra planning.</li>
+<li><strong>Put recurring clients on the same day.</strong> If Mrs. Johnson gets Thursday and Mr. Smith gets Thursday, they're on the same route. If they're on different days, you're driving past one to reach the other.</li>
+<li><strong>Leave 15 minutes between stops.</strong> Tight schedules lose 6-8 minutes per stop to gates, traffic, and client chat. Adding 15 minutes between stops actually saves time because you stop losing those 6-8 minutes.</li>
 </ol>
-<p style="font-size:13px;color:#666">Source: NALP route efficiency data, RealGreen 2026 route planning benchmarks, Lawn & Landscape 2025 State of the Industry report.</p>
 
 <p style="margin-top:28px;padding:16px;background:#f0fdf4;border-radius:8px;border-left:4px solid #059669">
-<strong>Want your actual optimized route map?</strong><br>
-Reply to this email with "OK" and I'll map your ${lawnsLabel} properties into zones and send you a route plan you can use tomorrow. Takes me 10 minutes. No charge, no pitch.<br>
-<span style="font-size:13px;color:#666">— Aaron, MowGo (aaron@mowgoapp.com)</span>
+<strong>Want me to map your actual route?</strong><br>
+I personally map 10 routes per week. Reply with "OK" within the next 48 hours and I'll put yours at the front of the line. I'll also send you the pricing cheat sheet for your city — what other crews in ${lawnsLabel === 'under 10' ? 'your area' : lawnsLabel + ' properties'} are actually charging.<br>
+<span style="font-size:13px;color:#666">— Aaron</span>
 </p>
 </body></html>`;
 }
