@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { haversineKm, optimizeRoute, tourDistance } from './optimizeRoute.js';
+import { haversineKm, optimizeRoute, suggestDay, tourDistance } from './optimizeRoute.js';
 
 // OKC-area demo coordinates
 const OKC = { lat: 35.4676, lng: -97.5164 };
@@ -87,4 +87,30 @@ test('optimizeRoute: 2-opt is anchor-aware (never worsens the anchor-inclusive t
 test('optimizeRoute: empty and single-job arrays', () => {
   assert.deepEqual(optimizeRoute([], OKC), []);
   assert.deepEqual(optimizeRoute([{ id: 'a', lat: 1, lng: 2 }], OKC), ['a']);
+});
+
+test('suggestDay: picks closest day', () => {
+  const byDay = {
+    1: [{ lat: 35.5, lng: -97.5 }, { lat: 35.51, lng: -97.52 }], // Monday - OKC area
+    3: [{ lat: 36.1, lng: -96.1 }], // Wednesday - Tulsa area
+  };
+  const newClient = { lat: 35.49, lng: -97.51 }; // OKC area
+  const result = suggestDay(byDay, newClient);
+  assert.equal(result.dayIndex, 1);
+  assert.equal(result.dayName, 'Monday');
+  assert.ok(result.avgDistanceKm < 10, `got ${result.avgDistanceKm}`);
+});
+
+test('suggestDay: returns null when no days have jobs', () => {
+  assert.equal(suggestDay({}, { lat: 35.5, lng: -97.5 }), null);
+  assert.equal(suggestDay({ 2: [], 4: null }, { lat: 35.5, lng: -97.5 }), null);
+});
+
+test('suggestDay: ignores empty/missing day arrays when picking closest', () => {
+  const byDay = {
+    0: [],
+    2: [{ lat: 35.4676, lng: -97.5164 }], // OKC
+  };
+  const result = suggestDay(byDay, { lat: 35.47, lng: -97.51 });
+  assert.equal(result.dayIndex, 2);
 });

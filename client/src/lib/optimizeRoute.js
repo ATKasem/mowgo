@@ -67,6 +67,32 @@ export function twoOpt(tour, anchor = null) {
   return best;
 }
 
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/**
+ * suggestDay(jobsByDay, newClient) → { dayIndex, dayName, avgDistanceKm } or null.
+ * jobsByDay: { 0: [{lat,lng},...], ... } (0=Sun..6=Sat) — only days with
+ * existing jobs are considered. Picks the day whose existing jobs are
+ * geographically closest to newClient on average.
+ */
+export function suggestDay(jobsByDay, newClient) {
+  let bestDay = null;
+  let bestAvg = Infinity;
+
+  for (const [dayIndex, jobs] of Object.entries(jobsByDay)) {
+    if (!jobs || jobs.length === 0) continue;
+    const totalDist = jobs.reduce((sum, j) => sum + haversineKm(newClient, j), 0);
+    const avg = totalDist / jobs.length;
+    if (avg < bestAvg) {
+      bestAvg = avg;
+      bestDay = parseInt(dayIndex, 10);
+    }
+  }
+
+  if (bestDay === null) return null;
+  return { dayIndex: bestDay, dayName: DAY_NAMES[bestDay], avgDistanceKm: Math.round(bestAvg * 10) / 10 };
+}
+
 /**
  * optimizeRoute(jobs, anchor) → ordered job id array.
  * jobs: [{ id, lat, lng }] — null lat/lng = unaddressable, stays in its
