@@ -141,8 +141,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     const touches = insertLeadTouches(env, { email, phone, smsConsent: smsConsentRecorded });
     const qualified = QUALIFIED_LAWNS.has(body.lawns_bucket) && QUALIFIED_CREWS.has(body.crew_bucket);
     const alert = qualified ? sendLeadAlert(env, { name, lawnsBucket: body.lawns_bucket, crewBucket: body.crew_bucket, monthly, email }) : Promise.resolve();
-    const background = Promise.all([delivery, touches, alert]);
-    if (typeof waitUntil === 'function') waitUntil(background); else background.catch(() => {});
+    await Promise.all([delivery, touches, alert]);
     return json({ success: true, report: { hours_wasted_week: hours, revenue_impact_month: monthly, annual_impact: annual } }, 201, origin);
   } catch { return json({ error: 'Could not run audit. Please try again.' }, 500, origin); }
 }
