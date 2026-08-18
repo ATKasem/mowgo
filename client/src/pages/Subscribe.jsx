@@ -269,6 +269,14 @@ export default function Subscribe() {
             </div>
           ))}
         </div>
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 px-6 py-3 border border-emerald-200 dark:border-emerald-800">
+            <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+            <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              {tr("30-day money-back guarantee. If MowGo doesn't save you time, we'll refund every penny.")}
+            </span>
+          </div>
+        </div>
         <div className="flex gap-3 justify-center mt-8">
           <Link to="/login?mode=signup" className="btn-secondary text-sm px-6 py-2.5">{tr("Try Free")}</Link>
           <Link to="/" className="btn-secondary text-sm px-6 py-2.5">{tr("Back Home")}</Link>
