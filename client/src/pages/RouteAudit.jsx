@@ -37,7 +37,7 @@ export default function RouteAudit() {
     const next = {};
     if (!form.name.trim()) next.name = t('routeAudit.validation.name');
     if (!EMAIL_RE.test(form.email.trim()) || form.email.trim().length > 254) next.email = t('routeAudit.validation.email');
-    if (!/^(?:\d{5}|[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d)$/.test(form.zip)) next.zip = t('routeAudit.validation.zip');
+    if (!/^(?:\d{5}|[A-Z]\d[A-Z] \d[A-Z]\d)$/i.test(form.zip)) next.zip = t('routeAudit.validation.zip');
     if (form.phone.trim() && !PHONE_RE.test(form.phone.trim())) next.phone = t('routeAudit.validation.phone');
     if (!MIDPOINTS[form.lawns_bucket]) next.lawns_bucket = t('routeAudit.validation.lawns');
     if (!['solo', '2_3', '4_plus'].includes(form.crew_bucket)) next.crew_bucket = t('routeAudit.validation.crew');
@@ -99,7 +99,7 @@ export default function RouteAudit() {
               <div className="mt-6 space-y-5">
                 {[
                   ['name', 'text', 'name'], ['email', 'email', 'email'], ['zip', 'text', 'zip'],
-                ].map(([name, type, translation]) => <label key={name} className="block text-sm font-semibold">{t(`routeAudit.form.${translation}`)}<input className={fieldClass} name={name} type={type} value={form[name]} onChange={update} placeholder={t(`routeAudit.form.${translation}Placeholder`)} maxLength={name === 'email' ? 254 : name === 'zip' ? 7 : 100} inputMode={name === 'zip' ? 'text' : undefined} disabled={submitting} aria-invalid={Boolean(errors[name])} />{errors[name] && <span className="mt-1 block text-sm font-normal text-red-600">{errors[name]}</span>}</label>)}
+                ].map(([name, type, translation]) => <label key={name} className="block text-sm font-semibold">{t(`routeAudit.form.${translation}`)}<input className={fieldClass} name={name} type={type} value={form[name]} onChange={update} placeholder={t(`routeAudit.form.${translation}Placeholder`)} maxLength={name === 'email' ? 254 : name === 'zip' ? 7 : 100} inputMode={name === 'zip' ? (/[A-Za-z]/.test(form.zip) ? 'text' : 'numeric') : undefined} disabled={submitting} aria-invalid={Boolean(errors[name])} />{errors[name] && <span className="mt-1 block text-sm font-normal text-red-600">{errors[name]}</span>}</label>)}
                 <label className="block text-sm font-semibold">{t('routeAudit.form.lawns')}<select className={fieldClass} name="lawns_bucket" value={form.lawns_bucket} onChange={update} disabled={submitting}><option value="">{t('routeAudit.form.select')}</option><option value="under_10">{t('routeAudit.options.under10')}</option><option value="10_25">{t('routeAudit.options.10to25')}</option><option value="25_50">{t('routeAudit.options.25to50')}</option><option value="50_plus">{t('routeAudit.options.50plus')}</option></select>{errors.lawns_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.lawns_bucket}</span>}</label>
                 <label className="block text-sm font-semibold">{t('routeAudit.form.crew')}<select className={fieldClass} name="crew_bucket" value={form.crew_bucket} onChange={update} disabled={submitting}><option value="">{t('routeAudit.form.select')}</option><option value="solo">{t('routeAudit.options.solo')}</option><option value="2_3">{t('routeAudit.options.2to3')}</option><option value="4_plus">{t('routeAudit.options.4plus')}</option></select>{errors.crew_bucket && <span className="mt-1 block text-sm font-normal text-red-600">{errors.crew_bucket}</span>}</label>
                 <label className="block text-sm font-semibold">{t('routeAudit.form.phone')} <span className="font-normal text-gray-400">({t('routeAudit.form.optional')})</span><input className={fieldClass} name="phone" type="tel" value={form.phone} onChange={update} placeholder={t('routeAudit.form.phonePlaceholder')} maxLength={20} disabled={submitting} aria-invalid={Boolean(errors.phone)} />{errors.phone && <span className="mt-1 block text-sm font-normal text-red-600">{errors.phone}</span>}</label>
@@ -131,13 +131,13 @@ export default function RouteAudit() {
               <p className="mt-4 text-xs font-medium text-gray-500">{t('routeAudit.report.estimate')}</p>
 
               <div className="mt-6 rounded-xl border border-amber-100 bg-amber-50 p-4">
-                <h3 className="font-bold text-amber-900">Zone comparison</h3>
-                <div className="mt-3 grid grid-cols-3 gap-3 text-center text-sm">
-                  <div><span className="block text-lg font-bold text-amber-900">~{result.hours} hrs</span><span className="text-xs text-amber-700">Without zones</span></div>
-                  <div><span className="block text-lg font-bold text-emerald-700">~{Math.max(1, result.hours - result.zoneSavings)} hrs</span><span className="text-xs text-amber-700">With zones</span></div>
-                  <div><span className="block text-lg font-bold text-emerald-700">~{result.zoneSavings} hrs</span><span className="text-xs text-amber-700">Saved per week</span></div>
-                </div>
-              </div>
+                              <h3 className="font-bold text-amber-900">{t('routeAudit.zoneComparison.title')}</h3>
+                              <div className="mt-3 grid grid-cols-3 gap-3 text-center text-sm">
+                                <div><span className="block text-lg font-bold text-amber-900">~{result.hours} hrs</span><span className="text-xs text-amber-700">{t('routeAudit.zoneComparison.withoutZones')}</span></div>
+                                <div><span className="block text-lg font-bold text-emerald-700">~{Math.max(1, result.hours - result.zoneSavings)} hrs</span><span className="text-xs text-amber-700">{t('routeAudit.zoneComparison.withZones')}</span></div>
+                                <div><span className="block text-lg font-bold text-emerald-700">~{result.zoneSavings} hrs</span><span className="text-xs text-amber-700">{t('routeAudit.zoneComparison.savedPerWeek')}</span></div>
+                              </div>
+                            </div>
 
               <div className="mt-6 rounded-xl border border-gray-200 p-4"><h3 className="font-bold">{t('routeAudit.report.mathTitle')}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600">{t('routeAudit.report.formula')}</p></div>
               {result.lawnsBucket === 'under_10' ? <p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p> : result.lawnsBucket === '50_plus' ? <p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p> : result.crewBucket === '4_plus' ? <p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p> : null}

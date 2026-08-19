@@ -1617,6 +1617,12 @@
       "mathTitle": "Here's the math",
       "formula": "Weekly lawns × 0.75 hours = weekly hours wasted. Weekly hours × 4.33 weeks × $45/hour = monthly revenue impact. Monthly impact × 12 × 0.6 seasonal factor = annual impact (lawn season ≈ 7 months)."
     },
+    "zoneComparison": {
+      "title": "Zone comparison",
+      "withoutZones": "Without zones",
+      "withZones": "With zones",
+      "savedPerWeek": "Saved per week"
+    },
     "branches": {
       "small": "You might not need automation yet — here's what we offer when you grow.",
       "pricing": "See pricing",
