@@ -20,17 +20,17 @@ STATE_FILE = pathlib.Path("/opt/data/mowgo/leads/route_audit_replies.json")
 LOCK_FILE = STATE_FILE.with_suffix(".lock")
 
 AUTO_SUBJECT = "Your route audit - next steps"
-AUTO_BODY = """Thanks for the OK.
+AUTO_BODY = """Thanks for the reply.
 
-I'll map your route and send it over within 24 hours.
+I'll put a route map together for you and send it over within 24 hours.
 
-While you wait, the numbers from your audit: a crew your size is losing about $17,887 a year to route waste. That's drive time that could be billable hours.
+In the meantime, here's the free route audit I mentioned: it shows exactly how much drive time your crew is losing, broken down by stop. Takes about 2 minutes, no signup.
 
-MowGo fixes that automatically. It also handles the part that most owners tell me is the second biggest time sink: invoicing. You set a job to repeat, it schedules itself, and the invoice goes out when the work is done. No more building invoices from scratch each week.
+https://mowgoapp.com/route-audit
 
-Free for your first 5 clients. No card needed. https://mowgoapp.com/#/subscribe
+Free for your first 5 clients. No card needed.
 
-I'll follow up with your route map tomorrow.
+I'll be in touch with your route map tomorrow.
 
 - Aaron"""
 

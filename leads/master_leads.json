@@ -54858,15 +54858,15 @@
     }
   ],
   "template": {
-    "subject_with_name": "{{NAME}}, your crew is losing $11,691 a season",
-    "subject_without_name": "Your crew is losing $11,691 a season to bad routing",
-    "html_body_with_name": "Hi {{NAME}},\n\nI am Aaron. I run a crew in OKC. I built a scheduling app called MowGo because I could not find one that worked for crews like mine.\n\nHere is why I am writing: most crews in {{CITY}} are losing about $11,691 a season to backtracking and bad routing. That is about two months of mowing you are paying for but not billing.\n\nI built a free tool that shows you the exact number for your crew. Enter your stops and weekly hours, and it tells you what you are losing plus the 3 fixes that save you 10 hours a week.\n\nYou can run it right now in about 2 minutes. No signup, no card.\n\nhttps://mowgoapp.com/route-audit\n\nAaron\nOwner, MowGo\nmowgoapp.com\n\n---\nMowGo LLC\n14001 N Western Ave, Oklahoma City, OK 73114\nUnsubscribe: {{UNSUBSCRIBE}}",
-    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI am Aaron. I run a crew in OKC. I built a scheduling app called MowGo because I could not find one that worked for crews like mine.\n\nHere is why I am writing: most crews in {{CITY}} are losing about $11,691 a season to backtracking and bad routing. That is about two months of mowing you are paying for but not billing.\n\nI built a free tool that shows you the exact number for your crew. Enter your stops and weekly hours, and it tells you what you are losing plus the 3 fixes that save you 10 hours a week.\n\nYou can run it right now in about 2 minutes. No signup, no card.\n\nhttps://mowgoapp.com/route-audit\n\nAaron\nOwner, MowGo\nmowgoapp.com\n\n---\nMowGo LLC\n14001 N Western Ave, Oklahoma City, OK 73114\nUnsubscribe: {{UNSUBSCRIBE}}",
+    "subject_with_name": "{{NAME}}, question about your routes",
+    "subject_without_name": "Question about your routes",
+    "html_body_with_name": "Hi {{NAME}},\n\nI'm Aaron. I run a crew in OKC.\n\nI saw {{BUSINESS}} covers {{CITY}}. Looks like you've been at it a while.\n\nDo you batch your stops by neighborhood, or run them in the order they come in?\n\n- Aaron",
+    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI'm Aaron. I run a crew in OKC.\n\nI saw you cover {{CITY}}. Looks like you've been at it a while.\n\nDo you batch your stops by neighborhood, or run them in the order they come in?\n\n- Aaron",
     "subject": "Quick question from an OKC crew owner",
     "is_plain_text": true,
-    "follow_up_with_name": "Hi {{NAME}},\n\nI sent this a few days ago. Did you get a chance to run the route audit?\n\nShort version: most crews in {{CITY}} are losing about $11,691 a season to bad routing. The audit shows your number in 2 minutes.\n\nhttps://mowgoapp.com/route-audit\n\nAaron\nOwner, MowGo",
-    "follow_up_without_name": "Hey {{BUSINESS}} Team,\n\nI sent this a few days ago. Did you get a chance to run the route audit?\n\nShort version: most crews in {{CITY}} are losing about $11,691 a season to bad routing. The audit shows your number in 2 minutes.\n\nhttps://mowgoapp.com/route-audit\n\nAaron\nOwner, MowGo",
-    "follow_up_subject": "Quick follow up \u2014 your free route audit"
+    "follow_up_with_name": "Hi {{NAME}},\n\nI sent this a few days ago, thought you might be busy.\n\nI built a free tool that shows how much drive time your crew is losing. Takes 2 minutes, no signup, no card.\n\nhttps://mowgoapp.com/route-audit\n\n- Aaron",
+    "follow_up_without_name": "Hey {{BUSINESS}} Team,\n\nI sent this a few days ago, thought you might be busy.\n\nI built a free tool that shows how much drive time your crew is losing. Takes 2 minutes, no signup, no card.\n\nhttps://mowgoapp.com/route-audit\n\n- Aaron",
+    "follow_up_subject": "{{NAME}}, the free route audit"
   },
   "stats": {
     "total_leads": 3227,
