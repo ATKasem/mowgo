@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """MowGo Email Outreach — sends from verified lead database via SendGrid.
-Runs as a cron job M-F to send up to 50 emails/day (warm-up).
+Runs as a cron job M-F to send up to 100 emails/day.
 Uses the trifecta+board+humanizer approved template (plain text)."""
 
 import json, subprocess, datetime, pathlib, os
@@ -12,7 +12,7 @@ for _line in pathlib.Path("/opt/data/.env").read_text().splitlines():
     if "=" in _line and not _line.strip().startswith("#"):
         _k, _v = _line.split("=", 1); _env[_k.strip()] = _v.strip()
 API_KEY = os.environ.get("SENDGRID_API_KEY") or _env.get("SENDGRID_API_KEY", "")
-MAX_PER_DAY = 100  # Warm-up: 100/day
+MAX_PER_DAY = 100
 
 TEMPLATES = {}
 SUBJECTS = {}
@@ -92,7 +92,7 @@ def main():
         print(f"No leads to send ({datetime.datetime.now().isoformat()})")
         return
     
-    # Cap at 50/day for warm-up
+    # Cap at 100/day
     batch = ready[:min(MAX_PER_DAY, len(ready))]
     
     sent_count = 0

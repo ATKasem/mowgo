@@ -49,21 +49,52 @@ async function reconcileCrewQuantity(env, ownerId) {
     );
     if (!profileRes.ok) return;
     const [profile] = await profileRes.json();
-    if (!profile || profile.tier !== 'crew' || !profile.stripe_customer_id) return;
+    if (!profile || !profile.stripe_customer_id) return;
 
-    // Step 2: Find the owner's one billable Crew subscription. Do not mutate an
-    // arbitrary subscription when test artifacts or duplicate subscriptions
-    // exist on the same customer.
+    // Step 2: Fetch the customer's subscriptions once — used both for the
+    // Crew-tier reconciliation below and for the downgrade cleanup path.
     const subsRes = await fetch(
       `${STRIPE_API}/subscriptions?customer=${encodeURIComponent(profile.stripe_customer_id)}&status=all&limit=100`,
       { headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}` } },
     );
     if (!subsRes.ok) return;
     const subsData = await subsRes.json();
-    const crewBasePrices = new Set([env.STRIPE_PRICE_CREW, env.STRIPE_PRICE_CREW_ANNUAL].filter(Boolean));
     const priceIdOf = item => (typeof item.price === 'string' ? item.price : item.price?.id);
-    const subscriptions = (subsData.data || []).filter(subscription => {
-      if (!billableStatuses.has(subscription.status) || subscription.pause_collection) return false;
+    const addonPriceIds = new Set([addonPriceMonth, addonPriceYear].filter(Boolean));
+    const billable = (subsData.data || []).filter(
+      subscription => billableStatuses.has(subscription.status) && !subscription.pause_collection,
+    );
+
+    if (profile.tier !== 'crew') {
+      // Owner is no longer on the Crew tier — most commonly because they
+      // switched plans in place via the Stripe customer portal, which swaps
+      // the base line item's price on the SAME subscription without
+      // touching unrelated line items. The metered add-on item added by
+      // this helper would otherwise keep billing forever with nothing left
+      // to reconcile it away, so remove any stray add-on items directly.
+      for (const subscription of billable) {
+        const items = subscription.items?.data || [];
+        for (const item of items) {
+          if (!addonPriceIds.has(priceIdOf(item))) continue;
+          const res = await fetch(`${STRIPE_API}/subscription_items/${encodeURIComponent(item.id)}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ proration_behavior: 'none' }).toString(),
+          });
+          if (!res.ok) console.error('updateCrewQuantity: stray add-on cleanup failed', await res.text());
+        }
+      }
+      return;
+    }
+
+    // Step 3: Find the owner's one billable Crew subscription. Do not mutate an
+    // arbitrary subscription when test artifacts or duplicate subscriptions
+    // exist on the same customer.
+    const crewBasePrices = new Set([env.STRIPE_PRICE_CREW, env.STRIPE_PRICE_CREW_ANNUAL].filter(Boolean));
+    const subscriptions = billable.filter(subscription => {
       const items = subscription.items?.data || [];
       return items.some(item => crewBasePrices.has(priceIdOf(item)));
     });
@@ -78,7 +109,6 @@ async function reconcileCrewQuantity(env, ownerId) {
     // so an annual Crew subscription MUST use the annual add-on price, not the
     // monthly one, or the write below will be rejected outright.
     const items = subscription.items?.data || [];
-    const addonPriceIds = new Set([addonPriceMonth, addonPriceYear].filter(Boolean));
     const baseItem = items.find(item => crewBasePrices.has(priceIdOf(item)))
       || items.find(item => !addonPriceIds.has(priceIdOf(item)));
     const interval = baseItem?.price?.recurring?.interval;
