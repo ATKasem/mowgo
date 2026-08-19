@@ -37,7 +37,7 @@ export default function RouteAudit() {
     const next = {};
     if (!form.name.trim()) next.name = t('routeAudit.validation.name');
     if (!EMAIL_RE.test(form.email.trim()) || form.email.trim().length > 254) next.email = t('routeAudit.validation.email');
-    if (!/^\d{5}$/.test(form.zip)) next.zip = t('routeAudit.validation.zip');
+    if (!/^(?:\d{5}|[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d)$/.test(form.zip)) next.zip = t('routeAudit.validation.zip');
     if (form.phone.trim() && !PHONE_RE.test(form.phone.trim())) next.phone = t('routeAudit.validation.phone');
     if (!MIDPOINTS[form.lawns_bucket]) next.lawns_bucket = t('routeAudit.validation.lawns');
     if (!['solo', '2_3', '4_plus'].includes(form.crew_bucket)) next.crew_bucket = t('routeAudit.validation.crew');

@@ -1598,7 +1598,7 @@
     "validation": {
       "name": "Enter your first name.",
       "email": "Enter a valid email address.",
-      "zip": "Enter a valid 5-digit ZIP code.",
+      "zip": "Enter a valid US ZIP code or Canadian postal code.",
       "phone": "Enter a valid US phone number.",
       "lawns": "Select your lawns per week.",
       "crew": "Select your crew size."
