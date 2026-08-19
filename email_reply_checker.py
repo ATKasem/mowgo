@@ -262,12 +262,11 @@ def main():
             print(f"   Follow-up sequence tracked {'✅' if tracked else '❌'}")
             handled = sent and tracked
         elif positive:
-            sent = send_rates_report(r["email"])
-            print(f"   📤 Report auto-sent {'✅' if sent else '❌'}")
-            if sent:
-                insert_lead_touches(r["email"])
-                print("   📝 Nurture sequence queued ✅")
-            handled = sent
+            sent = send_auto_response(r["email"])
+            tracked = record_route_audit_reply(r["email"], sent)
+            print(f"   Route audit auto-response {'✅' if sent else '❌'}")
+            print(f"   Follow-up sequence tracked {'✅' if tracked else '❌'}")
+            handled = sent and tracked
         if handled:
             seen.add(r["id"])
         print("---")

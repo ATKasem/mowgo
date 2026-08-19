@@ -59,7 +59,7 @@ def personalize(lead):
     
     if name and lead.get("verified_name"):
         template = TEMPLATES["with_name"]
-        subject = SUBJECTS["with_name"]
+        subject = SUBJECTS["with_name"].replace("{{NAME}}", name)
         greeting = f"Hi {name},"
         body = template.replace("{{NAME}}", name)
     else:

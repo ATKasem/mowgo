@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""MowGo Email Follow-up — sends Day 3 follow-up to non-repliers via Resend.
+"""MowGo Email Follow-up — sends Day 3 follow-up to non-repliers.
 Runs M-W-F at noon to catch leads who were sent but didn't reply."""
 
 import json, subprocess, datetime, pathlib, os
 
 LEADS_FILE = "/opt/data/mowgo/leads/master_leads.json"
-# Use Resend API key from .env, fallback to env var
+# Use Resend API key from .env, fallback to env var or hardcoded
 _env = {}
 for _line in pathlib.Path("/opt/data/.env").read_text().splitlines():
     if "=" in _line and not _line.strip().startswith("#"):
@@ -35,7 +35,7 @@ def send_email(to_email, subject, text_body, from_idx):
     })
     result = subprocess.run(
         ["curl", "-s", "-w", "\n%{http_code}", "-X", "POST", "https://api.resend.com/emails",
-         "-H", f"Authorization: Bearer ***",
+         "-H", f"Authorization: Bearer {API_KEY}",
          "-H", "Content-Type: application/json",
          "-H", "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
          "-d", payload],
@@ -70,7 +70,7 @@ def main():
         
         if name and lead.get("verified_name"):
             body = t["follow_up_with_name"].replace("{{NAME}}", name)
-            subject = t["follow_up_subject"].replace("{{CITY}}", city)
+            subject = t["follow_up_subject"].replace("{{NAME}}", name).replace("{{CITY}}", city)
         else:
             body = t["follow_up_without_name"].replace("{{BUSINESS}}", business)
             subject = t["follow_up_subject"].replace("{{CITY}}", city)

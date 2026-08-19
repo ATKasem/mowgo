@@ -70,7 +70,7 @@ def main():
         
         if name and lead.get("verified_name"):
             body = t["follow_up_with_name"].replace("{{NAME}}", name)
-            subject = t["follow_up_subject"].replace("{{CITY}}", city)
+            subject = t["follow_up_subject"].replace("{{NAME}}", name).replace("{{CITY}}", city)
         else:
             body = t["follow_up_without_name"].replace("{{BUSINESS}}", business)
             subject = t["follow_up_subject"].replace("{{CITY}}", city)
