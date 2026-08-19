@@ -50,6 +50,7 @@ async function reconcileCrewQuantity(env, ownerId) {
     if (!profileRes.ok) return;
     const [profile] = await profileRes.json();
     if (!profile || !profile.stripe_customer_id) return;
+    if (profile.tier !== 'crew') return;  // Only reconcile crew add-ons for crew-tier owners
 
     // Step 2: Fetch the customer's subscriptions once — used both for the
     // Crew-tier reconciliation below and for the downgrade cleanup path.
