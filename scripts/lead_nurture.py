@@ -255,7 +255,7 @@ def main():
     if not SUPABASE_URL or not SERVICE_KEY:
         print("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not configured", file=sys.stderr)
         sys.exit(1)
-    mode = sys.argv[1] if len(sys.argv) > 1 else "--dry-run"
+    mode = sys.argv[1] if len(sys.argv) > 1 else "--send"
     run(dry_run=(mode != "--send"))
 
 
