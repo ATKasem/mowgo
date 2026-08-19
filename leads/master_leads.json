@@ -54864,8 +54864,8 @@
     "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI'm Aaron. I run a crew in OKC.\n\nI saw you cover {{CITY}}. Looks like you've been at it a while.\n\nDo you batch your stops by neighborhood, or run them in the order they come in?\n\n- Aaron",
     "subject": "Quick question from an OKC crew owner",
     "is_plain_text": true,
-    "follow_up_with_name": "Hi {{NAME}},\n\nI sent this a few days ago, thought you might be busy.\n\nI built a free tool that shows how much drive time your crew is losing. Takes 2 minutes, no signup, no card.\n\nhttps://mowgoapp.com/route-audit\n\n- Aaron",
-    "follow_up_without_name": "Hey {{BUSINESS}} Team,\n\nI sent this a few days ago, thought you might be busy.\n\nI built a free tool that shows how much drive time your crew is losing. Takes 2 minutes, no signup, no card.\n\nhttps://mowgoapp.com/route-audit\n\n- Aaron",
+    "follow_up_with_name": "Hi {{NAME}},\n\nI sent this a few days ago, thought you might be busy.\n\nI'm doing 10 route audits this week for crews in {{CITY}}. Yours is still in the queue.\n\nIt's free, takes 2 minutes, no signup. Shows you exactly how much drive time your crew is losing.\n\nhttps://mowgoapp.com/route-audit\n\nIf the timing isn't right, do you know any other crew owners in {{CITY}} who might want to see how much they're wasting on bad routing?\n\n- Aaron",
+    "follow_up_without_name": "Hey {{BUSINESS}} Team,\n\nI sent this a few days ago, thought you might be busy.\n\nI'm doing 10 route audits this week for crews in {{CITY}}. Yours is still in the queue.\n\nIt's free, takes 2 minutes, no signup. Shows you exactly how much drive time your crew is losing.\n\nhttps://mowgoapp.com/route-audit\n\nIf the timing isn't right, do you know any other crew owners in {{CITY}} who might want to see how much they're wasting on bad routing?\n\n- Aaron",
     "follow_up_subject": "{{NAME}}, the free route audit"
   },
   "stats": {

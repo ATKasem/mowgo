@@ -35,7 +35,9 @@ def send_email(to_email, subject, text_body, from_idx):
         "to": [to_email],
         "subject": subject,
         "text": text_body,
-        "reply_to": "hermes.assistant.job@gmail.com"
+        "reply_to": "hermes.assistant.job@gmail.com",
+        "open_tracking": True,
+        "click_tracking": True
     })
     result = subprocess.run(
         ["curl", "-s", "-w", "\n%{http_code}", "-X", "POST", "https://api.resend.com/emails",
