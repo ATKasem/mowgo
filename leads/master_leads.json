@@ -54860,8 +54860,8 @@
   "template": {
     "subject_with_name": "{{NAME}}, question about your routes",
     "subject_without_name": "Question about your routes",
-    "html_body_with_name": "Hi {{NAME}},\n\nI'm Aaron. I run a crew in OKC.\n\nI saw {{BUSINESS}} covers {{CITY}}. Looks like you've been at it a while.\n\nDo you batch your stops by neighborhood, or run them in the order they come in?\n\n- Aaron",
-    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI'm Aaron. I run a crew in OKC.\n\nI saw you cover {{CITY}}. Looks like you've been at it a while.\n\nDo you batch your stops by neighborhood, or run them in the order they come in?\n\n- Aaron",
+    "html_body_with_name": "Hi {{NAME}},\n\nI'm Aaron. I run a crew in OKC.\n\nI saw {{BUSINESS}} covers {{CITY}}. You're hitting stops all over town.\n\nDo you batch by neighborhood, or run them in the order they come in?\n\n- Aaron",
+    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI'm Aaron. I run a crew in OKC.\n\nI saw you cover {{CITY}}. You're hitting stops all over town.\n\nDo you batch by neighborhood, or run them in the order they come in?\n\n- Aaron",
     "subject": "Quick question from an OKC crew owner",
     "is_plain_text": true,
     "follow_up_with_name": "Hi {{NAME}},\n\nI sent this a few days ago, thought you might be busy.\n\nI'm doing 10 route audits this week for crews in {{CITY}}. Yours is still in the queue.\n\nIt's free, takes 2 minutes, no signup. Shows you exactly how much drive time your crew is losing.\n\nhttps://mowgoapp.com/route-audit\n\nIf the timing isn't right, do you know any other crew owners in {{CITY}} who might want to see how much they're wasting on bad routing?\n\n- Aaron",
