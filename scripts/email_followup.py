@@ -10,7 +10,7 @@ _env = {}
 for _line in pathlib.Path("/opt/data/.env").read_text().splitlines():
     if "=" in _line and not _line.strip().startswith("#"):
         _k, _v = _line.split("=", 1); _env[_k.strip()] = _v.strip()
-API_KEY = os.environ.get("RESEND_API_KEY") or _env.get("RESEND_API_KEY", "«redacted:re…»")
+API_KEY = os.environ.get("RESEND_API_KEY") or _env.get("RESEND_API_KEY", "")
 MAX_FOLLOW_UPS = 25  # 25/day so total stays under 50/day across send+followup
 
 FROM_NAMES = ["Aaron <aaron@mowgoapp.com>", "Aaron <hello@mowgoapp.com>"]
