@@ -38,7 +38,10 @@ YARD_SIZES = [
 ]
 POSITIVE_RE = re.compile(
     r"\byes\b|\bsure\b|\bsend it\b|\bgo ahead\b|\bye[ah]+\b|\bok\b|"
-    r"\bthat would be great\b|\bi want\b|\bplease\b.*\bsend\b|\bsend me\b",
+    r"\bthat would be great\b|\bi want\b|\bplease\b.*\bsend\b|\bsend me\b|"
+    r"\binterested\b|\bsounds good\b|\babsolutely\b|\bplease do\b|"
+    r"\bi.d like that\b|\bcount me in\b|\blet.s do it\b|\bsign me up\b|"
+    r"\bshow me\b|\btell me more\b|\bi.m in\b",
     re.IGNORECASE,
 )
 ROUTE_AUDIT_SUBJECT_RE = re.compile(r"your (?:free )?route audit", re.IGNORECASE)
@@ -248,12 +251,29 @@ def main():
         print("")  # silent — nothing new
         return
     
+    # Load sent leads so we only auto-respond to people we actually emailed
+    try:
+        sent_emails = set()
+        master = json.loads(BASE.with_name("master_leads.json").read_text())
+        for l in master.get("leads", []):
+            if l.get("sent"):
+                sent_emails.add(l.get("email", "").strip().lower())
+    except Exception:
+        sent_emails = set()
+
     # Output new replies
     for r in fresh:
+        replied_email = r["email"].strip().lower()
         print(f"📬 REPLY FROM: {r['from']}")
         print(f"   Subject: {r['subject']}")
         print(f"   Body: {r['body'][:300]}")
-        positive = POSITIVE_RE.search(authored_reply(r["body"]))
+        positive = bool(POSITIVE_RE.search(authored_reply(r["body"])))
+        # Only auto-respond if we've actually contacted this person
+        if sent_emails and replied_email not in sent_emails:
+            print(f"   ⏭ Sender not in outreach list — skipping auto-response")
+            handled = True
+            seen.add(r["id"])
+            continue
         handled = True
         if is_route_audit_reply(r["subject"]) and positive:
             sent = send_auto_response(r["email"])
