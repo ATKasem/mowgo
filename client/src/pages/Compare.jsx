@@ -413,6 +413,14 @@ export default function Compare() {
         </div>
       </section>
 
+      <section className="max-w-4xl mx-auto px-4 py-8">
+        <h2 className="text-sm font-semibold text-[var(--color-text-muted)]">Related</h2>
+        <p className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[var(--color-text-muted)]">
+          <Link to="/rates" className="hover:text-emerald-400">Lawn rates by city</Link>
+          <Link to="/route-audit" className="hover:text-emerald-400">Free route audit</Link>
+        </p>
+      </section>
+
       {/* Footer */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">

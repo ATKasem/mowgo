@@ -147,6 +147,13 @@ export default function RouteAudit() {
             </div>
           )}
         </section>
+        <section className="mt-10 border-t border-gray-200 pt-6">
+          <h2 className="text-sm font-semibold text-[var(--color-text-muted)]">Related</h2>
+          <p className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[var(--color-text-muted)]">
+            <Link to="/compare" className="hover:text-emerald-400">Compare lawn care software</Link>
+            <Link to="/rates" className="hover:text-emerald-400">Lawn rates by city</Link>
+          </p>
+        </section>
       </main>
     </div>
   );
