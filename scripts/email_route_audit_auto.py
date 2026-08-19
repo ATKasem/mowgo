@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Send route-audit reply and follow-up emails through SendGrid."""
+"""Send route-audit reply and follow-up emails through Resend."""
 
 import json
 import os
@@ -12,7 +12,7 @@ from contextlib import contextmanager
 import fcntl
 
 ENV_FILE = pathlib.Path("/opt/data/.env")
-SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
+RESEND_URL = "https://api.resend.com/emails"
 FROM_EMAIL = "aaron@mowgoapp.com"
 FROM_NAME = "Aaron"
 REPLY_TO_EMAIL = "hermes.assistant.job@gmail.com"
@@ -59,14 +59,14 @@ After Friday the map goes to the next crew.
 
 def _load_api_key():
     """Load the key from the process first, then the shared dotenv file."""
-    if os.environ.get("SENDGRID_API_KEY"):
-        return os.environ["SENDGRID_API_KEY"]
+    if os.environ.get("RESEND_API_KEY"):
+        return os.environ["RESEND_API_KEY"]
     if not ENV_FILE.exists():
         return ""
     for line in ENV_FILE.read_text().splitlines():
         if "=" in line and not line.lstrip().startswith("#"):
             key, value = line.split("=", 1)
-            if key.strip() == "SENDGRID_API_KEY":
+            if key.strip() == "RESEND_API_KEY":
                 return value.strip()
     return ""
 
@@ -116,30 +116,31 @@ def locked_state():
 
 
 def send_email(to_email, subject, text_body):
-    """Send a plain-text email. Return True only for SendGrid's 202 response."""
+    """Send a plain-text email via Resend. Return True for a 200 response."""
     api_key = _load_api_key()
     if not api_key:
-        print("  SENDGRID_API_KEY not configured - email not sent")
+        print("  RESEND_API_KEY not configured - email not sent")
         return False
 
     payload = json.dumps({
-        "personalizations": [{"to": [{"email": to_email}]}],
-        "from": {"email": FROM_EMAIL, "name": FROM_NAME},
-        "reply_to": {"email": REPLY_TO_EMAIL, "name": FROM_NAME},
+        "from": f"{FROM_NAME} <{FROM_EMAIL}>",
+        "to": [to_email],
         "subject": subject,
-        "content": [{"type": "text/plain", "value": text_body}],
+        "text": text_body,
+        "reply_to": REPLY_TO_EMAIL,
     }).encode()
-    request = urllib.request.Request(SENDGRID_URL, data=payload, method="POST")
+    request = urllib.request.Request(RESEND_URL, data=payload, method="POST")
     request.add_header("Authorization", f"Bearer {api_key}")
     request.add_header("Content-Type", "application/json")
+    request.add_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36")
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             response.read()
-            return response.status == 202
+            return response.status == 200
     except urllib.error.HTTPError as error:
-        print(f"  SendGrid error: {error.code} {error.read().decode(errors='replace')[:200]}")
+        print(f"  Resend error: {error.code} {error.read().decode(errors='replace')[:200]}")
     except Exception as error:
-        print(f"  SendGrid error: {error}")
+        print(f"  Resend error: {error}")
     return False
 
 

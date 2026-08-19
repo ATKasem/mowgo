@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """MowGo Onboarding Email Sequence — Day 1/2/3/7 nurture for new signups.
-Runs daily. Sends via SendGrid. Silent when nothing to send."""
+Runs daily. Sends via Resend. Silent when nothing to send."""
 
 import json, subprocess, datetime, pathlib, os
 
@@ -8,7 +8,7 @@ _env = {}
 for _line in pathlib.Path("/opt/data/.env").read_text().splitlines():
     if "=" in _line and not _line.strip().startswith("#"):
         _k, _v = _line.split("=", 1); _env[_k.strip()] = _v.strip()
-API_KEY = os.environ.get("SENDGRID_API_KEY") or _env.get("SENDGRID_API_KEY", "")
+API_KEY = os.environ.get("RESEND_API_KEY") or _env.get("RESEND_API_KEY", "")
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or _env.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SUPABASE_URL = "https://vqgiynfrpsqddjrayczc.supabase.co"
 NOW = datetime.datetime.now(datetime.timezone.utc)
@@ -23,18 +23,19 @@ def api_post(url, headers, body):
 
 def send_email(to_email, subject, text_body):
     payload = json.dumps({
-        "personalizations": [{"to": [{"email": to_email}]}],
-        "from": {"email": "aaron@mowgoapp.com", "name": "Aaron from MowGo"},
-        "reply_to": {"email": "hello@mowgoapp.com", "name": "Aaron"},
+        "from": "Aaron from MowGo <aaron@mowgoapp.com>",
+        "to": [to_email],
         "subject": subject,
-        "content": [{"type": "text/plain", "value": text_body}]
+        "text": text_body,
+        "reply_to": "hello@mowgoapp.com"
     })
-    r = subprocess.run(["curl", "-s", "-w", "\n%{http_code}", "-X", "POST", "https://api.sendgrid.com/v3/mail/send",
+    r = subprocess.run(["curl", "-s", "-w", "\n%{http_code}", "-X", "POST", "https://api.resend.com/emails",
          "-H", f"Authorization: Bearer {API_KEY}",
          "-H", "Content-Type: application/json",
+         "-H", "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
          "-d", payload], capture_output=True, text=True, timeout=30)
     parts = r.stdout.strip().split("\n")
-    return parts[-1] if parts else "000" == "202"
+    return (parts[-1] if parts else "000") == "200"
 
 # ── Templates ────────────────────────────────────────────────────────────────
 

@@ -71,9 +71,18 @@ I personally map 10 routes per week. Reply with "OK" within the next 48 hours an
 }
 
 async function sendEmail(env, name, email, hours, monthly, annual, lawnsBucket, crewBucket) {
-  if (!env.SENDGRID_API_KEY) { console.warn('Route audit email skipped: SENDGRID_API_KEY is not configured'); return; }
+  if (!env.RESEND_API_KEY) { console.warn('Route audit email skipped: RESEND_API_KEY is not configured'); return; }
   try {
-    const response = await fetch('https://api.sendgrid.com/v3/mail/send', { method: 'POST', headers: { Authorization: `Bearer ${env.SENDGRID_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ personalizations: [{ to: [{ email }] }], from: { email: 'aaron@mowgoapp.com', name: 'Aaron' }, reply_to: { email: 'hermes.assistant.job@gmail.com', name: 'Hermes' }, subject: `Your route audit: ~${hours} hrs/week on the table`, content: [{ type: 'text/html', value: emailHtml(name, hours, monthly, annual, lawnsBucket, crewBucket) }], tracking_settings: { open_tracking: { enable: true }, click_tracking: { enable: true } } }) });
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Aaron <aaron@mowgoapp.com>',
+        to: [email],
+        subject: `Your route audit: ~${hours} hrs/week on the table`,
+        html: emailHtml(name, hours, monthly, annual, lawnsBucket, crewBucket),
+      }),
+    });
     if (!response.ok) console.warn('Route audit email failed:', response.status, await response.text());
   } catch (error) { console.warn('Route audit email failed:', error?.message || error); }
 }
