@@ -3,8 +3,14 @@
 to outreach emails. Posts new replies to stdout for cron delivery.
 Silent when nothing new."""
 
-import json, imaplib, email, re, pathlib, datetime as dt
+import json, imaplib, email, re, pathlib, datetime as dt, html
 import urllib.request, urllib.error
+from email.header import decode_header, make_header
+
+try:
+    from scripts.email_route_audit_auto import locked_state, send_auto_response
+except ModuleNotFoundError:  # Support direct execution from scripts/.
+    from email_route_audit_auto import locked_state, send_auto_response
 
 BASE = pathlib.Path("/opt/data/mowgo/leads")
 SEEN = BASE / "email_replies_seen.json"
@@ -35,6 +41,41 @@ POSITIVE_RE = re.compile(
     r"\bthat would be great\b|\bi want\b|\bplease\b.*\bsend\b|\bsend me\b",
     re.IGNORECASE,
 )
+ROUTE_AUDIT_SUBJECT_RE = re.compile(r"your (?:free )?route audit", re.IGNORECASE)
+
+
+def is_route_audit_reply(subject):
+    """Return whether the inbound reply subject belongs to a route audit."""
+    return bool(ROUTE_AUDIT_SUBJECT_RE.search(subject or ""))
+
+
+def record_route_audit_reply(email_addr, sent_auto):
+    """Persist one route-audit sequence per normalized email address."""
+    normalized = email_addr.strip().lower()
+    try:
+        with locked_state() as records:
+            records[:] = [item for item in records if item.get("email", "").lower() != normalized]
+            records.append({
+                "email": normalized,
+                "replied_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "sent_auto": bool(sent_auto),
+                "sent_f1": False,
+                "sent_f2": False,
+                "trial_started": False,
+            })
+    except (OSError, RuntimeError, json.JSONDecodeError) as error:
+        print(f"   Could not update route-audit state: {error}")
+        return False
+    return True
+
+
+def authored_reply(body):
+    """Exclude common quoted-history markers from positive-signal matching."""
+    separators = (r"^On .+wrote:\s*$", r"^-{2,}\s*Original Message\s*-{2,}$", r"^From:\s")
+    result = body
+    for separator in separators:
+        result = re.split(separator, result, maxsplit=1, flags=re.IGNORECASE | re.MULTILINE)[0]
+    return "\n".join(line for line in result.splitlines() if not line.lstrip().startswith(">"))
 
 
 def _cell(value, align="left"):
@@ -72,30 +113,31 @@ def rates_report_html(name=""):
 
 
 def send_rates_report(email_addr, name=""):
-    api_key = ENV.get("RESEND_API_KEY", "")
+    api_key = ENV.get("SENDGRID_API_KEY", "")
     if not api_key:
-        print("  ⚠️ RESEND_API_KEY not configured — can't auto-send report")
+        print("  ⚠️ SENDGRID_API_KEY not configured — can't auto-send report")
         return False
+    from_name, from_addr = "Aaron <aaron@mowgoapp.com>".split(" <")
+    from_addr = from_addr.rstrip(">")
     payload = json.dumps({
-        "from": "Aaron <aaron@mowgoapp.com>",
-        "reply_to": "Hermes <hermes.assistant.job@gmail.com>",
-        "to": email_addr,
+        "personalizations": [{"to": [{"email": email_addr}]}],
+        "from": {"email": from_addr, "name": from_name},
+        "reply_to": {"email": "hermes.assistant.job@gmail.com", "name": "Hermes"},
         "subject": "Your Oklahoma Lawn Rates Report — What to Charge in Your City",
-        "html": rates_report_html(name),
+        "content": [{"type": "text/html", "value": rates_report_html(name)}],
     }).encode()
-    req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
+    req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
     req.add_header("Authorization", f"Bearer {api_key}")
     req.add_header("Content-Type", "application/json")
-    req.add_header("User-Agent", "Mozilla/5.0")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             r.read()
             return True
     except urllib.error.HTTPError as e:
-        print(f"  ❌ Resend error: {e.code} {e.read().decode()[:200]}")
+        print(f"  ❌ SendGrid error: {e.code} {e.read().decode()[:200]}")
         return False
     except Exception as e:
-        print(f"  ❌ Resend error: {e}")
+        print(f"  ❌ SendGrid error: {e}")
         return False
 
 
@@ -139,11 +181,11 @@ def check_inbox():
     
     replies = []
     for uid in ids[-20:]:  # max 20 per check
-        _, msg_data = mail.fetch(uid, "(RFC822)")
+        _, msg_data = mail.fetch(uid, "(BODY.PEEK[])")
         raw = msg_data[0][1] if msg_data[0] else b""
         msg = email.message_from_bytes(raw)
         
-        subject = msg.get("Subject", "")
+        subject = str(make_header(decode_header(msg.get("Subject", ""))))
         sender = msg.get("From", "")
         reply_to = msg.get("Reply-To", "")
         
@@ -158,6 +200,12 @@ def check_inbox():
                 if part.get_content_type() == "text/plain":
                     body = part.get_payload(decode=True).decode("utf-8", errors="ignore")
                     break
+            if not body:
+                for part in msg.walk():
+                    if part.get_content_type() == "text/html":
+                        raw_html = part.get_payload(decode=True).decode("utf-8", errors="ignore")
+                        body = html.unescape(re.sub(r"<[^>]+>", " ", raw_html))
+                        break
         else:
             body = msg.get_payload(decode=True).decode("utf-8", errors="ignore")
         
@@ -170,6 +218,7 @@ def check_inbox():
             "email": sender_email,
             "subject": subject,
             "body": body[:500].strip(),
+            "id": msg.get("Message-ID") or uid.decode(),
             "date": str(dt.datetime.now())[:19]
         })
     
@@ -183,29 +232,36 @@ def main():
         except: seen = set()
     
     replies = check_inbox()
-    fresh = [r for r in replies if r["email"] not in seen]
+    fresh = [r for r in replies if r["id"] not in seen]
     
     if not fresh:
         print("")  # silent — nothing new
         return
-    
-    # Mark seen
-    for r in fresh:
-        seen.add(r["email"])
-    SEEN.write_text(json.dumps(list(seen)))
     
     # Output new replies
     for r in fresh:
         print(f"📬 REPLY FROM: {r['from']}")
         print(f"   Subject: {r['subject']}")
         print(f"   Body: {r['body'][:300]}")
-        if POSITIVE_RE.search(r["body"].lower()):
+        positive = POSITIVE_RE.search(authored_reply(r["body"]))
+        handled = True
+        if is_route_audit_reply(r["subject"]) and positive:
+            sent = send_auto_response(r["email"])
+            tracked = record_route_audit_reply(r["email"], sent)
+            print(f"   Route audit auto-response {'✅' if sent else '❌'}")
+            print(f"   Follow-up sequence tracked {'✅' if tracked else '❌'}")
+            handled = sent and tracked
+        elif positive:
             sent = send_rates_report(r["email"])
             print(f"   📤 Report auto-sent {'✅' if sent else '❌'}")
             if sent:
                 insert_lead_touches(r["email"])
                 print("   📝 Nurture sequence queued ✅")
+            handled = sent
+        if handled:
+            seen.add(r["id"])
         print("---")
+    SEEN.write_text(json.dumps(sorted(seen)))
 
 if __name__ == "__main__":
     main()
