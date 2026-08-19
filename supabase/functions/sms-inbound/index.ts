@@ -23,7 +23,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-/** Normalize a US phone to E.164 (+1XXXXXXXXXX), or null if not a valid US number. */
+/** Normalize a US/Canadian phone to E.164 (+1XXXXXXXXXX), or null if not a valid US/Canadian number. */
 export function normalizePhone(raw: string | null | undefined): string | null {
   const digits = (raw ?? "").replace(/\D/g, "");
   if (digits.length === 10) return "+1" + digits;

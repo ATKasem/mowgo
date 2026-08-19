@@ -526,7 +526,7 @@ export default function Settings() {
           </div>
           {(!profile?.tier || profile.tier === 'free') && (
             <div className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] pt-2 border-t border-gray-100 dark:border-gray-800">
-              {tr("Upgrade to Solo ($39/mo) or Crew ($79/mo) for unlimited clients, offline mode, and more.")}
+              {tr("Upgrade to Solo ($39 USD/mo) or Crew ($79 USD/mo) for unlimited clients, offline mode, and more.")}
             </div>
           )}
           {profile?.stripe_customer_id && (
@@ -622,7 +622,7 @@ export default function Settings() {
         <div className="card p-5 space-y-3">
           <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm flex items-center gap-2"><Users className="w-4 h-4 text-brand" />{tr("Team")}</h4>
           {!TEAM_ACCESS_TIERS.includes(profile?.tier) && (
-            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Team management is available on the Crew plan ($79/mo). Upgrade to add crew members, assign jobs, and track progress.")}</p>
+            <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{tr("Team management is available on the Crew plan ($79 USD/mo). Upgrade to add crew members, assign jobs, and track progress.")}</p>
           )}
           {teamError && (
             <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg p-3" role="alert">

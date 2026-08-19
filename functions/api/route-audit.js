@@ -166,7 +166,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     if (name.length > 100) return json({ error: 'Name must be 100 characters or fewer.' }, 400, origin);
     if (email.length > 254 || !EMAIL_RE.test(email)) return json({ error: 'Enter a valid email address.' }, 400, origin);
     if (!/^(?:\d{5}|[A-Z]\d[A-Z] \d[A-Z]\d)$/i.test(zip)) return json({ error: 'Enter a valid US ZIP code or Canadian postal code.' }, 400, origin);
-    if (phone && !PHONE_RE.test(phone)) return json({ error: 'Enter a valid US phone number.' }, 400, origin);
+    if (phone && !PHONE_RE.test(phone)) return json({ error: 'Enter a valid US or Canadian phone number.' }, 400, origin);
     if (!Object.hasOwn(MIDPOINTS, body.lawns_bucket)) return json({ error: 'Select a valid lawns-per-week range.' }, 400, origin);
     if (!CREWS.has(body.crew_bucket)) return json({ error: 'Select a valid crew size.' }, 400, origin);
     const rawHours = MIDPOINTS[body.lawns_bucket] * 0.75;

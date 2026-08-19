@@ -82,7 +82,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     if (!name) return json({ error: 'Name is required.' }, 400);
     if (name.length > 100) return json({ error: 'Name must be 100 characters or fewer.' }, 400);
     if (!phone && !email) return json({ error: 'A phone number or email is required.' }, 400);
-    if (phone && !PHONE_RE.test(phone)) return json({ error: 'Enter a valid US phone number.' }, 400);
+    if (phone && !PHONE_RE.test(phone)) return json({ error: 'Enter a valid US or Canadian phone number.' }, 400);
     if (email && (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) return json({ error: 'Enter a valid email address.' }, 400);
     if (address.length > 200) return json({ error: 'Address must be 200 characters or fewer.' }, 400);
     if (!UUID_RE.test(body.business_id || '')) return json({ error: 'Invalid quote request link.' }, 400);

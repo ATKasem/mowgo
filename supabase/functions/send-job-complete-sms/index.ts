@@ -52,6 +52,7 @@ function originHeaders(origin: string | null) {
   };
 }
 
+/** Normalize a US/Canadian phone to E.164 (+1XXXXXXXXXX), or null if not a valid US/Canadian number. */
 function normalizePhone(raw: string | null | undefined): string | null {
   const digits = (raw ?? "").replace(/\D/g, "");
   if (digits.length === 10) return "+1" + digits;

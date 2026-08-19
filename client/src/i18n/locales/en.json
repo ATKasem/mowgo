@@ -1599,7 +1599,7 @@
       "name": "Enter your first name.",
       "email": "Enter a valid email address.",
       "zip": "Enter a valid US ZIP code or Canadian postal code.",
-      "phone": "Enter a valid US phone number.",
+      "phone": "Enter a valid US or Canadian phone number.",
       "lawns": "Select your lawns per week.",
       "crew": "Select your crew size."
     },

@@ -8,7 +8,7 @@ export async function onRequestPost(context) {
   const consentInfo = !!body?.consent_info;
   const consentMkt = !!body?.consent_mkt;
   if (!/^(1?\d{10})$/.test(phone)) {
-    return json({ ok: false, error: "Enter a valid 10-digit US phone number." }, 400);
+    return json({ ok: false, error: "Enter a valid 10-digit US or Canadian phone number." }, 400);
   }
   const e164 = "+" + (phone.length === 10 ? "1" + phone : phone);
 
