@@ -1,6 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { haversineKm, optimizeRoute, suggestDay, tourDistance } from './optimizeRoute.js';
+import {
+  haversineKm,
+  optimizeRoute,
+  optimizeRouteByZone,
+  suggestDay,
+  tourDistance,
+} from './optimizeRoute.js';
 
 // OKC-area demo coordinates
 const OKC = { lat: 35.4676, lng: -97.5164 };
@@ -87,6 +93,80 @@ test('optimizeRoute: 2-opt is anchor-aware (never worsens the anchor-inclusive t
 test('optimizeRoute: empty and single-job arrays', () => {
   assert.deepEqual(optimizeRoute([], OKC), []);
   assert.deepEqual(optimizeRoute([{ id: 'a', lat: 1, lng: 2 }], OKC), ['a']);
+});
+
+test('optimizeRouteByZone: jobs in two zones are grouped by zone', () => {
+  const jobs = [
+    { id: 'north-1', zone_id: 'north', lat: 35.7, lng: -97.5 },
+    { id: 'south-1', zone_id: 'south', lat: 35.3, lng: -97.5 },
+    { id: 'north-2', zone_id: 'north', lat: 35.71, lng: -97.5 },
+    { id: 'south-2', zone_id: 'south', lat: 35.31, lng: -97.5 },
+  ];
+  const zoneMap = new Map([
+    ['north', { name: 'North', color: '#0000ff' }],
+    ['south', { name: 'South', color: '#ff0000' }],
+  ]);
+
+  const order = optimizeRouteByZone(jobs, OKC, zoneMap);
+  const zones = order.map(id => jobs.find(job => job.id === id).zone_id);
+  assert.ok(
+    zones.join(',') === 'north,north,south,south'
+      || zones.join(',') === 'south,south,north,north',
+    `zones must be contiguous, got ${zones}`,
+  );
+});
+
+test('optimizeRoute: zone centroids determine which zone comes first', () => {
+  const anchor = { lat: 0, lng: 0 };
+  const jobs = [
+    { id: 'spread-near', zone_id: 'spread', lat: 0, lng: 0.1 },
+    { id: 'spread-far', zone_id: 'spread', lat: 0, lng: 10 },
+    { id: 'compact-1', zone_id: 'compact', lat: 0, lng: 2 },
+    { id: 'compact-2', zone_id: 'compact', lat: 0, lng: 2.1 },
+  ];
+  const zoneMap = new Map([
+    ['spread', { name: 'Spread', color: '#0000ff' }],
+    ['compact', { name: 'Compact', color: '#ff0000' }],
+  ]);
+
+  assert.deepEqual(
+    optimizeRoute(jobs, anchor, zoneMap),
+    ['compact-1', 'compact-2', 'spread-near', 'spread-far'],
+  );
+});
+
+test('optimizeRouteByZone: runs route optimization within each zone', () => {
+  const anchor = { lat: 0, lng: 0 };
+  const jobs = [
+    { id: 'far', zone_id: 'only', lat: 0, lng: 3 },
+    { id: 'near', zone_id: 'only', lat: 0, lng: 1 },
+    { id: 'middle', zone_id: 'only', lat: 0, lng: 2 },
+  ];
+  const zoneMap = new Map([['only', { name: 'Only', color: '#0000ff' }]]);
+
+  assert.deepEqual(optimizeRouteByZone(jobs, anchor, zoneMap), ['near', 'middle', 'far']);
+});
+
+test('optimizeRouteByZone: unzoned jobs go last', () => {
+  const jobs = [
+    { id: 'unzoned-1', zone_id: null, lat: 35.47, lng: -97.51 },
+    { id: 'zoned', zone_id: 'far', lat: 36.5, lng: -97.5 },
+    { id: 'unzoned-2', lat: 35.48, lng: -97.51 },
+  ];
+  const zoneMap = new Map([['far', { name: 'Far', color: '#0000ff' }]]);
+
+  assert.deepEqual(optimizeRouteByZone(jobs, OKC, zoneMap), ['zoned', 'unzoned-1', 'unzoned-2']);
+});
+
+test('optimizeRoute: works without a zone map', () => {
+  const anchor = { lat: 0, lng: 0 };
+  const jobs = [
+    { id: 'far', zone_id: 'a', lat: 0, lng: 10 },
+    { id: 'near', zone_id: 'b', lat: 0, lng: 1 },
+    { id: 'middle', zone_id: 'a', lat: 0, lng: 2 },
+  ];
+
+  assert.deepEqual(optimizeRoute(jobs, anchor), ['near', 'middle', 'far']);
 });
 
 test('suggestDay: picks closest day', () => {

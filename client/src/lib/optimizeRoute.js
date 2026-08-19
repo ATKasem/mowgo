@@ -94,11 +94,12 @@ export function suggestDay(jobsByDay, newClient) {
 }
 
 /**
- * optimizeRoute(jobs, anchor) → ordered job id array.
+ * optimizeRoute(jobs, anchor, zoneMap?) → ordered job id array.
  * jobs: [{ id, lat, lng }] — null lat/lng = unaddressable, stays in its
  * relative place (spec: "optimizer works around them").
  */
-export function optimizeRoute(jobs, anchor) {
+export function optimizeRoute(jobs, anchor, zoneMap) {
+  if (zoneMap !== undefined) return optimizeRouteByZone(jobs, anchor, zoneMap);
   if (jobs.length <= 2) return jobs.map(j => j.id);
   const addressable = jobs
     .map((j, idx) => ({ idx, lat: j.lat, lng: j.lng }))
@@ -127,4 +128,47 @@ export function optimizeRoute(jobs, anchor) {
     else result.push(without[wi++]);
   }
   return result.map(p => jobs[p.idx].id);
+}
+
+/**
+ * Groups jobs by zone, orders zones nearest-first from their centroid, then
+ * optimizes the jobs within each zone. Null/undefined zones always come last.
+ */
+export function optimizeRouteByZone(jobs, anchor, zoneMap) {
+  // zoneMap carries the caller's zone metadata; job.zone_id determines group
+  // membership so jobs remain routable even if that metadata is stale.
+  void zoneMap;
+
+  const zoneGroups = new Map();
+  const unzoned = [];
+  for (const job of jobs) {
+    if (job.zone_id == null) {
+      unzoned.push(job);
+      continue;
+    }
+    if (!zoneGroups.has(job.zone_id)) zoneGroups.set(job.zone_id, []);
+    zoneGroups.get(job.zone_id).push(job);
+  }
+
+  const zones = [...zoneGroups.values()].map(zoneJobs => {
+    const addressable = zoneJobs.filter(job => job.lat != null && job.lng != null);
+    const centroid = addressable.length === 0 ? null : {
+      lat: addressable.reduce((sum, job) => sum + job.lat, 0) / addressable.length,
+      lng: addressable.reduce((sum, job) => sum + job.lng, 0) / addressable.length,
+    };
+    return { jobs: zoneJobs, centroid };
+  });
+
+  if (anchor) {
+    zones.sort((a, b) => {
+      const distanceA = a.centroid ? haversineKm(anchor, a.centroid) : Infinity;
+      const distanceB = b.centroid ? haversineKm(anchor, b.centroid) : Infinity;
+      return distanceA - distanceB;
+    });
+  }
+
+  return [
+    ...zones.flatMap(zone => optimizeRoute(zone.jobs, anchor)),
+    ...optimizeRoute(unzoned, anchor),
+  ];
 }
