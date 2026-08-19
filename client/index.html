@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>MowGo — Lawn Care Business Software for Oklahoma Crews</title>
-    <meta name="description" content="Rain delay auto-reschedule, scheduling, routing, and invoicing for Oklahoma lawn care crews. Free for your first 5 clients. No credit card." />
+    <title>MowGo — Lawn Care Scheduling, Routing & Invoicing Software</title>
+    <meta name="description" content="Rain-delay auto-reschedule, scheduling, routing, and invoicing built for lawn care crews. Free for your first 5 clients. No credit card." />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#10b981" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -17,15 +17,15 @@
     <!-- Open Graph / social share (FB/IG-first strategy) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="MowGo" />
-    <meta property="og:title" content="MowGo — Lawn Care Business Software for Oklahoma Crews" />
-    <meta property="og:description" content="Rain on Tuesday? One tap moves your whole schedule and texts every client. Built in Oklahoma City, for Oklahoma crews. Free for 5 clients." />
+    <meta property="og:title" content="MowGo — Lawn Care Scheduling, Routing & Invoicing Software" />
+    <meta property="og:description" content="Rain on Tuesday? One tap moves your whole schedule and texts every client. Built in Oklahoma City, for crews everywhere. Free for 5 clients." />
     <meta property="og:url" content="https://mowgoapp.com/" />
     <meta property="og:image" content="https://mowgoapp.com/landing/dashboard.png" />
     <meta property="og:image:width" content="1536" />
     <meta property="og:image:height" content="643" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="MowGo — Lawn Care Business Software for Oklahoma Crews" />
-    <meta name="twitter:description" content="Rain on Tuesday? One tap moves your whole schedule and texts every client. Free for 5 clients." />
+    <meta name="twitter:title" content="MowGo — Lawn Care Scheduling, Routing & Invoicing Software" />
+    <meta name="twitter:description" content="Rain on Tuesday? One tap moves your whole schedule and texts every client. Built for crews, not office managers. Free for 5 clients." />
     <meta name="twitter:image" content="https://mowgoapp.com/landing/dashboard.png" />
     <link rel="canonical" href="https://mowgoapp.com/" />
 
@@ -39,11 +39,14 @@
       t.src=v;s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', 'YOUR_PIXEL_ID');
-      fbq('track', 'PageView');
+      const metaPixelId = "%VITE_META_PIXEL_ID%";
+      if (metaPixelId && !metaPixelId.includes('%VITE_')) {
+        fbq('init', metaPixelId);
+        fbq('track', 'PageView');
+      }
     </script>
     <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"
+      src="https://www.facebook.com/tr?id=%VITE_META_PIXEL_ID%&ev=PageView&noscript=1"
     /></noscript>
 
     <!-- Structured data -->

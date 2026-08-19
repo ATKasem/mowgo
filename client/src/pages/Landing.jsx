@@ -287,7 +287,11 @@ export default function Landing() {
         {/* Comparison Callout */}
         <FadeIn delay={200}>
           <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-white mb-1">{tr("How MowGo Solo stacks up")}</h3>
+            <h3 className="text-lg font-bold text-white mb-1">
+              <Link to="/compare" className="transition-colors hover:text-emerald-400">
+                {tr("How MowGo Solo stacks up")}
+              </Link>
+            </h3>
             <p className="text-sm text-[var(--color-text-muted)] mb-6">{tr("See what $39/mo gets your crew.")}</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -299,11 +303,11 @@ export default function Landing() {
                       <span className="block text-xs text-[var(--color-text-secondary)] font-normal">{tr("$39/mo")}</span>
                     </th>
                     <th className="text-center py-2.5 px-3">
-                      <span className="text-gray-300 font-semibold">{tr("Jobber Grow")}</span>
+                      <Link to="/compare" className="text-gray-300 font-semibold transition-colors hover:text-emerald-400">{tr("Jobber Grow")}</Link>
                       <span className="block text-xs text-[var(--color-text-secondary)] font-normal">{tr("$139/mo")}</span>
                     </th>
                     <th className="text-center py-2.5 pl-3">
-                      <span className="text-gray-300 font-semibold">{tr("LawnPro")}</span>
+                      <Link to="/switch-from-lawnpro" className="text-gray-300 font-semibold transition-colors hover:text-emerald-400">{tr("LawnPro")}</Link>
                       <span className="block text-xs text-[var(--color-text-secondary)] font-normal">{tr("$39/mo")}</span>
                     </th>
                   </tr>
