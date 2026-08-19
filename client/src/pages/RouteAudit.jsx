@@ -14,7 +14,8 @@ function reportFor(bucket) {
   const hours = Math.round(MIDPOINTS[bucket] * 0.75);
   const monthly = Math.round(MIDPOINTS[bucket] * 0.75 * 4.33 * 45);
   const annual = Math.round(MIDPOINTS[bucket] * 0.75 * 4.33 * 45 * 12 * 0.6);
-  return { hours, monthly, annual };
+  const zoneSavings = Math.round(hours * 0.18);
+  return { hours, monthly, annual, zoneSavings };
 }
 
 export default function RouteAudit() {
@@ -128,6 +129,16 @@ export default function RouteAudit() {
                 <div className="rounded-xl bg-emerald-50 p-3"><strong className="block text-2xl text-emerald-800">${result.annual.toLocaleString()}</strong><span className="text-xs text-gray-600">{t('routeAudit.report.annual')}</span></div>
               </div>
               <p className="mt-4 text-xs font-medium text-gray-500">{t('routeAudit.report.estimate')}</p>
+
+              <div className="mt-6 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                <h3 className="font-bold text-amber-900">Zone comparison</h3>
+                <div className="mt-3 grid grid-cols-3 gap-3 text-center text-sm">
+                  <div><span className="block text-lg font-bold text-amber-900">~{result.hours} hrs</span><span className="text-xs text-amber-700">Without zones</span></div>
+                  <div><span className="block text-lg font-bold text-emerald-700">~{Math.max(1, result.hours - result.zoneSavings)} hrs</span><span className="text-xs text-amber-700">With zones</span></div>
+                  <div><span className="block text-lg font-bold text-emerald-700">~{result.zoneSavings} hrs</span><span className="text-xs text-amber-700">Saved per week</span></div>
+                </div>
+              </div>
+
               <div className="mt-6 rounded-xl border border-gray-200 p-4"><h3 className="font-bold">{t('routeAudit.report.mathTitle')}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600">{t('routeAudit.report.formula')}</p></div>
               {result.lawnsBucket === 'under_10' ? <p className="mt-6 text-gray-700">{t('routeAudit.branches.small')}</p> : result.lawnsBucket === '50_plus' ? <p className="mt-6 text-gray-700">{t('routeAudit.branches.large')}</p> : result.crewBucket === '4_plus' ? <p className="mt-6 text-gray-700">{t('routeAudit.branches.crew')}</p> : null}
               <Link to="/subscribe" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white">{t('routeAudit.branches.cta', 'Start Free Trial')}<ArrowRight className="h-4 w-4" /></Link>
