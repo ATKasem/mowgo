@@ -24,37 +24,35 @@ AUTO_BODY = """Thanks for the OK.
 
 I'll map your route and send it over within 24 hours.
 
-While you wait, here's what I'd do if I were you: start a free trial of MowGo. It's free for your first 5 clients. No card needed.
+While you wait, the numbers from your audit: a crew your size is losing about $17,887 a year to route waste. That's drive time that could be billable hours.
 
-The reason: the 3 fixes I sent you work, but they're manual. MowGo does them automatically: zone scheduling, route optimization, recurring jobs. One click.
+MowGo fixes that automatically. It also handles the part that most owners tell me is the second biggest time sink: invoicing. You set a job to repeat, it schedules itself, and the invoice goes out when the work is done. No more building invoices from scratch each week.
 
-You're losing $17,887/year. MowGo is $468/year. That math works no matter how you slice it.
-
-Start here (no card): https://mowgoapp.com/#/subscribe
+Free for your first 5 clients. No card needed. https://mowgoapp.com/#/subscribe
 
 I'll follow up with your route map tomorrow.
 
 - Aaron"""
 
 FOLLOWUP_1_SUBJECT = "Your optimized route map is ready"
-FOLLOWUP_1_BODY = """I mapped your route. Here's what I found:
+FOLLOWUP_1_BODY = """Your route map is ready.
 
-Fixing the route order saves you about 2 hours/day. That's 10 hours/week. That's $2,484/month back in your pocket.
+If you're running 10 or more stops a day, reordering them by proximity saves you about 10 to 15 hours a week. That's $2,484 a month in season, about $17,887 over the year.
 
-MowGo does this automatically, every day, every route. You set it up once and it reorders stops by proximity.
+MowGo does this automatically, every day, on every route. It also handles your invoicing: set the schedule once, the job shows up, and the invoice goes out when the work is done. No more Sunday nights building invoices.
 
-I can't send the map as an attachment here, but if you start a free trial, it's the first thing you'll see on your Today screen.
-
-Free for 5 clients. No card: https://mowgoapp.com/#/subscribe
+The map is the first thing you'll see on your Today screen if you start a trial. Free for 5 clients, no card. https://mowgoapp.com/#/subscribe
 
 - Aaron"""
 
 FOLLOWUP_2_SUBJECT = "Your route map expires Friday"
-FOLLOWUP_2_BODY = """I'm only doing 10 of these this week. Your route analysis is still in the queue.
+FOLLOWUP_2_BODY = """I'm doing 10 of these route maps this week. Yours is still in the queue.
 
-If you want it, start a trial at https://mowgoapp.com/#/subscribe and I'll send your map immediately.
+If you want it, start a trial at https://mowgoapp.com/#/subscribe and I'll send your map today. The route optimizer, invoice scheduler, and everything else in MowGo comes with it.
 
-If not, no hard feelings. The audit email has the 3 fixes. Those alone will save you 5-10 hours/week.
+If not, no problem. The 3 fixes in your audit email will save you 5 to 10 hours a week on their own. MowGo just makes them automatic.
+
+After Friday the map goes to the next crew.
 
 - Aaron"""
 

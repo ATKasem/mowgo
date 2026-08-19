@@ -35,7 +35,11 @@ def send_email(to_email, subject, text_body, from_idx):
         "from": {"email": from_addr, "name": from_name},
         "reply_to": {"email": "hermes.assistant.job@gmail.com", "name": "Aaron"},
         "subject": subject,
-        "content": [{"type": "text/plain", "value": text_body}]
+        "content": [{"type": "text/plain", "value": text_body}],
+        "tracking_settings": {
+            "open_tracking": {"enable": True},
+            "click_tracking": {"enable": True}
+        }
     })
     result = subprocess.run(
         ["curl", "-s", "-w", "\n%{http_code}", "-X", "POST", "https://api.sendgrid.com/v3/mail/send",
