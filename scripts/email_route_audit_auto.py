@@ -28,7 +28,9 @@ In the meantime, here's the free route audit I mentioned: it shows exactly how m
 
 https://mowgoapp.com/route-audit
 
-Free for your first 5 clients. No card needed.
+If you want to see how MowGo fixes this automatically, start a free trial. No card needed.
+
+https://mowgoapp.com/subscribe
 
 I'll be in touch with your route map tomorrow.
 
