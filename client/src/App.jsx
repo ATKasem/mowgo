@@ -32,6 +32,9 @@ const JobberPriceIncrease = lazy(() => import('./pages/JobberPriceIncrease'));
 const QuoteIQAlternative = lazy(() => import('./pages/QuoteIQAlternative'));
 const RuunlyComparison = lazy(() => import('./pages/RuunlyComparison'));
 const ProBaseComparison = lazy(() => import('./pages/ProBaseComparison'));
+const JobberIsTooExpensive = lazy(() => import('./pages/JobberIsTooExpensive'));
+const NoPerUserFees = lazy(() => import('./pages/NoPerUserFees'));
+const BestForSmallCrews = lazy(() => import('./pages/BestForSmallCrews'));
 const Booking = lazy(() => import('./pages/Booking'));
 const PortalReturn = lazy(() => import('./pages/PortalReturn'));
 const AdminConcierge = lazy(() => import('./pages/AdminConcierge'));
@@ -333,6 +336,9 @@ export default function App() {
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/switch-from-lawnpro" element={<SwitchingFromLawnPro />} />
           <Route path="/quoteiq-alternative" element={<QuoteIQAlternative />} />
+          <Route path="/jobber-too-expensive" element={<JobberIsTooExpensive />} />
+          <Route path="/no-per-user-fees" element={<NoPerUserFees />} />
+          <Route path="/best-for-small-crews" element={<BestForSmallCrews />} />
           <Route path="/compare/ruunly" element={<RuunlyComparison />} />
           <Route path="/compare/probase" element={<ProBaseComparison />} />
           <Route path="/book/:businessId" element={<Booking />} />
