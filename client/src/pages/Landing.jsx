@@ -16,7 +16,7 @@ const features = [
 
 const differentiators = [
   { icon: Wifi, title: 'Works Offline', desc: 'Spotty cell service in rural Oklahoma? MowGo keeps working without internet and syncs when you are back in range.' },
-  { icon: DollarSign, title: 'No Per-User Fees', desc: 'Jobber charges $29/mo per extra crew member. MowGo charges once — your whole crew is included.' },
+  { icon: DollarSign, title: 'No Per-User Fees on Solo', desc: 'Jobber charges $29/mo per extra crew member. MowGo Solo is $39 flat for your whole crew. Crew is $79/mo with your first crew member included.' },
   { icon: Shield, title: 'Built in OKC, Not Silicon Valley', desc: 'We are not a VC-funded startup in California guessing what Oklahoma crews need. We talk to local operators every week.' },
   { icon: Users, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed.', },
 ];

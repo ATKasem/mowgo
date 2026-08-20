@@ -80,7 +80,7 @@ export default function NoPerUserFees() {
           </FadeIn>
           <FadeIn delay={200}>
             <p className="mt-6 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              {tr("Stop paying $29/user every time you add a crew member. MowGo charges a flat $39/mo for your entire crew — no per-user fees, no hidden charges.")}
+              {tr("Stop paying $29/user every time you add a crew member. MowGo Solo is $39/mo flat for your whole crew — no per-user fees. Even Crew is $79/mo with your first crew member included, then just $10/mo per extra.")}
             </p>
           </FadeIn>
           <FadeIn delay={300}>
@@ -145,7 +145,7 @@ export default function NoPerUserFees() {
               {tr("The")} <span className="text-emerald-500">{tr("MowGo difference")}</span>
             </h2>
             <p className="text-center text-gray-500 dark:text-gray-400 mb-10 max-w-xl mx-auto text-lg">
-              {tr("One flat price. Your whole crew. No per-user fees.")}
+              {tr("MowGo Solo is $39/mo flat — no per-user fees. Crew is $79/mo with your first crew member included, then $10/mo per additional.")}
             </p>
           </FadeIn>
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -266,7 +266,7 @@ export default function NoPerUserFees() {
           <div className="space-y-4">
             {[
               { q: 'What are per-user fees in lawn care software?', a: 'Per-user fees mean you pay a separate monthly charge for every crew member who uses the software. For example, Jobber charges $29/user/mo on top of the base plan. A 2-person crew pays $168/mo total on Jobber Connect, while MowGo charges $39/mo flat for the entire crew.' },
-              { q: 'Does MowGo really have no per-user fees?', a: 'Correct. MowGo Solo is $39/mo flat. There are no per-user fees, no add-on charges, and no hidden costs. Your whole crew uses it for one price.' },
+              { q: 'Does MowGo really have no per-user fees?', a: 'MowGo Solo is $39/mo flat — no per-user fees, your whole crew uses it for one price. Crew is $79/mo with your first crew member included, then $10/mo per additional. Either way, you save hundreds vs Jobber.' },
               { q: 'Why do other lawn care apps charge per user?', a: 'Per-user pricing is a common SaaS model that scales revenue with team size. It works well for enterprise tools but penalizes small crews. MowGo was built specifically for 1-3 person operations, so flat pricing makes more sense.' },
             ].map(({ q, a }, i) => (
               <FadeIn key={i} delay={i * 100}>
