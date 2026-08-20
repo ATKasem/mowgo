@@ -161,7 +161,7 @@ export default function Landing() {
             <Link to="/compare" className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
               {tr("Compare")}
             </Link>
-            <button onClick={() => document.getElementById('solo-offer')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
+            <button onClick={() => document.getElementById('solo-offer')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 inline-flex items-center min-h-[44px]">
               {tr("Pricing")}
             </button>
             <Link to="/login" className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
