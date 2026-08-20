@@ -76,7 +76,7 @@ export default function RouteAudit() {
         </div>
       </nav>
       <main className="mx-auto grid max-w-5xl gap-10 px-4 py-12 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
-        <section>
+        <section className="order-2 lg:order-1">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800">
             <MapPin className="h-4 w-4" />{t('routeAudit.eyebrow')}
           </div>
@@ -92,7 +92,7 @@ export default function RouteAudit() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xl shadow-emerald-900/10 sm:p-8">
+        <section className="order-1 rounded-2xl border border-gray-200 bg-white p-6 shadow-xl shadow-emerald-900/10 sm:p-8 lg:order-2">
           {!result ? (
             <form onSubmit={submit} noValidate>
               <h2 className="text-2xl font-bold">{t('routeAudit.form.title')}</h2>
@@ -158,7 +158,7 @@ export default function RouteAudit() {
             </div>
           )}
         </section>
-        <section className="mt-10 border-t border-gray-200 pt-6">
+        <section className="order-3 mt-10 border-t border-gray-200 pt-6">
           <h2 className="text-sm font-semibold text-[var(--color-text-muted)]">Related</h2>
           <p className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[var(--color-text-muted)]">
             <Link to="/compare" className="hover:text-emerald-400">Compare lawn care software</Link>
