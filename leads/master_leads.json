@@ -931,7 +931,10 @@
       "verified_email": true,
       "source": "Apify Google Maps scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:41.702746"
+      "sent_date": "2026-08-14T22:29:41.702746",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:11.908326",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 59,
@@ -946,7 +949,10 @@
       "verified_email": true,
       "source": "Apify Google Maps scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:41.863222"
+      "sent_date": "2026-08-14T22:29:41.863222",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:12.114074",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 60,
@@ -961,7 +967,10 @@
       "verified_email": true,
       "source": "Apify Google Maps scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:42.035100"
+      "sent_date": "2026-08-14T22:29:42.035100",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:12.305793",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 61,
@@ -976,7 +985,10 @@
       "verified_email": true,
       "source": "Apify Google Maps scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:42.211161"
+      "sent_date": "2026-08-14T22:29:42.211161",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:12.518803",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 62,
@@ -991,7 +1003,10 @@
       "verified_email": true,
       "source": "Apify Google Maps scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:42.395373"
+      "sent_date": "2026-08-14T22:29:42.395373",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:12.704470",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 63,
@@ -1006,7 +1021,10 @@
       "verified_email": true,
       "source": "Apify Google Maps scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:42.580310"
+      "sent_date": "2026-08-14T22:29:42.580310",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:12.893371",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 64,
@@ -1021,7 +1039,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:42.740151"
+      "sent_date": "2026-08-14T22:29:42.740151",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:13.076045",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 65,
@@ -1036,7 +1057,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:42.898531"
+      "sent_date": "2026-08-14T22:29:42.898531",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:13.258687",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 66,
@@ -1051,7 +1075,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:43.099524"
+      "sent_date": "2026-08-14T22:29:43.099524",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:13.491547",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 67,
@@ -1066,7 +1093,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:43.260371"
+      "sent_date": "2026-08-14T22:29:43.260371",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:13.703568",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 68,
@@ -1081,7 +1111,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:43.479884"
+      "sent_date": "2026-08-14T22:29:43.479884",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:13.879338",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 70,
@@ -1096,7 +1129,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:43.832177"
+      "sent_date": "2026-08-14T22:29:43.832177",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:14.067766",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 71,
@@ -1111,7 +1147,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:44.002863"
+      "sent_date": "2026-08-14T22:29:44.002863",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:14.279706",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 72,
@@ -1126,7 +1165,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:44.168415"
+      "sent_date": "2026-08-14T22:29:44.168415",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:14.459011",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 73,
@@ -1141,7 +1183,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:44.377390"
+      "sent_date": "2026-08-14T22:29:44.377390",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:14.691844",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 74,
@@ -1156,7 +1201,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:44.671956"
+      "sent_date": "2026-08-14T22:29:44.671956",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:14.910134",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 75,
@@ -1171,7 +1219,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:44.923025"
+      "sent_date": "2026-08-14T22:29:44.923025",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:15.355630",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 76,
@@ -1186,7 +1237,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:45.090667"
+      "sent_date": "2026-08-14T22:29:45.090667",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:15.547692",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 77,
@@ -1201,7 +1255,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:45.256124"
+      "sent_date": "2026-08-14T22:29:45.256124",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:15.760486",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 78,
@@ -1216,7 +1273,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:45.430239"
+      "sent_date": "2026-08-14T22:29:45.430239",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:16.022051",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 79,
@@ -1231,7 +1291,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:45.592838"
+      "sent_date": "2026-08-14T22:29:45.592838",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:16.221108",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 80,
@@ -1246,7 +1309,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:45.738583"
+      "sent_date": "2026-08-14T22:29:45.738583",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:16.461531",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 81,
@@ -1261,7 +1327,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:45.928698"
+      "sent_date": "2026-08-14T22:29:45.928698",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:16.677895",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 82,
@@ -1276,7 +1345,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:46.206798"
+      "sent_date": "2026-08-14T22:29:46.206798",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:16.863190",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 83,
@@ -1291,7 +1363,10 @@
       "verified_email": true,
       "source": "Apify landscaper scraper",
       "sent": true,
-      "sent_date": "2026-08-14T22:29:46.402087"
+      "sent_date": "2026-08-14T22:29:46.402087",
+      "follow_up_sent": true,
+      "follow_up_date": "2026-08-20T17:22:17.101629",
+      "last_event": "follow_up_sent"
     },
     {
       "id": 84,
@@ -3561,9 +3636,10 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null,
-      "junk": true
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:01.466451",
+      "junk": true,
+      "last_event": "sent"
     },
     {
       "id": 239,
@@ -6229,9 +6305,10 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null,
-      "junk": true
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:01.663350",
+      "junk": true,
+      "last_event": "sent"
     },
     {
       "id": 408,
@@ -6293,8 +6370,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:02.323354",
+      "last_event": "sent"
     },
     {
       "id": 412,
@@ -6308,8 +6386,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:02.511615",
+      "last_event": "sent"
     },
     {
       "id": 413,
@@ -6323,8 +6402,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:02.712091",
+      "last_event": "sent"
     },
     {
       "id": 414,
@@ -6338,8 +6418,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:02.909063",
+      "last_event": "sent"
     },
     {
       "id": 415,
@@ -6353,8 +6434,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:03.098541",
+      "last_event": "sent"
     },
     {
       "id": 416,
@@ -6369,7 +6451,8 @@
       "verified_email": true,
       "source": "Apify bulk scrape",
       "sent": false,
-      "sent_date": null
+      "sent_date": null,
+      "last_event": "failed"
     },
     {
       "id": 418,
@@ -6383,8 +6466,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:03.504114",
+      "last_event": "sent"
     },
     {
       "id": 419,
@@ -6398,8 +6482,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:03.785168",
+      "last_event": "sent"
     },
     {
       "id": 420,
@@ -6429,8 +6514,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:04.017373",
+      "last_event": "sent"
     },
     {
       "id": 422,
@@ -6444,8 +6530,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:04.214534",
+      "last_event": "sent"
     },
     {
       "id": 423,
@@ -6459,8 +6546,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:04.393797",
+      "last_event": "sent"
     },
     {
       "id": 424,
@@ -6474,8 +6562,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:04.579056",
+      "last_event": "sent"
     },
     {
       "id": 425,
@@ -6489,8 +6578,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:04.774299",
+      "last_event": "sent"
     },
     {
       "id": 426,
@@ -6504,8 +6594,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:05.066785",
+      "last_event": "sent"
     },
     {
       "id": 427,
@@ -6519,8 +6610,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:05.259387",
+      "last_event": "sent"
     },
     {
       "id": 428,
@@ -6534,8 +6626,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:05.480998",
+      "last_event": "sent"
     },
     {
       "id": 429,
@@ -6549,8 +6642,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:05.695936",
+      "last_event": "sent"
     },
     {
       "id": 430,
@@ -6564,8 +6658,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:05.903134",
+      "last_event": "sent"
     },
     {
       "id": 431,
@@ -6579,8 +6674,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:06.096127",
+      "last_event": "sent"
     },
     {
       "id": 432,
@@ -6594,8 +6690,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:06.296699",
+      "last_event": "sent"
     },
     {
       "id": 433,
@@ -6609,8 +6706,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:06.616846",
+      "last_event": "sent"
     },
     {
       "id": 434,
@@ -6624,8 +6722,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:06.806357",
+      "last_event": "sent"
     },
     {
       "id": 435,
@@ -6639,8 +6738,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:06.985174",
+      "last_event": "sent"
     },
     {
       "id": 437,
@@ -6702,8 +6802,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:07.198017",
+      "last_event": "sent"
     },
     {
       "id": 441,
@@ -6717,8 +6818,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:07.388980",
+      "last_event": "sent"
     },
     {
       "id": 442,
@@ -6732,8 +6834,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:07.566909",
+      "last_event": "sent"
     },
     {
       "id": 443,
@@ -6747,8 +6850,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:07.744390",
+      "last_event": "sent"
     },
     {
       "id": 444,
@@ -6762,8 +6866,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:07.950815",
+      "last_event": "sent"
     },
     {
       "id": 445,
@@ -6777,8 +6882,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:08.134438",
+      "last_event": "sent"
     },
     {
       "id": 446,
@@ -6792,8 +6898,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:08.333360",
+      "last_event": "sent"
     },
     {
       "id": 447,
@@ -6807,8 +6914,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:08.539317",
+      "last_event": "sent"
     },
     {
       "id": 448,
@@ -6822,8 +6930,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:08.735388",
+      "last_event": "sent"
     },
     {
       "id": 449,
@@ -6837,8 +6946,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:08.938905",
+      "last_event": "sent"
     },
     {
       "id": 450,
@@ -6852,8 +6962,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:09.129690",
+      "last_event": "sent"
     },
     {
       "id": 451,
@@ -6867,8 +6978,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:09.309746",
+      "last_event": "sent"
     },
     {
       "id": 452,
@@ -6882,8 +6994,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:09.509324",
+      "last_event": "sent"
     },
     {
       "id": 453,
@@ -6897,8 +7010,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:09.691594",
+      "last_event": "sent"
     },
     {
       "id": 454,
@@ -6912,8 +7026,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:09.880029",
+      "last_event": "sent"
     },
     {
       "id": 455,
@@ -6927,8 +7042,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:10.078348",
+      "last_event": "sent"
     },
     {
       "id": 456,
@@ -6942,8 +7058,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:10.271489",
+      "last_event": "sent"
     },
     {
       "id": 457,
@@ -6957,8 +7074,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:10.459132",
+      "last_event": "sent"
     },
     {
       "id": 458,
@@ -6972,8 +7090,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:10.646844",
+      "last_event": "sent"
     },
     {
       "id": 459,
@@ -7003,8 +7122,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:10.836145",
+      "last_event": "sent"
     },
     {
       "id": 461,
@@ -7018,8 +7138,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:11.021688",
+      "last_event": "sent"
     },
     {
       "id": 462,
@@ -7033,8 +7154,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:11.197686",
+      "last_event": "sent"
     },
     {
       "id": 463,
@@ -7048,8 +7170,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:11.378899",
+      "last_event": "sent"
     },
     {
       "id": 464,
@@ -7063,8 +7186,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:11.566939",
+      "last_event": "sent"
     },
     {
       "id": 465,
@@ -7078,8 +7202,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:11.774794",
+      "last_event": "sent"
     },
     {
       "id": 466,
@@ -7093,8 +7218,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:11.962886",
+      "last_event": "sent"
     },
     {
       "id": 467,
@@ -7108,8 +7234,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:12.160123",
+      "last_event": "sent"
     },
     {
       "id": 468,
@@ -7123,8 +7250,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:12.354381",
+      "last_event": "sent"
     },
     {
       "id": 469,
@@ -7138,8 +7266,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:12.547427",
+      "last_event": "sent"
     },
     {
       "id": 470,
@@ -7153,8 +7282,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:12.750864",
+      "last_event": "sent"
     },
     {
       "id": 471,
@@ -7168,8 +7298,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:12.945093",
+      "last_event": "sent"
     },
     {
       "id": 472,
@@ -7183,8 +7314,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:13.122438",
+      "last_event": "sent"
     },
     {
       "id": 473,
@@ -7198,8 +7330,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:13.316509",
+      "last_event": "sent"
     },
     {
       "id": 474,
@@ -7214,7 +7347,8 @@
       "verified_email": true,
       "source": "Apify bulk scrape",
       "sent": false,
-      "sent_date": null
+      "sent_date": null,
+      "last_event": "failed"
     },
     {
       "id": 475,
@@ -7228,8 +7362,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:13.698314",
+      "last_event": "sent"
     },
     {
       "id": 476,
@@ -7243,8 +7378,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:13.947667",
+      "last_event": "sent"
     },
     {
       "id": 477,
@@ -7258,8 +7394,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:14.155356",
+      "last_event": "sent"
     },
     {
       "id": 478,
@@ -7273,8 +7410,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:14.348593",
+      "last_event": "sent"
     },
     {
       "id": 479,
@@ -7288,8 +7426,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:14.537284",
+      "last_event": "sent"
     },
     {
       "id": 480,
@@ -7303,8 +7442,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:14.714140",
+      "last_event": "sent"
     },
     {
       "id": 481,
@@ -7318,8 +7458,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:14.906890",
+      "last_event": "sent"
     },
     {
       "id": 482,
@@ -7333,8 +7474,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:15.082682",
+      "last_event": "sent"
     },
     {
       "id": 483,
@@ -7348,8 +7490,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:15.345892",
+      "last_event": "sent"
     },
     {
       "id": 484,
@@ -7363,8 +7506,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:15.623224",
+      "last_event": "sent"
     },
     {
       "id": 485,
@@ -7378,8 +7522,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:15.810885",
+      "last_event": "sent"
     },
     {
       "id": 486,
@@ -7393,8 +7538,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:16.004967",
+      "last_event": "sent"
     },
     {
       "id": 487,
@@ -7408,8 +7554,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:16.259492",
+      "last_event": "sent"
     },
     {
       "id": 488,
@@ -7423,8 +7570,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:16.434612",
+      "last_event": "sent"
     },
     {
       "id": 489,
@@ -7438,8 +7586,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:16.616115",
+      "last_event": "sent"
     },
     {
       "id": 490,
@@ -7453,8 +7602,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:16.798268",
+      "last_event": "sent"
     },
     {
       "id": 491,
@@ -7468,8 +7618,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:16.995611",
+      "last_event": "sent"
     },
     {
       "id": 492,
@@ -7483,8 +7634,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:17.200849",
+      "last_event": "sent"
     },
     {
       "id": 493,
@@ -7498,8 +7650,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:17.394136",
+      "last_event": "sent"
     },
     {
       "id": 494,
@@ -7513,8 +7666,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:17.579547",
+      "last_event": "sent"
     },
     {
       "id": 495,
@@ -7528,8 +7682,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:17.765781",
+      "last_event": "sent"
     },
     {
       "id": 496,
@@ -7543,8 +7698,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:17.967570",
+      "last_event": "sent"
     },
     {
       "id": 497,
@@ -7558,8 +7714,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:18.180434",
+      "last_event": "sent"
     },
     {
       "id": 498,
@@ -7605,8 +7762,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:18.364071",
+      "last_event": "sent"
     },
     {
       "id": 501,
@@ -7620,8 +7778,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:18.541938",
+      "last_event": "sent"
     },
     {
       "id": 502,
@@ -7635,8 +7794,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:18.820865",
+      "last_event": "sent"
     },
     {
       "id": 503,
@@ -7650,8 +7810,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:19.229226",
+      "last_event": "sent"
     },
     {
       "id": 504,
@@ -7665,8 +7826,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:19.421236",
+      "last_event": "sent"
     },
     {
       "id": 505,
@@ -7680,8 +7842,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:19.617759",
+      "last_event": "sent"
     },
     {
       "id": 506,
@@ -7695,8 +7858,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:19.795824",
+      "last_event": "sent"
     },
     {
       "id": 507,
@@ -7710,8 +7874,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:20.039471",
+      "last_event": "sent"
     },
     {
       "id": 508,
@@ -7725,8 +7890,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:20.226193",
+      "last_event": "sent"
     },
     {
       "id": 509,
@@ -7740,8 +7906,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:20.466364",
+      "last_event": "sent"
     },
     {
       "id": 510,
@@ -7755,8 +7922,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:20.641925",
+      "last_event": "sent"
     },
     {
       "id": 511,
@@ -7770,8 +7938,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:20.830346",
+      "last_event": "sent"
     },
     {
       "id": 512,
@@ -7785,8 +7954,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:21.024452",
+      "last_event": "sent"
     },
     {
       "id": 513,
@@ -7800,8 +7970,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:21.201819",
+      "last_event": "sent"
     },
     {
       "id": 514,
@@ -7815,8 +7986,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:21.386319",
+      "last_event": "sent"
     },
     {
       "id": 515,
@@ -7830,8 +8002,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:21.571177",
+      "last_event": "sent"
     },
     {
       "id": 516,
@@ -7845,8 +8018,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:21.790408",
+      "last_event": "sent"
     },
     {
       "id": 517,
@@ -7860,8 +8034,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-20T13:07:22.017599",
+      "last_event": "sent"
     },
     {
       "id": 518,
@@ -121276,19 +121451,22 @@
     }
   ],
   "template": {
-    "subject_with_name": "{{NAME}}, question about your routes",
-    "subject_without_name": "Quick question about your routes",
-    "html_body_with_name": "Hi {{NAME}},\n\nI'm Aaron. Run a crew in OKC.\n\nWe were losing about 12 hours a week to bad routing before I grouped stops by zone. That's roughly $800/week in wasted wages.\n\nHow does {{BUSINESS}} handle {{CITY}}? Do your trucks stay in one area per day or run all over?\n\n- Aaron",
-    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI'm Aaron. Run a crew in OKC.\n\nWe were losing about 12 hours a week to bad routing before I grouped stops by zone. That's roughly $800/week in wasted wages.\n\nHow do you handle {{CITY}}? Do your trucks stay in one area per day or run all over?\n\n- Aaron"
+    "subject_with_name": "{{NAME}}, your crew is losing $17K/year",
+    "subject_without_name": "{{CITY}} crews are losing $17K/year to bad routing",
+    "html_body_with_name": "Hi {{NAME}},\n\nMost crews in {{CITY}} are losing about $17,000 a year to bad routing. That's roughly two months of revenue you're paying for but not billing.\n\nI'm Aaron. I run a crew in OKC and built a free tool that shows your exact number. It takes about 2 minutes.\n\nHow does {{BUSINESS}} handle scheduling \u2014 do you batch by neighborhood or just run them in the order they come in?",
+    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nMost crews in {{CITY}} are losing about $17,000 a year to bad routing. That's roughly two months of revenue you're paying for but not billing.\n\nI'm Aaron. I run a crew in OKC and built a free tool that shows your exact number. It takes about 2 minutes.\n\nHow do you handle scheduling \u2014 do you batch by neighborhood or just run them in the order they come in?",
+    "follow_up_with_name": "{{NAME}}, any thoughts on the route audit?\n\nI sent it over a few days ago \u2014 curious if you got a chance to run your numbers. Most crews I talk to are surprised by how much drive time they're actually losing.\n\nNo pitch here. Just wanted to make sure you got it.",
+    "follow_up_without_name": "Hey {{BUSINESS}} \u2014 any thoughts on the route audit?\n\nI sent it over a few days ago. Curious if you ran your numbers yet. Most crews are surprised by what they find.\n\nNo pitch here. Just following up to make sure you got it.",
+    "follow_up_subject": "{{NAME}}, quick follow-up on the route audit"
   },
   "stats": {
     "total_leads": 3227,
     "verified_ready": 1620,
-    "sent_today": 100,
-    "total_sent": 365,
+    "sent_today": 98,
+    "total_sent": 463,
     "total_bounced": 7,
-    "last_run": "2026-08-19T13:35:06.193833",
-    "last_follow_up_run": "2026-08-18T17:00:11.813064",
-    "follow_ups_sent": 50
+    "last_run": "2026-08-20T13:07:22.017642",
+    "last_follow_up_run": "2026-08-20T17:22:17.101667",
+    "follow_ups_sent": 75
   }
 }
