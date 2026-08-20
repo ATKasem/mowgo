@@ -161,7 +161,7 @@ export default function Landing() {
             <Link to="/compare" className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
               {tr("Compare")}
             </Link>
-            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-medium text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-3 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
+            <button onClick={() => document.getElementById('solo-offer')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
               {tr("Pricing")}
             </button>
             <Link to="/login" className="text-sm font-semibold text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] hover:text-brand-hover dark:hover:text-emerald-400 transition-colors px-4 py-2 rounded-lg hover:bg-[var(--color-surface-secondary)] dark:hover:bg-gray-800 min-h-[44px]">
@@ -292,7 +292,7 @@ export default function Landing() {
       </section>
 
       {/* Solo Offer */}
-      <section id="pricing" className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
+      <section id="solo-offer" className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-8 tracking-tight">{tr("The Solo Plan. Everything a one-man crew needs.")}</h2>
           <div className="mx-auto max-w-2xl rounded-2xl border-2 border-emerald-500 bg-white dark:bg-gray-950 p-6 md:p-8 shadow-xl">
