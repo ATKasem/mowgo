@@ -57,7 +57,7 @@ const plans = [
 
 const stats = [
   { value: '556k+', label: 'Landscaping businesses in the US', suffix: 'IBISWorld, 2026' },
-  { value: '0', label: 'per-user fees on any plan', suffix: 'Solo is $39 flat. Crew is $79 flat. Premium is $199 flat.' },
+  { value: '0', label: 'per-user fees on Solo', suffix: 'Solo is $39 flat. Crew is $79/mo with 1 crew member included, then $10/mo per extra.' },
   { value: '<1%', label: 'of your revenue', suffix: 'Solo costs less than one missed job. Solo is $39/mo — under 1% for any crew billing over $3,900/mo.' },
 ];
 
