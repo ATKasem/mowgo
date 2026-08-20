@@ -8,17 +8,10 @@ import { startCheckout } from '../lib/payments';
 import { supabase } from '../lib/supabase';
 
 const features = [
-  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'Tuesday rain. Eight clients to rebook. One tap moves every job to the next dry day. Clients get texted automatically. No phone calls, no rescheduling chaos.', color: 'from-emerald-500 to-green-500' },
-  { icon: MapPin, title: 'Route Optimization', desc: 'Your crew spends less time on I-35 and more time mowing. MowGo plans the day\'s route so you hit more jobs per gallon.', color: 'from-emerald-500 to-teal-500' },
-  { icon: Users, title: 'Built for Real Crews', desc: 'Gate codes, pet instructions, mow height, Bermuda vs fescue — the fields crews actually use every day. Not a generic CRM.', color: 'from-gray-500 to-gray-600' },
-  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice created. One tap copies a payment text to the client. No processing fees. Venmo, Zelle, or Cash App.', color: 'from-amber-500 to-orange-500' },
-];
-
-const differentiators = [
-  { icon: Wifi, title: 'Works Offline', desc: "Dead zone? MowGo keeps working without internet. Syncs when you're back in range. No missed jobs, no paperwork pile-up." },
-  { icon: DollarSign, title: 'No Per-User Fees on Solo', desc: 'Jobber charges $29/mo per extra crew member. MowGo charges once — your whole crew is included.' },
-  { icon: Shield, title: 'Built in OKC, Not Silicon Valley', desc: "We're not a VC-funded startup guessing what crews need. We talk to operators like you every week. We built MowGo for ourselves first." },
-  { icon: Users, title: 'Works Everywhere', desc: 'iPhone, Android, desktop — installs to your home screen like a native app. No App Store download needed. Works on any device your crew carries.', },
+  { icon: CloudRain, title: 'Rain Delay One-Tap Move', desc: 'Tuesday rain. One tap moves every job to the next dry day. Clients get texted. You keep mowing.', color: 'from-emerald-500 to-green-500' },
+  { icon: MapPin, title: 'Route Optimization', desc: 'Your crew spends less time on the road and more time on the lawn. MowGo plans the day so you hit more jobs per gallon.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Users, title: 'Fields You Actually Use', desc: 'Gate codes, mow height, Bermuda vs fescue, pet notes — the fields crews actually use every day. Not a generic CRM.', color: 'from-gray-500 to-gray-600' },
+  { icon: FileText, title: 'One-Tap Invoicing', desc: 'Mark a job complete. Invoice created. One tap sends a payment text. Venmo, Zelle, Cash App. No processing fees.', color: 'from-amber-500 to-orange-500' },
 ];
 
 const plans = [
@@ -68,9 +61,9 @@ const faqs = [
   { q: 'Is it really free?', a: 'Yes. Free for 5 clients, no card needed, no time limit. Rain delay, scheduling, and invoicing included. No catch.' },
   { q: 'What happens if I want to switch from Jobber or LawnPro?', a: "We import your clients and prepare your first operating week within 48 hours. Free. You don't lift a finger." },
   { q: 'Does it work without cell service?', a: "Yes. Works in dead zones. Syncs when you're back in range. Your crew keeps running either way." },
-  { q: "What's the catch?", a: "No catch. Cancel anytime. 14-day free trial. 30-day Rain-Proof Guarantee: If Solo doesn't save you 5 hours a week, we refund your first month in full." },
-  { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo, $158 off Crew) and one payment covers the whole season — no card hits in winter. The Rain-Proof Guarantee still applies: unused months are refunded.' },
-  { q: 'What happens to my data if I cancel?', a: 'Your data stays yours, always. Export it anytime. If you cancel, we delete your data on request.' },
+  { q: "What's the catch?", a: "No catch. 14-day free trial. 30-day guarantee. Cancel anytime. If Solo doesn't save you 5 hours a week, we refund your first month." },
+  { q: 'Why should I pay yearly?', a: 'Two months free ($78 off Solo). One payment covers the whole season. No card hits in winter. Annual plan still carries the Rain-Proof Guarantee — unused months refunded.' },
+  { q: 'What happens to my data if I cancel?', a: 'Your data stays yours. Export anytime. If you cancel, we delete your data on request.' },
 ];
 
 function FadeIn({ children, className = '', delay = 0 }) {
@@ -188,11 +181,11 @@ export default function Landing() {
         <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-24 md:py-32 text-center">
           <FadeIn delay={100}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight leading-[1.1]">
-              {tr("Your crew spends less time driving and")} <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{tr("more mowing.")}</span>
+              {tr("Stop losing $200/week to bad routing. Or your first month is free.")}
             </h1>
           </FadeIn>
           <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed">
-            {tr("MowGo plans the day's route so you hit more jobs per gallon. Rain delays? One tap moves everything.")}
+            {tr("MowGo plans your crew's day so you hit more jobs per gallon. Rain delays? One tap moves everything. Clients get texted automatically. Free for 5 clients.")}
           </p>
           <div className="mt-10">
             <div className="rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl shadow-emerald-500/10 overflow-hidden">
@@ -207,19 +200,38 @@ export default function Landing() {
           </div>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-[#EA580C] hover:bg-orange-700 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-orange-600/25 hover:shadow-2xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
-                {tr("Start Free — No Credit Card")}
+                {tr("Start Free — Save $200/week")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link to="/route-audit" className="group inline-flex items-center gap-2 bg-[var(--color-surface-secondary)] dark:bg-gray-800 text-[var(--color-text-primary)] dark:text-gray-300 font-semibold rounded-xl px-8 py-3.5 text-base hover:bg-[var(--color-surface-hover)] dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-md hover:shadow-gray-200 dark:hover:shadow-gray-800/50 active:scale-[0.97] transition-all duration-200">{tr("Run My Free Audit →")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></Link>
           </div>
-          <p className="mt-4 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr("Free for 5 clients. No credit card. 2 minutes to start.")}</p>
+          <p className="mt-4 text-sm font-semibold text-[var(--color-text-secondary)] dark:text-gray-300">{tr("30-Day Rain-Proof Guarantee: If Solo doesn't save you 5 hours a week, your first month is free. No questions.")}</p>
+        </div>
+      </section>
+
+      {/* Pain */}
+      <section className="bg-gray-50 dark:bg-gray-900/60 py-24">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white tracking-tight">{tr("You know the feeling.")}</h2>
+          <div className="mt-10 space-y-5">
+            {[
+              'Tuesday rain. Eight clients to rebook. You spend the morning on the phone instead of on the mower.',
+              'Gate codes buried in text messages. Pet instructions scribbled on a napkin. Mow height written on the back of a receipt.',
+              'Invoice written in the truck at 8pm. Hope they pay by Friday.',
+            ].map((pain) => (
+              <div key={pain} className="flex gap-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5">
+                <AlertCircle className="w-5 h-5 text-[#EA580C] flex-shrink-0 mt-0.5" />
+                <p className="text-[var(--color-text-secondary)] dark:text-gray-300 leading-relaxed">{tr(pain)}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-xl font-bold text-emerald-600 dark:text-emerald-400">{tr("That's why we built MowGo.")}</p>
         </div>
       </section>
 
       {/* Features */}
       <section className="max-w-4xl mx-auto px-4 py-24">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Built for Oklahoma crews,")} <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{tr("not office managers")}</span></h2>
-        <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-14 max-w-xl mx-auto text-lg">{tr("Other apps were built in Silicon Valley for 20-person operations. MowGo was built by a lawn care operator who runs crews — for crews like yours.")}</p>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-14 tracking-tight">{tr("The daily problems MowGo fixes.")}</h2>
         <div className="grid md:grid-cols-2 gap-5 mb-20">
           {features.map(({ icon: Icon, title, desc, color, soon }) => (
             <div key={title} className="group card p-6 flex gap-4 hover:border-emerald-200 dark:hover:border-emerald-800 cursor-default">
@@ -234,36 +246,13 @@ export default function Landing() {
           ))}
         </div>
 
-        {/* Differentiators */}
-        <h3 className="text-xl font-bold text-center text-[var(--color-text-primary)] dark:text-gray-200 mb-12">{tr("Things our competitors won't tell you")}</h3>
-        <div className="grid md:grid-cols-2 gap-5">
-          {differentiators.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="card p-5 flex gap-3">
-              <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-semibold text-sm text-[var(--color-text-primary)] dark:text-white">{tr(title)}</h4>
-                <p className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mt-1 leading-relaxed">{tr(desc)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Rain-Proof Guarantee */}
-        <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700 text-center">
-          <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
-          <h3 className="text-xl font-bold text-white mb-2">{tr('The Rain-Proof Guarantee')}</h3>
-          <p className="text-sm text-gray-300 max-w-2xl mx-auto mb-4">{tr("We built MowGo for crews like yours. Use Solo for 30 days, send 10 invoices, and schedule 5 recurring clients. If you don't feel more organized, we refund your first month in full. No questions, no hoops. Your data stays yours, always.")}</p>
-          <p className="text-xs text-[var(--color-text-secondary)]">{tr('Applies to Solo. No setup fees. No contracts. Cancel anytime.')}{billingInterval === 'year' && <span> {tr("Annual? Unused months refunded.")}</span>}</p>
-        </div>
-
         {/* Comparison Callout */}
-        <div className="mt-16 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-bold text-white mb-1">
+        <div className="mt-8 bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-800 dark:border-gray-700">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 text-center">
             <Link to="/compare" className="transition-colors hover:text-emerald-400">
-              {tr("How MowGo Solo stacks up")}
+              {tr("See what $39/mo gets your crew.")}
             </Link>
-          </h3>
-          <p className="text-sm text-[var(--color-text-muted)] mb-6">{tr("See what $39/mo gets your crew.")}</p>
+          </h2>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border-2 border-emerald-500 bg-emerald-950/30 p-5">
               <div className="flex items-start justify-between gap-3">
@@ -271,7 +260,7 @@ export default function Landing() {
                   <h4 className="text-emerald-400 font-bold">{tr("MowGo Solo")}</h4>
                   <p className="text-xl font-extrabold text-white">{tr("$39/mo")}</p>
                 </div>
-                <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-bold text-emerald-300">{tr("Save $100/mo")}</span>
+                <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-bold text-emerald-300">{tr("Save $100/mo vs Jobber")}</span>
               </div>
               <ul className="mt-5 space-y-3 text-sm text-gray-300">
                 <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" /><span>{tr("Rain Delay")}</span></li>
@@ -298,8 +287,47 @@ export default function Landing() {
               </ul>
             </div>
           </div>
-          <p className="text-xs text-[var(--color-text-secondary)] mt-4 text-center">{tr("Jobber Grow is $139/mo ($99/mo billed annually) plus $29/mo per additional user. LawnPro's apps are live, but they don't offer rain delay, offline mode, or dark mode.")}</p>
+          <p className="text-sm text-gray-300 mt-6 text-center">{tr("Jobber Grow is $139/mo ($99 annual) plus $29/user. MowGo Solo is $39 flat. One price, no surprises.")}</p>
         </div>
+      </section>
+
+      {/* Solo Offer */}
+      <section id="pricing" className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-8 tracking-tight">{tr("The Solo Plan. Everything a one-man crew needs.")}</h2>
+          <div className="mx-auto max-w-2xl rounded-2xl border-2 border-emerald-500 bg-white dark:bg-gray-950 p-6 md:p-8 shadow-xl">
+            <div className="text-center">
+              <p className="text-5xl font-extrabold text-[var(--color-text-primary)] dark:text-white">{tr("$39/mo")}</p>
+              <p className="mt-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">{tr("$390/year — save $78")}</p>
+            </div>
+            <div className="mt-8 space-y-4">
+              {['Free 48-hour setup: We import your clients and prepare your first week. You don\'t lift a finger. ($150 value)', 'What to Charge in Your City: Real pricing data from your market. ($49 value)', '15 ready-to-send scripts: Invoices, reminders, price raises, no-show follow-ups. ($79 value)'].map((bonus) => <p key={bonus} className="flex gap-3 text-sm text-[var(--color-text-secondary)] dark:text-gray-300"><Check className="w-5 h-5 shrink-0 text-emerald-500" />{tr(bonus)}</p>)}
+            </div>
+            <p className="mt-5 text-center text-lg font-extrabold text-emerald-600 dark:text-emerald-400">{tr("$278 value — included with Solo.")}</p>
+            <div className="mt-6 grid sm:grid-cols-2 gap-3">
+              {['Unlimited clients & jobs', 'Recurring job automation', 'GPS route navigation', 'Client notes, codes & pets', 'Offline mode', 'Rain delay one-tap move'].map((feature) => <p key={feature} className="flex gap-2 text-sm text-[var(--color-text-secondary)] dark:text-gray-300"><Check className="w-4 h-4 shrink-0 text-emerald-500" />{tr(feature)}</p>)}
+            </div>
+            <p className="mt-7 rounded-xl bg-[#EA580C] p-4 text-center font-bold text-white">{tr("Only 20 new accounts this week. Setup queue: ~3 days.")}</p>
+            <button onClick={() => handleStartCheckout('solo', billingInterval)} className="mt-4 w-full rounded-xl bg-[#EA580C] px-6 py-4 text-lg font-bold text-white shadow-lg hover:bg-orange-700 transition-colors">{tr("Start Free Trial")}</button>
+            <div className="mt-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 text-center">
+              <Shield className="mx-auto mb-2 h-6 w-6 text-[#EA580C]" />
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white">{tr("30-Day Rain-Proof Guarantee: If you're not more organized in 30 days, your first month is free. Unused months refunded on annual.")}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Exclusion */}
+      <section className="max-w-3xl mx-auto px-4 pb-24">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-[var(--color-text-primary)] dark:text-white mb-10 tracking-tight">{tr("Who this is NOT for.")}</h2>
+        <div className="space-y-4">
+          {[
+            'Enterprise landscaping companies with 20 trucks. You need a CRM, not a scheduler.',
+            'Office managers who never touch a mower. This is built for the person loading the truck at 6am.',
+            "Anyone who wants a free app forever. We're not a VC-funded startup. We charge $39 because we need to eat.",
+          ].map((item) => <p key={item} className="card p-5 text-[var(--color-text-secondary)] dark:text-gray-300">{tr(item)}</p>)}
+        </div>
+        <p className="mt-8 text-xl font-bold text-emerald-600 dark:text-emerald-400">{tr("If you're still reading, this is probably for you.")}</p>
       </section>
 
       {/* Stats */}
@@ -313,6 +341,7 @@ export default function Landing() {
             </div>
           ))}
         </div>
+        <p className="mt-6 text-center font-semibold text-[var(--color-text-secondary)] dark:text-gray-300">{tr("Built in OKC. Used by real crews.")}</p>
       </section>
 
       {/* Testimonials (hidden until real quotes exist) */}
@@ -332,12 +361,9 @@ export default function Landing() {
       )}
 
       {/* Pricing */}
-      <section id="pricing" className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
+      <section className="bg-[var(--color-surface-bg)] dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-4 tracking-tight">{tr("Know what you pay every month")}</h2>
-          <p className="text-center text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] mb-2 text-lg">{tr("Start free. Pay only when your client list grows. Cancel anytime.")}</p>
-          <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-2">{tr("Solo costs {{price}} and is built for crews who don't need a {{competitorPrice}} enterprise system.", { price: '$39/month', competitorPrice: '$200+/month' })}</p>
-          <p className="text-center text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mb-14">{tr("14-day free trial on paid plans. No setup fees. No contracts.")}</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-[var(--color-text-primary)] dark:text-white mb-10 tracking-tight">{tr("Choose the plan that fits your crew.")}</h2>
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center rounded-xl bg-[var(--color-surface-secondary)] dark:bg-gray-800 p-1 gap-1">
               <button
@@ -408,6 +434,7 @@ export default function Landing() {
                       )}
                     </div>
                   )}
+                  {plan.highlight && <p className="mt-4 rounded-lg bg-[#EA580C] p-3 text-center text-xs font-bold text-white">{tr("Only 20 new accounts this week. Setup queue: ~3 days.")}</p>}
                   {plan.highlight && (
                     <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-[var(--color-text-primary)] dark:text-gray-200">
                       <Shield className="w-4 h-4 flex-shrink-0 text-[#EA580C]" />
@@ -436,8 +463,12 @@ export default function Landing() {
       <section className="max-w-2xl mx-auto px-4 py-16">
         <div className="card border border-[var(--color-border)] dark:border-gray-800 p-8 md:p-10 text-center">
           <BadgeCheck className="w-10 h-10 text-[#EA580C] mx-auto mb-4" />
-          <h2 className="text-2xl md:text-3xl font-extrabold text-[var(--color-text-primary)] dark:text-white mb-3 tracking-tight">{tr("Save 10 hours/week or $390 back")}</h2>
-          <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed">{tr("If MowGo doesn't save you at least 10 hours a week in your first 60 days, your first month is on us. And we'll set up your next 50 clients for free. No fine print.")}</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-[var(--color-text-primary)] dark:text-white mb-3 tracking-tight">{tr("Save 10 hours/week. Or your first month is free.")}</h2>
+          <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed">{tr("If MowGo doesn't save you at least 10 hours a week in your first 60 days, your first month is on us. Plus we'll set up your next 50 clients for free. No fine print. No questions.")}</p>
+          <Link to="/login?mode=signup" className="group mt-6 inline-flex items-center gap-2 bg-[#EA580C] hover:bg-orange-700 text-white font-semibold rounded-xl px-8 py-3.5 text-base transition-colors">
+            {tr("Start Free — Save 10 Hours/Week")}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </section>
 
