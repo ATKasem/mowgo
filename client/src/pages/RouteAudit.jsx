@@ -130,6 +130,12 @@ export default function RouteAudit() {
               </div>
               <p className="mt-4 text-xs font-medium text-gray-500">{t('routeAudit.report.estimate')}</p>
 
+              <div className="mt-6 rounded-xl bg-emerald-600 p-4 text-center">
+                <p className="text-lg font-bold text-white">You're leaving ${result.annual.toLocaleString()} on the table every season.</p>
+                <p className="mt-1 text-sm text-emerald-100">MowGo fixes this. Start a free trial.</p>
+                <Link to="/subscribe" className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-emerald-700 transition hover:bg-emerald-50">Start Free Trial &gt;</Link>
+              </div>
+
               <div className="mt-6 rounded-xl border border-amber-100 bg-amber-50 p-4">
                               <h3 className="font-bold text-amber-900">{t('routeAudit.zoneComparison.title')}</h3>
                               <div className="mt-3 grid grid-cols-3 gap-3 text-center text-sm">

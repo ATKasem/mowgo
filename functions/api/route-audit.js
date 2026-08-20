@@ -63,9 +63,10 @@ function emailHtml(name, hours, monthly, annual, lawnsBucket, crewBucket) {
 </ol>
 
 <p style="margin-top:28px;padding:16px;background:#f0fdf4;border-radius:8px;border-left:4px solid #059669">
-<strong>Want me to map your actual route?</strong><br>
-I personally map 10 routes per week. Reply with "OK" within the next 48 hours and I'll put yours at the front of the line. I'll also send you the pricing cheat sheet for your city — what other crews in ${lawnsLabel === 'under 10' ? 'your area' : lawnsLabel + ' properties'} are actually charging.<br>
-<span style="font-size:13px;color:#666">— Aaron</span>
+<strong>MowGo can fix this for you.</strong><br>
+MowGo's scheduling + routing cuts drive time by 5-10 hours/week for crews like yours. Start a free trial and we will import your route data and show you the optimized version.<br><br>
+<a href="https://mowgoapp.com/subscribe" style="display:inline-block;padding:12px 24px;background:#059669;color:white;text-decoration:none;border-radius:8px;font-weight:bold">Start Free Trial ></a><br>
+<span style="font-size:13px;color:#666">No card required. Cancel anytime.</span>
 </p>
 </body></html>`;
 }
