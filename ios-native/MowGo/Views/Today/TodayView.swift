@@ -38,10 +38,10 @@ struct TodayView: View {
     @State private var showingSendRouteOptions = false
     @State private var showingRouteStops = false
     @State private var completedJobForPhoto: Job?
-    @State private var shouldRequestReviewAfterPhoto = false
     @AppStorage("preferred_nav_app") private var preferredNavAppRaw = PreferredNavigationApp.appleMaps.rawValue
     @AppStorage("completed_job_count") private var completedJobCount = 0
     @AppStorage("review_prompt_requested") private var reviewPromptRequested = false
+    @AppStorage("review_prompt_pending") private var reviewPromptPending = false
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -686,7 +686,7 @@ struct TodayView: View {
                         showBanner("Job marked done — client notified ✅")
                         completedJobCount += 1
                         if completedJobCount >= ReviewPrompt.completedJobThreshold && !reviewPromptRequested {
-                            shouldRequestReviewAfterPhoto = true
+                            reviewPromptPending = true
                         }
                         completedJobForPhoto = job
                     }
@@ -731,8 +731,8 @@ struct TodayView: View {
     // MARK: - Helpers
 
     private func requestPendingReview() {
-        guard shouldRequestReviewAfterPhoto else { return }
-        shouldRequestReviewAfterPhoto = false
+        guard reviewPromptPending else { return }
+        reviewPromptPending = false
         reviewPromptRequested = true
         ReviewPrompt.requestReview()
     }

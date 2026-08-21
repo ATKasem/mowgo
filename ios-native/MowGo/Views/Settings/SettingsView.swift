@@ -750,11 +750,15 @@ private struct BusinessProfileSettingsView: View {
                         .textInputAutocapitalization(.words)
                     TextField("Phone number", text: $phone)
                         .keyboardType(.phonePad)
-                    TextField("Email address", text: $email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
+                    HStack {
+                        Text("Email address").foregroundColor(theme.textMuted)
+                        Spacer()
+                        Text(email.isEmpty ? NSLocalizedString("Not set", comment: "Email display when blank") : email)
+                            .foregroundColor(theme.textSecondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Email address")
+                    .accessibilityValue(email)
                 } footer: {
                     Text("This information appears on customer-facing messages and invoices.")
                 }

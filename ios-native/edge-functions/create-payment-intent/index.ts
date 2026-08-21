@@ -109,12 +109,49 @@ serve(async (req) => {
       );
     }
 
+    // Reuse an existing, still-usable PaymentIntent for this invoice to avoid
+    // orphaning payable intents on retries/restarts/concurrent devices.
+    if (invoice.stripe_payment_intent_id) {
+      const existingResp = await fetch(
+        `https://api.stripe.com/v1/payment_intents/${invoice.stripe_payment_intent_id}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${stripeKey}` },
+        },
+      );
+      if (existingResp.ok) {
+        const existingIntent = await existingResp.json();
+        const usable =
+          existingIntent.status === "requires_payment_method" ||
+          existingIntent.status === "requires_confirmation" ||
+          existingIntent.status === "requires_action";
+        if (usable) {
+          console.log("Reusing existing PaymentIntent:", existingIntent.id);
+          return new Response(
+            JSON.stringify({
+              client_secret: existingIntent.client_secret,
+              payment_intent_id: existingIntent.id,
+            }),
+            {
+              status: 200,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+        // Otherwise fall through and create a fresh intent (the old one is
+        // no longer payable).
+      }
+    }
+
     const resp = await fetch("https://api.stripe.com/v1/payment_intents", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
-        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}-${Date.now()}`,
+        // Stable key per user+invoice (no wall-clock component): Stripe
+        // dedupes within 24h, so concurrent/retry creators resolve to the
+        // same intent instead of creating competing chargeable intents.
+        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}`,
       },
       body: new URLSearchParams({
         amount: String(amount),
