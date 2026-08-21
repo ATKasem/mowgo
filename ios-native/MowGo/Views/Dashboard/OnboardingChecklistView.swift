@@ -10,9 +10,20 @@ import SwiftUI
 
 struct OnboardingChecklistView: View {
     @EnvironmentObject var store: DataStore
-    @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("onboarding_checklist_dismissed") private var dismissed = false
+    @EnvironmentObject var auth: AuthService
+    @Environment(\\.colorScheme) private var colorScheme
+
+    /// Dismissal keyed per authenticated profile, so it doesn't leak across accounts on the same device.
+    @AppStorage("onboarding_checklist_dismissed_") private var dismissedRaw = ""
     @Binding var selectedTab: Int
+
+    private var dismissedKey: String {
+        auth.user?.id?.uuidString ?? "anon"
+    }
+
+    private var isDismissedForUser: Bool {
+        dismissedRaw.split(separator: ",").contains(Substring(dismissedKey))
+    }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -34,7 +45,7 @@ struct OnboardingChecklistView: View {
     private var allDone: Bool { milestones.allSatisfy(\.done) }
 
     var body: some View {
-        if !dismissed && !allDone {
+        if !isDismissedForUser && !allDone {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("Start in 4 steps")
@@ -42,7 +53,11 @@ struct OnboardingChecklistView: View {
                         .foregroundColor(theme.textPrimary)
                     Spacer()
                     Button {
-                        dismissed = true
+                        var keys = dismissedRaw.split(separator: ",").map(String.init)
+                        if !keys.contains(dismissedKey) {
+                            keys.append(dismissedKey)
+                        }
+                        dismissedRaw = keys.joined(separator: ",")
                     } label: {
                         Image(systemName: "xmark")
                             .font(.caption.weight(.semibold))

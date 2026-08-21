@@ -155,6 +155,13 @@ struct ConciergeSetupView: View {
                 return
             }
             defer { url.stopAccessingSecurityScopedResource() }
+
+            let resourceValues = try? url.resourceValues(forKeys: [.fileSizeKey])
+            if let fileSize = resourceValues?.fileSize, fileSize > maxCsvCharacters {
+                errorMessage = NSLocalizedString("That file is too large. Concierge uploads are limited to 100,000 characters.", comment: "Concierge file size error")
+                return
+            }
+
             let data = try Data(contentsOf: url)
             guard data.count <= maxCsvCharacters else {
                 errorMessage = NSLocalizedString("That file is too large. Concierge uploads are limited to 100,000 characters.", comment: "Concierge file size error")
