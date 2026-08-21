@@ -283,6 +283,14 @@
 "Venmo (@handle)" = "Venmo (@usuario)";
 "Cash App ($handle)" = "Cash App ($usuario)";
 
+// MARK: - Recurring Jobs (RecurringJobsSettingsView)
+
+"Recurring Jobs" = "Trabajos recurrentes";
+"No active templates" = "Sin plantillas activas";
+"%d active" = "%d activas";
+"No recurring jobs yet. Set one up when scheduling a job." = "Aún no hay trabajos recurrentes. Configura uno al programar un trabajo.";
+"Inactive" = "Inactivo";
+
 // MARK: - Integrations
 
 "QuickBooks" = "QuickBooks";
@@ -394,6 +402,15 @@
 "Could Not Remove Crew Member" = "No se pudo quitar al miembro del equipo";
 "An unknown error occurred." = "Ocurrió un error desconocido.";
 
+// MARK: - Onboarding Checklist (OnboardingChecklistView)
+
+"Start in 4 steps" = "Comienza en 4 pasos";
+"Add your first client" = "Agrega tu primer cliente";
+"Schedule your first job" = "Programa tu primer trabajo";
+"Complete a job" = "Completa un trabajo";
+"Send an invoice" = "Envía una factura";
+"Dismiss" = "Cerrar";
+
 // MARK: - Job Photo Picker
 
 "Select a photo for this job" = "Selecciona una foto para este trabajo";
@@ -406,6 +423,25 @@
 // MARK: - Camera
 
 "Try Again" = "Intentar de nuevo";
+
+// MARK: - Concierge Setup
+"Concierge Setup" = "Configuración de conserjería";
+"Import clients, pre-schedule first week" = "Importa clientes y programa la primera semana";
+"Business Name" = "Nombre del negocio";
+"Client Count (optional)" = "Cantidad de clientes (opcional)";
+"We import your clients and prepare your first operating week within 48 hours." = "Importamos tus clientes y preparamos tu primera semana operativa en un plazo de 48 horas.";
+"Client list" = "Lista de clientes";
+"Upload a CSV or text file" = "Sube un archivo CSV o de texto";
+"%lld rows loaded" = "%lld filas cargadas";
+"Paste your client list from Excel or CSV if you do not have a file." = "Pega tu lista de clientes desde Excel o CSV si no tienes un archivo.";
+"Submit setup request" = "Enviar solicitud de configuración";
+"Could not access the selected file." = "No se pudo acceder al archivo seleccionado.";
+"That file is too large. Concierge uploads are limited to 100,000 characters." = "Ese archivo es demasiado grande. Las cargas de conserjería están limitadas a 100,000 caracteres.";
+"Could not read that file." = "No se pudo leer ese archivo.";
+"Client count must be a whole number of zero or more." = "La cantidad de clientes debe ser un número entero de cero o más.";
+"Request received — we will prepare your first operating week within 48 hours." = "Solicitud recibida: prepararemos tu primera semana operativa en un plazo de 48 horas.";
+"This feature requires a Solo, Crew, or Premium plan." = "Esta función requiere un plan Solo, Equipo o Premium.";
+"Could not submit your request." = "No se pudo enviar tu solicitud.";
 
 // Verification-pass additions (2026-08-06): keys the first localization pass missed
 "Void Invoice" = "Anular factura";

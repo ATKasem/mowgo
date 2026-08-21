@@ -36,7 +36,7 @@ struct SettingsView: View {
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
 
     private enum SettingsDestination: Hashable {
-        case businessProfile, notifications, appearance, billing, integrations, importYardbook, recurringJobs
+        case businessProfile, notifications, appearance, billing, concierge, integrations, importYardbook, recurringJobs
     }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -172,6 +172,8 @@ struct SettingsView: View {
                 onCancelSubscription: { showCancelConfirmation = true },
                 onViewPlans: { showSubscription = true }
             )
+        case .concierge:
+            ConciergeSetupView()
         case .integrations:
             IntegrationsView()
         case .importYardbook:
@@ -197,6 +199,12 @@ struct SettingsView: View {
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.billing) {
                 SettingsLinkRow(title: "Billing", subtitle: auth.user?.tierLabel ?? NSLocalizedString("Free", comment: "Subscription tier name: free plan"), icon: "creditcard.fill")
+            }
+            if isPaidTier {
+                Divider().padding(.leading, 52)
+                NavigationLink(value: SettingsDestination.concierge) {
+                    SettingsLinkRow(title: "Concierge Setup", subtitle: NSLocalizedString("Import clients, pre-schedule first week", comment: "Concierge setup settings row subtitle"), icon: "sparkles")
+                }
             }
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.recurringJobs) {

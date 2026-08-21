@@ -204,6 +204,7 @@ final class AuthService: ObservableObject {
         struct ProfilePatch: Encodable {
             let businessName: String
             let phone: String?
+            let email: String?
             let venmoHandle: String?
             let cashappHandle: String?
             let zelleHandle: String?
@@ -214,6 +215,7 @@ final class AuthService: ObservableObject {
             ProfilePatch(
                 businessName: name,
                 phone: normalizedPhone.isEmpty ? nil : normalizedPhone,
+                email: normalizedEmail.isEmpty ? nil : normalizedEmail,
                 venmoHandle: normalizedVenmo.isEmpty ? nil : normalizedVenmo,
                 cashappHandle: normalizedCashapp.isEmpty ? nil : normalizedCashapp,
                 zelleHandle: normalizedZelle.isEmpty ? nil : normalizedZelle
