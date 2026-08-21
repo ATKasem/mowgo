@@ -37,7 +37,10 @@ struct TodayView: View {
     @State private var routeUndoIds: [UUID]?
     @State private var showingSendRouteOptions = false
     @State private var showingRouteStops = false
+    @State private var completedJobForPhoto: Job?
+    @State private var shouldRequestReviewAfterPhoto = false
     @AppStorage("preferred_nav_app") private var preferredNavAppRaw = PreferredNavigationApp.appleMaps.rawValue
+    @AppStorage("completed_job_count") private var completedJobCount = 0
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -244,6 +247,13 @@ struct TodayView: View {
             }
             .sheet(isPresented: $showingRouteStops) {
                 routeStopsSheet
+            }
+            .sheet(item: $completedJobForPhoto, onDismiss: requestPendingReview) { job in
+                JobPhotoPicker(jobId: job.id) { url in
+                    Task { await store.updateJobPhoto(jobId: job.id, url: url) }
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
             }
             .confirmationDialog("Send Route", isPresented: $showingSendRouteOptions) {
                 if preferredNavApp != .waze {
@@ -673,6 +683,11 @@ struct TodayView: View {
                     try await store.toggleJobStatus(job)
                     if wasDone {
                         showBanner("Job marked done — client notified ✅")
+                        completedJobCount += 1
+                        if completedJobCount == ReviewPrompt.completedJobThreshold {
+                            shouldRequestReviewAfterPhoto = true
+                        }
+                        completedJobForPhoto = job
                     }
                 } catch {
                     operationError = error.localizedDescription
@@ -713,6 +728,12 @@ struct TodayView: View {
     }
 
     // MARK: - Helpers
+
+    private func requestPendingReview() {
+        guard shouldRequestReviewAfterPhoto else { return }
+        shouldRequestReviewAfterPhoto = false
+        ReviewPrompt.requestReview()
+    }
 
     private var isToday: Bool { Calendar.current.isDateInToday(selectedDate) }
 

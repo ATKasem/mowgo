@@ -102,6 +102,12 @@ struct DashboardView: View {
         auth.user?.role == ownerRole
     }
 
+    /// Activation nudge: show while the owner is still ramping up
+    /// (fewer than 3 clients or no jobs scheduled yet).
+    private var showOnboardingChecklist: Bool {
+        store.clients.count < 3 || store.jobs.isEmpty
+    }
+
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
     // MARK: - Body
@@ -110,6 +116,9 @@ struct DashboardView: View {
         ScrollView {
             VStack(spacing: 16) {
                 headerSection
+                if isOwner && showOnboardingChecklist {
+                    OnboardingChecklistView(selectedTab: $selectedTab)
+                }
                 statCardsSection
                 if isOwner { quickActionsSection }
                 todayPreviewSection

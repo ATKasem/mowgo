@@ -50,6 +50,13 @@ serve(async (req) => {
 
     const { currency = "usd", invoice_id } = await req.json();
 
+    if (currency !== "usd") {
+      return new Response(JSON.stringify({ error: "Unsupported currency" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (!invoice_id) {
       return new Response(
         JSON.stringify({ error: "invoice_id required" }),

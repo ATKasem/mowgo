@@ -36,7 +36,7 @@ struct SettingsView: View {
     @AppStorage("rainDelayAlerts") private var rainDelayAlerts = true
 
     private enum SettingsDestination: Hashable {
-        case businessProfile, notifications, appearance, billing, integrations, importYardbook
+        case businessProfile, notifications, appearance, billing, integrations, importYardbook, recurringJobs
     }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
@@ -55,6 +55,10 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 8) {
                         profileCard
+
+                        if let profile = auth.user, profile.hasActiveTrial {
+                            trialBanner(profile)
+                        }
 
                         SectionHeader("Business")
                         settingsLinks
@@ -104,6 +108,7 @@ struct SettingsView: View {
             .onAppear(perform: loadProfileDraft)
             .task { await loadReferrals() }
             .onChange(of: auth.user?.businessName) { _, _ in loadProfileDraft() }
+            .onChange(of: auth.user?.email) { _, _ in loadProfileDraft() }
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView(currentTier: auth.user?.tier ?? "free")
             }
@@ -171,6 +176,8 @@ struct SettingsView: View {
             IntegrationsView()
         case .importYardbook:
             ImportFromYardbookView()
+        case .recurringJobs:
+            RecurringJobsSettingsView()
         }
     }
 
@@ -190,6 +197,14 @@ struct SettingsView: View {
             Divider().padding(.leading, 52)
             NavigationLink(value: SettingsDestination.billing) {
                 SettingsLinkRow(title: "Billing", subtitle: auth.user?.tierLabel ?? NSLocalizedString("Free", comment: "Subscription tier name: free plan"), icon: "creditcard.fill")
+            }
+            Divider().padding(.leading, 52)
+            NavigationLink(value: SettingsDestination.recurringJobs) {
+                SettingsLinkRow(
+                    title: "Recurring Jobs",
+                    subtitle: recurringJobsSubtitle,
+                    icon: "arrow.triangle.2.circlepath"
+                )
             }
             if isPaidTier {
                 Divider().padding(.leading, 52)
@@ -396,9 +411,41 @@ struct SettingsView: View {
         .background(theme.surface).cornerRadius(16)
     }
 
+    private func trialBanner(_ profile: UserProfile) -> some View {
+        Button { showSubscription = true } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(profile.trialDaysLeft ?? 1) days left in your \(profile.trialPlanLabel ?? "Free") trial")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(MowGoTheme.deepGreen)
+                    Text("Subscribe to keep unlimited clients & jobs")
+                        .font(.caption)
+                        .foregroundColor(theme.textMuted)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(theme.textMuted)
+            }
+            .padding(14)
+            .background(MowGoTheme.deepGreen.opacity(MowGoTheme.accentOpacity))
+            .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
+    }
+
     private var isPaidTier: Bool {
         let tier = auth.user?.tier ?? "free"
         return tier == "solo" || tier == "crew" || tier == "premium"
+    }
+
+    private var recurringJobsSubtitle: String {
+        let activeCount = store.recurringJobs.filter(\.isActive).count
+        if activeCount == 0 {
+            return NSLocalizedString("No active templates", comment: "Recurring jobs settings row subtitle when none are active")
+        }
+        let format = NSLocalizedString("%d active", comment: "Recurring jobs settings row subtitle, count of active templates")
+        return String(format: format, activeCount)
     }
 
     private func openCustomerPortal() {
@@ -546,6 +593,124 @@ private struct ActivityView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+private struct RecurringJobsSettingsView: View {
+    @EnvironmentObject var store: DataStore
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var toggleError: String?
+
+    private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
+
+    private var activeTemplates: [RecurringJob] {
+        store.recurringJobs.filter(\.isActive)
+    }
+
+    private var inactiveTemplates: [RecurringJob] {
+        store.recurringJobs.filter { !$0.isActive }
+    }
+
+    var body: some View {
+        Form {
+            if store.recurringJobs.isEmpty {
+                Section {
+                    Text("No recurring jobs yet. Set one up when scheduling a job.")
+                        .font(.subheadline)
+                        .foregroundColor(theme.textMuted)
+                }
+            } else {
+                if !activeTemplates.isEmpty {
+                    Section("Active") {
+                        ForEach(activeTemplates) { template in
+                            recurringRow(template)
+                        }
+                    }
+                }
+                if !inactiveTemplates.isEmpty {
+                    Section("Inactive") {
+                        ForEach(inactiveTemplates) { template in
+                            recurringRow(template)
+                        }
+                    }
+                }
+            }
+            if let toggleError {
+                Section { Text(toggleError).foregroundColor(.red) }
+            }
+        }
+        .scrollContentBackground(.hidden)
+        .background(theme.background)
+        .navigationTitle("Recurring Jobs")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func recurringRow(_ template: RecurringJob) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(clientName(for: template))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(theme.textPrimary)
+                Text(template.title)
+                    .font(.caption)
+                    .foregroundColor(theme.textMuted)
+                HStack(spacing: 4) {
+                    Text(template.frequency.label)
+                        .font(.caption2.weight(.medium))
+                        .foregroundColor(MowGoTheme.deepGreen)
+                    let days = dayText(for: template)
+                    if !days.isEmpty {
+                        Text("· \(days)")
+                            .font(.caption2)
+                            .foregroundColor(theme.textMuted)
+                    }
+                    if let time = template.scheduledTime {
+                        Text("· \(time)")
+                            .font(.caption2)
+                            .foregroundColor(theme.textMuted)
+                    }
+                }
+            }
+            Spacer()
+            Toggle("", isOn: activeBinding(for: template))
+                .labelsHidden()
+                .tint(MowGoTheme.deepGreen)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func clientName(for template: RecurringJob) -> String {
+        store.clients.first(where: { $0.id == template.clientId })?.name
+            ?? NSLocalizedString("Client", comment: "Recurring job row fallback when the client can't be found")
+    }
+
+    private static let dayAbbreviations: [Int: String] = [
+        1: NSLocalizedString("Mon", comment: "Weekday abbreviation"),
+        2: NSLocalizedString("Tue", comment: "Weekday abbreviation"),
+        3: NSLocalizedString("Wed", comment: "Weekday abbreviation"),
+        4: NSLocalizedString("Thu", comment: "Weekday abbreviation"),
+        5: NSLocalizedString("Fri", comment: "Weekday abbreviation"),
+        6: NSLocalizedString("Sat", comment: "Weekday abbreviation")
+    ]
+
+    private func dayText(for template: RecurringJob) -> String {
+        template.daysOfWeek.sorted().compactMap { Self.dayAbbreviations[$0] }.joined(separator: ", ")
+    }
+
+    private func activeBinding(for template: RecurringJob) -> Binding<Bool> {
+        Binding(
+            get: { template.isActive },
+            set: { newValue in
+                Task {
+                    do {
+                        try await store.updateRecurringJobActive(template, isActive: newValue)
+                        toggleError = nil
+                    } catch {
+                        toggleError = error.localizedDescription
+                    }
+                }
+            }
+        )
+    }
 }
 
 private struct BusinessProfileSettingsView: View {

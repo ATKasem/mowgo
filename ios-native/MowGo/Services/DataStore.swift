@@ -133,6 +133,10 @@ private struct RecurringJobInsert: Encodable {
     let startDate: String
 }
 
+private struct RecurringActivePatch: Codable {
+    let isActive: Bool
+}
+
 private struct InvoicePaidPatch: Encodable {
     let status: Invoice.InvoiceStatus
     let paidAt: String
@@ -549,19 +553,19 @@ final class DataStore: ObservableObject {
             }
 
         case "invoice:create":
-            struct C: Decodable { let jobId: UUID; let clientId: UUID; let amount: Double }
+            struct C: Decodable { let jobId: UUID; let clientId: UUID; let amount: Decimal }
             let c = try JSONDecoder().decode(C.self, from: mutation.payload)
             // Idempotent + owner-safe: the RPC resolves the owner for crew
             // completions and ON CONFLICT makes duplicates a no-op.
             if invoices.contains(where: { $0.jobId == c.jobId }) { break }
             struct Params: Encodable {
                 let pJobId: UUID
-                let pAmount: Double
+                let pAmount: Decimal
             }
             struct Row: Decodable {
                 let invoiceId: UUID
                 let created: Bool
-                let amount: Double?
+                let amount: Decimal?
             }
             let rows: [Row]? = try await sb.rpc(
                 "create_invoice_for_job",
@@ -571,7 +575,7 @@ final class DataStore: ObservableObject {
             if let row = rows?.first, row.created {
                 // Prefer the RPC-returned authoritative amount (client rate
                 // may be stale); fall back to the local rate if absent.
-                let resolvedAmount = row.amount.map { Decimal(string: String(format: "%.2f", $0)) ?? 0 } ?? Decimal(string: String(format: "%.2f", c.amount)) ?? 0
+                let resolvedAmount = row.amount ?? c.amount
                 let created = Invoice(
                     id: row.invoiceId, clientId: c.clientId, jobId: c.jobId,
                     amount: resolvedAmount,
@@ -592,6 +596,10 @@ final class DataStore: ObservableObject {
 
         case "recurring:delete":
             try await sb.delete("recurring_jobs", id: mutation.entityId)
+
+        case "recurring:active":
+            let p = try JSONDecoder().decode(RecurringActivePatch.self, from: mutation.payload)
+            try await sb.update("recurring_jobs", id: mutation.entityId, p)
 
         default:
             throw PendingMutationError.unknownOperation(mutation.operation)
@@ -1210,9 +1218,9 @@ final class DataStore: ObservableObject {
         }
 
         guard await canSync() else {
-            struct P: Encodable { let jobId: UUID; let clientId: UUID; let amount: Double }
+            struct P: Encodable { let jobId: UUID; let clientId: UUID; let amount: Decimal }
             _ = safeEnqueue("invoice:create", id: UUID(), payload: P(
-                jobId: job.id, clientId: clientId, amount: centsDouble(rate)
+                jobId: job.id, clientId: clientId, amount: rate
             ))
             return
         }
@@ -1251,38 +1259,37 @@ final class DataStore: ObservableObject {
         }
     }
 
-    /// Money-safe Double: round to cents before encoding so Postgres numeric
-    /// columns never receive binary-float noise (0.1+0.2 artifacts).
-    private func centsDouble(_ amount: Decimal) -> Double {
+    /// Round monetary values to cents before encoding for Postgres numeric columns.
+    private func centsDecimal(_ amount: Decimal) -> Decimal {
         var rounded = Decimal()
         var amt = amount
         NSDecimalRound(&rounded, &amt, 2, .plain)
-        return NSDecimalNumber(decimal: rounded).doubleValue
+        return rounded
     }
 
     private func createInvoice(jobId: UUID, clientId: UUID, amount: Decimal, clientName: String?) async throws {
         struct Params: Encodable {
             let pJobId: UUID
-            let pAmount: Double
+            let pAmount: Decimal
         }
         struct Row: Decodable {
             let invoiceId: UUID
             let created: Bool
-            let amount: Double?
+            let amount: Decimal?
         }
         // Owner-safe RPC: resolves the OWNER for crew completions (RLS is
         // owner-only), atomically idempotent per job, and reports both
         // outcomes so we never have to fetch a possibly-invisible row.
         let rows: [Row]? = try await sb.rpc(
             "create_invoice_for_job",
-            params: Params(pJobId: jobId, pAmount: centsDouble(amount)),
+            params: Params(pJobId: jobId, pAmount: centsDecimal(amount)),
             [Row].self
         )
         guard let row = rows?.first else { return }
         if row.created {
             // Prefer the RPC-returned authoritative amount (client rate may
             // be stale); fall back to the local rate if absent.
-            let resolvedAmount = row.amount.map { Decimal(string: String(format: "%.2f", $0)) ?? 0 } ?? amount
+            let resolvedAmount = row.amount ?? amount
             let created = Invoice(
                 id: row.invoiceId, clientId: clientId, jobId: jobId, amount: resolvedAmount,
                 status: .unpaid, createdAt: ISO8601DateFormatter().string(from: Date()),
@@ -1300,7 +1307,7 @@ final class DataStore: ObservableObject {
     /// Manual ad-hoc invoice (no job) — mirrors Android's New Invoice dialog.
     /// Owner-only via RLS; crew sees the RLS error surfaced in the form.
     func createManualInvoice(clientId: UUID, amount: Decimal, clientName: String?) async throws {
-        let value = centsDouble(amount)
+        let value = centsDecimal(amount)
         guard value > 0 else {
             throw NSError(domain: "MowGo", code: 400, userInfo: [NSLocalizedDescriptionKey: "Amount must be positive"])
         }
@@ -1319,7 +1326,7 @@ final class DataStore: ObservableObject {
         struct InvoiceInsert: Encodable {
             let userId: UUID
             let clientId: UUID
-            let amount: Double
+            let amount: Decimal
             let status: String
         }
         let inserted: Invoice = try await sb.insert("invoices", InvoiceInsert(
@@ -1704,6 +1711,39 @@ final class DataStore: ObservableObject {
             }
             guard safeEnqueueEmpty("recurring:delete", id: template.id) else { throw DataStoreError.persistenceUnavailable }
             recurringJobs.removeAll { $0.id == template.id }
+            self.error = "Saved offline — will sync when connected"
+            return
+        }
+    }
+
+    func updateRecurringJobActive(_ template: RecurringJob, isActive: Bool) async throws {
+        var updated = template
+        updated.isActive = isActive
+        guard await canSync() else {
+            guard safeEnqueue("recurring:active", id: template.id, payload: RecurringActivePatch(isActive: isActive)) else {
+                throw DataStoreError.persistenceUnavailable
+            }
+            if let idx = recurringJobs.firstIndex(where: { $0.id == template.id }) {
+                recurringJobs[idx] = updated
+            }
+            return
+        }
+        do {
+            try await sb.update("recurring_jobs", id: template.id, RecurringActivePatch(isActive: isActive))
+            if let idx = recurringJobs.firstIndex(where: { $0.id == template.id }) {
+                recurringJobs[idx] = updated
+            }
+        } catch {
+            guard isNetworkError(error) else {
+                self.error = error.localizedDescription
+                throw error
+            }
+            guard safeEnqueue("recurring:active", id: template.id, payload: RecurringActivePatch(isActive: isActive)) else {
+                throw DataStoreError.persistenceUnavailable
+            }
+            if let idx = recurringJobs.firstIndex(where: { $0.id == template.id }) {
+                recurringJobs[idx] = updated
+            }
             self.error = "Saved offline — will sync when connected"
             return
         }

@@ -18,15 +18,12 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const ALLOWED_ORIGINS = [
-  "https://mowgo.pages.dev",
   "https://mowgoapp.com",
-  "http://localhost:5173",
 ];
 
 function originHeaders(origin: string | null) {
-  const allowed = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
-    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Origin": origin ?? ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type",
   };
@@ -47,6 +44,13 @@ const tierToEnvKeyAnnual: Record<string, string> = {
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const cors = originHeaders(origin);
+
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { ...originHeaders(null), "Content-Type": "application/json" },
+    });
+  }
 
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: cors });
