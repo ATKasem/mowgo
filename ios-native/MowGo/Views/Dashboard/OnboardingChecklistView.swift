@@ -11,7 +11,7 @@ import SwiftUI
 struct OnboardingChecklistView: View {
     @EnvironmentObject var store: DataStore
     @EnvironmentObject var auth: AuthService
-    @Environment(\\.colorScheme) private var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
 
     /// Dismissal keyed per authenticated profile, so it doesn't leak across accounts on the same device.
     @AppStorage("onboarding_checklist_dismissed_") private var dismissedRaw = ""
@@ -27,22 +27,26 @@ struct OnboardingChecklistView: View {
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
-    private struct Milestone {
-        let label: LocalizedStringKey
-        let tab: Int
-        let done: Bool
-    }
-
-    private var milestones: [Milestone] {
+    private static func milestoneStates(store: DataStore) -> [(label: LocalizedStringKey, tab: Int, done: Bool)] {
         [
-            Milestone(label: "Add your first client", tab: 2, done: !store.clients.isEmpty),
-            Milestone(label: "Schedule your first job", tab: 1, done: !store.jobs.isEmpty),
-            Milestone(label: "Complete a job", tab: 1, done: store.jobs.contains { $0.status == .done }),
-            Milestone(label: "Send an invoice", tab: 3, done: !store.invoices.isEmpty)
+            (label: "Add your first client", tab: 2, done: !store.clients.isEmpty),
+            (label: "Schedule your first job", tab: 1, done: !store.jobs.isEmpty),
+            (label: "Complete a job", tab: 1, done: store.jobs.contains { $0.status == .done }),
+            (label: "Send an invoice", tab: 3, done: !store.invoices.isEmpty)
         ]
     }
 
-    private var allDone: Bool { milestones.allSatisfy(\.done) }
+    static func milestonesDone(store: DataStore) -> Bool {
+        milestoneStates(store: store).allSatisfy { $0.done }
+    }
+
+    private var milestones: [(done: Bool, label: LocalizedStringKey, tab: Int)] {
+        Self.milestoneStates(store: store)
+    }
+
+    private var allDone: Bool {
+        Self.milestonesDone(store: store)
+    }
 
     var body: some View {
         if !isDismissedForUser && !allDone {
@@ -78,7 +82,7 @@ struct OnboardingChecklistView: View {
         }
     }
 
-    private func milestoneRow(_ milestone: Milestone) -> some View {
+    private func milestoneRow(_ milestone: (done: Bool, label: LocalizedStringKey, tab: Int)) -> some View {
         Button {
             selectedTab = milestone.tab
         } label: {

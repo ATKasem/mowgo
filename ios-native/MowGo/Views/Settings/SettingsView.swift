@@ -607,6 +607,7 @@ private struct RecurringJobsSettingsView: View {
     @EnvironmentObject var store: DataStore
     @Environment(\.colorScheme) private var colorScheme
     @State private var toggleError: String?
+    @State private var updatingTemplateIds: Set<UUID> = []
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
@@ -682,8 +683,10 @@ private struct RecurringJobsSettingsView: View {
             Toggle("", isOn: activeBinding(for: template))
                 .labelsHidden()
                 .tint(MowGoTheme.deepGreen)
+                .disabled(updatingTemplateIds.contains(template.id))
         }
         .padding(.vertical, 4)
+        .opacity(updatingTemplateIds.contains(template.id) ? 0.6 : 1)
     }
 
     private func clientName(for template: RecurringJob) -> String {
@@ -708,7 +711,10 @@ private struct RecurringJobsSettingsView: View {
         Binding(
             get: { template.isActive },
             set: { newValue in
+                guard !updatingTemplateIds.contains(template.id) else { return }
+                updatingTemplateIds.insert(template.id)
                 Task {
+                    defer { updatingTemplateIds.remove(template.id) }
                     do {
                         try await store.updateRecurringJobActive(template, isActive: newValue)
                         toggleError = nil

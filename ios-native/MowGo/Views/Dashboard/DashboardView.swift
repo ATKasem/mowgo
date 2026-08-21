@@ -102,10 +102,10 @@ struct DashboardView: View {
         auth.user?.role == ownerRole
     }
 
-    /// Activation nudge: show while the owner is still ramping up
-    /// (fewer than 3 clients or no jobs scheduled yet).
+    /// Activation nudge: show while owner exists and the checklist itself hasn't
+    /// reported that all milestones are complete.
     private var showOnboardingChecklist: Bool {
-        store.clients.count < 3 || store.jobs.isEmpty
+        isOwner && !OnboardingChecklistView.milestonesDone(store: store)
     }
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }

@@ -466,3 +466,7 @@
 "Set business location to see conditions" = "Configura la ubicación del negocio para ver las condiciones";
 "Referral stats are not available right now." = "Las estadísticas de referidos no están disponibles en este momento.";
 "Share this link with clients so they can book their own appointments online. You can also add it to your website or social media." = "Comparte este enlace con tus clientes para que puedan reservar sus propias citas en línea. También puedes añadirlo a tu sitio web o redes sociales.";
+
+// MARK: - Trial Banner
+"%lld days left in your %@ trial" = "Quedan %lld días de tu prueba de %@";
+"Subscribe to keep unlimited clients & jobs" = "Suscríbete para conservar clientes y trabajos ilimitados";
