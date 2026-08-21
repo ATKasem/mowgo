@@ -148,10 +148,11 @@ serve(async (req) => {
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
-        // Stable key per user+invoice (no wall-clock component): Stripe
-        // dedupes within 24h, so concurrent/retry creators resolve to the
-        // same intent instead of creating competing chargeable intents.
-        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}`,
+        // Stable key per user+invoice with generation marker: when a stored
+        // PaymentIntent is unusable, including its ID in the key (instead of
+        // the bare invoice) gives Stripe a fresh dedup window for the new
+        // intent, rather than replaying the prior creation.
+        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}-${invoice.stripe_payment_intent_id || "0"}`,
       },
       body: new URLSearchParams({
         amount: String(amount),
