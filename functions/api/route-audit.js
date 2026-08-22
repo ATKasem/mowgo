@@ -68,6 +68,9 @@ MowGo's scheduling + routing cuts drive time by 5-10 hours/week for crews like y
 <a href="https://mowgoapp.com/subscribe" style="display:inline-block;padding:12px 24px;background:#059669;color:white;text-decoration:none;border-radius:8px;font-weight:bold">Start Free Trial ></a><br>
 <span style="font-size:13px;color:#666">No card required. Cancel anytime.</span>
 </p>
+<p style="margin-top:20px;padding:12px;background:#fefce8;border-radius:8px;border-left:4px solid #eab308;font-size:14px;color:#713f12">
+<strong>Want this report by text?</strong> We can text you a summary. <a href="https://mowgoapp.com/#/route-audit?optin=true" style="color:#ca8a04;font-weight:bold">Click here to add your phone number →</a>
+</p>
 </body></html>`;
 }
 

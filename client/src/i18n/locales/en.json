@@ -1692,6 +1692,7 @@
       "phone": "Phone",
       "optional": "optional",
       "phonePlaceholder": "405-555-0100",
+      "smsBenefit": "Get results by text — faster than email:",
       "consentPrefix": "I agree to receive ",
       "consentMarketing": "marketing",
       "consentMiddle": " text messages from MowGo about lawn care pricing reports and offers (about 1–2 messages a month). This consent is separate from any informational or transactional messages. Message & data rates may apply. Reply ",
@@ -1706,7 +1707,9 @@
       "submit": "Run my free audit →",
       "submitting": "Running your audit...",
       "priorityLine": "I personally audit 10 routes per week. Yours goes to the front of the line.",
-      "scarcity": "Free audit, no signup. Your results in 30 seconds."
+      "scarcity": "Free audit, no signup. Your results in 30 seconds.",
+      "optinTitle": "Get your report by text",
+      "optinBody": "Enter your phone number and check the box below to receive your route audit results by SMS."
     },
     "options": {
       "under10": "Under 10",

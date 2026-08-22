@@ -8050,8 +8050,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:01.810190",
+      "last_event": "sent"
     },
     {
       "id": 519,
@@ -8065,8 +8066,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:02.029236",
+      "last_event": "sent"
     },
     {
       "id": 520,
@@ -8080,8 +8082,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:02.247229",
+      "last_event": "sent"
     },
     {
       "id": 521,
@@ -8095,8 +8098,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:02.549411",
+      "last_event": "sent"
     },
     {
       "id": 522,
@@ -8110,8 +8114,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:02.769352",
+      "last_event": "sent"
     },
     {
       "id": 523,
@@ -8125,8 +8130,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:02.971036",
+      "last_event": "sent"
     },
     {
       "id": 524,
@@ -8140,8 +8146,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:03.145260",
+      "last_event": "sent"
     },
     {
       "id": 525,
@@ -8155,8 +8162,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:03.333189",
+      "last_event": "sent"
     },
     {
       "id": 526,
@@ -8170,8 +8178,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:03.545626",
+      "last_event": "sent"
     },
     {
       "id": 527,
@@ -8185,8 +8194,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:03.739867",
+      "last_event": "sent"
     },
     {
       "id": 528,
@@ -8200,8 +8210,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:03.949995",
+      "last_event": "sent"
     },
     {
       "id": 529,
@@ -8215,8 +8226,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:04.135808",
+      "last_event": "sent"
     },
     {
       "id": 530,
@@ -8230,8 +8242,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:04.333104",
+      "last_event": "sent"
     },
     {
       "id": 531,
@@ -8245,8 +8258,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:04.791049",
+      "last_event": "sent"
     },
     {
       "id": 532,
@@ -8260,8 +8274,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:04.985858",
+      "last_event": "sent"
     },
     {
       "id": 533,
@@ -8275,8 +8290,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:05.173781",
+      "last_event": "sent"
     },
     {
       "id": 534,
@@ -8290,8 +8306,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:05.374392",
+      "last_event": "sent"
     },
     {
       "id": 535,
@@ -8305,8 +8322,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:05.589533",
+      "last_event": "sent"
     },
     {
       "id": 537,
@@ -8320,8 +8338,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:05.809957",
+      "last_event": "sent"
     },
     {
       "id": 538,
@@ -8335,8 +8354,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:06.007686",
+      "last_event": "sent"
     },
     {
       "id": 539,
@@ -8350,8 +8370,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:06.250765",
+      "last_event": "sent"
     },
     {
       "id": 540,
@@ -8365,8 +8386,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:06.439491",
+      "last_event": "sent"
     },
     {
       "id": 541,
@@ -8380,8 +8402,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:06.641716",
+      "last_event": "sent"
     },
     {
       "id": 542,
@@ -8395,8 +8418,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:06.837262",
+      "last_event": "sent"
     },
     {
       "id": 543,
@@ -8410,8 +8434,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:07.015788",
+      "last_event": "sent"
     },
     {
       "id": 544,
@@ -8441,8 +8466,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:07.198963",
+      "last_event": "sent"
     },
     {
       "id": 546,
@@ -8456,8 +8482,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:07.424394",
+      "last_event": "sent"
     },
     {
       "id": 547,
@@ -8471,8 +8498,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:07.623610",
+      "last_event": "sent"
     },
     {
       "id": 548,
@@ -8486,8 +8514,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:07.802992",
+      "last_event": "sent"
     },
     {
       "id": 549,
@@ -8501,8 +8530,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:07.998681",
+      "last_event": "sent"
     },
     {
       "id": 550,
@@ -8516,8 +8546,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:08.222395",
+      "last_event": "sent"
     },
     {
       "id": 551,
@@ -8531,8 +8562,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:08.410930",
+      "last_event": "sent"
     },
     {
       "id": 552,
@@ -8546,8 +8578,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:08.614502",
+      "last_event": "sent"
     },
     {
       "id": 553,
@@ -8561,8 +8594,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:08.822853",
+      "last_event": "sent"
     },
     {
       "id": 554,
@@ -8576,8 +8610,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:09.240641",
+      "last_event": "sent"
     },
     {
       "id": 555,
@@ -8591,8 +8626,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:09.433500",
+      "last_event": "sent"
     },
     {
       "id": 556,
@@ -8606,8 +8642,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:09.646344",
+      "last_event": "sent"
     },
     {
       "id": 557,
@@ -8621,8 +8658,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:09.836024",
+      "last_event": "sent"
     },
     {
       "id": 558,
@@ -8636,8 +8674,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:10.025891",
+      "last_event": "sent"
     },
     {
       "id": 559,
@@ -8667,8 +8706,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:10.205349",
+      "last_event": "sent"
     },
     {
       "id": 561,
@@ -8682,8 +8722,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:10.400495",
+      "last_event": "sent"
     },
     {
       "id": 562,
@@ -8697,8 +8738,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:10.598135",
+      "last_event": "sent"
     },
     {
       "id": 563,
@@ -8712,8 +8754,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:10.830275",
+      "last_event": "sent"
     },
     {
       "id": 564,
@@ -8727,8 +8770,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:11.102383",
+      "last_event": "sent"
     },
     {
       "id": 565,
@@ -8742,8 +8786,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:11.301913",
+      "last_event": "sent"
     },
     {
       "id": 567,
@@ -8757,8 +8802,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:11.504108",
+      "last_event": "sent"
     },
     {
       "id": 568,
@@ -8772,8 +8818,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:11.745954",
+      "last_event": "sent"
     },
     {
       "id": 569,
@@ -8787,8 +8834,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:11.932530",
+      "last_event": "sent"
     },
     {
       "id": 570,
@@ -8802,8 +8850,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:12.127119",
+      "last_event": "sent"
     },
     {
       "id": 571,
@@ -8817,8 +8866,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:12.335517",
+      "last_event": "sent"
     },
     {
       "id": 572,
@@ -8832,8 +8882,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:12.533278",
+      "last_event": "sent"
     },
     {
       "id": 573,
@@ -8847,8 +8898,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:12.728421",
+      "last_event": "sent"
     },
     {
       "id": 574,
@@ -8862,8 +8914,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:12.944627",
+      "last_event": "sent"
     },
     {
       "id": 575,
@@ -8877,8 +8930,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:13.123518",
+      "last_event": "sent"
     },
     {
       "id": 576,
@@ -8892,8 +8946,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:13.330295",
+      "last_event": "sent"
     },
     {
       "id": 577,
@@ -8907,8 +8962,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:13.534593",
+      "last_event": "sent"
     },
     {
       "id": 578,
@@ -8922,8 +8978,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:13.735718",
+      "last_event": "sent"
     },
     {
       "id": 579,
@@ -8953,8 +9010,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:13.928953",
+      "last_event": "sent"
     },
     {
       "id": 582,
@@ -8968,8 +9026,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:14.122884",
+      "last_event": "sent"
     },
     {
       "id": 583,
@@ -8983,8 +9042,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:14.315692",
+      "last_event": "sent"
     },
     {
       "id": 584,
@@ -8998,8 +9058,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:14.516331",
+      "last_event": "sent"
     },
     {
       "id": 585,
@@ -9013,8 +9074,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:14.731468",
+      "last_event": "sent"
     },
     {
       "id": 586,
@@ -9028,8 +9090,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:14.912673",
+      "last_event": "sent"
     },
     {
       "id": 587,
@@ -9043,8 +9106,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:15.103789",
+      "last_event": "sent"
     },
     {
       "id": 588,
@@ -9058,8 +9122,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:15.292035",
+      "last_event": "sent"
     },
     {
       "id": 589,
@@ -9073,8 +9138,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:15.492002",
+      "last_event": "sent"
     },
     {
       "id": 590,
@@ -9104,8 +9170,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:15.694069",
+      "last_event": "sent"
     },
     {
       "id": 592,
@@ -9119,8 +9186,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:15.883058",
+      "last_event": "sent"
     },
     {
       "id": 593,
@@ -9134,8 +9202,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:16.081317",
+      "last_event": "sent"
     },
     {
       "id": 594,
@@ -9149,8 +9218,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:16.279271",
+      "last_event": "sent"
     },
     {
       "id": 595,
@@ -9164,8 +9234,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:16.474822",
+      "last_event": "sent"
     },
     {
       "id": 596,
@@ -9179,8 +9250,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:16.691359",
+      "last_event": "sent"
     },
     {
       "id": 597,
@@ -9194,8 +9266,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:16.882600",
+      "last_event": "sent"
     },
     {
       "id": 598,
@@ -9209,8 +9282,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:17.093747",
+      "last_event": "sent"
     },
     {
       "id": 599,
@@ -9224,8 +9298,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:17.305483",
+      "last_event": "sent"
     },
     {
       "id": 600,
@@ -9239,8 +9314,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:17.498127",
+      "last_event": "sent"
     },
     {
       "id": 601,
@@ -9254,8 +9330,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:17.671699",
+      "last_event": "sent"
     },
     {
       "id": 602,
@@ -9269,8 +9346,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:17.858705",
+      "last_event": "sent"
     },
     {
       "id": 603,
@@ -9284,8 +9362,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:18.054070",
+      "last_event": "sent"
     },
     {
       "id": 604,
@@ -9299,8 +9378,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:18.280160",
+      "last_event": "sent"
     },
     {
       "id": 605,
@@ -9314,8 +9394,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:18.466135",
+      "last_event": "sent"
     },
     {
       "id": 606,
@@ -9329,8 +9410,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:18.665563",
+      "last_event": "sent"
     },
     {
       "id": 607,
@@ -9344,8 +9426,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:18.892282",
+      "last_event": "sent"
     },
     {
       "id": 608,
@@ -9359,8 +9442,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:19.099237",
+      "last_event": "sent"
     },
     {
       "id": 609,
@@ -9374,8 +9458,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:19.287906",
+      "last_event": "sent"
     },
     {
       "id": 610,
@@ -9389,8 +9474,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:19.482425",
+      "last_event": "sent"
     },
     {
       "id": 611,
@@ -9436,8 +9522,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:19.695138",
+      "last_event": "sent"
     },
     {
       "id": 614,
@@ -9451,8 +9538,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:19.899527",
+      "last_event": "sent"
     },
     {
       "id": 615,
@@ -9466,8 +9554,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:20.104524",
+      "last_event": "sent"
     },
     {
       "id": 616,
@@ -9513,8 +9602,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:20.304747",
+      "last_event": "sent"
     },
     {
       "id": 619,
@@ -9528,8 +9618,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:20.491803",
+      "last_event": "sent"
     },
     {
       "id": 620,
@@ -9543,8 +9634,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:20.679427",
+      "last_event": "sent"
     },
     {
       "id": 621,
@@ -9606,8 +9698,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:20.887101",
+      "last_event": "sent"
     },
     {
       "id": 626,
@@ -9653,8 +9746,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:21.062870",
+      "last_event": "sent"
     },
     {
       "id": 630,
@@ -9684,8 +9778,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:21.259026",
+      "last_event": "sent"
     },
     {
       "id": 632,
@@ -9699,8 +9794,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:21.458488",
+      "last_event": "sent"
     },
     {
       "id": 633,
@@ -9730,8 +9826,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:21.644909",
+      "last_event": "sent"
     },
     {
       "id": 635,
@@ -9745,8 +9842,9 @@
       "verified_name": false,
       "verified_email": true,
       "source": "Apify bulk scrape",
-      "sent": false,
-      "sent_date": null
+      "sent": true,
+      "sent_date": "2026-08-21T13:07:21.845290",
+      "last_event": "sent"
     },
     {
       "id": 636,
@@ -26895,9 +26993,10 @@
       "verified_name": true,
       "verified_email": true,
       "source": "CAI Houston Chapter Directory",
-      "sent": false,
-      "sent_date": null,
-      "last_event": null
+      "sent": true,
+      "sent_date": "2026-08-22T04:31:43.810149",
+      "last_event": "sent",
+      "ab_variant": "A"
     },
     {
       "id": 2060,
@@ -26913,7 +27012,7 @@
       "source": "CAI Houston Chapter Directory",
       "sent": false,
       "sent_date": null,
-      "last_event": null
+      "last_event": "reset_from_spam"
     },
     {
       "id": 2061,
@@ -26927,9 +27026,10 @@
       "verified_name": true,
       "verified_email": true,
       "source": "CAI Houston Chapter Directory",
-      "sent": false,
-      "sent_date": null,
-      "last_event": null
+      "sent": true,
+      "sent_date": "2026-08-22T04:31:44.212369",
+      "last_event": "sent",
+      "ab_variant": "A"
     },
     {
       "id": 2062,
@@ -26945,7 +27045,7 @@
       "source": "Facebook Group Post",
       "sent": false,
       "sent_date": null,
-      "last_event": null
+      "last_event": "reset_from_spam"
     },
     {
       "id": 2063,
@@ -26959,9 +27059,10 @@
       "verified_name": true,
       "verified_email": true,
       "source": "Facebook Group Post",
-      "sent": false,
-      "sent_date": null,
-      "last_event": null
+      "sent": true,
+      "sent_date": "2026-08-22T04:31:44.602500",
+      "last_event": "sent",
+      "ab_variant": "A"
     },
     {
       "id": 2064,
@@ -26977,7 +27078,7 @@
       "source": "Facebook Group Post",
       "sent": false,
       "sent_date": null,
-      "last_event": null
+      "last_event": "reset_from_spam"
     },
     {
       "id": 2065,
@@ -26991,9 +27092,10 @@
       "verified_name": true,
       "verified_email": true,
       "source": "Facebook Group Post",
-      "sent": false,
-      "sent_date": null,
-      "last_event": null
+      "sent": true,
+      "sent_date": "2026-08-22T04:31:44.981248",
+      "last_event": "sent",
+      "ab_variant": "A"
     },
     {
       "id": 2066,
@@ -27009,7 +27111,7 @@
       "source": "Facebook Group Post",
       "sent": false,
       "sent_date": null,
-      "last_event": null
+      "last_event": "reset_from_spam"
     },
     {
       "id": 2067,
@@ -27023,9 +27125,10 @@
       "verified_name": true,
       "verified_email": true,
       "source": "Facebook Group Post",
-      "sent": false,
-      "sent_date": null,
-      "last_event": null
+      "sent": true,
+      "sent_date": "2026-08-22T04:31:45.376206",
+      "last_event": "sent",
+      "ab_variant": "A"
     },
     {
       "id": 2068,
@@ -27041,7 +27144,7 @@
       "source": "Company website",
       "sent": false,
       "sent_date": null,
-      "last_event": null
+      "last_event": "reset_from_spam"
     },
     {
       "id": 2069,
@@ -121448,25 +121551,1282 @@
       "sent": false,
       "bounced": false,
       "replied": false
+    },
+    {
+      "name": "Dan's Quality Lawn and Landscaping Services",
+      "business": "Dan's Quality Lawn and Landscaping Services",
+      "city": "Houston",
+      "state": "TX",
+      "phone": "(832) 225-2081",
+      "website": "https://www.dansqualitylawns.com/",
+      "email": "",
+      "google_place_id": "ChIJ_TZGNXOlQIYRMObsKCY4RZ0",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": false,
+      "id": 3757,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Cruz Lawn Service & Landscaping",
+      "business": "Cruz Lawn Service & Landscaping",
+      "city": "Houston",
+      "state": "TX",
+      "phone": "",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJ_12d8j-3QIYRuUQrQuEzj_s",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3758,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Just Right Lawns - San Antonio",
+      "business": "Just Right Lawns - San Antonio",
+      "city": "San Antonio",
+      "state": "TX",
+      "phone": "(210) 338-8429",
+      "website": "https://justrightlawns.com/san-antonio-tx/",
+      "email": "",
+      "google_place_id": "ChIJv6lXkxJgXIYRC3KxC9DRjy0",
+      "source": "google_maps_daily_gen",
+      "rating": 4.6,
+      "verified_email": false,
+      "id": 3759,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Rivera's Lawn Services",
+      "business": "Rivera's Lawn Services",
+      "city": "San Antonio",
+      "state": "TX",
+      "phone": "(210) 452-1902",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJ9f6zaJ3T3IURuzIKdt8WT1w",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3760,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Emerald Lawns - San Antonio Lawn Care",
+      "business": "Emerald Lawns - San Antonio Lawn Care",
+      "city": "Helotes",
+      "state": "TX",
+      "phone": "(210) 664-4930",
+      "website": "https://emeraldlawns.com/locations/san-antonio-tx/",
+      "email": "",
+      "google_place_id": "ChIJ94L2khPz8CERvhdTek2sYV4",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": false,
+      "id": 3761,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Sam's lawn care dfw",
+      "business": "Sam's lawn care dfw",
+      "city": "Dallas",
+      "state": "TX",
+      "phone": "",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJjVRSNYGbToYRtP414Cez4rY",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": false,
+      "id": 3762,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Fred's Lawn Care",
+      "business": "Fred's Lawn Care",
+      "city": "Dallas",
+      "state": "TX",
+      "phone": "(214) 225-9591",
+      "website": "http://www.fredslawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJ1WDKHTzdBocRhRQ39FyQg8M",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3763,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Real Green Pest and Lawn Care",
+      "business": "Real Green Pest and Lawn Care",
+      "city": "Austin",
+      "state": "TX",
+      "phone": "(844) 508-0092",
+      "website": "https://realgreenservices.com/",
+      "email": "",
+      "google_place_id": "ChIJK8mga4_RRIYRZIoaLmG4LJs",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3764,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Cutting Edge Lawn Care",
+      "business": "Cutting Edge Lawn Care",
+      "city": "Austin",
+      "state": "TX",
+      "phone": "(512) 835-4144",
+      "website": "https://www.cuttinglawns.com/",
+      "email": "",
+      "google_place_id": "ChIJ5xVcwyItW4YRwlgwdLqFaU0",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3765,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Loopers Lawn Care",
+      "business": "Loopers Lawn Care",
+      "city": "Austin",
+      "state": "TX",
+      "phone": "(512) 720-8788",
+      "website": "http://www.looperslawns.com/",
+      "email": "",
+      "google_place_id": "ChIJU4czVT9JW4YRmu18oa_j9Xw",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3766,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "360\u00b0 Luxury Landscaping",
+      "business": "360\u00b0 Luxury Landscaping",
+      "city": "Raleigh",
+      "state": "NC",
+      "phone": "(919) 649-1713",
+      "website": "http://www.360luxurylandscaping.com/",
+      "email": "info@360luxurylandscaping.com",
+      "google_place_id": "ChIJm54IisZfrIkRoZVOxb6evXg",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3767,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Flower the People Lawn Care and Landscaping",
+      "business": "Flower the People Lawn Care and Landscaping",
+      "city": "Nashville",
+      "state": "TN",
+      "phone": "(980) 867-9436",
+      "website": "https://www.ftplandscaping.com/",
+      "email": "",
+      "google_place_id": "ChIJP3d8AilnZIgR1ekgMS0JSfc",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3768,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "BlackHawk Lawn Care",
+      "business": "BlackHawk Lawn Care",
+      "city": "Jacksonville",
+      "state": "FL",
+      "phone": "(904) 914-1042",
+      "website": "http://blackhawklawns.com/",
+      "email": "",
+      "google_place_id": "ChIJhSeyI8xN5IgRPCSHufArBGg",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3769,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Skinner Lawns | Lawn Care and Landscaping",
+      "business": "Skinner Lawns | Lawn Care and Landscaping",
+      "city": "Jacksonville",
+      "state": "FL",
+      "phone": "(904) 720-2515",
+      "website": "http://www.skinnerlawns.com/",
+      "email": "",
+      "google_place_id": "ChIJF4QUU2rJ5YgRhdqZLarNYLM",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3770,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Lawn Stars and Beyond",
+      "business": "Lawn Stars and Beyond",
+      "city": "Tampa",
+      "state": "FL",
+      "phone": "(813) 862-7656",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJRTH9yqPPwogRBCrZhYaQYUE",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3771,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Stingray Lawn Service",
+      "business": "Stingray Lawn Service",
+      "city": "Orlando",
+      "state": "FL",
+      "phone": "(321) 252-9787",
+      "website": "https://stingrayls.com/",
+      "email": "",
+      "google_place_id": "ChIJY6qrS_qwxGgRyfoi5giIpE4",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3772,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Jimmy Center Lawn Care",
+      "business": "Jimmy Center Lawn Care",
+      "city": "Orlando",
+      "state": "FL",
+      "phone": "(407) 554-9408",
+      "website": "https://jimmycenterlawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJjeX00hd954gRlpwmIIV8h34",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3773,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Blue View Lawn Care",
+      "business": "Blue View Lawn Care",
+      "city": "Orlando",
+      "state": "FL",
+      "phone": "",
+      "website": "https://blueviewlawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJdTHNsjJ754gRts8ivj8cUjM",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3774,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Midlands",
+      "business": "Midlands",
+      "city": "Lexington",
+      "state": "SC",
+      "phone": "(803) 356-8080",
+      "website": "http://midlandslandscape.com/",
+      "email": "",
+      "google_place_id": "ChIJrYoyv4wuxUURfHj76mciABw",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3775,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Dreher's Lawn Care",
+      "business": "Dreher's Lawn Care",
+      "city": "Columbia",
+      "state": "SC",
+      "phone": "(803) 665-1954",
+      "website": "https://square.site/book/BV6NCTNASZ0MG/dreher-s-lawn-care-columbia-sc",
+      "email": "",
+      "google_place_id": "ChIJ9-689ESyQCkR2Dw1hddqz60",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3776,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Curb Appeal Lawn Care LLC",
+      "business": "Curb Appeal Lawn Care LLC",
+      "city": "Simpsonville",
+      "state": "SC",
+      "phone": "(864) 399-9185",
+      "website": "http://www.curbappeallawn.com/",
+      "email": "",
+      "google_place_id": "ChIJNwR6HPQnWIgRkPf3dfEUplg",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3777,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "CS Outdoors Landscaping",
+      "business": "CS Outdoors Landscaping",
+      "city": "Greenville",
+      "state": "SC",
+      "phone": "(864) 293-8844",
+      "website": "http://www.csoutdoorsgvl.com/",
+      "email": "charles@csoutdoors.net",
+      "google_place_id": "ChIJxRzbSH0tWIgR-CH0NS0kaB4",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3778,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Andres Lawn Care and Maintenance",
+      "business": "Andres Lawn Care and Maintenance",
+      "city": "Greenville",
+      "state": "SC",
+      "phone": "(864) 320-0199",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJCYmYvuLl8GoRpwp5G0i3XtY",
+      "source": "google_maps_daily_gen",
+      "rating": 4.0,
+      "verified_email": false,
+      "id": 3779,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Cedar Landscaping and Pressure Washing",
+      "business": "Cedar Landscaping and Pressure Washing",
+      "city": "Greenville",
+      "state": "SC",
+      "phone": "(864) 884-0424",
+      "website": "http://www.cedarlandscapingandpressurewashing.com/",
+      "email": "",
+      "google_place_id": "ChIJzfwKwv0zWIgRlEaAyohZvTI",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3780,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Gecko Green Lawn Care",
+      "business": "Gecko Green Lawn Care",
+      "city": "Fort Worth",
+      "state": "TX",
+      "phone": "(972) 845-9066",
+      "website": "https://www.geckogreen.com/",
+      "email": "",
+      "google_place_id": "ChIJo9GzHW53ToYR2ryPwtAKcpg",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3781,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "ALL IN 1 LAWN & TREE SERVICE",
+      "business": "ALL IN 1 LAWN & TREE SERVICE",
+      "city": "Fort Worth",
+      "state": "TX",
+      "phone": "",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJ-Tvs52txToYRox3hVS_yEvg",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3782,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Jardinero, LLC",
+      "business": "Jardinero, LLC",
+      "city": "Fort Worth",
+      "state": "TX",
+      "phone": "(817) 203-4209",
+      "website": "http://jardinerollc.net/",
+      "email": "",
+      "google_place_id": "ChIJg6R4W-Z6Iw8RuY4W2IWkLpg",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3783,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Edge To Edge Lawn Care",
+      "business": "Edge To Edge Lawn Care",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 392-6180",
+      "website": "https://www.edgetoedgelawncare.com/",
+      "email": "edgetoedgelcs@outlook.com",
+      "google_place_id": "ChIJIdvRrtu_uokR1wd_4ySYEX4",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3784,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Agronomic Lawn Management",
+      "business": "Agronomic Lawn Management",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 799-4982",
+      "website": "https://www.fertilizewithalm.com/services/lawn-care/virginia-beach-va",
+      "email": "",
+      "google_place_id": "ChIJ0drfCDzruokRZ4OH0ycDhiM",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3785,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Hunter's Lawn & Landscape",
+      "business": "Hunter's Lawn & Landscape",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 201-8102",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJjSc84zvkfAMR1F9SsZUFMak",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3786,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Va Beach Lawncare LLC",
+      "business": "Va Beach Lawncare LLC",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 615-5746",
+      "website": "https://vabeachlawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJsQFKz42_uokRbAsMPqHFINQ",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3787,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Tk's Landscaping",
+      "business": "Tk's Landscaping",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 322-7504",
+      "website": "https://tkslandscape.com/",
+      "email": "tkslandscaping2020@gmail.com",
+      "google_place_id": "ChIJrWhr9-u_uokRr8VSC1TanlE",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": true,
+      "id": 3788,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Dreamlawns",
+      "business": "Dreamlawns",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 631-9773",
+      "website": "https://www.dreamlawnsvb.com/",
+      "email": "dreamlawns@dreamlawnsvb.com",
+      "google_place_id": "ChIJgUI8m_DquokR-WCoaA6yhqI",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": true,
+      "id": 3789,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Lawnboss",
+      "business": "Lawnboss",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 705-0450",
+      "website": "http://golawnboss.com/",
+      "email": "",
+      "google_place_id": "ChIJmeETY3bBuokR3KJ45mYYf_Y",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3790,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Ready Cut Lawn Care",
+      "business": "Ready Cut Lawn Care",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "phone": "(757) 617-8244",
+      "website": "https://www.readycutlawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJ_zRDYOeOxC0RLzbo8P965L0",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3791,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Valor Lawn Care & Landscaping LLC",
+      "business": "Valor Lawn Care & Landscaping LLC",
+      "city": "Richmond",
+      "state": "VA",
+      "phone": "(276) 633-2915",
+      "website": "https://valorlawncareandlandscaping.com/",
+      "email": "info@valorlawncareandlandscapes.com",
+      "google_place_id": "ChIJhUme9u0VsYkRi75YgsNmFX0",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3792,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Mitchell's Lawn Care Service LLC",
+      "business": "Mitchell's Lawn Care Service LLC",
+      "city": "Glen Allen",
+      "state": "VA",
+      "phone": "(804) 316-3183",
+      "website": "https://mitchellslawncareservice.com/",
+      "email": "",
+      "google_place_id": "ChIJmZgjA0JrsYkRvRWLnLTRgjE",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": false,
+      "id": 3793,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Stanton's Lawn Service, LLC",
+      "business": "Stanton's Lawn Service, LLC",
+      "city": "Richmond",
+      "state": "VA",
+      "phone": "(804) 694-6824",
+      "website": "https://stantonslawnllc.com/",
+      "email": "stantonslawn@gmail.com",
+      "google_place_id": "ChIJZaijIZBdSqIRqkGen-PDbb0",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3794,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Ryan Lawn & Tree",
+      "business": "Ryan Lawn & Tree",
+      "city": "Merriam",
+      "state": "KS",
+      "phone": "(913) 381-1505",
+      "website": "https://ryanlawn.com/",
+      "email": "",
+      "google_place_id": "ChIJa5ryEgjtwIcRKIWWHCnNYUo",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3795,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Ryan Lawn & Tree",
+      "business": "Ryan Lawn & Tree",
+      "city": "Chesterfield",
+      "state": "MO",
+      "phone": "(636) 327-4779",
+      "website": "https://stlouis.ryanlawn.com/",
+      "email": "",
+      "google_place_id": "ChIJt22ht3nI3ocRqIx2UE3wUXI",
+      "source": "google_maps_daily_gen",
+      "rating": 4.6,
+      "verified_email": false,
+      "id": 3796,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Loyalty Lawn Care",
+      "business": "Loyalty Lawn Care",
+      "city": "St Charles",
+      "state": "MO",
+      "phone": "(636) 201-3218",
+      "website": "https://loyaltylawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJJxFxATYp34cRITq-DX9mAFA",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3797,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Smoke's Lawn Care LLC",
+      "business": "Smoke's Lawn Care LLC",
+      "city": "Cleveland",
+      "state": "OH",
+      "phone": "(216) 403-5219",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJd0hqfpjjMIgRoAO1lAp3XeM",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3798,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "The Ohio Landscaping Lawn Care Company",
+      "business": "The Ohio Landscaping Lawn Care Company",
+      "city": "Cleveland",
+      "state": "OH",
+      "phone": "(216) 250-1642",
+      "website": "https://www.ohiolandscapinglawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJFfSPhkvtMIgRCp82sYqZwC8",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3799,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Mr. Greens Lawn Care",
+      "business": "Mr. Greens Lawn Care",
+      "city": "Lakewood",
+      "state": "OH",
+      "phone": "(216) 536-6436",
+      "website": "http://www.mrgreenslawncare.net/",
+      "email": "",
+      "google_place_id": "ChIJz0RMv_PxMIgRGxeG_CCGx10",
+      "source": "google_maps_daily_gen",
+      "rating": 4.6,
+      "verified_email": false,
+      "id": 3800,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Cleveland Curb Appeal",
+      "business": "Cleveland Curb Appeal",
+      "city": "Cleveland",
+      "state": "OH",
+      "phone": "(216) 851-6717",
+      "website": "https://www.clevelandcurbappeal.com/",
+      "email": "",
+      "google_place_id": "ChIJv5O-stNg60MRi3cRQ5DuZT8",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3801,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Khalil's Landscaping and Snow Removal",
+      "business": "Khalil's Landscaping and Snow Removal",
+      "city": "Cleveland",
+      "state": "OH",
+      "phone": "(216) 407-7433",
+      "website": "https://cuyahogaturfco.com/",
+      "email": "",
+      "google_place_id": "ChIJ5-Jq87dVMIgRSxxWs8Wd1R8",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3802,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Best Greening Services",
+      "business": "Best Greening Services",
+      "city": "Cleveland",
+      "state": "OH",
+      "phone": "(216) 227-1500",
+      "website": "https://www.bestgreeningservices.com/",
+      "email": "",
+      "google_place_id": "ChIJ3c4BHertMIgR7lFSE2yMpE8",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3803,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "ExperiGreen & Top Lawn",
+      "business": "ExperiGreen & Top Lawn",
+      "city": "Westland",
+      "state": "MI",
+      "phone": "(734) 251-5053",
+      "website": "https://toplawn.com/",
+      "email": "",
+      "google_place_id": "ChIJq6raWdyyJIgREmMH2CQ6Jb8",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3804,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Kevin's All Season Lawn & Landscaping, LLC",
+      "business": "Kevin's All Season Lawn & Landscaping, LLC",
+      "city": "Detroit",
+      "state": "MI",
+      "phone": "(313) 294-4545",
+      "website": "http://www.kevinsallseason.com/",
+      "email": "",
+      "google_place_id": "ChIJBdjKJOQzO4gR59r-70ivFTs",
+      "source": "google_maps_daily_gen",
+      "rating": 3.9,
+      "verified_email": false,
+      "id": 3805,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Lawn Tech",
+      "business": "Lawn Tech",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "phone": "(616) 591-9999",
+      "website": "https://www.lawntechofmi.com/",
+      "email": "info@lawntechofmi.com",
+      "google_place_id": "ChIJv-pIkG-tGYgRah_tIwGAUdY",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": true,
+      "id": 3806,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Fresh Cuts Lawn Care and Landscaping LLC",
+      "business": "Fresh Cuts Lawn Care and Landscaping LLC",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "phone": "(616) 970-7800",
+      "website": "http://www.freshcutslawncareandlandscaping.com/",
+      "email": "dfasburg@gmail.com",
+      "google_place_id": "ChIJq6qqqvquGYgRAwjpUoxCxzU",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": true,
+      "id": 3807,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "MI Lawn and Landscape",
+      "business": "MI Lawn and Landscape",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "phone": "(616) 325-7205",
+      "website": "http://www.milawnandlandscape.com/",
+      "email": "",
+      "google_place_id": "ChIJgQ2_e-StGYgRXpwKm4nboZ0",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3808,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "MJR Landscape",
+      "business": "MJR Landscape",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "phone": "(616) 432-9876",
+      "website": "http://www.mjrlandscape.com/",
+      "email": "",
+      "google_place_id": "ChIJDZCNWCKzGYgR7xb2Lczgr50",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": false,
+      "id": 3809,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Jake's Quality Lawn Care",
+      "business": "Jake's Quality Lawn Care",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "phone": "(616) 294-0539",
+      "website": "http://jakesqualitylawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJIQcQ0H-zGYgR8RJ3MBVLjTo",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3810,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Tender Lawn Care Inc",
+      "business": "Tender Lawn Care Inc",
+      "city": "Kentwood",
+      "state": "MI",
+      "phone": "(616) 456-9942",
+      "website": "http://www.mytenderlawncare.com/",
+      "email": "",
+      "google_place_id": "ChIJa_cZItasGYgRfAj6iP9sq3g",
+      "source": "google_maps_daily_gen",
+      "rating": 4.0,
+      "verified_email": false,
+      "id": 3811,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Larry's Lawn and Tree Service",
+      "business": "Larry's Lawn and Tree Service",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "phone": "(616) 241-5203",
+      "website": "http://larryslawnservice.com/",
+      "email": "",
+      "google_place_id": "ChIJ9UpHnqmzGYgRe0sRrgZwuoc",
+      "source": "google_maps_daily_gen",
+      "rating": 4.3,
+      "verified_email": false,
+      "id": 3812,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Greener Living Lawn Care Service",
+      "business": "Greener Living Lawn Care Service",
+      "city": "Chicago",
+      "state": "IL",
+      "phone": "(224) 415-3698",
+      "website": "http://www.greenerlivinglawn.com/",
+      "email": "",
+      "google_place_id": "ChIJT5DktRnHD4gRhwIpmGKiCzc",
+      "source": "google_maps_daily_gen",
+      "rating": 4.3,
+      "verified_email": false,
+      "id": 3813,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Hernandez Lawn care LLC",
+      "business": "Hernandez Lawn care LLC",
+      "city": "Hazel Crest",
+      "state": "IL",
+      "phone": "(312) 806-8284",
+      "website": "https://hernandezlawncarellc.com/",
+      "email": "",
+      "google_place_id": "ChIJ15NDNlIZDogRC4FaudFir24",
+      "source": "google_maps_daily_gen",
+      "rating": 4.7,
+      "verified_email": false,
+      "id": 3814,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Lawn Care Maven, LLC",
+      "business": "Lawn Care Maven, LLC",
+      "city": "Chicago",
+      "state": "IL",
+      "phone": "(872) 231-2299",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJO8MPO6wpDogRUAz9LcprdEo",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3815,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Glass Grass Landscaping",
+      "business": "Glass Grass Landscaping",
+      "city": "Chicago",
+      "state": "IL",
+      "phone": "(224) 421-5849",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJdRAogYDcuCwRRmY9J4iuoPc",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3816,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Clean N Cut Lawn Care",
+      "business": "Clean N Cut Lawn Care",
+      "city": "Indianapolis",
+      "state": "IN",
+      "phone": "(317) 628-2350",
+      "website": "https://www.cleanncut.com/",
+      "email": "",
+      "google_place_id": "ChIJk2NvadCzFIgRsCLuRQ9QVi0",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3817,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "SuperiorTouchLawnCare",
+      "business": "SuperiorTouchLawnCare",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(302) 396-6066",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJk9jnARy1xokRUT5Z1TclMZ0",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3818,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "chinvi's lawn care services llc",
+      "business": "chinvi's lawn care services llc",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(445) 544-2008",
+      "website": "http://www.chinvislawncareservices.com/",
+      "email": "chinvislawncareservices@gmail.com",
+      "google_place_id": "ChIJYbqyae3HxokRPF5S65PmXPo",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3819,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Lawn Care Philadelphia",
+      "business": "Lawn Care Philadelphia",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(844) 213-9501",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJ74VtW2HHxokRxgK-Dpd63hI",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3820,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Duran's LANDSCAPING LLC",
+      "business": "Duran's LANDSCAPING LLC",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(267) 970-1289",
+      "website": "http://duranlandscapingllc.com/",
+      "email": "",
+      "google_place_id": "ChIJ-5OaTbu3xokRKhZCq4IHyXU",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3821,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "UDS Philly Landscaping and Removal",
+      "business": "UDS Philly Landscaping and Removal",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(267) 540-3107",
+      "website": "http://udsphilly.com/",
+      "email": "",
+      "google_place_id": "ChIJEWQL1sjU9qcRu6EjqZmoME4",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3822,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Rainbow Lawncare Industries",
+      "business": "Rainbow Lawncare Industries",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(215) 457-7533",
+      "website": "https://www.rainbowlhc.com/",
+      "email": "",
+      "google_place_id": "ChIJ7YgM7r63xokRLQiWINUWPOw",
+      "source": "google_maps_daily_gen",
+      "rating": 4.4,
+      "verified_email": false,
+      "id": 3823,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Big jay's snow removal & lawn care LLC",
+      "business": "Big jay's snow removal & lawn care LLC",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(267) 237-8840",
+      "website": "http://www.contactbigjay.com/",
+      "email": "",
+      "google_place_id": "ChIJnZhYAGCpxokRInDZ1_F97co",
+      "source": "google_maps_daily_gen",
+      "rating": 4.4,
+      "verified_email": false,
+      "id": 3824,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "BEST CHOICE LANDSCAPING & MASONRY",
+      "business": "BEST CHOICE LANDSCAPING & MASONRY",
+      "city": "Philadelphia",
+      "state": "PA",
+      "phone": "(267) 864-1450",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJR5iqNUC1xokRI1BS5zu-OWE",
+      "source": "google_maps_daily_gen",
+      "rating": 4.3,
+      "verified_email": false,
+      "id": 3825,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Liberty Tree and Landscape Management",
+      "business": "Liberty Tree and Landscape Management",
+      "city": "Glenside",
+      "state": "PA",
+      "phone": "(215) 886-6111",
+      "website": "http://libertytreecare.com/",
+      "email": "",
+      "google_place_id": "ChIJc7cOXkC6xokR1X26auByZws",
+      "source": "google_maps_daily_gen",
+      "rating": 4.9,
+      "verified_email": false,
+      "id": 3826,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Augusta Lawn Care & Snow Removal Services of Cherry Creek",
+      "business": "Augusta Lawn Care & Snow Removal Services of Cherry Creek",
+      "city": "Denver",
+      "state": "CO",
+      "phone": "(303) 228-6919",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJAYur29x_bIcRAxH160tZxx0",
+      "source": "google_maps_daily_gen",
+      "rating": 0.0,
+      "verified_email": false,
+      "id": 3827,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Senske Lawn Care Services - Denver",
+      "business": "Senske Lawn Care Services - Denver",
+      "city": "Denver",
+      "state": "CO",
+      "phone": "(720) 798-2038",
+      "website": "https://senske.com/denver-lawn-care-services/",
+      "email": "",
+      "google_place_id": "ChIJNUEqz3J5bIcRNlTga_N7Ytw",
+      "source": "google_maps_daily_gen",
+      "rating": 4.6,
+      "verified_email": false,
+      "id": 3828,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Mark's Quality Lawn Care",
+      "business": "Mark's Quality Lawn Care",
+      "city": "Denver",
+      "state": "CO",
+      "phone": "(303) 420-2880",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJZZ8vy6OHa4cRnnWCJ1gG3Do",
+      "source": "google_maps_daily_gen",
+      "rating": 4.8,
+      "verified_email": false,
+      "id": 3829,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "los Parientes Landscaping LLC",
+      "business": "los Parientes Landscaping LLC",
+      "city": "Phoenix",
+      "state": "AZ",
+      "phone": "(602) 334-3831",
+      "website": "https://lovable.dev/preview/fnqTJL6Y0bOOrcAiuYOSgJU2lBXh5L7d",
+      "email": "",
+      "google_place_id": "ChIJaxmDC-cPK4cR5oz-zYdWPko",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3830,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "Phoenix Landscapers, Landscaping Design and Tree Services",
+      "business": "Phoenix Landscapers, Landscaping Design and Tree Services",
+      "city": "Phoenix",
+      "state": "AZ",
+      "phone": "(602) 456-0447",
+      "website": "https://www.phxlandscapers.com/",
+      "email": "info@phxlandscapers.com",
+      "google_place_id": "ChIJxVnemFpyK4cRKjvyP3ZVq3Q",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3831,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "R & 3Js Lawncare",
+      "business": "R & 3Js Lawncare",
+      "city": "Phoenix",
+      "state": "AZ",
+      "phone": "(602) 326-4556",
+      "website": "https://www.r3jlawncare.com/",
+      "email": "felixramirez81@gmail.com",
+      "google_place_id": "ChIJVVWFYituK4cRya3ZG-oyWUU",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": true,
+      "id": 3832,
+      "verified_name": true,
+      "last_event": "imported"
+    },
+    {
+      "name": "C&J Lawn Care LLC",
+      "business": "C&J Lawn Care LLC",
+      "city": "Phoenix",
+      "state": "AZ",
+      "phone": "(623) 850-0718",
+      "website": "",
+      "email": "",
+      "google_place_id": "ChIJ27VLx2JxK4cRrRVgYECyPAw",
+      "source": "google_maps_daily_gen",
+      "rating": 5.0,
+      "verified_email": false,
+      "id": 3833,
+      "verified_name": true,
+      "last_event": "imported"
     }
   ],
   "template": {
-    "subject_with_name": "{{NAME}}, your crew is losing $17K/year",
-    "subject_without_name": "{{CITY}} crews are losing $17K/year to bad routing",
-    "html_body_with_name": "Hi {{NAME}},\n\nMost crews in {{CITY}} are losing about $17,000 a year to bad routing. That's roughly two months of revenue you're paying for but not billing.\n\nI'm Aaron. I run a crew in OKC and built a free tool that shows your exact number. It takes about 2 minutes.\n\nHow does {{BUSINESS}} handle scheduling \u2014 do you batch by neighborhood or just run them in the order they come in?",
-    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nMost crews in {{CITY}} are losing about $17,000 a year to bad routing. That's roughly two months of revenue you're paying for but not billing.\n\nI'm Aaron. I run a crew in OKC and built a free tool that shows your exact number. It takes about 2 minutes.\n\nHow do you handle scheduling \u2014 do you batch by neighborhood or just run them in the order they come in?",
-    "follow_up_with_name": "{{NAME}}, any thoughts on the route audit?\n\nI sent it over a few days ago \u2014 curious if you got a chance to run your numbers. Most crews I talk to are surprised by how much drive time they're actually losing.\n\nNo pitch here. Just wanted to make sure you got it.",
-    "follow_up_without_name": "Hey {{BUSINESS}} \u2014 any thoughts on the route audit?\n\nI sent it over a few days ago. Curious if you ran your numbers yet. Most crews are surprised by what they find.\n\nNo pitch here. Just following up to make sure you got it.",
-    "follow_up_subject": "{{NAME}}, quick follow-up on the route audit"
+    "subject_with_name": "{{NAME}}, question about your routes",
+    "subject_without_name": "Question about {{CITY}} routes",
+    "html_body_with_name": "Hi {{NAME}},\n\nI am Aaron. I run a crew in OKC.\n\nWe were losing about 12 hours a week to bad routing before I grouped stops by zone. That is about $800 a week in wasted wages, close to $17,000 a season.\n\nHow does {{BUSINESS}} handle {{CITY}}? Do your trucks stay in one area per day or run all over?",
+    "html_body_without_name": "Hey {{BUSINESS}} Team,\n\nI am Aaron. I run a crew in OKC.\n\nWe were losing about 12 hours a week to bad routing before I grouped stops by zone. That is about $800 a week in wasted wages, close to $17,000 a season.\n\nHow do you handle {{CITY}}? Do your trucks stay in one area per day or run all over?",
+    "follow_up_with_name": "Hi {{NAME}},\n\nA few days ago I mentioned that most crews lose about 12 hours a week to bad routing. I put together a free audit that shows your exact number in 2 minutes.\n\nHere is the link: https://mowgoapp.com/route-audit\n\nNo signup, just your numbers. Takes about 2 minutes.",
+    "follow_up_without_name": "Hi there,\n\nA few days ago I mentioned that most crews lose about 12 hours a week to bad routing. I put together a free audit that shows your exact number in 2 minutes.\n\nHere is the link: https://mowgoapp.com/route-audit\n\nNo signup, just your numbers. Takes about 2 minutes.",
+    "follow_up_subject": "{{NAME}}, the number I mentioned",
+    "subject_with_name_v2": "{{NAME}}, your routing in {{CITY}}",
+    "subject_without_name_v2": "Routing in {{CITY}}",
+    "html_body_with_name_v2": "Hi {{NAME}},\n\nAaron here. I route for a crew in OKC.\n\nBefore I zoned my routes by neighborhood, I was burning about $800 a week in extra drive time. Most operators in {{CITY}} are leaving that same money on the table.\n\nHow do you structure your days? Do you batch by area or take whatever comes in?",
+    "html_body_without_name_v2": "Hey {{BUSINESS}} Team,\n\nAaron here. I route for a crew in OKC.\n\nBefore I zoned my routes by neighborhood, I was burning about $800 a week in extra drive time. Most operators in {{CITY}} are leaving that same money on the table.\n\nHow do you structure your days? Do you batch by area or take whatever comes in?",
+    "follow_up_subject_v2": "{{NAME}}, the route audit",
+    "follow_up_with_name_v2": "Hi {{NAME}},\n\nFollowing up on my note about routing waste. I built a free tool that calculates your exact drive time loss based on your lawn count and crew size.\n\nYou can run it here: https://mowgoapp.com/route-audit\n\nTakes 2 minutes, no signup.",
+    "follow_up_without_name_v2": "Hi there,\n\nFollowing up on my note about routing waste. I built a free tool that calculates your exact drive time loss based on your lawn count and crew size.\n\nYou can run it here: https://mowgoapp.com/route-audit\n\nTakes 2 minutes, no signup.",
+    "subject_with_name_v3": "{{NAME}}, 12 hours a week in {{CITY}}",
+    "subject_without_name_v3": "12 hours a week in {{CITY}}",
+    "html_body_with_name_v3": "Hi {{NAME}},\n\nI am Aaron. Run a crew in OKC.\n\nMost operators I talk to in {{CITY}} are losing about 12 hours a week to backtracking. That is a full day and a half every month.\n\nThe fix was simple for us: we grouped stops by zone. Took about a weekend to set up.\n\nHow does your current routing work? Do your guys run all over the city or stay in one area?",
+    "html_body_without_name_v3": "Hey {{BUSINESS}} Team,\n\nI am Aaron. Run a crew in OKC.\n\nMost operators I talk to in {{CITY}} are losing about 12 hours a week to backtracking. That is a full day and a half every month.\n\nThe fix was simple for us: we grouped stops by zone. Took about a weekend to set up.\n\nHow does your current routing work? Do your guys run all over the city or stay in one area?",
+    "follow_up3_subject": "{{NAME}}, what a crew in {{CITY}} did",
+    "follow_up3_subject_v2": "{{NAME}}, one crew in {{CITY}}",
+    "follow_up3_with_name": "Hi {{NAME}},\n\nI talked to a crew in {{CITY}} last week who was losing about 10 hours a week to backtracking. They zoned their routes by area and cut that to 3 hours in the first week.\n\nI put together a free audit that shows your number if you want to see where you stand.\n\nhttps://mowgoapp.com/#/route-audit",
+    "follow_up3_without_name": "Hi there,\n\nI talked to a crew in {{CITY}} last week who was losing about 10 hours a week to backtracking. They zoned their routes by area and cut that to 3 hours in the first week.\n\nI put together a free audit that shows your number if you want to see where you stand.\n\nhttps://mowgoapp.com/#/route-audit",
+    "follow_up3_with_name_v2": "Hi {{NAME}},\n\nA crew in {{CITY}} just ran the route audit. They were losing 12 hours a week. They fixed it by grouping stops by zone.\n\nYou can run yours here: https://mowgoapp.com/#/route-audit",
+    "follow_up3_without_name_v2": "Hi there,\n\nA crew in {{CITY}} just ran the route audit. They were losing 12 hours a week. They fixed it by grouping stops by zone.\n\nYou can run yours here: https://mowgoapp.com/#/route-audit",
+    "follow_up4_subject": "Closing this out, {{NAME}}",
+    "follow_up4_subject_v2": "Last note, {{NAME}}",
+    "follow_up4_with_name": "Hi {{NAME}},\n\nI am wrapping up my route audits for the season. If you want to see your number, the audit is still open.\n\nhttps://mowgoapp.com/#/route-audit\n\nNo pressure either way. If routing is not a problem for you, that is good too.\n\nTake care.\n\nAaron",
+    "follow_up4_without_name": "Hi there,\n\nI am wrapping up my route audits for the season. If you want to see your number, the audit is still open.\n\nhttps://mowgoapp.com/#/route-audit\n\nNo pressure either way. If routing is not a problem, that is good too.\n\nTake care.\n\nAaron",
+    "follow_up4_with_name_v2": "Hi {{NAME}},\n\nThis is my last note on the route audit. If you want it, it is here: https://mowgoapp.com/#/route-audit\n\nIf not, no problem. I will not be following up on this again.\n\nBest,\n\nAaron",
+    "follow_up4_without_name_v2": "Hi there,\n\nThis is my last note on the route audit. If you want it, it is here: https://mowgoapp.com/#/route-audit\n\nIf not, no problem. I will not be following up on this again.\n\nBest,\n\nAaron"
   },
   "stats": {
-    "total_leads": 3227,
-    "verified_ready": 1620,
-    "sent_today": 98,
-    "total_sent": 463,
+    "total_leads": 8058,
+    "verified_ready": 3418,
+    "sent_today": 10,
+    "total_sent": 566,
     "total_bounced": 7,
-    "last_run": "2026-08-20T13:07:22.017642",
+    "last_run": "2026-08-21T13:07:21.845335",
     "last_follow_up_run": "2026-08-20T17:22:17.101667",
-    "follow_ups_sent": 75
+    "follow_ups_sent": 75,
+    "last_merge": "2026-08-22T12:23:52.108140+00:00",
+    "last_added": 0
   }
 }
