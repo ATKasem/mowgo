@@ -29,6 +29,7 @@ const Subscribe = lazy(() => import('./pages/Subscribe'));
 const Compare = lazy(() => import('./pages/Compare'));
 const SwitchingFromLawnPro = lazy(() => import('./pages/SwitchingFromLawnPro'));
 const JobberPriceIncrease = lazy(() => import('./pages/JobberPriceIncrease'));
+const LawnCareSoftwareCost = lazy(() => import('./pages/LawnCareSoftwareCost'));
 const QuoteIQAlternative = lazy(() => import('./pages/QuoteIQAlternative'));
 const RuunlyComparison = lazy(() => import('./pages/RuunlyComparison'));
 const ProBaseComparison = lazy(() => import('./pages/ProBaseComparison'));
@@ -330,6 +331,7 @@ export default function App() {
           <Route path="/rates" element={<Rates />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/blog/jobber-price-increase-2026" element={<JobberPriceIncrease />} />
+          <Route path="/blog/lawn-care-software-cost-2026" element={<LawnCareSoftwareCost />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/sms-optin" element={<SmsOptIn />} />

@@ -1,6 +1,7 @@
 # SEO static-page rewrites (real-path content for crawlers; humans get redirected to the hash app)
 /compare /seo/compare/index.html 200
 /blog/jobber-price-increase-2026 /seo/blog/jobber-price-increase-2026/index.html 200
+/blog/lawn-care-software-cost-2026 /seo/blog/lawn-care-software-cost-2026/index.html 200
 /switch-from-lawnpro /seo/switch-from-lawnpro/index.html 200
 /quoteiq-alternative /seo/quoteiq-alternative/index.html 200
 /compare/ruunly /seo/compare/ruunly/index.html 200

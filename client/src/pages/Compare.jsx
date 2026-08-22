@@ -203,6 +203,7 @@ export default function Compare() {
           <Link to="/quoteiq-alternative" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("QuoteIQ alternative")}</Link>
           <Link to="/switch-from-lawnpro" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("Switch from LawnPro")}</Link>
           <Link to="/blog/jobber-price-increase-2026" className="min-h-[44px] inline-flex items-center px-3 hover:underline">{tr("Jobber pricing")}</Link>
+          <Link to="/blog/lawn-care-software-cost-2026" className="min-h-[44px] inline-flex items-center px-3 hover:underline">Lawn care software cost</Link>
         </div>
       </section>
 

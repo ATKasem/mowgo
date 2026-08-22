@@ -437,7 +437,7 @@ export default function Settings() {
         <div className="card p-5 space-y-4">
           <div className="flex items-center gap-2">
             <Gift className="w-4 h-4 text-brand" />
-            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm">{tr('Give a month, earn a month')}</h4>
+            <h4 className="font-semibold text-[var(--color-text-primary)] dark:text-white text-sm">{tr('Refer a crew, earn a month free')}</h4>
           </div>
           {referralLoading ? <div className="flex justify-center py-5"><Loader2 className="w-5 h-5 text-brand animate-spin" /></div> : referralError ? (
             <p role="alert" className="text-sm text-red-600 dark:text-red-400">{referralError}</p>
@@ -461,7 +461,7 @@ export default function Settings() {
               </div>
               <p className="text-xs text-[var(--color-text-muted)] break-all">{`https://mowgoapp.com?ref=${referralStats.code}`}</p>
               <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">
-                {tr("You've referred {{total}} people. {{earned}} have signed up.", { total: referralStats.total_count, earned: referralStats.earned_count })}
+                {tr("You've brought in {{total}} crews. {{earned}} have subscribed.", { total: referralStats.total_count, earned: referralStats.earned_count })}
               </p>
               <div className="grid grid-cols-1 gap-2">
                 {[[tr('Reward balance'), `${referralStats.earned_count ?? 0} ${tr('free months')}`]].map(([label, value]) => (

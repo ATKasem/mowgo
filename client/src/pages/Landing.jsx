@@ -3,7 +3,7 @@ import usePageTitle from '../hooks/usePageTitle';
 import { useState, useEffect, useRef } from 'react';
 import { CloudRain, MapPin, Users, FileText, Check, ArrowRight, Wifi, DollarSign, Shield, AlertCircle, ChevronDown, BadgeCheck, Gift } from 'lucide-react';
 import Logo from '../components/Logo';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { startCheckout } from '../lib/payments';
 import { supabase } from '../lib/supabase';
 
@@ -106,6 +106,18 @@ export default function Landing() {
       }
     })();
     return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref && ref.length >= 4 && ref.length <= 10) {
+      const existing = localStorage.getItem("mowgo_ref_code");
+      if (existing !== ref.toUpperCase()) {
+        localStorage.setItem("mowgo_ref_code", ref.toUpperCase().trim());
+        localStorage.setItem("mowgo_ref_ts", String(Date.now()));
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -477,8 +489,8 @@ export default function Landing() {
         <div className="card border border-[var(--color-border)] dark:border-gray-800 p-8 md:p-10 text-center">
           <Gift className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mx-auto mb-4" />
           <h2 className="text-2xl md:text-3xl font-extrabold text-[var(--color-text-primary)] dark:text-white mb-3 tracking-tight">{tr("Get a free month for every crew you bring")}</h2>
-          <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed mb-6">{tr("Give your referral code to another lawn crew. When they subscribe, you get a month free. They get a free trial. Win-win.")}</p>
-          <Link to="/subscribe" className="group inline-flex items-center gap-2 bg-[#EA580C] hover:bg-orange-700 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-orange-600/25 hover:shadow-2xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
+          <p className="text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] leading-relaxed mb-6">{tr("You know other owners who waste as much time on schedules as you used to. Send them your referral code. They get a 14-day free trial and concierge setup. You get a month free when they subscribe. No limit on how many you bring.")}</p>
+          <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-[#EA580C] hover:bg-orange-700 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-orange-600/25 hover:shadow-2xl hover:shadow-orange-600/30 hover:-translate-y-0.5 transition-all duration-200">
             {tr("Get your referral code")}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -527,6 +539,7 @@ export default function Landing() {
           <div className="flex flex-wrap justify-center gap-2 text-sm text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
             <Link to="/compare" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Compare")}</Link>
             <Link to="/blog/jobber-price-increase-2026" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Jobber pricing")}</Link>
+            <Link to="/blog/lawn-care-software-cost-2026" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">Lawn care software cost</Link>
             <Link to="/switch-from-lawnpro" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("LawnPro alternative")}</Link>
             <Link to="/quoteiq-alternative" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("QuoteIQ alternative")}</Link>
             <Link to="/login" className="hover:text-[var(--color-text-secondary)] dark:hover:text-gray-300 transition-colors py-2 px-2 rounded-lg">{tr("Log In")}</Link>
