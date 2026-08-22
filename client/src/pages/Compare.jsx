@@ -177,6 +177,26 @@ export default function Compare() {
             {tr('We built MowGo because the other options are either too expensive, too complicated, or sell your data.')}{' '}
             {tr("Compare price and field tools side by side. No fluff. No hidden catches.")}
           </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 mb-8">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 text-center">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{tr("Per-User Fees")}</p>
+              <p className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{tr("$0")}</p>
+              <p className="text-xs text-red-500 mt-1">{tr("Jobber +$29/user")}</p>
+              <p className="text-xs text-gray-400 mt-2">{tr("Every extra crew member costs nothing on MowGo")}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 text-center">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{tr("Platform Fees")}</p>
+              <p className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{tr("$0")}</p>
+              <p className="text-xs text-red-500 mt-1">{tr("QuoteIQ +1% surcharge")}</p>
+              <p className="text-xs text-gray-400 mt-2">{tr("No transaction fees beyond Stripe's cut")}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 text-center">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{tr("Crew Scaling")}</p>
+              <p className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{tr("Unlimited")}</p>
+              <p className="text-xs text-red-500 mt-1">{tr("HCP +$35/user past 8")}</p>
+              <p className="text-xs text-gray-400 mt-2">{tr("No band rounding. Unlimited from $699/mo.")}</p>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login?mode=signup" className="group inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl px-8 py-3.5 text-base shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
               {tr("Try MowGo Free")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />

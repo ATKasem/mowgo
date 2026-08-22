@@ -1,5 +1,6 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import usePageTitle from '../hooks/usePageTitle';
+import { useState, useEffect, useRef } from 'react';
 import { Sprout, ArrowRight, Check, X, DollarSign, Users, CloudRain, Smartphone, Wifi, Gift, Calendar, FileText, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -21,6 +22,29 @@ const comparisonRows = [
   { feature: 'Auto-invoicing', mowgo: 'Yes — automatic on job complete', quoteiq: 'Manual invoicing workflow' },
   { feature: 'Mobile-first design', mowgo: 'Yes — built for the truck', quoteiq: 'Desktop-oriented interface' },
 ];
+
+const trueCostRows = [
+  { feature: 'Setup', mowgo: '2 min. No call', quoteiq: 'Requires onboarding/sales' },
+  { feature: 'Your crew', mowgo: 'Flat fee', quoteiq: 'Per-user pricing' },
+  { feature: 'Platform fee', mowgo: 'Stripe only ($0 extra)', quoteiq: 'Stripe + 1% surcharge' },
+  { feature: 'Rain delay', mowgo: 'One-tap auto-reschedule', quoteiq: 'Manual, per job' },
+  { feature: 'Offline mode', mowgo: 'Works without cell', quoteiq: 'Requires internet' },
+  { feature: 'Data ownership', mowgo: 'Yours. Export anytime', quoteiq: 'Shared with platform' },
+  { feature: 'Dark mode', mowgo: 'Built in', quoteiq: 'Not available' },
+];
+
+function FadeIn({ children, className = '', delay = 0 }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.1 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return <div ref={ref} className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} ${className}`} style={{ transitionDelay: `${delay}ms` }}>{children}</div>;
+}
 
 export default function QuoteIQAlternative() {
   const { tr, t, i18n } = useLocalizedText('quoteIQAlternative');
@@ -115,7 +139,41 @@ export default function QuoteIQAlternative() {
           </div>
         </section>
 
-        {/* Section 3: Feature Comparison Table */}
+        {/* Section 3: True Cost Analysis */}
+        <FadeIn>
+          <section>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
+              {tr("$149.99 vs $39. Side by side.")}
+            </h2>
+            <div className="overflow-x-auto">
+              <div className="card overflow-hidden min-w-[600px]">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-800">
+                      <th className="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">{tr("Feature")}</th>
+                      <th className="text-center px-5 py-3 font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30">{tr("MowGo")}</th>
+                      <th className="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900">{tr("QuoteIQ")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trueCostRows.map((row) => (
+                      <tr key={row.feature} className="border-b border-gray-100 dark:border-gray-800 last:border-b-0">
+                        <td className="px-5 py-3 font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-950">{tr(row.feature)}</td>
+                        <td className="px-5 py-3 text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30">{tr(row.mowgo)}</td>
+                        <td className="px-5 py-3 text-center text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900">{tr(row.quoteiq)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <p className="mt-6 text-gray-600 dark:text-gray-400 leading-relaxed">
+              {tr("QuoteIQ Pro costs 3.8× more than MowGo Solo. At that price it still doesn't include dark mode, offline mode, or client self-booking — three features that come with every MowGo plan.")}
+            </p>
+          </section>
+        </FadeIn>
+
+        {/* Section 4: Feature Comparison Table */}
         <section>
           <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
             {tr("MowGo vs QuoteIQ")}

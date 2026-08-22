@@ -209,6 +209,33 @@ export default function JobberIsTooExpensive() {
         </div>
       </section>
 
+      {/* The Fine Print */}
+      <section className="max-w-4xl mx-auto px-4 pb-24">
+        <FadeIn>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-10 tracking-tight">
+            {tr("The Fine Print: What Jobber Leaves Out")}
+          </h2>
+          <div className="card p-6 md:p-8">
+            <ul className="space-y-5">
+              {[
+                { label: 'Band billing', description: "Jobber's 2-5 person band costs $199/mo whether you have 2 people or 5. You're paying for 5 when you only have 2." },
+                { label: 'Per-user add-ons', description: "Every person you add to Jobber costs $29/mo on top of the base plan. A 10-person crew on Plus pays $599 base + $290 = $889/mo." },
+                { label: 'Hidden tiers', description: "Jobber's best prices require a 1-year commitment. Month-to-month users pay $29-$100/mo more — and that's before per-user fees. The price you see is rarely the price you pay." },
+                { label: 'Missing features', description: "AI Receptionist is $29/mo extra on every plan except Plus. Marketing Suite is $79/mo extra. Pipeline is $49/mo extra. Jobber Core doesn't include GPS, online booking, or credit card processing without add-ons." },
+              ].map(({ label, description }) => (
+                <li key={label} className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                  <strong className="text-gray-900 dark:text-white">{tr(label)}:</strong>{' '}
+                  {tr(description)}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 text-xs text-gray-400 dark:text-gray-500">
+              {tr("All prices from getjobber.com, verified August 2026. We update this page when they change.")}
+            </p>
+          </div>
+        </FadeIn>
+      </section>
+
       {/* FAQ */}
       <section className="bg-gray-50 dark:bg-gray-900 py-24">
         <div className="max-w-3xl mx-auto px-4">
