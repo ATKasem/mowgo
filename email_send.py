@@ -13,6 +13,7 @@ API_KEY = os.environ.get("RESEND_API_KEY") or _env.get("RESEND_API_KEY", "")
 MAX_PER_DAY = 100
 FROM_NAMES = ["Aaron <aaron@mowgoapp.com>", "Aaron <hello@mowgoapp.com>"]
 UNSUB_LINK = "https://mowgoapp.com/unsubscribe"
+BLOCKED_FILE = "/opt/data/mowgo/leads/blocked_emails.json"
 
 def load_leads():
     with open(LEADS_FILE) as f:
@@ -82,13 +83,25 @@ def personalize(lead, templates, variant):
 
     return body, subject
 
+def load_blocked():
+    try:
+        import pathlib
+        p = pathlib.Path(BLOCKED_FILE)
+        if p.exists():
+            d = json.loads(p.read_text())
+            return set(d.get("emails", []))
+    except: pass
+    return set()
+
 def main():
     data = load_leads()
     leads = data["leads"]
     templates = data["template"]
+    blocked = load_blocked()
 
     ready = [l for l in leads if l.get("verified_email") and l.get("email")
-             and not l.get("sent") and not l.get("bounced")]
+             and not l.get("sent") and not l.get("bounced")
+             and l["email"].lower() not in blocked]
 
     if not ready:
         print(f"No leads to send ({datetime.datetime.now().isoformat()})")

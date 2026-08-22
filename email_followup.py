@@ -13,6 +13,7 @@ API_KEY = os.environ.get("RESEND_API_KEY") or _env.get("RESEND_API_KEY", "")
 MAX_FOLLOW_UPS = 50
 FROM_NAMES = ["Aaron <aaron@mowgoapp.com>", "Aaron <hello@mowgoapp.com>"]
 UNSUB_LINK = "https://mowgoapp.com/unsubscribe"
+BLOCKED_FILE = "/opt/data/mowgo/leads/blocked_emails.json"
 
 # Day offsets for each follow-up touch
 TOUCH_DAYS = {2: 3, 3: 7, 4: 14}  # touch_number: min days since first email
@@ -68,15 +69,28 @@ def days_since(date_str):
         # Failing open risks a mass-mail incident; failing closed just delays.
         return 0
 
+def load_blocked():
+    try:
+        import pathlib
+        p = pathlib.Path(BLOCKED_FILE)
+        if p.exists():
+            d = json.loads(p.read_text())
+            return set(d.get("emails", []))
+    except:
+        pass
+    return set()
+
 def main():
     data = load_leads()
     leads = data["leads"]
     t = data["template"]
     now = datetime.datetime.now(datetime.timezone.utc)
+    blocked = load_blocked()
 
     # Leads who got first email, haven't replied/bounced
     base = [l for l in leads if l.get("sent") and not l.get("replied") and not l.get("bounced")
-            and l.get("verified_email") and l.get("email")]
+            and l.get("verified_email") and l.get("email")
+            and l["email"].lower() not in blocked]
 
     sent_count = 0
 
