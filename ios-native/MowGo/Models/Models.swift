@@ -125,6 +125,10 @@ struct Job: Codable, Identifiable, Equatable {
     var createdAt: String?
     // Joined from clients table (not stored on jobs)
     var clients: ClientRef?
+    /// Materials cost for the job (from `jobs.materials_cost`).
+    var materialsCost: Decimal?
+    /// Miles driven to the job site (from `jobs.travel_miles`).
+    var travelMiles: Int?
 
     enum JobStatus: String, Codable, CaseIterable {
         case scheduled, inProgress = "in_progress", done, skipped
@@ -168,6 +172,25 @@ struct Job: Codable, Identifiable, Equatable {
     var address: String? { clients?.address }
     var clientRate: Decimal? { clients?.rate }
     var recurrence: String { recurrenceRule ?? "none" }
+
+    // MARK: - Profitability
+
+    /// Estimated profit = revenue − materials − travel − labor.
+    /// Uses default cost rates ($0.70/mi, $25/hr) matching the server RPC.
+    var estimatedProfit: Decimal {
+        let revenue = clients?.rate ?? 0
+        let materials = materialsCost ?? 0
+        let travel = Decimal(travelMiles ?? 0) * 0.70
+        let labor = Decimal(durationMinutes ?? 60) / 60.0 * 25.0
+        return revenue - materials - travel - labor
+    }
+
+    /// Profit margin as a percentage (0–100). Returns 0 when revenue is zero.
+    var profitMarginPercent: Decimal {
+        let revenue = clients?.rate ?? 0
+        guard revenue > 0 else { return 0 }
+        return (estimatedProfit / revenue) * 100
+    }
 }
 
 // MARK: - Client
@@ -443,6 +466,10 @@ struct UserProfile: Codable, Identifiable {
     /// `select=*` in fetchProfile picks these up automatically.
     var trialTier: String?
     var trialEndsAt: String?
+    /// Cost per mile driven to job sites (from `profiles.cost_per_mile`).
+    var costPerMile: Decimal?
+    /// Hourly labor cost for profitability (from `profiles.hourly_labor_cost`).
+    var hourlyLaborCost: Decimal?
 
     /// True while a 14-day app trial is active (trialTier set, not expired).
     var hasActiveTrial: Bool {

@@ -173,6 +173,19 @@ struct JobCardView: View {
                     .foregroundColor(theme.textMuted)
                 }
 
+                // Profit indicator for completed jobs
+                if job.status == .done {
+                    let profit = job.estimatedProfit
+                    let margin = job.profitMarginPercent
+                    HStack(spacing: 2) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 9))
+                        Text("Profit: \(profit.formatted(.currency(code: "USD"))) (\(margin, specifier: "%.0f")% margin)")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(profit >= 0 ? MowGoTheme.success : MowGoTheme.danger)
+                }
+
                 // Photo thumbnail row
                 if let photoUrl = job.photoUrl, !photoUrl.isEmpty {
                     AsyncImage(url: resolvedPhotoURL) { image in

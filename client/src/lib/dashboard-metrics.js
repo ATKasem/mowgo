@@ -197,6 +197,33 @@ export function weatherBannerView(hasLocation, loading, hasData) {
   return hasData ? 'loaded' : 'unavailable';
 }
 
+/** Estimated profit for a single job using client rate and cost fields. */
+export function jobProfit(job) {
+  const revenue = safeNumber(job.clients?.rate) || 0;
+  const materials_cost = safeNumber(job.materials_cost) || 0;
+  const travel_cost = (safeNumber(job.travel_miles) || 0) * 0.70;
+  const labor_cost = (safeNumber(job.duration_minutes) || 60) / 60 * 25;
+  const estimated_profit = revenue - materials_cost - travel_cost - labor_cost;
+  const profit_margin_percent = revenue > 0 ? (estimated_profit / revenue * 100) : 0;
+  return { revenue, materials_cost, travel_cost, labor_cost, estimated_profit, profit_margin_percent };
+}
+
+/** Aggregate profitability for an array of done jobs. */
+export function summarizeProfitability(jobs = []) {
+  jobs = validJobs(jobs).filter(job => job.status === 'done');
+  let totalRevenue = 0;
+  let totalCosts = 0;
+  let totalProfit = 0;
+  for (const job of jobs) {
+    const p = jobProfit(job);
+    totalRevenue += p.revenue;
+    totalCosts += p.materials_cost + p.travel_cost + p.labor_cost;
+    totalProfit += p.estimated_profit;
+  }
+  const overall_margin_percent = totalRevenue > 0 ? (totalProfit / totalRevenue * 100) : 0;
+  return { totalRevenue, totalCosts, totalProfit, overall_margin_percent };
+}
+
 /**
  * Needs Attention queue, in priority order: rain decision, overdue invoices,
  * new leads, estimated-rate review, unfinished work. Only actionable (non-zero)

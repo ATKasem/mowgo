@@ -3,6 +3,7 @@ import { memo, useState, useEffect } from 'react';
 import { Check, MapPin, Key, PawPrint, StickyNote, Navigation, AlarmCheck, RefreshCw, GripVertical, Clock, Camera, Pencil, SkipForward } from 'lucide-react';
 import { STATUS_CONFIG, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/constants';
 import { getJobPhotos } from '../lib/data';
+import { jobProfit } from '../lib/dashboard-metrics';
 import { getMapsUrl } from '../lib/maps';
 
 function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown, onEdit, onSkip, teamMembers }) {
@@ -95,6 +96,19 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
         {/* Status badge */}
         <span className={statusInfo.badge}>{tr(statusInfo.label)}</span>
       </div>
+
+      {/* Profit indicator for done jobs */}
+      {isDone && (() => {
+        const profit = jobProfit(job);
+        if (profit.revenue === 0) return null;
+        return (
+          <div className="px-4 pb-3 pt-0">
+            <p className="text-[11px] text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
+              ${Math.round(profit.estimated_profit)} {tr('profit')} ({Math.round(profit.profit_margin_percent)}% {tr('margin')})
+            </p>
+          </div>
+        );
+      })()}
 
       {/* Expanded detail */}
       {isExpanded && (

@@ -63,6 +63,25 @@ struct DashboardView: View {
     private var todayRevenue: Decimal {
         todayDone.reduce(0) { $0 + ($1.clientRate ?? 0) }
     }
+    private var todayMaterialsCost: Decimal {
+        todayDone.reduce(0) { $0 + ($1.materialsCost ?? 0) }
+    }
+    private var todayTravelCost: Decimal {
+        todayDone.reduce(0) { $0 + Decimal($1.travelMiles ?? 0) * 0.70 }
+    }
+    private var todayLaborCost: Decimal {
+        todayDone.reduce(0) { $0 + Decimal($1.durationMinutes ?? 60) / 60.0 * 25.0 }
+    }
+    private var todayTotalCosts: Decimal {
+        todayMaterialsCost + todayTravelCost + todayLaborCost
+    }
+    private var todayProfit: Decimal {
+        todayRevenue - todayTotalCosts
+    }
+    private var todayProfitMargin: Decimal {
+        guard todayRevenue > 0 else { return 0 }
+        return (todayProfit / todayRevenue) * 100
+    }
 
     private var outstanding: Decimal {
         store.invoices
@@ -120,6 +139,9 @@ struct DashboardView: View {
                     OnboardingChecklistView(selectedTab: $selectedTab)
                 }
                 statCardsSection
+                if isOwner && !todayDone.isEmpty {
+                    profitTodaySection
+                }
                 if isOwner { quickActionsSection }
                 todayPreviewSection
                 if isOwner && !teamProgressRows.isEmpty { teamProgressSection }
@@ -235,6 +257,52 @@ struct DashboardView: View {
                     ).onTapGesture { selectedTab = 2 }
                 }
             }
+        }
+    }
+
+    // MARK: - Profit Today
+
+    private var profitTodaySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "chart.bar.fill")
+                    .font(.subheadline)
+                    .foregroundColor(MowGoTheme.deepGreen)
+                Text("Profit Today")
+                    .font(.headline)
+                    .foregroundColor(theme.textPrimary)
+                Spacer()
+            }
+
+            HStack(alignment: .firstTextBaseline) {
+                Text(formatCurrency(todayProfit))
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(todayProfit >= 0 ? MowGoTheme.deepGreen : MowGoTheme.danger)
+                Text("\(todayProfitMargin, specifier: "%.0f")% margin")
+                    .font(.subheadline)
+                    .foregroundColor(theme.textMuted)
+            }
+
+            // Costs breakdown
+            HStack(spacing: 16) {
+                profitCostItem(label: "Materials", value: todayMaterialsCost)
+                profitCostItem(label: "Travel", value: todayTravelCost)
+                profitCostItem(label: "Labor", value: todayLaborCost)
+            }
+        }
+        .padding(16)
+        .background(theme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func profitCostItem(label: LocalizedStringKey, value: Decimal) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(formatCurrency(value))
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(theme.textPrimary)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(theme.textMuted)
         }
     }
 

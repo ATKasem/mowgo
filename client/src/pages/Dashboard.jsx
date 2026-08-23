@@ -10,7 +10,7 @@ import ConciergeStatus from '../components/ConciergeStatus';
 import {
   localDate, summarizeDashboard, todayCommand, upcomingJobs, moneyToCollect,
   unfinishedJobCount, rainRiskDay, rainAffectedJobs, weatherBannerView, attentionItems,
-  estimatedRateReview,
+  estimatedRateReview, jobProfit, summarizeProfitability,
 } from '../lib/dashboard-metrics';
 import { hasTeamAccess } from '../lib/constants';
 import { teamProgressView } from '../lib/today-ux';
@@ -769,6 +769,22 @@ export default function Dashboard() {
             <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">{card.sub}</p>
           </div>
         ))}
+        {(() => {
+          const todayProfit = summarizeProfitability(jobsData.filter(j => j.scheduled_date === localDate()));
+          if (todayProfit.totalRevenue === 0) return null;
+          return (
+            <div className="card p-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-2.5">
+                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${Math.round(todayProfit.totalProfit).toLocaleString()}</p>
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-gray-300 mt-0.5">{tr("Today's Profit")}</p>
+              <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] mt-0.5">
+                {Math.round(todayProfit.overall_margin_percent)}% {tr('margin')} · ${Math.round(todayProfit.totalCosts)} {tr('costs')}
+              </p>
+            </div>
+          );
+        })()}
       </div>
       {hasTeamAccess(profile) && teamError && (
         <p className="mt-4 text-sm text-amber-700 dark:text-amber-400" role="status">{teamError}</p>
