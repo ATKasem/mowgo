@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Premium websites for Oklahoma small businesses. See your complete website before you pay. $149 per month, no contract.">
+  <meta property="og:title" content="OK.websites — Built before you pay">
+  <meta property="og:description" content="Your complete business website, built first. Approve it, then pay $149/month.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ok-websites.pages.dev/">
+  <title>OK.websites — Built Before You Pay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.170.0/build/three.module.js"}}</script>
+  <style>
+    /* ═══════ GOOGLE-ESC PALETTE ═══════ */
+    :root{
+      --blue:#1a73e8;
+      --blue-dark:#1557b0;
+      --blue-light:#e8f0fe;
+      --blue-glow:rgba(26,115,232,.08);
+      --white:#fff;
+      --bg:#fff;
+      --bg-alt:#f8f9fa;
+      --bg-dark:#1f1f1f;
+      --bg-dark-alt:#2d2d2d;
+      --text:#202124;
+      --text-secondary:#5f6368;
+      --text-muted:#70757a;
+      --text-muted-dark:#9aa0a6;
+      --text-on-dark:#e8eaed;
+      --line:#dadce0;
+      --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);
+      --shadow-lg:0 8px 30px rgba(0,0,0,.1);
+      --radius:12px;
+      --radius-sm:8px;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --pad:clamp(1.5rem,5vw,5rem);
+      --nav-h:4rem;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+    input{font:inherit}
+    ::selection{background:var(--blue);color:#fff}
+    .skip-link{position:fixed;left:1rem;top:-5rem;z-index:1001;padding:.6rem 1rem;background:var(--blue);color:#fff;font-weight:500;border-radius:var(--radius-sm)}.skip-link:focus{top:1rem}
+    :focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:2px}
+
+    /* 3D Canvas — fixed behind hero, with hero gradient as fallback */
+    #webgl{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:1;transition:opacity .2s linear;background:linear-gradient(165deg,#fff 0%,#f0f4ff 45%,#e8f0fe 100%)}
+
+    /* Content layers */
+    .site-content{position:relative;z-index:2}
+    .dark{background:var(--bg-dark);color:var(--text-on-dark)}
+    .light{background:var(--bg);color:var(--text)}
+    .alt{background:var(--bg-alt);color:var(--text)}
+
+    /* Section reveals */
+    html.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+    .reveal.is-visible{opacity:1;transform:none}
+    html:not(.js) .reveal{opacity:1;transform:none}
+
+    /* Nav */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:900;height:var(--nav-h);display:flex;align-items:center;padding:0 var(--pad);background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+    .nav.scrolled{border-color:var(--line);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+    .logo{display:flex;align-items:center;gap:.4rem;font-size:1.1rem;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+    .logo-mark{display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:6px;background:var(--blue);color:#fff;font-size:.7rem;font-weight:700}
+    .nav-links{display:flex;gap:2rem;margin-left:auto;margin-right:2.2rem}
+    .nav-links a{font-size:.82rem;font-weight:500;color:var(--text-secondary);transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-cta{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.2rem;border-radius:100vmax;background:var(--blue);color:#fff;font-size:.8rem;font-weight:500;transition:background .2s,box-shadow .2s}
+    .nav-cta:hover{background:var(--blue-dark);box-shadow:0 2px 8px rgba(26,115,232,.3)}
+
+    /* Hero — clean, light, Google-esque */
+    .hero{position:relative;height:100svh;min-height:40rem;display:flex;align-items:flex-end;padding:6rem var(--pad) clamp(3rem,6vh,5rem);overflow:hidden}
+    .hero-copy{width:min(72rem,100%);position:relative}
+    .hero-kicker{display:flex;align-items:center;gap:.6rem;margin-bottom:1.6rem;font-size:.78rem;font-weight:500;color:var(--blue)}
+    .hero-kicker span{display:block;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+    .hero h1{max-width:12ch;margin:0;font:500 clamp(3.2rem,8vw,7.5rem)/1.05 'Playfair Display',serif;letter-spacing:-.05em;color:var(--text)}
+    .hero h1 em{color:var(--blue);font-style:normal}
+    .hero-bottom{display:grid;grid-template-columns:minmax(14rem,26rem) auto;align-items:end;gap:clamp(1.5rem,5vw,5rem);margin-top:clamp(1.5rem,3.5vw,3rem)}
+    .hero-sub{margin:0;color:var(--text-secondary);font-size:clamp(.95rem,1.2vw,1.1rem);line-height:1.7}
+    .hero-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+
+    /* Buttons — Material-inspired */
+    .button{display:inline-flex;align-items:center;justify-content:center;height:3.2rem;padding:0 1.6rem;border-radius:100vmax;font-size:.82rem;font-weight:500;letter-spacing:.01em;transition:background .2s,box-shadow .2s,transform .2s}
+    .button:hover{transform:translateY(-2px)}
+    .button-primary{background:var(--blue);color:#fff;box-shadow:0 1px 4px rgba(26,115,232,.25)}
+    .button-primary:hover{background:var(--blue-dark);box-shadow:0 4px 14px rgba(26,115,232,.35)}
+    .button-ghost{border:1px solid var(--line);color:var(--text);background:var(--white)}
+    .button-ghost:hover{background:var(--bg-alt);border-color:#bbb}
+    .dark .button-primary{background:#8ab4f8;color:#202124;box-shadow:none}
+    .dark .button-primary:hover{background:#aec7fa}
+    .dark .button-ghost{border-color:rgba(255,255,255,.2);color:var(--text-on-dark);background:transparent}
+    .dark .button-ghost:hover{background:rgba(255,255,255,.06)}
+
+    /* Scroll cue */
+    .scroll-cue{position:absolute;right:var(--pad);bottom:2.5rem;display:flex;align-items:center;gap:.8rem;font-size:.7rem;color:var(--text-muted)}
+    .scroll-line{position:relative;width:1px;height:2.6rem;background:var(--line);overflow:hidden}
+    .scroll-line::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--blue);animation:scroll 1.6s var(--ease) infinite}
+    @keyframes scroll{to{top:110%}}
+
+    /* Section layout */
+    .section{position:relative;padding:clamp(5rem,10vw,8rem) var(--pad)}
+    .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;margin-bottom:clamp(2.5rem,5vw,4.5rem)}
+    .section-head h2{margin:0;font:500 clamp(2rem,5vw,4.5rem)/1.1 'Playfair Display',serif;letter-spacing:-.04em}
+    .section-index{font-size:.75rem;font-weight:500;color:var(--text-muted);white-space:nowrap}
+    .eyebrow{display:flex;align-items:center;gap:.5rem;margin:0 0 1rem;font-size:.78rem;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+
+    /* Marquee */
+    .marquee{padding:1.6rem 0;background:var(--bg-alt);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+    .marquee-track{display:flex;width:max-content;animation:marquee 40s linear infinite}
+    .marquee span{display:block;white-space:nowrap;font-weight:500;font-size:.9rem;color:var(--text-muted);padding-right:1.6rem}
+    @keyframes marquee{to{transform:translateX(-50%)}}
+
+    /* Showcase */
+    .showcase{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(17rem,.8fr);gap:clamp(2rem,7vw,7rem);align-items:center}
+    .showcase-copy h2{max-width:11ch;margin:0 0 1.2rem;font:500 clamp(2rem,4.5vw,4.2rem)/1.08 'Playfair Display',serif;letter-spacing:-.04em}
+    .showcase-copy p{max-width:32rem;margin:0 0 1.8rem;color:var(--text-secondary);font-size:1.02rem;line-height:1.7}
+
+    /* Device mockup — clean, flat-ish Google style */
+    .device-stage{position:relative;min-height:28rem;display:grid;place-items:center;perspective:1000px}
+    .device-stage::before{content:"";position:absolute;width:55%;height:55%;border-radius:50%;background:var(--blue-glow);filter:blur(50px)}
+    .laptop{position:relative;width:min(100%,38rem);aspect-ratio:1.5;background:#e8eaed;border-radius:var(--radius);padding:2%;box-shadow:var(--shadow-lg),0 0 0 1px rgba(0,0,0,.04);transform:rotateY(4deg) rotateX(2deg)}
+    .laptop::after{content:"";position:absolute;left:-6%;right:-6%;bottom:-3.5%;height:4%;border-radius:0 0 10px 10px;background:var(--line)}
+    .site-preview{height:100%;overflow:hidden;background:#fff;border-radius:8px;color:var(--text);padding:6% 7%;position:relative}
+    .preview-nav{display:flex;justify-content:space-between;align-items:center;font-size:.5rem;font-weight:600;color:var(--text-muted);letter-spacing:.03em;padding-bottom:4%;border-bottom:1px solid var(--line);margin-bottom:4%}
+    .preview-nav span:last-child{display:flex;gap:1.2rem}
+    .preview-hero{display:grid;grid-template-columns:1.3fr .7fr;height:68%;align-items:center;gap:1rem}
+    .preview-title{font:600 clamp(1.2rem,2.8vw,2.8rem)/.95 'Playfair Display',serif;letter-spacing:-.04em}
+    .preview-title i{color:var(--blue);font-style:normal}
+    .preview-art{height:80%;background:var(--blue-light);border-radius:8px;position:relative;overflow:hidden}
+    .preview-art::before,.preview-art::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(26,115,232,.3)}
+    .preview-art::before{width:110%;height:110%;left:-50%;top:25%}
+    .preview-art::after{width:65%;height:65%;right:-28%;top:-18%}
+    .preview-chip{position:absolute;right:8%;bottom:8%;padding:.35rem .55rem;background:var(--blue);color:#fff;font-size:.45rem;font-weight:600;border-radius:4px}
+    .phone{position:absolute;right:-2%;bottom:6%;width:22%;aspect-ratio:.48;background:var(--bg-dark);border-radius:18px;padding:4px;box-shadow:0 15px 40px rgba(0,0,0,.15);transform:rotate(3deg)}
+    .phone .site-preview{padding:13% 8%}
+    .phone .preview-hero{display:block;padding-top:35%}
+    .phone .preview-title{font-size:.65rem}
+
+    /* Features — clean material cards */
+    .feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .feature{background:var(--white);padding:clamp(1.5rem,3vw,2.5rem);display:flex;flex-direction:column;transition:background .25s}
+    .feature:hover{background:var(--bg-alt)}
+    .feature-icon{width:2.2rem;height:2.2rem;color:var(--blue);margin-bottom:1.2rem}
+    .feature h3{margin:0 0 .4rem;font-size:1.05rem;font-weight:600;color:var(--text)}
+    .feature p{margin:0;color:var(--text-secondary);font-size:.9rem;line-height:1.55}
+    .feature p strong{color:var(--text);font-weight:600}
+
+    /* Pricing — Google Material card */
+    .pricing-wrap{display:grid;grid-template-columns:.6fr 1.4fr;gap:clamp(2rem,6vw,6rem);align-items:start}
+    .pricing-intro{position:sticky;top:5.5rem}
+    .pricing-intro h2{margin:0 0 1.2rem;font:500 clamp(2.2rem,5vw,4.5rem)/1.08 'Playfair Display',serif;letter-spacing:-.04em}
+    .pricing-intro p{max-width:24rem;color:var(--text-secondary)}
+    .pricing-card{position:relative;padding:clamp(2rem,4vw,3.5rem);background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--line)}
+    .pricing-label{display:flex;justify-content:space-between;gap:1rem;padding-bottom:1rem;border-bottom:1px solid var(--line);font-size:.78rem;font-weight:500;color:var(--text-secondary)}
+    .price{margin:clamp(1.5rem,4vw,2.5rem) 0 .5rem;font:500 clamp(3.2rem,7vw,6rem)/.9 'Playfair Display',serif;letter-spacing:-.06em}
+    .price sup{font:500 clamp(1rem,1.8vw,1.6rem)/1 Inter,sans-serif;vertical-align:top}
+    .price small{font:500 .75rem/1 Inter,sans-serif;color:var(--text-muted);margin-left:.3rem}
+    .price-note{color:var(--text-secondary);font-size:.92rem;margin:0 0 2rem}
+    .includes{display:grid;grid-template-columns:repeat(2,1fr);gap:0;margin:2rem 0}
+    .include{padding:.8rem 0;border-top:1px solid var(--line);font-size:.88rem;color:var(--text)}
+    .include:nth-child(odd){margin-right:1.2rem}
+    .include::before{content:"✓";margin-right:.6rem;color:var(--blue);font-weight:600}
+    .pricing-card .button-primary{width:100%}
+
+    /* Process */
+    .process-head{margin-bottom:4rem}
+    .process-head h2{margin:0 0 .8rem;font:500 clamp(2rem,5vw,4.5rem)/1.08 'Playfair Display',serif;letter-spacing:-.04em}
+    .process-head p{max-width:28rem;color:var(--text-secondary)}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;position:relative}
+    .step{padding:clamp(1.5rem,3vw,2.5rem);background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);transition:box-shadow .3s,transform .3s}
+    .step:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+    .step-number{display:grid;place-items:center;width:3rem;height:3rem;border-radius:50%;background:var(--blue-light);color:var(--blue);font-weight:700;font-size:1rem;margin-bottom:1.2rem}
+    .step h3{margin:0 0 .4rem;font-size:1rem;font-weight:600}
+    .step p{margin:0;color:var(--text-secondary);font-size:.9rem;line-height:1.6}
+
+    /* Industries */
+    .industry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .industry{position:relative;min-height:22rem;padding:clamp(1.5rem,3vw,2.5rem);display:flex;flex-direction:column;justify-content:space-between;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--white);transition:box-shadow .35s,transform .35s;text-decoration:none}
+    .industry:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+    .industry-icon{font-size:2.2rem;margin-bottom:auto}
+    .industry h3{margin:0;font:500 clamp(1.6rem,3vw,2.8rem)/.95 'Playfair Display',serif;letter-spacing:-.04em;color:var(--text)}
+    .industry .industry-tag{font-size:.72rem;font-weight:500;color:var(--text-muted);margin-top:1rem;text-transform:uppercase;letter-spacing:.06em}
+
+    /* FAQ */
+    .faq-layout{display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(2rem,8vw,8rem)}
+    .faq-title h2{position:sticky;top:5.5rem;margin:0;font:500 clamp(2rem,5vw,4.5rem)/1.08 'Playfair Display',serif;letter-spacing:-.04em}
+    .faq-list{border-top:1px solid var(--line)}
+    .faq-item{border-bottom:1px solid var(--line)}
+    .faq-question{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:1rem;padding:1.4rem 0;background:transparent;text-align:left;font-size:1rem;font-weight:500;color:var(--text)}
+    .faq-symbol{display:grid;place-items:center;width:2rem;height:2rem;border:1px solid var(--line);border-radius:50%;font-size:1.1rem;transition:transform .3s var(--ease),background .25s;color:var(--text-muted)}
+    .faq-question[aria-expanded=true] .faq-symbol{transform:rotate(45deg);background:var(--blue-light);border-color:var(--blue);color:var(--blue)}
+    .faq-answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+    .faq-answer>div{overflow:hidden}
+    .faq-answer p{max-width:36rem;margin:0;padding:0 3rem 1.4rem 0;color:var(--text-secondary);font-size:.92rem;line-height:1.7}
+    .faq-question[aria-expanded=true]+.faq-answer{grid-template-rows:1fr}
+
+    /* Final CTA */
+    .final{text-align:center;background:linear-gradient(165deg,var(--bg-dark),var(--bg-dark-alt));overflow:hidden}
+    .final-inner{width:min(52rem,100%);margin:0 auto}
+    .final h2{margin:0 auto 1rem;max-width:14ch;font:500 clamp(2.5rem,6vw,5.5rem)/1.05 'Playfair Display',serif;letter-spacing:-.04em;color:var(--text-on-dark)}
+    .final h2 em{color:#8ab4f8;font-style:normal}
+    .final p{color:var(--text-muted);max-width:30rem;margin:0 auto}
+    .lead-form{width:min(38rem,100%);margin:2.5rem auto 0;display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:100vmax;padding:.3rem;transition:border-color .3s}
+    .lead-form:focus-within{border-color:#8ab4f8}
+    .lead-form input{flex:1;min-width:0;padding:.8rem 1.2rem;border:0;background:transparent;color:var(--text-on-dark);font-size:.95rem;outline:0}
+    .lead-form input::placeholder{color:var(--text-muted)}
+    .lead-form button{padding:.7rem 1.6rem;border-radius:100vmax;background:#8ab4f8;color:#202124;font-weight:600;font-size:.82rem;transition:background .2s}
+    .lead-form button:hover{background:#aec7fa}
+    .form-note{min-height:1.5rem;margin:1rem auto 0;font-size:.78rem;color:var(--text-muted-dark)}
+
+    /* Footer */
+    .footer{display:flex;align-items:center;justify-content:space-between;padding:1.5rem var(--pad);border-top:1px solid var(--line);font-size:.78rem;color:var(--text-muted)}
+    .footer .logo{font-size:1rem;color:var(--text)}
+
+    /* Custom cursor — subtle Google blue, only when JS active */
+    .cursor-dot,.cursor-ring{display:none;position:fixed;left:0;top:0;z-index:1000;pointer-events:none;border-radius:50%}
+    .cursor-dot{width:8px;height:8px;background:var(--blue);margin:-4px}
+    .cursor-ring{width:36px;height:36px;margin:-18px;border:1px solid rgba(0,0,0,.12);transition:width .3s var(--ease),height .3s var(--ease),margin .3s var(--ease),background .3s,border-color .3s}
+    .cursor-ring.hover{width:52px;height:52px;margin:-26px;background:var(--blue-glow);border-color:var(--blue)}
+
+    .noscript{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:1000;padding:1rem;background:var(--bg);color:var(--text);text-align:center;border:1px solid var(--line);border-radius:var(--radius-sm)}
+    @media (hover:hover) and (pointer:fine){html.js body{cursor:none}html.js a,html.js button,html.js input{cursor:none}html.js .cursor-dot,html.js .cursor-ring{display:block}}
+
+    /* Responsive */
+    @media (max-width:860px){
+      .nav-links{display:none}
+      .hero h1{font-size:clamp(2.5rem,14vw,5rem)}
+      .hero-bottom{grid-template-columns:1fr}
+      .scroll-cue{display:none}
+      .showcase,.pricing-wrap,.faq-layout{grid-template-columns:1fr}
+      .device-stage{min-height:20rem}.device-stage::before{display:none}
+      .pricing-intro{position:static}
+      .feature-grid{grid-template-columns:1fr}
+      .steps{grid-template-columns:1fr}
+      .industry-grid{grid-template-columns:1fr}
+      .faq-title h2{position:static}
+      .step-number{width:2.5rem;height:2.5rem;font-size:.85rem}
+    }
+    @media (max-width:520px){
+      .hero{padding-bottom:4rem}
+      .section{padding-top:4rem;padding-bottom:4rem}
+      .hero-actions .button{width:100%}
+      .laptop{transform:none}
+      .phone{right:-3%}
+      .includes{grid-template-columns:1fr}
+      .include:nth-child(odd){margin-right:0}
+      .price{font-size:3.5rem}
+      .lead-form{flex-direction:column;border-radius:var(--radius);padding:.5rem;gap:.5rem}
+      .lead-form input{text-align:center;padding:.6rem}
+      .lead-form button{width:100%}
+      .footer{flex-direction:column;gap:.5rem;text-align:center}
+    }
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .marquee-track,.scroll-line::after{animation:none!important}
+      .reveal,.button,.feature,.industry,.faq-answer,.faq-symbol{transition:none!important}
+      .reveal{opacity:1;transform:none}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <canvas id="webgl" aria-hidden="true"></canvas>
+  <div class="cursor-dot" aria-hidden="true"></div><div class="cursor-ring" aria-hidden="true"></div>
+  <header class="nav" aria-label="Primary navigation">
+    <a class="logo" href="#top" aria-label="OK websites home"><span class="logo-mark">OK</span> websites</a>
+    <nav class="nav-links"><a href="#services">Services</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></nav>
+    <a class="nav-cta" href="#contact">Get started</a>
+  </header>
+  <main id="main" class="site-content">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="hero-kicker"><span></span>Oklahoma small business websites</div>
+        <h1 id="hero-title">You need a <em>website.</em></h1>
+        <div class="hero-bottom">
+          <p class="hero-sub">We build the whole thing before you pay. See it live, make it yours, then go online for $149 a month.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#contact">Get your free preview</a><a class="button button-ghost" href="#process">See how it works</a></div>
+        </div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true"><span>Scroll</span><span class="scroll-line"></span></div>
+    </section>
+    <div class="marquee" aria-label="Guarantees">
+      <div class="marquee-track" aria-hidden="true"><span>No risk • No nonsense • No contracts • No upfront • No surprises • </span><span>No risk • No nonsense • No contracts • No upfront • No surprises • </span></div>
+    </div>
+    <section class="section alt" id="services" aria-labelledby="showcase-title">
+      <div class="showcase">
+        <div class="device-stage reveal" aria-label="Website preview illustration">
+          <div class="laptop"><div class="site-preview"><div class="preview-nav"><span>RED DIRT / LANDSCAPES</span><span>Services</span><span>Work</span><span>Contact</span></div><div class="preview-hero"><div class="preview-title">Outdoor living,<br><i>done right.</i></div><div class="preview-art"><span class="preview-chip">Get a quote</span></div></div></div><div class="phone"><div class="site-preview"><div class="preview-nav"><span>RD/L</span><span>☰</span></div><div class="preview-hero"><div class="preview-title" style="font-size:.55rem">Outdoor living,<br><i>done right.</i></div></div></div></div></div>
+        </div>
+        <div class="showcase-copy reveal"><p class="eyebrow">Zero-risk launch</p><h2 id="showcase-title">Your site. Working. Before you shake on it.</h2><p>We build your entire website before you pay a dollar. You see it live. You approve it. Then you pay $149/month. No leap of faith required.</p><a class="button button-primary" href="#contact">Get your free preview</a></div>
+      </div>
+    </section>
+    <section class="section light" aria-labelledby="features-title">
+      <div class="section-head reveal"><h2 id="features-title">What's included.</h2><span class="section-index">Everything you need</span></div>
+      <div class="feature-grid">
+        <article class="feature reveal"><svg class="feature-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="16" stroke="currentColor"/><path d="M8 24h32M24 8c5 5 7 10 7 16s-2 11-7 16c-5-5-7-10-7-16s2-11 7-16Z" stroke="currentColor"/></svg><h3>Custom domain</h3><p><strong>yourname.com</strong> included, set up, and managed.</p></article>
+        <article class="feature reveal"><svg class="feature-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="13" y="5" width="22" height="38" rx="3" stroke="currentColor"/><path d="M21 37h6" stroke="currentColor"/></svg><h3>Mobile first</h3><p>Perfect on phone, tablet, and desktop — every device.</p></article>
+        <article class="feature reveal"><svg class="feature-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="m8 35 10-11 8 6 14-17" stroke="currentColor"/><path d="M29 13h11v11" stroke="currentColor"/></svg><h3>SEO ready</h3><p>Built to be <strong>Google-friendly</strong> from day one.</p></article>
+        <article class="feature reveal"><svg class="feature-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M7 10h34v25H20l-8 6v-6H7V10Z" stroke="currentColor"/><path d="M14 19h20M14 26h13" stroke="currentColor"/></svg><h3>Contact forms</h3><p>Leads go straight from your site to your phone or email.</p></article>
+      </div>
+    </section>
+    <section class="section alt" id="pricing" aria-labelledby="pricing-title">
+      <div class="pricing-wrap">
+        <div class="pricing-intro reveal"><p class="eyebrow">Clear and simple</p><h2 id="pricing-title">One honest price.</h2><p>No setup fee. No mystery invoice. No annual lock-in. Just a professional website that earns its keep.</p></div>
+        <article class="pricing-card reveal"><div class="pricing-label"><span>Founding client rate</span><span>Cancel anytime</span></div><div class="price"><sup>$</sup>149 <small>/month</small></div><p class="price-note">Normally $299 — first 20 clients are locked in at this price.</p><div class="includes"><div class="include">Professional website</div><div class="include">Custom domain</div><div class="include">Mobile optimized</div><div class="include">SEO setup</div><div class="include">Contact forms</div><div class="include">Hosting &amp; security</div><div class="include">1 revision included</div><div class="include">Ongoing support</div></div><a class="button button-primary" href="#contact">Get your free preview</a></article>
+      </div>
+    </section>
+    <section class="section light" id="process" aria-labelledby="process-title">
+      <div class="process-head reveal"><p class="eyebrow">How it works</p><h2 id="process-title">Three steps. No leap of faith.</h2><p>We handle everything. You just approve the work and go live.</p></div>
+      <div class="steps">
+        <article class="step reveal"><div class="step-number">1</div><h3>We build</h3><p>Tell us about your business. We build your complete site preview in 48 hours.</p></article>
+        <article class="step reveal"><div class="step-number">2</div><h3>You approve</h3><p>See it live, love it, request any changes that make it yours.</p></article>
+        <article class="step reveal"><div class="step-number">3</div><h3>You pay $149</h3><p>Go live month-to-month. Stay because it works — not because you're stuck.</p></article>
+      </div>
+    </section>
+    <section class="section alt" aria-labelledby="industries-title">
+      <div class="section-head reveal"><h2 id="industries-title">We build for:</h2><span class="section-index">Local businesses</span></div>
+      <div class="industry-grid reveal">
+        <a class="industry" href="#contact"><div class="industry-icon">🌿</div><h3>Lawn care</h3><div class="industry-tag">Outdoor services</div></a>
+        <a class="industry" href="#contact"><div class="industry-icon">🔧</div><h3>Plumbing</h3><div class="industry-tag">Home services</div></a>
+        <a class="industry" href="#contact"><div class="industry-icon">🍽️</div><h3>Restaurant</h3><div class="industry-tag">Hospitality</div></a>
+      </div>
+    </section>
+    <section class="section light faq" id="faq" aria-labelledby="faq-title">
+      <div class="faq-layout">
+        <div class="faq-title reveal"><p class="eyebrow">Straight answers</p><h2 id="faq-title">Frequently asked.</h2></div>
+        <div class="faq-list reveal">
+          <div class="faq-item"><button class="faq-question" aria-expanded="false" aria-controls="faq-1"><span>How is this different from a template site?</span><span class="faq-symbol" aria-hidden="true">+</span></button><div class="faq-answer" id="faq-1"><div><p>Your site is designed around your business, customers, and goals. We handle the writing, structure, design, mobile, and launch — so it never feels like a template with your logo pasted on.</p></div></div></div>
+          <div class="faq-item"><button class="faq-question" aria-expanded="false" aria-controls="faq-2"><span>What if I don't like the site?</span><span class="faq-symbol" aria-hidden="true">+</span></button><div class="faq-answer" id="faq-2"><div><p>You pay nothing. We build the preview first so you decide after seeing the work, not before.</p></div></div></div>
+          <div class="faq-item"><button class="faq-question" aria-expanded="false" aria-controls="faq-3"><span>What does $149/month include?</span><span class="faq-symbol" aria-hidden="true">+</span></button><div class="faq-answer" id="faq-3"><div><p>Professional website, custom domain, secure hosting, mobile optimization, SEO, lead forms, one revision, and ongoing support.</p></div></div></div>
+          <div class="faq-item"><button class="faq-question" aria-expanded="false" aria-controls="faq-4"><span>Can I cancel anytime?</span><span class="faq-symbol" aria-hidden="true">+</span></button><div class="faq-answer" id="faq-4"><div><p>Yes. Month-to-month, no long-term contract. We want you to stay because the site is valuable to your business.</p></div></div></div>
+          <div class="faq-item"><button class="faq-question" aria-expanded="false" aria-controls="faq-5"><span>How fast can I get my site?</span><span class="faq-symbol" aria-hidden="true">+</span></button><div class="faq-answer" id="faq-5"><div><p>Your first complete preview is typically ready within 48 hours after we have your business details.</p></div></div></div>
+        </div>
+      </div>
+    </section>
+    <section class="section final" id="contact" aria-labelledby="contact-title">
+      <div class="final-inner reveal"><p class="eyebrow" style="justify-content:center;color:#8ab4f8">Your preview is free</p><h2 id="contact-title">Ready to get your <em>website?</em></h2><p>Enter your business name and we'll start building your free preview.</p><form class="lead-form" id="lead-form"><label for="business" class="skip-link">Your business name</label><input id="business" name="business" type="text" placeholder="Your business name…" autocomplete="organization" minlength="2" required><button type="submit">Get started</button></form><p class="form-note" id="form-note">No card. No contract. No obligation.</p></div>
+    </section>
+  </main>
+  <footer class="footer"><a class="logo" href="#top"><span class="logo-mark">OK</span> websites</a><span>Made for Oklahoma small business</span><span>© <span id="year"></span></span></footer>
+  <noscript><div class="noscript">This site works without JavaScript, but motion and interactive previews are disabled.</div></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+  <script>
+    document.documentElement.classList.add('js');
+    let lenis;
+    window.threeActive=true;
+    const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nav=document.querySelector('.nav');
+    const reveals=[...document.querySelectorAll('.reveal')];
+    function revealSections(){const vh=window.innerHeight;reveals.forEach((el)=>{if(el.getBoundingClientRect().top<vh*1.5)el.classList.add('is-visible')})}
+    function handleScroll(){nav.classList.toggle('scrolled',window.scrollY>20);revealSections();const canvas=document.querySelector('#webgl');if(canvas){const opacity=Math.max(0,1-window.scrollY/window.innerHeight);canvas.style.opacity=String(opacity);if(opacity<=0&&window.threeActive){window.threeActive=false}else if(opacity>0&&!window.threeActive){window.threeActive=true}}}
+    if(!reducedMotion&&window.Lenis){
+      lenis=new Lenis({duration:1.2,easing:(t)=>Math.min(1,1.001-Math.pow(2,-10*t)),smoothWheel:true});
+      document.querySelector('html').style.scrollBehavior='auto';
+      lenis.on('scroll',handleScroll);
+      function raf(time){lenis.raf(time);requestAnimationFrame(raf)}requestAnimationFrame(raf);
+      document.querySelectorAll('a[href^="#"]').forEach((link)=>link.addEventListener('click',(event)=>{const target=document.querySelector(link.getAttribute('href'));if(target){event.preventDefault();lenis.scrollTo(target,{offset:-60});history.replaceState(null,'','#'+link.getAttribute('href').slice(1))}}));
+    }else{window.addEventListener('scroll',handleScroll,{passive:true})}
+    handleScroll();
+    document.querySelectorAll('.faq-question').forEach((button)=>{button.addEventListener('click',()=>{const item=button.closest('.faq-item');const wasOpen=button.getAttribute('aria-expanded')==='true';document.querySelectorAll('.faq-item').forEach((other)=>{const q=other.querySelector('.faq-question');q.setAttribute('aria-expanded','false');const a=other.querySelector('.faq-answer');if(a)a.hidden=true});if(!wasOpen){button.setAttribute('aria-expanded','true');const answer=item.querySelector('.faq-answer');if(answer)answer.hidden=false}})});
+    const finePointer=window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    if(finePointer){const dot=document.querySelector('.cursor-dot');const ring=document.querySelector('.cursor-ring');let mx=-50,my=-50,rx=-50,ry=-50;window.addEventListener('pointermove',(e)=>{mx=e.clientX;my=e.clientY;dot.style.transform=`translate(${mx}px,${my}px)`});document.querySelectorAll('a,button,input').forEach((el)=>{el.addEventListener('pointerenter',()=>ring.classList.add('hover'));el.addEventListener('pointerleave',()=>ring.classList.remove('hover'))});window.addEventListener('blur',()=>ring.classList.remove('hover'));function cursorLoop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;ring.style.transform=`translate(${rx}px,${ry}px)`;requestAnimationFrame(cursorLoop)}cursorLoop()}
+    document.querySelector('#year').textContent=new Date().getFullYear();
+    document.querySelector('#lead-form').addEventListener('submit',(event)=>{event.preventDefault();const input=document.querySelector('#business');const note=document.querySelector('#form-note');const name=input.value.trim();if(name.length<2){input.setCustomValidity('Please enter your business name (at least 2 characters)');input.reportValidity();input.setCustomValidity('');return}const subject=encodeURIComponent(`Free website preview — ${name}`);const body=encodeURIComponent(`Hi OK.websites,\n\nI'd like a free preview for ${name}.\n\nMy name:\nPhone:\nCurrent website (if any):`);note.textContent='Opening your email app…';note.setAttribute('role','status');window.location.href=`mailto:hello@okwebsites.com?subject=${subject}&body=${body}`});
+    // Init all FAQ answers hidden
+    document.querySelectorAll('.faq-answer').forEach((a)=>a.hidden=true);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas=document.querySelector('#webgl');
+    let renderer;
+    try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.75));renderer.setSize(window.innerWidth,window.innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1}catch(e){canvas.hidden=true}
+    if(renderer){
+      const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0xffffff,.026);
+      const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,.1,80);camera.position.set(0,0,8);
+      scene.add(new THREE.AmbientLight(0xc8d8e8,.5));const key=new THREE.DirectionalLight(0xffffff,1.6);key.position.set(5,7,8);scene.add(key);const blueLight=new THREE.PointLight(0x1a73e8,30,18);blueLight.position.set(4,-1,4);scene.add(blueLight);
+      const group=new THREE.Group();scene.add(group);
+      const solidMat=new THREE.MeshStandardMaterial({color:0xf0f4ff,metalness:.3,roughness:.18,emissive:0x1a73e8,emissiveIntensity:.08});
+      const wireMat=new THREE.MeshStandardMaterial({color:0x1a73e8,wireframe:true,transparent:true,opacity:.3,emissive:0x1a73e8,emissiveIntensity:.12});
+      const shapes=[new THREE.Mesh(new THREE.TorusKnotGeometry(1.5,.32,130,18),solidMat),new THREE.Mesh(new THREE.IcosahedronGeometry(1.1,1),wireMat),new THREE.Mesh(new THREE.DodecahedronGeometry(1.35,0),solidMat),new THREE.Mesh(new THREE.OctahedronGeometry(.75,1),wireMat)];
+      const positions=[[5.2,.5,-2],[-4.8,2.2,-7],[3.8,-3.6,-12],[-3.3,-2.8,-4]];shapes.forEach((shape,i)=>{shape.position.set(...positions[i]);shape.rotation.set(i*.35,i*.6,0);group.add(shape)});
+      const count=220;const data=new Float32Array(count*3);for(let i=0;i<count;i++){const r=4+Math.random()*12;const theta=Math.random()*Math.PI*2;const phi=Math.acos(2*Math.random()-1);data[i*3]=r*Math.sin(phi)*Math.cos(theta);data[i*3+1]=r*Math.sin(phi)*Math.sin(theta);data[i*3+2]=r*Math.cos(phi)-6}const pGeo=new THREE.BufferGeometry();pGeo.setAttribute('position',new THREE.BufferAttribute(data,3));const particles=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0x1a73e8,size:.025,transparent:true,opacity:.35,sizeAttenuation:true}));scene.add(particles);
+      const clock=new THREE.Clock();let mouseX=0,mouseY=0;window.addEventListener('pointermove',(e)=>{mouseX=(e.clientX/window.innerWidth-.5);mouseY=(e.clientY/window.innerHeight-.5)},{passive:true});
+      function render(){const delta=Math.min(clock.getDelta(),.05);if(!reduced&&window.threeActive!==false){shapes.forEach((shape,i)=>{shape.rotation.x+=delta*(.06+i*.016);shape.rotation.y+=delta*(.1+i*.02)});particles.rotation.y+=delta*.006;camera.position.x+=(mouseX*.4-camera.position.x)*.016;camera.position.y+=(-mouseY*.25-camera.position.y)*.016;camera.lookAt(0,0,-5)}renderer.render(scene,camera);if(!reduced)requestAnimationFrame(render)}render();
+      window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.75));renderer.setSize(window.innerWidth,window.innerHeight)},{passive:true});
+    }
+  </script>
+</body>
+</html>
