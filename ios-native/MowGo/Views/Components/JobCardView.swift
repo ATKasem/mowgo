@@ -180,7 +180,7 @@ struct JobCardView: View {
                     HStack(spacing: 2) {
                         Image(systemName: "chart.line.uptrend.xyaxis")
                             .font(.system(size: 9))
-                        Text("Profit: \(profit.formatted(.currency(code: "USD"))) (\(margin, specifier: "%.0f")% margin)")
+                        Text("Profit: \(profit.formatted(.currency(code: "USD"))) (\(NSDecimalNumber(decimal: margin).doubleValue, specifier: "%.0f")% margin)")
                     }
                     .font(.caption2)
                     .foregroundColor(profit >= 0 ? MowGoTheme.success : MowGoTheme.danger)
