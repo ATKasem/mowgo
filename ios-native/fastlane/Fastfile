@@ -21,7 +21,16 @@ platform :ios do
         xcodeproj: "../MowGo.xcodeproj"
       )
     rescue => e
-      puts "Could not fetch latest build number (app may not exist in App Store Connect yet): #{e.message}"
+      puts "App not found - creating it now..."
+      create_app_online(
+        app_identifier: "com.mowgo.app",
+        app_name: "MowGow",
+        sku: "MowGow",
+        company_name: "MowGo LLC",
+        primary_language: "English (US)",
+        software_url: "https://mowgoapp.com",
+        platform: "ios"
+      )
       increment_build_number(
         build_number: 1,
         xcodeproj: "../MowGo.xcodeproj"
