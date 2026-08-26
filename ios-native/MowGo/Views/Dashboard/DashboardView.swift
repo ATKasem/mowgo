@@ -278,7 +278,7 @@ struct DashboardView: View {
                 Text(formatCurrency(todayProfit))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(todayProfit >= 0 ? MowGoTheme.deepGreen : MowGoTheme.danger)
-                Text("\(todayProfitMargin, specifier: "%.0f")% margin")
+                Text("\(NSDecimalNumber(decimal: todayProfitMargin).doubleValue, specifier: "%.0f")% margin")
                     .font(.subheadline)
                     .foregroundColor(theme.textMuted)
             }
