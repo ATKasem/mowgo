@@ -14,7 +14,7 @@ platform :ios do
     sh("cd .. && xcodegen generate")
 
     increment_build_number(
-      build_number: latest_testflight_build_number(app_identifier: "com.mowgo.app") + 1,
+      build_number: latest_testflight_build_number(app_identifier: "com.mowgoapp") + 1,
       xcodeproj: "../MowGo.xcodeproj"
     )
 

@@ -482,7 +482,7 @@ struct SettingsView: View {
     private var appInfoCard: some View {
         VStack(spacing: 8) {
             InfoRow(label: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
-            InfoRow(label: "Bundle", value: Bundle.main.bundleIdentifier ?? "com.mowgo.app")
+            InfoRow(label: "Bundle", value: Bundle.main.bundleIdentifier ?? "com.mowgoapp")
             InfoRow(label: "Made in", value: "OKC 🌾")
         }
         .padding(16).background(theme.surface).cornerRadius(16)

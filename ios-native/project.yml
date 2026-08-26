@@ -19,7 +19,7 @@ targets:
       base:
         INFOPLIST_FILE: MowGo/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: MowGo
-        INFOPLIST_KEY_CFBundleIdentifier: com.mowgo.app
+        INFOPLIST_KEY_CFBundleIdentifier: com.mowgoapp
         INFOPLIST_KEY_CFBundleShortVersionString: "1.0.0"
         INFOPLIST_KEY_CFBundleVersion: "1"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
@@ -28,10 +28,10 @@ targets:
         INFOPLIST_KEY_NSCameraUsageDescription: "MowGo uses your camera to attach photos to jobs."
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "MowGo accesses your photo library to attach photos to jobs."
         INFOPLIST_KEY_CFBundleURLTypes:
-          - CFBundleURLName: com.mowgo.app
+          - CFBundleURLName: com.mowgoapp
             CFBundleURLSchemes:
               - mowgo
-        PRODUCT_BUNDLE_IDENTIFIER: com.mowgo.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.mowgoapp
         # Credentials — leave empty for CI (app runs in demo mode)
         INFOPLIST_KEY_SUPABASE_URL: "https://vqgiynfrpsqddjrayczc.supabase.co"
         INFOPLIST_KEY_SUPABASE_ANON_KEY: "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz"

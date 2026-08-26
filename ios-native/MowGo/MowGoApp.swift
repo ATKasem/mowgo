@@ -21,7 +21,7 @@ struct MowGoApp: App {
     /// Falls back to in-memory if the on-disk schema is corrupt. This loses
     /// offline durability, so both failures are logged as launch-critical.
     private static let modelContainer: ModelContainer = {
-        let logger = Logger(subsystem: "com.mowgo.app", category: "Persistence")
+        let logger = Logger(subsystem: "com.mowgoapp", category: "Persistence")
         let storeURL = URL.applicationSupportDirectory.appending(path: "MowGo.sqlite")
         let diskConfig = ModelConfiguration(url: storeURL)
         do {

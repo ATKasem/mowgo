@@ -26,7 +26,7 @@ jobs:
         working-directory: ios-native
         run: |
           cat > MowGo/Config.xcconfig << 'EOF'
-          INFOPLIST_KEY_CFBundleIdentifier = com.mowgo.app
+          INFOPLIST_KEY_CFBundleIdentifier = com.mowgoapp
           INFOPLIST_KEY_CFBundleName = MowGo
           INFOPLIST_KEY_CFBundleDisplayName = MowGo
           INFOPLIST_KEY_CFBundleExecutable = MowGo
@@ -41,7 +41,7 @@ jobs:
           INFOPLIST_KEY_SUPABASE_URL = https:$(_SLASH)$(_SLASH)vqgiynfrpsqddjrayczc.supabase.co
           INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
           INFOPLIST_KEY_StripePublishableKey = pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj
-          PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
+          PRODUCT_BUNDLE_IDENTIFIER = com.mowgoapp
           MARKETING_VERSION = 1.0.0
           CURRENT_PROJECT_VERSION = 1
           SWIFT_EMIT_LOC_STRINGS = YES
