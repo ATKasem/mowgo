@@ -1,0 +1,67 @@
+name: iOS Deploy to TestFlight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios-native/**'
+      - '.github/workflows/ios-deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Install Fastlane
+        run: brew install fastlane
+
+      - name: Create Config.xcconfig
+        working-directory: ios-native
+        run: |
+          cat > MowGo/Config.xcconfig << 'EOF'
+          INFOPLIST_KEY_CFBundleIdentifier = com.mowgo.app
+          INFOPLIST_KEY_CFBundleName = MowGo
+          INFOPLIST_KEY_CFBundleDisplayName = MowGo
+          INFOPLIST_KEY_CFBundleExecutable = MowGo
+          INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0
+          INFOPLIST_KEY_CFBundleVersion = 1
+          INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64
+          INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
+          INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
+          INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES
+          INFOPLIST_KEY_NSCameraUsageDescription = MowGo uses your camera to attach photos to jobs.
+          _SLASH = /
+          INFOPLIST_KEY_SUPABASE_URL = https:$(_SLASH)$(_SLASH)vqgiynfrpsqddjrayczc.supabase.co
+          INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
+          INFOPLIST_KEY_StripePublishableKey = pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj
+          PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
+          MARKETING_VERSION = 1.0.0
+          CURRENT_PROJECT_VERSION = 1
+          SWIFT_EMIT_LOC_STRINGS = YES
+          GENERATE_INFOPLIST_FILE = NO
+          EOF
+
+      - name: Generate Xcode project
+        working-directory: ios-native
+        run: xcodegen generate
+
+      - name: Set up App Store Connect API Key
+        working-directory: ios-native/fastlane
+        run: |
+          mkdir -p ~/.fastlane
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ~/.fastlane/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+
+      - name: Build and Upload to TestFlight
+        working-directory: ios-native/fastlane
+        run: fastlane beta
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
