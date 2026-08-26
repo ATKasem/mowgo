@@ -11,15 +11,15 @@ platform :ios do
       in_house: false
     )
 
-    xcodegen
+    sh("cd .. && xcodegen generate")
 
     increment_build_number(
       build_number: latest_testflight_build_number(app_identifier: "com.mowgo.app") + 1,
-      xcodeproj: "MowGo.xcodeproj"
+      xcodeproj: "../MowGo.xcodeproj"
     )
 
     build_app(
-      project: "MowGo.xcodeproj",
+      project: "../MowGo.xcodeproj",
       scheme: "MowGo",
       export_method: "app-store",
       output_directory: "build",
