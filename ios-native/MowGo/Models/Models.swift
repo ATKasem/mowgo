@@ -473,7 +473,7 @@ struct UserProfile: Codable, Identifiable {
 
     /// True while a 14-day app trial is active (trialTier set, not expired).
     var hasActiveTrial: Bool {
-        guard let trialTier, let endRaw = trialEndsAt,
+        guard trialTier != nil, let endRaw = trialEndsAt,
               let end = Self.isoFormatter.date(from: endRaw) else { return false }
         return Date() < end
     }

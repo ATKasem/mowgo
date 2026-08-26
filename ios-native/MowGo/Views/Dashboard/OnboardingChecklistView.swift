@@ -27,12 +27,12 @@ struct OnboardingChecklistView: View {
 
     private var theme: MowGoTheme { MowGoTheme.themed(colorScheme) }
 
-    private static func milestoneStates(store: DataStore) -> [(label: LocalizedStringKey, tab: Int, done: Bool)] {
+    private static func milestoneStates(store: DataStore) -> [(done: Bool, label: LocalizedStringKey, tab: Int)] {
         [
-            (label: "Add your first client", tab: 2, done: !store.clients.isEmpty),
-            (label: "Schedule your first job", tab: 1, done: !store.jobs.isEmpty),
-            (label: "Complete a job", tab: 1, done: store.jobs.contains { $0.status == .done }),
-            (label: "Send an invoice", tab: 3, done: !store.invoices.isEmpty)
+            (done: !store.clients.isEmpty, label: "Add your first client", tab: 2),
+            (done: !store.jobs.isEmpty, label: "Schedule your first job", tab: 1),
+            (done: store.jobs.contains { $0.status == .done }, label: "Complete a job", tab: 1),
+            (done: !store.invoices.isEmpty, label: "Send an invoice", tab: 3)
         ]
     }
 
