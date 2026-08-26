@@ -13,29 +13,10 @@ platform :ios do
 
     sh("cd .. && xcodegen generate")
 
-    # Try to get the latest testflight build number, fall back to 0 if app doesn't exist yet
-    begin
-      latest = latest_testflight_build_number(app_identifier: "com.mowgo.app")
-      increment_build_number(
-        build_number: latest + 1,
-        xcodeproj: "../MowGo.xcodeproj"
-      )
-    rescue => e
-      puts "App not found - creating it now..."
-      create_app_online(
-        app_identifier: "com.mowgo.app",
-        app_name: "MowGow",
-        sku: "MowGow",
-        company_name: "MowGo LLC",
-        primary_language: "English (US)",
-        software_url: "https://mowgoapp.com",
-        platform: "ios"
-      )
-      increment_build_number(
-        build_number: 1,
-        xcodeproj: "../MowGo.xcodeproj"
-      )
-    end
+    increment_build_number(
+      build_number: latest_testflight_build_number(app_identifier: "com.mowgo.app") + 1,
+      xcodeproj: "../MowGo.xcodeproj"
+    )
 
     build_app(
       project: "../MowGo.xcodeproj",
