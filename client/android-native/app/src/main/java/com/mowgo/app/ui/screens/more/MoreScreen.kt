@@ -756,7 +756,7 @@ private fun BillingPlanCard(
             if (canUpgrade) {
                 // Trial-first no-card flow: a FREE user without an active trial
                 // starts the 14-day trial (no card). Users in/after a trial go
-                // straight to checkout (Stripe trial skipped — see edge function).
+                // straight to checkout (no second trial — see subscription-checkout.js).
                 val isTrialStart = currentTier == "free" && !hasUsedTrial && !trialJustGranted
                 val action = if (isTrialStart) "trial:$tier" else "checkout:$tier"
                 Button(

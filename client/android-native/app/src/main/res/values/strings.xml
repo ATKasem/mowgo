@@ -152,7 +152,6 @@
     <string name="invoices_tab_estimates">Estimates</string>
     <string name="invoices_new_estimate_cd">New Estimate</string>
     <string name="invoices_new_invoice_cd">New Invoice</string>
-    <string name="invoices_confirm_payment_title">Confirm Payment</string>
     <string name="invoices_delete_title">Delete Invoice</string>
     <string name="invoices_delete_body">Delete this invoice for $%1$s? This cannot be undone.</string>
     <string name="invoices_mark_paid_title">Mark as Paid</string>
@@ -190,8 +189,6 @@
     <string name="invoices_status_unpaid">Unpaid</string>
     <string name="invoices_status_overdue">Overdue</string>
     <string name="invoices_paid_on">Paid %1$s</string>
-    <string name="invoices_payment_recover_error">Could not recover payment confirmation details.</string>
-    <string name="invoices_payment_failed_generic">Payment failed.</string>
     <string name="invoices_payment_sheet_error">Could not present payment sheet.</string>
     <string name="invoices_payment_text_copied">Payment text copied — paste it into a text to the client</string>
     <string name="invoices_reminder_copied">Reminder copied — paste it into a text</string>
@@ -352,7 +349,7 @@
     <string name="integrations_event_customer_created_title">Customer Created</string>
     <string name="integrations_event_customer_created_detail">New client added</string>
     <string name="integrations_event_payment_failed_title">Payment Failed</string>
-    <string name="integrations_event_payment_failed_detail">Stripe payment fails</string>
+    <string name="integrations_event_payment_failed_detail">Subscription payment fails</string>
     <string name="integrations_event_rain_delay_title">Rain Delay Applied</string>
     <string name="integrations_event_rain_delay_detail">Jobs rescheduled due to rain</string>
     <string name="integrations_event_job_skipped_title">Job Skipped</string>
@@ -408,4 +405,5 @@
     <string name="referral_signed_up">Signed up</string>
     <string name="referral_converted">Converted</string>
     <string name="referral_rewards">Free months</string>
+    <string name="invoices_payment_page_open_failed">Could not open the payment page.</string>
 </resources>

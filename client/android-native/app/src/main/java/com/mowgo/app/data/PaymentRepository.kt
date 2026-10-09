@@ -1,6 +1,5 @@
 package com.mowgo.app.data
 
-import com.mowgo.app.BuildConfig
 import com.mowgo.app.data.auth.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,85 +12,60 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import java.net.URI
 
-data class PaymentIntentResult(
-    val clientSecret: String,
-    val paymentIntentId: String,
-)
+/** No payment provider is live yet (server answered `payments_unavailable`). */
+class PaymentsComingSoonException : IllegalStateException("Card payments are coming soon.")
 
+/**
+ * Card payments through MowGo's payment provider. The server picks the
+ * provider (functions/api/payments/*); the app only opens the provider's
+ * hosted pages, so no card data touches the app and no payment SDK is
+ * bundled.
+ */
 class PaymentRepository(
     private val authRepository: AuthRepository = AuthRepository(),
     private val httpClient: OkHttpClient = OkHttpClient(),
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun createPaymentIntent(amountCents: Int, invoiceId: String): PaymentIntentResult {
-        ensureConfigured()
+    /**
+     * Hosted page where the business's customer pays this invoice. The same
+     * link can be shared with the customer. The invoice is marked paid by the
+     * provider's webhook, never by the app.
+     */
+    suspend fun invoicePaymentLink(invoiceId: String): String {
         val response = post(
-            function = "create-payment-intent",
-            body = json.encodeToString(
-                CreatePaymentIntentRequest.serializer(),
-                CreatePaymentIntentRequest(amountCents, invoiceId = invoiceId),
-            ),
+            "invoice-link",
+            json.encodeToString(InvoiceLinkRequest.serializer(), InvoiceLinkRequest(invoiceId)),
         )
-        val result = decode<CreatePaymentIntentResponse>(response)
-        if (result.clientSecret.isBlank() || result.paymentIntentId.isBlank()) {
-            throw IllegalStateException(errorFrom(response) ?: "Could not initialize payment.")
-        }
-        return PaymentIntentResult(result.clientSecret, result.paymentIntentId)
-    }
-
-    suspend fun confirmPayment(invoiceId: String, paymentIntentId: String) {
-        ensureConfigured()
-        val response = post(
-            function = "confirm-payment",
-            body = json.encodeToString(
-                ConfirmPaymentRequest.serializer(),
-                ConfirmPaymentRequest(invoiceId, paymentIntentId),
-            ),
-        )
-        if (!decode<SuccessResponse>(response).success) {
-            throw IllegalStateException(errorFrom(response) ?: "Could not confirm payment.")
-        }
+        return httpsUrl(decode<UrlResponse>(response).url)
     }
 
     suspend fun createCheckoutSession(tier: String, interval: String = "month"): String {
-        ensureConfigured()
         val response = post(
-            function = "create-checkout-session",
-            body = json.encodeToString(CheckoutRequest.serializer(), CheckoutRequest(tier, interval)),
+            "subscription-checkout",
+            json.encodeToString(CheckoutRequest.serializer(), CheckoutRequest(tier, interval)),
         )
-        val url = decode<UrlResponse>(response).url
-        return validateStripeUrl(url, CHECKOUT_HOST)
+        return httpsUrl(decode<UrlResponse>(response).url)
     }
 
     suspend fun createCustomerPortal(): String {
-        ensureConfigured()
-        val response = post("create-customer-portal", EMPTY_JSON)
-        val url = decode<UrlResponse>(response).url
-        return validateStripeUrl(url, PORTAL_HOST)
+        val response = post("billing-portal", PLATFORM_JSON)
+        return httpsUrl(decode<UrlResponse>(response).url)
     }
 
     suspend fun cancelSubscription() {
-        ensureConfigured()
-        val response = post("cancel-subscription", EMPTY_JSON)
+        val response = post("cancel-subscription", PLATFORM_JSON)
         if (!decode<SuccessResponse>(response).success) {
             throw IllegalStateException(errorFrom(response) ?: "Could not cancel subscription.")
         }
     }
 
-    private fun ensureConfigured() {
-        if (!SupabaseClientProvider.isConfigured) {
-            throw IllegalStateException("Stripe is not configured.")
-        }
-    }
-
-    private suspend fun post(function: String, body: String): String {
+    private suspend fun post(path: String, body: String): String {
         val token = authRepository.currentSession?.accessToken
             ?: throw IllegalStateException("Not authenticated")
         val request = Request.Builder()
-            .url("$FUNCTION_BASE_URL$function")
+            .url("$PAYMENTS_BASE_URL$path")
             .header("Authorization", "Bearer $token")
-            .header("apikey", BuildConfig.SUPABASE_ANON_KEY)
             .header("Content-Type", "application/json")
             .post(RequestBody.create(JSON_MEDIA_TYPE, body))
             .build()
@@ -100,11 +74,15 @@ class PaymentRepository(
             httpClient.newCall(request).execute().use { response ->
                 val responseBody = response.body?.string().orEmpty()
                 if (!response.isSuccessful) {
-                    val serverError = runCatching {
-                        json.decodeFromString(ErrorResponse.serializer(), responseBody).error
+                    val error = runCatching {
+                        json.decodeFromString(ErrorResponse.serializer(), responseBody)
                     }.getOrNull()
+                    if (error?.code == "payments_unavailable") throw PaymentsComingSoonException()
+                    if (response.code in 500..599) {
+                        throw IllegalStateException("Payment service is temporarily unavailable. Please try again in a moment.")
+                    }
                     throw IllegalStateException(
-                        serverError?.takeIf { it.isNotBlank() } ?: "Server error (${response.code})",
+                        error?.error?.takeIf { it.isNotBlank() } ?: "Server error (${response.code})",
                     )
                 }
                 responseBody
@@ -120,45 +98,32 @@ class PaymentRepository(
         json.decodeFromString(ErrorResponse.serializer(), body).error
     }.getOrNull()?.takeIf { it.isNotBlank() }
 
-    private fun validateStripeUrl(url: String, allowedHost: String): String {
+    /** The server already checked the host belongs to the provider; still require https. */
+    private fun httpsUrl(url: String): String {
         val uri = runCatching { URI(url) }
             .getOrElse { throw IllegalStateException("Invalid payment URL.") }
-        if (uri.scheme != "https" || uri.host != allowedHost) {
+        if (uri.scheme != "https" || uri.host.isNullOrBlank()) {
             throw IllegalStateException("Invalid payment URL.")
         }
         return url
     }
 
-    @Serializable
-    private data class CreatePaymentIntentRequest(
-        val amount: Int,
-        val currency: String = "usd",
-        @SerialName("invoice_id") val invoiceId: String,
-    )
+    @Serializable private data class InvoiceLinkRequest(@SerialName("invoice_id") val invoiceId: String)
 
     @Serializable
-    private data class CreatePaymentIntentResponse(
-        @SerialName("client_secret") val clientSecret: String = "",
-        @SerialName("payment_intent_id") val paymentIntentId: String = "",
+    private data class CheckoutRequest(
+        val plan: String,
+        val interval: String = "month",
+        val platform: String = "android",
     )
 
-    @Serializable
-    private data class ConfirmPaymentRequest(
-        @SerialName("invoice_id") val invoiceId: String,
-        @SerialName("payment_intent_id") val paymentIntentId: String,
-    )
-
-    @Serializable private data class CheckoutRequest(val tier: String, val interval: String = "month")
     @Serializable private data class UrlResponse(val url: String = "")
     @Serializable private data class SuccessResponse(val success: Boolean = false)
-    @Serializable private data class ErrorResponse(val error: String? = null)
+    @Serializable private data class ErrorResponse(val error: String? = null, val code: String? = null)
 
     companion object {
-        private const val FUNCTION_BASE_URL =
-            "https://vqgiynfrpsqddjrayczc.supabase.co/functions/v1/"
-        private const val CHECKOUT_HOST = "checkout.stripe.com"
-        private const val PORTAL_HOST = "billing.stripe.com"
-        private const val EMPTY_JSON = "{}"
+        private const val PAYMENTS_BASE_URL = "https://mowgoapp.com/api/payments/"
+        private const val PLATFORM_JSON = """{"platform":"android"}"""
         private val JSON_MEDIA_TYPE = "application/json".toMediaType()
     }
 }

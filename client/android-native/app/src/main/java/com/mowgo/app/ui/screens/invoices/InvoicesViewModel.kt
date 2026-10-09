@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
-import kotlin.math.roundToInt
 
 /**
  * UI state for the Invoices screen.
@@ -39,9 +38,10 @@ data class InvoicesUiState(
     val voidError: String? = null,
     val showSnackbar: String? = null,
     val payingInvoiceId: String? = null,
-    val pendingPayment: PendingInvoicePayment? = null,
-    val isPaymentSheetPresenting: Boolean = false,
-    val isPaymentConfirmationPending: Boolean = false,
+    /** Hosted payment page to open (one-shot event for the screen). */
+    val pendingPaymentUrl: String? = null,
+    /** A payment page was opened; refresh when the user comes back. */
+    val awaitingPaymentReturn: Boolean = false,
     val paymentError: String? = null,
 ) {
     /** Invoices enriched with client names for display. */
@@ -70,12 +70,6 @@ data class EstimateWithClient(val estimate: Estimate, val clientName: String?)
 data class InvoiceWithClient(
     val invoice: Invoice,
     val clientName: String?,
-)
-
-data class PendingInvoicePayment(
-    val invoiceId: String,
-    val clientSecret: String,
-    val paymentIntentId: String,
 )
 
 class InvoicesViewModel : ViewModel() {
@@ -120,6 +114,11 @@ class InvoicesViewModel : ViewModel() {
 
     fun refresh() = loadData()
 
+    /**
+     * Opens the payment provider's hosted page for this invoice. The invoice is
+     * marked paid by the provider's webhook, not by the app — we just refresh
+     * when the user returns.
+     */
     fun payInvoice(invoice: InvoiceWithClient) {
         if (_uiState.value.payingInvoiceId != null) return
         viewModelScope.launch {
@@ -128,99 +127,34 @@ class InvoicesViewModel : ViewModel() {
                 paymentError = null,
             )
             try {
-                val intent = paymentRepository.createPaymentIntent(
-                    amountCents = (invoice.invoice.amount * 100).roundToInt(),
-                    invoiceId = invoice.invoice.id,
-                )
+                val url = paymentRepository.invoicePaymentLink(invoice.invoice.id)
                 _uiState.value = _uiState.value.copy(
-                    pendingPayment = PendingInvoicePayment(
-                        invoiceId = invoice.invoice.id,
-                        clientSecret = intent.clientSecret,
-                        paymentIntentId = intent.paymentIntentId,
-                    ),
+                    payingInvoiceId = null,
+                    pendingPaymentUrl = url,
                 )
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(
                     payingInvoiceId = null,
-                    paymentError = error.message ?: "Could not initialize payment.",
+                    paymentError = error.message ?: "Could not open the payment page.",
                 )
-            }
-        }
-    }
-
-    fun paymentSheetPresented() {
-        if (_uiState.value.pendingPayment != null) {
-            _uiState.value = _uiState.value.copy(isPaymentSheetPresenting = true)
-        }
-    }
-
-    fun paymentCompleted(payment: PendingInvoicePayment) {
-        val pending = _uiState.value.pendingPayment
-        if (pending?.paymentIntentId != payment.paymentIntentId) return
-        _uiState.value = _uiState.value.copy(
-            isPaymentSheetPresenting = false,
-            isPaymentConfirmationPending = true,
-            paymentError = null,
-        )
-        confirmPendingPayment(payment)
-    }
-
-    fun retryConfirmPayment() {
-        val payment = _uiState.value.pendingPayment ?: return
-        if (!_uiState.value.isPaymentConfirmationPending) return
-        _uiState.value = _uiState.value.copy(paymentError = null)
-        confirmPendingPayment(payment)
-    }
-
-    private fun confirmPendingPayment(payment: PendingInvoicePayment) {
-        viewModelScope.launch {
-            try {
-                paymentRepository.confirmPayment(payment.invoiceId, payment.paymentIntentId)
-                _uiState.value = _uiState.value.copy(
-                    payingInvoiceId = null,
-                    pendingPayment = null,
-                    isPaymentSheetPresenting = false,
-                    isPaymentConfirmationPending = false,
-                    showSnackbar = "Payment confirmed",
-                )
+                // e.g. "already paid" — pull fresh state.
                 loadData()
-            } catch (error: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isPaymentSheetPresenting = false,
-                    isPaymentConfirmationPending = true,
-                    paymentError = "Payment was successful but confirmation failed. Retry confirmation.",
-                )
             }
         }
     }
 
-    fun paymentCanceled() {
-        _uiState.value = _uiState.value.copy(
-            payingInvoiceId = null,
-            pendingPayment = null,
-            isPaymentSheetPresenting = false,
-            isPaymentConfirmationPending = false,
-        )
+    fun paymentUrlOpened() {
+        _uiState.value = _uiState.value.copy(pendingPaymentUrl = null, awaitingPaymentReturn = true)
     }
 
-    fun paymentFailed(message: String) {
-        _uiState.value = _uiState.value.copy(
-            payingInvoiceId = null,
-            pendingPayment = null,
-            isPaymentSheetPresenting = false,
-            isPaymentConfirmationPending = false,
-            paymentError = message,
-        )
+    fun paymentUrlFailed(message: String) {
+        _uiState.value = _uiState.value.copy(pendingPaymentUrl = null, paymentError = message)
     }
 
-    fun dismissPendingPayment() {
-        _uiState.value = _uiState.value.copy(
-            payingInvoiceId = null,
-            pendingPayment = null,
-            isPaymentSheetPresenting = false,
-            isPaymentConfirmationPending = false,
-            paymentError = null,
-        )
+    fun onReturnedFromPayment() {
+        if (!_uiState.value.awaitingPaymentReturn) return
+        _uiState.value = _uiState.value.copy(awaitingPaymentReturn = false)
+        loadData()
     }
 
     fun dismissPaymentError() {
