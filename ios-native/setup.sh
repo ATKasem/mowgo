@@ -27,9 +27,6 @@ if [ -n "$SUPABASE_URL" ]; then
     sed -i '' "s|\$(SUPABASE_URL)|${SUPABASE_URL}|g" project.yml
     sed -i '' "s|\$(SUPABASE_ANON_KEY)|${SUPABASE_ANON_KEY}|g" project.yml
 fi
-if [ -n "$STRIPE_PUBLISHABLE_KEY" ]; then
-    sed -i '' "s|\$(STRIPE_PUBLISHABLE_KEY)|${STRIPE_PUBLISHABLE_KEY}|g" project.yml
-fi
 
 # ── Generate Xcode project ──
 echo "🔨 Generating Xcode project..."
@@ -47,7 +44,6 @@ if [ -z "$SUPABASE_URL" ]; then
     echo "   To connect your backend:"
     echo "     export SUPABASE_URL='https://your-project.supabase.co'"
     echo "     export SUPABASE_ANON_KEY='sb_publishable_...'"
-    echo "     export STRIPE_PUBLISHABLE_KEY='pk_live_...'"
     echo "     bash setup.sh"
 fi
 echo ""

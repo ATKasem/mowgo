@@ -38,12 +38,6 @@ targets:
         # Credentials — leave empty for CI (app runs in demo mode)
         INFOPLIST_KEY_SUPABASE_URL: "https://vqgiynfrpsqddjrayczc.supabase.co"
         INFOPLIST_KEY_SUPABASE_ANON_KEY: "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz"
-        INFOPLIST_KEY_StripePublishableKey: "$(STRIPE_PUBLISHABLE_KEY)"
-    dependencies:
-      - package: stripe-ios
-        product: StripePayments
-      - package: stripe-ios
-        product: StripePaymentSheet
   MowGoTests:
     type: bundle.unit-test
     platform: iOS
@@ -51,7 +45,3 @@ targets:
       - path: Tests
     dependencies:
       - target: MowGo
-packages:
-  stripe-ios:
-    url: https://github.com/stripe/stripe-ios.git
-    from: 23.2.0

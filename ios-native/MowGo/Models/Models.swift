@@ -361,7 +361,7 @@ struct Invoice: Codable, Identifiable, Equatable {
     var clientId: UUID?
     var jobId: UUID?
     var amount: Decimal
-    /// Integer-cents representation used by Stripe.
+    /// Integer-cents representation (payment amounts are always cents).
     var amountCents: Int {
         var cents = amount * 100
         var rounded = Decimal()
@@ -370,8 +370,9 @@ struct Invoice: Codable, Identifiable, Equatable {
     }
     var currencyAmount: Decimal { amount }
     var status: InvoiceStatus
-    var stripeInvoiceId: String?
-    var stripePaymentIntentId: String?
+    /// Card payment link state (`invoices.payment_provider` / `provider_payment_id`).
+    var paymentProvider: String?
+    var providerPaymentId: String?
     var sentAt: String?
     var paidAt: String?
     var createdAt: String?
@@ -453,7 +454,8 @@ struct UserProfile: Codable, Identifiable {
     /// Business location for the Day Conditions weather card (`profiles.latitude/longitude`).
     var latitude: Double?
     var longitude: Double?
-    var stripeCustomerId: String?
+    /// Set once the business has a subscription billing account (`profiles.billing_customer_id`).
+    var billingCustomerId: String?
     var venmoHandle: String?
     var cashappHandle: String?
     var zelleHandle: String?
@@ -665,6 +667,9 @@ final class InvoiceCache {
     var jobId: UUID?
     var amount: Double
     var status: String          // "unpaid" or "paid"
+    // Legacy attribute names kept so the on-disk SwiftData schema doesn't
+    // change (no migration). stripePaymentIntentId now holds the
+    // provider-neutral payment id; stripeInvoiceId is unused.
     var stripeInvoiceId: String?
     var stripePaymentIntentId: String?
     var sentAt: String?
@@ -680,8 +685,8 @@ final class InvoiceCache {
         self.jobId = invoice.jobId
         self.amount = NSDecimalNumber(decimal: invoice.amount).doubleValue
         self.status = invoice.status.rawValue
-        self.stripeInvoiceId = invoice.stripeInvoiceId
-        self.stripePaymentIntentId = invoice.stripePaymentIntentId
+        self.stripeInvoiceId = nil
+        self.stripePaymentIntentId = invoice.providerPaymentId
         self.sentAt = invoice.sentAt
         self.paidAt = invoice.paidAt
         self.createdAt = invoice.createdAt

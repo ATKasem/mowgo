@@ -102,52 +102,32 @@ class IOSReviewFixTests(unittest.TestCase):
             2,
         )
 
-    def test_payment_intent_creation_has_a_single_flight_guard(self) -> None:
-        stripe = source("Services/StripeService.swift")
+    def test_payment_requests_have_a_single_flight_guard(self) -> None:
+        payments = source("Services/PaymentsService.swift")
         payment = source("Views/Payments/PaymentView.swift")
 
-        create_intent = stripe.split("func createPaymentIntent", 1)[1]
-        create_intent = create_intent.split("// MARK: - Confirm payment", 1)[0]
-        self.assertIn("guard !isLoading else", create_intent)
-        self.assertIn("isLoading = true", create_intent)
-        self.assertIn("defer { isLoading = false }", create_intent)
-        self.assertIn("case operationInProgress", stripe)
-        self.assertIn("@ObservedObject private var stripe", payment)
+        post = payments.split("private func post(", 1)[1].split("private func hostedURL", 1)[0]
+        self.assertIn("guard !isLoading else", post)
+        self.assertIn("isLoading = true", post)
+        self.assertIn("defer { isLoading = false }", post)
+        self.assertIn("case operationInProgress", payments)
+        self.assertIn("@ObservedObject private var payments", payment)
 
-    def test_payment_edge_functions_are_idempotent_and_fail_closed(self) -> None:
-        edge_root = ROOT.parent / "edge-functions"
-        create = (edge_root / "create-payment-intent/index.ts").read_text()
-        confirm = (edge_root / "confirm-payment/index.ts").read_text()
+    def test_invoice_payment_is_settled_server_side_only(self) -> None:
+        # Server logic (amount/ids/voided checks) is covered by
+        # functions/api/_shared/payments/payments.test.js.
+        payments = source("Services/PaymentsService.swift")
         payment = source("Views/Payments/PaymentView.swift")
 
-        self.assertIn('"Idempotency-Key"', create)
-        self.assertIn("mowgo-invoice-${user.id}-${invoice_id}", create)
-        self.assertIn("stripe_payment_intent_id", create)
-        self.assertIn("payment_intent_id: paymentIntent.id", create)
-        self.assertIn('.select("id, user_id, amount, status, stripe_payment_intent_id")', create)
-        self.assertNotIn("const { amount,", create)
-
-        self.assertIn('status: 503', confirm)
-        self.assertIn("if (!resp.ok)", confirm)
-        self.assertIn('pi.status !== "succeeded"', confirm)
-        self.assertIn('pi.metadata?.invoice_id !== invoice_id', confirm)
-        self.assertIn('pi.metadata?.user_id !== user.id', confirm)
-        self.assertIn("pi.amount_received !== expectedAmount", confirm)
-        self.assertIn(".eq(\"stripe_payment_intent_id\", payment_intent_id)", confirm)
-        self.assertIn("error: saveErr", create)
-        self.assertIn(".maybeSingle()", create)
-        self.assertIn("data: updatedInvoice", confirm)
-        self.assertIn("!updatedInvoice", confirm)
-        self.assertNotIn("If Stripe call fails, proceed anyway", confirm)
-
-        completed = payment.split("case .completed:", 1)[1].split(
-            "case .canceled:", 1
-        )[0]
-        self.assertIn("try await self.stripe.confirmPayment", completed)
-        self.assertIn("await self.store.loadAll()", completed)
-        self.assertIn("catch", completed)
-        self.assertNotIn("try?", completed)
-        self.assertNotIn("markInvoicePaid", completed)
+        self.assertNotIn("import Stripe", payment)
+        self.assertNotIn("import Stripe", payments)
+        self.assertIn('url.scheme == "https"', payments)
+        self.assertIn('"payments_unavailable"', payments)
+        self.assertIn("validAccessToken()", payments)
+        # The app never marks an invoice paid; the provider webhook does.
+        self.assertNotIn("markInvoicePaid", payment)
+        self.assertNotIn("InvoicePaidPatch", payment)
+        self.assertIn("onDismiss: { Task { await store.loadAll() } }", payment)
 
     def test_currency_models_do_not_use_binary_floating_point(self) -> None:
         models = source("Models/Models.swift")

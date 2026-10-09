@@ -470,3 +470,9 @@
 // MARK: - Trial Banner
 "%lld days left in your %@ trial" = "Quedan %lld días de tu prueba de %@";
 "Subscribe to keep unlimited clients & jobs" = "Suscríbete para conservar clientes y trabajos ilimitados";
+
+/* Payments (provider-neutral hosted pages) */
+"Card payments are coming soon." = "Los pagos con tarjeta llegarán pronto.";
+"Payment service is temporarily unavailable. Please try again in a moment." = "El servicio de pagos no está disponible temporalmente. Inténtalo de nuevo en un momento.";
+"Please wait — a payment request is already in progress." = "Espera — ya hay una solicitud de pago en curso.";
+"Could not open the payment page." = "No se pudo abrir la página de pago.";

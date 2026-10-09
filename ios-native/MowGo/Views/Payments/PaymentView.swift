@@ -2,20 +2,18 @@
 //  PaymentView.swift
 //  MowGo
 //
-//  Stripe checkout for invoices and subscription plans.
+//  Card collection for invoices (provider's hosted payment page) and
+//  subscription plan cards. See PaymentsService.
 //
 
 import SwiftUI
-import StripePayments
-import StripePaymentSheet
 
 struct PaymentView: View {
     @EnvironmentObject var store: DataStore
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
-    @ObservedObject private var stripe = StripeService.shared
-    @State private var showingCheckout = false
-    @State private var checkoutURL: URL?
+    @ObservedObject private var payments = PaymentsService.shared
+    @State private var hostedPage: HostedPage?
+    @State private var paymentLink: URL?
     @State private var paymentError: String?
 
     let invoice: Invoice
@@ -40,13 +38,13 @@ struct PaymentView: View {
             }
             .padding()
 
-            // Collect button
+            // Collect button — opens the provider's hosted payment page.
             Button {
                 UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-                Task { @MainActor in await processPayment() }
+                Task { @MainActor in await openPaymentPage() }
             } label: {
                 HStack {
-                    if stripe.isLoading {
+                    if payments.isLoading {
                         ProgressView().tint(MowGoTheme.onAccent)
                     } else {
                         Image(systemName: "dollarsign.circle.fill")
@@ -61,7 +59,16 @@ struct PaymentView: View {
                 .cornerRadius(12)
             }
             .buttonStyle(CollectButtonStyle())
-            .disabled(stripe.isLoading)
+            .disabled(payments.isLoading)
+
+            // The same link can be texted/emailed so the customer pays later.
+            if let paymentLink {
+                ShareLink(item: paymentLink) {
+                    Label("Send Payment Link", systemImage: "square.and.arrow.up")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(MowGoTheme.deepGreen)
+                }
+            }
 
             if let err = paymentError {
                 Text(err)
@@ -71,99 +78,24 @@ struct PaymentView: View {
             }
         }
         .padding(16)
+        // The invoice flips to paid via the provider's webhook; refresh when
+        // the payment page closes so the list reflects it.
+        .sheet(item: $hostedPage, onDismiss: { Task { await store.loadAll() } }) { page in
+            SafariView(url: page.url).ignoresSafeArea()
+        }
     }
 
-    private func processPayment() async {
-        guard stripe.isConfigured else {
-            paymentError = "Stripe is not configured. Set StripePublishableKey in Info.plist."
-            return
-        }
+    private func openPaymentPage() async {
         paymentError = nil
-        let amountCents = invoice.amountCents
         do {
-            let paymentIntent = try await stripe.createPaymentIntent(
-                amount: amountCents, invoiceId: invoice.id
-            )
-            let paymentId = paymentIntent.paymentIntentId
-            let intentConfig = PaymentSheet.IntentConfiguration(
-                mode: .payment(amount: amountCents, currency: "usd"),
-                confirmHandler: { _, _, intentCreationCallback in
-                    intentCreationCallback(.success(paymentIntent.clientSecret))
-                }
-            )
-            var config = PaymentSheet.Configuration()
-            config.merchantDisplayName = "MowGo"
-            let paymentSheet = PaymentSheet(
-                intentConfiguration: intentConfig,
-                configuration: config
-            )
-            // Present from the topmost controller because PaymentView may itself be in a sheet.
-            guard let windowScene = UIApplication.shared.connectedScenes
-                .compactMap({ $0 as? UIWindowScene })
-                .first(where: { $0.activationState == .foregroundActive }),
-                  let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController,
-                  let presentingVC = topmostViewController(from: rootVC) else {
-                paymentError = "Could not present payment sheet."
-                return
-            }
-            paymentSheet.present(from: presentingVC) { result in
-                switch result {
-                case .completed:
-                    // Trust boundary: this client callback is not authoritative settlement.
-                    // The edge function must independently verify the PaymentIntent with Stripe.
-                    Task {
-                        do {
-                            try await self.stripe.confirmPayment(
-                                invoiceId: self.invoice.id,
-                                paymentIntentId: paymentId
-                            )
-                            await self.store.loadAll()
-                            await MainActor.run { self.dismiss() }
-                        } catch {
-                            await MainActor.run {
-                                self.paymentError = "Payment succeeded, but verification failed: \(error.localizedDescription). Refresh before trying again."
-                            }
-                        }
-                    }
-                case .canceled:
-                    Task { @MainActor in self.paymentError = "Payment was canceled." }
-                case .failed(let error):
-                    Task { @MainActor in self.paymentError = error.localizedDescription }
-                }
-            }
-            return  // PaymentSheet handles the rest via its completion handler
+            let url = try await payments.invoicePaymentLink(invoiceId: invoice.id)
+            paymentLink = url
+            hostedPage = HostedPage(url: url)
         } catch {
-            paymentError = paymentCreationErrorMessage(for: error)
-            // 409: already paid / still processing — the server may have just
-            // settled the invoice, so pull fresh state.
-            if case SupabaseError.httpStatus(409, _) = error {
-                await store.loadAll()
-            }
+            paymentError = error.localizedDescription
+            // e.g. "already paid" — pull fresh state.
+            if case PaymentsError.server(_) = error { await store.loadAll() }
         }
-    }
-
-    private func paymentCreationErrorMessage(for error: Error) -> String {
-        if case SupabaseError.httpStatus(409, let detail?) = error {
-            return detail
-        }
-        if case SupabaseError.httpStatus(let statusCode, _) = error,
-           (500...599).contains(statusCode) {
-            return "Payment service is temporarily unavailable. Please try again in a moment."
-        }
-        return error.localizedDescription
-    }
-
-    private func topmostViewController(from viewController: UIViewController?) -> UIViewController? {
-        if let presented = viewController?.presentedViewController {
-            return topmostViewController(from: presented)
-        }
-        if let navigationController = viewController as? UINavigationController {
-            return topmostViewController(from: navigationController.visibleViewController)
-        }
-        if let tabBarController = viewController as? UITabBarController {
-            return topmostViewController(from: tabBarController.selectedViewController)
-        }
-        return viewController
     }
 }
 
@@ -192,7 +124,6 @@ struct SubscriptionPlanCard: View {
     /// one-shot) — flips the button between trial-start and checkout.
     var userHasUsedTrial: Bool = false
 
-    private let stripe = StripeService.shared
     @State private var isPurchasing = false
     @State private var error: String?
     /// Set when a trial was just granted, before the async profile reload lands.
@@ -265,7 +196,7 @@ struct SubscriptionPlanCard: View {
             if canUpgrade {
                 // Trial-first no-card flow: a FREE user without an active trial
                 // starts the 14-day trial (no card). Users in/after a trial go
-                // straight to checkout (Stripe trial skipped — see edge function).
+                // straight to checkout (no second trial — see subscription-checkout.js).
                 let isTrialStart = userTier.lowercased() == "free" && !userHasUsedTrial && !trialJustGranted
                 Button {
                     Task { await subscribe() }
@@ -301,7 +232,7 @@ struct SubscriptionPlanCard: View {
         error = nil
         // Trial-first no-card flow: free user without a used trial → grant the
         // 14-day trial via RPC (idempotent, one-shot per human server-side).
-        // No card, no Stripe. Otherwise → normal checkout.
+        // No card needed. Otherwise → the provider's hosted checkout.
         if userTier.lowercased() == "free" && !userHasUsedTrial && !trialJustGranted {
             let granted = await auth.grantTrial(plan: tier)
             isPurchasing = false
@@ -313,14 +244,9 @@ struct SubscriptionPlanCard: View {
             }
             return
         }
-        guard stripe.isConfigured else {
-            error = "Stripe not configured."
-            isPurchasing = false
-            return
-        }
         do {
-            let url = try await stripe.createCheckoutSession(tier: tier, interval: billingInterval)
-            // Open in Safari
+            let url = try await PaymentsService.shared.subscriptionCheckoutURL(tier: tier, interval: billingInterval)
+            // Open in Safari; the hosted page returns via /#/portal-return → mowgo://settings?upgraded=true
             let didOpen = await UIApplication.shared.open(url)
             if !didOpen {
                 self.error = "Could not open checkout."

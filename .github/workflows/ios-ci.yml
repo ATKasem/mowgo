@@ -35,7 +35,6 @@ jobs:
           INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
           INFOPLIST_KEY_SUPABASE_URL = https://placeholder.supabase.co
           INFOPLIST_KEY_SUPABASE_ANON_KEY = placeholder-anon-key
-          INFOPLIST_KEY_StripePublishableKey = pk_placeholder
           PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
           GENERATE_INFOPLIST_FILE = YES
           EOF

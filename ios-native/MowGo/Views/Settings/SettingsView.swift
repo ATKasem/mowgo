@@ -460,8 +460,7 @@ struct SettingsView: View {
         Task {
             portalError = nil
             do {
-                let stripe = StripeService.shared
-                let url = try await stripe.createCustomerPortal()
+                let url = try await PaymentsService.shared.billingPortalURL()
                 await UIApplication.shared.open(url)
             } catch {
                 portalError = error.localizedDescription
@@ -472,7 +471,7 @@ struct SettingsView: View {
     private func handleCancelSubscription() async {
         cancelError = nil
         do {
-            try await StripeService.shared.cancelSubscription()
+            try await PaymentsService.shared.cancelSubscription()
             await auth.loadProfile()
         } catch {
             cancelError = error.localizedDescription
