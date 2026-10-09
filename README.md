@@ -2,7 +2,7 @@
 
 Lawn-care scheduling SaaS — **"The lawn care app that just works. Even when it rains."**
 
-Built by Aaron (lawn care business owner) for lawn care businesses. Web app + native iOS (SwiftUI) + native Android (Kotlin), on Supabase + Stripe + Cloudflare Pages.
+Built by Aaron (lawn care business owner) for lawn care businesses. Web app + native iOS (SwiftUI) + native Android (Kotlin), on Supabase + Cloudflare Pages. Card payments go through a swappable payment provider (see `docs/PAYMENTS.md`).
 
 ## Live
 
@@ -15,12 +15,12 @@ Built by Aaron (lawn care business owner) for lawn care businesses. Web app + na
 
 ## Stack
 
-- **Web:** React 19 + Vite 8 + Tailwind v4 + supabase-js + stripe-js (SPA, HashRouter)
-- **API:** Cloudflare Pages Functions (`functions/api/`) — Stripe checkout/webhook, route audit, leads, concierge, autopilot, team invites
+- **Web:** React 19 + Vite 8 + Tailwind v4 + supabase-js (SPA, HashRouter)
+- **API:** Cloudflare Pages Functions (`functions/api/`) — provider-neutral payments (`api/payments/`), route audit, leads, concierge, autopilot, team invites
 - **Backend:** Supabase (Postgres, RLS = authz ground truth, migrations in `supabase/migrations/`)
-- **iOS:** SwiftUI (`ios-native/MowGo/`), Keychain sessions, Stripe PaymentSheet
+- **iOS:** SwiftUI (`ios-native/MowGo/`), Keychain sessions, hosted payment pages (no payment SDK)
 - **Android:** Kotlin (`client/android-native/`), supabase-kt, FCM
-- **Payments:** Stripe (live) — tiers: Free / Solo $39 / Crew $79 / Premium $199, 14-day trial
+- **Payments:** provider layer in `functions/api/_shared/payments/` — Stripe removed, Rise Concepts planned; card payments show "coming soon" until a provider is live. Tiers: Free / Solo $39 / Crew $79 / Premium $199, 14-day no-card trial
 
 ## Repo layout
 
