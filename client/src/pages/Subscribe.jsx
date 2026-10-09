@@ -1,7 +1,7 @@
 import useLocalizedText from '../i18n/useLocalizedText';
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Check, CheckCircle, XCircle, Loader2, ArrowRight, AlertCircle, Sprout, RefreshCw } from 'lucide-react';
+import { Check, CheckCircle, XCircle, Loader2, ArrowRight, Sprout, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { startCheckout } from '../lib/payments';
 import { useAuth } from '../App';
@@ -76,9 +76,9 @@ export default function Subscribe() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const sessionId = searchParams.get('session_id');
-  const [status, setStatus] = useState(sessionId ? 'verifying' : 'cancelled');
-  const [error, setError] = useState('');
+  // The payment provider's hosted checkout returns here with ?checkout=success.
+  const checkoutReturned = searchParams.get('checkout') === 'success';
+  const [status, setStatus] = useState(checkoutReturned ? 'verifying' : 'cancelled');
   const [conciergeRequest, setConciergeRequest] = useState(undefined);
   const [retry, setRetry] = useState(0);
   const [billingInterval, setBillingInterval] = useState('year');
@@ -137,37 +137,41 @@ export default function Subscribe() {
   }, [status, user]);
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!checkoutReturned) return;
+    let active = true;
 
-    async function verify() {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const headers = {};
-        if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
-        const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`, { headers });
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        const data = await res.json();
-
-        if (data.status === 'complete' && data.payment_status === 'paid') {
-          setStatus('success');
-          // Clear session ID from URL to prevent leaks
-          window.history.replaceState({}, '', '#/subscribe');
-        } else if (data.status === 'complete' && data.payment_status === 'unpaid') {
-          // Trial — subscription created but no payment yet
-          setStatus('success');
-        } else {
-          setStatus('failed');
-          setError(data.error || tr('Payment was not completed'));
+    // The return URL proves nothing on its own (anyone can open it). The
+    // provider's webhook sets profiles.tier server-side, usually within
+    // seconds, and a real subscription also clears the in-app trial — so
+    // poll our own profile for that.
+    async function confirmPlan() {
+      for (const delay of [0, 2000, 4000, 8000]) {
+        if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+        if (!active) return;
+        try {
+          const { data: { user: authed } } = await supabase.auth.getUser();
+          if (!authed) break;
+          const { data, error: profileError } = await supabase
+            .from('profiles')
+            .select('tier, trial_ends_at')
+            .eq('id', authed.id)
+            .single();
+          if (!profileError && data && data.tier !== 'free' && !data.trial_ends_at) {
+            if (!active) return;
+            setStatus('success');
+            window.history.replaceState({}, '', '#/subscribe');
+            return;
+          }
+        } catch {
+          // Network hiccup — keep polling.
         }
-      } catch (err) {
-        // Network error — don't lie to the user
-        setStatus('failed');
-        setError(tr('Could not verify payment. Please contact support or try again.'));
       }
+      if (active) setStatus('pending');
     }
 
-    verify();
-  }, [sessionId, retry]);
+    confirmPlan();
+    return () => { active = false; };
+  }, [checkoutReturned, retry]);
 
   if (status === 'verifying') {
     return (
@@ -209,24 +213,24 @@ export default function Subscribe() {
     );
   }
 
-  if (status === 'failed') {
+  if (status === 'pending') {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
         <SubscribeNav tr={tr} />
         <div className="text-center max-w-md mx-auto px-4 flex-1 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+          <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mx-auto mb-6">
+            <Loader2 className="w-8 h-8 text-amber-600 dark:text-amber-400" />
           </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">{tr("Something went wrong")}</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">{error || tr("We couldn't verify your payment. Please try again.")}</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">{tr("Almost done")}</h1>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">{tr("Your payment is still processing. Your plan usually updates within a few minutes.")}</p>
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => { setStatus('verifying'); setError(''); setRetry(r => r + 1); }}
+              onClick={() => { setStatus('verifying'); setRetry(r => r + 1); }}
               className="btn-primary text-sm px-6 py-2.5"
             >
-              {tr("Try Again")} <RefreshCw className="w-4 h-4" />
+              {tr("Check Again")} <RefreshCw className="w-4 h-4" />
             </button>
-            <Link to="/" className="btn-secondary text-sm px-6 py-2.5">{tr("Back Home")}</Link>
+            <Link to="/app" className="btn-secondary text-sm px-6 py-2.5">{tr("Go to App")}</Link>
           </div>
         </div>
       </div>

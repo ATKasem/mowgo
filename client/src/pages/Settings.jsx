@@ -529,7 +529,7 @@ export default function Settings() {
               {tr("Upgrade to Solo ($39 USD/mo) or Crew ($79 USD/mo) for unlimited clients, offline mode, and more.")}
             </div>
           )}
-          {profile?.stripe_customer_id && (
+          {profile?.billing_customer_id && (
             <button
               type="button"
               onClick={handleManageSubscription}

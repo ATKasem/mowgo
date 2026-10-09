@@ -290,7 +290,7 @@
     "only_app_with_rain_delay": "La única app con reprogramación por lluvia",
     "rain_tomorrow_one_tap_moves_your_whole_day_no_competitor_has_this_not_qu": "¿Lloverá mañana? Con un toque, reprogramas todo el día. Ningún competidor ofrece esto: ni QuoteIQ, ni Jobber, ni nadie.",
     "no_platform_fees": "Sin comisiones de plataforma",
-    "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ cobra un 1 % por cada transacción, además de la comisión de Stripe. Nosotros no tocamos tu dinero: Stripe cobra su comisión y nada más.",
+    "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ cobra un 1 % por cada transacción, además de la comisión de Stripe. Nosotros no tocamos tu dinero: el procesador de tarjetas cobra su comisión y nada más.",
     "your_data_is_yours": "Tus datos son tuyos",
     "feature_comparison": "Comparación de funciones",
     "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Comparación de MowGo con 9 competidores, incluidos los precios y la disponibilidad de 14 funciones clave",
@@ -366,7 +366,8 @@
     "start_free_trial": "Inicia la prueba gratis",
     "planado_new_in_the_band_charges_per_user_12_29_user_mo_and_has_no_invoic": "Planado (nuevo en el mercado) cobra por usuario — $12–$29/usuario/mes — y no tiene facturación ni pagos. La facturación automática de MowGo + enlace de pago por SMS está incluida a $39 fijos.",
     "service_autopilot_s_49_mo_is_one_mobile_license_a_2_person_crew_runs_199": "Los $49/mes de Service Autopilot son UNA licencia móvil — un equipo de 2 personas paga $199+/mes con tarifa de registro y facturación solo anual. MowGo Crew cuesta $79 fijos, todo el equipo incluido.",
-    "billing_interval": "Período de facturación"
+    "billing_interval": "Período de facturación",
+    "no_transaction_fees_beyond_the_card_processor_s_cut": "Sin comisiones por transacción más allá de la del procesador de tarjetas"
   },
   "ruunlyComparison": {
     "route_optimization": "Optimización de rutas",
@@ -881,7 +882,9 @@
     "our_database_provider_your_data_is_encrypted_at_rest": "nuestro proveedor de base de datos (tus datos están cifrados en reposo)",
     "only_when_required_by_valid_legal_process": "solo cuando lo exija un proceso legal válido",
     "privacy_policy_mowgo": "Política de privacidad — MowGo",
-    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "Política de privacidad de MowGo. Sus datos siempre son suyos — sin anuncios, sin venta de datos, sin trucos."
+    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "Política de privacidad de MowGo. Sus datos siempre son suyos — sin anuncios, sin venta de datos, sin trucos.",
+    "to_process_card_payments_through_our_payment_processor_we_never_store_yo": "Para procesar pagos con tarjeta a través de nuestro procesador de pagos (nunca almacenamos todos tus datos de pago)",
+    "our_payment_processor": "Nuestro procesador de pagos"
   },
   "quoteIQAlternative": {
     "rain_delay_auto_reschedule": "Reprogramación automática por lluvia",
@@ -946,7 +949,9 @@
     "check_these_five_things_before_you_move_your_clients_and_schedule_to_ano": "Revisa estas cinco cosas antes de mover tus clientes y tu agenda a otra app:",
     "no_platform_fee_stripe_s_cut_only": "Sin comisión de plataforma: solo la de Stripe",
     "seo_title": "Alternativa a QuoteIQ para jardinería — plan gratis, 5 clientes",
-    "seo_description": "QuoteIQ discontinuó su plan gratis en julio de 2026. MowGo da a las cuadrillas de jardinería una opción gratis: 5 clientes para siempre, sin tarjeta."
+    "seo_description": "QuoteIQ discontinuó su plan gratis en julio de 2026. MowGo da a las cuadrillas de jardinería una opción gratis: 5 clientes para siempre, sin tarjeta.",
+    "card_processor_only_0_extra": "Solo el procesador de tarjetas ($0 extra)",
+    "no_platform_fee_card_processor_s_cut_only": "Sin comisión de plataforma: solo la del procesador de tarjetas"
   },
   "resetPassword": {
     "passwords_do_not_match": "Las contraseñas no coinciden.",
@@ -1102,7 +1107,9 @@
     "quickbooks_sync_error": "Error de sincronización: {error}",
     "auto_sync_invoices": "Sincronización automática",
     "last_synced": "Última sincronización",
-    "never": "Nunca"
+    "never": "Nunca",
+    "fired_when_a_subscription_payment_fails": "Se activa cuando falla el pago de una suscripción",
+    "card_payments_are_coming_soon": "Los pagos con tarjeta llegarán pronto."
   },
   "subscribe": {
     "premium": "Premium",
@@ -1148,7 +1155,12 @@
     "give_this_code_to_one_crew_you_know": "Dale este código a una cuadrilla que conozcas:",
     "copy": "Copiar",
     "copied": "¡Copiado!",
-    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "Ellos obtienen una prueba gratis; tú ganas un mes gratis cuando se suscriban."
+    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "Ellos obtienen una prueba gratis; tú ganas un mes gratis cuando se suscriban.",
+    "almost_done": "Casi listo",
+    "your_payment_is_still_processing_your_plan_usually_updates_within_a_few_": "Tu pago aún se está procesando. Tu plan suele actualizarse en unos minutos.",
+    "check_again": "Comprobar de nuevo",
+    "go_to_app": "Ir a la app",
+    "card_payments_are_coming_soon": "Los pagos con tarjeta llegarán pronto."
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Reportes de pérdida de datos",
@@ -1746,5 +1758,11 @@
     "your_trial_ended": "Tu prueba terminó",
     "your_clients_are_safe_subscribe_to_keep_scheduling_beyond_5": "Tus clientes están a salvo — suscríbete para seguir programando más de 5.",
     "subscribe": "Suscribirse"
+  },
+  "paymentComplete": {
+    "payment_not_completed": "Pago no completado",
+    "thank_you": "¡Gracias!",
+    "no_charge_was_made_you_can_use_the_same_payment_link_again_whenever_you_": "No se realizó ningún cargo. Puedes usar el mismo enlace de pago cuando quieras.",
+    "your_payment_was_received_you_can_close_this_page": "Recibimos tu pago. Ya puedes cerrar esta página."
   }
 }

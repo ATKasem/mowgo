@@ -301,7 +301,7 @@
     "only_app_with_rain_delay": "Only app with rain delay",
     "rain_tomorrow_one_tap_moves_your_whole_day_no_competitor_has_this_not_qu": "Rain tomorrow? One tap moves your whole day. No competitor has this — not QuoteIQ, not Jobber, not anyone.",
     "no_platform_fees": "No platform fees",
-    "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — Stripe takes their cut, that's it.",
+    "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — the card processor takes their cut, that's it.",
     "your_data_is_yours": "Your data is yours",
     "feature_comparison": "Feature comparison",
     "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Feature comparison between MowGo and 9 competitors including pricing and availability of 14 key features",
@@ -361,7 +361,8 @@
     "route_optimization": "Route Optimization",
     "one_tap_optimized_routes_send_stops_to_your_maps_app": "One-tap optimized routes + send stops to your maps app",
     "start_free_trial": "Start Free Trial",
-    "billing_interval": "Billing interval"
+    "billing_interval": "Billing interval",
+    "no_transaction_fees_beyond_the_card_processor_s_cut": "No transaction fees beyond the card processor's cut"
   },
   "ruunlyComparison": {
     "route_optimization": "Route Optimization",
@@ -872,7 +873,9 @@
     "our_database_provider_your_data_is_encrypted_at_rest": "our database provider (your data is encrypted at rest)",
     "only_when_required_by_valid_legal_process": "only when required by valid legal process",
     "privacy_policy_mowgo": "Privacy Policy — MowGo",
-    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "MowGo privacy policy. Your data stays yours — no ads, no selling, no funny business."
+    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "MowGo privacy policy. Your data stays yours — no ads, no selling, no funny business.",
+    "to_process_card_payments_through_our_payment_processor_we_never_store_yo": "To process card payments through our payment processor (we never store your full payment details)",
+    "our_payment_processor": "Our payment processor"
   },
   "quoteIQAlternative": {
     "rain_delay_auto_reschedule": "Rain delay auto-reschedule",
@@ -948,7 +951,9 @@
     "shared_with_platform": "Shared with platform",
     "dark_mode": "Dark mode",
     "built_in": "Built in",
-    "quoteiq_pro_costs_3_8_more_than_mowgo_solo_at_that_price_it_still_doesn": "QuoteIQ Pro costs 3.8× more than MowGo Solo. At that price it still doesn't include dark mode, offline mode, or client self-booking — three features that come with every MowGo plan."
+    "quoteiq_pro_costs_3_8_more_than_mowgo_solo_at_that_price_it_still_doesn": "QuoteIQ Pro costs 3.8× more than MowGo Solo. At that price it still doesn't include dark mode, offline mode, or client self-booking — three features that come with every MowGo plan.",
+    "card_processor_only_0_extra": "Card processor only ($0 extra)",
+    "no_platform_fee_card_processor_s_cut_only": "No platform fee — card processor’s cut only"
   },
   "resetPassword": {
     "passwords_do_not_match": "Passwords do not match.",
@@ -1104,7 +1109,9 @@
     "quickbooks_sync_error": "Sync failed: {error}",
     "auto_sync_invoices": "Auto-sync invoices",
     "last_synced": "Last synced",
-    "never": "Never"
+    "never": "Never",
+    "fired_when_a_subscription_payment_fails": "Fired when a subscription payment fails",
+    "card_payments_are_coming_soon": "Card payments are coming soon."
   },
   "subscribe": {
     "premium": "Premium",
@@ -1148,7 +1155,12 @@
     "give_this_code_to_one_crew_you_know": "Give this code to one crew you know:",
     "copy": "Copy",
     "copied": "Copied!",
-    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "They get a free trial, you get a free month when they subscribe."
+    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "They get a free trial, you get a free month when they subscribe.",
+    "almost_done": "Almost done",
+    "your_payment_is_still_processing_your_plan_usually_updates_within_a_few_": "Your payment is still processing. Your plan usually updates within a few minutes.",
+    "check_again": "Check Again",
+    "go_to_app": "Go to App",
+    "card_payments_are_coming_soon": "Card payments are coming soon."
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Data Loss Reports",
@@ -1825,5 +1837,11 @@
     "your_trial_ended": "Your trial ended",
     "your_clients_are_safe_subscribe_to_keep_scheduling_beyond_5": "Your clients are safe — subscribe to keep scheduling beyond 5.",
     "subscribe": "Subscribe"
+  },
+  "paymentComplete": {
+    "payment_not_completed": "Payment not completed",
+    "thank_you": "Thank you!",
+    "no_charge_was_made_you_can_use_the_same_payment_link_again_whenever_you_": "No charge was made. You can use the same payment link again whenever you’re ready.",
+    "your_payment_was_received_you_can_close_this_page": "Your payment was received. You can close this page."
   }
 }

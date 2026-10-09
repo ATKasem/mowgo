@@ -17,7 +17,7 @@ const comparisonRows = [
   { feature: 'Rain delay owner-confirmed move', mowgo: 'Yes — you confirm the move', quoteiq: 'Manual reschedule only' },
   { feature: 'Offline mode', mowgo: 'Yes — works without cell service', quoteiq: 'Not available' },
   { feature: 'Per-user fees', mowgo: 'None', quoteiq: 'Charges per user on paid plans' },
-  { feature: 'Transaction fees', mowgo: 'No platform fee — Stripe\u2019s cut only', quoteiq: 'Payment processing fees apply' },
+  { feature: 'Transaction fees', mowgo: 'No platform fee — card processor\u2019s cut only', quoteiq: 'Payment processing fees apply' },
   { feature: 'Drag-and-drop scheduling', mowgo: 'Yes — move jobs with one finger', quoteiq: 'Basic list-based scheduling' },
   { feature: 'Auto-invoicing', mowgo: 'Yes — automatic on job complete', quoteiq: 'Manual invoicing workflow' },
   { feature: 'Mobile-first design', mowgo: 'Yes — built for the truck', quoteiq: 'Desktop-oriented interface' },
@@ -26,7 +26,7 @@ const comparisonRows = [
 const trueCostRows = [
   { feature: 'Setup', mowgo: '2 min. No call', quoteiq: 'Requires onboarding/sales' },
   { feature: 'Your crew', mowgo: 'Flat fee', quoteiq: 'Per-user pricing' },
-  { feature: 'Platform fee', mowgo: 'Stripe only ($0 extra)', quoteiq: 'Stripe + 1% surcharge' },
+  { feature: 'Platform fee', mowgo: 'Card processor only ($0 extra)', quoteiq: 'Stripe + 1% surcharge' },
   { feature: 'Rain delay', mowgo: 'One-tap auto-reschedule', quoteiq: 'Manual, per job' },
   { feature: 'Offline mode', mowgo: 'Works without cell', quoteiq: 'Requires internet' },
   { feature: 'Data ownership', mowgo: 'Yours. Export anytime', quoteiq: 'Shared with platform' },
