@@ -119,8 +119,74 @@ serve(async (req) => {
           headers: { Authorization: `Bearer ${stripeKey}` },
         },
       );
+      // Only a Stripe 404 (unknown/foreign intent id) is safe to replace. Any
+      // other failure means we can't tell whether money is already moving, so
+      // don't risk a second charge.
+      if (!existingResp.ok && existingResp.status !== 404) {
+        console.error("Could not retrieve existing PaymentIntent:", existingResp.status);
+        return new Response(
+          JSON.stringify({ error: "Payment service unavailable. Please try again." }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
       if (existingResp.ok) {
         const existingIntent = await existingResp.json();
+
+        // Money is moving or already moved on the stored intent (e.g. the app
+        // was killed before confirm-payment ran). Creating another intent here
+        // would charge the customer twice.
+        if (
+          existingIntent.status === "processing" ||
+          existingIntent.status === "requires_capture" ||
+          existingIntent.status === "succeeded"
+        ) {
+          if (existingIntent.status === "succeeded") {
+            // Settle the invoice with the same checks as confirm-payment.
+            const settles =
+              existingIntent.metadata?.invoice_id === invoice_id &&
+              existingIntent.metadata?.user_id === user.id &&
+              existingIntent.amount_received === amount;
+            if (settles) {
+              const { error: settleErr } = await supabase
+                .from("invoices")
+                .update({ status: "paid", paid_at: new Date().toISOString() })
+                .eq("id", invoice_id)
+                .eq("user_id", user.id)
+                .eq("stripe_payment_intent_id", existingIntent.id);
+              if (settleErr) {
+                console.error("Failed to settle paid invoice:", settleErr);
+              }
+            }
+            return new Response(
+              JSON.stringify({
+                error: settles
+                  ? "This invoice has already been paid. Refresh to update it."
+                  : "A payment for a different amount already went through for this invoice. Check it in Stripe before charging again.",
+                payment_intent_id: existingIntent.id,
+                status: existingIntent.status,
+              }),
+              {
+                status: 409,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+          return new Response(
+            JSON.stringify({
+              error: "A payment for this invoice is still processing. Try again in a few minutes.",
+              payment_intent_id: existingIntent.id,
+              status: existingIntent.status,
+            }),
+            {
+              status: 409,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
+        }
+
         const payable =
           existingIntent.status === "requires_payment_method" ||
           existingIntent.status === "requires_confirmation" ||
@@ -157,8 +223,8 @@ serve(async (req) => {
             },
           );
         }
-        // Otherwise fall through and create a fresh intent (the old one is
-        // no longer payable).
+        // Otherwise (canceled, or cancelled above for a stale amount) fall
+        // through and create a fresh intent.
       }
     }
 

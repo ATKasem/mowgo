@@ -134,10 +134,18 @@ struct PaymentView: View {
             return  // PaymentSheet handles the rest via its completion handler
         } catch {
             paymentError = paymentCreationErrorMessage(for: error)
+            // 409: already paid / still processing — the server may have just
+            // settled the invoice, so pull fresh state.
+            if case SupabaseError.httpStatus(409, _) = error {
+                await store.loadAll()
+            }
         }
     }
 
     private func paymentCreationErrorMessage(for error: Error) -> String {
+        if case SupabaseError.httpStatus(409, let detail?) = error {
+            return detail
+        }
         if case SupabaseError.httpStatus(let statusCode, _) = error,
            (500...599).contains(statusCode) {
             return "Payment service is temporarily unavailable. Please try again in a moment."
