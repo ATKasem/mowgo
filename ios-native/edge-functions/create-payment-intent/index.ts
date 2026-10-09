@@ -121,11 +121,30 @@ serve(async (req) => {
       );
       if (existingResp.ok) {
         const existingIntent = await existingResp.json();
-        const usable =
+        const payable =
           existingIntent.status === "requires_payment_method" ||
           existingIntent.status === "requires_confirmation" ||
           existingIntent.status === "requires_action";
-        if (usable) {
+        // The invoice amount can change after an intent was created. Reusing a
+        // stale intent would charge the old amount, which confirm-payment then
+        // rejects (charged, but invoice stays unpaid).
+        const amountMatches =
+          existingIntent.amount === amount && existingIntent.currency === currency;
+        if (payable && !amountMatches) {
+          // Cancel so the stale amount can't still be paid from another device.
+          // Best-effort: a new intent is created below either way.
+          const cancelResp = await fetch(
+            `https://api.stripe.com/v1/payment_intents/${existingIntent.id}/cancel`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${stripeKey}` },
+            },
+          );
+          if (!cancelResp.ok) {
+            console.error("Failed to cancel stale PaymentIntent:", existingIntent.id);
+          }
+        }
+        if (payable && amountMatches) {
           console.log("Reusing existing PaymentIntent:", existingIntent.id);
           return new Response(
             JSON.stringify({
@@ -151,8 +170,9 @@ serve(async (req) => {
         // Stable key per user+invoice with generation marker: when a stored
         // PaymentIntent is unusable, including its ID in the key (instead of
         // the bare invoice) gives Stripe a fresh dedup window for the new
-        // intent, rather than replaying the prior creation.
-        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}-${invoice.stripe_payment_intent_id || "0"}`,
+        // intent, rather than replaying the prior creation. The amount is part
+        // of the key because Stripe rejects a reused key with different params.
+        "Idempotency-Key": `mowgo-invoice-${user.id}-${invoice_id}-${invoice.stripe_payment_intent_id || "0"}-${amount}`,
       },
       body: new URLSearchParams({
         amount: String(amount),
