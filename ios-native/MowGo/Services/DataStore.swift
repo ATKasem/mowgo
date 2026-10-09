@@ -363,10 +363,15 @@ final class DataStore: ObservableObject {
                 // Remove permanently broken or already-done mutations
                 if error is DecodingError || error is PendingMutationError {
                     persistence.removeMutation(mutation)
-                } else if case SupabaseError.httpStatus(404, _) = error,
-                          mutation.operation.hasSuffix(":delete") {
-                    // Entity already deleted on server — safe to remove
+                } else if case SupabaseError.httpStatus(let code, _) = error,
+                          (400..<500).contains(code), ![401, 408, 429].contains(code) {
+                    // The server rejected this change (validation, RLS, conflict,
+                    // or entity already gone). Retrying won't help, and keeping it
+                    // would block every later mutation — drop it and tell the user.
                     persistence.removeMutation(mutation)
+                    if !mutation.operation.hasSuffix(":delete") || code != 404 {
+                        self.error = "An offline change couldn't be saved and was discarded."
+                    }
                 } else {
                     break // Stop on first retryable failure — preserve FIFO order
                 }
