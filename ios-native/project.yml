@@ -11,8 +11,11 @@ targets:
     configFiles:
       Debug: MowGo/Config.xcconfig
       Release: MowGo/Config.xcconfig
-    capabilities:
-      - pushNotifications
+    entitlements:
+      path: MowGo/MowGo.entitlements
+      properties:
+        # Xcode rewrites this to "production" when exporting for App Store / TestFlight.
+        aps-environment: development
     sources:
       - path: MowGo
     settings:
