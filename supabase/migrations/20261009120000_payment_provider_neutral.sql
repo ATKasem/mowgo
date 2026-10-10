@@ -3,9 +3,8 @@
 -- Code now reads/writes only the neutral columns below, through the payments
 -- layer in functions/api/_shared/payments/. See docs/PAYMENTS.md.
 --
--- The old stripe_* columns are left in place (not dropped) so any app build
--- already installed that still SELECTs them keeps working. Drop them in a
--- later migration once no supported client reads them.
+-- The old stripe_* columns are copied here and dropped by
+-- 20261010120000_drop_stripe_columns.sql.
 --
 -- Idempotent: safe to re-run.
 
@@ -21,13 +20,19 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS billing_subscription_id tex
 -- hijack or block that customer's subscription webhooks. Billing identity is
 -- server-only from now on: no GRANT UPDATE on the billing_* columns either
 -- (profiles had blanket UPDATE revoked in 002_crew_features.sql).
-REVOKE UPDATE (stripe_customer_id) ON public.profiles FROM authenticated;
-
-UPDATE public.profiles
-   SET billing_provider = 'stripe',
-       billing_customer_id = stripe_customer_id
- WHERE stripe_customer_id IS NOT NULL
-   AND billing_customer_id IS NULL;
+-- (Skipped when 20261010120000_drop_stripe_columns.sql already removed the column.)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'stripe_customer_id') THEN
+    EXECUTE 'REVOKE UPDATE (stripe_customer_id) ON public.profiles FROM authenticated';
+    EXECUTE 'UPDATE public.profiles
+                SET billing_provider = ''stripe'',
+                    billing_customer_id = stripe_customer_id
+              WHERE stripe_customer_id IS NOT NULL
+                AND billing_customer_id IS NULL';
+  END IF;
+END $$;
 
 -- Webhooks resolve profiles by (provider, customer id).
 CREATE INDEX IF NOT EXISTS profiles_billing_customer_idx
@@ -42,11 +47,17 @@ ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS provider_payment_id text;
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS payment_link_url text;
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS payment_link_amount_cents integer;
 
-UPDATE public.invoices
-   SET payment_provider = 'stripe',
-       provider_payment_id = stripe_payment_intent_id
- WHERE stripe_payment_intent_id IS NOT NULL
-   AND provider_payment_id IS NULL;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_schema = 'public' AND table_name = 'invoices' AND column_name = 'stripe_payment_intent_id') THEN
+    EXECUTE 'UPDATE public.invoices
+                SET payment_provider = ''stripe'',
+                    provider_payment_id = stripe_payment_intent_id
+              WHERE stripe_payment_intent_id IS NOT NULL
+                AND provider_payment_id IS NULL';
+  END IF;
+END $$;
 
 -- ---------------------------------------------------------------------------
 -- webhook_events: which provider an event id belongs to

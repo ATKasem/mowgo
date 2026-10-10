@@ -409,7 +409,7 @@ describe('updateCrewQuantity', () => {
   test('no-op for non-crew tiers, other providers, or no live provider', async () => {
     for (const profile of [
       { tier: 'solo', billing_provider: 'fake', billing_customer_id: 'cus_1' },
-      { tier: 'crew', billing_provider: 'stripe', billing_customer_id: 'cus_1' },
+      { tier: 'crew', billing_provider: 'other', billing_customer_id: 'cus_1' },
     ]) {
       fetchMock = mockFetch([rest('GET', 'profiles', () => [profile])]);
       await updateCrewQuantity(baseEnv, 'owner-1');

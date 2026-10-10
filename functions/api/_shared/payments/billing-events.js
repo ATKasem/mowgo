@@ -6,7 +6,7 @@
  * crew seats, referral rewards, win-back email, outbound 'payment.failed'
  * webhooks, and marking invoices paid.
  *
- * Ported from the former Stripe webhook. Idempotency: the caller dedups by
+ * Idempotency: the caller dedups by
  * event id AFTER this returns, so every step here must be safe to repeat.
  */
 

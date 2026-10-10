@@ -1,10 +1,13 @@
 /**
- * Picks the active payment provider from env.PAYMENTS_PROVIDER.
- * Returns null when none is set, the name is unknown, or the provider isn't
- * ready — callers treat null as "card payments unavailable" (HTTP 503).
+ * Picks the active payment provider: env.PAYMENTS_PROVIDER, defaulting to
+ * Rise Concepts. Returns null when the name is unknown or the provider isn't
+ * ready (not implemented, or credentials missing) — callers treat null as
+ * "card payments unavailable" (HTTP 503).
  */
 
 import { RiseProvider } from './providers/rise.js';
+
+const DEFAULT_PROVIDER = 'rise';
 
 const PROVIDERS = {
   rise: RiseProvider,
@@ -16,7 +19,7 @@ export function registerPaymentProvider(name, ProviderClass) {
 }
 
 export function getPaymentProvider(env) {
-  const name = String(env?.PAYMENTS_PROVIDER || '').trim().toLowerCase();
+  const name = String(env?.PAYMENTS_PROVIDER || DEFAULT_PROVIDER).trim().toLowerCase();
   const Provider = PROVIDERS[name];
   if (!Provider) return null;
   const provider = new Provider(env);

@@ -1,27 +1,41 @@
 /**
- * Rise Concepts payment provider — NOT IMPLEMENTED YET.
+ * Rise Concepts payment provider — MowGo's processor (Stripe has been
+ * removed). NOT IMPLEMENTED YET: every method needs Rise's API.
  *
- * Rise Concepts' processing appears to run on the MX Merchant platform
- * (Priority). Waiting on from Rise before this can be written:
- *   - API docs + sandbox credentials (confirm whether it's the MX Merchant API)
+ * Rise's processing runs on Priority's MX Merchant platform. From MX
+ * Merchant's public developer hub (developer.mxmerchant.com — unverified
+ * against a sandbox; confirm with Rise):
+ *   - "Checkout API" v3, REST, separate Sandbox and Production environments;
+ *     auth is HTTP Basic or OAuth 1.0a.
+ *   - Recurring billing = "contracts" (create / update / get / cancel, list a
+ *     contract's payments and history). Requires the Invoice App to be
+ *     activated in the merchant's MX Merchant portal.
+ *   - Notifications can be delivered to a webhook callback URL; "sources"
+ *     select which payment channels trigger them (API, QuickPay, Recurring).
+ *     The API sets up one event per notification. Public docs don't describe
+ *     webhook signing — ASK RISE how callbacks are authenticated; parseWebhook
+ *     must reject unauthenticated calls.
+ *
+ * Still needed from Rise before this can be written:
+ *   - API docs + sandbox credentials
  *   - Sub-merchant onboarding: each lawn business must be its own merchant so
  *     invoice payments settle to them, not to MowGo (merchant_accounts table)
- *   - Hosted payment page / payment links with success + cancel redirects
- *   - Signed webhooks for payment + recurring-billing events
- *   - Recurring billing API: create plan subscription, change quantity
- *     (crew seats), cancel, customer credit (referrals)
+ *   - Hosted payment page / payment links with success + cancel redirects,
+ *     and a way to cancel/expire a link
+ *   - Webhook authentication scheme + event payloads (payment + recurring)
+ *   - Contract quantity changes (crew seats) and customer credit (referrals)
  *
- * Until isReady() returns true the registry reports payments as unavailable,
- * so setting PAYMENTS_PROVIDER=rise early is harmless.
+ * Until isReady() returns true the registry reports payments as unavailable.
+ * Rise is the default provider (PAYMENTS_PROVIDER may be left unset).
  *
  * Env (Cloudflare Pages dashboard — never commit values):
- *   RISE_API_BASE_URL       e.g. sandbox vs production base URL
- *   RISE_API_KEY            API credential
- *   RISE_API_SECRET         API credential
+ *   RISE_API_BASE_URL       sandbox or production Checkout API base URL
+ *   RISE_API_KEY            API credential (Basic auth username / consumer key)
+ *   RISE_API_SECRET         API credential (Basic auth password / secret)
  *   RISE_PLATFORM_MERCHANT_ID  MowGo's own merchant id (subscriptions)
- *   RISE_WEBHOOK_SECRET     webhook signature secret
+ *   RISE_WEBHOOK_SECRET     whatever Rise uses to authenticate callbacks
  *   RISE_HOSTED_PAGE_HOSTS  comma-separated hosts hosted pages may live on
- *   RISE_PLAN_<PLAN>_<INTERVAL>  provider plan ids, e.g. RISE_PLAN_CREW_MONTH
+ *   RISE_PLAN_<PLAN>_<INTERVAL>  plan ids/amounts, e.g. RISE_PLAN_CREW_MONTH
  */
 
 import { ProviderNotImplementedError } from '../errors.js';
