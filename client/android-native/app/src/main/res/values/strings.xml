@@ -406,4 +406,15 @@
     <string name="referral_converted">Converted</string>
     <string name="referral_rewards">Free months</string>
     <string name="invoices_payment_page_open_failed">Could not open the payment page.</string>
+    <!-- Card payments setup (merchant onboarding) -->
+    <string name="card_payments_title">Card Payments</string>
+    <string name="card_payments_coming_soon">Card payments are coming soon. Zelle, Venmo and Cash App requests work today.</string>
+    <string name="card_payments_active">Card payments are active. Customers can pay invoices by card.</string>
+    <string name="card_payments_pending">Your application is being reviewed. You can finish any remaining steps.</string>
+    <string name="card_payments_restricted">More information is needed before you can accept cards.</string>
+    <string name="card_payments_disabled">Card payments are turned off for your account. Contact support.</string>
+    <string name="card_payments_setup_description">Let customers pay invoices by card. Payments go straight to your business.</string>
+    <string name="card_payments_continue_setup">Continue setup</string>
+    <string name="card_payments_finish_setup">Finish setup</string>
+    <string name="card_payments_set_up">Set up card payments</string>
 </resources>

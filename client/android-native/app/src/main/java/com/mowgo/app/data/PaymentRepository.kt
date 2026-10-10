@@ -1,6 +1,7 @@
 package com.mowgo.app.data
 
 import com.mowgo.app.data.auth.AuthRepository
+import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -11,6 +12,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import java.net.URI
+
+/** Which card flows are live (false until a payment provider is implemented). */
+data class PaymentsConfig(val subscriptions: Boolean, val invoicePayments: Boolean)
 
 /** No payment provider is live yet (server answered `payments_unavailable`). */
 class PaymentsComingSoonException : IllegalStateException("Card payments are coming soon.")
@@ -51,6 +55,40 @@ class PaymentRepository(
     suspend fun createCustomerPortal(): String {
         val response = post("billing-portal", PLATFORM_JSON)
         return httpsUrl(decode<UrlResponse>(response).url)
+    }
+
+    /** Public: whether card payments are live. Any failure reads as "not available". */
+    suspend fun paymentsConfig(): PaymentsConfig = withContext(Dispatchers.IO) {
+        runCatching {
+            val request = Request.Builder().url("${PAYMENTS_BASE_URL}config").get().build()
+            httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@use PaymentsConfig(false, false)
+                val body = json.decodeFromString(ConfigResponse.serializer(), response.body?.string().orEmpty())
+                PaymentsConfig(body.subscriptions, body.invoicePayments)
+            }
+        }.getOrDefault(PaymentsConfig(false, false))
+    }
+
+    /**
+     * Hosted page where the business applies for / finishes its own merchant
+     * account, so invoice card payments settle to the business.
+     */
+    suspend fun merchantOnboardingUrl(): String {
+        val response = post("merchant-onboarding", PLATFORM_JSON)
+        return httpsUrl(decode<UrlResponse>(response).url)
+    }
+
+    /**
+     * "none", "pending", "active", "restricted" or "disabled". Read straight
+     * from merchant_accounts (RLS: own row only); the provider webhook keeps it
+     * current.
+     */
+    suspend fun merchantStatus(): String {
+        val userId = SupabaseClientProvider.auth.currentSessionOrNull()?.user?.id ?: return "none"
+        val rows = SupabaseClientProvider.client.from("merchant_accounts").select {
+            filter { eq("user_id", userId) }
+        }.decodeList<MerchantRow>()
+        return rows.firstOrNull()?.status ?: "none"
     }
 
     suspend fun cancelSubscription() {
@@ -118,6 +156,8 @@ class PaymentRepository(
     )
 
     @Serializable private data class UrlResponse(val url: String = "")
+    @Serializable private data class ConfigResponse(val subscriptions: Boolean = false, val invoicePayments: Boolean = false)
+    @Serializable private data class MerchantRow(val status: String = "none")
     @Serializable private data class SuccessResponse(val success: Boolean = false)
     @Serializable private data class ErrorResponse(val error: String? = null, val code: String? = null)
 

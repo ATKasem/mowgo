@@ -8,6 +8,7 @@ import { ArrowUpRight, CheckCircle2 } from 'lucide-react';
 const DEEP_LINKS = {
   upgraded: 'mowgo://settings?upgraded=true',
   portal: 'mowgo://settings?portal_returned=true',
+  merchant: 'mowgo://settings?merchant_returned=true',
   canceled: 'mowgo://settings',
 };
 

@@ -14,6 +14,7 @@ import QuickBooksConnect from '../components/QuickBooksConnect';
 import ConciergeSetup from '../components/ConciergeSetup';
 import ConciergeStatus from '../components/ConciergeStatus';
 import TrialBanner from '../components/TrialBanner';
+import CardPaymentsSetup from '../components/CardPaymentsSetup';
 import { isActiveConciergeRequest } from '../lib/concierge-request';
 import { createLocationGeocoder, LocationGeocodeCanceledError, LocationGeocodeError, persistProfileWithResolvedLocation } from '../lib/location-geocoder';
 
@@ -542,6 +543,8 @@ export default function Settings() {
             </button>
           )}
         </div>
+
+        {!isDemoMode() && profile && profile.role !== 'crew' && <CardPaymentsSetup />}
 
         <SectionHeader>{tr("Preferences")}</SectionHeader>
 

@@ -137,6 +137,37 @@ export async function resumeCheckoutIntent() {
   }
 }
 
+/** The signed-in owner's merchant status for card payments, or 'none'. */
+export async function getMerchantStatus() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 'none';
+  // RLS: owners can read only their own row.
+  const { data, error } = await supabase
+    .from('merchant_accounts')
+    .select('status')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.status || 'none';
+}
+
+/** Redirect to the payment provider's hosted merchant application. */
+export async function startMerchantOnboarding() {
+  try {
+    const { status, data } = await postPayments('merchant-onboarding');
+    if (status === 401) return { error: 'Please log in again.' };
+    if (data.code === 'payments_unavailable') return { error: PAYMENTS_COMING_SOON, unavailable: true };
+    if (data.url) {
+      window.location.href = data.url;
+      return { success: true };
+    }
+    return { error: data.error || 'Unable to start card payment setup.' };
+  } catch (err) {
+    console.error('Merchant onboarding error:', err);
+    return { error: 'Connection failed. Check your internet and try again.' };
+  }
+}
+
 export async function openCustomerPortal() {
   try {
     const { status, data } = await postPayments('billing-portal');

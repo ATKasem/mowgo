@@ -1013,6 +1013,9 @@ private struct BillingSettingsView: View {
                 if let errorMessage {
                     Text(errorMessage).font(.caption).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading)
                 }
+
+                // Owner-only; hides itself for crew and demo mode.
+                CardPaymentsSetupCard()
             }
             .padding(16)
         }

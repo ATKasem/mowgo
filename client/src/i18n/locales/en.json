@@ -1101,7 +1101,20 @@
     "last_synced": "Last synced",
     "never": "Never",
     "fired_when_a_subscription_payment_fails": "Fired when a subscription payment fails",
-    "card_payments_are_coming_soon": "Card payments are coming soon."
+    "card_payments_are_coming_soon": "Card payments are coming soon.",
+    "card_payments": "Card Payments",
+    "card_payments_are_coming_soon_zelle_venmo_and_cash_app_requests_work_tod": "Card payments are coming soon. Zelle, Venmo and Cash App requests work today.",
+    "card_payments_are_active_customers_can_pay_invoices_by_card": "Card payments are active. Customers can pay invoices by card.",
+    "your_application_is_being_reviewed_you_can_finish_any_remaining_steps": "Your application is being reviewed. You can finish any remaining steps.",
+    "continue_setup": "Continue setup",
+    "more_information_is_needed_before_you_can_accept_cards": "More information is needed before you can accept cards.",
+    "finish_setup": "Finish setup",
+    "card_payments_are_turned_off_for_your_account_contact_support": "Card payments are turned off for your account. Contact support.",
+    "let_customers_pay_invoices_by_card_payments_go_straight_to_your_business": "Let customers pay invoices by card. Payments go straight to your business.",
+    "set_up_card_payments": "Set up card payments",
+    "could_not_load_card_payment_status": "Could not load card payment status.",
+    "unable_to_start_card_payment_setup": "Unable to start card payment setup.",
+    "please_log_in_again": "Please log in again."
   },
   "subscribe": {
     "premium": "Premium",

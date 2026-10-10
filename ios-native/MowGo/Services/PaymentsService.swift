@@ -55,6 +55,21 @@ final class PaymentsService: ObservableObject {
         try await hostedURL(from: post("billing-portal", body: ["platform": "ios"]))
     }
 
+    /// Hosted page where the business applies for / finishes its own
+    /// merchant account (invoice card payments settle to the business).
+    func merchantOnboardingURL() async throws -> URL {
+        try await hostedURL(from: post("merchant-onboarding", body: ["platform": "ios"]))
+    }
+
+    /// The owner's merchant status: "none", "pending", "active",
+    /// "restricted" or "disabled". Read straight from merchant_accounts
+    /// (RLS: own row, read-only); the provider webhook keeps it current.
+    func merchantStatus() async throws -> String {
+        struct Row: Decodable { let status: String }
+        let rows: [Row] = try await sb.fetch("merchant_accounts")
+        return rows.first?.status ?? "none"
+    }
+
     func cancelSubscription() async throws {
         let json = try await post("cancel-subscription", body: [:])
         guard json["success"] as? Bool == true else {
