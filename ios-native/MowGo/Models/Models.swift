@@ -667,11 +667,9 @@ final class InvoiceCache {
     var jobId: UUID?
     var amount: Double
     var status: String          // "unpaid" or "paid"
-    // Legacy attribute names kept so the on-disk SwiftData schema doesn't
-    // change (no migration). stripePaymentIntentId now holds the
-    // provider-neutral payment id; stripeInvoiceId is unused.
-    var stripeInvoiceId: String?
-    var stripePaymentIntentId: String?
+    // originalName maps the old on-disk attribute, so SwiftData migrates the
+    // store in place (the old stripeInvoiceId attribute is simply dropped).
+    @Attribute(originalName: "stripePaymentIntentId") var providerPaymentId: String?
     var sentAt: String?
     var paidAt: String?
     var createdAt: String?
@@ -685,8 +683,7 @@ final class InvoiceCache {
         self.jobId = invoice.jobId
         self.amount = NSDecimalNumber(decimal: invoice.amount).doubleValue
         self.status = invoice.status.rawValue
-        self.stripeInvoiceId = nil
-        self.stripePaymentIntentId = invoice.providerPaymentId
+        self.providerPaymentId = invoice.providerPaymentId
         self.sentAt = invoice.sentAt
         self.paidAt = invoice.paidAt
         self.createdAt = invoice.createdAt
