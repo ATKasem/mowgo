@@ -42,6 +42,3 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
-# Stripe PaymentSheet — keep result types (crash defense, Invoices screen)
--keep class com.stripe.android.paymentsheet.PaymentSheetResult** { *; }
--keep class com.stripe.android.paymentsheet.PaymentSheet$Builder** { *; }

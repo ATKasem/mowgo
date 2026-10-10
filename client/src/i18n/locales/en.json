@@ -225,6 +225,7 @@
     "hmndp_operator_pricing_research_opens_in_new_tab": "HMNDP operator pricing research (opens in new tab)"
   },
   "compare": {
+    "0": "$0",
     "compare_mowgo_plans": "Compare MowGo plans",
     "premium": "Premium",
     "39_mo": "$39/mo",
@@ -248,12 +249,10 @@
     "job_assignment_tracking": "Job assignment & tracking",
     "team_progress_dashboard": "Team progress dashboard",
     "per_user_fees": "Per-User Fees",
-    "0": "$0",
     "jobber_29_user": "Jobber +$29/user",
     "every_extra_crew_member_costs_nothing_on_mowgo": "Every extra crew member costs nothing on MowGo",
     "platform_fees": "Platform Fees",
     "quoteiq_1_surcharge": "QuoteIQ +1% surcharge",
-    "no_transaction_fees_beyond_stripe_s_cut": "No transaction fees beyond Stripe's cut",
     "crew_scaling": "Crew Scaling",
     "unlimited": "Unlimited",
     "hcp_35_user_past_8": "HCP +$35/user past 8",
@@ -283,7 +282,6 @@
     "app_store_google_play_not_just_pwa": "App Store + Google Play (not just PWA)",
     "no_data_selling": "No Data Selling",
     "your_customer_data_stays_yours": "Your customer data stays yours",
-    "stripe_payments": "Stripe Payments",
     "accept_cards_online": "Accept cards online",
     "gps_navigation": "GPS Navigation",
     "tap_to_navigate_to_client": "Tap to navigate to client",
@@ -301,7 +299,7 @@
     "only_app_with_rain_delay": "Only app with rain delay",
     "rain_tomorrow_one_tap_moves_your_whole_day_no_competitor_has_this_not_qu": "Rain tomorrow? One tap moves your whole day. No competitor has this — not QuoteIQ, not Jobber, not anyone.",
     "no_platform_fees": "No platform fees",
-    "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — Stripe takes their cut, that's it.",
+    "quoteiq_charges_1_on_every_transaction_on_top_of_stripe_we_don_t_touch_y": "QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — the card processor takes their cut, that's it.",
     "your_data_is_yours": "Your data is yours",
     "feature_comparison": "Feature comparison",
     "feature_comparison_between_mowgo_and_7_competitors_including_pricing_and": "Feature comparison between MowGo and 9 competitors including pricing and availability of 14 key features",
@@ -361,7 +359,8 @@
     "route_optimization": "Route Optimization",
     "one_tap_optimized_routes_send_stops_to_your_maps_app": "One-tap optimized routes + send stops to your maps app",
     "start_free_trial": "Start Free Trial",
-    "billing_interval": "Billing interval"
+    "billing_interval": "Billing interval",
+    "no_transaction_fees_beyond_the_card_processor_s_cut": "No transaction fees beyond the card processor's cut"
   },
   "ruunlyComparison": {
     "route_optimization": "Route Optimization",
@@ -646,7 +645,6 @@
     "built_for_lawn_crews": "Fields You Actually Use",
     "gate_codes_pet_instructions_mow_height_bermuda_vs_fescue_notes_the_field": "Gate codes, pet instructions, mow height, Bermuda vs fescue — the fields crews actually use every day. Not a generic CRM.",
     "one_tap_invoicing": "One Tap, One Invoice, Done",
-    "mark_a_job_complete_invoice_sends_automatically_client_pays_via_stripe_l": "Mark a job complete. Invoice created. One tap copies a payment text to the client. No processing fees. Venmo, Zelle, or Cash App.",
     "works_offline": "Works Where Cell Doesn't",
     "spotty_cell_service_in_rural_oklahoma_mowgo_keeps_working_without_intern": "Dead zone? MowGo keeps working without internet. Syncs when you're back in range. No missed jobs, no paperwork pile-up.",
     "built_in_okc_not_silicon_valley": "Built in OKC, Not Silicon Valley",
@@ -694,7 +692,6 @@
     "start_free_upgrade_when_you_are_ready_cancel_anytime": "Start free. Upgrade when you are ready. Cancel anytime.",
     "14_day_free_trial_on_paid_plans_no_setup_fees_no_contracts": "14-day free trial on paid plans. No setup fees. No contracts.",
     "most_popular": "Most Popular",
-    "coming_soon_stripe_payments_multi_user_crew_access_and_route_optimizatio": "Stripe payments are live. Route optimization ships next — early adopters get new features at no price increase.",
     "built_in_okc_used_by_oklahoma_crews": "Built in OKC. Used by real crews.",
     "free_for_5_clients_no_credit_card_2_minutes": "Free for 5 clients. No credit card. 2 minutes.",
     "available_on_iphone_android_and_desktop": "Available on iPhone, Android, and desktop.",
@@ -718,7 +715,6 @@
     "free_launch_kit_278_value_included_with_solo": "Free Launch Kit — $278 value, included with Solo",
     "the_rain_proof_guarantee": "The Rain-Proof Guarantee",
     "applies_to_solo_and_crew_no_setup_fees_no_contracts_cancel_anytime": "Applies to Solo. No setup fees. No contracts. Cancel anytime.",
-    "stripe_payments_are_live_route_optimization_ships_next_oklahoma_early_ad": "Stripe payments are live. Route optimization ships next — early adopters get new features at no price increase.",
     "card_checkout_is_live_route_optimization_ships_next_oklahoma_early_adopt": "Card checkout is live. Route optimization ships next — early adopters get new features at no price increase.",
     "rain_on_tuesday_eight_clients_to_rebook": "Rain on Tuesday. Eight clients to rebook.",
     "one_tap_fixes_it": "One tap fixes it.",
@@ -849,12 +845,10 @@
     "usage_data": "Usage data:",
     "2_how_we_use_your_data": "2. How We Use Your Data",
     "to_provide_and_maintain_the_mowgo_service": "To provide and maintain the MowGo service",
-    "to_process_payments_via_stripe_we_never_store_your_full_payment_details": "To process payments via Stripe (we never store your full payment details)",
     "to_send_service_related_communications_appointment_reminders_invoices": "To send service-related communications (appointment reminders, invoices)",
     "to_improve_and_personalize_the_app_experience": "To improve and personalize the app experience",
     "3_data_sharing": "3. Data Sharing",
     "we_do_not_sell_your_data_we_share_data_only_with": "We do not sell your data. We share data only with:",
-    "stripe": "Stripe",
     "supabase": "Supabase",
     "law_enforcement": "Law enforcement",
     "4_your_rights": "4. Your Rights",
@@ -872,7 +866,9 @@
     "our_database_provider_your_data_is_encrypted_at_rest": "our database provider (your data is encrypted at rest)",
     "only_when_required_by_valid_legal_process": "only when required by valid legal process",
     "privacy_policy_mowgo": "Privacy Policy — MowGo",
-    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "MowGo privacy policy. Your data stays yours — no ads, no selling, no funny business."
+    "mowgo_privacy_policy_your_data_stays_yours_no_ads_no_selling_no_funny_bu": "MowGo privacy policy. Your data stays yours — no ads, no selling, no funny business.",
+    "to_process_card_payments_through_our_payment_processor_we_never_store_yo": "To process card payments through our payment processor (we never store your full payment details)",
+    "our_payment_processor": "Our payment processor"
   },
   "quoteIQAlternative": {
     "rain_delay_auto_reschedule": "Rain delay auto-reschedule",
@@ -925,7 +921,6 @@
     "with_5_clients_on_the_forever_free_plan_no_credit_card_no_catch": "— with 5 clients on the forever-free plan. No credit card, no catch.",
     "august_2026_update": "August 2026 Update",
     "check_these_five_things_before_you_move_your_clients_and_schedule_to_ano": "Check these five things before you move your clients and schedule to another app:",
-    "no_platform_fee_stripe_s_cut_only": "No platform fee — Stripe’s cut only",
     "seo_title": "QuoteIQ Alternative for Lawn Care — Free Plan, 5 Clients",
     "seo_description": "QuoteIQ discontinued its free plan in July 2026. MowGo gives lawn care crews a free option: 5 clients forever, no credit card.",
     "149_99_vs_39_side_by_side": "$149.99 vs $39. Side by side.",
@@ -936,7 +931,6 @@
     "flat_fee": "Flat fee",
     "per_user_pricing": "Per-user pricing",
     "platform_fee": "Platform fee",
-    "stripe_only_0_extra": "Stripe only ($0 extra)",
     "stripe_1_surcharge": "Stripe + 1% surcharge",
     "rain_delay": "Rain delay",
     "one_tap_auto_reschedule": "One-tap auto-reschedule",
@@ -948,7 +942,9 @@
     "shared_with_platform": "Shared with platform",
     "dark_mode": "Dark mode",
     "built_in": "Built in",
-    "quoteiq_pro_costs_3_8_more_than_mowgo_solo_at_that_price_it_still_doesn": "QuoteIQ Pro costs 3.8× more than MowGo Solo. At that price it still doesn't include dark mode, offline mode, or client self-booking — three features that come with every MowGo plan."
+    "quoteiq_pro_costs_3_8_more_than_mowgo_solo_at_that_price_it_still_doesn": "QuoteIQ Pro costs 3.8× more than MowGo Solo. At that price it still doesn't include dark mode, offline mode, or client self-booking — three features that come with every MowGo plan.",
+    "card_processor_only_0_extra": "Card processor only ($0 extra)",
+    "no_platform_fee_card_processor_s_cut_only": "No platform fee — card processor’s cut only"
   },
   "resetPassword": {
     "passwords_do_not_match": "Passwords do not match.",
@@ -1076,7 +1072,6 @@
     "customer_created": "Customer Created",
     "fired_when_a_new_client_is_added": "Fired when a new client is added",
     "payment_failed": "Payment Failed",
-    "fired_when_a_stripe_payment_fails": "Fired when a Stripe payment fails",
     "rain_delay_applied": "Rain Delay Applied",
     "fired_when_jobs_are_rescheduled_due_to_rain": "Fired when jobs are rescheduled due to rain",
     "booking_link": "Booking Link",
@@ -1104,7 +1099,22 @@
     "quickbooks_sync_error": "Sync failed: {error}",
     "auto_sync_invoices": "Auto-sync invoices",
     "last_synced": "Last synced",
-    "never": "Never"
+    "never": "Never",
+    "fired_when_a_subscription_payment_fails": "Fired when a subscription payment fails",
+    "card_payments_are_coming_soon": "Card payments are coming soon.",
+    "card_payments": "Card Payments",
+    "card_payments_are_coming_soon_zelle_venmo_and_cash_app_requests_work_tod": "Card payments are coming soon. Zelle, Venmo and Cash App requests work today.",
+    "card_payments_are_active_customers_can_pay_invoices_by_card": "Card payments are active. Customers can pay invoices by card.",
+    "your_application_is_being_reviewed_you_can_finish_any_remaining_steps": "Your application is being reviewed. You can finish any remaining steps.",
+    "continue_setup": "Continue setup",
+    "more_information_is_needed_before_you_can_accept_cards": "More information is needed before you can accept cards.",
+    "finish_setup": "Finish setup",
+    "card_payments_are_turned_off_for_your_account_contact_support": "Card payments are turned off for your account. Contact support.",
+    "let_customers_pay_invoices_by_card_payments_go_straight_to_your_business": "Let customers pay invoices by card. Payments go straight to your business.",
+    "set_up_card_payments": "Set up card payments",
+    "could_not_load_card_payment_status": "Could not load card payment status.",
+    "unable_to_start_card_payment_setup": "Unable to start card payment setup.",
+    "please_log_in_again": "Please log in again."
   },
   "subscribe": {
     "premium": "Premium",
@@ -1148,7 +1158,12 @@
     "give_this_code_to_one_crew_you_know": "Give this code to one crew you know:",
     "copy": "Copy",
     "copied": "Copied!",
-    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "They get a free trial, you get a free month when they subscribe."
+    "they_get_a_free_trial_you_get_a_free_month_when_they_subscribe": "They get a free trial, you get a free month when they subscribe.",
+    "almost_done": "Almost done",
+    "your_payment_is_still_processing_your_plan_usually_updates_within_a_few_": "Your payment is still processing. Your plan usually updates within a few minutes.",
+    "check_again": "Check Again",
+    "go_to_app": "Go to App",
+    "card_payments_are_coming_soon": "Card payments are coming soon."
   },
   "switchingFromLawnPro": {
     "data_loss_reports": "Data Loss Reports",
@@ -1825,5 +1840,11 @@
     "your_trial_ended": "Your trial ended",
     "your_clients_are_safe_subscribe_to_keep_scheduling_beyond_5": "Your clients are safe — subscribe to keep scheduling beyond 5.",
     "subscribe": "Subscribe"
+  },
+  "paymentComplete": {
+    "payment_not_completed": "Payment not completed",
+    "thank_you": "Thank you!",
+    "no_charge_was_made_you_can_use_the_same_payment_link_again_whenever_you_": "No charge was made. You can use the same payment link again whenever you’re ready.",
+    "your_payment_was_received_you_can_close_this_page": "Your payment was received. You can close this page."
   }
 }

@@ -131,7 +131,10 @@ struct RainDelayHistoryView: View {
         Task<Void, Never> {
             defer { isUndoing = false }
             do { try await store.undoRainDelay(entry) }
-            catch let caught { error = caught.localizedDescription }
+            catch let caught {
+                error = caught.localizedDescription
+                store.errorWasPresented(caught)
+            }
         }
     }
 }

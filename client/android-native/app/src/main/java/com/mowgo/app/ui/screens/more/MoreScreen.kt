@@ -24,6 +24,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import com.mowgo.app.data.SupabaseClientProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -92,6 +95,8 @@ fun MoreScreen(
             cancelSubscription = viewModel::cancelSubscription,
             billingUrlHandled = viewModel::billingUrlHandled,
             billingUrlFailed = viewModel::billingUrlFailed,
+            loadCardPayments = viewModel::loadCardPayments,
+            startMerchantOnboarding = viewModel::startMerchantOnboarding,
         )
         MoreDestination.INTEGRATIONS -> IntegrationsScreen(back = { destination = MoreDestination.ROOT })
         MoreDestination.REFERRALS -> ReferralScreen(state, { destination = MoreDestination.ROOT }, viewModel::loadReferrals)
@@ -447,8 +452,12 @@ private fun BillingSettingsScreen(
     cancelSubscription: () -> Unit,
     billingUrlHandled: () -> Unit,
     billingUrlFailed: () -> Unit,
+    loadCardPayments: () -> Unit,
+    startMerchantOnboarding: () -> Unit,
 ) {
     val context = LocalContext.current
+    // Merchant status changes on the provider's site; refresh on return.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { loadCardPayments() }
     val tier = state.profile?.tier?.lowercase() ?: "free"
     val billingInterval = state.billingInterval
     val description = when (tier) {
@@ -681,6 +690,71 @@ private fun BillingSettingsScreen(
         state.billingMessage?.let {
             Text(it, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
         }
+
+        // Owner-only (role defaults to owner; crew is explicit). Hidden in demo mode.
+        if (SupabaseClientProvider.isConfigured && state.profile?.role != "crew") {
+            CardPaymentsSetupCard(
+                enabled = state.cardPaymentsEnabled,
+                status = state.merchantStatus,
+                loading = state.billingLoadingAction == "merchant",
+                actionsEnabled = state.billingLoadingAction == null,
+                start = startMerchantOnboarding,
+            )
+        }
+    }
+}
+
+/** Set up the business's own merchant account so customers can pay invoices by card. */
+@Composable
+private fun CardPaymentsSetupCard(
+    enabled: Boolean,
+    status: String?,
+    loading: Boolean,
+    actionsEnabled: Boolean,
+    start: () -> Unit,
+) {
+    val description = when {
+        status == null -> null
+        !enabled -> stringResource(R.string.card_payments_coming_soon)
+        status == "active" -> stringResource(R.string.card_payments_active)
+        status == "pending" -> stringResource(R.string.card_payments_pending)
+        status == "restricted" -> stringResource(R.string.card_payments_restricted)
+        status == "disabled" -> stringResource(R.string.card_payments_disabled)
+        else -> stringResource(R.string.card_payments_setup_description)
+    }
+    val action = when {
+        !enabled || status == null -> null
+        status == "pending" -> stringResource(R.string.card_payments_continue_setup)
+        status == "restricted" -> stringResource(R.string.card_payments_finish_setup)
+        status == "active" || status == "disabled" -> null
+        else -> stringResource(R.string.card_payments_set_up)
+    }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CreditCard, null, tint = MaterialTheme.colorScheme.primary)
+                Spacer(Modifier.width(12.dp))
+                Text(stringResource(R.string.card_payments_title), fontWeight = FontWeight.Medium)
+            }
+            if (description == null) {
+                CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+            } else {
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (enabled && status == "active") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (action != null) {
+                OutlinedButton(onClick = start, enabled = actionsEnabled, modifier = Modifier.fillMaxWidth()) {
+                    if (loading) {
+                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(action)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -756,7 +830,7 @@ private fun BillingPlanCard(
             if (canUpgrade) {
                 // Trial-first no-card flow: a FREE user without an active trial
                 // starts the 14-day trial (no card). Users in/after a trial go
-                // straight to checkout (Stripe trial skipped — see edge function).
+                // straight to checkout (no second trial — see subscription-checkout.js).
                 val isTrialStart = currentTier == "free" && !hasUsedTrial && !trialJustGranted
                 val action = if (isTrialStart) "trial:$tier" else "checkout:$tier"
                 Button(

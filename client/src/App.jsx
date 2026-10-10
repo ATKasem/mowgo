@@ -38,6 +38,7 @@ const NoPerUserFees = lazy(() => import('./pages/NoPerUserFees'));
 const BestForSmallCrews = lazy(() => import('./pages/BestForSmallCrews'));
 const Booking = lazy(() => import('./pages/Booking'));
 const PortalReturn = lazy(() => import('./pages/PortalReturn'));
+const PaymentComplete = lazy(() => import('./pages/PaymentComplete'));
 const AdminConcierge = lazy(() => import('./pages/AdminConcierge'));
 const RouteAudit = lazy(() => import('./pages/RouteAudit'));
 const Rates = lazy(() => import('./pages/Rates'));
@@ -347,6 +348,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/portal-return" element={<PortalReturn />} />
+          <Route path="/payment-complete" element={<PaymentComplete />} />
           <Route path="/admin/concierge" element={<AdminConcierge />} />
 
           {/* Protected */}

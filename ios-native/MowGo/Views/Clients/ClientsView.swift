@@ -342,7 +342,10 @@ struct ClientsView: View {
     private func updateStatus(_ lead: Lead, status: LeadStatus) {
         Task<Void, Never> {
             do { try await store.updateLeadStatus(lead.id, status: status) }
-            catch { operationError = error.localizedDescription }
+            catch {
+                operationError = error.localizedDescription
+                store.errorWasPresented(error)
+            }
         }
     }
 
@@ -351,14 +354,20 @@ struct ClientsView: View {
             do {
                 try await store.convertLeadToClient(lead)
                 selectedSegment = 0
-            } catch { operationError = error.localizedDescription }
+            } catch {
+                operationError = error.localizedDescription
+                store.errorWasPresented(error)
+            }
         }
     }
 
     private func deleteLead(_ lead: Lead) {
         Task<Void, Never> {
             do { try await store.deleteLead(lead.id) }
-            catch { operationError = error.localizedDescription }
+            catch {
+                operationError = error.localizedDescription
+                store.errorWasPresented(error)
+            }
         }
     }
 }

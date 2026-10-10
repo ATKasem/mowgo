@@ -26,7 +26,6 @@
         "npm:@capacitor/ios@^8.4.2",
         "npm:@capacitor/splash-screen@^8.0.2",
         "npm:@capacitor/status-bar@^8.0.3",
-        "npm:@stripe/stripe-js@^2.4.0",
         "npm:@supabase/supabase-js@^2.110.8",
         "npm:@tailwindcss/vite@^4.3.3",
         "npm:@types/react-dom@^19.2.3",

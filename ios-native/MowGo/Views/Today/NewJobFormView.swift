@@ -146,6 +146,8 @@ struct NewJobFormView: View {
             return
         }
         let jobTitle = clientName
+        let trimmedNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        let jobNotes = trimmedNotes.isEmpty ? nil : trimmedNotes
 
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
@@ -161,7 +163,7 @@ struct NewJobFormView: View {
             scheduledTime: timeFmt.string(from: scheduledTime),
             durationMinutes: duration,
             status: .scheduled,
-            notes: notes.isEmpty ? nil : notes,
+            notes: jobNotes,
             routeOrder: (store.jobs
                 .filter { $0.scheduledDate == date }
                 .map { $0.routeOrder ?? -1 }
@@ -184,7 +186,7 @@ struct NewJobFormView: View {
                         scheduledTime: timeFmt.string(from: scheduledTime),
                         durationMinutes: duration,
                         assignedTo: assignedTo,
-                        notes: notes.isEmpty ? nil : notes,
+                        notes: jobNotes,
                         frequency: freq,
                         daysOfWeek: Array(selectedDays).sorted(),
                         isActive: true,
@@ -202,6 +204,7 @@ struct NewJobFormView: View {
                 dismiss()
             } catch {
                 self.error = error.localizedDescription
+                store.errorWasPresented(error)
                 isSaving = false
             }
         }

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Probe MowGo Stripe endpoints for the functions-live check (expect 401 JSON)."""
+"""Probe MowGo payment endpoints for the functions-live check.
+
+Expect: config → 200 JSON; the others → 401 JSON for anonymous calls.
+(File name kept so existing ops jobs that run it keep working.)
+"""
 import json
 import urllib.request
 import urllib.error
@@ -30,9 +34,10 @@ def probe(method, path, body=None):
 
 def main():
     cases = [
-        ("checkout-subscription", "POST", "/api/stripe/checkout-subscription", {}),
-        ("verify-session", "GET", "/api/stripe/verify-session?session_id=cs_test_dummy", None),
-        ("create-portal-session", "POST", "/api/stripe/create-portal-session", {}),
+        ("payments-config", "GET", "/api/payments/config", None),
+        ("subscription-checkout", "POST", "/api/payments/subscription-checkout", {}),
+        ("billing-portal", "POST", "/api/payments/billing-portal", {}),
+        ("invoice-link", "POST", "/api/payments/invoice-link", {}),
         ("root", "GET", "/", None),
     ]
     for name, method, path, body in cases:

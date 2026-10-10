@@ -17,7 +17,6 @@
     "express-rate-limit": "^8.6.0",
     "helmet": "^8.3.0",
     "resend": "^6.18.0",
-    "stripe": "^22.3.2",
     "twilio": "^6.0.2"
   }
 }

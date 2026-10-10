@@ -13,7 +13,7 @@ const AVAILABLE_EVENTS = [
   { key: 'clients.imported',   label: 'Clients Imported',    desc: 'Fired when clients are imported from another platform (e.g. Yardbook)' },
   { key: 'lead.created',       label: 'Lead Created',         desc: 'Fired when a new lead is captured' },
   { key: 'lead.status.updated', label: 'Lead Status Updated', desc: 'Fired when a lead moves through the pipeline' },
-  { key: 'payment.failed',     label: 'Payment Failed',      desc: 'Fired when a Stripe payment fails' },
+  { key: 'payment.failed',     label: 'Payment Failed',      desc: 'Fired when a subscription payment fails' },
   { key: 'rain.delay.applied', label: 'Rain Delay Applied',  desc: 'Fired when jobs are rescheduled due to rain' },
 ];
 

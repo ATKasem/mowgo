@@ -36,14 +36,15 @@ class IOSReviewFixTests(unittest.TestCase):
 
         self.assertIn("struct ClientUpdate: Encodable", data_store)
         self.assertIn("struct JobStatusPatch: Encodable", data_store)
-        self.assertIn("struct JobSchedulePatch: Encodable", data_store)
+        # Codable: rain-delay undo also decodes it.
+        self.assertRegex(data_store, re.compile(r"struct JobSchedulePatch: (Encodable|Codable)"))
         self.assertIn("struct InvoicePaidPatch: Encodable", data_store)
         self.assertIn('sb.update("clients", id: client.id, ClientUpdate(', data_store)
         self.assertIn('sb.update("jobs", id: job.id, JobStatusPatch(', data_store)
         self.assertIn('sb.update("jobs", id: job.id, JobSchedulePatch(', data_store)
         self.assertIn('sb.update("invoices", id: invoice.id, InvoicePaidPatch(', data_store)
         client_update = data_store.split("private struct ClientUpdate:", 1)[1].split(
-            "private struct JobInsert:", 1
+            "private struct ", 1
         )[0]
         self.assertNotIn("userId", client_update)
         self.assertNotIn("createdAt", client_update)
@@ -97,57 +98,42 @@ class IOSReviewFixTests(unittest.TestCase):
         )
         self.assertNotIn("try? await refreshAccessToken()", service)
         self.assertNotIn("isRetry: Bool", service)
+        # Only permanent (401/403/auth) refresh failures sign the user out;
+        # transient ones (offline) keep the session. Both paths rethrow.
         self.assertGreaterEqual(
-            len(re.findall(r"await signOut\(\)\s+throw error", service)),
+            len(re.findall(
+                r"if isPermanentRefreshFailure\(error\) \{\s+await signOut\(\)\s+\}\s+throw error",
+                service,
+            )),
             2,
         )
 
-    def test_payment_intent_creation_has_a_single_flight_guard(self) -> None:
-        stripe = source("Services/StripeService.swift")
+    def test_payment_requests_have_a_single_flight_guard(self) -> None:
+        payments = source("Services/PaymentsService.swift")
         payment = source("Views/Payments/PaymentView.swift")
 
-        create_intent = stripe.split("func createPaymentIntent", 1)[1]
-        create_intent = create_intent.split("// MARK: - Confirm payment", 1)[0]
-        self.assertIn("guard !isLoading else", create_intent)
-        self.assertIn("isLoading = true", create_intent)
-        self.assertIn("defer { isLoading = false }", create_intent)
-        self.assertIn("case operationInProgress", stripe)
-        self.assertIn("@ObservedObject private var stripe", payment)
+        post = payments.split("private func post(", 1)[1].split("private func hostedURL", 1)[0]
+        self.assertIn("guard !isLoading else", post)
+        self.assertIn("isLoading = true", post)
+        self.assertIn("defer { isLoading = false }", post)
+        self.assertIn("case operationInProgress", payments)
+        self.assertIn("@ObservedObject private var payments", payment)
 
-    def test_payment_edge_functions_are_idempotent_and_fail_closed(self) -> None:
-        edge_root = ROOT.parent / "edge-functions"
-        create = (edge_root / "create-payment-intent/index.ts").read_text()
-        confirm = (edge_root / "confirm-payment/index.ts").read_text()
+    def test_invoice_payment_is_settled_server_side_only(self) -> None:
+        # Server logic (amount/ids/voided checks) is covered by
+        # functions/api/_shared/payments/payments.test.js.
+        payments = source("Services/PaymentsService.swift")
         payment = source("Views/Payments/PaymentView.swift")
 
-        self.assertIn('"Idempotency-Key"', create)
-        self.assertIn("mowgo-invoice-${user.id}-${invoice_id}", create)
-        self.assertIn("stripe_payment_intent_id", create)
-        self.assertIn("payment_intent_id: paymentIntent.id", create)
-        self.assertIn('.select("id, user_id, amount, status, stripe_payment_intent_id")', create)
-        self.assertNotIn("const { amount,", create)
-
-        self.assertIn('status: 503', confirm)
-        self.assertIn("if (!resp.ok)", confirm)
-        self.assertIn('pi.status !== "succeeded"', confirm)
-        self.assertIn('pi.metadata?.invoice_id !== invoice_id', confirm)
-        self.assertIn('pi.metadata?.user_id !== user.id', confirm)
-        self.assertIn("pi.amount_received !== expectedAmount", confirm)
-        self.assertIn(".eq(\"stripe_payment_intent_id\", payment_intent_id)", confirm)
-        self.assertIn("error: saveErr", create)
-        self.assertIn(".maybeSingle()", create)
-        self.assertIn("data: updatedInvoice", confirm)
-        self.assertIn("!updatedInvoice", confirm)
-        self.assertNotIn("If Stripe call fails, proceed anyway", confirm)
-
-        completed = payment.split("case .completed:", 1)[1].split(
-            "case .canceled:", 1
-        )[0]
-        self.assertIn("try await self.stripe.confirmPayment", completed)
-        self.assertIn("await self.store.loadAll()", completed)
-        self.assertIn("catch", completed)
-        self.assertNotIn("try?", completed)
-        self.assertNotIn("markInvoicePaid", completed)
+        self.assertNotIn("import Stripe", payment)
+        self.assertNotIn("import Stripe", payments)
+        self.assertIn('url.scheme == "https"', payments)
+        self.assertIn('"payments_unavailable"', payments)
+        self.assertIn("validAccessToken()", payments)
+        # The app never marks an invoice paid; the provider webhook does.
+        self.assertNotIn("markInvoicePaid", payment)
+        self.assertNotIn("InvoicePaidPatch", payment)
+        self.assertIn("onDismiss: { Task { await store.loadAll() } }", payment)
 
     def test_currency_models_do_not_use_binary_floating_point(self) -> None:
         models = source("Models/Models.swift")
@@ -167,7 +153,7 @@ class IOSReviewFixTests(unittest.TestCase):
         job_form = source("Views/Today/NewJobFormView.swift")
 
         self.assertIn('.alert("Couldn’t Save Client"', client_form)
-        self.assertIn('.alert("Couldn’t Save Job"', job_form)
+        self.assertRegex(job_form, re.compile(r'\.alert\("Couldn[’\']t Save Job"'))
         self.assertIn("trimmingCharacters(in: .whitespacesAndNewlines)", client_form)
         self.assertIn("trimmingCharacters(in: .whitespacesAndNewlines)", job_form)
         self.assertIn("guard let clientId else", job_form)
@@ -204,7 +190,8 @@ class IOSReviewFixTests(unittest.TestCase):
             settings,
         )
         self.assertIn("let currentTier: String", settings)
-        self.assertEqual(settings.count("isCurrent: normalizedCurrentTier =="), 3)
+        # Free, Solo, Crew, Premium.
+        self.assertEqual(settings.count("isCurrent: normalizedCurrentTier =="), 4)
         self.assertNotIn("isCurrent: true", settings)
         self.assertNotIn("isCurrent: false", settings)
 
@@ -220,8 +207,9 @@ class IOSReviewFixTests(unittest.TestCase):
             7,
         )
         invoices = source("Views/Invoices/InvoicesView.swift")
-        self.assertIn("private var totalUnpaidCents: Int", invoices)
-        self.assertIn("$0 + $1.amountCents", invoices)
+        # Summed as Decimal — exact, no Double or integer truncation.
+        self.assertIn("private var totalUnpaid: Decimal", invoices)
+        self.assertIn("$0 + $1.amount", invoices)
 
     def test_job_card_labels_pet_and_key_details(self) -> None:
         job_card = source("Views/Components/JobCardView.swift")
@@ -233,16 +221,13 @@ class IOSReviewFixTests(unittest.TestCase):
         picker = source("Views/Components/JobPhotoPicker.swift")
 
         self.assertIn('@State private var showSourcePicker = false', picker)
-        self.assertRegex(
-            picker,
-            re.compile(r'\.confirmationDialog\(\s*"Add Job Photo"'),
-        )
-        self.assertIn('Button("Take Photo")', picker)
+        self.assertIn(".sheet(isPresented: $showSourcePicker)", picker)
+        self.assertIn('Label("Take Photo"', picker)
         self.assertIn(
             ".disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))",
             picker,
         )
-        self.assertIn('Button("Choose from Library")', picker)
+        self.assertIn('Label("Choose from Library"', picker)
         self.assertRegex(
             picker,
             re.compile(r"CameraView\(jobId:\s*jobId\)\s*\{\s*url\s+in"),
@@ -305,9 +290,10 @@ class IOSReviewFixTests(unittest.TestCase):
         replay = data_store.split('case "job:status":', 1)[1].split(
             'case "job:delete":', 1
         )[0]
-        self.assertIn("await fireWebhookJobCompleted(job)", replay)
-        self.assertIn("await firePushJobCompleted(job)", replay)
-        self.assertIn("await fireWebhookJobSkipped(job)", replay)
+        # `updated` = the local job with the replayed status applied.
+        self.assertIn("await fireWebhookJobCompleted(updated)", replay)
+        self.assertIn("await firePushJobCompleted(updated)", replay)
+        self.assertIn("await fireWebhookJobSkipped(updated)", replay)
 
     def test_sign_out_waits_for_device_token_clear(self) -> None:
         push = source("Services/PushNotificationService.swift")
@@ -318,10 +304,10 @@ class IOSReviewFixTests(unittest.TestCase):
             push,
         )
         self.assertIn("return task", push)
-        self.assertIn(
-            "await PushNotificationService.shared.clearDeviceToken()?.value",
-            auth,
-        )
+        # Waits for the clear, but capped (5s) so sign-out never hangs.
+        self.assertIn("PushNotificationService.shared.clearDeviceToken()", auth)
+        self.assertIn("await clearTask.value", auth)
+        self.assertIn("Task.sleep(for: .seconds(5))", auth)
 
 
 if __name__ == "__main__":

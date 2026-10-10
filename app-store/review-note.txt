@@ -8,8 +8,8 @@ MowGo is business management software for lawn care and landscaping service comp
 field-service tool sold to business owners — the paid plans unlock business workflow
 features used outside the app (scheduling operations, invoicing, crew management).
 
-Subscriptions are processed through Stripe Checkout (opened only on checkout.stripe.com)
-rather than StoreKit IAP because MowGo is a multi-platform business application: the same
+Subscriptions are processed on our payment provider's secure hosted checkout page
+(opened in Safari) rather than StoreKit IAP because MowGo is a multi-platform business application: the same
 subscription must work seamlessly across web, iOS, and Android, and the service itself is
 delivered as a business tool, not digital content consumed within the app. This follows
 the established precedent for business/enterprise apps that manage real-world services

@@ -361,7 +361,7 @@ struct Invoice: Codable, Identifiable, Equatable {
     var clientId: UUID?
     var jobId: UUID?
     var amount: Decimal
-    /// Integer-cents representation used by Stripe.
+    /// Integer-cents representation (payment amounts are always cents).
     var amountCents: Int {
         var cents = amount * 100
         var rounded = Decimal()
@@ -370,8 +370,9 @@ struct Invoice: Codable, Identifiable, Equatable {
     }
     var currencyAmount: Decimal { amount }
     var status: InvoiceStatus
-    var stripeInvoiceId: String?
-    var stripePaymentIntentId: String?
+    /// Card payment link state (`invoices.payment_provider` / `provider_payment_id`).
+    var paymentProvider: String?
+    var providerPaymentId: String?
     var sentAt: String?
     var paidAt: String?
     var createdAt: String?
@@ -453,7 +454,8 @@ struct UserProfile: Codable, Identifiable {
     /// Business location for the Day Conditions weather card (`profiles.latitude/longitude`).
     var latitude: Double?
     var longitude: Double?
-    var stripeCustomerId: String?
+    /// Set once the business has a subscription billing account (`profiles.billing_customer_id`).
+    var billingCustomerId: String?
     var venmoHandle: String?
     var cashappHandle: String?
     var zelleHandle: String?
@@ -586,6 +588,8 @@ final class JobCache {
     }
 }
 
+// Money lives only in jsonData (Decimal via Client/Invoice); cache classes
+// keep no Double copies of rate/amount.
 @Model
 final class ClientCache {
     @Attribute(.unique) var id: UUID
@@ -594,7 +598,6 @@ final class ClientCache {
     var address: String?
     var phone: String?
     var email: String?
-    var rate: Double
     var cleaningNotes: String?
     var petInstructions: String?
     var jsonData: Data
@@ -609,7 +612,6 @@ final class ClientCache {
         self.address = client.address
         self.phone = client.phone
         self.email = client.email
-        self.rate = NSDecimalNumber(decimal: client.rate).doubleValue
         self.cleaningNotes = client.cleaningNotes
         self.petInstructions = client.petInstructions
         self.cachedAt = Date()
@@ -663,10 +665,10 @@ final class InvoiceCache {
     var userId: UUID
     var clientId: UUID?
     var jobId: UUID?
-    var amount: Double
     var status: String          // "unpaid" or "paid"
-    var stripeInvoiceId: String?
-    var stripePaymentIntentId: String?
+    // originalName maps the old on-disk attribute, so SwiftData migrates the
+    // store in place (the old stripeInvoiceId attribute is simply dropped).
+    @Attribute(originalName: "stripePaymentIntentId") var providerPaymentId: String?
     var sentAt: String?
     var paidAt: String?
     var createdAt: String?
@@ -678,10 +680,8 @@ final class InvoiceCache {
         self.userId = userId
         self.clientId = invoice.clientId
         self.jobId = invoice.jobId
-        self.amount = NSDecimalNumber(decimal: invoice.amount).doubleValue
         self.status = invoice.status.rawValue
-        self.stripeInvoiceId = invoice.stripeInvoiceId
-        self.stripePaymentIntentId = invoice.stripePaymentIntentId
+        self.providerPaymentId = invoice.providerPaymentId
         self.sentAt = invoice.sentAt
         self.paidAt = invoice.paidAt
         self.createdAt = invoice.createdAt
