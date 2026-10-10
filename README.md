@@ -20,7 +20,7 @@ Built by Aaron (lawn care business owner) for lawn care businesses. Web app + na
 - **Backend:** Supabase (Postgres, RLS = authz ground truth, migrations in `supabase/migrations/`)
 - **iOS:** SwiftUI (`ios-native/MowGo/`), Keychain sessions, hosted payment pages (no payment SDK)
 - **Android:** Kotlin (`client/android-native/`), supabase-kt, FCM
-- **Payments:** provider layer in `functions/api/_shared/payments/` — Stripe removed, Rise Concepts planned; card payments show "coming soon" until a provider is live. Tiers: Free / Solo $39 / Crew $79 / Premium $199, 14-day no-card trial
+- **Payments:** provider layer in `functions/api/_shared/payments/` — Rise Concepts (MX Merchant) is the processor (Stripe fully removed); card payments show "coming soon" until `providers/rise.js` is implemented. Tiers: Free / Solo $39 / Crew $79 / Premium $199, 14-day no-card trial
 
 ## Repo layout
 

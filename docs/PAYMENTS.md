@@ -1,7 +1,8 @@
 # Payments
 
-MowGo takes card payments through a **swappable payment provider**. Stripe has
-been removed. Rise Concepts is the planned provider; until it is wired in, card
+MowGo takes card payments through **Rise Concepts** (MX Merchant platform),
+behind a swappable provider layer. Stripe has been removed completely: code,
+SDKs, keys and database columns. Until the Rise provider is implemented, card
 payments are off and every client shows "Card payments are coming soon."
 The 14-day no-card trial and Zelle / Venmo / Cash App payment requests keep
 working.
@@ -23,7 +24,7 @@ web / iOS / Android ──► /api/payments/*  (Cloudflare Pages Functions)
                               │
                               ▼
             functions/api/_shared/payments/
-              registry.js        PAYMENTS_PROVIDER → provider instance (or null)
+              registry.js        PAYMENTS_PROVIDER (default 'rise') → provider instance (or null)
               contract.js        the interface every provider implements
               providers/rise.js  Rise Concepts — stub, not implemented
               billing-events.js  provider-neutral webhook handling
@@ -62,8 +63,10 @@ native apps go through `/#/portal-return?result=…`, which deep-links into
 
 ## Database
 
-Migration `supabase/migrations/20261009120000_payment_provider_neutral.sql`
-(apply with `npx supabase db query --linked --file …`):
+Apply both migrations, in order, with `npx supabase db query --linked --file …`.
+Both are safe to re-run.
+
+`20261009120000_payment_provider_neutral.sql`:
 
 - `profiles.billing_provider`, `billing_customer_id`, `billing_subscription_id`.
   These are server-only: users can't write them, and the old user-writable
@@ -75,15 +78,21 @@ Migration `supabase/migrations/20261009120000_payment_provider_neutral.sql`
   only the server writes.
 - `get_conversion_kpi()` now uses `billing_customer_id`.
 
-The old `stripe_*` columns stay so already-installed app builds don't break.
-Drop them in a later migration.
+`20261010120000_drop_stripe_columns.sql` drops `profiles.stripe_customer_id` and
+`invoices.stripe_payment_intent_id` / `stripe_invoice_id`. It refuses to run if
+any value wasn't copied by the first migration.
 
 ## Wiring in Rise Concepts
 
 Ask Rise for:
 
-1. **API docs + sandbox credentials.** Their processing appears to run on the
-   MX Merchant (Priority) platform; confirm which API you'd integrate with.
+1. **API docs + sandbox credentials.** Rise runs on Priority's MX Merchant
+   platform. Its public developer hub describes a REST "Checkout API" v3
+   (Basic auth or OAuth 1.0a; Sandbox and Production environments), recurring
+   billing via "contracts" (requires the Invoice App in the MX Merchant
+   portal), and webhook notifications. Confirm this is the API for your
+   account. **Ask how webhook callbacks are authenticated** — the public docs
+   don't say, and the webhook must reject unsigned calls.
 2. **Sub-merchant onboarding** so each lawn business is its own merchant and
    invoice payments are paid out to them (fixes the money-routing problem).
 3. **Hosted payment page / payment links** with success and cancel redirect
@@ -102,8 +111,8 @@ Then:
 2. Add a merchant-onboarding flow that creates/updates `merchant_accounts`
    rows. A business can't create invoice links until its row is `active`.
 3. Test in sandbox, then flip `IMPLEMENTED = true` in `rise.js`.
-4. In Cloudflare Pages (Preview + Production) set `PAYMENTS_PROVIDER=rise` and
-   the `RISE_*` variables listed at the top of `rise.js`. Point Rise's webhook
+4. In Cloudflare Pages (Preview + Production) set the `RISE_*` variables
+   listed at the top of `rise.js` (`PAYMENTS_PROVIDER` defaults to `rise`). Point Rise's webhook
    at `https://mowgoapp.com/api/payments/webhook`.
 
 Tests: `node --test functions/api/_shared/payments/payments.test.js` runs the
