@@ -12,6 +12,7 @@ import { onRequestPost as portalPost } from '../../payments/billing-portal.js';
 import { onRequestPost as cancelPost } from '../../payments/cancel-subscription.js';
 import { onRequestPost as invoiceLinkPost } from '../../payments/invoice-link.js';
 import { onRequestPost as webhookPost } from '../../payments/webhook.js';
+import { onRequestPost as onboardingPost } from '../../payments/merchant-onboarding.js';
 import { updateCrewQuantity } from '../update-crew-quantity.js';
 
 registerPaymentProvider('fake', FakeProvider);
@@ -393,6 +394,148 @@ describe('webhook', () => {
       });
     }
   });
+});
+
+describe('merchant-onboarding', () => {
+  const call = (env, body = {}) => onboardingPost({ request: apiRequest('/api/payments/merchant-onboarding', { body }), env });
+
+  test('503 when no provider is live', async () => {
+    fetchMock = mockFetch([authOk()]);
+    assert.equal((await call(noProviderEnv)).status, 503);
+  });
+
+  test('crew members cannot onboard', async () => {
+    fetchMock = mockFetch([authOk(), rest('GET', 'profiles', () => [{ role: 'crew', business_name: null }])]);
+    const res = await call(baseEnv);
+    assert.equal(res.status, 403);
+    assert.equal(FakeProvider.calls.length, 0);
+  });
+
+  test('409 when already active with this provider', async () => {
+    fetchMock = mockFetch([
+      authOk(),
+      rest('GET', 'profiles', () => [{ role: 'owner', business_name: 'Green' }]),
+      rest('GET', 'merchant_accounts', () => [{ provider: 'fake', provider_merchant_id: 'mer_1', status: 'active' }]),
+    ]);
+    const res = await call(baseEnv);
+    assert.equal(res.status, 409);
+    assert.equal((await res.json()).code, 'already_active');
+  });
+
+  test('new application: returns hosted URL and stores a pending row', async () => {
+    let upsert;
+    let upsertUrl;
+    fetchMock = mockFetch([
+      authOk('owner-1', 'owner@example.com'),
+      rest('GET', 'profiles', () => [{ role: 'owner', business_name: 'Green Thumb' }]),
+      rest('GET', 'merchant_accounts', () => []),
+      rest('POST', 'merchant_accounts', (url, init) => { upsertUrl = url; upsert = init.body; return [init.body]; }),
+    ]);
+    const res = await call(baseEnv, { platform: 'android' });
+    assert.deepEqual(await res.json(), { url: 'https://pay.fake.test/onboard/1' });
+    const args = FakeProvider.calls[0].args;
+    assert.equal(args.email, 'owner@example.com');
+    assert.equal(args.businessName, 'Green Thumb');
+    assert.equal(args.existingMerchantId, null);
+    assert.equal(args.returnUrl, 'https://mowgoapp.com/#/portal-return?result=merchant');
+    assert.match(upsertUrl, /on_conflict=user_id/);
+    assert.equal(upsert.user_id, 'owner-1');
+    assert.equal(upsert.provider, 'fake');
+    assert.equal(upsert.provider_merchant_id, 'mer_new');
+    assert.equal(upsert.status, 'pending');
+  });
+
+  test('resuming keeps the merchant id and restricted status', async () => {
+    FakeProvider.behavior.createMerchantOnboarding = () => ({ url: 'https://pay.fake.test/onboard/2', providerMerchantId: null });
+    let upsert;
+    fetchMock = mockFetch([
+      authOk(),
+      rest('GET', 'profiles', () => [{ role: 'owner', business_name: null }]),
+      rest('GET', 'merchant_accounts', () => [{ provider: 'fake', provider_merchant_id: 'mer_1', status: 'restricted' }]),
+      rest('POST', 'merchant_accounts', (url, init) => { upsert = init.body; return [init.body]; }),
+    ]);
+    await call(baseEnv, {});
+    assert.equal(FakeProvider.calls[0].args.existingMerchantId, 'mer_1');
+    assert.equal(upsert.provider_merchant_id, 'mer_1');
+    assert.equal(upsert.status, 'restricted');
+  });
+
+  test('switching providers starts a fresh pending application', async () => {
+    let upsert;
+    fetchMock = mockFetch([
+      authOk(),
+      rest('GET', 'profiles', () => [{ role: 'owner', business_name: null }]),
+      rest('GET', 'merchant_accounts', () => [{ provider: 'other', provider_merchant_id: 'old_1', status: 'active' }]),
+      rest('POST', 'merchant_accounts', (url, init) => { upsert = init.body; return [init.body]; }),
+    ]);
+    await call(baseEnv, {});
+    assert.equal(FakeProvider.calls[0].args.existingMerchantId, null);
+    assert.equal(upsert.provider, 'fake');
+    assert.equal(upsert.provider_merchant_id, 'mer_new');
+    assert.equal(upsert.status, 'pending');
+  });
+
+  test('502 when the onboarding URL is on a foreign host', async () => {
+    FakeProvider.behavior.createMerchantOnboarding = () => ({ url: 'https://evil.example/x', providerMerchantId: 'm' });
+    fetchMock = mockFetch([
+      authOk(),
+      rest('GET', 'profiles', () => [{ role: 'owner' }]),
+      rest('GET', 'merchant_accounts', () => []),
+    ]);
+    assert.equal((await call(baseEnv)).status, 502);
+    assert.equal(fetchMock.calls.some((c) => c.method === 'POST'), false);
+  });
+});
+
+describe('webhook: merchant.updated', () => {
+  const post = () => webhookPost({ request: new Request('https://mowgoapp.com/api/payments/webhook', { method: 'POST', body: '{}' }), env: baseEnv });
+  const setup = (routes) => {
+    const patches = [];
+    fetchMock = mockFetch([
+      rest('GET', 'webhook_events', () => []),
+      ...routes,
+      rest('PATCH', 'merchant_accounts', (url, init) => { patches.push({ url, body: init.body }); return [{}]; }),
+      rest('POST', 'webhook_events', () => new Response(null, { status: 201 })),
+    ]);
+    return patches;
+  };
+
+  test('activates the row found by merchant id', async () => {
+    FakeProvider.behavior.parseWebhook = () => [{ id: 'm1', type: 'merchant.updated', providerMerchantId: 'mer_1', merchantStatus: 'active' }];
+    const patches = setup([rest('GET', 'merchant_accounts', () => [{ user_id: 'owner-1' }])]);
+    await post();
+    assert.equal(patches.length, 1);
+    assert.match(patches[0].url, /user_id=eq\.owner-1/);
+    assert.match(patches[0].url, /provider=eq\.fake/);
+    assert.equal(patches[0].body.status, 'active');
+    assert.equal(patches[0].body.provider_merchant_id, 'mer_1');
+  });
+
+  test('adopts the merchant id by user id when onboarding had none yet', async () => {
+    FakeProvider.behavior.parseWebhook = () => [{ id: 'm2', type: 'merchant.updated', userId: 'owner-2', providerMerchantId: 'mer_2', merchantStatus: 'pending' }];
+    const patches = setup([rest('GET', 'merchant_accounts', (url) => (url.includes('provider_merchant_id=eq')
+      ? []
+      : [{ provider: 'fake', provider_merchant_id: null }]))]);
+    await post();
+    assert.equal(patches.length, 1);
+    assert.match(patches[0].url, /user_id=eq\.owner-2/);
+  });
+
+  for (const [name, event, rows] of [
+    ['no onboarding row', { userId: 'owner-3', providerMerchantId: 'mer_3', merchantStatus: 'active' }, () => []],
+    ['row belongs to another provider', { userId: 'owner-4', providerMerchantId: 'mer_4', merchantStatus: 'active' },
+      (url) => (url.includes('provider_merchant_id=eq') ? [] : [{ provider: 'other', provider_merchant_id: null }])],
+    ['conflicting merchant id', { userId: 'owner-5', providerMerchantId: 'mer_5', merchantStatus: 'active' },
+      (url) => (url.includes('provider_merchant_id=eq') ? [] : [{ provider: 'fake', provider_merchant_id: 'mer_other' }])],
+    ['unknown status', { providerMerchantId: 'mer_1', merchantStatus: 'approved' }, () => [{ user_id: 'owner-1' }]],
+  ]) {
+    test(`does not update: ${name}`, async () => {
+      FakeProvider.behavior.parseWebhook = () => [{ id: `x-${name}`, type: 'merchant.updated', ...event }];
+      const patches = setup([rest('GET', 'merchant_accounts', rows)]);
+      assert.equal((await post()).status, 200);
+      assert.equal(patches.length, 0);
+    });
+  }
 });
 
 describe('updateCrewQuantity', () => {

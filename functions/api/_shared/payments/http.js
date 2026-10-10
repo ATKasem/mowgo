@@ -80,6 +80,8 @@ export function returnUrls(env, platform, kind) {
         : { success: `${base}/#/subscribe?checkout=success`, cancel: `${base}/#/subscribe` };
     case 'portal':
       return { success: native ? `${base}/#/portal-return?result=portal` : `${base}/#/settings` };
+    case 'merchant':
+      return { success: native ? `${base}/#/portal-return?result=merchant` : `${base}/#/settings?merchant=returned` };
     case 'invoice':
       // The payer is usually the business's customer, not a MowGo user.
       return { success: `${base}/#/payment-complete`, cancel: `${base}/#/payment-complete?canceled=1` };

@@ -54,6 +54,7 @@ All are `POST` with `Authorization: Bearer <supabase access token>` except
 | `/api/payments/subscription-checkout` | `{ plan, interval, platform? }` → hosted checkout URL. Refuses if already subscribed. No second trial after the in-app trial |
 | `/api/payments/billing-portal` | Hosted page to manage card / plan |
 | `/api/payments/cancel-subscription` | Cancel at period end (the tier drops when the webhook says so) |
+| `/api/payments/merchant-onboarding` | Owner only → hosted page where the business applies for its own merchant account. Creates/refreshes its `merchant_accounts` row (`pending`); approval arrives as a `merchant.updated` webhook event |
 | `/api/payments/invoice-link` | `{ invoice_id }` → hosted payment link for the business's customer. One live link per invoice; a new link only if the amount changed, and the provider must cancel the old one |
 | `/api/payments/webhook` | Provider webhook. Signature verified by the provider class; dedup via `webhook_events` (`<provider>:<event id>`), recorded only after processing succeeds |
 
@@ -82,6 +83,21 @@ Both are safe to re-run.
 `invoices.stripe_payment_intent_id` / `stripe_invoice_id`. It refuses to run if
 any value wasn't copied by the first migration.
 
+`20261010130000_merchant_accounts_lookup.sql` makes each provider merchant id
+belong to exactly one business (webhook lookups stay unambiguous).
+
+## Merchant onboarding (card payments for each business)
+
+1. Owner taps **Set up card payments** (web Settings, iOS Billing, Android
+   Billing). Crew members and demo mode don't see it.
+2. `merchant-onboarding` calls `provider.createMerchantOnboarding` and opens
+   the provider's hosted application page; the row starts as `pending`.
+3. The provider's webhook sends `merchant.updated` (`pending` → `active`,
+   `restricted` or `disabled`). Only a row created by step 2 for that provider
+   is updated — webhooks can't create rows for arbitrary users.
+4. Apps read the status straight from `merchant_accounts` (RLS: own row,
+   read-only). Invoice links work only while it's `active`.
+
 ## Wiring in Rise Concepts
 
 Ask Rise for:
@@ -105,18 +121,24 @@ Ask Rise for:
 
 Then:
 
-1. Implement every method in `providers/rise.js` against the contract in
-   `contract.js`. `parseWebhook` must verify the signature and translate
-   payloads into the normalized event types.
-2. Add a merchant-onboarding flow that creates/updates `merchant_accounts`
-   rows. A business can't create invoice links until its row is `active`.
-3. Test in sandbox, then flip `IMPLEMENTED = true` in `rise.js`.
+1. Fill in each method in `providers/rise.js`. The plumbing is done:
+   `this.request()` (Basic auth, https-only, pinned to `RISE_API_BASE_URL`,
+   15 s timeout, errors that never echo response bodies) and
+   `planId()` / `planFor()` (MowGo plan ↔ `RISE_PLAN_*`). Each method's
+   comment says exactly what it must do and return. `parseWebhook` must
+   authenticate the callback and map payloads to the normalized event types,
+   including `merchant.updated`.
+2. Add sandbox tests to `providers/rise.test.js` (it already covers the
+   plumbing with an injected `fetch`).
+3. Flip `IMPLEMENTED = true` in `rise.js`.
 4. In Cloudflare Pages (Preview + Production) set the `RISE_*` variables
    listed at the top of `rise.js` (`PAYMENTS_PROVIDER` defaults to `rise`). Point Rise's webhook
    at `https://mowgoapp.com/api/payments/webhook`.
 
-Tests: `node --test functions/api/_shared/payments/payments.test.js` runs the
-endpoints and webhook handling against a fake provider.
+Tests: `node --test functions/api/_shared/payments/*.test.js functions/api/_shared/payments/providers/*.test.js`
+runs the endpoints,
+webhook handling and merchant onboarding against a fake provider, plus the
+Rise plumbing.
 
 ## App Store note
 

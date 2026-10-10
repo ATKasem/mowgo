@@ -12,7 +12,7 @@
 
 import { dispatchWebhookEvent } from '../dispatch-webhook.js';
 import { updateCrewQuantity } from '../update-crew-quantity.js';
-import { PLANS } from './contract.js';
+import { MERCHANT_STATUSES, PLANS } from './contract.js';
 import { callRpc, eq, fetchUserEmail, insertRow, patchRows, selectRows, withTimeout } from './supabase.js';
 import { appUrl } from './http.js';
 
@@ -33,6 +33,8 @@ export async function handleBillingEvent(env, provider, event) {
     case 'invoice_payment.failed':
       // Nothing to change: the invoice stays unpaid and the payer can retry.
       return;
+    case 'merchant.updated':
+      return handleMerchantUpdated(env, provider, event);
     default:
       // Unknown types are ignored so new provider events can't break the webhook.
       return;
@@ -290,6 +292,57 @@ async function settleInvoicePayment(env, provider, event) {
     `id=${eq(invoiceId)}&user_id=${eq(userId)}&provider_payment_id=${eq(providerPaymentId)}&status=in.(unpaid,overdue)`,
     { status: 'paid', paid_at: new Date().toISOString() },
   );
+}
+
+// --- Merchant accounts (businesses taking card payments) ---------------------
+
+/**
+ * A business's merchant account changed status (approved, needs info,
+ * closed). Only updates a row that our onboarding endpoint already created
+ * for this provider — provider events can never create rows for arbitrary
+ * users.
+ */
+async function handleMerchantUpdated(env, provider, event) {
+  const { providerMerchantId, merchantStatus, userId } = event;
+  if (!MERCHANT_STATUSES.includes(merchantStatus)) {
+    console.error(`billing: ${provider.name} merchant event ${event.id} has unknown status ${merchantStatus}`);
+    return;
+  }
+  if (!providerMerchantId && !userId) {
+    console.error(`billing: ${provider.name} merchant event ${event.id} has no merchant or user id`);
+    return;
+  }
+
+  let targetUserId = null;
+  if (providerMerchantId) {
+    const rows = await selectRows(
+      env,
+      'merchant_accounts',
+      `provider=${eq(provider.name)}&provider_merchant_id=${eq(providerMerchantId)}&select=user_id`,
+    );
+    if (rows.length === 1) targetUserId = rows[0].user_id;
+  }
+  if (!targetUserId && userId) {
+    // Onboarding started but the merchant id wasn't known yet: adopt it only
+    // if this user's row is for this provider and has no conflicting id.
+    const [row] = await selectRows(
+      env, 'merchant_accounts', `user_id=${eq(userId)}&select=provider,provider_merchant_id`,
+    );
+    if (row && row.provider === provider.name
+        && (!row.provider_merchant_id || row.provider_merchant_id === providerMerchantId)) {
+      targetUserId = userId;
+    }
+  }
+  if (!targetUserId) {
+    console.error(`billing: ${provider.name} merchant event ${event.id} matches no onboarding row — needs manual review`);
+    return;
+  }
+
+  await patchRows(env, 'merchant_accounts', `user_id=${eq(targetUserId)}&provider=${eq(provider.name)}`, {
+    status: merchantStatus,
+    ...(providerMerchantId ? { provider_merchant_id: providerMerchantId } : {}),
+    updated_at: new Date().toISOString(),
+  });
 }
 
 // --- Email ------------------------------------------------------------------

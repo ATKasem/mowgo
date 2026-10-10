@@ -57,13 +57,19 @@
  *   provider MUST cancel/expire that earlier link first so a customer can't
  *   pay the stale amount — throw if it can't.
  *
+ * @property {(args: {userId: string, email: string|null, businessName: string|null, existingMerchantId: string|null, returnUrl: string}) => Promise<{url: string, providerMerchantId: string|null}>} createMerchantOnboarding
+ *   Hosted page where a lawn business applies for / finishes its own merchant
+ *   account (sub-merchant). Return the provider's merchant id as soon as one
+ *   exists (may be null until the application is submitted). Approval arrives
+ *   later as a merchant.updated webhook event.
+ *
  * @property {(request: Request) => Promise<NormalizedEvent[]|null>} parseWebhook
  *   Verify the signature and translate the provider's payload into zero or
  *   more NormalizedEvents. Return null when the signature is invalid.
  *
  * @typedef {Object} NormalizedEvent
  * @property {string} id  Provider event id (used for dedup; namespaced by provider).
- * @property {'subscription.active'|'subscription.canceled'|'subscription.payment_failed'|'invoice_payment.succeeded'|'invoice_payment.failed'} type
+ * @property {'subscription.active'|'subscription.canceled'|'subscription.payment_failed'|'invoice_payment.succeeded'|'invoice_payment.failed'|'merchant.updated'} type
  * @property {string} [userId]          MowGo user id, when the provider echoes our metadata.
  * @property {string} [customerId]      Provider customer id.
  * @property {string} [subscriptionId]
@@ -73,6 +79,12 @@
  * @property {string} [providerPaymentId]
  * @property {number} [amountCents]
  * @property {string} [currency]
+ * @property {string} [providerMerchantId]  merchant.updated: the business's merchant id.
+ * @property {MerchantStatus} [merchantStatus] merchant.updated: new status.
+ *
+ * @typedef {'pending'|'active'|'restricted'|'disabled'} MerchantStatus
+ *   pending = applied / under review; active = can take card payments;
+ *   restricted = needs more info from the business; disabled = closed.
  */
 
 export const PLANS = ['solo', 'crew', 'premium'];
@@ -83,4 +95,6 @@ export const EVENT_TYPES = [
   'subscription.payment_failed',
   'invoice_payment.succeeded',
   'invoice_payment.failed',
+  'merchant.updated',
 ];
+export const MERCHANT_STATUSES = ['pending', 'active', 'restricted', 'disabled'];

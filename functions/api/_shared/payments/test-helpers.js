@@ -46,6 +46,9 @@ export class FakeProvider {
   async createInvoicePayment(args) {
     return (await this.record('createInvoicePayment', args)) ?? { url: 'https://pay.fake.test/inv/2', providerPaymentId: 'pay_2' };
   }
+  async createMerchantOnboarding(args) {
+    return (await this.record('createMerchantOnboarding', args)) ?? { url: 'https://pay.fake.test/onboard/1', providerMerchantId: 'mer_new' };
+  }
   async parseWebhook(request) {
     const impl = FakeProvider.behavior.parseWebhook;
     return impl ? impl(request) : null;

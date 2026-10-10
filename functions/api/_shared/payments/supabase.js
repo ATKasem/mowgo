@@ -49,6 +49,22 @@ export async function insertRow(env, table, row, prefer = 'return=minimal') {
   }));
 }
 
+/** Insert or merge on `onConflict` (a unique column); returns the stored rows. */
+export async function upsertRow(env, table, row, onConflict) {
+  const { url } = supabaseConfig(env);
+  const res = await withTimeout(fetch(`${url}/rest/v1/${table}?on_conflict=${encodeURIComponent(onConflict)}`, {
+    method: 'POST',
+    headers: serviceHeaders(env, {
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=representation',
+    }),
+    body: JSON.stringify(row),
+  }));
+  if (!res.ok) throw new Error(`upsert ${table} failed: ${res.status}`);
+  const rows = await res.json();
+  return Array.isArray(rows) ? rows : [];
+}
+
 export async function callRpc(env, fn, params) {
   const { url } = supabaseConfig(env);
   return withTimeout(fetch(`${url}/rest/v1/rpc/${fn}`, {
