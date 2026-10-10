@@ -588,6 +588,8 @@ final class JobCache {
     }
 }
 
+// Money lives only in jsonData (Decimal via Client/Invoice); cache classes
+// keep no Double copies of rate/amount.
 @Model
 final class ClientCache {
     @Attribute(.unique) var id: UUID
@@ -596,7 +598,6 @@ final class ClientCache {
     var address: String?
     var phone: String?
     var email: String?
-    var rate: Double
     var cleaningNotes: String?
     var petInstructions: String?
     var jsonData: Data
@@ -611,7 +612,6 @@ final class ClientCache {
         self.address = client.address
         self.phone = client.phone
         self.email = client.email
-        self.rate = NSDecimalNumber(decimal: client.rate).doubleValue
         self.cleaningNotes = client.cleaningNotes
         self.petInstructions = client.petInstructions
         self.cachedAt = Date()
@@ -665,7 +665,6 @@ final class InvoiceCache {
     var userId: UUID
     var clientId: UUID?
     var jobId: UUID?
-    var amount: Double
     var status: String          // "unpaid" or "paid"
     // originalName maps the old on-disk attribute, so SwiftData migrates the
     // store in place (the old stripeInvoiceId attribute is simply dropped).
@@ -681,7 +680,6 @@ final class InvoiceCache {
         self.userId = userId
         self.clientId = invoice.clientId
         self.jobId = invoice.jobId
-        self.amount = NSDecimalNumber(decimal: invoice.amount).doubleValue
         self.status = invoice.status.rawValue
         self.providerPaymentId = invoice.providerPaymentId
         self.sentAt = invoice.sentAt

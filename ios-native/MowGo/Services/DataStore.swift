@@ -170,6 +170,13 @@ final class DataStore: ObservableObject {
     @Published var recurringJobs: [RecurringJob] = []
     @Published var isLoading = false
     @Published var error: String?
+
+    /// Screens that show a thrown error themselves call this, so the app-wide
+    /// banner (MainTabView) doesn't repeat the same message once they close.
+    /// Only clears an identical message — unrelated banners are kept.
+    func errorWasPresented(_ presented: Error) {
+        if error == presented.localizedDescription { error = nil }
+    }
     @Published private(set) var rainDelayHistory: [RainDelayEntry] = []
 
     private let sb = SupabaseService.shared

@@ -719,6 +719,7 @@ private struct RecurringJobsSettingsView: View {
                         toggleError = nil
                     } catch {
                         toggleError = error.localizedDescription
+                        store.errorWasPresented(error)
                     }
                 }
             }

@@ -692,6 +692,7 @@ struct TodayView: View {
                     }
                 } catch {
                     operationError = error.localizedDescription
+                    store.errorWasPresented(error)
                 }
             },
             onSkip: {
@@ -704,6 +705,7 @@ struct TodayView: View {
                     showBanner("Job skipped — client notified ✅")
                 } catch {
                     operationError = error.localizedDescription
+                    store.errorWasPresented(error)
                 }
             },
             onEdit: { editingJob = job },
@@ -813,6 +815,7 @@ struct TodayView: View {
                     try await store.updateClient(client)
                 } catch {
                     failedAddresses += 1
+                    store.errorWasPresented(error)
                 }
             }
 
@@ -831,6 +834,7 @@ struct TodayView: View {
                 showBanner(failedAddresses > 0 ? "Some addresses couldn't be mapped" : "Route optimized")
             } catch {
                 operationError = error.localizedDescription
+                store.errorWasPresented(error)
             }
             isOperating = false
         }
@@ -856,6 +860,7 @@ struct TodayView: View {
                 showBanner("Route order restored")
             } catch {
                 operationError = error.localizedDescription
+                store.errorWasPresented(error)
             }
             isOperating = false
         }
@@ -1009,6 +1014,7 @@ struct TodayView: View {
                 showBanner("Rain delay undone")
             } catch {
                 operationError = error.localizedDescription
+                store.errorWasPresented(error)
             }
         }
     }
@@ -1036,6 +1042,7 @@ struct TodayView: View {
                 }
             } catch {
                 operationError = error.localizedDescription
+                store.errorWasPresented(error)
             }
             isOperating = false
         }
@@ -1057,6 +1064,7 @@ struct TodayView: View {
                 }
             } catch {
                 operationError = error.localizedDescription
+                store.errorWasPresented(error)
             }
             isOperating = false
         }
