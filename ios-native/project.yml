@@ -18,6 +18,11 @@ targets:
         aps-environment: development
     sources:
       - path: MowGo
+    scheme:
+      testTargets:
+        - MowGoTests
+        - MowGoUITests
+      gatherCoverageData: false
     settings:
       base:
         INFOPLIST_FILE: MowGo/Info.plist
@@ -43,5 +48,14 @@ targets:
     platform: iOS
     sources:
       - path: Tests
+        excludes:
+          - "*.sh"
+    dependencies:
+      - target: MowGo
+  MowGoUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
     dependencies:
       - target: MowGo

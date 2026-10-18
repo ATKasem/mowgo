@@ -30,10 +30,20 @@ final class AuthService: ObservableObject {
     /// has been checked.
     @Published var isDemoMode = false
 
+    /// UI tests launch with `-UITestDemoMode` to run against local demo data
+    /// instead of a real backend. Debug builds only — release builds ignore it.
+    static var isUITestDemoMode: Bool {
+        #if DEBUG
+        return ProcessInfo.processInfo.arguments.contains("-UITestDemoMode")
+        #else
+        return false
+        #endif
+    }
+
     init() {
         // Try to restore a previous session
         Task {
-            let configured = await sb.isConfigured
+            let configured = await sb.isConfigured && !Self.isUITestDemoMode
             if configured {
                 isDemoMode = false
                 if await sb.restoreSession() {
