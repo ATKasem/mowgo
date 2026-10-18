@@ -1,39 +1,21 @@
-import Foundation
+import CoreLocation
 
+/// Street-address geocoding for route optimization.
+///
+/// Uses Apple's on-device geocoder (free, no API key). Open-Meteo — used for
+/// the business-location weather lookup — only matches place names, so it
+/// returned nothing for street addresses like "123 Oak St, Austin, TX" and
+/// Optimize could never place real clients on the map.
 struct GeocodingService {
-    private struct Response: Decodable {
-        struct Result: Decodable {
-            let latitude: Double
-            let longitude: Double
-        }
-        let results: [Result]?
-    }
-
-    private let session: URLSession
-
-    init(session: URLSession = .shared) {
-        self.session = session
-    }
-
     func geocodeAddress(_ address: String) async -> (lat: Double, lng: Double)? {
         let trimmed = address.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
-        var components = URLComponents(string: "https://geocoding-api.open-meteo.com/v1/search")
-        components?.queryItems = [
-            URLQueryItem(name: "name", value: trimmed),
-            URLQueryItem(name: "count", value: "1"),
-            URLQueryItem(name: "language", value: "en"),
-            URLQueryItem(name: "format", value: "json")
-        ]
-        guard let url = components?.url else { return nil }
-
         do {
-            let (data, response) = try await session.data(from: url)
-            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
-                  let result = try JSONDecoder().decode(Response.self, from: data).results?.first else {
-                return nil
-            }
-            return (result.latitude, result.longitude)
+            // A fresh geocoder per request: CLGeocoder handles one request at a time.
+            let placemarks = try await CLGeocoder().geocodeAddressString(trimmed)
+            guard let coordinate = placemarks.first?.location?.coordinate,
+                  CLLocationCoordinate2DIsValid(coordinate) else { return nil }
+            return (coordinate.latitude, coordinate.longitude)
         } catch {
             return nil
         }

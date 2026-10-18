@@ -824,6 +824,13 @@ struct TodayView: View {
                 let coordinate = coordinates(for: job)
                 return (job.id, coordinate?.lat, coordinate?.lng)
             }
+            // Fewer than 2 mapped stops: nothing to optimize. Say so instead of
+            // claiming a reorder that didn't happen.
+            guard entries.filter({ $0.lat != nil && $0.lng != nil }).count >= 2 else {
+                showBanner("Couldn't find these addresses on the map — check them in Clients")
+                isOperating = false
+                return
+            }
             let optimizedIds = RouteOptimizer.optimizeRoute(entries: entries, anchor: routeAnchor)
             do {
                 try await store.reorderJobs(optimizedIds)
