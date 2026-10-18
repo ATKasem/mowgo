@@ -755,10 +755,15 @@ enum ScheduledTimeFormat {
 // MARK: - Job display order
 
 extension Job {
-    /// Stable order for day lists: time (untimed last), then route order, then
-    /// id. Status deliberately plays no part — a job must not move when it is
-    /// started or completed, or the next tap lands on a different job.
+    /// Stable order for day lists, matching web and Android: route order first
+    /// (so an optimized or hand-sorted route survives a relaunch; unordered
+    /// jobs last), then time (untimed last), then id. Status deliberately plays
+    /// no part — a job must not move when it is started or completed, or the
+    /// next tap lands on a different job.
     static func displayOrder(_ a: Job, _ b: Job) -> Bool {
+        let routeA = a.routeOrder ?? Int.max
+        let routeB = b.routeOrder ?? Int.max
+        if routeA != routeB { return routeA < routeB }
         // Compare HH:mm only: the app writes "08:00", the DB returns "08:00:00".
         let timeA = a.scheduledTime.map { String($0.prefix(5)) }
         let timeB = b.scheduledTime.map { String($0.prefix(5)) }
@@ -769,9 +774,6 @@ extension Job {
             default: return false
             }
         }
-        let routeA = a.routeOrder ?? Int.max
-        let routeB = b.routeOrder ?? Int.max
-        if routeA != routeB { return routeA < routeB }
         return a.id.uuidString < b.id.uuidString
     }
 }
