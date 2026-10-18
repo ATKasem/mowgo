@@ -1,5 +1,6 @@
 package com.mowgo.app.ui.screens.jobs
 
+import com.mowgo.app.lib.ScheduledTimeFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -170,7 +171,7 @@ private fun JobsCard(
             }
             job.clientAddress?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                job.scheduledTime?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                job.scheduledTime?.let { Text(ScheduledTimeFormat.display(it), style = MaterialTheme.typography.bodyMedium) }
                 Text("$${String.format(Locale.US, "%.0f", job.clientRate)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.weight(1f))
                 TextButton(onClick = onToggle) {

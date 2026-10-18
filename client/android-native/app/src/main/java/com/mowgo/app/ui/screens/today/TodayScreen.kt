@@ -1,5 +1,6 @@
 package com.mowgo.app.ui.screens.today
 
+import com.mowgo.app.lib.ScheduledTimeFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -182,6 +183,15 @@ fun TodayScreen(
                         )
                     }
 
+                    if (state.canOptimizeRoute) {
+                        item {
+                            OptimizeRouteButton(
+                                isOptimizing = state.isOptimizingRoute,
+                                onClick = viewModel::optimizeRoute,
+                            )
+                        }
+                    }
+
                     // Job list header
                     item {
                         Text(
@@ -244,6 +254,23 @@ private fun SyncStatusBanner(isOffline: Boolean, pendingSyncCount: Int) {
     }
 }
 
+@Composable
+private fun OptimizeRouteButton(isOptimizing: Boolean, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = !isOptimizing,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+    ) {
+        if (isOptimizing) {
+            CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+        } else {
+            Icon(Icons.Filled.Route, contentDescription = null, modifier = Modifier.size(18.dp))
+        }
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(if (isOptimizing) R.string.today_optimizing_route else R.string.today_optimize_route))
+    }
+}
+
 // ── Header ──────────────────────────────────────────────────────────────
 
 @Composable
@@ -272,13 +299,15 @@ private fun TodayHeader(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = businessName,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.secondary,
-            fontWeight = FontWeight.Medium,
-        )
+        if (businessName.isNotBlank()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = businessName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Medium,
+            )
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -647,7 +676,7 @@ private fun JobCard(
                 Column(horizontalAlignment = Alignment.End) {
                     jobWithClient.scheduledTime?.let { time ->
                         Text(
-                            text = time,
+                            text = ScheduledTimeFormat.display(time),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

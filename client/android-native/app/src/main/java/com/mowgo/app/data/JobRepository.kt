@@ -17,7 +17,9 @@ import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.sync.SyncManager
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
+import com.mowgo.app.lib.Coordinate
 import java.io.IOException
 import java.time.LocalDate
 import java.time.Instant
@@ -215,9 +217,61 @@ class JobRepository {
         val targetIndex = newOrder.coerceIn(0, sameDay.lastIndex)
         if (oldIndex == targetIndex) return
         sameDay.add(targetIndex, sameDay.removeAt(oldIndex))
+        persistDayOrder(jobId, sameDay.map { it.id })
+    }
 
+    /**
+     * Persist a whole day's stop order (route optimizer). [orderedIds] comes
+     * first; any other job on [date] keeps its relative place after them, so
+     * a job added mid-optimize can't end up without a route_order.
+     */
+    suspend fun applyRouteOrder(date: String, orderedIds: List<String>) {
+        if (orderedIds.isEmpty()) return
+        val sameDay = loadJobs().filter { it.scheduledDate == date }
+            .sortedWith(compareBy<JobWithClient> { it.routeOrder ?: Int.MAX_VALUE }.thenBy { it.scheduledTime ?: "" })
+        val present = sameDay.map { it.id }.toSet()
+        val ordered = orderedIds.filter { it in present }
+        if (ordered.isEmpty()) return // every optimized job was deleted/moved meanwhile
+        val rest = sameDay.map { it.id }.filterNot { it in ordered }
+        persistDayOrder(ordered.first(), ordered + rest)
+    }
+
+    /** Saved coordinates for the given clients (route optimizer). Missing = not yet geocoded. */
+    suspend fun loadClientCoordinates(clientIds: Collection<String>): Map<String, Coordinate> {
+        if (!SupabaseClientProvider.isConfigured || clientIds.isEmpty()) return emptyMap()
+        return try {
+            SupabaseClientProvider.client.from("clients")
+                .select(Columns.list("id", "latitude", "longitude")) {
+                    filter { isIn("id", clientIds.toList()) }
+                }
+                .decodeList<ClientCoordinates>()
+                .mapNotNull { row ->
+                    val lat = row.latitude ?: return@mapNotNull null
+                    val lng = row.longitude ?: return@mapNotNull null
+                    row.id to Coordinate(lat, lng)
+                }
+                .toMap()
+        } catch (e: Exception) {
+            if (!isNetworkError(e)) throw e
+            emptyMap()
+        }
+    }
+
+    /**
+     * Cache a geocoded client location so later optimizes skip the lookup.
+     * Patches only latitude/longitude — never the whole client row.
+     */
+    suspend fun saveClientCoordinates(clientId: String, coordinate: Coordinate) {
+        if (!SupabaseClientProvider.isConfigured) return
+        SupabaseClientProvider.client.from("clients")
+            .update(ClientCoordinatesPatch(coordinate.lat, coordinate.lng)) {
+                filter { eq("id", clientId) }
+            }
+    }
+
+    private suspend fun persistDayOrder(entityId: String, orderedIds: List<String>) {
         if (!SupabaseClientProvider.isConfigured) {
-            val orders = sameDay.mapIndexed { index, item -> item.id to (index + 1) }.toMap()
+            val orders = orderedIds.mapIndexed { index, id -> id to (index + 1) }.toMap()
             demoJobsMutable = demoJobsMutable.map { item ->
                 orders[item.id]?.let { order -> item.copy(job = item.job.copy(routeOrder = order)) } ?: item
             }
@@ -225,7 +279,7 @@ class JobRepository {
         }
 
         val payload = JobReorderPayload(
-            sameDay.mapIndexed { index, item -> JobRouteOrder(item.id, index + 1) }
+            orderedIds.mapIndexed { index, id -> JobRouteOrder(id, index + 1) }
         )
         try {
             performReorder(payload)
@@ -239,7 +293,7 @@ class JobRepository {
             val cachedById = AppDatabaseProvider.database.jobDao().getAll().associateBy { it.id }
             cacheAndEnqueue(
                 OP_JOB_REORDER,
-                jobId,
+                entityId,
                 Json.encodeToString(JobReorderPayload.serializer(), payload),
             ) { dao ->
                 payload.orders.forEach { order ->
@@ -753,4 +807,17 @@ private data class JobReorderPayload(
 private data class JobRouteOrder(
     val id: String,
     @SerialName("route_order") val routeOrder: Int,
+)
+
+@Serializable
+private data class ClientCoordinates(
+    val id: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+)
+
+@Serializable
+private data class ClientCoordinatesPatch(
+    val latitude: Double,
+    val longitude: Double,
 )

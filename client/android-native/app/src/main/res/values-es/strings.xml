@@ -68,6 +68,12 @@
     <string name="today_confirm_rain_delay">Confirmar retraso por lluvia</string>
     <string name="today_no_rain_delays">Aún no hay retrasos por lluvia</string>
     <string name="today_undo">Deshacer</string>
+    <string name="today_optimize_route">Optimizar</string>
+    <string name="today_optimizing_route">Optimizando…</string>
+    <string name="today_route_optimized">Ruta optimizada</string>
+    <string name="today_route_optimized_partial">Ruta optimizada — algunas direcciones no se pudieron asignar</string>
+    <string name="today_route_no_addresses">No se encontraron estas direcciones en el mapa — revísalas en Clientes</string>
+    <string name="today_route_failed">No se pudo optimizar la ruta. Inténtalo de nuevo.</string>
     <string name="today_job_count">%1$d trabajo(s)</string>
     <string name="today_stat_completed">Completados</string>
     <string name="today_stat_revenue">Ingresos</string>

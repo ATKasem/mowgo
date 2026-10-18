@@ -68,6 +68,12 @@
     <string name="today_confirm_rain_delay">Confirm Rain Delay</string>
     <string name="today_no_rain_delays">No rain delays yet</string>
     <string name="today_undo">Undo</string>
+    <string name="today_optimize_route">Optimize</string>
+    <string name="today_optimizing_route">Optimizing…</string>
+    <string name="today_route_optimized">Route optimized</string>
+    <string name="today_route_optimized_partial">Route optimized — some addresses couldn\'t be mapped</string>
+    <string name="today_route_no_addresses">Couldn\'t find these addresses on the map — check them in Clients</string>
+    <string name="today_route_failed">Could not optimize route. Try again.</string>
     <string name="today_job_count">%1$d job(s)</string>
     <string name="today_stat_completed">Completed</string>
     <string name="today_stat_revenue">Revenue</string>

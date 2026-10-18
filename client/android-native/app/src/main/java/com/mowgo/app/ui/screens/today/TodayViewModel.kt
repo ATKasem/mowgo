@@ -16,6 +16,12 @@ import com.mowgo.app.data.model.RainDelayEntry
 import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.sync.SyncManager
+import com.mowgo.app.R
+import com.mowgo.app.lib.AddressGeocoder
+import com.mowgo.app.lib.Coordinate
+import com.mowgo.app.lib.Entry
+import com.mowgo.app.lib.RouteOptimizer
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +40,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
+private val PAID_TIERS = setOf("solo", "crew", "premium")
+
 /**
  * UI state for the Today screen.
  */
@@ -42,7 +50,7 @@ data class TodayUiState(
     val error: String? = null,
     val jobs: List<JobWithClient> = emptyList(),
     val clients: List<Client> = emptyList(),
-    val businessName: String = "Green Thumb Lawn Care",
+    val businessName: String = "",
     val showRainDelayDialog: Boolean = false,
     val rainDelayCount: Int = 0,
     val rainDelayTargetDate: String = LocalDate.now().plusDays(1).toString(),
@@ -58,7 +66,15 @@ data class TodayUiState(
     val uploadingPhotoJobIds: Set<String> = emptySet(),
     val isOffline: Boolean = false,
     val pendingSyncCount: Int = 0,
+    /** Paid plan (solo/crew/premium) and not a crew member — same gate as web/iOS. */
+    val isPaidOwner: Boolean = false,
+    val businessLocation: Coordinate? = null,
+    val isOptimizingRoute: Boolean = false,
 ) {
+    /** Optimize needs 3+ stops; route_order is day-wide, so owners only. */
+    val canOptimizeRoute: Boolean
+        get() = isPaidOwner && todayJobs.size >= 3
+
     val todayJobs: List<JobWithClient>
         get() {
             val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -147,6 +163,9 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                     hasBusinessLocation = hasLocation,
                     isOffline = !SyncManager.isOnline.value,
                     pendingSyncCount = pendingSyncCount,
+                    businessName = profile?.businessName?.trim().orEmpty(),
+                    isPaidOwner = profile?.tier?.let { it in PAID_TIERS } == true && profile?.role != "crew",
+                    businessLocation = if (hasLocation) Coordinate(latitude!!, longitude!!) else null,
                 )
             } catch (e: Exception) {
                 if (generation == loadGeneration) _uiState.value = _uiState.value.copy(
@@ -198,6 +217,64 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     showSnackbar = "Failed to delete: ${e.message}",
+                )
+            }
+        }
+    }
+
+    /**
+     * Reorder today's stops by drive distance. Looks up any client address
+     * without saved coordinates (platform Geocoder), caches the result on the
+     * client row, then saves the optimized order through the same path as the
+     * up/down arrows (offline-queued when there's no signal).
+     */
+    fun optimizeRoute() {
+        val start = _uiState.value
+        if (!start.canOptimizeRoute || start.isOptimizingRoute) return
+        _uiState.value = start.copy(isOptimizingRoute = true)
+        val app = getApplication<Application>()
+        viewModelScope.launch {
+            try {
+                val dayJobs = _uiState.value.todayJobs
+                val date = dayJobs.first().scheduledDate
+                val coordinates = repository.loadClientCoordinates(dayJobs.map { it.clientId }.toSet()).toMutableMap()
+                val geocoder = AddressGeocoder(app)
+                var unmapped = 0
+                dayJobs.distinctBy { it.clientId }.forEach { job ->
+                    if (coordinates.containsKey(job.clientId)) return@forEach
+                    val found = job.clientAddress?.let { geocoder.geocode(it) }
+                    if (found == null) {
+                        unmapped++
+                        return@forEach
+                    }
+                    coordinates[job.clientId] = found
+                    // Caching is best-effort: a failed save only means a re-lookup next time.
+                    try {
+                        repository.saveClientCoordinates(job.clientId, found)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Exception) {
+                    }
+                }
+
+                val entries = dayJobs.map { job ->
+                    val coordinate = coordinates[job.clientId]
+                    Entry(job.id, coordinate?.lat, coordinate?.lng)
+                }
+                val message = if (entries.count { it.lat != null && it.lng != null } < 2) {
+                    app.getString(R.string.today_route_no_addresses)
+                } else {
+                    repository.applyRouteOrder(date, RouteOptimizer.optimizeRoute(entries, _uiState.value.businessLocation))
+                    loadData()
+                    app.getString(if (unmapped > 0) R.string.today_route_optimized_partial else R.string.today_route_optimized)
+                }
+                _uiState.value = _uiState.value.copy(isOptimizingRoute = false, showSnackbar = message)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isOptimizingRoute = false,
+                    showSnackbar = app.getString(R.string.today_route_failed),
                 )
             }
         }
