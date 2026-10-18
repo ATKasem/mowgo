@@ -23,6 +23,11 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # The action's default ("tools platform-tools") fails on current
+          # runners: cmdline-tools 16 no longer ships the legacy "tools"
+          # package. Gradle installs the platforms/build-tools it needs.
+          packages: 'platform-tools'
 
       - name: Make gradlew executable
         working-directory: client/android-native
