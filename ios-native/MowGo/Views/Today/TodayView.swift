@@ -63,8 +63,11 @@ struct TodayView: View {
             filtered.sort { a, b in
                 let orderA = a.routeOrder ?? Int.max
                 let orderB = b.routeOrder ?? Int.max
-                return orderA < orderB
+                if orderA != orderB { return orderA < orderB }
+                return Job.displayOrder(a, b)
             }
+        } else {
+            filtered.sort(by: Job.displayOrder)
         }
         return filtered
     }
@@ -268,7 +271,7 @@ struct TodayView: View {
                 }
             }
             .onAppear {
-                if auth.user?.tier == "crew" || auth.user?.tier == "premium" {
+                if auth.user?.canManageCrew == true {
                     Task { await store.loadTeamMembers() }
                 }
             }
@@ -503,7 +506,7 @@ struct TodayView: View {
     // MARK: - Crew Filter
 
     private var crewFilterBar: some View {
-        let canManageCrew = auth.user?.tier == "crew" || auth.user?.tier == "premium"
+        let canManageCrew = auth.user?.canManageCrew == true
         return Group {
             if canManageCrew && store.teamMembers.count >= 2 {
                 HStack(spacing: 8) {

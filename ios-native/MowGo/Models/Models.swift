@@ -510,6 +510,11 @@ struct UserProfile: Codable, Identifiable {
         default: tier ?? NSLocalizedString("Free", comment: "Subscription tier name: free plan")
         }
     }
+
+    /// Crew features (roster, invites, crew filter) need a Crew or Premium plan.
+    /// Trials set `tier` to the trial plan server-side, so `tier` alone decides.
+    /// UX only — invite-crew enforces the tier on the server.
+    var canManageCrew: Bool { tier == "crew" || tier == "premium" }
 }
 
 struct ReferralStatus: Codable, Equatable {
@@ -714,4 +719,59 @@ struct InviteProfile: Codable {
     let tier: String?
     let role: String?
     let businessId: String?
+}
+
+// MARK: - Scheduled time display
+
+/// Formats a Postgres `time` value for display in the user's locale.
+/// The DB returns "08:00:00" even though the app writes "08:00", so accept
+/// both; anything unparseable is shown as-is rather than hidden.
+enum ScheduledTimeFormat {
+    private static let parsers: [DateFormatter] = ["HH:mm:ss", "HH:mm"].map { format in
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: "UTC")
+        f.dateFormat = format
+        return f
+    }
+
+    private static let output: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = .autoupdatingCurrent
+        f.timeZone = TimeZone(identifier: "UTC")
+        f.dateStyle = .none
+        f.timeStyle = .short
+        return f
+    }()
+
+    static func display(_ raw: String) -> String {
+        for parser in parsers {
+            if let date = parser.date(from: raw) { return output.string(from: date) }
+        }
+        return raw
+    }
+}
+
+// MARK: - Job display order
+
+extension Job {
+    /// Stable order for day lists: time (untimed last), then route order, then
+    /// id. Status deliberately plays no part — a job must not move when it is
+    /// started or completed, or the next tap lands on a different job.
+    static func displayOrder(_ a: Job, _ b: Job) -> Bool {
+        // Compare HH:mm only: the app writes "08:00", the DB returns "08:00:00".
+        let timeA = a.scheduledTime.map { String($0.prefix(5)) }
+        let timeB = b.scheduledTime.map { String($0.prefix(5)) }
+        if timeA != timeB {
+            switch (timeA, timeB) {
+            case let (x?, y?): return x < y
+            case (_?, nil): return true
+            default: return false
+            }
+        }
+        let routeA = a.routeOrder ?? Int.max
+        let routeB = b.routeOrder ?? Int.max
+        if routeA != routeB { return routeA < routeB }
+        return a.id.uuidString < b.id.uuidString
+    }
 }

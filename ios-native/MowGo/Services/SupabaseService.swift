@@ -466,10 +466,15 @@ actor SupabaseService {
         let filter = profile?.role == "crew"
             ? "assigned_to=eq.\(uid.uuidString)"
             : "user_id=eq.\(uid.uuidString)"
-        let path = "/rest/v1/jobs?select=*,clients!left(*)&\(filter)&order=scheduled_date.asc"
+        let path = "/rest/v1/jobs?select=*,clients!left(*)&\(filter)&order=\(Self.jobsOrder)"
         let data = try await request("GET", path)
         return try decoder.decode([Job].self, from: data)
     }
+
+    /// Fully deterministic job order. Ordering by date alone left same-day ties
+    /// in heap order, so an updated row jumped to the end on the next poll and
+    /// the Today list shifted under the user's finger.
+    private static let jobsOrder = "scheduled_date.asc,scheduled_time.asc.nullslast,created_at.asc,id.asc"
 
     func fetchInvoices() async throws -> [Invoice] {
         guard let uid = try await getCurrentUserId() else { throw SupabaseError.network }
@@ -492,7 +497,7 @@ actor SupabaseService {
         let filter = profile?.role == "crew"
             ? "assigned_to=eq.\(uid.uuidString)"
             : "user_id=eq.\(uid.uuidString)"
-        let path = "/rest/v1/jobs?select=*,clients!left(*)&\(filter)&order=scheduled_date.asc"
+        let path = "/rest/v1/jobs?select=*,clients!left(*)&\(filter)&order=\(Self.jobsOrder)"
         let data = try await request("GET", path)
         return try decoder.decode([Job].self, from: data)
     }

@@ -29,6 +29,7 @@ struct InvoicesView: View {
     private var unpaid: [Invoice] { store.invoices.filter { $0.status == .unpaid || $0.status == .overdue } }
     private var paid: [Invoice] { store.invoices.filter { $0.status == .paid } }
     private var totalUnpaid: Decimal { unpaid.reduce(0) { $0 + $1.amount } }
+    private var totalPaid: Decimal { paid.reduce(0) { $0 + $1.amount } }
 
     var body: some View {
         NavigationStack {
@@ -124,7 +125,7 @@ struct InvoicesView: View {
     private var totalBar: some View {
         HStack { VStack { Text("Unpaid").font(.caption); Text(totalUnpaid.formatted(.currency(code: "USD"))).font(.title2.bold()).foregroundColor(MowGoTheme.danger) }.frame(maxWidth: .infinity)
             Divider().frame(height: 40)
-            VStack { Text("Paid").font(.caption); Text("\(paid.count)").font(.title2.bold()).foregroundColor(MowGoTheme.success) }.frame(maxWidth: .infinity)
+            VStack { Text("Paid").font(.caption); Text(totalPaid.formatted(.currency(code: "USD"))).font(.title2.bold()).foregroundColor(MowGoTheme.success) }.frame(maxWidth: .infinity)
         }.foregroundColor(theme.textMuted).padding().background(theme.surface).cornerRadius(16)
     }
     private func sectionHeader(_ title: String) -> some View { Text(title).font(.headline).foregroundColor(theme.textPrimary).frame(maxWidth: .infinity, alignment: .leading) }
@@ -170,8 +171,10 @@ struct InvoiceRow: View {
                     VStack(alignment: .leading) {
                         Text(invoice.clientName ?? NSLocalizedString("Invoice", comment: "Invoice row fallback when no client name"))
                             .font(.subheadline.weight(.medium))
-                        if let date = invoice.createdAt {
-                            Text(String(date.prefix(10))).font(.caption).foregroundColor(theme.textMuted)
+                        if let createdAt = invoice.createdAt {
+                            // created_at is UTC; show the user's local day, not the UTC date prefix.
+                            Text(InvoiceDetailView.parseISODate(createdAt)?.formatted(date: .abbreviated, time: .omitted) ?? String(createdAt.prefix(10)))
+                                .font(.caption).foregroundColor(theme.textMuted)
                         }
                         Text("Tap for details")
                             .font(.caption2)

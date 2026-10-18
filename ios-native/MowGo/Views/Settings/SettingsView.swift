@@ -673,7 +673,7 @@ private struct RecurringJobsSettingsView: View {
                             .foregroundColor(theme.textMuted)
                     }
                     if let time = template.scheduledTime {
-                        Text("· \(time)")
+                        Text("· \(ScheduledTimeFormat.display(time))")
                             .font(.caption2)
                             .foregroundColor(theme.textMuted)
                     }

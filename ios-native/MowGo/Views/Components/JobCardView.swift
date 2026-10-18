@@ -134,7 +134,7 @@ struct JobCardView: View {
                     if let time = job.scheduledTime {
                         Image(systemName: "clock")
                             .font(.system(size: 10))
-                        Text(time)
+                        Text(ScheduledTimeFormat.display(time))
                     }
                     if let duration = job.durationMinutes {
                         Text("· \(duration)m")

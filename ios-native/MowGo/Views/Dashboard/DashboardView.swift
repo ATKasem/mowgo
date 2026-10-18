@@ -53,7 +53,7 @@ struct DashboardView: View {
     }
 
     private var todayJobs: [Job] {
-        store.jobs.filter { $0.scheduledDate == today }
+        store.jobs.filter { $0.scheduledDate == today }.sorted(by: Job.displayOrder)
     }
 
     private var todayDone: [Job] {
@@ -121,6 +121,10 @@ struct DashboardView: View {
         auth.user?.role == ownerRole
     }
 
+    private var canManageCrew: Bool {
+        auth.user?.canManageCrew == true
+    }
+
     /// Activation nudge: show while owner exists and the checklist itself hasn't
     /// reported that all milestones are complete.
     private var showOnboardingChecklist: Bool {
@@ -144,8 +148,8 @@ struct DashboardView: View {
                 }
                 if isOwner { quickActionsSection }
                 todayPreviewSection
-                if isOwner && !teamProgressRows.isEmpty { teamProgressSection }
-                if isOwner { crewRosterSection }
+                if isOwner && canManageCrew && !teamProgressRows.isEmpty { teamProgressSection }
+                if isOwner && canManageCrew { crewRosterSection }
             }
             .padding(16)
         }
@@ -632,7 +636,7 @@ struct DashboardView: View {
                     }
                 }
                 if let time = job.scheduledTime {
-                    Text(time)
+                    Text(ScheduledTimeFormat.display(time))
                         .font(.caption)
                         .foregroundColor(theme.textMuted)
                 }
