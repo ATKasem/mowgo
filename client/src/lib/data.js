@@ -571,8 +571,38 @@ export async function loadClients() {
 
 // ===== Route Optimization: geocoding =====
 
-/** Open-Meteo geocoding — free, no key (same provider as getWeatherForLocation). */
+/**
+ * Street-address geocoding for route optimization. Free, no API key.
+ *
+ * Nominatim (OpenStreetMap) first: it resolves street addresses (US + Canada)
+ * and allows browser CORS. Open-Meteo stays as the fallback for city-only
+ * input — on its own it only matches place names, so "123 Oak St, Austin, TX"
+ * returned nothing and Optimize could never place real clients.
+ * Nominatim usage policy: ≤1 request/second (ensureClientCoords spaces calls
+ * 1.1s apart) and coords are cached on the client row, so each address is
+ * looked up once.
+ */
 export async function geocodeAddress(address) {
+  const query = (address || '').trim();
+  if (!query) return null;
+  return (await geocodeWithNominatim(query)) ?? (await geocodeWithOpenMeteo(query));
+}
+
+async function geocodeWithNominatim(address) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=jsonv2&limit=1`;
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const latitude = Number(data?.[0]?.lat);
+    const longitude = Number(data?.[0]?.lon);
+    return Number.isFinite(latitude) && Number.isFinite(longitude) ? { latitude, longitude } : null;
+  } catch {
+    return null; // graceful failure — never throw
+  }
+}
+
+async function geocodeWithOpenMeteo(address) {
   try {
     const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(address)}&count=1&language=en&format=json`;
     const res = await fetch(url);
@@ -593,7 +623,7 @@ export async function updateClientCoords(clientId, lat, lng) {
 
 /**
  * Lazy backfill: for clients with an address but no coords, geocode
- * sequentially (~100ms apart, rate-limit-safe), persist, and return a
+ * sequentially (1.1s apart — Nominatim's 1 req/s policy), persist, and return a
  * clientId → {lat, lng} map. Coords already on the row are reused — the
  * second Optimize tap makes zero new geocode calls.
  */
@@ -607,7 +637,7 @@ export async function ensureClientCoords(clients) {
       continue;
     }
     pending++;
-    if (pending > 1) await new Promise(r => setTimeout(r, 100));
+    if (pending > 1) await new Promise(r => setTimeout(r, 1100));
     const coords = await geocodeAddress(client.address);
     if (coords) {
       try { await updateClientCoords(client.id, coords.latitude, coords.longitude); } catch (err) {
