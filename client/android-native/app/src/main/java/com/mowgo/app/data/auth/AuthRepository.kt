@@ -4,9 +4,11 @@ import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.TeamRepository
 import com.mowgo.app.data.local.AppDatabaseProvider
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.StateFlow
 
 /**

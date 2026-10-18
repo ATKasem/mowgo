@@ -133,6 +133,7 @@ class DashboardViewModel : ViewModel() {
         scheduledTime: String?,
         notes: String?,
         routeOrder: Int?,
+        recurrenceRule: String,
         onSuccess: () -> Unit,
     ) {
         viewModelScope.launch {
@@ -146,6 +147,7 @@ class DashboardViewModel : ViewModel() {
                         notes = notes,
                         routeOrder = routeOrder,
                         status = Job.STATUS_SCHEDULED,
+                        recurrenceRule = recurrenceRule.takeUnless { it == "none" },
                     )
                 )
                 onSuccess()

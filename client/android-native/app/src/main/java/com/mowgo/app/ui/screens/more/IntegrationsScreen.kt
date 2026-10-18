@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mowgo.app.R
-import com.mowgo.app.data.AuthRepository
+import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.WebhookConfig
 import com.mowgo.app.data.WebhookRepository
 import kotlinx.coroutines.launch
@@ -62,6 +62,7 @@ private const val QBO_BASE_URL = "https://mowgoapp.com/api/integrations"
 fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
+    val syncSuccessMessage = stringResource(R.string.qbo_sync_success)
     var editing by remember { mutableStateOf<WebhookConfig?>(null) }
     var deleting by remember { mutableStateOf<WebhookConfig?>(null) }
     val context = LocalContext.current
@@ -72,7 +73,7 @@ fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = view
     // Fetch QBO status on launch
     LaunchedEffect(Unit) {
         try {
-            val auth = AuthRepository(context.applicationContext)
+            val auth = AuthRepository()
             val session = auth.currentSession
             val token = session?.accessToken ?: return@LaunchedEffect
             val conn = java.net.URL("$QBO_BASE_URL/qbo-status").openConnection() as java.net.HttpURLConnection
@@ -112,7 +113,7 @@ fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = view
                     showDisconnectDialog = false
                     scope.launch {
                         try {
-                            val auth = AuthRepository(context.applicationContext)
+                            val auth = AuthRepository()
                             val session = auth.currentSession
                             val token = session?.accessToken ?: return@launch
                             val conn = java.net.URL("$QBO_BASE_URL/qbo-disconnect").openConnection() as java.net.HttpURLConnection
@@ -161,7 +162,7 @@ fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = view
                             Text(stringResource(R.string.qbo_integration), fontWeight = FontWeight.SemiBold)
                             Text(
                                 if (qboState.connected && qboState.companyName != null)
-                                    stringResource(R.string.qbo_connected, qboState.companyName)
+                                    stringResource(R.string.qbo_connected, qboState.companyName.orEmpty())
                                 else stringResource(R.string.qbo_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -178,7 +179,7 @@ fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = view
                                         scope.launch {
                                             try {
                                                 qboState = qboState.copy(loading = true)
-                                                val auth = AuthRepository(context.applicationContext)
+                                                val auth = AuthRepository()
                                                 val session = auth.currentSession
                                                 val token = session?.accessToken ?: return@launch
                                                 val conn = java.net.URL("$QBO_BASE_URL/qbo-connect").openConnection() as java.net.HttpURLConnection
@@ -231,7 +232,7 @@ fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = view
                                     scope.launch {
                                         qboState = qboState.copy(syncing = true, error = null)
                                         try {
-                                            val auth = AuthRepository(context.applicationContext)
+                                            val auth = AuthRepository()
                                             val session = auth.currentSession
                                             val token = session?.accessToken ?: return@launch
                                             val conn = java.net.URL("$QBO_BASE_URL/qbo-sync").openConnection() as java.net.HttpURLConnection
@@ -245,7 +246,7 @@ fun IntegrationsScreen(back: () -> Unit, viewModel: IntegrationsViewModel = view
                                             conn.disconnect()
                                             if (code == 200) {
                                                 qboState = qboState.copy(syncing = false)
-                                                scope.launch { snackbar.showSnackbar(stringResource(R.string.qbo_sync_success)) }
+                                                scope.launch { snackbar.showSnackbar(syncSuccessMessage) }
                                                 // Refresh status
                                                 val statusConn = java.net.URL("$QBO_BASE_URL/qbo-status").openConnection() as java.net.HttpURLConnection
                                                 statusConn.requestMethod = "GET"

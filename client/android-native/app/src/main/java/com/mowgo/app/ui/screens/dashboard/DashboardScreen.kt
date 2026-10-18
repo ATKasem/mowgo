@@ -1,5 +1,6 @@
 package com.mowgo.app.ui.screens.dashboard
 
+import com.mowgo.app.lib.ScheduledTimeFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -105,8 +106,8 @@ fun DashboardScreen(
         NewJobDialog(
             clients = loaded.clients,
             onDismiss = { showAddJob = false },
-            onCreate = { title, clientId, date, time, notes, routeOrder ->
-                viewModel.createJob(title, clientId, date, time, notes, routeOrder) {
+            onCreate = { title, clientId, date, time, notes, routeOrder, recurrence ->
+                viewModel.createJob(title, clientId, date, time, notes, routeOrder, recurrence) {
                     showAddJob = false
                 }
             },
@@ -329,7 +330,7 @@ private fun TodayJobRow(job: JobWithClient) {
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Text(job.clientName.ifBlank { job.title }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-            job.scheduledTime?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            job.scheduledTime?.let { Text(ScheduledTimeFormat.display(it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
         Text(
             when (job.status) {
