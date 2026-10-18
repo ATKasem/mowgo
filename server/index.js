@@ -4,9 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { createClient } = require('@supabase/supabase-js');
-const Stripe = require('stripe');
 const { Resend } = require('resend');
-const { constructStripeEvent, handleStripeEvent } = require('./stripe-subscriptions');
 
 const app = express();
 
@@ -30,45 +28,9 @@ app.use('/api/', rateLimit({
   legacyHeaders: false,
 }));
 
-// Webhook needs raw body for Stripe signature verification — mount BEFORE rate limiter & json parser
-// Exempt from rate limiting: Stripe retries failed deliveries with exponential backoff;
-// a 429 causes Stripe to eventually disable the endpoint.
-app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
-  try { event = constructStripeEvent(stripe, req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); }
-  catch (err) { return res.status(400).send(`Webhook Error: ${err.message}`); }
-
-  try {
-    await handleStripeEvent(event, {
-      supabase,
-      stripe,
-      priceToTier: {
-        [process.env.STRIPE_PRICE_SOLO]: 'solo',
-        [process.env.STRIPE_PRICE_CREW]: 'crew',
-        [process.env.STRIPE_PRICE_SOLO_ANNUAL]: 'solo',
-        [process.env.STRIPE_PRICE_CREW_ANNUAL]: 'crew',
-        [process.env.STRIPE_PRICE_PREMIUM]: 'premium',
-        [process.env.STRIPE_PRICE_PREMIUM_ANNUAL]: 'premium',
-      },
-    });
-  } catch (err) {
-    console.error(`Stripe webhook ${event.id} failed:`, err.message);
-    return res.status(err.statusCode || 500).send(err.message);
-  }
-  res.json({ received: true });
-});
-
-// Stripe endpoints: stricter limit (webhook is exempt — mounted above)
-app.use('/api/stripe/', rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-}));
-
 app.use(express.json());
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // === Helpers ===
@@ -363,35 +325,8 @@ app.post('/api/invoices/send-email', auth, async (req, res) => {
   }
 });
 
-// === STRIPE ===
-app.post('/api/stripe/checkout', auth, async (req, res) => {
-  const { invoice_id } = req.body;
-  if (!invoice_id) return res.status(400).json({ error: 'Missing invoice_id' });
-
-  // Fetch the invoice server-side — never trust client-provided amounts
-  const { data: invoice, error: invError } = await supabase
-    .from('invoices')
-    .select('amount, status, user_id')
-    .eq('id', invoice_id)
-    .single();
-
-  if (invError || !invoice) return res.status(404).json({ error: 'Invoice not found' });
-  if (invoice.user_id !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
-  if (invoice.status === 'paid') return res.status(400).json({ error: 'Invoice already paid' });
-
-  const amountInCents = Math.round(invoice.amount * 100);
-  if (amountInCents <= 0) return res.status(400).json({ error: 'Invalid invoice amount' });
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card', 'apple_pay', 'google_pay'],
-    line_items: [{ price_data: { currency: 'usd', product_data: { name: 'Service Invoice' }, unit_amount: amountInCents }, quantity: 1 }],
-    mode: 'payment',
-    success_url: `${process.env.APP_URL}/invoices?paid=true`,
-    cancel_url: `${process.env.APP_URL}/invoices?paid=false`,
-    metadata: { invoice_id },
-  });
-  res.json({ url: session.url });
-});
+// Payments (subscriptions + invoice card payments) live in Cloudflare Pages
+// Functions: functions/api/payments/. See docs/PAYMENTS.md.
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`MowGo API running on port ${PORT}`));

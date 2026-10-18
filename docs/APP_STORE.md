@@ -23,14 +23,14 @@ Jobber and Housecall Pro are built for 20-person crews at $119+/month. Yardbook 
 • Smart calendar with recurring jobs — set it once, it populates forever
 • Daily route planner with drag-and-drop reordering + GPS navigation
 • Client profiles — addresses, gate codes, alarm codes, pet instructions, mow height
-• One-tap invoicing — mark job complete, invoice auto-created, client pays via Stripe
+• One-tap invoicing — mark job complete, invoice auto-created, client pays by Zelle, Venmo or Cash App
 • Works offline — syncs when you're back online, no extra charge
 • Dark mode built in — not a browser hack, actual dark mode
 • Compare us — full feature comparison table at mowgo.pages.dev/#/compare
 
 **PRICING:**
 • Free: Up to 10 clients, rain delay, basic scheduling, dark mode, installable PWA
-• Solo: $39/month — unlimited clients, routes, offline mode, Stripe payments
+• Solo: $39/month — unlimited clients, routes, offline mode, invoice payments
 • Crew: $79/month — multi-user team, job assignment, route optimization, priority support
 
 14-day free trial on paid plans. No per-user fees. No contracts. Cancel anytime.
@@ -73,6 +73,6 @@ https://mowgo.pages.dev/#/compare
 
 ## Review Notes
 - Demo mode is active on TestFlight builds — no account needed, tap "Continue with Demo"
-- Stripe checkout is fully functional with live keys for subscription payments
+- Card checkout is not live yet (payment provider switching to Rise Concepts); the Upgrade button shows "Card payments are coming soon." The 14-day no-card trial works
 - Offline mode uses IndexedDB via Service Worker, syncs on reconnect
 - Rain delay is the key differentiator — test it on the Today tab

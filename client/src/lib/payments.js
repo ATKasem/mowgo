@@ -1,33 +1,56 @@
 /**
- * Redirect to Stripe Checkout via Cloudflare Pages Function.
- * The server-side endpoint handles Stripe API calls with the secret key.
+ * Card payments go through MowGo's payment provider via Cloudflare Pages
+ * Functions (functions/api/payments/*). The provider is swappable server-side;
+ * this file only deals with hosted-page URLs and the shared error codes.
+ * Until a provider is live, endpoints return 503 { code: 'payments_unavailable' }.
+ */
+import { supabase } from './supabase';
+
+export const PAYMENTS_COMING_SOON = 'Card payments are coming soon.';
+
+async function postPayments(path, body = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return { status: 401, data: {} };
+  const res = await fetch(`/api/payments/${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify(body),
+  });
+  let data = {};
+  try { data = await res.json(); } catch { /* non-JSON error page */ }
+  return { status: res.status, data };
+}
+
+/** { subscriptions, invoicePayments } — false until a provider is live. */
+export async function getPaymentsConfig() {
+  try {
+    const res = await fetch('/api/payments/config');
+    if (!res.ok) throw new Error(String(res.status));
+    const data = await res.json();
+    return { subscriptions: Boolean(data.subscriptions), invoicePayments: Boolean(data.invoicePayments) };
+  } catch {
+    return { subscriptions: false, invoicePayments: false };
+  }
+}
+
+/**
+ * Redirect to the payment provider's hosted checkout.
  *
  * @param {'solo'|'crew'|'premium'} plan
  * @param {'month'|'year'} interval
  */
-import { supabase } from './supabase';
-
 export async function startCheckout(plan, interval = 'month') {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) return { error: 'Log in or create an account before subscribing.' };
-
-    const res = await fetch('/api/stripe/checkout-subscription', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ plan, interval }),
-    });
-
-    const data = await res.json();
-
+    const { status, data } = await postPayments('subscription-checkout', { plan, interval });
+    if (status === 401) return { error: 'Log in or create an account before subscribing.' };
+    if (data.code === 'payments_unavailable') return { error: PAYMENTS_COMING_SOON, unavailable: true };
     if (data.url) {
       window.location.href = data.url;
       return { success: true };
     }
-
     return { error: data.error || 'Failed to start checkout' };
   } catch (err) {
     console.error('Checkout error:', err);
@@ -114,23 +137,49 @@ export async function resumeCheckoutIntent() {
   }
 }
 
+/** The signed-in owner's merchant status for card payments, or 'none'. */
+export async function getMerchantStatus() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 'none';
+  // RLS: owners can read only their own row.
+  const { data, error } = await supabase
+    .from('merchant_accounts')
+    .select('status')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.status || 'none';
+}
+
+/** Redirect to the payment provider's hosted merchant application. */
+export async function startMerchantOnboarding() {
+  try {
+    const { status, data } = await postPayments('merchant-onboarding');
+    if (status === 401) return { error: 'Please log in again.' };
+    if (data.code === 'payments_unavailable') return { error: PAYMENTS_COMING_SOON, unavailable: true };
+    if (data.url) {
+      window.location.href = data.url;
+      return { success: true };
+    }
+    return { error: data.error || 'Unable to start card payment setup.' };
+  } catch (err) {
+    console.error('Merchant onboarding error:', err);
+    return { error: 'Connection failed. Check your internet and try again.' };
+  }
+}
+
 export async function openCustomerPortal() {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) return { error: 'Please log in to manage your subscription.' };
-
-    const res = await fetch('/api/stripe/create-portal-session', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    });
-    const data = await res.json();
+    const { status, data } = await postPayments('billing-portal');
+    if (status === 401) return { error: 'Please log in to manage your subscription.' };
+    if (data.code === 'payments_unavailable') return { error: PAYMENTS_COMING_SOON, unavailable: true };
     if (data.url) {
       window.location.href = data.url;
       return { success: true };
     }
     return { error: data.error || 'Unable to open subscription management.' };
   } catch (err) {
-    console.error('Customer portal error:', err);
+    console.error('Billing portal error:', err);
     return { error: 'Connection failed. Check your internet and try again.' };
   }
 }

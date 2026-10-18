@@ -22,22 +22,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Supabase/Stripe config — overridable via local.properties (gitignored) or CI env vars.
+        // Supabase config — overridable via local.properties (gitignored) or CI env vars.
         // SUPABASE_URL/SUPABASE_ANON_KEY are PUBLIC (anon key is RLS-protected, ships in every
-        // client) so a committed prod default is fine. STRIPE_PUBLISHABLE_KEY is NOT defaulted —
-        // shipping a live key as a silent fallback would let any local/CI debug build process
-        // real charges. If it's missing, MowGoActivity.onCreate() fails loudly at app launch
-        // (build still compiles, so CI's assembleDebug step is unaffected) instead of using it.
+        // client) so a committed prod default is fine. Card payments need no client key: the
+        // app opens the payment provider's hosted pages (see data/PaymentRepository.kt).
         val props = Properties().apply {
             val f = rootProject.file("local.properties")
             if (f.exists()) f.inputStream().use { load(it) }
         }
         buildConfigField("String", "SUPABASE_URL", "\"${props.getProperty("SUPABASE_URL", "https://vqgiynfrpsqddjrayczc.supabase.co")}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${props.getProperty("SUPABASE_ANON_KEY", "sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz")}\"")
-        val stripeKey = props.getProperty("STRIPE_PUBLISHABLE_KEY")
-            ?: System.getenv("STRIPE_PUBLISHABLE_KEY")
-            ?: ""
-        buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"$stripeKey\"")
     }
 
     signingConfigs {
@@ -141,7 +135,6 @@ dependencies {
     implementation(libs.coil.compose)
 
     // Payments
-    implementation(libs.stripe.android)
 
     // Firebase Cloud Messaging
     implementation(platform(libs.firebase.bom))

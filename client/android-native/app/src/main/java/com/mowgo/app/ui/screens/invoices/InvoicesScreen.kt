@@ -1,6 +1,9 @@
 package com.mowgo.app.ui.screens.invoices
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
@@ -25,6 +28,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
@@ -36,8 +41,6 @@ import com.mowgo.app.data.model.Estimate
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
 import com.mowgo.app.ui.theme.MowGoColors
 import com.mowgo.app.ui.theme.extendedColors
-import com.stripe.android.paymentsheet.PaymentSheet
-import com.stripe.android.paymentsheet.PaymentSheetResult
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,8 +53,8 @@ fun InvoicesScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
-    val paymentRecoverErrorText = stringResource(R.string.invoices_payment_recover_error)
-    val paymentFailedGenericText = stringResource(R.string.invoices_payment_failed_generic)
+    val paymentPageOpenFailedText = stringResource(R.string.invoices_payment_page_open_failed)
+    val context = LocalContext.current
     val paymentTextCopiedText = stringResource(R.string.invoices_payment_text_copied)
     val reminderCopiedText = stringResource(R.string.invoices_reminder_copied)
     val invoiceDefaultClientName = stringResource(R.string.invoices_default_client_name)
@@ -61,31 +64,6 @@ fun InvoicesScreen(
     val invoiceMsgServicedNoDate = stringResource(R.string.invoices_msg_serviced_no_date)
     val invoiceMsgNudgeWithDate = stringResource(R.string.invoices_msg_nudge_with_date)
     val invoiceMsgNudgeNoDate = stringResource(R.string.invoices_msg_nudge_no_date)
-    // PaymentSheet must be created via the Compose-safe builder (uses
-    // rememberLauncherForActivityResult internally). Building with
-    // .build(activity) inside remember{} crashed at composition:
-    // registerForActivityResult throws IllegalStateException once the
-    // activity is STARTED/RESUMED (confirmed in stripe-android 21.19.0
-    // bytecode) — this was the Invoices-tab crash.
-    val paymentSheet = remember {
-        PaymentSheet.Builder { result ->
-            val payment = viewModel.uiState.value.pendingPayment
-            when (result) {
-                is PaymentSheetResult.Completed -> {
-                    if (payment != null) {
-                        viewModel.paymentCompleted(payment)
-                    } else {
-                        viewModel.paymentFailed(paymentRecoverErrorText)
-                    }
-                }
-                is PaymentSheetResult.Canceled -> viewModel.paymentCanceled()
-                is PaymentSheetResult.Failed -> viewModel.paymentFailed(
-                    result.error.localizedMessage ?: paymentFailedGenericText,
-                )
-            }
-        }
-    }.build()
-
     LaunchedEffect(state.showSnackbar) {
         state.showSnackbar?.let { message ->
             snackbarHostState.showSnackbar(message)
@@ -93,42 +71,25 @@ fun InvoicesScreen(
         }
     }
 
-    LaunchedEffect(state.paymentError, state.isPaymentConfirmationPending) {
-        if (!state.isPaymentConfirmationPending) {
-            state.paymentError?.let { message ->
-                snackbarHostState.showSnackbar(message)
-                viewModel.dismissPaymentError()
-            }
+    LaunchedEffect(state.paymentError) {
+        state.paymentError?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.dismissPaymentError()
         }
     }
 
-    LaunchedEffect(state.pendingPayment) {
-        val payment = state.pendingPayment
-        if (payment != null && !state.isPaymentSheetPresenting && !state.isPaymentConfirmationPending) {
-            viewModel.paymentSheetPresented()
-            paymentSheet.presentWithPaymentIntent(
-                payment.clientSecret,
-                PaymentSheet.Configuration.Builder(merchantDisplayName = "MowGo").build(),
-            )
-        }
+    // Open the provider's hosted payment page in the browser.
+    LaunchedEffect(state.pendingPaymentUrl) {
+        val url = state.pendingPaymentUrl ?: return@LaunchedEffect
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val opened = runCatching { context.startActivity(intent) }.isSuccess
+        if (opened) viewModel.paymentUrlOpened() else viewModel.paymentUrlFailed(paymentPageOpenFailedText)
     }
 
-    if (state.isPaymentConfirmationPending && state.paymentError != null) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissPendingPayment() },
-            title = { Text(stringResource(R.string.invoices_confirm_payment_title)) },
-            text = { Text(state.paymentError!!) },
-            confirmButton = {
-                TextButton(onClick = { viewModel.retryConfirmPayment() }) {
-                    Text(stringResource(R.string.action_retry))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.dismissPendingPayment() }) {
-                    Text(stringResource(R.string.action_dismiss))
-                }
-            },
-        )
+    // Invoices flip to paid via the provider's webhook; refresh on return.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onReturnedFromPayment()
     }
 
     // Delete confirmation dialog

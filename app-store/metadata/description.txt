@@ -7,7 +7,7 @@ FREE TIER: 5 CLIENTS, FOREVER
 • Rain delay auto-reschedule — one tap, done
 • Daily scheduling with drag-and-drop
 • Client profiles — gate codes, pet instructions, mow notes
-• Invoicing with Stripe payments
+• Invoicing with Zelle, Venmo and Cash App payment requests
 • Dark mode built in, works offline
 
 SOLO PLAN — $39/MONTH

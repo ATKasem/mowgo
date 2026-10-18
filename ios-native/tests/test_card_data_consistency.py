@@ -37,7 +37,8 @@ class CardDataConsistencyTests(unittest.TestCase):
 
         self.assertIn('Image(systemName: "phone.fill")', job_card)
         self.assertIn('Image(systemName: "location.fill")', job_card)
-        self.assertIn('job.status == .done ? "Undo" : "Complete"', job_card)
+        # Three-state toggle: Start → Complete → Undo.
+        self.assertIn('job.status == .done ? "Undo" : job.status == .inProgress ? "Complete" : "Start"', job_card)
         self.assertIn('Button("Edit")', client_card)
         self.assertIn("client.phone", client_card)
 
@@ -48,12 +49,18 @@ class CardDataConsistencyTests(unittest.TestCase):
         )[0]
 
         self.assertIn("VStack(alignment: .leading, spacing: 4)", expanded)
-        self.assertNotIn("stride(from:", expanded)
-        self.assertNotIn("HStack(spacing: 6)", expanded)
+        # The detail list is vertical; the HStack after it is the quick-action
+        # button row (call / map), which matches the job card.
+        details = expanded.split("VStack(alignment: .leading, spacing: 4)", 1)[1].split(
+            ".padding(.horizontal, 12).padding(.bottom, 8)", 1
+        )[0]
+        self.assertNotIn("stride(from:", details)
+        self.assertNotIn("HStack(spacing: 6)", details)
 
         ordered_details = [
             "client.phone",
-            "client.keyCode",
+            # Gate codes are fetched on demand (not kept in the cached client list).
+            "displayKeyCode",
             "client.petInstructions",
             "client.address",
             "client.cleaningNotes",

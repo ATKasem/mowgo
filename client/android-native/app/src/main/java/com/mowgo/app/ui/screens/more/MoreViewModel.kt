@@ -8,6 +8,7 @@ import com.mowgo.app.data.ExportRepository
 import com.mowgo.app.data.ProfileRepository
 import com.mowgo.app.data.PaymentRepository
 import com.mowgo.app.data.SettingsRepository
+import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.auth.AuthRepository
 import com.mowgo.app.data.model.Profile
 import com.mowgo.app.data.model.ReferralStatus
@@ -30,6 +31,10 @@ data class MoreUiState(
     val billingMessage: String? = null,
     val billingInterval: String = "year",
     val pendingBillingUrl: String? = null,
+    /** Card payments live on the server (provider implemented). */
+    val cardPaymentsEnabled: Boolean = false,
+    /** Owner's merchant status; null until loaded. */
+    val merchantStatus: String? = null,
     /// Set when a trial was just granted, before the async profile reload lands.
     /// Guards the double-tap window: a second grant_trial call would return
     /// false (server-side one-shot) and show a misleading error.
@@ -302,6 +307,43 @@ class MoreViewModel(
                     billingLoadingAction = null,
                     billingError = error.message ?: "Could not cancel subscription.",
                 )
+            }
+        }
+    }
+
+    fun loadCardPayments() {
+        if (!SupabaseClientProvider.isConfigured) return
+        viewModelScope.launch {
+            val config = paymentRepository.paymentsConfig()
+            val status = if (config.invoicePayments) {
+                runCatching { paymentRepository.merchantStatus() }.getOrNull()
+            } else {
+                "none"
+            }
+            _uiState.value = _uiState.value.copy(
+                cardPaymentsEnabled = config.invoicePayments,
+                merchantStatus = status ?: _uiState.value.merchantStatus ?: "none",
+            )
+        }
+    }
+
+    fun startMerchantOnboarding() {
+        if (_uiState.value.billingLoadingAction != null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                billingLoadingAction = "merchant",
+                billingError = null,
+                billingMessage = null,
+            )
+            try {
+                val url = paymentRepository.merchantOnboardingUrl()
+                _uiState.value = _uiState.value.copy(billingLoadingAction = null, pendingBillingUrl = url)
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    billingLoadingAction = null,
+                    billingError = error.message ?: "Could not start card payment setup.",
+                )
+                loadCardPayments()
             }
         }
     }

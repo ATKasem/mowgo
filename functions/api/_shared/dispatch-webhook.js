@@ -1,7 +1,7 @@
 /**
  * Shared outgoing-webhook dispatch — used by:
  *  - functions/api/webhook-dispatch.js (browser-authenticated, user-triggered)
- *  - functions/api/stripe/webhook.js (server-triggered, e.g. payment.failed)
+ *  - functions/api/_shared/payments/billing-events.js (server-triggered, e.g. payment.failed)
  *
  * Looks up all active webhook_configs for a user, filters to configs that
  * subscribed to the given event, and POSTs JSON to each configured URL with

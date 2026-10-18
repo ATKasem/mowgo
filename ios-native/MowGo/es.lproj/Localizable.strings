@@ -470,3 +470,22 @@
 // MARK: - Trial Banner
 "%lld days left in your %@ trial" = "Quedan %lld días de tu prueba de %@";
 "Subscribe to keep unlimited clients & jobs" = "Suscríbete para conservar clientes y trabajos ilimitados";
+
+/* Payments (provider-neutral hosted pages) */
+"Card payments are coming soon." = "Los pagos con tarjeta llegarán pronto.";
+"Payment service is temporarily unavailable. Please try again in a moment." = "El servicio de pagos no está disponible temporalmente. Inténtalo de nuevo en un momento.";
+"Please wait — a payment request is already in progress." = "Espera — ya hay una solicitud de pago en curso.";
+"Could not open the payment page." = "No se pudo abrir la página de pago.";
+
+/* Card payments setup (merchant onboarding) */
+"Card Payments" = "Pagos con tarjeta";
+"Card payments are coming soon. Zelle, Venmo and Cash App requests work today." = "Los pagos con tarjeta llegarán pronto. Las solicitudes por Zelle, Venmo y Cash App ya funcionan.";
+"Card payments are active. Customers can pay invoices by card." = "Los pagos con tarjeta están activos. Tus clientes pueden pagar facturas con tarjeta.";
+"Your application is being reviewed. You can finish any remaining steps." = "Tu solicitud está en revisión. Puedes completar los pasos pendientes.";
+"More information is needed before you can accept cards." = "Se necesita más información antes de que puedas aceptar tarjetas.";
+"Card payments are turned off for your account. Contact support." = "Los pagos con tarjeta están desactivados para tu cuenta. Contacta a soporte.";
+"Let customers pay invoices by card. Payments go straight to your business." = "Permite que tus clientes paguen facturas con tarjeta. Los pagos van directo a tu negocio.";
+"Continue setup" = "Continuar configuración";
+"Finish setup" = "Terminar configuración";
+"Set up card payments" = "Configurar pagos con tarjeta";
+"Could not load card payment status." = "No se pudo cargar el estado de los pagos con tarjeta.";

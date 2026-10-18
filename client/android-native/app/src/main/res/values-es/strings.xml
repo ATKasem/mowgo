@@ -152,7 +152,6 @@
     <string name="invoices_tab_estimates">Cotizaciones</string>
     <string name="invoices_new_estimate_cd">Nueva cotización</string>
     <string name="invoices_new_invoice_cd">Nueva factura</string>
-    <string name="invoices_confirm_payment_title">Confirmar pago</string>
     <string name="invoices_delete_title">Eliminar factura</string>
     <string name="invoices_delete_body">¿Eliminar esta factura de $%1$s? Esta acción no se puede deshacer.</string>
     <string name="invoices_mark_paid_title">Marcar como pagada</string>
@@ -190,8 +189,6 @@
     <string name="invoices_status_unpaid">Sin pagar</string>
     <string name="invoices_status_overdue">Vencida</string>
     <string name="invoices_paid_on">Pagada el %1$s</string>
-    <string name="invoices_payment_recover_error">No se pudieron recuperar los detalles de confirmación del pago.</string>
-    <string name="invoices_payment_failed_generic">El pago falló.</string>
     <string name="invoices_payment_sheet_error">No se pudo mostrar la pantalla de pago.</string>
     <string name="invoices_payment_text_copied">Texto de pago copiado — pégalo en un mensaje al cliente</string>
     <string name="invoices_reminder_copied">Recordatorio copiado — pégalo en un mensaje</string>
@@ -352,7 +349,7 @@
     <string name="integrations_event_customer_created_title">Cliente creado</string>
     <string name="integrations_event_customer_created_detail">Nuevo cliente agregado</string>
     <string name="integrations_event_payment_failed_title">Pago fallido</string>
-    <string name="integrations_event_payment_failed_detail">Falla un pago de Stripe</string>
+    <string name="integrations_event_payment_failed_detail">Falla el pago de una suscripción</string>
     <string name="integrations_event_rain_delay_title">Retraso por lluvia aplicado</string>
     <string name="integrations_event_rain_delay_detail">Trabajos reprogramados por lluvia</string>
     <string name="integrations_event_job_skipped_title">Trabajo omitido</string>
@@ -408,4 +405,16 @@
     <string name="referral_signed_up">Registrados</string>
     <string name="referral_converted">Convertidos</string>
     <string name="referral_rewards">Meses gratis</string>
+    <string name="invoices_payment_page_open_failed">No se pudo abrir la página de pago.</string>
+    <!-- Card payments setup (merchant onboarding) -->
+    <string name="card_payments_title">Pagos con tarjeta</string>
+    <string name="card_payments_coming_soon">Los pagos con tarjeta llegarán pronto. Las solicitudes por Zelle, Venmo y Cash App ya funcionan.</string>
+    <string name="card_payments_active">Los pagos con tarjeta están activos. Tus clientes pueden pagar facturas con tarjeta.</string>
+    <string name="card_payments_pending">Tu solicitud está en revisión. Puedes completar los pasos pendientes.</string>
+    <string name="card_payments_restricted">Se necesita más información antes de que puedas aceptar tarjetas.</string>
+    <string name="card_payments_disabled">Los pagos con tarjeta están desactivados para tu cuenta. Contacta a soporte.</string>
+    <string name="card_payments_setup_description">Permite que tus clientes paguen facturas con tarjeta. Los pagos van directo a tu negocio.</string>
+    <string name="card_payments_continue_setup">Continuar configuración</string>
+    <string name="card_payments_finish_setup">Terminar configuración</string>
+    <string name="card_payments_set_up">Configurar pagos con tarjeta</string>
 </resources>

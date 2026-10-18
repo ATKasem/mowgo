@@ -13,17 +13,19 @@ platform :ios do
 
     sh("cd .. && xcodegen generate")
 
-    increment_build_number(
-      build_number: latest_testflight_build_number(app_identifier: "com.mowgoapp") + 1,
-      xcodeproj: "../MowGo.xcodeproj"
-    )
+    # Pass the build number straight to xcodebuild. Info.plist reads
+    # CFBundleVersion from $(CURRENT_PROJECT_VERSION); agvtool-based
+    # increment_build_number needs VERSIONING_SYSTEM=apple-generic, which
+    # this project doesn't set.
+    build_number = latest_testflight_build_number(app_identifier: "com.mowgoapp") + 1
 
     build_app(
-      project: "../MowGo.xcodeproj",
+      project: "MowGo.xcodeproj",
       scheme: "MowGo",
       export_method: "app-store",
       output_directory: "build",
-      clean: true
+      clean: true,
+      xcargs: "CURRENT_PROJECT_VERSION=#{build_number}"
     )
 
     upload_to_testflight(

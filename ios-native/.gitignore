@@ -26,3 +26,7 @@ supabase/.temp/
 *.env
 .env.local
 .env.production
+
+# Simulator test output (CI)
+screenshots/
+*.xcresult

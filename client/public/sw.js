@@ -24,7 +24,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return; // cross-origin: default (supabase, stripe, fonts)
+  if (url.origin !== self.location.origin) return; // cross-origin: default (supabase, payment pages, fonts)
   if (url.pathname.startsWith('/api/')) return; // API: never cache
 
   // Navigations: network-first with cache fallback (offline app shell)

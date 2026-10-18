@@ -72,17 +72,18 @@ serve(async (req) => {
     }
 
     // All four metrics are computed in a single SQL aggregate (RPC
-    // get_conversion_kpi, supabase/migrations/20260808120000_conversion_kpi_rpc.sql)
+    // get_conversion_kpi, latest definition in
+    // supabase/migrations/20261009120000_payment_provider_neutral.sql)
     // rather than fetched as rows and counted in JS:
     //  - profiles.trial_started_at is NOT a reliable trial cohort: the
-    //    Stripe webhook (functions/api/stripe/webhook.js updateProfile)
+    //    payments webhook (functions/api/_shared/payments/billing-events.js)
     //    nulls trial_tier/trial_started_at/trial_ends_at on ANY paid
     //    subscription event, so converted users vanish from that column.
     //    tier_events(source='trial_grant') is the immutable cohort instead.
     //  - "converted" also has to catch a trial user who bought the SAME
     //    tier they were trialing on — the webhook only logs a tier_events
     //    row when the tier actually changes, so that case needs a fallback
-    //    to profiles.tier / stripe_customer_id.
+    //    to profiles.tier / billing_customer_id.
     //  - PostgREST caps unbounded .select() results at ~1000 rows, which
     //    would silently truncate these counts as the platform grows.
     const { data: kpiRows, error: kpiError } = await admin.rpc("get_conversion_kpi");

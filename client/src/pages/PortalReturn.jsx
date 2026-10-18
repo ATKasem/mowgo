@@ -1,15 +1,26 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import useLocalizedText from '../i18n/useLocalizedText';
 import { ArrowUpRight, CheckCircle2 } from 'lucide-react';
 
+// Hosted payment pages send native users here; map the result to an app
+// deep link. Only fixed values are forwarded — never the raw query string.
+const DEEP_LINKS = {
+  upgraded: 'mowgo://settings?upgraded=true',
+  portal: 'mowgo://settings?portal_returned=true',
+  merchant: 'mowgo://settings?merchant_returned=true',
+  canceled: 'mowgo://settings',
+};
+
 export default function PortalReturn() {
   const { tr } = useLocalizedText('portalReturn');
+  const [searchParams] = useSearchParams();
+  const deepLink = DEEP_LINKS[searchParams.get('result')] || DEEP_LINKS.portal;
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
     // Attempt deep link
-    window.location.href = 'mowgo://settings?portal_returned=true';
+    window.location.href = deepLink;
 
     // If still here after 2s, app probably didn't open — show fallback
     const timer = setTimeout(() => setFallback(true), 2000);
@@ -24,7 +35,7 @@ export default function PortalReturn() {
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, []);
+  }, [deepLink]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4">
@@ -45,7 +56,7 @@ export default function PortalReturn() {
         {/* Primary button */}
         <button
           onClick={() => {
-            window.location.href = 'mowgo://settings?portal_returned=true';
+            window.location.href = deepLink;
             setTimeout(() => setFallback(true), 2000);
           }}
           className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold text-lg py-4 px-6 rounded-xl shadow-sm transition-colors cursor-pointer"

@@ -16,7 +16,6 @@
     "@capacitor/ios": "^8.4.2",
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
-    "@stripe/stripe-js": "^2.4.0",
     "@supabase/supabase-js": "^2.110.8",
     "i18next": "^25.10.10",
     "i18next-browser-languagedetector": "^8.2.1",

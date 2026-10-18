@@ -313,6 +313,7 @@ private struct InvoiceDetailView: View {
             } catch {
                 await MainActor.run {
                     markPaidError = error.localizedDescription
+                    store.errorWasPresented(error)
                     markingPaid = false
                 }
             }

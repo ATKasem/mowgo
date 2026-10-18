@@ -36,11 +36,11 @@ enum ExportService {
 
     static func csv(from invoices: [Invoice]) -> String {
         makeCSV(
-            headers: ["ID", "User ID", "Client ID", "Client Name", "Job ID", "Amount", "Status", "Stripe Invoice ID", "Stripe Payment Intent ID", "Sent At", "Paid At", "Created At"],
+            headers: ["ID", "User ID", "Client ID", "Client Name", "Job ID", "Amount", "Status", "Payment Provider", "Provider Payment ID", "Sent At", "Paid At", "Created At"],
             rows: invoices.map { invoice in
                 [invoice.id.uuidString, invoice.userId?.uuidString, invoice.clientId?.uuidString,
                  invoice.clientName, invoice.jobId?.uuidString, String(describing: invoice.amount),
-                 invoice.status.csvLabel, invoice.stripeInvoiceId, invoice.stripePaymentIntentId,
+                 invoice.status.csvLabel, invoice.paymentProvider, invoice.providerPaymentId,
                  invoice.sentAt, invoice.paidAt, invoice.createdAt]
             }
         )

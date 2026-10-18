@@ -7,12 +7,12 @@ Canonical layout for humans and agents. `README.md` is the front door; this is t
 | Path | What it is | App code? |
 |---|---|---|
 | `client/` | React 19 + Vite web app. `src/` = pages, components, lib, hooks, i18n. `android-native/` = Kotlin Android app (supabase-kt, FCM). `public/` = static assets | ✅ web + android |
-| `functions/` | **Cloudflare Pages Functions — the production API.** `api/` subdir: stripe checkout/webhook/portal, route-audit, leads, concierge, autopilot, team invites, booking. `_shared/` = shared validators (e.g. `safe-webhook-url.js`) | ✅ API |
+| `functions/` | **Cloudflare Pages Functions — the production API.** `api/` subdir: payments (provider-neutral checkout/portal/invoice links/webhook), route-audit, leads, concierge, autopilot, team invites, booking. `_shared/` = shared validators (e.g. `safe-webhook-url.js`) | ✅ API |
 | `supabase/` | `migrations/` = SQL schema (RLS is the authorization ground truth). `functions/` = edge functions (auth hooks, checkout session for native) | ✅ backend |
-| `ios-native/` | SwiftUI iOS app (`MowGo/`), Keychain sessions, SwiftData cache, Stripe PaymentSheet. `edge-functions/` = Supabase edge functions used by iOS | ✅ iOS |
+| `ios-native/` | SwiftUI iOS app (`MowGo/`), Keychain sessions, SwiftData cache, hosted payment pages. `edge-functions/` = Supabase edge functions used by iOS (ai-chat) | ✅ iOS |
 | `server/` | Legacy Node/Express server — dev + invoice path only, largely superseded by `functions/`. `test/` = webhook tests | ⚠️ legacy |
 | `scripts/` | Ops + cron backend scripts (activation emails, lead nurture, vault sync dumps, etc.). **Called by absolute path from Hermes cron wrappers — do not move** | ⚙️ ops |
-| `docs/` | Specs, setup guides (Supabase auth, Stripe, CI/CD, store metadata, architecture, brand) | 📄 |
+| `docs/` | Specs, setup guides (Supabase auth, payments, CI/CD, store metadata, architecture, brand) | 📄 |
 | `marketing/` | Playbooks, content templates, social strategy | 📄 |
 | `ops/` | Non-app artifacts. `ops/archive/agent-scratch/` = one-shot agent working files; `ops/archive/reports/` = historical one-shot reports | 🗄️ archive |
 | `certs/`, `profiles/`, `match_version.txt` | fastlane match signing store for CI | 🔐 CI |
@@ -43,7 +43,7 @@ client/src/
   pages/                 Landing, RouteAudit, Compare, Login, ResetPassword, Subscribe,
                          Layout (5-tab nav) → Home, Today, Clients, Invoices, Settings, Autopilot
   components/            JobCard, NewJobForm, InvoiceToast, OnboardingChecklist, ConciergeSetup, ...
-  lib/                   supabase.js (demo mode), payments.js (Stripe), constants.js,
+  lib/                   supabase.js (demo mode), payments.js (hosted checkout), constants.js,
                          offlineStorage.js, maps.js, autopilotTools.js, ics.js, demoData.js
   hooks/                 useAutopilot.js, ...
   i18n/                  locale files (textKey 72-char truncation — see AGENTS.md)
@@ -53,9 +53,12 @@ client/src/
 
 | Endpoint | Purpose |
 |---|---|
-| `stripe/checkout-subscription.js` | Create Stripe Checkout session (solo/crew/premium × month/year) |
-| `stripe/webhook.js` | **Production billing truth** — updates `profiles.tier` |
-| `stripe/create-portal-session.js` | Customer billing portal |
+| `payments/subscription-checkout.js` | Hosted subscription checkout (solo/crew/premium × month/year) |
+| `payments/webhook.js` | **Production billing truth** — provider webhook → `profiles.tier`, invoices paid |
+| `payments/billing-portal.js`, `cancel-subscription.js` | Manage / cancel subscription |
+| `payments/invoice-link.js` | Hosted payment link for an invoice (settles to the business's merchant account) |
+| `payments/config.js` | Public: is card payment live? (clients show "coming soon") |
+| `_shared/payments/` | Provider contract, registry, Rise stub, shared billing-event logic — see `docs/PAYMENTS.md` |
 | `route-audit.js` | Free route-audit lead magnet (estimate email + lead capture) |
 | `leads/public.js` | Lead intake (shared phone regex with route-audit) |
 | `autopilot.js` | LLM proxy for chat-to-CRM |

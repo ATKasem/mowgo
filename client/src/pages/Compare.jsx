@@ -33,7 +33,7 @@ const features = [
   { label: 'Recurring Jobs', key: 'recurring', desc: 'Weekly/biweekly/monthly auto-schedule' },
   { label: 'Installable Web App', key: 'pwa', desc: 'Works on iPhone, Android, and desktop as a PWA' },
   { label: 'No Data Selling', key: 'privacy', desc: 'Your customer data stays yours' },
-  { label: 'Zero-Fee Payments', key: 'stripe', desc: 'Venmo, Zelle, Cash App — no card processing fees' },
+  { label: 'Zero-Fee Payments', key: 'zeroFeePayments', desc: 'Venmo, Zelle, Cash App — no card processing fees' },
   { label: 'Per-User Fees', key: 'perUser', desc: 'MowGo: $10/mo per extra crew member. Jobber: $29/mo per user. Servinix: $20/mo per tech.', star: true },
   { label: 'GPS Navigation', key: 'gps', desc: 'Tap to navigate to client' },
   { label: 'Route Optimization', key: 'route', desc: 'One-tap optimized routes + send stops to your maps app' },
@@ -53,7 +53,7 @@ const data = {
   recurring:    [ true,  true,  true,  true,  true,  true,  false, false, true,  true  ],
   pwa:          [ true,   true,  true,  false, false, true,  false, false, false, false ],
   privacy:      [ true,  true,  false, false, true,  true,  true,  false, false, false ],
-  stripe:       [ true,  false, false, false, false, false, false, false, false, false, false ],
+  zeroFeePayments: [ true,  false, false, false, false, false, false, false, false, false, false ],
   perUser:      [ "$10/mo", "N/A", "$29/mo", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "$20/tech" ],
   gps:          [ true,  true,  true,  false, true,  true,  true,  false, false, false, false ],
   // Route Optimization availability — researched Aug 5, 2026: QuoteIQ (myquoteiq.com, all plans), Jobber (help.getjobber.com, Connect+), Yardbook (support.yardbook.com), LawnPro (lawnprosoftware.com/features/routing), Housecall Pro 'soon' (alpha per help.housecallpro.com), GreenRoute (greenrouteapp.com), LawnBoss (lawnboss.app), SoloOp (solo-op.com), TurfHop (youraspire.com lawn routing list)
@@ -188,7 +188,7 @@ export default function Compare() {
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{tr("Platform Fees")}</p>
               <p className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{tr("$0")}</p>
               <p className="text-xs text-red-500 mt-1">{tr("QuoteIQ +1% surcharge")}</p>
-              <p className="text-xs text-gray-400 mt-2">{tr("No transaction fees beyond Stripe's cut")}</p>
+              <p className="text-xs text-gray-400 mt-2">{tr("No transaction fees beyond the card processor's cut")}</p>
             </div>
             <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 text-center">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{tr("Crew Scaling")}</p>
@@ -242,7 +242,7 @@ export default function Compare() {
               <DollarSign className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
             <h3 className="font-bold text-gray-900 dark:text-white mb-2">{tr("No platform fees")}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — Stripe takes their cut, that's it.")}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{tr("QuoteIQ charges 1% on every transaction on top of Stripe. We don't touch your money — the card processor takes their cut, that's it.")}</p>
           </div>
           <div className="card p-6 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/20">

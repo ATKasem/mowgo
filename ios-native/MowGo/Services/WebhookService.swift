@@ -15,12 +15,12 @@ actor WebhookService {
     private static let dispatchURL = URL(string: "https://mowgoapp.com/api/webhook-dispatch")!
 
     /// Fire a webhook event via the /api/webhook-dispatch Pages Function.
-    /// Requires a Supabase access token on SupabaseService.shared.token.
+    /// Requires a signed-in Supabase session (token is refreshed if expired).
     /// `userId` is retained for caller clarity/logging — the server derives
     /// the user from the Bearer token, not from this value.
     func fire(userId: UUID, event: String, payload: [String: Any]) async {
-        // await required — SupabaseService is an actor; token is actor-isolated
-        guard let token = await SupabaseService.shared.token, !token.isEmpty else {
+        // Refreshes an expired token first; throws when signed out / demo mode.
+        guard let token = try? await SupabaseService.shared.validAccessToken(), !token.isEmpty else {
             #if DEBUG
             print("[WebhookService] Skipping \(event) — no auth token (demo mode?)")
             #endif

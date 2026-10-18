@@ -103,7 +103,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  // --- Look up configs + dispatch (shared with server-triggered events, e.g. Stripe) ---
+  // --- Look up configs + dispatch (shared with server-triggered events, e.g. payment-provider webhooks) ---
   if (!env.SUPABASE_SERVICE_ROLE_KEY) {
     return Response.json({ error: 'Server misconfigured' }, { status: 500, headers });
   }

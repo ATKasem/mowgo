@@ -84,6 +84,7 @@ struct NewLeadFormView: View {
                 dismiss()
             } catch {
                 self.error = error.localizedDescription
+                store.errorWasPresented(error)
                 isSaving = false
             }
         }

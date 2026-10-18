@@ -120,10 +120,11 @@ actor SupabaseService {
         }
         token = accessToken
         refreshToken = json?["refresh_token"] as? String
-        // Parse expires_in (seconds from now)
-        if let expiresIn = json?["expires_in"] as? Double {
-            tokenExpiry = Date().addingTimeInterval(expiresIn - 300) // 5 min buffer
-        }
+        // Parse expires_in (seconds from now). Fall back to Supabase's default
+        // 1h — a nil expiry makes isAuthenticated false and forces a refresh
+        // before every request.
+        let expiresIn = (json?["expires_in"] as? Double) ?? 3600
+        tokenExpiry = Date().addingTimeInterval(expiresIn - 300) // 5 min buffer
         guard saveSession() else {
             await signOut()
             throw AuthError.sessionPersistenceFailed
@@ -142,6 +143,7 @@ actor SupabaseService {
     }
 
     func signOut() async {
+        let accessToken = token
         refreshTask?.cancel()
         refreshTask = nil
         _cachedUserId = nil
@@ -149,6 +151,25 @@ actor SupabaseService {
         refreshToken = nil
         tokenExpiry = nil
         clearSession()
+        if let accessToken, !accessToken.isEmpty {
+            revokeServerSession(accessToken: accessToken)
+        }
+    }
+
+    /// Best-effort revoke of this device's refresh token so a copied token
+    /// can't mint new sessions. scope=local leaves the user's other devices
+    /// signed in. Fire-and-forget: sign-out never waits on the network, and
+    /// an already-expired access token (401) is fine to ignore.
+    private func revokeServerSession(accessToken: String) {
+        guard let url = URL(string: "\(baseURL)/auth/v1/logout?scope=local") else { return }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.timeoutInterval = 10
+        req.setValue(anonKey, forHTTPHeaderField: "apikey")
+        req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        Task.detached {
+            _ = try? await URLSession.shared.data(for: req)
+        }
     }
 
     func resetPassword(email: String) async throws {
@@ -335,9 +356,8 @@ actor SupabaseService {
                 try Task.checkCancellation()
                 token = accessToken
                 refreshToken = json?["refresh_token"] as? String
-                if let expiresIn = json?["expires_in"] as? Double {
-                    tokenExpiry = Date().addingTimeInterval(expiresIn - 300)
-                }
+                let expiresIn = (json?["expires_in"] as? Double) ?? 3600
+                tokenExpiry = Date().addingTimeInterval(expiresIn - 300)
                 guard saveSession() else {
                     throw AuthError.sessionPersistenceFailed
                 }
@@ -373,6 +393,8 @@ actor SupabaseService {
             throw SupabaseError.network
         }
         let path = "\(uid.uuidString)/\(jobId.uuidString)/\(UUID().uuidString).jpg"
+        // Direct URLSession call (no request() retry), so refresh up front.
+        let accessToken = try await validAccessToken()
 
         guard let url = URL(string: "\(baseURL)/storage/v1/object/job-photo/\(path)") else {
             throw SupabaseError.network
@@ -380,9 +402,7 @@ actor SupabaseService {
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue(anonKey, forHTTPHeaderField: "apikey")
-        if let token {
-            req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        }
+        req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         req.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
         req.setValue("true", forHTTPHeaderField: "x-upsert")
         req.httpBody = imageData
@@ -425,13 +445,13 @@ actor SupabaseService {
             return nil
         }
         guard let signURL = URL(string: "\(baseURL)/storage/v1/object/sign/job-photo/\(pathOrURL)"),
-              let token else {
+              let accessToken = try? await validAccessToken() else {
             return nil
         }
         var signRequest = URLRequest(url: signURL)
         signRequest.httpMethod = "POST"
         signRequest.setValue(anonKey, forHTTPHeaderField: "apikey")
-        signRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        signRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         signRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         signRequest.httpBody = try? JSONEncoder().encode(["expiresIn": 3600])
         guard let (signedData, signedResponse) = try? await URLSession.shared.data(for: signRequest),
@@ -455,7 +475,10 @@ actor SupabaseService {
             q["user_id"] = "eq.\(uid.uuidString)"
         }
         var path = "/rest/v1/\(table)?select=*"
-        for (k, v) in q { path += "&\(k)=\(v.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? v)" }
+        // .urlQueryAllowed leaves &, = and + literal, which would let a value
+        // add extra PostgREST parameters (or turn + into a space).
+        let valueAllowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "&=+"))
+        for (k, v) in q { path += "&\(k)=\(v.addingPercentEncoding(withAllowedCharacters: valueAllowed) ?? v)" }
         let data = try await request("GET", path)
         return try decoder.decode([T].self, from: data)
     }

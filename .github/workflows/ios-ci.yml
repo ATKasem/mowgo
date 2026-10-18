@@ -16,6 +16,7 @@ on:
 jobs:
   build:
     runs-on: macos-15
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +36,6 @@ jobs:
           INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
           INFOPLIST_KEY_SUPABASE_URL = https://placeholder.supabase.co
           INFOPLIST_KEY_SUPABASE_ANON_KEY = placeholder-anon-key
-          INFOPLIST_KEY_StripePublishableKey = pk_placeholder
           PRODUCT_BUNDLE_IDENTIFIER = com.mowgo.app
           GENERATE_INFOPLIST_FILE = YES
           EOF
@@ -52,3 +52,43 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             -configuration Debug build \
             CODE_SIGNING_ALLOWED=NO
+
+      # Unit tests (MowGoTests) + simulator UI smoke tests (MowGoUITests).
+      # The UI tests launch the app in demo mode, so no backend is needed.
+      - name: Test (simulator)
+        working-directory: ios-native
+        run: |
+          xcodebuild -project MowGo.xcodeproj \
+            -scheme MowGo \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -configuration Debug \
+            -resultBundlePath TestResults.xcresult \
+            test \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Export test screenshots
+        if: always()
+        working-directory: ios-native
+        run: |
+          if [ -d TestResults.xcresult ]; then
+            mkdir -p screenshots
+            xcrun xcresulttool export attachments --path TestResults.xcresult --output-path screenshots || true
+            ls -la screenshots || true
+          fi
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ui-test-screenshots
+          path: ios-native/screenshots
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: ios-native/TestResults.xcresult
+          retention-days: 7

@@ -35,7 +35,7 @@ export default function Privacy() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("2. How We Use Your Data")}</h2>
             <ul className="list-disc pl-5 space-y-1">
               <li>{tr("To provide and maintain the MowGo service")}</li>
-              <li>{tr("To process payments via Stripe (we never store your full payment details)")}</li>
+              <li>{tr("To process card payments through our payment processor (we never store your full payment details)")}</li>
               <li>{tr("To send service-related communications (appointment reminders, invoices)")}</li>
               <li>{tr("To improve and personalize the app experience")}</li>
             </ul>
@@ -45,7 +45,7 @@ export default function Privacy() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{tr("3. Data Sharing")}</h2>
             <p>{tr("We do not sell your data. We share data only with:")}</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>{tr("Stripe")}</strong> — {tr("for payment processing")}</li>
+              <li><strong>{tr("Our payment processor")}</strong> — {tr("for payment processing")}</li>
               <li><strong>{tr("Supabase")}</strong> — {tr("our database provider (your data is encrypted at rest)")}</li>
               <li><strong>{tr("Law enforcement")}</strong> — {tr("only when required by valid legal process")}</li>
             </ul>

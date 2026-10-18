@@ -7,7 +7,7 @@
 //   APNS_KEY_ID      — 10-char key ID from Apple Developer → Keys → APNs Auth Key
 //   APNS_TEAM_ID     — 10-char Team ID from Apple Developer → Membership
 //   APNS_AUTH_KEY    — The .p8 file contents (full PEM string)
-//   APNS_BUNDLE_ID   — iOS bundle identifier (default: com.mowgo.app)
+//   APNS_BUNDLE_ID   — iOS bundle identifier (default: com.mowgoapp)
 //   FCM_SERVICE_ACCOUNT_JSON — Firebase service account JSON for FCM HTTP v1
 //
 // Request body:
@@ -174,7 +174,7 @@ async function sendApnsPush(
   title: string,
   body: string,
 ): Promise<{ success: boolean; status: number; detail?: string }> {
-  const bundleId = Deno.env.get("APNS_BUNDLE_ID") ?? "com.mowgo.app";
+  const bundleId = Deno.env.get("APNS_BUNDLE_ID") ?? "com.mowgoapp";
   const token = await generateApnsToken();
 
   // Use apns:// for production; change to apns://api.sandbox.push.apple.com for dev

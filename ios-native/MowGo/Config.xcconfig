@@ -22,9 +22,6 @@ _SLASH = /
 INFOPLIST_KEY_SUPABASE_URL = https:$(_SLASH)$(_SLASH)vqgiynfrpsqddjrayczc.supabase.co
 INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_C10u9M0wmcgAqDgkZoxm6g_eAsQSjpz
 
-// MARK: - Stripe
-INFOPLIST_KEY_StripePublishableKey = pk_live_51TwFQhGwXKVLlr2Ip5FKKwDmcwcOyG9lTFgOr2k3ooyaoLhYYwdfKQOOfzBnwcFpFgl8hAe9QHRR80Af1Odv6WEy00PnQgQarj
-
 // MARK: - Build
 PRODUCT_BUNDLE_IDENTIFIER = com.mowgoapp
 MARKETING_VERSION = 1.0.0

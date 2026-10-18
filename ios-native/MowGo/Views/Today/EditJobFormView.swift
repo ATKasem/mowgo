@@ -109,6 +109,7 @@ struct EditJobFormView: View {
                 dismiss()
             } catch {
                 self.error = error.localizedDescription
+                store.errorWasPresented(error)
                 isSaving = false
             }
         }

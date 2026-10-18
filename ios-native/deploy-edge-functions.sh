@@ -1,6 +1,7 @@
 #!/bin/bash
 # deploy-edge-functions.sh
-# Deploy all 4 Supabase Edge Functions for MowGo.
+# Deploy the iOS-owned Supabase Edge Function (ai-chat).
+# Payments run in Cloudflare Pages Functions (functions/api/payments).
 #
 # Prerequisites:
 #   1. Install Supabase CLI: brew install supabase/tap/supabase
@@ -28,25 +29,14 @@ echo ""
 echo "  → ai-chat: OPENROUTER_API_KEY"
 supabase secrets set OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-}" 2>/dev/null || echo "  ⚠️  Set OPENROUTER_API_KEY env var first"
 
-# Stripe
-echo "  → Stripe: STRIPE_SECRET_KEY"
-supabase secrets set STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-}" 2>/dev/null || echo "  ⚠️  Set STRIPE_SECRET_KEY env var first"
-echo "  → Stripe: STRIPE_PRICE_SOLO"
-supabase secrets set STRIPE_PRICE_SOLO="${STRIPE_PRICE_SOLO:-}" 2>/dev/null || echo "  ⚠️  Set STRIPE_PRICE_SOLO env var first"
-echo "  → Stripe: STRIPE_PRICE_CREW"
-supabase secrets set STRIPE_PRICE_CREW="${STRIPE_PRICE_CREW:-}" 2>/dev/null || echo "  ⚠️  Set STRIPE_PRICE_CREW env var first"
-
 echo ""
 echo "🚀 Deploying functions..."
 echo ""
 
 supabase functions deploy ai-chat
-supabase functions deploy create-payment-intent
-supabase functions deploy confirm-payment
-supabase functions deploy create-checkout-session
 
 echo ""
-echo "✅ All 4 functions deployed!"
+echo "✅ ai-chat deployed!"
 echo ""
 echo "📋 Deployed functions:"
 supabase functions list
