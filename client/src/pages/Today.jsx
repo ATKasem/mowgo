@@ -2,6 +2,7 @@ import useLocalizedText from '../i18n/useLocalizedText';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { INITIAL_JOB_FORM, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS, hasTeamAccess } from '../lib/constants';
 import { localDate } from '../lib/dashboard-metrics';
+import { sortJobs } from '../lib/job-order';
 import { dayConditionsView, teamProgressView } from '../lib/today-ux';
 import { createJob, updateJob, updateJobStatus, createInvoice, reorderJobs, loadClients, loadTeamMembers, loadProfile, loadTeamDashboard, rainDelayJobs, sendRainDelaySms, loadRainDelayHistory, saveRainDelayEntry, removeRainDelayEntry, getWeatherForLocation, getDayConditions, sprayStatus, SPRAY_RULE, ensureClientCoords, saveProfile, fireWebhook } from '../lib/data';
 import { buildRouteLink, buildSingleStopUrl } from '../lib/navLinks';
@@ -311,7 +312,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
       const currentJobs = jobsRef.current;
       const newJob = await createJob({ ...currentForm, scheduled_date: date, route_order: currentJobs.filter(j => j.scheduled_date === date).length + 1 });
       if (newJob) {
-        setJobs(prev => [newJob, ...prev]);
+        setJobs(prev => sortJobs([...prev, newJob])); // land where a refresh would put it
         setShowForm(false);
         setForm(INITIAL_JOB_FORM);
       }
@@ -390,7 +391,7 @@ export default function Today({ jobs = [], setJobs, invoices = [], setInvoices, 
                 assigned_to: job.assigned_to || null,
               }).then(nextJob => {
                 pendingRecurringRef.current.delete(dedupeKey);
-                if (nextJob) setJobs(p => [...p, nextJob]);
+                if (nextJob) setJobs(p => sortJobs([...p, nextJob]));
                 const clientName = job.clients?.name || tr('Job');
                 setCompletedToast({ name: tr('{{client}} · Next {{recurrence}} job created', { client: clientName, recurrence: tr(recLabel) }), amount: job.clients?.rate || 0, type: 'recurring' });
                 if (toggleTimeoutRef.current) clearTimeout(toggleTimeoutRef.current);

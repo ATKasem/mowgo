@@ -5,9 +5,10 @@ import { STATUS_CONFIG, RECURRENCE_OPTIONS, TEAM_MEMBER_COLORS } from '../lib/co
 import { getJobPhotos } from '../lib/data';
 import { jobProfit } from '../lib/dashboard-metrics';
 import { getMapsUrl } from '../lib/maps';
+import { formatScheduledTime } from '../lib/scheduled-time';
 
 function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, onToggleExpand, onToggleStatus, onDragStart, onDragOver, onDrop, onDragEnd, onMoveUp, onMoveDown, onEdit, onSkip, teamMembers }) {
-  const { tr } = useLocalizedText('jobCard');
+  const { tr, i18n } = useLocalizedText('jobCard');
   const [photos, setPhotos] = useState({ before: null, after: null });
   const client = job.clients;
   const isDone = job.status === 'done';
@@ -76,7 +77,7 @@ function JobCard({ job, index, isExpanded, isAnimating, isDragging, isDragOver, 
             {client?.name || tr('Unknown')}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{job.scheduled_time?.slice(0, 5)}</span>
+            <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)]">{formatScheduledTime(job.scheduled_time, i18n.resolvedLanguage)}</span>
             <span className="text-gray-300 dark:text-[var(--color-text-secondary)] text-xs">&middot;</span>
             <span className="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-muted)] truncate">{job.title}</span>
             {recurrenceLabel && (

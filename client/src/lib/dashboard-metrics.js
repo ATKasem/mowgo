@@ -1,3 +1,5 @@
+import { compareDayOrder, compareScheduleOrder } from './job-order.js';
+
 /** Local calendar date (YYYY-MM-DD), avoiding UTC day-boundary drift. */
 export function localDate(offsetDays = 0, now = new Date()) {
   const date = new Date(now);
@@ -15,7 +17,6 @@ const safeNumber = value => {
     return null;
   }
 };
-const routeOrder = value => safeNumber(value) ?? Infinity;
 const isDateString = value => {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const date = new Date(`${value}T00:00:00Z`);
@@ -109,7 +110,7 @@ export function todayCommand(jobs = [], now = new Date()) {
   const todayJobs = jobs
     .filter(job => job.scheduled_date === today)
     .slice()
-    .sort((a, b) => routeOrder(a.route_order) - routeOrder(b.route_order));
+    .sort(compareDayOrder);
   const done = todayJobs.filter(job => job.status === 'done');
   const inProgress = todayJobs.filter(job => job.status === 'in_progress');
   const next = todayJobs.find(job => job.status !== 'done') || null;
@@ -137,10 +138,7 @@ export function upcomingJobs(jobs = [], now = new Date(), limit = 5) {
   return jobs
     .filter(job => job.scheduled_date > today && job.status !== 'done')
     .slice()
-    .sort((a, b) => {
-      if (a.scheduled_date !== b.scheduled_date) return a.scheduled_date < b.scheduled_date ? -1 : 1;
-      return routeOrder(a.route_order) - routeOrder(b.route_order);
-    })
+    .sort(compareScheduleOrder)
     .slice(0, limit)
     .map(job => ({
       id: job.id,

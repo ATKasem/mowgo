@@ -1,3 +1,5 @@
+import { formatScheduledTime } from './scheduled-time.js';
+
 /** Generate .ics calendar file from jobs array and trigger download */
 export function downloadICS(jobs, filename = 'mowgo-schedule.ics') {
   const blob = new Blob([generateICS(jobs)], { type: 'text/calendar;charset=utf-8' });
@@ -60,11 +62,11 @@ function escapeHtml(str) {
 }
 
 /** Open print-friendly schedule view for PDF export */
-export function printSchedule(jobs) {
+export function printSchedule(jobs, language) {
   const rows = jobs.map(j => `
     <tr>
       <td>${escapeHtml(j.scheduled_date)}</td>
-      <td>${escapeHtml(j.scheduled_time?.slice(0, 5) || '')}</td>
+      <td>${escapeHtml(formatScheduledTime(j.scheduled_time, language))}</td>
       <td>${escapeHtml(j.clients?.name || 'Unknown')}</td>
       <td>${escapeHtml(j.title)}</td>
       <td>${escapeHtml(j.clients?.address || '')}</td>

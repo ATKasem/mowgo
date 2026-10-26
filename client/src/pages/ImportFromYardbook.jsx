@@ -6,6 +6,7 @@ import { useAuth } from '../App';
 import { supabase } from '../lib/supabase';
 import { parseCsv, MOWGO_FIELDS } from '../utils/csvParser';
 import { fireWebhook } from '../lib/data';
+import { localDate } from '../lib/dashboard-metrics';
 
 const STEPS = ['upload', 'preview', 'configure', 'import', 'schedules', 'results'];
 const BATCH_SIZE = 50;
@@ -273,7 +274,7 @@ export default function ImportFromYardbook() {
 
     setScheduleSaving(true);
     setError('');
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localDate();
     const rows = selectedRows.map(row => ({
       user_id: user?.id,
       client_id: row.clientId,

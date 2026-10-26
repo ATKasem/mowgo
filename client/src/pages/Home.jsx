@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../App';
 import { downloadICS, generateGoogleCalUrl, downloadCSV, printSchedule } from '../lib/ics';
+import { formatScheduledTime } from '../lib/scheduled-time';
 import {
   Sprout, Sun, Cloud, CloudRain, CloudSun, CloudDrizzle, CloudLightning, Snowflake,
   Calendar, DollarSign, AlertCircle, CheckCircle, Clock,
@@ -198,7 +199,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                   className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
                   <FileSpreadsheet className="w-3.5 h-3.5" />{tr("Download CSV (Excel/Numbers)")}
                 </button>
-                <button onClick={() => { printSchedule(jobs.filter(j => j.scheduled_date >= today)); setShowExport(false); }}
+                <button onClick={() => { printSchedule(jobs.filter(j => j.scheduled_date >= today), i18n.resolvedLanguage); setShowExport(false); }}
                   className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 min-h-[44px]">
                   <Printer className="w-3.5 h-3.5" />{tr("Print / Save as PDF")}
                 </button>
@@ -257,7 +258,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${job.status === 'done' ? 'bg-emerald-400' : job.status === 'in_progress' ? 'bg-sky-400' : 'bg-amber-400'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{formatScheduledTime(job.scheduled_time, i18n.resolvedLanguage)} · {job.title}</p>
                     </div>
                   </div>
                 ))}
@@ -322,7 +323,7 @@ export default function Home({ jobs = [], invoices = [] }) {
                   <span className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-bold text-emerald-700 dark:text-emerald-400 flex-shrink-0">{i + 1}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{job.clients?.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{job.scheduled_time?.slice(0, 5)} · {job.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{formatScheduledTime(job.scheduled_time, i18n.resolvedLanguage)} · {job.title}</p>
                   </div>
                   <ChevronLeft className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-emerald-500 transition-colors rotate-180" />
                 </Link>

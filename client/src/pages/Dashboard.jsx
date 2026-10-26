@@ -14,6 +14,8 @@ import {
 } from '../lib/dashboard-metrics';
 import { hasTeamAccess } from '../lib/constants';
 import { teamProgressView } from '../lib/today-ux';
+import { formatScheduledTime } from '../lib/scheduled-time';
+import { compareDayOrder } from '../lib/job-order';
 import { conciergeRequestRpcState, dashboardConciergeView, isActiveOrDoneConciergeRequest } from '../lib/concierge-request';
 
 const CONCIERGE_PROMPT_DISMISS_KEY = 'mf_concierge_prompt_dismissed';
@@ -332,7 +334,7 @@ function attentionItemMeta(item, tr) {
 }
 
 export default function Dashboard() {
-  const { tr } = useLocalizedText('dashboard');
+  const { tr, i18n } = useLocalizedText('dashboard');
   const { user } = useContext(AuthContext);
   const [stats, setStats] = useState(null);
   const [jobsData, setJobsData] = useState([]);
@@ -598,7 +600,7 @@ export default function Dashboard() {
   const todayRoute = jobsData
     .filter(job => job.scheduled_date === localDate() && job.status !== 'done')
     .slice()
-    .sort((a, b) => (Number.isFinite(a.route_order) ? a.route_order : 9999) - (Number.isFinite(b.route_order) ? b.route_order : 9999));
+    .sort(compareDayOrder);
   const plannedMinutesRemaining = todayRoute.reduce((total, job) => total + (Number(job.duration_minutes) || 0), 0);
   const money = moneyToCollect(invoicesData);
   const upcoming = upcomingJobs(jobsData);
@@ -650,7 +652,7 @@ export default function Dashboard() {
             <div className="min-w-0 flex-1">
               <p className="text-[11px] uppercase tracking-wide text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{tr('Next stop')}</p>
               <p className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">
-                {command.nextJob.clientName || tr('Next job')}{command.nextJob.time ? ` · ${command.nextJob.time}` : ''}
+                {command.nextJob.clientName || tr('Next job')}{command.nextJob.time ? ` · ${formatScheduledTime(command.nextJob.time, i18n.resolvedLanguage)}` : ''}
               </p>
               {command.nextJob.address && (
                 <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)] truncate">{command.nextJob.address}</p>
@@ -671,7 +673,7 @@ export default function Dashboard() {
             {todayRoute.slice(0, 3).map((job, index) => (
               <Link key={job.id} to={`/app/today?date=${encodeURIComponent(job.scheduled_date)}`} className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] dark:border-gray-700 p-3 min-h-[48px]">
                 <span className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">{index + 1}</span>
-                <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">{job.clients?.name || tr('Next job')}</span><span className="block text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{job.scheduled_time || tr('Time not set')} · {job.duration_minutes || 0} min</span></span>
+                <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[var(--color-text-primary)] dark:text-white truncate">{job.clients?.name || tr('Next job')}</span><span className="block text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">{job.scheduled_time ? formatScheduledTime(job.scheduled_time, i18n.resolvedLanguage) : tr('Time not set')} · {job.duration_minutes || 0} min</span></span>
                 <ArrowRight className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]" />
               </Link>
             ))}
@@ -741,7 +743,7 @@ export default function Dashboard() {
                   </span>
                   <span className="block text-xs text-[var(--color-text-muted)] dark:text-[var(--color-text-secondary)]">
                     {new Date(`${job.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                    {job.time ? ` · ${job.time}` : ''}
+                    {job.time ? ` · ${formatScheduledTime(job.time, i18n.resolvedLanguage)}` : ''}
                   </span>
                   <span className="block text-xs font-medium text-brand-hover dark:text-emerald-400 mt-0.5">
                     {tr(job.status === 'in_progress' ? 'In progress' : job.status === 'scheduled' ? 'Scheduled' : 'Pending')}

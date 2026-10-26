@@ -8,6 +8,7 @@
 import { supabase, isDemoMode } from './supabase';
 import { demoJobs, demoClients, demoInvoices, demoTeamMembers, demoLeads } from './demoData';
 import { localDate } from './dashboard-metrics';
+import { sortJobs } from './job-order';
 
 // ===== In-memory demo state (shared across pages) =====
 let _jobs = [...demoJobs];
@@ -95,15 +96,31 @@ async function fireQuickBooksSync(event, payload, token) {
 
 // ===== Jobs =====
 
+/**
+ * Deterministic job order. The rendered day list follows array order, so
+ * same-day rows that tie on route_order (generated jobs default to 99, older
+ * rows are null) must not come back in heap order — otherwise a job that was
+ * just updated jumps to the end on the next refresh. Matches the iOS/Android
+ * display order: route_order (unordered last), then time (untimed last), then
+ * id. Status deliberately plays no part.
+ */
+function orderJobs(query) {
+  return query
+    .order('scheduled_date', { ascending: true })
+    .order('route_order', { ascending: true, nullsFirst: false })
+    .order('scheduled_time', { ascending: true, nullsFirst: false })
+    .order('id', { ascending: true });
+}
+
 export async function loadJobs() {
   if (isDemoMode()) {
     // Crew demo users only see jobs assigned to them
     const profile = _teamMembers.find(m => m.id === _currentDemoUserId());
     if (!profile) return [];
     if (profile.role === 'crew') {
-      return _jobs.filter(j => j.assigned_to === profile.id);
+      return sortJobs(_jobs.filter(j => j.assigned_to === profile.id));
     }
-    return [..._jobs];
+    return sortJobs(_jobs);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -121,8 +138,8 @@ export async function loadJobs() {
 
   let query = supabase
     .from('jobs')
-    .select('*, clients!left(*)')
-    .order('route_order', { ascending: true });
+    .select('*, clients!left(*)');
+  query = orderJobs(query);
 
   if (profile?.role === 'crew') {
     // Crew sees only jobs assigned to them (RLS also enforces this)
@@ -136,7 +153,7 @@ export async function loadJobs() {
 
   if (error) { console.error('loadJobs:', error); throw new Error('Failed to load jobs: ' + (error.message || 'Unknown error')); }
 
-  return (data || []).map(j => ({
+  return sortJobs((data || []).map(j => ({
     id: j.id,
     client_id: j.client_id,
     title: j.title,
@@ -162,7 +179,7 @@ export async function loadJobs() {
       pet_instructions: j.clients.pet_instructions,
       tags: j.clients.tags || [],
     } : null,
-  }));
+  })));
 }
 
 export async function fetchJobsForExport() {
@@ -199,8 +216,8 @@ export async function fetchJobsForExport() {
 
   let query = supabase
     .from('jobs')
-    .select('*, clients!left(*)')
-    .order('route_order', { ascending: true });
+    .select('*, clients!left(*)');
+  query = orderJobs(query);
 
   query = profile?.role === 'crew'
     ? query.eq('assigned_to', user.id)
@@ -1167,7 +1184,7 @@ export async function updateEstimateStatus(id, status) {
 }
 
 export async function convertEstimateToJob(estimate) {
-  const job = await createJob({ client_id: estimate.client_id, title: estimate.note || 'Lawn care', scheduled_date: new Date().toISOString().slice(0, 10), scheduled_time: '09:00', duration_minutes: 60, status: 'scheduled' });
+  const job = await createJob({ client_id: estimate.client_id, title: estimate.note || 'Lawn care', scheduled_date: localDate(), scheduled_time: '09:00', duration_minutes: 60, status: 'scheduled' });
   if (isDemoMode()) {
     _estimates = _estimates.map(e => e.id === estimate.id ? { ...e, job_id: job.id } : e); notify(); return _estimates.find(e => e.id === estimate.id);
   }

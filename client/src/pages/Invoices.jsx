@@ -4,6 +4,7 @@ import { updateInvoiceStatus, invoicePayMethods, createInvoice, loadClients, voi
 import { CheckCircle, AlertCircle, Copy, Receipt, Filter, X, ChevronRight, ClipboardCheck, Plus } from 'lucide-react';
 import { INVOICE_STATUS } from '../lib/constants';
 import EstimatesSection from '../components/EstimatesSection';
+import { formatLocalDay } from '../lib/locale';
 
 const iconMap = { CheckCircle, AlertCircle };
 
@@ -20,7 +21,7 @@ function invoiceText(invoice, tr, language) {
   const name = invoice.clients?.name || tr('Client');
   const amount = Number(invoice.amount || 0).toFixed(2);
   const date = invoice.created_at
-    ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
+    ? formatLocalDay(invoice.created_at, language)
     : tr('today');
 
   return tr('Hi {{name}} — your lawn was serviced on {{date}}. ${{amount}} due. {{paymentInfo}}. Thanks!', { name, date, amount, paymentInfo: invoicePaymentInfo(tr) });
@@ -31,7 +32,7 @@ function invoiceNudgeText(invoice, tr, language) {
   const name = invoice.clients?.name || tr('Client');
   const amount = Number(invoice.amount || 0).toFixed(2);
   const date = invoice.created_at
-    ? new Date(invoice.created_at).toLocaleDateString(language === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' })
+    ? formatLocalDay(invoice.created_at, language)
     : '';
   const datePart = date ? `${language === 'es' ? ' del' : ' from'} ${date}` : '';
   return tr('Hi {{name}} — friendly reminder: ${{amount}}{{datePart}} is still due. {{paymentInfo}}. Thanks!', { name, amount, datePart, paymentInfo: invoicePaymentInfo(tr) });
@@ -290,7 +291,7 @@ export default function Invoices({ invoices = [], setInvoices }) {
         {filtered.map(invoice => {
           const statusInfo = INVOICE_STATUS[invoice.status] || INVOICE_STATUS.unpaid;
           const Icon = iconMap[statusInfo.icon] || AlertCircle;
-          const dateStr = invoice.created_at ? new Date(invoice.created_at).toLocaleDateString(i18n.resolvedLanguage === 'es' ? 'es-US' : 'en-US', { month: 'short', day: 'numeric' }) : tr('Unknown date');
+          const dateStr = invoice.created_at ? formatLocalDay(invoice.created_at, i18n.resolvedLanguage) : tr('Unknown date');
           const isPaid = invoice.status === 'paid';
           const isVoided = invoice.status === 'voided';
           const isExpanded = expandedId === invoice.id;
