@@ -9,6 +9,7 @@ import { supabase, isDemoMode } from './supabase';
 import { demoJobs, demoClients, demoInvoices, demoTeamMembers, demoLeads } from './demoData';
 import { localDate } from './dashboard-metrics';
 import { sortJobs } from './job-order';
+import { formatLocalDay } from './locale';
 
 // ===== In-memory demo state (shared across pages) =====
 let _jobs = [...demoJobs];
@@ -1198,7 +1199,9 @@ export function estimateText(estimate) {
 }
 
 export function estimateNudgeText(estimate) {
-  const date = new Date(estimate.created_at).toLocaleDateString();
+  // The nudge is about the estimate the client received, so date it by when
+  // it was sent (same as Android); English text, so an en-US short day.
+  const date = formatLocalDay(estimate.sent_at || estimate.created_at);
   return `Hi ${estimate.clients?.name || 'there'}, just checking in on your estimate for $${Number(estimate.amount).toFixed(2)} from ${date} — still want me to hold the spot? Happy to adjust anything. Thanks!`;
 }
 
