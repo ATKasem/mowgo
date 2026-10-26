@@ -1,5 +1,6 @@
 package com.mowgo.app.data.model
 
+import com.mowgo.app.lib.Timestamps
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant
@@ -32,11 +33,7 @@ data class Profile(
         get() {
             val endRaw = trialEndsAt ?: return false
             if (trialTier == null) return false
-            return try {
-                Instant.parse(endRaw).isAfter(Instant.now())
-            } catch (_: Exception) {
-                false
-            }
+            return Timestamps.parseInstant(endRaw)?.isAfter(Instant.now()) ?: false
         }
 
     /** True when this user already used their app trial (active OR expired). */
@@ -46,13 +43,9 @@ data class Profile(
     val trialDaysLeft: Int?
         get() {
             val endRaw = trialEndsAt ?: return null
-            return try {
-                val end = Instant.parse(endRaw)
-                val hours = ChronoUnit.HOURS.between(Instant.now(), end)
-                max(1, ceil(hours.toDouble() / 24).toInt())
-            } catch (_: Exception) {
-                null
-            }
+            val end = Timestamps.parseInstant(endRaw) ?: return null
+            val hours = ChronoUnit.HOURS.between(Instant.now(), end)
+            return max(1, ceil(hours.toDouble() / 24).toInt())
         }
 
     /** Plan label for the trial banner (trialTier or current tier). */

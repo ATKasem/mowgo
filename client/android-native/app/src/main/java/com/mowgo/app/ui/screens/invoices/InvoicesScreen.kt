@@ -33,11 +33,13 @@ import com.mowgo.app.data.SupabaseClientProvider
 import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.data.model.Estimate
+import com.mowgo.app.lib.Timestamps
 import com.mowgo.app.ui.screens.today.ClientPickerDialog
 import com.mowgo.app.ui.theme.MowGoColors
 import com.mowgo.app.ui.theme.extendedColors
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
+import java.time.Duration
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -376,7 +378,7 @@ private fun EstimateCard(estimate: Estimate, clientName: String?, onClick: () ->
         Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(clientName ?: stringResource(R.string.label_unknown_client), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
-                estimate.createdAt?.let { Text(it.take(10), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                estimate.createdAt?.let { Text(formatDate(it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 estimate.note?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1) }
                 if (estimate.jobId != null) Text(stringResource(R.string.invoices_converted), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.extendedColors.success)
             }
@@ -420,12 +422,12 @@ private fun EstimateDetailDialog(estimate: Estimate, clientName: String?, onDism
     val defaultClientName = stringResource(R.string.invoices_default_client_name)
     val name = clientName ?: defaultClientName; val amount = String.format("%.2f", estimate.amount)
     val estimateMessage = String.format(estimateMsgFormat, name, amount)
-    val canNudge = estimate.status == Estimate.STATUS_SENT && estimate.sentAt?.let { runCatching { Instant.parse(it).isBefore(Instant.now().minusSeconds(3 * 86400)) }.getOrDefault(false) } == true
+    val canNudge = estimate.status == Estimate.STATUS_SENT && estimate.sentAt?.let { Timestamps.parseInstant(it)?.isBefore(Instant.now().minusSeconds(3 * 86400)) } == true
     AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.invoices_estimate_title), color = MaterialTheme.colorScheme.onSurface) }, containerColor = MaterialTheme.colorScheme.surface,
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             EstimateCard(estimate, clientName, onClick = {})
             TextButton(onClick = { copy(estimateMessage) }) { Text(stringResource(R.string.invoices_copy_estimate_text)) }
-            if (canNudge) TextButton(onClick = { copy(String.format(estimateNudgeFormat, name, amount, estimate.sentAt?.take(10) ?: "")) }) { Text(stringResource(R.string.invoices_nudge), color = MaterialTheme.extendedColors.warning) }
+            if (canNudge) TextButton(onClick = { copy(String.format(estimateNudgeFormat, name, amount, estimate.sentAt?.let { Timestamps.formatLocalDate(it, "MMM d") } ?: "")) }) { Text(stringResource(R.string.invoices_nudge), color = MaterialTheme.extendedColors.warning) }
             if (estimate.status == Estimate.STATUS_DRAFT || estimate.status == Estimate.STATUS_SENT) { TextButton(onClick = { onStatus(Estimate.STATUS_APPROVED) }) { Text(stringResource(R.string.invoices_mark_approved)) }; TextButton(onClick = { onStatus(Estimate.STATUS_DECLINED) }) { Text(stringResource(R.string.invoices_mark_declined), color = MaterialTheme.colorScheme.error) } }
             if (estimate.status == Estimate.STATUS_APPROVED && estimate.jobId == null) Button(onClick = onConvert) { Text(stringResource(R.string.invoices_convert_to_job)) }
             if (estimate.jobId != null) Text(stringResource(R.string.invoices_converted), color = MaterialTheme.extendedColors.success)
@@ -508,10 +510,8 @@ private fun InvoiceCard(
     val isPaid = invoice.status == Invoice.STATUS_PAID
     val isVoided = invoice.status == Invoice.STATUS_VOIDED
     val canNudge = !isPaid && !isVoided && onNudge != null && (invoice.createdAt?.let { raw ->
-        runCatching {
-            java.time.Instant.parse(raw)
-                .isBefore(java.time.Instant.now().minus(java.time.Duration.ofDays(3)))
-        }.getOrDefault(false)
+        Timestamps.parseInstant(raw)
+            ?.isBefore(Instant.now().minus(Duration.ofDays(3)))
     } ?: false)
 
     Card(
@@ -856,16 +856,7 @@ private fun NewInvoiceDialog(
 
 // ── Helper ──────────────────────────────────────────────────────────────
 
-private fun formatDate(isoDate: String): String {
-    return try {
-        val instant = Instant.parse(isoDate)
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy")
-            .withZone(java.time.ZoneId.systemDefault())
-        formatter.format(instant)
-    } catch (_: Exception) {
-        isoDate.take(10)
-    }
-}
+private fun formatDate(isoDate: String): String = Timestamps.formatLocalDate(isoDate, "MMM d, yyyy")
 
 // ── Empty State ─────────────────────────────────────────────────────────
 

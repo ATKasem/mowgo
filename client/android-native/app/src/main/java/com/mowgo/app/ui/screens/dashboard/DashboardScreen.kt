@@ -224,8 +224,8 @@ private fun DashboardContent(
         item { StatsGrid(state, onNavigateToTab) }
         if (state.isOwner) item { QuickActions(onAddJob, onAddClient) }
         item { TodayPreview(state.todayJobs, onNavigateToTab) }
-        if (state.isOwner && state.teamProgress.isNotEmpty()) item { TeamCard(state.teamProgress) }
-        if (state.isOwner) item { CrewRoster(state.teamMembers, onInvite, onRemove) }
+        if (state.hasTeamAccess && state.teamProgress.isNotEmpty()) item { TeamCard(state.teamProgress) }
+        if (state.hasTeamAccess) item { CrewRoster(state.teamMembers, onInvite, onRemove) }
     }
 }
 
@@ -311,7 +311,7 @@ private fun TodayPreview(jobs: List<JobWithClient>, onNavigateToTab: (String) ->
                 Text(stringResource(R.string.dashboard_no_jobs_today), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
-            jobs.sortedBy { it.routeOrder ?: Int.MAX_VALUE }.take(3).forEach { TodayJobRow(it) }
+            jobs.sortedWith(JobWithClient.DISPLAY_ORDER).take(3).forEach { TodayJobRow(it) }
         }
     }
 }

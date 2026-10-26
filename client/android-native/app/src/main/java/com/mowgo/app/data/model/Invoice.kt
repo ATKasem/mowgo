@@ -32,6 +32,9 @@ data class Invoice(
     @SerialName("created_at")
     val createdAt: String? = null,
 ) {
+    /** Money still owed: unpaid and overdue both count (voided does not), matching web. */
+    val isOwed: Boolean get() = status == STATUS_UNPAID || status == STATUS_OVERDUE
+
     companion object {
         const val STATUS_UNPAID = "unpaid"
         const val STATUS_PAID = "paid"

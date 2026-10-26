@@ -52,7 +52,7 @@ class JobRepository {
 
     /** Load all jobs for the current user, joined with client info. Falls back to the local cache when offline. */
     suspend fun loadJobs(): List<JobWithClient> {
-        if (!SupabaseClientProvider.isConfigured) return demoJobs()
+        if (!SupabaseClientProvider.isConfigured) return demoJobs().sortedWith(JobWithClient.SCHEDULE_ORDER)
 
         val userId = getCurrentUserId() ?: return emptyList()
         try {
@@ -65,8 +65,10 @@ class JobRepository {
                         if (profile?.role == "crew") eq("assigned_to", userId)
                         else eq("user_id", userId)
                     }
+                    order("scheduled_date", Order.ASCENDING)
                     order("route_order", Order.ASCENDING)
                     order("scheduled_time", Order.ASCENDING)
+                    order("id", Order.ASCENDING)
                 }
                 .decodeList<Job>()
             AppDatabaseProvider.database.jobDao().replaceAll(jobs.map { it.toCachedEntity() })
@@ -82,7 +84,7 @@ class JobRepository {
                     clientRate = c?.rate ?: 0.0,
                     clientAddress = c?.address,
                 )
-            }
+            }.sortedWith(JobWithClient.SCHEDULE_ORDER)
         } catch (e: Exception) {
             if (!isNetworkError(e)) throw e
             return loadJobsFromCache(userId)
@@ -104,7 +106,7 @@ class JobRepository {
                 clientRate = c?.rate ?: 0.0,
                 clientAddress = c?.address,
             )
-        }
+        }.sortedWith(JobWithClient.SCHEDULE_ORDER)
     }
 
     /** Load all clients for the current user. Falls back to the local cache when offline. */
@@ -210,7 +212,7 @@ class JobRepository {
         val moving = jobs.firstOrNull { it.id == jobId }
             ?: throw IllegalArgumentException("Job not found")
         val sameDay = jobs.filter { it.scheduledDate == moving.scheduledDate }
-            .sortedWith(compareBy<JobWithClient> { it.routeOrder ?: Int.MAX_VALUE }.thenBy { it.scheduledTime ?: "" })
+            .sortedWith(JobWithClient.DISPLAY_ORDER)
             .toMutableList()
         val oldIndex = sameDay.indexOfFirst { it.id == jobId }
         if (oldIndex < 0) return
@@ -228,7 +230,7 @@ class JobRepository {
     suspend fun applyRouteOrder(date: String, orderedIds: List<String>) {
         if (orderedIds.isEmpty()) return
         val sameDay = loadJobs().filter { it.scheduledDate == date }
-            .sortedWith(compareBy<JobWithClient> { it.routeOrder ?: Int.MAX_VALUE }.thenBy { it.scheduledTime ?: "" })
+            .sortedWith(JobWithClient.DISPLAY_ORDER)
         val present = sameDay.map { it.id }.toSet()
         val ordered = orderedIds.filter { it in present }
         if (ordered.isEmpty()) return // every optimized job was deleted/moved meanwhile

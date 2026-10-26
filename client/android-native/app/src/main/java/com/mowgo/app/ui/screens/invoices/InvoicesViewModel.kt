@@ -11,6 +11,7 @@ import com.mowgo.app.data.model.Client
 import com.mowgo.app.data.model.Invoice
 import com.mowgo.app.data.model.Estimate
 import com.mowgo.app.data.model.Profile
+import com.mowgo.app.lib.Timestamps
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,9 +57,9 @@ data class InvoicesUiState(
             }
         }
 
-    val unpaidCount: Int get() = invoices.count { it.status == Invoice.STATUS_UNPAID }
+    val unpaidCount: Int get() = invoices.count { it.isOwed }
     val paidCount: Int get() = invoices.count { it.status == Invoice.STATUS_PAID }
-    val totalUnpaid: Double get() = invoices.filter { it.status == Invoice.STATUS_UNPAID }.sumOf { it.amount }
+    val totalUnpaid: Double get() = invoices.filter { it.isOwed }.sumOf { it.amount }
     val estimatesWithClientName: List<EstimateWithClient> get() {
         val clientMap = clients.associateBy { it.id }
         return estimates.map { EstimateWithClient(it, it.clientName ?: clientMap[it.clientId]?.name) }
@@ -272,8 +273,8 @@ class InvoicesViewModel : ViewModel() {
     ): String {
         val name = clientName?.takeIf { it.isNotBlank() } ?: defaultName
         val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
-        val date = invoice.createdAt?.take(10)?.let { raw ->
-            runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
+        val date = invoice.createdAt?.let { raw ->
+            Timestamps.localDate(raw)?.format(java.time.format.DateTimeFormatter.ofPattern("MMM d"))
         }
         return if (date != null) {
             String.format(withDateFormat, name, date, amount, payLine)
@@ -292,8 +293,8 @@ class InvoicesViewModel : ViewModel() {
     ): String {
         val name = clientName?.takeIf { it.isNotBlank() } ?: defaultName
         val amount = String.format(java.util.Locale.US, "%.2f", invoice.amount)
-        val date = invoice.createdAt?.take(10)?.let { raw ->
-            runCatching { java.time.LocalDate.parse(raw).format(java.time.format.DateTimeFormatter.ofPattern("MMM d")) }.getOrNull()
+        val date = invoice.createdAt?.let { raw ->
+            Timestamps.localDate(raw)?.format(java.time.format.DateTimeFormatter.ofPattern("MMM d"))
         }
         return if (date != null) {
             // Resource order: %1$s=name, %2$s=amount, %3$s=date, %4$s=payLine

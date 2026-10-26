@@ -91,7 +91,7 @@ fun JobsScreen(viewModel: JobsViewModel = viewModel()) {
                         JobFilter.SCHEDULED -> it.status == Job.STATUS_SCHEDULED || it.status == Job.STATUS_IN_PROGRESS
                         JobFilter.DONE -> it.status == Job.STATUS_DONE
                     }
-                }.sortedWith(compareBy<JobWithClient> { it.scheduledDate }.thenBy { it.scheduledTime ?: "" })
+                }.sortedWith(JobWithClient.SCHEDULE_ORDER)
 
                 when {
                     state.isLoading && state.jobs.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }

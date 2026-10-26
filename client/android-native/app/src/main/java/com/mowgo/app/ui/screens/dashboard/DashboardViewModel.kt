@@ -19,6 +19,9 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/** Plans that include crew management — same gate as web (TEAM_ACCESS_TIERS) and invite-crew. */
+private val TEAM_TIERS = setOf("crew", "premium")
+
 sealed interface DashboardUiState {
     data object Loading : DashboardUiState
     data class Error(val message: String) : DashboardUiState
@@ -39,6 +42,8 @@ sealed interface DashboardUiState {
         val activeClients: Int,
         val recurringClients: Int,
         val isOwner: Boolean,
+        /** Owner on a Crew/Premium plan (a trial sets tier server-side). invite-crew enforces this too. */
+        val hasTeamAccess: Boolean,
         val teamProgress: List<TeamProgressRow>,
         val isRefreshing: Boolean = false,
         val isInviting: Boolean = false,
@@ -202,7 +207,7 @@ class DashboardViewModel : ViewModel() {
                 val clients = jobRepository.loadClients()
                 val invoices = invoiceRepository.loadInvoices()
                 val profile = profileRepository.loadProfile()
-                val teamMembers = teamRepository.loadTeamMembers()
+                val teamMembers = if (hasTeamAccess(profile)) teamRepository.loadTeamMembers() else emptyList()
                 if (generation == loadGeneration) {
                     _uiState.value = buildLoadedState(jobs, clients, invoices, profile, teamMembers)
                 }
@@ -230,6 +235,7 @@ class DashboardViewModel : ViewModel() {
         teamMembers: List<UserProfile>,
         actionMessage: String? = null,
     ): DashboardUiState.Loaded {
+        val teamAccess = hasTeamAccess(profile)
         val todayDate = LocalDate.now()
         val today = todayDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
         val weekStart = localDate(-6)
@@ -271,7 +277,7 @@ class DashboardViewModel : ViewModel() {
             todayJobs = todayJobs,
             todayDoneCount = todayDone.size,
             todayRevenue = todayDone.sumOf { it.clientRate },
-            outstanding = invoices.filter { it.status == Invoice.STATUS_UNPAID }.sumOf { it.amount },
+            outstanding = invoices.filter { it.isOwed }.sumOf { it.amount },
             weeklyJobs = weeklyJobs,
             weeklyDoneCount = weeklyDone.size,
             weeklyRevenue = weeklyDone.sumOf { it.clientRate },
@@ -289,10 +295,14 @@ class DashboardViewModel : ViewModel() {
                 .distinct()
                 .size,
             isOwner = profile?.role == "owner" || profile == null,
-            teamProgress = rows,
+            hasTeamAccess = teamAccess,
+            teamProgress = if (teamAccess) rows else emptyList(),
             actionMessage = actionMessage,
         )
     }
+
+    private fun hasTeamAccess(profile: Profile?): Boolean =
+        profile?.role == "owner" && profile.tier in TEAM_TIERS
 
     private fun localDate(offsetDays: Long): String = LocalDate.now()
         .plusDays(offsetDays)
